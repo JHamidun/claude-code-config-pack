@@ -1,0 +1,172 @@
+{
+  "$schema": "image_prompts_reference_v1",
+  "source": "promptgather.io",
+  "last_updated": "—",
+  "models": {
+    "nano_banana_pro": {
+      "name": "Nano Banana Pro (Gemini 3 Pro Image)",
+      "description": "Google DeepMind's advanced AI image generation model built on Gemini 3 Pro architecture",
+      "capabilities": ["4K resolution", "accurate text rendering", "multilingual text", "studio-level control"],
+      "access": "Google AI Studio or Gemini app"
+    },
+    "midjourney": {
+      "name": "Midjourney",
+      "description": "Premium image generation with artistic styles",
+      "version_tags": ["--v 6.0", "--v 5.2", "--style raw"]
+    },
+    "dalle3": {
+      "name": "DALL-E 3",
+      "description": "OpenAI's image generation model"
+    },
+    "stable_diffusion": {
+      "name": "Stable Diffusion XL",
+      "description": "Open source image generation",
+      "models": ["JuggernautXL v9", "SDXL Base", "RealVisXL"]
+    }
+  },
+  "categories": {
+    "fashion_portrait": {
+      "description": "High-end fashion and model photography",
+      "tags": ["High Fashion", "Fashion Model", "Editorial Style", "Portrait"]
+    },
+    "character_integration": {
+      "description": "Mixing real people with fictional characters",
+      "tags": ["CGI Characters", "Anime Integration", "3D Characters", "Crossover"]
+    },
+    "product_photography": {
+      "description": "Commercial product shots and automotive",
+      "tags": ["Product", "Automotive", "Studio", "Commercial"]
+    },
+    "cinematic": {
+      "description": "Film-like compositions and lighting",
+      "tags": ["Cinematic", "Dramatic Lighting", "Movie Still"]
+    },
+    "surreal_art": {
+      "description": "Dreamlike and impossible imagery",
+      "tags": ["Surreal", "Fantasy", "Dreamlike", "Abstract"]
+    }
+  },
+  "prompts": [
+    {
+      "id": "winnie_fashion",
+      "title": "Charming Colors and Characters Unite in Style!",
+      "category": "character_integration",
+      "style_tags": ["High Fashion", "Fashion Model", "Centered", "Soft Light"],
+      "prompt_structure": {
+        "quality": "hyper-realistic, high-detail, professional fashion photoshoot",
+        "face": {
+          "preserve_original": true,
+          "reference_match": true,
+          "description": "Use the exact same face from the uploaded photo without altering any facial features or identity."
+        },
+        "subject": {
+          "description": "A stylish young woman with the same face as the reference photo.",
+          "clothing": {
+            "top": {"type": "knitted sweater", "color": "soft Winnie-the-Pooh yellow"},
+            "pants": {"type": "high-waisted jeans", "color": "warm honey beige"},
+            "shoes": {"type": "high-top sneakers", "color": "white with subtle yellow accents"}
+          },
+          "pose": "standing with one arm resting casually on a giant 3D-rendered Winnie the Pooh character",
+          "expression": "natural, confident, casual fashion look"
+        },
+        "character_element": {
+          "name": "Winnie the Pooh",
+          "type": "giant 3D photorealistic render",
+          "style": "clean, glossy, cartoon-accurate but ultra-detailed",
+          "interaction": "the woman's arm rests on the character as if posing together"
+        },
+        "environment": {
+          "background": "seamless solid vibrant honey-yellow backdrop",
+          "setting": "professional photo studio",
+          "lighting": "soft evenly diffused studio lighting with clean highlights and minimal shadows"
+        }
+      },
+      "techniques": ["face preservation", "character integration", "color coordination", "studio setup"]
+    },
+    {
+      "id": "zootopia_selfie",
+      "title": "Cinematic Smiles with My Cop Bunny!",
+      "category": "character_integration",
+      "style_tags": ["Cinematic", "Human Portrait", "Centered"],
+      "prompt_structure": {
+        "characters": [
+          {"name": "Subject", "description": "beautiful young Korean woman, smiling, long black hair, wearing a white strapless top with black stars, silver necklace"},
+          {"name": "Judy Hopps", "description": "Disney character from Zootopia, wearing police uniform, smiling"}
+        ],
+        "scene": {
+          "location": "slightly dark, crowded movie theater/cinema hall",
+          "background": "large movie screen showing a scene with multiple male characters in action poses",
+          "lighting": "cinematic lighting"
+        },
+        "interaction": "taking a selfie together, standing side-by-side",
+        "style": "photorealistic, ultra-detailed, 8K"
+      },
+      "techniques": ["selfie composition", "Disney character integration", "cinema environment"]
+    },
+    {
+      "id": "biker_portrait",
+      "title": "Rebellious Elegance: The Androgynous Biker Vibe",
+      "category": "cinematic",
+      "style_tags": ["Cinematic", "Human Portrait", "Street Style"],
+      "prompt_structure": {
+        "subject": "Full-length portrait of a young androgynous biker woman with curvy build, somber/rebellious expression, face unaltered",
+        "attire": "Dark sleeveless top, loose wide-legged denim pants, patterned white sneakers, minimal jewelry in edgy street style",
+        "pose": "Sitting confidently on motorcycle leaning forward, hands clasped together",
+        "vehicle": "Black cruiser motorcycle",
+        "environment": "Urban cafe visible through glass window with subtle typography and slightly blurred cityscape",
+        "lighting": "Soft natural light, high-contrast shadows, somber greenish-grey tones, dramatic rebellious atmosphere",
+        "style": "35mm film photography with rough grainy textures, shallow depth of field, cinematic composition",
+        "technical": "1:1 aspect ratio, 1200x1200px resolution"
+      },
+      "techniques": ["film grain", "shallow DOF", "environmental storytelling", "edgy fashion"]
+    },
+    {
+      "id": "robot_partner",
+      "title": "Snap a Selfie with Your Robotic Companion!",
+      "category": "character_integration",
+      "style_tags": ["Sci-Fi", "Portrait", "Hyper Realistic"],
+      "prompt": "hyperrealistic ultra-detailed 8k photo of YOU (Upload Your Photo) standing in a bright cozy living room, same location as the reference: cream-colored sofa, large white curtains with soft daylight shining through, warm neutral walls, several green houseplants, minimal decor, natural sunlight and soft shadows. Use the uploaded photo as the main subject of the image, preserving the face, hairstyle, body type, clothing, and overall style exactly as in the uploaded photo. The subject is standing in front of the sofa, body slightly angled to the side, legs close together, one hip slightly popped, holding a smartphone in one hand at chest height, screen facing them, as if taking a mirror selfie, with a relaxed confident expression and slight smile, eyes toward the phone. Behind them, their partner is standing very close, a tall, attractive humanoid robot with a highly muscular, athletic build, entirely robotic with no human skin, detailed mechanical anatomy inspired by a futuristic cyborg: layered silver and gunmetal plates, visible bundles of flexible cables as muscles, complex joints, smooth armor around shoulders, chest, arms, and legs, elegant angular robotic face with a strong jawline, glowing blue eyes, subtle wear and micro-scratches on metal for realism. The robot's torso is broad and V-shaped, narrow waist, perfect proportions, clearly fit and powerful but aesthetically beautiful. The robot stands just behind the subject with one sleek metallic arm wrapped gently and protectively around the front of their neck and shoulders, hand resting softly near the collarbone in an affectionate pose, the other arm relaxed at its side. Their bodies are close, giving a sense of intimacy and comfort. Extremely realistic skin texture on the subject, natural hair strands, detailed fabric texture and wrinkles on their clothing, realistic reflections and specular highlights on the robot's metal surfaces, accurate global illumination and depth of field, sharp focus on both characters, slight background blur. Photoreal, cinematic lighting, no fantasy effects, looks like a real candid photo taken on a phone in this apartment.",
+      "negative_prompt": "cartoon, anime, illustration, painting, 3d render, CGI, low resolution, blurry, grainy, oversaturated, unrealistic proportions, extra limbs, deformed hands, distorted face, visible mirror edges, text, watermark, logo, armor covering the subject, human skin on the robot, grotesque, horror, gore",
+      "techniques": ["face preservation", "robot design", "intimate pose", "realistic materials", "home environment"]
+    }
+  ],
+  "prompt_templates": {
+    "fashion_portrait": {
+      "template": "[Quality level] photo of [subject description], wearing [detailed clothing], [pose description], [background/environment], [lighting style], [camera settings]",
+      "example": "hyper-realistic fashion photo of a confident young woman, wearing oversized blazer and minimal jewelry, standing with hands in pockets, seamless white studio background, soft diffused lighting, shot on medium format camera"
+    },
+    "character_integration": {
+      "template": "[Quality] image of [real person description] with [fictional character], [interaction/pose], [environment], [lighting], [style modifiers]",
+      "example": "photorealistic 8K image of a smiling person taking a selfie with Pikachu, both making peace signs, Tokyo street at night, neon lighting, cinematic composition"
+    },
+    "product_shot": {
+      "template": "[Product description] on [surface/background], [lighting setup], [camera angle], [quality keywords]",
+      "example": "sleek black smartphone on polished marble surface, dramatic side lighting with soft fill, 45-degree angle, product photography, 8K ultra-detailed"
+    }
+  },
+  "style_modifiers": {
+    "photography_styles": [
+      "editorial style", "fashion photography", "street photography",
+      "portrait photography", "product photography", "automotive photography"
+    ],
+    "film_looks": [
+      "35mm film", "Kodak Portra 400", "Fuji Superia", "vintage film grain",
+      "cinematic color grading", "desaturated", "high contrast B&W"
+    ],
+    "lighting_setups": [
+      "studio lighting", "natural light", "golden hour", "soft diffused",
+      "dramatic shadows", "rim lighting", "neon glow", "volumetric light"
+    ],
+    "quality_boosters": [
+      "8K", "ultra-detailed", "hyper-realistic", "photorealistic",
+      "sharp focus", "high resolution", "professional quality"
+    ]
+  },
+  "negative_prompt_library": {
+    "general": ["blur", "low quality", "low resolution", "grainy", "pixelated"],
+    "anatomy": ["extra limbs", "deformed hands", "extra fingers", "distorted face", "ugly"],
+    "style_conflicts": ["cartoon", "anime", "illustration", "painting", "sketch", "3d render"],
+    "artifacts": ["watermark", "text", "logo", "frame", "border", "signature"],
+    "lighting_issues": ["overexposed", "underexposed", "harsh shadows", "flat lighting"]
+  }
+}

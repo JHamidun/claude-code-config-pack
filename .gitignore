@@ -1,0 +1,8 @@
+.credentials.master.env
+*.pyc
+__pycache__/
+node_modules/
+.DS_Store
+*.session
+MEMORY.md
+chats.db*
