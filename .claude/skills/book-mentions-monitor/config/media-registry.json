@@ -1,0 +1,26 @@
+{
+  "_comment": "Справочник доменов → уровень/категория/город. Аналог базы СМИ Медиалогии. Расширяемый под свой рынок. Если домена нет — enrich ставит дефолт (Федеральный/Интернет-СМИ). Список ниже — нейтральные примеры популярных РУ-СМИ.",
+  "domains": {
+    "kp.ru":            {"level": "Федеральный", "category": "Интернет-СМИ", "city": "Москва", "name": "Комсомольская правда"},
+    "rg.ru":            {"level": "Федеральный", "category": "Интернет-СМИ", "city": "Москва", "name": "Российская газета"},
+    "mel.fm":           {"level": "Федеральный", "category": "Интернет-СМИ", "city": "Москва", "name": "Мел"},
+    "lifehacker.ru":    {"level": "Федеральный", "category": "Интернет-СМИ", "city": "Москва", "name": "Лайфхакер"},
+    "vokrugsveta.ru":   {"level": "Федеральный", "category": "Журнал", "city": "Москва", "name": "Вокруг света"},
+    "m24.ru":           {"level": "Региональный", "category": "Интернет-СМИ", "city": "Москва", "name": "Москва 24"},
+    "snob.ru":          {"level": "Федеральный", "category": "Интернет-СМИ", "city": "Москва", "name": "Сноб"},
+    "godliteratury.ru": {"level": "Федеральный", "category": "Интернет-СМИ", "city": "Москва", "name": "Год Литературы"}
+  },
+  "aggregators": ["bezformata", "gorodzovet", "rambler", "mail.ru", "yandex", "msn.", "kudago", "afisha", "news.ru"],
+  "shops": ["ozon.", "wildberries", "litres", "labirint", "book24", "chitai-gorod", "megamarket", "biblio-globus", "market.yandex", "oz.by", "bookmate"],
+  "social_domains": {
+    "t.me": "Telegram", "telegram": "Telegram", "vk.com": "VK", "dzen.ru": "Дзен",
+    "ok.ru": "Одноклассники", "youtube.com": "YouTube", "youtu.be": "YouTube",
+    "instagram.com": "Instagram", "tiktok.com": "TikTok", "rutube.ru": "Rutube",
+    "livelib.ru": "LiveLib", "reddit.com": "Reddit"
+  },
+  "reach_estimate": {
+    "_comment": "Грубая оценка аудитории по домену (если Tranco/CF недоступны). В проде — Tranco-ранг → бакет (см. lib/reach.py).",
+    "kp.ru": 2900000, "rg.ru": 1600000, "mail.ru": 3400000, "rambler": 1100000,
+    "vokrugsveta.ru": 900000, "mel.fm": 700000, "lifehacker.ru": 2600000, "m24.ru": 1100000
+  }
+}
