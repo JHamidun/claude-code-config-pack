@@ -1,0 +1,62 @@
+Editorial sticker mascot illustration, square 1:1, plain white background.
+
+CHARACTER: <one-paragraph description of your character — what they ARE,
+overall shape, defining visual features. Example for an egg mascot:>
+ANTHROPOMORPHIC SUNNY-SIDE-UP FRIED EGG named "<name>" — gently tilted to a
+3/4 view, head subtly cocked to the right, suggesting a curious thinking pose.
+The body is a CLASSIC FRIED EGG — irregular wavy white-of-the-egg shape with
+golden-brown crisp curly edges. Two PERFECT ORANGE-GOLD YOLKS sit as huge
+expressive EYES — each yolk has a clear BLACK PUPIL. CRITICAL: both pupils
+PERFECTLY CENTERED and aligned looking straight at the viewer at the SAME
+focus point — no cross-eye, no asymmetric gaze, no drift.
+
+FLOATING DETAILS (around the head):
+<accent elements that float around the character — emphasises mood. Example:>
+4-5 tiny cyan-colored markdown / code symbols like { }, >, <, # gently
+arranged around the upper head — light, airy, like thought-bubbles in code form.
+
+ACCESSORIES — all clearly visible:
+1. <accessory 1 with full description, including symmetry requirements>
+2. <accessory 2>
+3. <accessory 3>
+
+OUTFIT:
+<full description of clothes, including any branded badge/logo with exact
+colours, position, size, dimensions. Be specific — "tiny dark-blue rounded
+square badge with white sans-serif letter and cyan glow at bottom-left".>
+
+BASE / PLATFORM:
+<what the character stands ON — gives composition stability and brand identity.
+Example: black cast-iron frying pan with brown wooden handle to the right.
+Pan is the visible base — not a shadow.>
+
+PROPS:
+- LEFT HAND: <prop 1 description with all details — text on scroll, colour,
+  syntax-highlight, etc.>
+- RIGHT HAND: <prop 2 description — what kind of tool, handle, head shape,
+  position. Be specific or it becomes a generic stick.>
+
+COMPANION (optional):
+<small secondary character, ~1/5 size, peeking out somewhere. Mirrors emotion
+of main mascot. Example: tiny BABY FRIED EGG with TWO yolk eyes, own laurel
+wreath, no glasses, no AirPods. Clearly an egg, not poultry.>
+
+BRAND PALETTE:
+- <color 1> #HEXHEX — used for X
+- <color 2> #HEXHEX — used for Y
+- <color 3> #HEXHEX — used for Z
+- Background: <usually plain white for alpha cut later>
+
+STYLE: clean editorial illustration, <reference quality e.g. New Yorker /
+Atlantic mascot quality>. Painterly soft strokes, slight paper grain. NOT
+cartoon, NOT 3D render, NOT pixel art, NOT anime, NOT chibi-overall (only the
+companion may be chibi).
+
+MOOD: <one-line emotional / tonal description. Example: gently ironic +
+intellectually curious + nerdy. A quirky philosopher fried egg, mid-thought,
+apprentice peeking out.>
+
+COMPOSITION: centered, main character fills 55-65% of frame. <Anchor
+elements>. Plain white background (alpha will be cut later). Must read clearly
+at 32×32 AND look beautiful at 512×512. Original signature design — NOT a
+copy of a known meme, NOT generic anime mascot, NOT robot.

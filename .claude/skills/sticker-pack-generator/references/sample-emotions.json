@@ -1,0 +1,27 @@
+[
+  {
+    "name": "01-fire",
+    "emoji": "🔥",
+    "change": "EMOTION: Fired up / excitement. Mascot is FIRED UP — small flames flicker around the edges, eyes WIDE OPEN with tiny FIRE FLAMES inside the pupils, eyebrows raised in excitement, mouth open in 'whoa!' expression. A few embers floating around."
+  },
+  {
+    "name": "02-love",
+    "emoji": "❤️",
+    "change": "EMOTION: Love / adoration. Eyes turn into PINK HEARTS instead of pupils, soft pink blush on cheeks, gentle smile. Tiny pink HEART PARTICLES floating around the head replacing code-symbols."
+  },
+  {
+    "name": "03-thinking",
+    "emoji": "🤔",
+    "change": "EMOTION: Thinking deeply. Mascot has one arm raised, finger touching the chin/edge, eyes slightly squinted in concentration, eyebrows pulled together. Question mark '?' floating among the particles. EXACTLY 2 arms, no third hand."
+  },
+  {
+    "name": "04-mind-blown",
+    "emoji": "🤯",
+    "change": "EMOTION: Mind blown. Top of the head / upper egg-white EXPLODING outward with cartoon explosion (yellow/orange burst, lightning bolts), eyes WIDE shocked with white pupils, mouth open in shock. Particles scatter outward."
+  },
+  {
+    "name": "05-loading",
+    "emoji": "😴",
+    "change": "EMOTION: Sleeping / loading. Eyes CLOSED with simple curved lines (sleep-eyes), small floating Z's above the head replacing other particles, very relaxed expression, slight smile. A tiny clock or hourglass particle suggesting wait."
+  }
+]

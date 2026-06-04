@@ -1,0 +1,228 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/schemas/mcp.json",
+  "servers": {
+    "perplexity": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "-m",
+        "perplexity.mcp"
+      ],
+      "env": {
+        "PERPLEXITY_COOKIES": "${PERPLEXITY_COOKIES}"
+      },
+      "description": "Perplexity Max — web search + reasoning (Claude Opus 4.7 Thinking default)",
+      "disabled": true
+    },
+    "claude-design": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "${HOME}\\.claude\\skills\\claude-design\\scripts\\claude_design_mcp.py"
+      ],
+      "env": {
+        "CLAUDE_DESIGN_COOKIES": "${CLAUDE_DESIGN_COOKIES}",
+        "CLAUDE_DESIGN_ORG_UUID": "${CLAUDE_DESIGN_ORG_UUID}"
+      },
+      "description": "Claude Design (claude.ai/design) — Connect-RPC client. List/get/create/update/delete projects, download ZIP, mint handoff token. Chat = Phase 2.",
+      "disabled": true
+    },
+    "affine": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "affine-mcp-server"
+      ],
+      "env": {
+        "AFFINE_BASE_URL": "${AFFINE_BASE_URL}",
+        "AFFINE_EMAIL": "${AFFINE_EMAIL}",
+        "AFFINE_PASSWORD": "${AFFINE_PASSWORD}",
+        "AFFINE_LOGIN_AT_START": "sync"
+      },
+      "description": "AFFiNE workspace — YourCompanyGPT documentation",
+      "disabled": true
+    },
+    "memory": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "description": "Persistent Knowledge Graph memory between sessions"
+    },
+    "sequentialthinking": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "description": "Step-by-step reasoning for complex problems"
+    },
+    "everything": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-everything"
+      ],
+      "description": "MCP test/debug server (everything reference impl)"
+    },
+    "dalle": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "dalle-mcp"
+      ],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      },
+      "description": "DALL-E image generation via OpenAI",
+      "disabled": true
+    },
+    "n8n": {
+      "type": "sse",
+      "url": "https://your-name.app.n8n.cloud/mcp-server/http",
+      "headers": {
+        "Authorization": "Bearer ${N8N_MCP_JWT}"
+      },
+      "description": "N8N workflow automation - 400+ integrations",
+      "disabled": true
+    },
+    "brave-search": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-brave-search"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+      },
+      "description": "Brave web search API for real-time info"
+    },
+    "puppeteer": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ],
+      "description": "Browser automation - screenshots, navigation, interaction"
+    },
+    "sqlite": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sqlite",
+        "${HOME}\\.claude\\bot_data.db"
+      ],
+      "description": "SQLite database access for Your Bot"
+    },
+    "fetch": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-fetch"
+      ],
+      "description": "Fetch web content and convert to markdown"
+    },
+    "time": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-time"
+      ],
+      "description": "Time-based automation - scheduling and reminders"
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ],
+      "description": "Playwright browser automation"
+    },
+    "microsoft-office": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@jenstangen1/pptx-xlsx-mcp"
+      ],
+      "description": "Microsoft Office - PowerPoint, Excel, Word automation"
+    },
+    "postgres": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres"
+      ],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "${DATABASE_URL_EXTERNAL}"
+      },
+      "description": "PostgreSQL database access (your-server server - your_database)"
+    },
+    "redis": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-redis"
+      ],
+      "env": {
+        "REDIS_URL": "${REDIS_URL_EXTERNAL}"
+      },
+      "description": "Redis cache and pub/sub (your-server server)"
+    },
+    "figma-mcp": {
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp",
+      "description": "Official Figma MCP Server (read designs, generate designs, Code Connect, variables, screenshots). Complements figma plugin (skills) and figma_api.py (REST API)."
+    },
+    "elevenlabs": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "elevenlabs-mcp-enhanced"
+      ],
+      "env": {
+        "ELEVENLABS_API_KEY": "${ELEVENLABS_API_KEY}"
+      },
+      "description": "ElevenLabs text-to-speech, voice cloning"
+    },
+    "replicate": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "replicate-mcp"
+      ],
+      "env": {
+        "REPLICATE_API_KEY": "${REPLICATE_API_KEY}"
+      },
+      "description": "Replicate - 1000+ AI models (FLUX, SD, Whisper, LLaMA, etc)"
+    },
+    "apify": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@apify/actors-mcp-server"
+      ],
+      "env": {
+        "APIFY_TOKEN": "${APIFY_API_TOKEN}"
+      },
+      "description": "Apify web scraping - 1600+ Actors for social media, e-commerce, search engines"
+    }
+  }
+}

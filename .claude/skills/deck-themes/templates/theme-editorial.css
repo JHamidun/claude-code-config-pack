@@ -1,0 +1,38 @@
+/* theme-editorial.css */
+:root {
+  --bg: #f3eee5;
+  --fg: #1c1a16;
+  --muted: #6f6a60;
+  --rule: rgba(0,0,0,.12);
+  --accent: oklch(38% 0.12 25);
+
+  --font-display: "Spectral", "Source Serif Pro", Georgia, serif;
+  --font-body:    "Spectral", Georgia, serif;
+  --font-mono:    ui-monospace, monospace;
+}
+@import url("https://fonts.googleapis.com/css2?family=Spectral:wght@300;400;600;700&display=swap");
+
+deck-stage section {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body);
+  padding: 100px 120px; box-sizing: border-box;
+}
+deck-stage section.dark { background: #1c1a16; color: #f3eee5; }
+deck-stage h1 { font-family: var(--font-display); font-size: 130px; line-height: 1; font-weight: 700; letter-spacing: -0.025em; margin: 0; }
+deck-stage h2 { font-family: var(--font-display); font-size: 80px;  line-height: 1.05; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+deck-stage h3 { font-family: var(--font-display); font-size: 44px;  line-height: 1.1;  font-weight: 600; margin: 0; }
+deck-stage p, deck-stage li {
+  font-size: 30px; line-height: 1.45; max-width: 32ch; font-weight: 300;
+}
+.eyebrow {
+  font-family: var(--font-mono); font-size: 15px;
+  text-transform: uppercase; letter-spacing: 0.18em; color: var(--muted);
+}
+.statement   { display: grid; place-content: center; text-align: center; }
+.two-col     { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-content: center; height: 100%; }
+.title-stack { display: grid; align-content: end; gap: 28px; height: 100%; }
+.placeholder {
+  background: #d8cfbf; color: #6f6a60;
+  font-family: var(--font-mono); font-size: 14px;
+  display: grid; place-items: center; border-radius: 0;
+}

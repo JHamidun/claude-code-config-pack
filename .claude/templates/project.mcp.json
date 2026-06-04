@@ -1,0 +1,33 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/schemas/mcp.schema.json",
+  "_comment": "Скопируй в корень проекта как .mcp.json и настрой под проект",
+
+  "mcpServers": {
+    "project-postgres": {
+      "_comment": "PostgreSQL для этого проекта",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/dbname"
+      }
+    },
+
+    "project-mongo": {
+      "_comment": "MongoDB для этого проекта (удали если не нужно)",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-mongodb"],
+      "env": {
+        "MONGODB_URI": "mongodb://localhost:27017/dbname"
+      }
+    },
+
+    "project-redis": {
+      "_comment": "Redis для кэширования (удали если не нужно)",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-redis"],
+      "env": {
+        "REDIS_URL": "redis://localhost:6379"
+      }
+    }
+  }
+}

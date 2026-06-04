@@ -1,0 +1,197 @@
+{
+  "$schema": "video_prompts_reference_v1",
+  "source": "promptgather.io",
+  "last_updated": "—",
+  "categories": {
+    "cinematic": {
+      "description": "Film-quality shots with professional cinematography",
+      "tags": ["Cinematic", "Film Noir", "Drama", "8K", "Professional"]
+    },
+    "hyper_realistic": {
+      "description": "Ultra-realistic renders that look like real footage",
+      "tags": ["Hyper Realistic", "Photorealistic", "Ultra Detailed", "8K"]
+    },
+    "surreal": {
+      "description": "Dreamlike, magical, impossible scenarios",
+      "tags": ["Surreal Realism", "Magical Realism", "Fantasy", "Abstract"]
+    },
+    "macro": {
+      "description": "Close-up detailed shots of small subjects",
+      "tags": ["Macro Close Up", "Detailed", "Nature", "Micro"]
+    },
+    "sci_fi": {
+      "description": "Futuristic, alien, technological themes",
+      "tags": ["Sci-Fi", "Cyberpunk", "Alien", "Futuristic", "Tech"]
+    },
+    "action": {
+      "description": "High-energy movement, chases, sports",
+      "tags": ["Action", "Fast-Paced", "Dynamic", "FPV", "Racing"]
+    },
+    "comedy": {
+      "description": "Humorous, playful, fun scenarios",
+      "tags": ["Comedy", "Humor", "Playful", "Cartoon Characters"]
+    },
+    "horror": {
+      "description": "Dark, scary, suspenseful content",
+      "tags": ["Horror", "Dark", "Suspense", "Thriller"]
+    }
+  },
+  "prompts": [
+    {
+      "id": "lantern_seed",
+      "title": "The Enigmatic Dance of the Lantern Seed",
+      "category": "macro",
+      "style_tags": ["Cinematic", "Abstract Void", "Macro Close Up"],
+      "duration": "8s",
+      "aspect_ratio": "16:9",
+      "motion_strength": 0.55,
+      "prompt": "Cinematic 8K macro video of a sacred living artifact: the Lantern Seed. A levitating teardrop of breathing stained-glass petals, iridescent liquid-crystal panels flexing organically with flowing Art Nouveau motifs that ripple like ink in water. Inside, a tiny warm micro-sun pulses slowly in solarpunk emerald and heliotrope gold. Delicate crystalline light-tendrils unfurl downward like photonic roots made of bending light, curling gently in zero gravity. Materials paradox: living glass, soft metallic bloom, bioluminescent enamel. Gentle sacred atmosphere, intelligent and otherworldly. Self-illuminated with prismatic halo and spectral bloom. Slow 360° orbital macro shot, 100mm lens, razor focus on inner sun and tendrils, hovering above matte white stone in minimalist black void. Hyper-detailed solarpunk biotech, art nouveau iridescence, fractal sacred geometry, gentle breathing and growth motion throughout",
+      "negative_prompt": "text, watermark, people, blur, motion blur, plastic, ugly, deformed, horror, dark, grainy",
+      "techniques": ["macro cinematography", "360 orbital", "bioluminescence", "sacred geometry", "Art Nouveau"]
+    },
+    {
+      "id": "shadows_smoke",
+      "title": "Shadows in Smoke: The Dance of Light and Illusion",
+      "category": "surreal",
+      "style_tags": ["Magical Realism", "Void Black"],
+      "prompt": "An elaborate shadow theater of ink-black silhouettes and flickering illusions melts away under intense heat. Candlelight pierces the dissolving forms. As the performance fades, the word SHADOW manifests in the lingering smoke — letters outlined in elusive darkness, ringed by empty silhouettes, with phantom shapes circling in muted elegance",
+      "techniques": ["shadow play", "smoke effects", "typography in motion", "high contrast"]
+    },
+    {
+      "id": "penguin_dj",
+      "title": "Rave on Ice: The Penguin DJ's Epic Slip and Spin",
+      "category": "comedy",
+      "style_tags": ["Surreal Realism"],
+      "prompt": "A chubby penguin DJ performs at a neon-lit ice rave, scratching records with its flipper. Seals and puffins dance off-beat in front of the DJ booth. The penguin attempts an epic music drop but slips on the ice, spinning into a perfect 360 spin that makes the crowd go wild. Flashing lights, silly dancing, and adorable chaos fill the scene with humor and energy.",
+      "techniques": ["anthropomorphic characters", "neon lighting", "physical comedy", "crowd reactions"]
+    },
+    {
+      "id": "scorpion_car",
+      "title": "Hyper-Realistic Scorpion Car Chase",
+      "category": "action",
+      "style_tags": ["Hyper Realistic"],
+      "prompt": "An intense, hyper-realistic cinematic shot. A sleek, futuristic sports car, shaped like a stylized scorpion, races down a winding mountain road. The car's chassis is a deep, metallic crimson, and its tail arches up and over the cockpit, a menacing stinger at the very end. The car's headlights and the vents on its sides glow with a brilliant, red-orange light. It speeds around a curve, its tires kicking up a fine spray of dust and gravel. The setting is a dramatic, desolate mountain pass at sunrise or sunset, with the sky filled with fiery clouds. The camera is positioned low, at road level, tracking the car as it speeds past. The focus is on the car's aggressive design and the stunning mountain scenery.",
+      "techniques": ["low angle tracking shot", "dynamic lighting", "particle effects", "dramatic environment"]
+    },
+    {
+      "id": "sonic_mario_selfie",
+      "title": "Ultra-Realistic Selfie with Sonic and Mario",
+      "category": "comedy",
+      "style_tags": ["Ultra Realistic CGI"],
+      "prompt": "Selfie ultra-realista en formato vertical 9:16 con lente ojo de pez de mí junto a (Sonic y Mario). Ambientado en una sala de estar pequeña y luminosa con tonos blancos. Ángulo de cámara alto. Distorsión extrema de ojo de pez. Iluminación realista y cinematográfica. Personajes de anime integrados con realismo estilizado.",
+      "techniques": ["fisheye distortion", "character integration", "selfie POV", "vertical format 9:16"]
+    },
+    {
+      "id": "cyborg_alien",
+      "title": "Cyborg Dreams: A Journey Through an Alien Landscape",
+      "category": "sci_fi",
+      "style_tags": ["Sci-Fi", "Cinematic"],
+      "prompt": "wide-angle low-angle shot, slow forward tracking, a lone cyborg standing on the rocky surface of an alien planet with bioluminescent flora and floating mineral shards, distant twin moons illuminating the horizon as dust trails swirl around the cyborg's metallic limbs, subtle atmospheric movement with energy pulses across the terrain, deep ambient alien soundscape with soft synthetic hums, cool-toned rim lighting with glowing highlights on metal surfaces, high-detail sci-fi cinematic style with no subtitles",
+      "techniques": ["wide-angle", "slow tracking", "bioluminescence", "rim lighting", "ambient soundscape"]
+    },
+    {
+      "id": "dew_rainforest",
+      "title": "Cinematic Transformation: From Dew to Rainforest",
+      "category": "macro",
+      "style_tags": ["Cinematic", "Nature Outdoor", "Slow Motion"],
+      "prompt": "Generate a hyper-realistic cinematic short clip that begins as a macro shot of morning dew on a leaf, with tiny water droplets reflecting sunlight in slow motion. As the camera pulls back, the view transforms into a vast lush rainforest with shafts of golden light cutting through fog. Include ultra-detailed textures, soft bokeh, floating pollen, light rays, and natural ambient particles. Make the transition seamless and breathtaking.",
+      "techniques": ["macro to wide transition", "slow motion", "bokeh", "volumetric lighting", "seamless zoom out"]
+    },
+    {
+      "id": "horror_moonlight",
+      "title": "Shadows in the Moonlight: A Silent Horror Encounter",
+      "category": "horror",
+      "style_tags": ["Horror", "80s Style"],
+      "prompt": "Cinematic 80s horror style. A woman walks through her dark kitchen with only moonlight filling the room. Over-the-shoulder shot showing a French glass door behind her. A large humanoid figure slowly steps up behind the curtain, only his shadow visible. She never sees him. Final moment: the curtain shifts slightly, revealing his hand reaching upward.",
+      "techniques": ["80s horror aesthetic", "moonlight only", "over-shoulder shot", "shadow reveal", "suspense building"]
+    },
+    {
+      "id": "fpv_asmaka",
+      "title": "Cinematic FPV Journey Through the Ancient Asmaka Kingdom",
+      "category": "action",
+      "style_tags": ["FPV", "Historical", "Cinematic"],
+      "prompt": "extremely fast-paced cinematic FPV flying through the ancient Indian Asmaka kingdom, sweeping low-altitude flights over dense forests, fortified settlements, bustling marketplaces, and sacred riverbanks, highly realistic textures, dramatic lighting, vivid colors, and dynamic motion that feels immersive and intensely energetic. move through narrow stone pathways, glide past warriors, merchants, and temples, reveal large-scale landscapes with mountains and rivers, and highlight the kingdom's architecture, culture, and environment in a visually striking and aesthetic style with a strong sense of realism and speed.",
+      "techniques": ["FPV drone style", "fast-paced", "historical recreation", "low altitude", "immersive motion"]
+    },
+    {
+      "id": "taj_mahal_3d",
+      "title": "Ethereal Elegance: A 3D Journey Through the Taj Mahal",
+      "category": "cinematic",
+      "style_tags": ["3D Visualization", "Architecture", "Isometric"],
+      "prompt": "Ultra-detailed isometric 3D architectural visualization of the Taj Mahal, perfect 45-degree top-down angle showing front and both sides equally, photorealistic materials, white marble with subtle golden hour warm lighting, intricate inlaid pieta dura patterns, red sandstone accents, highly detailed onion domes with golden finials, four minarets with perfect chhatris, symmetrical reflecting pool in foreground with tiny scaled people walking, small tourist buses and auto-rickshaws on the paved forecourt, manicured green gardens and cypress trees for scale, clean crisp soft shadows, subtle ambient occlusion, depth of field, 1080x1080 square aspect ratio, perfectly centered composition, pure white background, professional archviz style like Evermotion/ArchiCGI quality, slightly stylized but hyper-realistic, clean sharp edges, video game asset level of detail with extra polish, cinematic yet neutral lighting",
+      "negative_prompt": "blurry, low resolution, distorted perspective, orthographic projection, people too big, cars too big, crowded scene, dark shadows, harsh lighting, yellow tint, oversaturated, cartoon, sketch, drawing, painting, watermark, text, logo, frame, border, ugly hands, deformed architecture, extra domes, wrong symmetry, night scene, fog, rain",
+      "techniques": ["isometric view", "architectural visualization", "golden hour", "ambient occlusion", "depth of field"]
+    },
+    {
+      "id": "film_noir_rain",
+      "title": "Mysterious Shadows in the Rain",
+      "category": "cinematic",
+      "style_tags": ["Film Noir", "Photorealistic"],
+      "prompt": "Static shot with shallow depth of field, a blurry man in a trench coat and fedora walks briskly across the foreground from right to left, revealing a woman in a dark blue vintage coat standing on a wet cobblestone street, holding a black umbrella and slowly turning her head to look back with a concerned expression. Warm amber streetlights reflecting on wet pavement, continuous rain falling. Sound of steady rain, hurried heavy footsteps on wet stone, distant faint jazz trumpet. \"Who is he...\". Film noir aesthetic, high contrast, photorealistic, no subtitles, no on-screen text.",
+      "techniques": ["shallow DOF", "film noir", "wet streets", "ambient audio description", "character reveal"]
+    },
+    {
+      "id": "late_night_office",
+      "title": "Nostalgia and Exhaustion: A Late-Night Office Scene",
+      "category": "cinematic",
+      "style_tags": ["Retro", "1980s", "Drama"],
+      "prompt": "Medium shot, a tired Indonesian BUMN worker, rubbing his temples in exhaustion, in front of a bulky 1980s computer in a cluttered office late at night. The scene is lit by the harsh fluorescent overhead lights and the green glow of the monochrome monitor. Retro aesthetic, shot as if on 1980s color film, slightly grainy.",
+      "techniques": ["period accurate props", "film grain", "fluorescent lighting", "monochrome monitor glow", "emotional performance"]
+    },
+    {
+      "id": "shrek_maui_gym",
+      "title": "Shrek and Maui: Gym Buddies",
+      "category": "comedy",
+      "style_tags": ["Comedy", "CGI Characters"],
+      "prompt": "Shrek and Maui lifting weights at a modern gym. Sweat, mirrors, dumbbells everywhere. Maui spotting Shrek on bench press. Bright daylight gym lighting, comedic realism.",
+      "techniques": ["character crossover", "realistic environment", "comedic framing", "daylight interior"]
+    },
+    {
+      "id": "porsche_kawaii",
+      "title": "Kawaii Races: The Dual Nature of the Porsche 911 GT3 RS",
+      "category": "hyper_realistic",
+      "style_tags": ["Minimalist Aesthetic", "White Studio", "Automotive"],
+      "prompt": "Side profile photography of a white Porsche 911 GT3 RS with hot pink wheels and pink GT3RS side decals, bright white studio infinite background, studio overhead bank lights visible, 8k resolution, photorealistic, automotive photography, sharp focus --ar 9:16 --v 6.0 --style raw",
+      "negative_prompt": "dark, low light, shadows, motion blur, people, dirt, reflection artifacts",
+      "techniques": ["studio lighting", "product photography", "minimalist background", "vertical format"]
+    }
+  ],
+  "prompt_techniques": {
+    "camera_movements": [
+      "static shot", "slow tracking", "orbital shot", "FPV flying", "dolly zoom",
+      "crane shot", "handheld", "steadicam", "push in", "pull back"
+    ],
+    "angles": [
+      "low-angle", "high-angle", "eye-level", "dutch angle", "overhead",
+      "over-shoulder", "POV", "isometric", "bird's eye"
+    ],
+    "lighting_styles": [
+      "golden hour", "blue hour", "moonlight", "neon", "rim lighting",
+      "soft diffused", "dramatic shadows", "high contrast", "bioluminescent"
+    ],
+    "motion_descriptors": [
+      "slow motion", "fast-paced", "seamless transition", "gentle movement",
+      "dynamic motion", "subtle atmospheric movement", "breathing motion"
+    ],
+    "quality_keywords": [
+      "8K", "4K", "hyper-realistic", "photorealistic", "ultra-detailed",
+      "cinematic", "professional", "sharp focus", "high-detail"
+    ],
+    "style_modifiers": [
+      "film noir", "80s aesthetic", "solarpunk", "cyberpunk", "art nouveau",
+      "retro", "minimalist", "surreal", "magical realism"
+    ]
+  },
+  "negative_prompt_library": [
+    "text, watermark, logo",
+    "blur, motion blur, out of focus",
+    "low resolution, grainy, pixelated",
+    "ugly, deformed, disfigured",
+    "cartoon, anime, illustration (when photorealistic needed)",
+    "dark, underexposed (when bright needed)",
+    "overexposed, blown highlights",
+    "extra limbs, extra fingers",
+    "distorted proportions",
+    "artifacts, glitches"
+  ]
+}
