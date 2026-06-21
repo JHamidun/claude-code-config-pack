@@ -1,0 +1,46 @@
+/* theme-data.css */
+:root {
+  --bg: #ffffff;
+  --fg: #0d0d0d;
+  --muted: #666;
+  --rule: rgba(0,0,0,.1);
+  --accent: oklch(58% 0.18 245);
+  --positive: oklch(58% 0.18 145);
+  --negative: oklch(58% 0.18 25);
+
+  --font-display: "Inter", "Helvetica Neue", system-ui, sans-serif;
+  --font-body:    "Inter", "Helvetica Neue", system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+}
+
+deck-stage section {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body);
+  padding: 64px 80px; box-sizing: border-box;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+}
+deck-stage h1 { font-size: 100px; font-weight: 700; line-height: 1; letter-spacing: -0.025em; margin: 0; }
+deck-stage h2 { font-size: 60px;  font-weight: 600; line-height: 1.05; letter-spacing: -0.02em; margin: 0; }
+deck-stage h3 { font-size: 32px;  font-weight: 600; margin: 0; }
+deck-stage p, deck-stage li { font-size: 22px; line-height: 1.5; max-width: 36ch; }
+.metric {
+  font-family: var(--font-mono);
+  font-size: 96px; font-weight: 600; letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.metric .delta.up   { color: var(--positive); }
+.metric .delta.down { color: var(--negative); }
+.eyebrow {
+  font-family: var(--font-mono); font-size: 13px;
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted);
+}
+.placeholder {
+  background: #f4f4f4; color: #999;
+  font-family: var(--font-mono); font-size: 12px;
+  display: grid; place-items: center;
+  border: 1px solid var(--rule);
+}
+table { border-collapse: collapse; width: 100%; font-size: 18px; font-variant-numeric: tabular-nums; }
+table th, table td { text-align: right; padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+table th:first-child, table td:first-child { text-align: left; }
+table th { color: var(--muted); font-weight: 500; text-transform: uppercase; font-size: 12px; letter-spacing: 0.08em; }

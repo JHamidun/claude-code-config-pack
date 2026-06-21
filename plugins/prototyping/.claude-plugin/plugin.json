@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "prototyping",
+  "displayName": "Prototyping",
+  "version": "0.1.0",
+  "description": "Wireframes, interactive prototypes, component playground, sketch/Claude-design to HTML.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "prototype",
+    "wireframe",
+    "ui",
+    "html"
+  ]
+}

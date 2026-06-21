@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "hamidun",
+  "description": "Curated Claude Code plugins by Zhemal Khamidun — design, content, dev workflow, AI media, and more.",
+  "version": "1.0.0",
+  "owner": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "plugins": [
+    {
+      "name": "design-system",
+      "source": "./plugins/design-system",
+      "description": "Design tokens, color scales, type scale, dark mode, themes, brand kit."
+    },
+    {
+      "name": "design-process",
+      "source": "./plugins/design-process",
+      "description": "Design taste, orchestration, critique, comparison, frontend presets, project init."
+    },
+    {
+      "name": "prototyping",
+      "source": "./plugins/prototyping",
+      "description": "Wireframes, interactive prototypes, component playground, sketch/Claude-design to HTML."
+    },
+    {
+      "name": "ui-motion",
+      "source": "./plugins/ui-motion",
+      "description": "Microinteractions, animations, mobile overlays, live tweaks, device frames, accessible forms."
+    },
+    {
+      "name": "design-io",
+      "source": "./plugins/design-io",
+      "description": "Figma import/export, PDF/PNG/PPTX export, dev handoff, verify, perf & a11y audits."
+    },
+    {
+      "name": "web-publish",
+      "source": "./plugins/web-publish",
+      "description": "Websites, HTML email, standalone/canonical HTML, PWA shell, web assets, slides, dataviz, diagrams."
+    },
+    {
+      "name": "presentations",
+      "source": "./plugins/presentations",
+      "description": "Gamma, Manus slides, Marp, native PPTX create/edit/import."
+    },
+    {
+      "name": "office-docs",
+      "source": "./plugins/office-docs",
+      "description": "DOCX, XLSX, PDF, EPUB, CSV analysis, file conversion & organization."
+    },
+    {
+      "name": "video-media",
+      "source": "./plugins/video-media",
+      "description": "Generation (Runway), avatars (HeyGen/D-ID), edit, download, export, subtitles, transcripts."
+    },
+    {
+      "name": "audio-voice",
+      "source": "./plugins/audio-voice",
+      "description": "Music generation (ACE-Step), TTS & voice cloning (ElevenLabs), transcription (Deepgram)."
+    },
+    {
+      "name": "image-gen",
+      "source": "./plugins/image-gen",
+      "description": "Nano Banana, DALL-E, Replicate, enhancement, OCR, stickers, generative art."
+    },
+    {
+      "name": "linkedin-suite",
+      "source": "./plugins/linkedin-suite",
+      "description": "Write, humanize, audit, plan LinkedIn posts; profile optimization; comment & reply drafting."
+    },
+    {
+      "name": "social-intel",
+      "source": "./plugins/social-intel",
+      "description": "Trends, ad spy, TikTok intel, SimilarWeb, Reddit/HN, scraping, GitHub gem hunting."
+    },
+    {
+      "name": "social-posting",
+      "source": "./plugins/social-posting",
+      "description": "Publish to X, Threads, Bluesky, Instagram, TikTok; multi-platform post drafting."
+    },
+    {
+      "name": "content-writing",
+      "source": "./plugins/content-writing",
+      "description": "Content engine, de-AI text, document interlinking, Telegram posts, RU proofreading."
+    },
+    {
+      "name": "dev-core",
+      "source": "./plugins/dev-core",
+      "description": "Python/JS/TS dev, database design, API docs, build fix, git workflow, architecture agents."
+    },
+    {
+      "name": "dev-process",
+      "source": "./plugins/dev-process",
+      "description": "TDD, systematic debugging, planning, code review, worktrees, parallel agents."
+    },
+    {
+      "name": "code-health",
+      "source": "./plugins/code-health",
+      "description": "Bug/cleanup/deps/reuse/security health audits, security audit, threat hunting."
+    },
+    {
+      "name": "browser-testing",
+      "source": "./plugins/browser-testing",
+      "description": "Browser automation (dev-browser, gstack, Playwright), webapp testing, test/perf agents."
+    },
+    {
+      "name": "gsd",
+      "source": "./plugins/gsd",
+      "description": "Phase-based dev framework: roadmaps, plans, execution, verification, debugging."
+    },
+    {
+      "name": "skill-dev",
+      "source": "./plugins/skill-dev",
+      "description": "Author skills/agents/plugins/MCP, prompt engineering, Claude API & CLI."
+    },
+    {
+      "name": "product-mgmt",
+      "source": "./plugins/product-mgmt",
+      "description": "Specs, roadmaps, metrics/OKR, user research synthesis, stakeholder comms."
+    },
+    {
+      "name": "sales-tools",
+      "source": "./plugins/sales-tools",
+      "description": "Account research, call prep, outreach, lead research, battlecards, daily briefing."
+    },
+    {
+      "name": "marketing-tools",
+      "source": "./plugins/marketing-tools",
+      "description": "Campaign planning, competitive analysis, performance analytics (ROAS/CPL)."
+    },
+    {
+      "name": "research-tools",
+      "source": "./plugins/research-tools",
+      "description": "Document Q&A, stock analysis, CEO council, thinking frameworks, meeting analysis."
+    },
+    {
+      "name": "ai-gateways",
+      "source": "./plugins/ai-gateways",
+      "description": "Route to GPT, Gemini, Kimi, DeepSeek, Perplexity for cross-model work."
+    },
+    {
+      "name": "google-workspace",
+      "source": "./plugins/google-workspace",
+      "description": "Gmail, Docs, Sheets, Drive, Calendar, Contacts, Tasks, Meet, Chat, Ads, Analytics."
+    },
+    {
+      "name": "integrations",
+      "source": "./plugins/integrations",
+      "description": "n8n, AWS, Telegram bots, Zoom, Pinecone, DeepL, server health, monitoring, Outlook."
+    },
+    {
+      "name": "session-tools",
+      "source": "./plugins/session-tools",
+      "description": "Memory search/learn, chat history, daily planning, reviews, model switching, session save/restore."
+    }
+  ]
+}

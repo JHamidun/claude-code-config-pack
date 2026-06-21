@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "design-process",
+  "displayName": "Design Process",
+  "version": "0.1.0",
+  "description": "Design taste, orchestration, critique, comparison, frontend presets, project init.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "design",
+    "critique",
+    "workflow",
+    "frontend"
+  ]
+}

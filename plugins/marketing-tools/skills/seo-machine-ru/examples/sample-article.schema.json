@@ -1,0 +1,27 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "headline": "Система управления задачами: как выбрать для команды",
+      "description": "Что такое система управления задачами, чем отличается от списка дел, как выбрать таск-менеджер для команды и внедрить за день.",
+      "inLanguage": "ru-RU",
+      "mainEntityOfPage": "https://example.com/blog/sistema-upravleniya-zadachami",
+      "author": {"@type": "Organization", "name": "ExampleCorp"},
+      "publisher": {"@type": "Organization", "name": "ExampleCorp", "url": "https://example.com"}
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type": "Question", "name": "Что такое система управления задачами?",
+         "acceptedAnswer": {"@type": "Answer", "text": "Инструмент, где команда ставит задачи, назначает ответственных и сроки и отслеживает статус в одном месте."}},
+        {"@type": "Question", "name": "Чем она лучше списка дел?",
+         "acceptedAnswer": {"@type": "Answer", "text": "Список дел личный и без статусов. Система управления задачами показывает, кто что делает, связывает задачи с проектами и хранит историю."}},
+        {"@type": "Question", "name": "Как выбрать таск-менеджер для команды?",
+         "acceptedAnswer": {"@type": "Answer", "text": "По командному доступу, представлениям (канбан/список/календарь), интеграциям, отчётности и цене на команду."}},
+        {"@type": "Question", "name": "Сколько времени занимает внедрение?",
+         "acceptedAnswer": {"@type": "Answer", "text": "Базовый старт — один день: завести проект, перенести задачи, подключить уведомления и договориться о правилах."}}
+      ]
+    }
+  ]
+}

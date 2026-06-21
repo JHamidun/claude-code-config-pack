@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "video-media",
+  "displayName": "Video Production",
+  "version": "0.1.0",
+  "description": "Generation (Runway), avatars (HeyGen/D-ID), edit, download, export, subtitles, transcripts.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "video",
+    "runway",
+    "youtube",
+    "avatar"
+  ]
+}

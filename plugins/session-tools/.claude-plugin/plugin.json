@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "session-tools",
+  "displayName": "Session & Memory",
+  "version": "0.1.0",
+  "description": "Memory search/learn, chat history, daily planning, reviews, model switching, session save/restore.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "memory",
+    "session",
+    "productivity"
+  ]
+}

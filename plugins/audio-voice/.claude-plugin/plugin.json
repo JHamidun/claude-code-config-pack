@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "audio-voice",
+  "displayName": "Audio & Voice",
+  "version": "0.1.0",
+  "description": "Music generation (ACE-Step), TTS & voice cloning (ElevenLabs), transcription (Deepgram).",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "audio",
+    "tts",
+    "voice",
+    "music"
+  ]
+}

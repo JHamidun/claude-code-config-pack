@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "sales-tools",
+  "displayName": "Sales Tools",
+  "version": "0.1.0",
+  "description": "Account research, call prep, outreach, lead research, battlecards, daily briefing.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "sales",
+    "outreach",
+    "crm",
+    "leads"
+  ]
+}
