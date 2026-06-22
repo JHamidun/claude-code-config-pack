@@ -4,7 +4,7 @@
 
 1. **No em dashes** (`—`), en dashes (`–`), or double dashes (`--`). Biggest AI tell.
 2. **Use `..` as soft pause** when you'd reach for an em dash. Feels human, matches the author's own rhythm.
-3. **Capitalize personal names, company names, product names** (Dharmesh, Felix, HubSpot, Claude). Lowercase reads as disrespectful.
+3. **Capitalize personal names, company names, product names** (Creator, Felix, HubSpot, Claude). Lowercase reads as disrespectful.
 4. **Sentence starts can be lowercase** (natural voice), but names inside are always capitalized.
 5. **Don't mention the user's own product by name** in comments on third-party posts. Describe what they do instead ("our AI content system", "the platform we're building").
 
