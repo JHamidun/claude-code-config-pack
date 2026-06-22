@@ -44,7 +44,7 @@ A LinkedIn post URL (any type: activity, share, ugcPost).
 
 ## Example
 
-> **Input:** `https://www.linkedin.com/posts/dharmesh_every-b2b-software-company-is-or-should-activity-7448808898326654978-iW20`
+> **Input:** `https://www.linkedin.com/posts/creator_every-b2b-software-company-is-or-should-activity-1234567890123456789-iW20`
 
 > **Output:**
 > - **Formula:** F10 Contrarian + Historical Receipts (confidence 0.72). Secondary: F5 Self-Proving Meta (0.28).

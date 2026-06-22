@@ -16,7 +16,7 @@ allowed-tools: Bash, Read, Write, WebSearch
 - "ad spy [бренд]" — полный анализ рекламы
 - "креативы конкурентов" — сбор рекламных материалов
 - "мониторинг рекламы" — периодический трекинг
-- Your Tracker: мониторинг рекламы конкурентов строительных смесей
+- Your Tracker: мониторинг рекламы конкурентов в вашей категории
 - YourCompanyGPT: что рекламируют AI-конкуренты
 
 ## API Endpoints
@@ -181,7 +181,7 @@ Combine with `/loop` or `/schedule` for recurring checks:
 /loop 24h ad-spy YourCompetitor your-industry
 ```
 
-Or integrate into Your Tracker cron collectors on your-server.
+Or integrate into your own cron collectors.
 
 ## Integration
 
@@ -192,4 +192,4 @@ Or integrate into Your Tracker cron collectors on your-server.
 | Meta Ads optimization | `meta-ads-analyzer` skill |
 | Content inspiration | `content-creation` skill |
 | Report to stakeholders | `stakeholder-comms` skill |
-| Save to radar DB | Your Tracker PostgreSQL (your-server) |
+| Save to your DB | your collector (your server) |
