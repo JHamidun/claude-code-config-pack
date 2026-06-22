@@ -1,7 +1,7 @@
 """
 auth.py — Cookie & header management for claude.ai/design Connect-RPC.
 
-Pattern matches other web-cookie MCPs: cookies live in env var as
+Pattern matches Perplexity / Plaud / Studio MCPs: cookies live in env var as
 JSON dict, this module rebuilds the Cookie header + adds Connect-RPC bits.
 
 ENV:
@@ -19,7 +19,7 @@ import os
 from typing import Dict
 
 
-BASE_URL = "https://claude.ai/design/anthropic.<internal>.api.v1alpha.<Service>"
+BASE_URL = "https://claude.ai/design/anthropic.omelette.api.v1alpha.OmeletteService"
 DOWNLOAD_URL = "https://claude.ai/design/v1/design/projects/{project_id}/download"
 
 
@@ -72,7 +72,7 @@ def _raise_org() -> str:
     raise RuntimeError(
         "CLAUDE_DESIGN_ORG_UUID env var is empty and could not be derived "
         "from `lastActiveOrg` cookie. Set it explicitly to the organization "
-        "UUID (e.g. YOUR_ANTHROPIC_ORG_UUID)."
+        "UUID (e.g. xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)."
     )
 
 
@@ -91,7 +91,7 @@ def base_headers(extra: Dict[str, str] | None = None) -> Dict[str, str]:
         "cookie": cookie_header(),
         "user-agent": (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-            "(KHTML, like Gecko) Chrome/YOUR_PUBLIC_IP Safari/537.36"
+            "(KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
         ),
         "referer": "https://claude.ai/design",
     }

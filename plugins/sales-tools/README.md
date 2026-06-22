@@ -14,7 +14,9 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `create-an-asset` | Generate tailored sales assets (landing pages, decks, one-pagers, workflow demos) from your deal context. |
 | `daily-briefing` | Start your day with a prioritized sales briefing. |
 | `draft-outreach` | Research a prospect then draft personalized outreach. |
+| `lead-enrichment` | Enrich and qualify B2B leads — match a company list against your CRM, pull firmographics, find decision-makers, score and export. |
 | `lead-research` | Identify and qualify high-quality leads, prospect research, ICP matching |
+| `tender-search-ru` | Find Russian procurement tenders (goszakupki) and shortlist contracts matching a product or company profile. |
 
 ### Commands
 

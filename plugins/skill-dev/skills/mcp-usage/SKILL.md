@@ -5,7 +5,7 @@ description: "MCP Servers Usage Skill"
 
 # MCP Servers Usage Skill
 
-Quick reference for using all 24 MCP servers effectively.
+Quick reference for using all your MCP servers effectively.
 
 ## When to Use This Skill
 - User asks what tools/capabilities are available
@@ -168,7 +168,7 @@ See: `${WORKSPACE}/.claude/MCP_SERVERS_GUIDE.md`
 - Sentry, Time
 
 ### Subscription Required
-- Ahrefs: $99+/month (currently disabled)
+- Ahrefs: $99+/month (optional)
 
 ---
 

@@ -165,7 +165,7 @@ If the input lacks these, ask the user for a specific number or anecdote to plug
 ## Non-negotiable rules
 
 - Preserve the user's actual claim. Humanizing does not mean changing meaning.
-- Capitalize all names (Dharmesh, Felix, HubSpot, Claude).
+- Capitalize all names (Creator, Felix, HubSpot, Claude).
 - Never introduce facts that weren't in the input. If a number is missing, ask.
 - Keep the user's sentence-level voice quirks (lowercase starts, `..` soft pauses).
 - Negative parallelism is a HARD ban (per author internal note): the strict tier always strips all 6 forms.

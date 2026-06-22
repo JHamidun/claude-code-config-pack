@@ -17,11 +17,9 @@ Expert skill for text-to-speech, voice cloning, sound effects, and audio AI usin
 ELEVENLABS_API_KEY=os.getenv('ELEVENLABS_API_KEY')
 ```
 
-## Голос User's (ElevenLabs)
+## Voices
 
-| Название | Voice ID | Категория |
-|----------|----------|-----------|
-| User_Нейтральный_123 | `YOUR_ELEVENLABS_VOICE_ID` | cloned |
+Use a prebuilt ElevenLabs voice, or set `ELEVENLABS_VOICE_ID` to your own (cloned) voice ID. List available voices via the `/v2/voices` endpoint.
 
 ## When to Use ElevenLabs
 

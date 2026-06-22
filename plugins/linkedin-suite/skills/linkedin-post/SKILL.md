@@ -188,12 +188,12 @@ LinkedIn использует 3 типа URN: `activity`, `share`, `ugcPost`. UR
 ```bash
 # Один файл, без зависимостей кроме stdlib
 python ${WORKSPACE}/tools/linkedin-skills/lib/url_parser.py \
-  "https://www.linkedin.com/posts/dharmesh_activity-7448808898326654978-iW20"
+  "https://www.linkedin.com/posts/creator_activity-1234567890123456789-iW20"
 
 # Output:
 # {
-#   "post_activity_id": "7448808898326654978",
-#   "post_urn": "urn:li:activity:7448808898326654978",
+#   "post_activity_id": "1234567890123456789",
+#   "post_urn": "urn:li:activity:1234567890123456789",
 #   "comment_id": null,
 #   "comment_urn": null,
 #   "url_type": "post"
@@ -209,7 +209,7 @@ curl -X POST "https://api.your-publisher.example/api/v1/linkedin-comments" \
   -H "x-social-poster-key: $SOCIAL_POSTER_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "postedId": "urn:li:activity:7448808898326654978",
+    "postedId": "urn:li:activity:1234567890123456789",
     "message": "Concrete take + a question that earns a reply.",
     "platformId": "linkedin-Tz9W5i6ZYG"
   }'
@@ -225,10 +225,10 @@ LinkedIn flattens thread to **2 уровня**. Если отвечаешь на
 curl -X POST "https://api.your-publisher.example/api/v1/linkedin-comments" \
   -H "x-social-poster-key: $SOCIAL_POSTER_API_KEY" \
   -d '{
-    "postedId": "urn:li:activity:7448808898326654978",
+    "postedId": "urn:li:activity:1234567890123456789",
     "message": "Reply text",
     "platformId": "linkedin-Tz9W5i6ZYG",
-    "parentComment": "urn:li:comment:(urn:li:activity:7448808898326654978,7449095071892672512)"
+    "parentComment": "urn:li:comment:(urn:li:activity:1234567890123456789,1234567890987654321)"
   }'
 ```
 
@@ -242,7 +242,7 @@ curl -X POST "https://api.your-publisher.example/api/v1/linkedin-comments" \
 curl -X POST "https://api.your-publisher.example/api/v1/linkedin-reactions" \
   -H "x-social-poster-key: $SOCIAL_POSTER_API_KEY" \
   -d '{
-    "postedId": "urn:li:activity:7448808898326654978",
+    "postedId": "urn:li:activity:1234567890123456789",
     "platformId": "linkedin-Tz9W5i6ZYG",
     "reactionType": "INTEREST"
   }'
@@ -263,7 +263,7 @@ import sys
 sys.path.insert(0, "${WORKSPACE}/tools/linkedin-skills")
 from lib import SocialPublisherClient, parse_linkedin_url
 
-parsed = parse_linkedin_url("https://www.linkedin.com/posts/dharmesh_activity-7448808898326654978-iW20")
+parsed = parse_linkedin_url("https://www.linkedin.com/posts/creator_activity-1234567890123456789-iW20")
 client = SocialPublisherClient()  # берёт SOCIAL_POSTER_API_KEY из env
 client.create_reaction(
     post_urn=parsed["post_urn"],
