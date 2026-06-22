@@ -16,7 +16,7 @@ Sources to drive via skills (printed as a plan, not scraped here):
   - hh.ru employer page     -> Skill headhunter
   - LinkedIn contact info    -> Skill linkedin / social-intel
   - public Telegram profile  -> tg_client.py user-info
-  - OUR Bitrix contacts      -> Skill bitrix24
+  - your Bitrix contacts      -> Skill bitrix24
 """
 import sys, io, re, json, os, subprocess, argparse
 import urllib.request

@@ -9,7 +9,7 @@ business card). Three legitimate channels:
      target's OWN privacy setting ("who can find me by phone"). If they hid it, returns nothing.
      The contact is deleted right after, so your contact list is not polluted.
   2. (plan) Public web search of the number in quotes — site/signature/2GIS/public profile.
-  3. (plan) Our Bitrix24 — maybe already a contact.
+  3. (plan) your Bitrix24 — maybe already a contact.
 
 Requires: TELEGRAM_API_ID / TELEGRAM_API_HASH in ~/.claude/.credentials.master.env and the
 existing session ~/.claude/telegram_session.session (same as tg_client.py).

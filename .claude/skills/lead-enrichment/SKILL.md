@@ -53,7 +53,7 @@ Goal: from a fragment, produce a one-page dossier + a verdict (qualify / hand to
 2. Route by type:
    - corporate email / domain  → domain_to_company.py → INN → firmographics (step 4)
    - free email (gmail/ya/mail) → treat as individual: use name + WebSearch
-   - phone                      → phone_lookup.py (operator/region) + check OUR Bitrix.
+   - phone                      → phone_lookup.py (operator/region) + check your Bitrix.
                                    If the lead GAVE you this number (inbound): phone_identify.py → Telegram native
                                    resolve (consented, respects their privacy) + web/CRM.
    - full name                  → WebSearch + social-intel + headhunter

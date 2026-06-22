@@ -17,7 +17,7 @@ Install pattern (optional, on demand): `pipx install holehe maigret ignorant` ; 
 
 ## 🟢 Phone enrichment — the "waterfall" pattern
 
-There is no legitimate OSS that returns a private individual's mobile from a name. Commercial "waterfall" providers (e.g. [FullEnrich](https://fullenrich.com/)) chain many data partnerships. The **legitimate waterfall is already implemented** in `scripts/phone_discovery.py`: company site → 2GIS/Yandex Business (`maps-places`) → hh employer (`headhunter`) → LinkedIn (`linkedin`) → EGRUL/DaData → our Bitrix. For a number the lead gave you, `scripts/phone_identify.py` does the consented Telegram resolve.
+There is no legitimate OSS that returns a private individual's mobile from a name. Commercial "waterfall" providers (e.g. [FullEnrich](https://fullenrich.com/)) chain many data partnerships. The **legitimate waterfall is already implemented** in `scripts/phone_discovery.py`: company site → 2GIS/Yandex Business (`maps-places`) → hh employer (`headhunter`) → LinkedIn (`linkedin`) → EGRUL/DaData → your Bitrix. For a number the lead gave you, `scripts/phone_identify.py` does the consented Telegram resolve.
 
 ### Audited phone/IG OSINT tools (source-reviewed 2026-06-09, not executed)
 
