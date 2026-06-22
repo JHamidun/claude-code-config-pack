@@ -25,8 +25,8 @@ The engagement compounding layer. Tracks which of the user's comments earned aut
 | Posted | Author | Post | Comment | Reply? | Stage | Action |
 |---|---|---|---|---|---|---|
 | 18h ago | PublicAuthor3 | Sample Co | "key takeaway" | ✅ Engager B replied 14h ago | Warm (6-24h window) | **Reply now** |
-| 22h ago | Dharmesh Shah | HubSpot | "integration depth moat" | No | Cold | Skip |
-| 3h ago | Felix T. | Rezolve | "twin economies" | No | Watch | Check in 3h |
+| 22h ago | Creator Shah | HubSpot | "integration depth moat" | No | Cold | Skip |
+| 3h ago | A. Author | ExampleCo | "twin economies" | No | Watch | Check in 3h |
 
 ### For each warm thread
 - Thread preview (last 3 turns)

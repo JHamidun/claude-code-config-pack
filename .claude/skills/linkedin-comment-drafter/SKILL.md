@@ -53,7 +53,7 @@ Then waits for user approval. On "post", calls SocialPublisher to react + commen
 ## Hard rules
 
 - 200-350 chars. Don't exceed.
-- Always capitalize the author's name (e.g., "Dharmesh", not "dharmesh").
+- Always capitalize the author's name (e.g., "Creator", not "creator").
 - No em dashes, no hashtags, no emoji unless the post itself uses them.
 - No mention of the user's own product by name. Describe what they do instead.
 - Never paste generic praise ("Great post!", "This.", "100%"). The skill refuses.
@@ -61,7 +61,7 @@ Then waits for user approval. On "post", calls SocialPublisher to react + commen
 
 ## Example invocation
 
-> User: "Comment on this: https://www.linkedin.com/posts/dharmesh_activity-7448808898326654978-iW20"
+> User: "Comment on this: https://www.linkedin.com/posts/creator_activity-1234567890123456789-iW20"
 >
 > Skill: [parses URL, fetches post, detects closing question "Seen this in your market?", drafts 3 variants]
 >

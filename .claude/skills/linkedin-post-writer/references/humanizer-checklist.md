@@ -87,7 +87,7 @@ Every post must pass this before the approval card is shown. If any fail, rewrit
 
 ## Final voice check
 
-- Capitalize all names (Dharmesh, not dharmesh)
+- Capitalize all names (Creator, not creator)
 - Capitalize company/product names (HubSpot, Claude, YourProduct)
 - Don't frame LinkedIn as inferior on LinkedIn
 - Don't name-drop own product more than once

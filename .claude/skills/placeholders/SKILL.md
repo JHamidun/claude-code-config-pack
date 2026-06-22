@@ -52,7 +52,7 @@ function Avatar({ name, size = 40 }) {
 ```
 
 ```jsx
-<Avatar name="Your Name" size={48} />  // → "ЖХ"
+<Avatar name="Your Name" size={48} />  // → "JD"
 ```
 
 ## Logo placeholder

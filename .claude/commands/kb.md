@@ -86,7 +86,7 @@ python ${WORKSPACE}/tools/kb.py doc <id>
 ```
 /kb example-query
 /kb спринт --source tldv --after 2025-01-01
-/kb "Alpine GPT" --source spark
+/kb "ExampleGPT" --source spark
 /kb stats
 /kb sources
 ```

@@ -159,7 +159,7 @@
 |---|---|
 | Метод (A) | YouTube Data API v3: `GET https://www.googleapis.com/youtube/v3/search?q="фраза"&key=YT_API_KEY&part=snippet` |
 | Метод (B) | ScrapeCreators `/v1/youtube/search?query=...` (8 кредитов/вызов) |
-| Smoke | **28 raw** (Data API ключ не активирован — нужно включить YouTube Data API v3 в Google Cloud Console); ScrapeCreators работает (осталось 24 452 кред) |
+| Smoke | **28 raw** (Data API ключ не активирован — нужно включить YouTube Data API v3 в Google Cloud Console); ScrapeCreators работает (кредиты на счёте) |
 | **Free** | **б** (ScrapeCreators кредиты; YT Data API 10 000 unit/день бесплатно) |
 
 **Грабли:**

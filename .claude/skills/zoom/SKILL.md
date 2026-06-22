@@ -263,10 +263,7 @@ zoom_api("POST", "/users/me/meetings", json={
 
 ## Account Info
 
-- **Email:** your-email@example.com
-- **Plan:** Zoom Workplace (Licensed, 300 participants, 30h meetings)
-- **PMI:** check via `zoom_api("GET", "/users/me")`
-- **App Name:** Claude Code YourFirstName
-- **Scopes:** 69 (all available for this account)
-- **App ID:** YOUR_ZOOM_APP_ID
-- **Marketplace:** https://marketplace.zoom.us/develop/apps/YOUR_ZOOM_APP_ID
+- **Email / plan / PMI:** check via `zoom_api("GET", "/users/me")`
+- **App:** create a Server-to-Server OAuth app in the Zoom Marketplace; grant the scopes your workflow needs
+- **App ID / credentials:** from your app's settings → store as `ZOOM_ACCOUNT_ID` / `ZOOM_CLIENT_ID` / `ZOOM_CLIENT_SECRET`
+- **Marketplace:** https://marketplace.zoom.us/develop/apps

@@ -17,14 +17,13 @@ Expert skill for using Pinecone - the leading vector database for AI application
 PINECONE_API_KEY=os.getenv('PINECONE_API_KEY')
 ```
 
-## Существующие индексы
+## Примеры индексов
 
 | Индекс | Описание |
 |--------|----------|
-| `company-tm-bot` | Company TM бот |
-| `company-plus-bot` | Company Plus бот |
+| `support-bot` | Векторы саппорт-бота |
+| `docs-search` | Поиск по документации |
 | `agent-dev` | Разработка агентов |
-| `chatbot-data` | Данные чатбота |
 | `test-index` | Тестовый |
 
 **Параметры:** Dimension 3072 (OpenAI text-embedding-3-large), Metric cosine, Serverless AWS us-east-1

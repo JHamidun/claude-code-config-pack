@@ -139,7 +139,7 @@ for i, batch in enumerate(batches):
 Примеры:
 - "Разработка Telegram Mini App для YourProject"
 - "Настройка интеграции Todoist и Google Calendar"
-- "Презентация FM Logistic AI Overview"
+- "Презентация Acme Corp AI Overview"
 
 Верни JSON:
 {{"session-id": "Title", ...}}
