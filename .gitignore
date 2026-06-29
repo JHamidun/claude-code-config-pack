@@ -6,3 +6,8 @@ node_modules/
 *.session
 MEMORY.md
 chats.db*
+
+# marketplace build artifacts (working files, not shipped)
+_*.py
+_*.json
+_qa/

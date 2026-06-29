@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "ui-motion",
+  "displayName": "UI Motion & States",
+  "version": "0.1.0",
+  "description": "Microinteractions, animations, mobile overlays, live tweaks, device frames, accessible forms.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "animation",
+    "microinteraction",
+    "ui",
+    "a11y"
+  ]
+}

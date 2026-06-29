@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "social-intel",
+  "displayName": "Social Intelligence",
+  "version": "0.1.0",
+  "description": "Trends, ad spy, TikTok intel, SimilarWeb, Reddit/HN, scraping, GitHub gem hunting.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "research",
+    "social",
+    "scraping",
+    "competitive"
+  ]
+}

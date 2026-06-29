@@ -1,0 +1,40 @@
+/* theme-minimal.css */
+:root {
+  --bg: #FAF9F6;
+  --fg: #111111;
+  --muted: #6B6B6B;
+  --rule: rgba(0,0,0,.08);
+  --accent: oklch(62% 0.14 25);
+
+  --font-display: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body:    "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono:    ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+deck-stage section {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body);
+  padding: 80px; box-sizing: border-box;
+}
+deck-stage section.dark { background: #111; color: #f5f5f5; }
+deck-stage h1, deck-stage h2, deck-stage h3 {
+  font-family: var(--font-display); margin: 0; letter-spacing: -0.02em;
+}
+deck-stage h1 { font-size: 120px; line-height: 1.02; font-weight: 700; }
+deck-stage h2 { font-size: 72px;  line-height: 1.05; font-weight: 600; }
+deck-stage h3 { font-size: 40px;  line-height: 1.1;  font-weight: 600; }
+deck-stage p, deck-stage li {
+  font-size: 28px; line-height: 1.4; max-width: 30ch; text-wrap: pretty;
+}
+.eyebrow {
+  font-family: var(--font-mono); font-size: 16px;
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted);
+}
+.statement   { display: grid; place-content: center; text-align: center; }
+.two-col     { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-content: center; height: 100%; }
+.title-stack { display: grid; align-content: end; gap: 24px; height: 100%; }
+.placeholder {
+  background: repeating-linear-gradient(45deg, #1a1a1a, #1a1a1a 8px, #222 8px, #222 16px);
+  color: #888; font-family: var(--font-mono); font-size: 14px;
+  display: grid; place-items: center; border-radius: 8px;
+}

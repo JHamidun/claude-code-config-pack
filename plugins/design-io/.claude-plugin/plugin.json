@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "design-io",
+  "displayName": "Design I/O & QA",
+  "version": "0.1.0",
+  "description": "Figma import/export, PDF/PNG/PPTX export, dev handoff, verify, perf & a11y audits.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "figma",
+    "export",
+    "handoff",
+    "audit"
+  ]
+}

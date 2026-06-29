@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "browser-testing",
+  "displayName": "Browser & Testing",
+  "version": "0.1.0",
+  "description": "Browser automation (dev-browser, gstack, Playwright), webapp testing, test/perf agents.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "browser",
+    "testing",
+    "e2e",
+    "playwright"
+  ]
+}

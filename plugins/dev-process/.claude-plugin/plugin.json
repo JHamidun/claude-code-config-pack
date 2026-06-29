@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "dev-process",
+  "displayName": "Dev Process",
+  "version": "0.1.0",
+  "description": "TDD, systematic debugging, planning, code review, worktrees, parallel agents.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "tdd",
+    "debugging",
+    "review",
+    "planning"
+  ]
+}

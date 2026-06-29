@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "ai-gateways",
+  "displayName": "Multi-Model Gateways",
+  "version": "0.1.0",
+  "description": "Route to GPT, Gemini, Kimi, DeepSeek, Perplexity for cross-model work.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "llm",
+    "gpt",
+    "gemini",
+    "multi-model"
+  ]
+}
