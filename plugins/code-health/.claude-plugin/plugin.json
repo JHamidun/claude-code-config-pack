@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "code-health",
+  "displayName": "Code Health",
+  "version": "0.1.0",
+  "description": "Bug/cleanup/deps/reuse/security health audits, security audit, threat hunting.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "security",
+    "audit",
+    "quality",
+    "health"
+  ]
+}

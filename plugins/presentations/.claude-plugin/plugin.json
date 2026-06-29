@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "presentations",
+  "displayName": "Presentations",
+  "version": "0.1.0",
+  "description": "Gamma, Manus slides, Marp, native PPTX create/edit/import.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "presentation",
+    "slides",
+    "pptx",
+    "deck"
+  ]
+}

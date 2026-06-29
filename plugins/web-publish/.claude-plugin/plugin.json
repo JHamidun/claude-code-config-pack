@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "web-publish",
+  "displayName": "Web Publishing",
+  "version": "0.1.0",
+  "description": "Websites, HTML email, standalone/canonical HTML, PWA shell, web assets, slides, dataviz, diagrams.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "website",
+    "html",
+    "email",
+    "pwa"
+  ]
+}

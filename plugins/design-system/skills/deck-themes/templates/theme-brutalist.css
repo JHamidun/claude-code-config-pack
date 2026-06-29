@@ -1,0 +1,38 @@
+/* theme-brutalist.css */
+:root {
+  --bg: #f0eee6;
+  --fg: #000;
+  --muted: #333;
+  --rule: #000;
+  --accent: oklch(78% 0.22 95);
+
+  --font-display: "JetBrains Mono", ui-monospace, monospace;
+  --font-body:    "JetBrains Mono", ui-monospace, monospace;
+  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+}
+
+deck-stage section {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body);
+  padding: 64px; box-sizing: border-box;
+  border: 0;
+}
+deck-stage section.dark    { background: #000;  color: #fff; }
+deck-stage section.accent  { background: var(--accent); color: #000; }
+
+deck-stage h1 { font-size: 110px; font-weight: 700; line-height: 0.95; letter-spacing: -0.03em; margin: 0; text-transform: uppercase; }
+deck-stage h2 { font-size: 64px;  font-weight: 700; line-height: 1; letter-spacing: -0.02em; margin: 0; text-transform: uppercase; }
+deck-stage h3 { font-size: 32px;  font-weight: 700; margin: 0; }
+deck-stage p, deck-stage li { font-size: 22px; line-height: 1.4; max-width: 40ch; }
+
+.eyebrow {
+  font-size: 14px;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  border: 2px solid currentColor; padding: 4px 8px; display: inline-block;
+}
+.placeholder {
+  background: transparent; color: inherit;
+  border: 2px solid currentColor;
+  font-size: 14px; text-transform: uppercase;
+  display: grid; place-items: center;
+}

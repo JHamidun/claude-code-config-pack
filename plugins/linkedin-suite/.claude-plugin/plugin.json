@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "linkedin-suite",
+  "displayName": "LinkedIn Suite",
+  "version": "0.1.0",
+  "description": "Write, humanize, audit, plan LinkedIn posts; profile optimization; comment & reply drafting.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "linkedin",
+    "content",
+    "social",
+    "writing"
+  ]
+}

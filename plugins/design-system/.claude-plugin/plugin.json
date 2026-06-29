@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "design-system",
+  "displayName": "Design System",
+  "version": "0.1.0",
+  "description": "Design tokens, color scales, type scale, dark mode, themes, brand kit.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "design",
+    "tokens",
+    "color",
+    "theme",
+    "brand"
+  ]
+}

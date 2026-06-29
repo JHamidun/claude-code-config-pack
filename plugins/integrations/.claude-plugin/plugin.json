@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "integrations",
+  "displayName": "Integrations & DevOps",
+  "version": "0.1.0",
+  "description": "n8n, AWS, Telegram bots, Zoom, Pinecone, DeepL, server health, monitoring, Outlook.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "devops",
+    "automation",
+    "integration"
+  ]
+}

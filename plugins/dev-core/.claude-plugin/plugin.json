@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "dev-core",
+  "displayName": "Dev Core",
+  "version": "0.1.0",
+  "description": "Python/JS/TS dev, database design, API docs, build fix, git workflow, architecture agents.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "development",
+    "backend",
+    "frontend",
+    "api"
+  ]
+}
