@@ -1,0 +1,21 @@
+name: sdat submit test
+
+on:
+  pull_request:
+    paths:
+      - ".claude/skills/sdat/scripts/**"
+  push:
+    branches: [main]
+    paths:
+      - ".claude/skills/sdat/scripts/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run submit.py tests
+        run: python .claude/skills/sdat/scripts/test_submit.py
