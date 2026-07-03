@@ -61,6 +61,45 @@ def die(msg: str, code: int = 1) -> None:
     sys.exit(code)
 
 
+def _binary_reject(p: Path) -> str:
+    """Честное сообщение об отказе для бинарного/не-UTF-8 файла (09-H9-1)."""
+    ext = p.suffix or "без расширения"
+    return (
+        f"«{p.name}» ({ext}) — бинарный файл или файл не в кодировке UTF-8. "
+        "Проверяющий читает ТЕКСТ: PDF, картинки, архивы сдавать нельзя. "
+        "Залей артефакт на gist.github.com / GitHub / облако и сдай ссылкой:\n"
+        "  submit.py submit --assignment <номер> --type link --url https://..."
+    )
+
+
+def read_text_artifact(path_str: str) -> tuple[str, str]:
+    """Прочитать файл-артефакт как ТЕКСТ. Возвращает (content, filename).
+
+    Раньше файлы читались `errors="replace"`: бинарник (PDF/скрин/архив)
+    превращался в кашу из U+FFFD, уходил на сервер, ученик видел «✅ принято»,
+    а проверяющий получал нечитаемое и выносил ложный вердикт (09-H9-1).
+
+    Теперь читаем БАЙТАМИ и декодируем СТРОГИМ UTF-8: бинарник (NUL-байт или
+    невалидный UTF-8) не отправляется кашей, а честно отклоняется — такой
+    артефакт нужно сдавать ссылкой (сервер хранит текст сдачи, не файлы).
+    """
+    p = Path(path_str)
+    if not p.is_file():
+        die(f"Файл не найден: {p}")
+    raw = p.read_bytes()
+    if len(raw) > MAX_CONTENT_BYTES:
+        die("Артефакт больше 2 МБ. Залей на gist/github и сдай ссылкой: --type link --url ...")
+    if b"\x00" in raw:  # NUL-байт → точно бинарь
+        die(_binary_reject(p))
+    try:
+        content = raw.decode("utf-8")  # строгий: бинарь → UnicodeDecodeError
+    except UnicodeDecodeError:
+        die(_binary_reject(p))
+    if not content.strip():
+        die(f"Файл пустой: {p}")
+    return content, p.name
+
+
 def api(method: str, token: str, payload: dict | None = None) -> tuple[int, dict]:
     url = f"{DEFAULT_BASE}/api/submit"
     data = json.dumps(payload).encode("utf-8") if payload is not None else None
@@ -128,26 +167,21 @@ def cmd_submit(token: str, args: argparse.Namespace) -> None:
             die("--type link требует --url")
         payload["url"] = args.url
     else:  # text | file
-        content = None
+        content: str | None = None
+        filename: str | None = None
         if args.content is not None:
             content = args.content
         elif args.content_file:
-            p = Path(args.content_file)
-            if not p.is_file():
-                die(f"Файл не найден: {p}")
-            content = p.read_text(encoding="utf-8", errors="replace")
-            payload.setdefault("filename", p.name)
+            content, filename = read_text_artifact(args.content_file)
         elif args.file:
-            p = Path(args.file)
-            if not p.is_file():
-                die(f"Файл не найден: {p}")
-            content = p.read_text(encoding="utf-8", errors="replace")
-            payload["filename"] = p.name
+            content, filename = read_text_artifact(args.file)
         if not content:
             die(f"--type {args.type} требует --content / --content-file / --file")
         if len(content.encode("utf-8")) > MAX_CONTENT_BYTES:
             die("Артефакт больше 2 МБ. Залей на gist/github и сдай ссылкой: --type link --url ...")
         payload["content"] = content
+        if filename:
+            payload.setdefault("filename", filename)
 
     if args.filename:
         payload["filename"] = args.filename
@@ -181,6 +215,10 @@ def _explain(status: int, data: dict) -> str:
         "assignment_not_found": "Такого задания нет. Запусти `list` — увидишь доступные номера.",
         "rate_limited": "Слишком часто. " + (msg or "Подожди и повтори."),
         "too_large": "Артефакт больше 2 МБ — сдай ссылкой (--type link --url ...).",
+        "binary_not_supported": (
+            "Бинарный файл (PDF/картинка/архив) не принимается — сдай ссылкой "
+            "(--type link --url ...). " + (msg or "")
+        ).strip(),
     }
     base = hints.get(err) or msg or err or f"HTTP {status}"
     return f"{base}" + (f"  ({err})" if err and err not in base else "")
