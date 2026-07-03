@@ -27,6 +27,14 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+# Windows-консоли (cp866/cp1251) роняют печать эмодзи/кириллицы UnicodeEncodeError.
+# Печать статуса не должна валить сдачу → форсируем UTF-8 с заменой непечатаемого.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+    except (AttributeError, ValueError):
+        pass
+
 DEFAULT_BASE = os.environ.get("HAMIDUN_ACADEMY_URL", "https://academy.hamidun.com").rstrip("/")
 ENV_FILE = Path(os.environ.get("HAMIDUN_ENV_FILE", str(Path.home() / ".claude" / "hamidun.env")))
 MAX_CONTENT_BYTES = 2 * 1024 * 1024  # 2 МБ текста — совпадает с лимитом сервера
