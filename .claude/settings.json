@@ -37,134 +37,74 @@
       "Bash(rm -rf C:/)",
       "Bash(rm -rf C:/Users)",
       "Bash(rm -rf C:/Windows)",
+      "Bash(rm -rf .*)",
+      "Bash(rm -fr *)",
+      "Bash(rm -r -f *)",
+      "Bash(rm --recursive --force *)",
       "Bash(:(){ :|:& };:)",
       "Bash(*DROP DATABASE*)",
       "Bash(*DROP TABLE*)",
       "Bash(*DROP SCHEMA*)",
       "Bash(*TRUNCATE TABLE*)",
+      "Bash(python -c *rmtree*)",
+      "Bash(python3 -c *rmtree*)",
+      "Bash(*node -e *rmSync*)",
+      "Bash(*node -e *unlinkSync*)",
       "Bash(git push --force origin main*)",
       "Bash(git push --force origin master*)",
       "Bash(git push -f origin main*)",
       "Bash(git push -f origin master*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f *)",
+      "Bash(git push -f*)",
+      "Bash(git push * --force*)",
+      "Bash(git push origin +*)",
+      "Bash(git push * +*:*)",
       "Bash(git reset --hard HEAD~*)",
+      "Bash(git clean -f*)",
       "Bash(*shutdown*)",
       "Bash(*format C:*)",
       "Bash(dd if=*of=/dev/sd*)",
       "PowerShell(*Remove-Item -Recurse -Force C:\\*)",
       "PowerShell(*Format-Volume*)",
       "PowerShell(*Stop-Computer*)",
-      "PowerShell(*Restart-Computer*)"
+      "PowerShell(*Restart-Computer*)",
+      "Bash(curl * | sh)",
+      "Bash(curl * | sh *)",
+      "Bash(curl *|sh*)",
+      "Bash(curl * | bash)",
+      "Bash(curl * | bash *)",
+      "Bash(wget * | sh)",
+      "Bash(wget * | sh *)",
+      "Bash(wget * | bash)",
+      "Bash(* | sh -s*)",
+      "Bash(* | sudo sh)",
+      "Bash(* | sudo bash)",
+      "Bash(del /s*)",
+      "Bash(del /q*)",
+      "Bash(* del /s*)",
+      "Bash(rmdir /s*)",
+      "Bash(* rmdir /s*)",
+      "Bash(mkfs*)",
+      "Bash(*> /dev/sd*)",
+      "PowerShell(*del /s*)",
+      "PowerShell(*rmdir /s*)",
+      "PowerShell(*Invoke-Expression*)",
+      "PowerShell(*| iex*)",
+      "PowerShell(*Clear-Disk*)",
+      "PowerShell(*diskpart*)",
+      "PowerShell(*cipher /w*)"
     ],
     "ask": [],
-    "defaultMode": "default",
+    "defaultMode": "acceptEdits",
     "additionalDirectories": [
       "${HOME}\\.claude",
-      "${HOME}\\.claude.json",
-      "${WORKSPACE}"
+      "${HOME}\\.claude.json"
     ]
   },
-  "enableAllProjectMcpServers": true,
+  "enableAllProjectMcpServers": false,
   "hooks": {
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PermissionRequest": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 120
-          }
-        ]
-      }
-    ],
-    "PostCompact": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PostToolUseFailure": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
     "PreToolUse": [
-      {
-        "matcher": "Bash(rm -rf)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo 'BLOCKED: Dangerous rm -rf command' && exit 1"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash(DROP DATABASE)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo 'BLOCKED: DROP DATABASE command' && exit 1"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash(DROP TABLE)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo 'BLOCKED: DROP TABLE command' && exit 1"
-          }
-        ]
-      },
       {
         "matcher": "Bash(git commit)",
         "hooks": [
@@ -184,28 +124,6 @@
             "timeout": 5
           }
         ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
       }
     ],
     "SessionStart": [
@@ -214,16 +132,6 @@
           {
             "type": "command",
             "command": "node \"${HOME}/.claude/hooks/gsd-check-update.js\""
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
           }
         ]
       }
@@ -236,88 +144,6 @@
             "type": "command",
             "command": "powershell -c \"[console]::beep(800,200); [console]::beep(1000,200)\"",
             "timeout": 3
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "StopFailure": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "SubagentStart": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "CwdChanged": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "FileChanged": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
           }
         ]
       }
@@ -337,7 +163,7 @@
     "coderabbit@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "dev-browser@dev-browser-marketplace": true,
+    "dev-browser@dev-browser-marketplace": false,
     "feature-dev@claude-plugins-official": true,
     "figma@claude-plugins-official": true,
     "firecrawl@claude-plugins-official": true,
