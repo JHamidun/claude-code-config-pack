@@ -1,6 +1,6 @@
 ---
 name: linkedin-hook-extractor
-description: Reverse-engineer the hook formula from any viral LinkedIn post. Use when the user finds a post they want to learn from — paste the URL and get a structural breakdown. Identifies which of the 10 canonical 2026 formulas it uses (anaphora, R.I.P. obituary, year-over-year pivot, time-anchor confession, self-proving meta, odd-precision money, paid-vs-free reversal, curiosity-gap, contrarian historical, comment-gate). Returns a blank template you can fill with your own voice. Keywords: hook formula, viral teardown, reverse engineer, post structure, 2026 formulas.
+description: "Reverse-engineer the hook formula from any viral LinkedIn post. Use when the user finds a post they want to learn from — paste the URL and get a structural breakdown. Identifies which of the 10 canonical 2026 formulas it uses (anaphora, R.I.P. obituary, year-over-year pivot, time-anchor confession, self-proving meta, odd-precision money, paid-vs-free reversal, curiosity-gap, contrarian historical, comment-gate). Returns a blank template you can fill with your own voice. Keywords: hook formula, viral teardown, reverse engineer, post structure, 2026 formulas."
 ---
 
 # LinkedIn Hook Extractor

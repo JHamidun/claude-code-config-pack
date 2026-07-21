@@ -1,6 +1,6 @@
 ---
 name: linkedin-detector-tester
-description: Run text through GPTZero, Originality.ai, ZeroGPT, Sapling, Copyleaks in parallel. Show divergence between detectors to expose unreliability. Keywords: AI detector, GPTZero, Originality.ai, ZeroGPT, Copyleaks, false positive, ESL bias, AI detection accuracy.
+description: "Run text through GPTZero, Originality.ai, ZeroGPT, Sapling, Copyleaks in parallel. Show divergence between detectors to expose unreliability. Keywords: AI detector, GPTZero, Originality.ai, ZeroGPT, Copyleaks, false positive, ESL bias, AI detection accuracy."
 ---
 
 # LinkedIn Detector Tester

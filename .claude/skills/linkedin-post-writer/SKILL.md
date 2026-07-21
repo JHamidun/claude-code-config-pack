@@ -1,6 +1,6 @@
 ---
 name: linkedin-post-writer
-description: Draft a viral-ready LinkedIn post using a 2026 hook formula. Use when the user wants to write a new LinkedIn post, needs help with a hook, or wants to pick a proven format (platform-risk anaphora, R.I.P. obituary, year-over-year pivot, time-anchor confession, self-proving meta, paid-vs-free reversal, curiosity-gap teaser, odd-precision money ledger, contrarian historical receipts). The skill drafts the post, runs the humanizer pass, shows an approval card, and schedules via SocialPublisher on confirmation. Keywords: linkedin post, viral hook, personal brand, founder post, content draft, thought leadership, 2026 algorithm.
+description: "Draft a viral-ready LinkedIn post using a 2026 hook formula. Use when the user wants to write a new LinkedIn post, needs help with a hook, or wants to pick a proven format (platform-risk anaphora, R.I.P. obituary, year-over-year pivot, time-anchor confession, self-proving meta, paid-vs-free reversal, curiosity-gap teaser, odd-precision money ledger, contrarian historical receipts). The skill drafts the post, runs the humanizer pass, shows an approval card, and schedules via SocialPublisher on confirmation. Keywords: linkedin post, viral hook, personal brand, founder post, content draft, thought leadership, 2026 algorithm."
 ---
 
 # LinkedIn Post Writer

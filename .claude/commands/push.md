@@ -1,6 +1,6 @@
 ---
 description: Automated release management with version bumping and dual changelog generation
-argument-hint: [patch|minor|major] [-m "message"]
+argument-hint: "[patch|minor|major] [-m \"message\"]"
 ---
 
 Execute the release automation script with auto-confirmation for Claude Code.

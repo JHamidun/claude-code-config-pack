@@ -1,6 +1,6 @@
 ---
 name: linkedin-post-audit
-description: Audit a LinkedIn post draft against 2026 algorithm heuristics and voice rules before publishing. Use when the user has a draft and wants to catch AI tells, algorithm penalties, or structural issues before shipping. Returns a pass/fail report with specific fixes and optional auto-rewrites. Keywords: post audit, linkedin review, algorithm check, EnterpriseTool, humanizer, AI detection, pre-publish check.
+description: "Audit a LinkedIn post draft against 2026 algorithm heuristics and voice rules before publishing. Use when the user has a draft and wants to catch AI tells, algorithm penalties, or structural issues before shipping. Returns a pass/fail report with specific fixes and optional auto-rewrites. Keywords: post audit, linkedin review, algorithm check, EnterpriseTool, humanizer, AI detection, pre-publish check."
 ---
 
 # LinkedIn Post Audit

@@ -1,6 +1,6 @@
 ---
 description: Генерация полного CRUD API для ресурса
-argument-hint: [framework] [resource-name]
+argument-hint: "[framework] [resource-name]"
 ---
 
 # 🔌 Generate API: $ARGUMENTS

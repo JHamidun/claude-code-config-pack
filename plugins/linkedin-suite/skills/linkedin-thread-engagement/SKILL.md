@@ -1,6 +1,6 @@
 ---
 name: linkedin-thread-engagement
-description: Monitor LinkedIn threads where the user commented for author replies and inbound signals. Use when the user wants to track which of their comments earned personal replies from post authors (the highest-value engagement signal). Flags the 6-24h "PublicAuthor3 window" where author replies are most likely, drafts follow-up responses, and optionally routes to DM. Keywords: thread monitoring, author reply, inbound tracking, comment follow-up, engagement compound.
+description: "Monitor LinkedIn threads where the user commented for author replies and inbound signals. Use when the user wants to track which of their comments earned personal replies from post authors (the highest-value engagement signal). Flags the 6-24h \"PublicAuthor3 window\" where author replies are most likely, drafts follow-up responses, and optionally routes to DM. Keywords: thread monitoring, author reply, inbound tracking, comment follow-up, engagement compound."
 ---
 
 # LinkedIn Thread Engagement

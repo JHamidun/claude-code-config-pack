@@ -1,6 +1,6 @@
 ---
 name: linkedin-rules-explainer
-description: Explain why each AI-tell rule exists and whether to trust it. Tier-classified rule reference for the linkedin-humanizer package. Separates forensic signals (real AI leakage), strict bans (corporate-speak the user wants out), and aesthetic overreach (stylistic patterns wrongly tagged as AI). Each rule comes with a famous human writer who uses it, a defense strength, and a citation. Use to defend a stylistic choice, audit detector output, or argue against blanket rules. Keywords: rule explainer, AI detector defense, em dash defense, rule of three, passive voice, false positive, OriginalityAI, GPTZero, stylometry.
+description: "Explain why each AI-tell rule exists and whether to trust it. Tier-classified rule reference for the linkedin-humanizer package. Separates forensic signals (real AI leakage), strict bans (corporate-speak the user wants out), and aesthetic overreach (stylistic patterns wrongly tagged as AI). Each rule comes with a famous human writer who uses it, a defense strength, and a citation. Use to defend a stylistic choice, audit detector output, or argue against blanket rules. Keywords: rule explainer, AI detector defense, em dash defense, rule of three, passive voice, false positive, OriginalityAI, GPTZero, stylometry."
 ---
 
 # LinkedIn Rules Explainer

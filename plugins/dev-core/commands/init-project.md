@@ -1,6 +1,6 @@
 ---
 description: Инициализация нового проекта с выбранным стеком
-argument-hint: [stack] [project-name]
+argument-hint: "[stack] [project-name]"
 ---
 
 # 🚀 Init Project: $ARGUMENTS
