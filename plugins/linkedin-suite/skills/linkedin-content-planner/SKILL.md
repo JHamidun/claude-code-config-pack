@@ -1,6 +1,6 @@
 ---
 name: linkedin-content-planner
-description: Generate a 7-day LinkedIn content plan given a theme, audience, and content pillars. Produces per-day recommendations (pillar, format, hook, angle, CTA type, best time), daily comment targets, and a weekly inbound-readiness check. Use when the user wants to plan a week of posts and comments instead of ad-hoc shipping. Keywords: content plan, weekly calendar, content pillars, LinkedIn strategy, founder schedule.
+description: "Generate a 7-day LinkedIn content plan given a theme, audience, and content pillars. Produces per-day recommendations (pillar, format, hook, angle, CTA type, best time), daily comment targets, and a weekly inbound-readiness check. Use when the user wants to plan a week of posts and comments instead of ad-hoc shipping. Keywords: content plan, weekly calendar, content pillars, LinkedIn strategy, founder schedule."
 ---
 
 # LinkedIn Content Planner

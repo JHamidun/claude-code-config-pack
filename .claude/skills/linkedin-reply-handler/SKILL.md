@@ -1,6 +1,6 @@
 ---
 name: linkedin-reply-handler
-description: Draft a reply to any existing LinkedIn comment from a URL. Use when the user wants to reply to a comment on someone else's post, reply to a reply on their own post, or follow up in a thread where the author just responded. The skill parses the commentUrn from the URL, figures out the correct parentComment target (LinkedIn flattens threads to 2 levels), drafts the reply in the user's voice, and waits for approval before posting via SocialPublisher. Keywords: linkedin reply, reply to comment, thread continuation, comment URL, parent comment URN.
+description: "Draft a reply to any existing LinkedIn comment from a URL. Use when the user wants to reply to a comment on someone else's post, reply to a reply on their own post, or follow up in a thread where the author just responded. The skill parses the commentUrn from the URL, figures out the correct parentComment target (LinkedIn flattens threads to 2 levels), drafts the reply in the user's voice, and waits for approval before posting via SocialPublisher. Keywords: linkedin reply, reply to comment, thread continuation, comment URL, parent comment URN."
 ---
 
 # LinkedIn Reply Handler

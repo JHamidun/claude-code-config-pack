@@ -1,6 +1,6 @@
 ---
 name: linkedin-comment-drafter
-description: Draft a high-quality LinkedIn comment on any post from a URL. Use when the user gives a LinkedIn post URL and asks to comment on it. The skill parses the URL, reads the post context, drafts 1-3 comment variants in the user's voice using 2026 hook patterns (first-commenter, data-first, answer-the-closing-question, quotable-reframe), picks a reaction type, and waits for approval before posting via SocialPublisher. Keywords: linkedin comment, engage post, comment draft, first commenter, linkedin reply strategy.
+description: "Draft a high-quality LinkedIn comment on any post from a URL. Use when the user gives a LinkedIn post URL and asks to comment on it. The skill parses the URL, reads the post context, drafts 1-3 comment variants in the user's voice using 2026 hook patterns (first-commenter, data-first, answer-the-closing-question, quotable-reframe), picks a reaction type, and waits for approval before posting via SocialPublisher. Keywords: linkedin comment, engage post, comment draft, first commenter, linkedin reply strategy."
 ---
 
 # LinkedIn Comment Drafter

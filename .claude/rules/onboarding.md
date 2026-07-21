@@ -18,7 +18,7 @@
 
 1. Copy the example file:
    ```bash
-   cp ~/.claude/.credentials.master.env.example ~/.claude/.credentials.master.env
+   cp ~/.claude/.credentials.template.env ~/.claude/.credentials.master.env
    ```
 2. **No API keys are required.** Claude Code runs entirely on your Claude subscription —
    text, code, reasoning, agents, skills all work with ZERO third-party keys. Leave the file as is.
