@@ -1,6 +1,6 @@
 ---
 name: tweaks-persist
-description: Сохранение состояния `tweaks-panel` в файл tokens.css или sidecar JSON, чтобы при перезагрузке прототипа крутилки не сбрасывались. Опционально: пишет финальное значение обратно в tokens.css при «Save tweaks».
+description: "Сохранение состояния `tweaks-panel` в файл tokens.css или sidecar JSON, чтобы при перезагрузке прототипа крутилки не сбрасывались. Опционально: пишет финальное значение обратно в tokens.css при «Save tweaks»."
 when_to_use: Активный экспериментальный режим с tweaks-panel, юзер крутит и хочет сохранить итог. Перед dev-handoff (фиксирует выбранные значения в tokens.css).
 ---
 

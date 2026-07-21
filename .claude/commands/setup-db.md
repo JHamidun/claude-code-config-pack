@@ -1,6 +1,6 @@
 ---
 description: Настройка database integration для любого фреймворка
-argument-hint: [database] (postgresql|mysql|mongodb|redis|sqlite) [framework] (fastapi|django|express|nestjs|go)
+argument-hint: "[database] (postgresql|mysql|mongodb|redis|sqlite) [framework] (fastapi|django|express|nestjs|go)"
 ---
 
 # 🗄️ Setup Database: $ARGUMENTS

@@ -1,6 +1,6 @@
 ---
 name: linkedin-emoji-detector
-description: Detect AI-pattern emoji usage in any LinkedIn post or comment draft. Counts emoji frequency, compares against the AI-correlated emoji frequency table (lightbulb, rocket, sparkles, recycling, target, chart, key, dart, muscle, fire), and returns an AI-emoji density score (0-100) plus suggested human-pattern alternatives. Three modes: scan, score, suggest. Use before publishing or as a pre-pass to linkedin-humanizer. Keywords: emoji detector, AI emoji, lightbulb tell, rocket tell, sparkles tell, ChatGPT signature, OriginalityAI, GPTZero, ToolName.
+description: "Detect AI-pattern emoji usage in any LinkedIn post or comment draft. Counts emoji frequency, compares against the AI-correlated emoji frequency table (lightbulb, rocket, sparkles, recycling, target, chart, key, dart, muscle, fire), and returns an AI-emoji density score (0-100) plus suggested human-pattern alternatives. Three modes: scan, score, suggest. Use before publishing or as a pre-pass to linkedin-humanizer. Keywords: emoji detector, AI emoji, lightbulb tell, rocket tell, sparkles tell, ChatGPT signature, OriginalityAI, GPTZero, ToolName."
 ---
 
 # LinkedIn Emoji Detector

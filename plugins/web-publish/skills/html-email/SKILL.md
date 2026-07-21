@@ -1,6 +1,6 @@
 ---
 name: html-email
-description: HTML-письма с табличной разметкой для Outlook / Gmail / Apple Mail / mobile clients. Не современный CSS — старая школа: tables, inline styles, fallbacks. Чтобы письмо не разваливалось у 30% получателей.
+description: "HTML-письма с табличной разметкой для Outlook / Gmail / Apple Mail / mobile clients. Не современный CSS — старая школа: tables, inline styles, fallbacks. Чтобы письмо не разваливалось у 30% получателей."
 when_to_use: Юзер просит «email-newsletter», «письмо рассылки», «marketing email», «transactional email». Не для in-app uploaded HTML — только для **отправки** через email-сервис.
 ---
 

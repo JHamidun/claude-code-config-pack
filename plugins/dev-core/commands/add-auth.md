@@ -1,6 +1,6 @@
 ---
 description: Добавление аутентификации в проект
-argument-hint: [method] (jwt|oauth2|session|firebase|auth0)
+argument-hint: "[method] (jwt|oauth2|session|firebase|auth0)"
 ---
 
 # 🔐 Add Auth: $ARGUMENTS
