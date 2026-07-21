@@ -5,6 +5,12 @@
 
 ---
 
+## ⚠️ Из коробки — только подписка Claude (БЕСПЛАТНО для пользователя)
+
+Свежая установка работает БЕЗ единого стороннего ключа: весь текст/код/reasoning — Opus по подписке Claude. Все таблицы внешних моделей ниже — ОПЦИОНАЛЬНЫЕ платные интеграции.
+
+**Правило NO-KEY:** прежде чем вызывать любой внешний API (Gemini, OpenAI, ElevenLabs…) — проверь ключ в `.credentials.master.env`. Ключ отсутствует/пустой/placeholder (`your_*_api_key`) → НЕ вызывай API и НЕ проси пользователя оплатить или включить биллинг. Ответь: «Эта функция опциональна, нужен свой API-ключ» + как получить (для Gemini: aistudio.google.com, есть бесплатный tier) — и предложи альтернативу.
+
 ## Контекст использования
 
 **Claude Code работает на Opus 4.6 через подписку** (не по API).
@@ -18,7 +24,7 @@ Opus закрывает ВСЕ текстовые, кодовые и reasoning �
 
 | Задача | Модель | Провайдер |
 |--------|--------|-----------|
-| **Генерация картинок** | `gemini-3.1-flash-image-preview` (default) или `gemini-3-pro-image-preview` (pro) или `gpt-image-1.5` | Google / OpenAI |
+| **Генерация картинок** (опционально, нужен GOOGLE_API_KEY) | `gemini-3.1-flash-image-preview` (default) или `gemini-3-pro-image-preview` (pro) или `gpt-image-1.5` | Google / OpenAI |
 | **Генерация видео** | `sora-2-pro` или `veo-3.1-generate-preview` | OpenAI / Google |
 | **Видео с аватаром** | HeyGen API (skill `heygen`) | HeyGen |
 | **TTS / озвучка** | `eleven_multilingual_v2` или `tts-1-hd` | ElevenLabs / OpenAI |

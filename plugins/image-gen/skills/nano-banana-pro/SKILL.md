@@ -3,6 +3,8 @@ name: nano-banana-pro
 description: "Nano Banana Pro / Gemini Image Ultra - Prompt Engineering Guide"
 ---
 
+> ⚠️ **NO-KEY GUARD (обязательно):** этот функционал требует ОПЦИОНАЛЬНОГО стороннего API-ключа. Перед вызовом проверь ключ в `.credentials.master.env`. Если ключ отсутствует, пустой или placeholder (`your_*_api_key`) — **НЕ проси пользователя оплатить счёт, включить биллинг или купить API**. Скажи одной строкой: «Эта функция опциональна и требует свой API-ключ (например, бесплатный ключ на aistudio.google.com); из коробки всё остальное работает по подписке Claude» — и предложи альтернативу или продолжай без неё.
+
 # Nano Banana Pro / Gemini Image Ultra - Prompt Engineering Guide
 
 > **See Also:**
