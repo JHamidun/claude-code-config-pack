@@ -12,7 +12,8 @@
 8. НЕ используй устаревшие модели — сверяй с config/models.md
 9. НЕ используй старый SDK `google.generativeai` — используй `from google import genai`
 10. НЕ запускай деструктивные команды без подтверждения
-11. НЕ используй НЕ ТУ модель для генерации изображений — ТОЛЬКО `gemini-3.1-flash-image-preview` (default) или `gemini-3-pro-image-preview` (pro)
+11. НЕ проси пользователя ОПЛАТИТЬ сторонний API (Gemini/OpenAI/и т.п.), включить биллинг или купить подписку. Сторонние API — опциональны. Нет ключа в `.credentials.master.env` (или там placeholder `your_*_api_key`) → фича недоступна: скажи об этом одной строкой, предложи альтернативу и продолжай. Из коробки всё работает по подписке Claude.
+12. НЕ используй НЕ ТУ модель для генерации изображений (сама генерация — ОПЦИОНАЛЬНАЯ фича, только при настроенном GOOGLE_API_KEY; без ключа — см. п.11) — ТОЛЬКО `gemini-3.1-flash-image-preview` (default) или `gemini-3-pro-image-preview` (pro)
     - НЕ `gemini-2.0-flash-exp-image-generation`
     - НЕ `gemini-2.0-flash-exp`
     - НЕ `gemini-2.0-flash`
