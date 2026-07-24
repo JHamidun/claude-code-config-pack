@@ -17,9 +17,13 @@ Expert skill for text-to-speech, voice cloning, sound effects, and audio AI usin
 ELEVENLABS_API_KEY=os.getenv('ELEVENLABS_API_KEY')
 ```
 
-## Voices
+## Голос пользователя (ElevenLabs)
 
-Use a prebuilt ElevenLabs voice, or set `ELEVENLABS_VOICE_ID` to your own (cloned) voice ID. List available voices via the `/v2/voices` endpoint.
+| Название | Voice ID | Категория |
+|----------|----------|-----------|
+| User_Нейтральный_123 | `YOUR_ELEVENLABS_VOICE_ID` | cloned |
+
+> **Локальная альтернатива (экономия кредитов):** для массовой/черновой RU-озвучки, длинных аудиокниг, dictation и офлайн — см. `references/local-voicebox-eval.md` (Voicebox / Chatterbox / Qwen3-TTS на your GPU, 0 кредитов). ElevenLabs остаётся каноном для флагманской озвучки пользователя, SFX и music.
 
 ## When to Use ElevenLabs
 
@@ -109,6 +113,117 @@ def stream_speech(text: str, voice_id: str):
     from elevenlabs.play import play
     play(audio_stream)
 ```
+
+## Music Generation (`client.music.compose`)
+
+ENDPOINT: `client.music.compose(prompt, music_length_ms, force_instrumental, model_id)` — добавлено 2026-05-31, params исправлены 2026-06-06 (production-used).
+
+### Quickstart
+
+```python
+from elevenlabs import ElevenLabs
+import os
+
+client = ElevenLabs(api_key=os.environ['ELEVENLABS_API_KEY'])
+
+result = client.music.compose(
+    prompt='Tense underscore, sub-bass pulse, sparse percussion, no vocals',
+    music_length_ms=30000,     # ← НЕ length_ms! (см. ниже)
+    force_instrumental=True,    # инструментал без вокала
+    model_id='music_v1',
+)
+
+with open('bgm.mp3', 'wb') as f:
+    for chunk in result:
+        f.write(chunk)
+```
+
+### Hard limits + param names
+
+- **CRITICAL — имя параметра длины = `music_length_ms`, НЕ `length_ms`.** `length_ms=...` → `TypeError: MusicClient.compose() got an unexpected keyword argument 'length_ms'` (проверено в проде, июнь 2026).
+- Инструментал — через `force_instrumental=True` (надёжнее, чем «no vocals» в тексте промпта).
+- `model_id='music_v1'`.
+- **~30 seconds на одну генерацию** (длиннее режь на сегменты с narrative handoff, см. video-generation `references/audio.md`).
+- Output: MP3 stream. Generation time: 10-30 sec wall-clock.
+
+### CRITICAL: Named-artist policy
+
+Любой prompt со ссылкой на named artist → `content_policy_violation`. Это **всегда** падает:
+
+- `'in the style of [Named Artist]'`
+- `'[Artist]-style vocal'`
+- `'sounds like [Track] by [Artist]'`
+- `'[Composer] cinematic'`
+
+**Workaround = ТОЛЬКО descriptor substitution.** Никаких имён.
+
+| Запрещено | Заменить на дескрипторы |
+|---|---|
+| `Hans Zimmer cinematic` | `Massive orchestral underscore, sub-bass pulse, brass swells, heroic` |
+| `in the style of Vangelis` | `Synthesized 80s sci-fi, analog warm pads, slow arpeggios` |
+| `Lo-fi hip-hop like Nujabes` | `Jazzy lo-fi, soft vinyl crackle, lazy drum samples, mellow piano` |
+| `Sounds like Lord of the Rings score` | `Celtic strings, choir swells, epic fantasy underscore, heroic horn motif` |
+| `John Williams adventure` | `Sweeping orchestral adventure, brass fanfare, rolling strings` |
+
+### Длинные треки (>30s)
+
+Генерируй 2 сегмента по 30s с narrative handoff в prompt'е, концатенируй **БЕЗ crossfade** (jarring на музыке):
+
+```python
+seg1 = client.music.compose(prompt='Dark mystery cinematic underscore, low strings, builds slowly', music_length_ms=30000, force_instrumental=True, model_id='music_v1')
+seg2 = client.music.compose(prompt='Continues from dark mystery, transitions into battle, percussion enters, brass swells', music_length_ms=30000, force_instrumental=True, model_id='music_v1')
+# ffmpeg -i seg1.mp3 -i seg2.mp3 -filter_complex "[0:a][1:a]concat=n=2:v=0:a=1[out]" -map "[out]" full.mp3
+```
+
+### Когда что использовать
+
+| Задача | Решение |
+|---|---|
+| Quick BGM под шортс | **ElevenLabs Music** — быстрее, не нужен service account |
+| Commercial-safe license для коммерческого ролика | **Lyria 2** (your-server AI, см. `video-generation/references/audio.md`) |
+| Кинематографический score для книжного трейлера | **Lyria 2** 2×30s + acrossfade |
+
+## Production voice IDs
+
+### YourFirstName voice (clone) — точные production settings
+
+```python
+audio = client.text_to_speech.convert(
+    voice_id = 'YOUR_HEYGEN_VOICE_ID',   # YourFirstName clone
+    text='Сегодня разберём, как…',
+    model_id='eleven_multilingual_v2',
+    voice_settings={
+        'stability': 0.55,
+        'similarity_boost': 0.80,
+        'style': 0.15,
+        'use_speaker_boost': True,
+    },
+)
+```
+
+**Отклонения от этих параметров → voice cracks, потеря тембра, over-acting.** Не править без причины.
+
+### EN voices on RU — эмпирически лучше native RU
+
+Английские voice IDs через `eleven_multilingual_v2` на русском тексте дают тембр заметно лучше native RU voices. Подтверждено в production (YourFirstName shortform pattern).
+
+| Voice | voice_id | Use |
+|---|---|---|
+| Matthew Villain | `bwCXcoVxWNYMlC6Esa8u` | mystical / character / book trailer narrator (RU и EN) |
+| Brian | (см. ElevenLabs catalog) | confident male, корпоративные шортсы |
+
+### Voice settings ranges (общие)
+
+| Параметр | Range | Эффект |
+|---|---|---|
+| `stability` | 0.20–0.35 | expressive, актёрская подача |
+| `stability` | >0.60 | robotic, монотонный |
+| `similarity_boost` | 0.80–0.90 | character lock, держит тембр |
+| `style` | 0.2 | intimate, разговорный |
+| `style` | 0.8 | dramatic, театральный |
+| `use_speaker_boost` | True | всегда True для production |
+
+Тестируй 5-10 voice IDs с identical text прежде чем commit к final.
 
 ### Instant Voice Cloning
 

@@ -1,0 +1,163 @@
+{
+  "id": "FDl4Ho3KYiA7MIxR",
+  "meta": {
+    "instanceId": "workflow-8ef4a796",
+    "versionId": "1.0.0",
+    "createdAt": "2025-09-29T07:07:49.912868",
+    "updatedAt": "2025-09-29T07:07:49.912880",
+    "owner": "n8n-user",
+    "license": "MIT",
+    "category": "automation",
+    "status": "active",
+    "priority": "high",
+    "environment": "production"
+  },
+  "name": "NetSuite Rest API workflow",
+  "tags": [
+    "automation",
+    "n8n",
+    "production-ready",
+    "excellent",
+    "optimized"
+  ],
+  "nodes": [
+    {
+      "id": "f7f90fb4-e29f-4bbf-a99d-ee2fde45cd06",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -380,
+        -40
+      ],
+      "parameters": {},
+      "typeVersion": 1,
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "9fcc1ce7-e9bf-4592-8bcd-7c77272a9c59",
+      "name": "NetSuite",
+      "type": "n8n-nodes-netsuite.netsuite",
+      "position": [
+        -40,
+        -180
+      ],
+      "parameters": {
+        "query": "={{ $json.query.suiteql }}",
+        "options": {},
+        "operation": "runSuiteQL"
+      },
+      "credentials": {
+        "netsuite": {
+          "id": "ro6Rl1oWY4KkFUYn",
+          "name": "NetSuite account"
+        }
+      },
+      "typeVersion": 1,
+      "notes": "This netsuite node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "1d615309-2cb0-4383-9698-2f80da0d4bf5",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -380,
+        -280
+      ],
+      "webhookId": "249328cc-587a-4269-b266-96fe60cfaeb9",
+      "parameters": {
+        "path": "249328cc-587a-4269-b266-96fe60cfaeb9",
+        "options": {},
+        "responseData": "allEntries",
+        "responseMode": "lastNode"
+      },
+      "typeVersion": 2,
+      "notes": "This webhook node performs automated tasks as part of the workflow."
+    }
+  ],
+  "active": true,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": null,
+    "timezone": "UTC",
+    "executionTimeout": 3600,
+    "maxExecutions": 1000,
+    "retryOnFail": true,
+    "retryCount": 3,
+    "retryDelay": 1000
+  },
+  "versionId": "d6823e59-8e07-44a6-b4af-b029da620523",
+  "connections": {
+    "1d615309-2cb0-4383-9698-2f80da0d4bf5": {
+      "main": [
+        [
+          {
+            "node": "error-handler-1d615309-2cb0-4383-9698-2f80da0d4bf5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-1d615309-2cb0-4383-9698-2f80da0d4bf5-b987d95a",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-1d615309-2cb0-4383-9698-2f80da0d4bf5-2147f6b1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-1d615309-2cb0-4383-9698-2f80da0d4bf5-4acc5284",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-1d615309-2cb0-4383-9698-2f80da0d4bf5-d788e0aa",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-1d615309-2cb0-4383-9698-2f80da0d4bf5-ccbf549f",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-1d615309-2cb0-4383-9698-2f80da0d4bf5-90add95f",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-1d615309-2cb0-4383-9698-2f80da0d4bf5-828d5190",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-1d615309-2cb0-4383-9698-2f80da0d4bf5-ea562ff6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "description": "Automated workflow: NetSuite Rest API workflow. This workflow processes data and performs automated tasks.",
+  "notes": "Excellent quality workflow: NetSuite Rest API workflow. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+}

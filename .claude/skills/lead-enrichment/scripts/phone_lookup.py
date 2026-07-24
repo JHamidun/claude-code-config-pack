@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """RU phone -> operator + region from the public numbering plan (Rossvyaz DEF/ABC codes).
 
-Usage:  python phone_lookup.py "+7 916 123-45-67"
+Usage:  python phone_lookup.py "+1234567890"
 Output: JSON {phone, def_code, operator, region}
 
 No PII. Uses the public Rossvyaz allocation registry (operator + region per DEF block).
@@ -13,7 +13,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='repla
 
 # Coarse DEF (mobile, 9xx) operator map by 3-digit prefix block. Public numbering plan.
 DEF_OPERATOR = {
-    'МТС': ['910','911','912','913','914','915','916','917','918','919','980','981','982','983','984','985','986','987','988','989','892','958'],
+    'ClientCorp8': ['910','911','912','913','914','915','916','917','918','919','980','981','982','983','984','985','986','987','988','989','892','958'],
     'МегаФон': ['920','921','922','923','924','925','926','927','928','929','930','931','932','933','934','936','937','938','939'],
     'Билайн': ['903','905','906','909','960','961','962','963','964','965','966','967','968','903'],
     'Tele2': ['900','901','902','904','908','950','951','952','953','977','991','992','993','994','995','996','999'],

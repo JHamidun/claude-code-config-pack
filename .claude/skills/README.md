@@ -82,11 +82,7 @@
 | `validate-plan-file/` | Plan file validation |
 | `generate-report-header/` | Standard report headers |
 | `parse-git-status/` | Git status parsing |
-| `bug-health-inline/` | Inline bug detection |
-| `cleanup-health-inline/` | Inline dead code cleanup |
-| `deps-health-inline/` | Inline dependency audit |
-| `reuse-health-inline/` | Inline duplication detection |
-| `security-health-inline/` | Inline security scanning |
+| `health-inline/` | Codebase health checks — 5 режимов (bug/cleanup/deps/reuse/security) |
 
 ## DevOps
 

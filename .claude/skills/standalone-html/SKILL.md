@@ -1,147 +1,94 @@
 ---
 name: standalone-html
-description: Самодостаточный single-file HTML — все скрипты, стили, картинки inline. Можно отправить как один файл по email, открыть без сервера, сохранить в Notion. Финальный output для слайдов / лендингов / прототипов когда нужна 100% portability.
-when_to_use: Юзер просит «один файл», «без зависимостей», «отправить по email», «открывается на любой машине», «standalone». После slides / interactive-prototype если внешние файлы тяжёлые.
+description: Свернуть HTML + все его ассеты в один файл, который работает офлайн.
+when_to_use: Пользователь просит "один файл", "self-contained", "чтобы можно было отправить", "без интернета чтоб работало".
 ---
 
 # Standalone HTML
 
-Один `.html` файл, который работает в браузере без файлового сервера, без интернета, без других файлов рядом. Все картинки → base64, шрифты → embedded, JS/CSS → inline.
+Inline-вшивает в один HTML все локальные ресурсы: CSS, JS, изображения, шрифты.
 
-## Какие inline'ятся
+## Скрипт
 
-| Тип | Метод | Размер |
-|---|---|---|
-| Изображения | `data:image/png;base64,...` | × 1.33 |
-| SVG | inline `<svg>` | стандартный |
-| Шрифты | `data:font/woff2;base64,...` в `@font-face` | × 1.33 |
-| CSS | `<style>` в `<head>` | стандартный |
-| JS | `<script>` в `<head>` или `<body>` | стандартный |
-| Видео | `data:video/mp4;base64,...` | × 1.33 (NOT recommended for >2MB) |
+`templates/inline.mjs`:
 
-`× 1.33` — оверхед base64 кодирования.
-
-## Каркас inliner script
-
-`scripts/inline.js`:
 ```js
-const fs = require('fs');
-const path = require('path');
-const mime = require('mime-types');
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
-function inlineFile(filePath, baseDir) {
-  const abs = path.resolve(baseDir, filePath);
-  const buf = fs.readFileSync(abs);
-  const m = mime.lookup(abs) || 'application/octet-stream';
-  return `data:${m};base64,${buf.toString('base64')}`;
+const [, , input, output] = process.argv;
+if (!input) { console.error('Usage: node inline.mjs <input.html> [output.html]'); process.exit(1); }
+
+const out = output || input.replace(/\.html?$/, '.standalone.html');
+const dir = path.dirname(input);
+let html = await fs.readFile(input, 'utf8');
+
+// <link rel="stylesheet" href="..."> → <style>
+html = await replaceAsync(html, /<link\s+[^>]*rel=["']stylesheet["'][^>]*>/gi, async (tag) => {
+  const m = tag.match(/href=["']([^"']+)["']/);
+  if (!m || /^https?:|\/\//.test(m[1])) return tag;
+  const css = await fs.readFile(path.join(dir, m[1]), 'utf8');
+  return `<style>\n${css}\n</style>`;
+});
+
+// <script src="..."> → <script>...</script>
+html = await replaceAsync(html, /<script\s+[^>]*src=["']([^"']+)["'][^>]*>\s*<\/script>/gi, async (tag, src) => {
+  if (/^https?:|\/\//.test(src)) return tag;
+  const code = await fs.readFile(path.join(dir, src), 'utf8');
+  const typeMatch = tag.match(/type=["']([^"']+)["']/);
+  const type = typeMatch ? ` type="${typeMatch[1]}"` : '';
+  return `<script${type}>\n${code}\n</script>`;
+});
+
+// <img src="..."> → data URL
+html = await replaceAsync(html, /<img\s+[^>]*src=["']([^"']+)["'][^>]*>/gi, async (tag, src) => {
+  if (/^https?:|\/\/|data:/.test(src)) return tag;
+  try {
+    const buf = await fs.readFile(path.join(dir, src));
+    const ext = path.extname(src).slice(1).toLowerCase() || 'png';
+    const mime = { svg: 'svg+xml', jpg: 'jpeg', jpeg: 'jpeg', png: 'png', webp: 'webp', gif: 'gif' }[ext] || 'octet-stream';
+    const data = `data:image/${mime};base64,${buf.toString('base64')}`;
+    return tag.replace(src, data);
+  } catch { return tag; }
+});
+
+// url(...) внутри инлайн-CSS — тоже data URL
+html = await replaceAsync(html, /url\(["']?([^"')]+)["']?\)/g, async (m, src) => {
+  if (/^https?:|\/\/|data:/.test(src)) return m;
+  try {
+    const buf = await fs.readFile(path.join(dir, src));
+    const ext = path.extname(src).slice(1).toLowerCase();
+    const mime = ({ woff2: 'font/woff2', woff: 'font/woff', ttf: 'font/ttf',
+      svg: 'image/svg+xml', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg' })[ext] || 'application/octet-stream';
+    return `url("data:${mime};base64,${buf.toString('base64')}")`;
+  } catch { return m; }
+});
+
+await fs.writeFile(out, html);
+console.log('✓', out);
+
+async function replaceAsync(str, re, fn) {
+  const promises = [];
+  str.replace(re, (...args) => { promises.push(fn(...args)); return ''; });
+  const results = await Promise.all(promises);
+  let i = 0;
+  return str.replace(re, () => results[i++]);
 }
-
-function inlineHTML(htmlPath) {
-  const baseDir = path.dirname(htmlPath);
-  let html = fs.readFileSync(htmlPath, 'utf-8');
-
-  // 1. Replace <link rel="stylesheet" href="X"> → <style>...content...</style>
-  html = html.replace(/<link\s+rel="stylesheet"\s+href="([^"]+)"\s*\/?>/g, (_, href) => {
-    if (href.startsWith('http')) return _;  // CDN — не трогаем
-    let css = fs.readFileSync(path.resolve(baseDir, href), 'utf-8');
-    // Inline url() в CSS
-    css = css.replace(/url\((['"]?)([^)'"]+)\1\)/g, (m, q, url) => {
-      if (url.startsWith('http') || url.startsWith('data:')) return m;
-      return `url("${inlineFile(url, path.dirname(path.resolve(baseDir, href)))}")`;
-    });
-    return `<style>\n${css}\n</style>`;
-  });
-
-  // 2. Replace <script src="X"> → <script>...content...</script>
-  html = html.replace(/<script\s+([^>]*?)src="([^"]+)"([^>]*?)\s*><\/script>/g,
-    (_, before, src, after) => {
-      if (src.startsWith('http')) return _;  // CDN
-      const js = fs.readFileSync(path.resolve(baseDir, src), 'utf-8');
-      return `<script ${before} ${after}>\n${js}\n</script>`;
-    });
-
-  // 3. Replace <img src="X"> → <img src="data:...">
-  html = html.replace(/<img\s+([^>]*?)src="([^"]+)"([^>]*?)\s*\/?>/g,
-    (_, before, src, after) => {
-      if (src.startsWith('http') || src.startsWith('data:')) return _;
-      return `<img ${before}src="${inlineFile(src, baseDir)}"${after}>`;
-    });
-
-  return html;
-}
-
-if (require.main === module) {
-  const out = inlineHTML(process.argv[2]);
-  fs.writeFileSync(process.argv[3] || 'standalone.html', out);
-  console.log(`✓ ${process.argv[3] || 'standalone.html'} (${(out.length / 1024).toFixed(1)} KB)`);
-}
-
-module.exports = { inlineHTML };
 ```
+
+## Запуск
 
 ```bash
-npm i mime-types
-node scripts/inline.js artifact.html artifact.standalone.html
+node inline.mjs deck.html
+# → deck.standalone.html
 ```
 
-## CDN scripts — оставлять или embedd'ить?
+## Ограничения
 
-В artifact из Claude Design используются:
-- `react.development.js`, `react-dom.development.js`, `babel-standalone`
+- Внешние URL (`https://...`) скрипт не трогает — они останутся ссылками. Если нужен полный офлайн — заранее скачай шрифты и CDN-скрипты в проект.
+- `<iframe src="...">` не разворачивается. iframe-вариантные канвасы (см. `design-canvas`) теряют содержимое — для них либо инлайнь HTML внутрь, либо отдай ZIP.
+- Размер: один HTML с шрифтами и картинками легко вырастает до 5–10 MB. Для отправки по почте оставь ассеты во внешних папках или сожми изображения.
 
-| Решение | Pro | Con |
-|---|---|---|
-| Оставить CDN-ссылки | размер file 50KB | нужен интернет для запуска |
-| Embedd'ить React+Babel | работает offline | размер file +1.5MB |
+## Legacy reference
 
-Для real standalone (offline ready) — embedd'ить. Но 1.5MB — большой email-attachment.
-
-**Compromise:** standalone-html + `react.production.min.js` + `react-dom.production.min.js` (без Babel, заранее compiled JSX через online tool):
-
-```bash
-# Pre-compile JSX в JS
-npx babel src/animation.jsx --presets=@babel/preset-react -o dist/animation.js
-# Теперь embedd'ить animation.js, не animation.jsx
-# И не нужен @babel/standalone — экономим 1MB
-```
-
-## Размеры — что разумно
-
-| Размер | Применение |
-|---|---|
-| < 100KB | Эмейл-attachment, Slack |
-| 100KB - 500KB | Telegram, Discord |
-| 500KB - 2MB | Notion-embed, GitHub gist |
-| 2MB - 10MB | Local file, Drive |
-| > 10MB | Не standalone — лучше hosting |
-
-Если получился >10MB — что-то пошло не так (большие images / видео).
-
-## Verifier для standalone
-
-После inline — открыть в браузере и проверить что всё работает:
-```bash
-node scripts/verify.js standalone.html
-# Через `verifier` skill: file:// без сети, всё должно рендериться
-```
-
-## Когда НЕ делать standalone
-
-- Артефакт идёт в production project — там сборщик сделает свою оптимизацию
-- Используется heavy data (CSV, JSON) на много MB — лучше hosting
-- Есть интерактив с back-end API — standalone не починит API
-
-## Stacking
-
-- `verifier` — проверить standalone после inline
-- `dev-handoff` — иногда нужен standalone-html ВНУТРИ handoff bundle для preview
-- `export-pdf` — после standalone проще export'ить (всё в одном файле)
-
-## Антипаттерны
-
-- Inline'ить видео >5MB → файл становится unusable
-- Использовать blob: URLs внутри standalone (исчезают при reload)
-- Оставить относительные ссылки которые не inline'ятся → broken images
-- Не сохранять source отдельно — после inline'a JS-код становится unreadable, debug сложно
-- Inline'ить шрифты для языков, которые не используются (полный CJK набор) → +2MB на ничего
-- Делать standalone каждое изменение → теряется dev-loop (live-preview не работает)
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-standalone-html.md`. Секции там: Какие inline'ятся, Каркас inliner script, CDN scripts — оставлять или embedd'ить?, Размеры — что разумно, Verifier для standalone, Когда НЕ делать standalone, Stacking, Антипаттерны.

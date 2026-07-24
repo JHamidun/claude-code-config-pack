@@ -1,0 +1,96 @@
+[metadata]
+author = "Kent Langley"
+created = "2026-05-01"
+updated = "2026-05-19"
+version = "1.3.0"
+license = "MIT"
+source_attribution = "Salim Ismail with contributors — The Organizational Singularity, OS Outline v20 (Edge Twin Data-Governance Pass), OpenExO Pro, May 2026"
+tags = [
+  "exo-3.0",
+  "intelligence-stack",
+  "rewrite-playbook",
+  "drive",
+  "shape",
+  "edge-twin",
+  "edge-deployment",
+  "mtp",
+  "agentic-firm",
+  "ai-native",
+  "govern-assure",
+  "four-pillars",
+  "trusted-evals",
+  "searchable-logs",
+  "granular-rollback",
+  "human-review-queue",
+  "hido",
+  "silent-drift",
+  "peter-principle-ai-agents",
+  "miura-ko-ladder",
+  "cross-organizational-accountability",
+  "permission-envelope",
+  "fiduciary-wedge",
+  "continuous-kill-switch",
+  "social-capital-crosswalk",
+  "five-layer-agent-stack",
+  "amazon-q-sidebar",
+  "steinberger-your-gateway-project",
+  "tokens-as-cogs",
+  "semianalysis",
+  "headless-360",
+  "per-outcome-pricing",
+  "idc-agent-forecast",
+  "salim-ismail",
+  "organizational-singularity",
+  "openexo",
+  "workflow-data-manifest",
+  "edge-twin-data-governance",
+  "no-data-fork",
+  "source-of-truth",
+  "erp-wins",
+  "cold-start-learning",
+  "shadow-mode",
+  "historical-replay",
+  "shadow-comparison",
+  "human-correction-capture",
+  "synthetic-edge-cases",
+  "human-override-rate",
+  "cio-edge-twin-diagnostic",
+  "appendix-f",
+  "readiness-gate",
+  "nist-ai-rmf",
+  "owasp-llm-top-10",
+  "csa-ai-controls-matrix",
+  "aicm",
+  "standards-mapping",
+  "access-not-training",
+  "scoped-workload-identity",
+  "short-lived-credentials"
+]
+
+[defaults]
+depth = "standard"
+output_format = "markdown"
+include_templates = true
+include_premium = false
+
+[defaults.model]
+name = "claude-opus-4-7"
+temperature = 0.3
+
+[environments.quick]
+depth = "quick"
+include_templates = false
+model.temperature = 0.5
+
+[environments.deep]
+depth = "deep"
+include_premium = true
+model.name = "claude-opus-4-7"
+model.temperature = 0.2
+
+[environments.workshop]
+depth = "deep"
+include_templates = true
+include_premium = true
+model.name = "claude-opus-4-7"
+model.temperature = 0.25

@@ -1,908 +1,352 @@
 ---
 name: gemini-3-pro
-description: "Gemini API Skill (Full Suite)"
+description: "Google AI Suite через API (GOOGLE_API_KEY): Gemini text (2M контекст), embeddings, TTS/STT (Live API), code execution, Google Search grounding, function calling; секции Imagen/Veo. Триггеры: «gemini api», «gemini 3 pro», «спроси gemini по api», «google embeddings». Канон image/video-моделей — config/models.md (генерация картинок → image-generation / nano-banana-pro)."
 ---
-
-> ⚠️ **NO-KEY GUARD (обязательно):** этот функционал требует ОПЦИОНАЛЬНОГО стороннего API-ключа. Перед вызовом проверь ключ в `.credentials.master.env`. Если ключ отсутствует, пустой или placeholder (`your_*_api_key`) — **НЕ проси пользователя оплатить счёт, включить биллинг или купить API**. Скажи одной строкой: «Эта функция опциональна и требует свой API-ключ (например, бесплатный ключ на aistudio.google.com); из коробки всё остальное работает по подписке Claude» — и предложи альтернативу или продолжай без неё.
 
 # Gemini API Skill (Full Suite)
 
 > **See Also:**
-> - **[image-generation](image-generation.md)** - General prompt engineering for all image generators
-> - **[nano-banana-pro](nano-banana-pro.md)** - Photorealistic portrait templates (Gemini-specific)
-> - **[openai-dalle](openai-dalle.md)** - OpenAI suite: DALL-E 3, Sora 2, Whisper, GPT-4o
+> - **[image-generation](../image-generation/SKILL.md)** — генерация картинок (канон NB2/Lite/Pro)
+> - **[nano-banana-pro](../nano-banana-pro/SKILL.md)** — prompt engineering для Gemini image
+> - **[video-generation](../video-generation/SKILL.md)** — генерация видео (Veo/Sora/Seedance)
+> - **[openai-dalle](../openai-dalle/SKILL.md)** — OpenAI suite: gpt-image-2, Sora, Whisper, TTS
+> - agent-builder tooling/references/gemini-api-models.md` — живой каталог моделей + discovery curl + OpenAI-shim для ботов
 
 ## Overview
 
-Expert skill for Google AI Suite - полный набор возможностей:
-- **Text**: Gemini 2.0 Flash/Pro (2M контекст!)
-- **Images**: Imagen 3 Ultra (генерация)
-- **Video**: Veo 2 (генерация видео)
-- **Audio TTS**: Text-to-Speech
-- **Audio STT**: Speech-to-Text (Live API)
-- **Embeddings**: text-embedding-004
-- **Tools**: Code execution, Google Search, Function calling
+Скилл для Google AI (Gemini) API — то, что Opus/Fable не делают сами:
+
+- **Text по API** — для автономных ботов/агентов вне Claude Code (2M контекст у Pro)
+- **Multimodal understanding** — анализ изображений, видео (вкл. YouTube URL), аудио, PDF
+- **Embeddings** — `gemini-embedding-001`
+- **Tools** — Google Search grounding, code execution, URL context, function calling
+- **TTS / Live API** — озвучка и realtime аудио-диалог
+- **Structured output** — JSON по схеме
+
+⚠️ **НЕ здесь**: генерация картинок и видео. Канон — `config/models.md`:
+картинки → skill `image-generation` (NB2 `gemini-3.1-flash-image-preview` default / NB2 Lite / NB Pro),
+видео → skill `video-generation` (`veo-3.1-generate-preview`, `sora-2-pro`).
+Запрещённые модели (gemini-2.0-flash*, gemini-2.5-flash-image, gemini-pro-vision, gemini-1.x) — `rules/dont-do.md`.
 
 ## API Key
 
-```bash
-# API ключи: ~/.claude/.credentials.master.env
-# Переменные: GOOGLE_API_KEY, GEMINI_API_KEY
-GOOGLE_API_KEY=os.getenv('GOOGLE_API_KEY')
-GEMINI_API_KEY=os.getenv('GEMINI_API_KEY')
-```
-
-## Available Models
-
-| Model | Context | Best For |
-|-------|---------|----------|
-| **gemini-2.0-flash** | 1M | Fast responses, real-time |
-| **gemini-2.0-flash-thinking** | 1M | Complex reasoning |
-| **gemini-2.0-pro** (preview) | 2M | Highest quality |
-| **gemini-1.5-pro** | 2M | Long documents |
-| **gemini-1.5-flash** | 1M | Cost-effective |
-| **gemini-1.5-flash-8b** | 1M | Ultra-fast, cheap |
-| **imagen-3-ultra** | - | Image generation |
-| **veo-2** | - | Video generation |
-
-## When to Use Gemini
-
-**Best for:**
-- Multimodal tasks (text + images + video + audio)
-- Massive context (up to 2M tokens!)
-- Native image generation (Imagen 3 Ultra)
-- Video generation (Veo 2)
-- Long document processing
-- Real-time streaming (Live API)
-- Code execution in sandbox
-
-**Advantages:**
-- Largest context window (2M!)
-- Native multimodal - all formats
-- Built-in Imagen 3 & Veo 2
-- Excellent reasoning (thinking models)
-- Google Search grounding
-- Live API for real-time audio/video
-
-## Dependencies
-
-```bash
-pip install google-generativeai
-```
-
-## Basic Usage
-
-### Setup Client
-
 ```python
-import google.generativeai as genai
+# Ключи: ~/.claude/.credentials.master.env
+# Канон: GOOGLE_API_KEY (GEMINI_API_KEY конфликтует с SDK при image-генерации)
 import os
-
-genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
-
-# Available models
-MODELS = {
-    "gemini-3-pro": "Flagship model, best quality",
-    "gemini-3-pro-vision": "Optimized for vision tasks",
-    "gemini-3-flash": "Fast, efficient, cheaper",
-    "gemini-2.0-flash-exp": "Experimental features"
-}
+os.environ.pop('GEMINI_API_KEY', None)   # снять конфликт SDK
+api_key = os.getenv('GOOGLE_API_KEY')
 ```
 
-### Text Generation
+## SDK
+
+```bash
+pip install google-genai
+```
 
 ```python
-def gemini_chat(prompt: str, system_prompt: str = None,
-                model_name: str = "gemini-3-pro"):
-    """
-    Chat with Gemini 3 Pro.
+from google import genai
+from google.genai import types
 
-    Models:
-        - gemini-3-pro: Best quality (2M context)
-        - gemini-3-flash: Fast & cheap
-        - gemini-3-pro-vision: Vision optimized
-    """
-    model = genai.GenerativeModel(
-        model_name=model_name,
-        system_instruction=system_prompt
+client = genai.Client(api_key=os.getenv('GOOGLE_API_KEY'))
+```
+
+⛔ Старый SDK `google.generativeai` (`import google.generativeai as genai`, `genai.configure(...)`, `GenerativeModel`) **ЗАПРЕЩЁН** (`rules/dont-do.md` п.9). Только `from google import genai`.
+
+## Актуальные модели (сверка июль 2026)
+
+| Модель | Контекст | Роль |
+|--------|----------|------|
+| `gemini-3.1-pro-preview` | ~2M | Лучший reasoning / длинные документы |
+| `gemini-3.5-flash` | ~1M | **Рекомендованный primary для ботов** (быстрый, дешёвый) |
+| `gemini-3.1-flash-lite` | ~1M | Самый дешёвый, простые Q&A/классификация |
+| `gemini-3-flash-preview` | ~1M | Beta, местами ограничен |
+| `gemini-2.5-pro` / `gemini-2.5-flash` | 1M | Стабильные fallback |
+| `gemini-embedding-001` | — | Embeddings |
+| `gemini-3.1-flash-tts-preview` | — | TTS |
+
+Каталог дрейфует между ключами и релизами — **перед хардкодом модели в конфиг прогони discovery**:
+
+```bash
+curl -s "https://generativelanguage.googleapis.com/v1beta/models?key=${GOOGLE_API_KEY}" | python -m json.tool
+```
+
+Полная таблица (latency/лимиты/прайс/gotchas) — agent-builder tooling/references/gemini-api-models.md`.
+
+## Text Generation
+
+```python
+def gemini_chat(prompt: str, system: str | None = None,
+                model: str = "gemini-3.5-flash") -> str:
+    response = client.models.generate_content(
+        model=model,
+        contents=prompt,
+        config=types.GenerateContentConfig(system_instruction=system),
     )
-
-    response = model.generate_content(prompt)
     return response.text
 
-# Simple usage
-result = gemini_chat("Explain quantum computing")
+result = gemini_chat("Explain quantum computing",
+                     model="gemini-3.1-pro-preview")  # когда нужно качество/2M
 ```
 
-### Image Understanding
+> В Claude Code текст/код/reasoning делают Opus/Fable по подписке — Gemini-текст нужен для автономных ботов, кросс-валидации (skill `multi-model-gateway`) и 2M-контекста.
+
+## Multimodal Understanding
+
+### Изображения
 
 ```python
-import PIL.Image
+from PIL import Image
 
-def analyze_image(image_path: str, prompt: str):
-    """Analyze image with Gemini 3 Pro Vision."""
-
-    model = genai.GenerativeModel("gemini-3-pro-vision")
-    image = PIL.Image.open(image_path)
-
-    response = model.generate_content([prompt, image])
-    return response.text
-
-def analyze_multiple_images(image_paths: list, prompt: str):
-    """Analyze multiple images at once."""
-
-    model = genai.GenerativeModel("gemini-3-pro-vision")
-    images = [PIL.Image.open(p) for p in image_paths]
-
-    response = model.generate_content([prompt] + images)
-    return response.text
-```
-
-### Native Image Generation (Imagen 3 / Nano Banana Pro)
-
-```python
-def generate_image(prompt: str, output_path: str,
-                   aspect_ratio: str = "1:1"):
-    """
-    Generate image with Gemini's native Imagen 3.
-
-    aspect_ratio: "1:1", "16:9", "9:16", "4:3", "3:4"
-    """
-    model = genai.GenerativeModel("gemini-3-pro")
-
-    response = model.generate_content(
-        f"Generate an image: {prompt}",
-        generation_config={
-            "response_mime_type": "image/png",
-            "image_generation_config": {
-                "aspect_ratio": aspect_ratio,
-                "quality": "high"
-            }
-        }
+def analyze_image(image_path: str, prompt: str) -> str:
+    img = Image.open(image_path)
+    response = client.models.generate_content(
+        model="gemini-3.5-flash",
+        contents=[prompt, img],           # можно несколько картинок списком
     )
-
-    # Save image
-    if response.candidates[0].content.parts[0].inline_data:
-        image_data = response.candidates[0].content.parts[0].inline_data.data
-        with open(output_path, 'wb') as f:
-            f.write(image_data)
-        return output_path
-
-    return None
+    return response.text
 ```
 
-### Video Understanding
+### Видео / аудио / PDF (Files API)
 
 ```python
-def analyze_video(video_path: str, prompt: str):
-    """Analyze video with Gemini 3 Pro."""
+import time
 
-    # Upload video file
-    video_file = genai.upload_file(video_path)
-
-    # Wait for processing
-    import time
-    while video_file.state.name == "PROCESSING":
+def analyze_file(file_path: str, prompt: str,
+                 model: str = "gemini-3.1-pro-preview") -> str:
+    """Видео, аудио, PDF, большие документы (2M контекст)."""
+    f = client.files.upload(file=file_path)
+    while f.state == "PROCESSING":
         time.sleep(2)
-        video_file = genai.get_file(video_file.name)
-
-    model = genai.GenerativeModel("gemini-3-pro-vision")
-    response = model.generate_content([prompt, video_file])
-
+        f = client.files.get(name=f.name)
+    response = client.models.generate_content(model=model, contents=[prompt, f])
     return response.text
 
-def analyze_youtube(youtube_url: str, prompt: str):
-    """Analyze YouTube video."""
+def transcribe_audio(audio_path: str) -> str:
+    return analyze_file(audio_path,
+        "Transcribe this audio accurately. Include speaker labels.")
+```
 
-    model = genai.GenerativeModel("gemini-3-pro-vision")
-    response = model.generate_content([
-        prompt,
-        {"youtube_url": youtube_url}
-    ])
+### YouTube URL
 
+```python
+def analyze_youtube(url: str, prompt: str) -> str:
+    response = client.models.generate_content(
+        model="gemini-3.5-flash",
+        contents=types.Content(parts=[
+            types.Part(file_data=types.FileData(file_uri=url)),
+            types.Part(text=prompt),
+        ]),
+    )
     return response.text
 ```
 
-### Audio Understanding
+## Structured Output (JSON)
 
 ```python
-def analyze_audio(audio_path: str, prompt: str):
-    """Analyze audio/podcast with Gemini."""
+import json
 
-    audio_file = genai.upload_file(audio_path)
-
-    model = genai.GenerativeModel("gemini-3-pro")
-    response = model.generate_content([prompt, audio_file])
-
-    return response.text
-
-def transcribe_audio(audio_path: str):
-    """Transcribe audio to text."""
-
-    return analyze_audio(
-        audio_path,
-        "Transcribe this audio accurately. Include speaker labels if multiple speakers."
+def structured_output(prompt: str, schema: dict) -> dict:
+    response = client.models.generate_content(
+        model="gemini-3.5-flash",
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=schema,       # или Pydantic-модель
+        ),
     )
-```
-
-### Long Document Processing (2M context!)
-
-```python
-def process_long_document(file_path: str, prompt: str):
-    """Process very long documents using 2M context."""
-
-    # Upload document
-    doc_file = genai.upload_file(file_path)
-
-    model = genai.GenerativeModel("gemini-3-pro")
-    response = model.generate_content([prompt, doc_file])
-
-    return response.text
-
-def summarize_codebase(files: dict):
-    """
-    Summarize entire codebase using 2M context.
-
-    Args:
-        files: {"path/to/file.py": "content", ...}
-    """
-    context = "# Codebase\n\n"
-    for path, content in files.items():
-        context += f"## {path}\n```\n{content}\n```\n\n"
-
-    return gemini_chat(
-        f"{context}\n\nProvide a comprehensive analysis of this codebase.",
-        system_prompt="You are a senior software architect."
-    )
-```
-
-### Google Search Grounding
-
-```python
-def search_grounded_response(query: str):
-    """Get response grounded in Google Search results."""
-
-    model = genai.GenerativeModel(
-        "gemini-3-pro",
-        tools=[{"google_search": {}}]
-    )
-
-    response = model.generate_content(query)
-    return response.text
-```
-
-### Structured Output (JSON)
-
-```python
-def structured_output(prompt: str, schema: dict):
-    """Get structured JSON output."""
-
-    model = genai.GenerativeModel("gemini-3-pro")
-
-    response = model.generate_content(
-        prompt,
-        generation_config={
-            "response_mime_type": "application/json",
-            "response_schema": schema
-        }
-    )
-
-    import json
     return json.loads(response.text)
 ```
 
-### Streaming
+## Streaming и Chat
 
 ```python
-def stream_response(prompt: str):
-    """Stream response for long outputs."""
+# Streaming
+for chunk in client.models.generate_content_stream(
+        model="gemini-3.5-flash", contents=prompt):
+    print(chunk.text, end="")
 
-    model = genai.GenerativeModel("gemini-3-pro")
-
-    response = model.generate_content(prompt, stream=True)
-
-    for chunk in response:
-        yield chunk.text
+# Multi-turn chat
+chat = client.chats.create(
+    model="gemini-3.5-flash",
+    config=types.GenerateContentConfig(system_instruction="You are a coding assistant."),
+)
+r1 = chat.send_message("Write a Python function to sort a list")
+r2 = chat.send_message("Now add type hints")
 ```
 
-### Multi-turn Chat
+## Built-in Tools
+
+### Google Search grounding
 
 ```python
-def create_chat_session(system_prompt: str = None):
-    """Create a multi-turn chat session."""
-
-    model = genai.GenerativeModel(
-        "gemini-3-pro",
-        system_instruction=system_prompt
+def grounded(query: str):
+    response = client.models.generate_content(
+        model="gemini-3.5-flash",
+        contents=query,
+        config=types.GenerateContentConfig(
+            tools=[types.Tool(google_search=types.GoogleSearch())],
+        ),
     )
-
-    chat = model.start_chat(history=[])
-    return chat
-
-def chat_message(chat, message: str):
-    """Send message in chat session."""
-    response = chat.send_message(message)
-    return response.text
-
-# Usage
-chat = create_chat_session("You are a helpful coding assistant.")
-response1 = chat_message(chat, "Write a Python function to sort a list")
-response2 = chat_message(chat, "Now add type hints to it")
-```
-
-## Advanced Features
-
-### Code Execution
-
-```python
-def execute_code(prompt: str):
-    """Let Gemini write and execute code."""
-
-    model = genai.GenerativeModel(
-        "gemini-3-pro",
-        tools=[{"code_execution": {}}]
-    )
-
-    response = model.generate_content(prompt)
-    return response.text
-```
-
-### Function Calling
-
-```python
-def with_functions(prompt: str, functions: list):
-    """Use function calling."""
-
-    model = genai.GenerativeModel(
-        "gemini-3-pro",
-        tools=functions
-    )
-
-    response = model.generate_content(prompt)
-    return response
-```
-
-## Nano Banana Pro Prompt Templates
-
-### Photorealistic Portrait
-```python
-prompt = """
-Generate image: Professional headshot photograph
-- Subject: confident business professional
-- Camera: Sony A7R IV with 85mm f/1.4 lens
-- Lighting: soft natural window light with reflector fill
-- Background: clean gradient, subtle bokeh
-- Quality: 8K, ultra-sharp focus on eyes
-- Style: natural, authentic expression
-"""
-```
-
-### Product Photography
-```python
-prompt = """
-Generate image: E-commerce product photo
-- Product: [description]
-- Background: pure white seamless
-- Lighting: soft diffused studio lighting
-- Style: professional, clean, commercial
-- Quality: high resolution, color accurate
-"""
-```
-
-### Creative Illustration
-```python
-prompt = """
-Generate image: Digital illustration
-- Subject: [description]
-- Style: [cyberpunk/fantasy/minimalist/anime]
-- Color palette: [colors]
-- Mood: [atmosphere]
-- Composition: dynamic, rule of thirds
-"""
-```
-
-## API Pricing Reference
-
-| Model | Input | Output |
-|-------|-------|--------|
-| gemini-3-pro | $1.25/1M tokens | $5/1M tokens |
-| gemini-3-flash | $0.075/1M tokens | $0.30/1M tokens |
-| Image generation | $0.02/image | - |
-
-## Quick Reference
-
-| Task | Code |
-|------|------|
-| Text generation | `model.generate_content(prompt)` |
-| Image analysis | `model.generate_content([prompt, image])` |
-| Image generation | Use `response_mime_type: "image/png"` |
-| Video analysis | Upload file, then generate_content |
-| Long documents | Upload file (2M context!) |
-| Streaming | `stream=True` |
-| JSON output | `response_mime_type: "application/json"` |
-
----
-
-## 🎬 Veo 2 - Video Generation
-
-### Overview
-
-Veo 2 - Google's flagship video generation model.
-
-| Feature | Value |
-|---------|-------|
-| Resolution | Up to 4K |
-| Duration | Up to 2 minutes |
-| Input | Text, Image |
-| Output | Video with audio |
-
-### Generate Video from Text
-
-```python
-def generate_video_veo(prompt: str, duration: int = 10):
-    """
-    Generate video with Veo 2.
-
-    Args:
-        prompt: Video description
-        duration: Duration in seconds (5-120)
-    """
-    import requests
-
-    api_key = os.getenv('GEMINI_API_KEY')
-
-    response = requests.post(
-        f"https://generativelanguage.googleapis.com/v1beta/videos:generate",
-        headers={"x-goog-api-key": api_key},
-        json={
-            "model": "veo-2",
-            "prompt": prompt,
-            "videoConfig": {
-                "durationSeconds": duration,
-                "aspectRatio": "16:9"
-            }
-        }
-    )
-
-    return response.json()  # Returns operation ID
-
-def get_video_result(operation_id: str):
-    """Get generated video URL."""
-    import requests
-
-    api_key = os.getenv('GEMINI_API_KEY')
-
-    response = requests.get(
-        f"https://generativelanguage.googleapis.com/v1beta/{operation_id}",
-        headers={"x-goog-api-key": api_key}
-    )
-
-    data = response.json()
-    if data.get("done"):
-        return data["response"]["videoUri"]
-    return None
-```
-
-### Generate Video from Image
-
-```python
-def image_to_video(image_path: str, prompt: str, duration: int = 10):
-    """Generate video starting from an image."""
-
-    import base64
-
-    with open(image_path, "rb") as f:
-        image_data = base64.b64encode(f.read()).decode()
-
-    # Use Gemini API with video generation
-    response = requests.post(
-        f"https://generativelanguage.googleapis.com/v1beta/videos:generate",
-        headers={"x-goog-api-key": os.getenv('GEMINI_API_KEY')},
-        json={
-            "model": "veo-2",
-            "prompt": prompt,
-            "image": {
-                "inlineData": {
-                    "mimeType": "image/png",
-                    "data": image_data
-                }
-            },
-            "videoConfig": {
-                "durationSeconds": duration
-            }
-        }
-    )
-
-    return response.json()
-```
-
----
-
-## 🖼️ Imagen 3 Ultra - Image Generation
-
-### Generate High-Quality Images
-
-```python
-def generate_image_imagen(prompt: str, output_path: str,
-                          aspect_ratio: str = "1:1",
-                          style: str = None):
-    """
-    Generate image with Imagen 3 Ultra.
-
-    Args:
-        prompt: Image description
-        output_path: Where to save
-        aspect_ratio: "1:1", "16:9", "9:16", "4:3", "3:4"
-        style: "photorealistic", "digital_art", "illustration"
-    """
-    import requests
-    import base64
-
-    api_key = os.getenv('GEMINI_API_KEY')
-
-    payload = {
-        "model": "imagen-3-ultra",
-        "prompt": prompt,
-        "aspectRatio": aspect_ratio,
-        "numberOfImages": 1
-    }
-
-    if style:
-        payload["style"] = style
-
-    response = requests.post(
-        "https://generativelanguage.googleapis.com/v1beta/images:generate",
-        headers={"x-goog-api-key": api_key},
-        json=payload
-    )
-
-    data = response.json()
-    if "predictions" in data:
-        image_bytes = base64.b64decode(data["predictions"][0]["bytesBase64Encoded"])
-        with open(output_path, "wb") as f:
-            f.write(image_bytes)
-        return output_path
-
-    return None
-
-def edit_image(image_path: str, mask_path: str, prompt: str, output_path: str):
-    """Edit image with mask (inpainting)."""
-
-    import base64
-
-    with open(image_path, "rb") as f:
-        image_data = base64.b64encode(f.read()).decode()
-
-    with open(mask_path, "rb") as f:
-        mask_data = base64.b64encode(f.read()).decode()
-
-    response = requests.post(
-        "https://generativelanguage.googleapis.com/v1beta/images:edit",
-        headers={"x-goog-api-key": os.getenv('GEMINI_API_KEY')},
-        json={
-            "model": "imagen-3-ultra",
-            "prompt": prompt,
-            "image": {"bytesBase64Encoded": image_data},
-            "mask": {"bytesBase64Encoded": mask_data}
-        }
-    )
-
-    data = response.json()
-    if "predictions" in data:
-        result = base64.b64decode(data["predictions"][0]["bytesBase64Encoded"])
-        with open(output_path, "wb") as f:
-            f.write(result)
-        return output_path
-
-    return None
-```
-
----
-
-## 🔊 Text-to-Speech (TTS)
-
-```python
-def text_to_speech(text: str, output_path: str,
-                   voice: str = "en-US-Wavenet-D",
-                   speaking_rate: float = 1.0):
-    """
-    Convert text to speech using Google Cloud TTS via Gemini.
-
-    Voices:
-        - en-US-Wavenet-A to J (various English voices)
-        - ru-RU-Wavenet-A to E (Russian)
-        - Multiple languages available
-    """
-    from google.cloud import texttospeech
-
-    client = texttospeech.TextToSpeechClient()
-
-    synthesis_input = texttospeech.SynthesisInput(text=text)
-
-    voice_config = texttospeech.VoiceSelectionParams(
-        language_code=voice.split("-")[0] + "-" + voice.split("-")[1],
-        name=voice
-    )
-
-    audio_config = texttospeech.AudioConfig(
-        audio_encoding=texttospeech.AudioEncoding.MP3,
-        speaking_rate=speaking_rate
-    )
-
-    response = client.synthesize_speech(
-        input=synthesis_input,
-        voice=voice_config,
-        audio_config=audio_config
-    )
-
-    with open(output_path, "wb") as f:
-        f.write(response.audio_content)
-
-    return output_path
-```
-
----
-
-## 🎤 Live API - Real-time Audio/Video
-
-### Real-time Audio Streaming
-
-```python
-async def live_audio_session():
-    """
-    Real-time audio conversation with Gemini Live API.
-
-    Supports:
-    - Real-time speech input
-    - Real-time speech output
-    - Tool use during conversation
-    """
-    import asyncio
-    from google import genai
-
-    client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
-
-    config = {
-        "model": "gemini-2.0-flash-live",
-        "generation_config": {
-            "response_modalities": ["AUDIO"],
-            "speech_config": {
-                "voice_config": {
-                    "prebuilt_voice_config": {"voice_name": "Puck"}
-                }
-            }
-        }
-    }
-
-    async with client.aio.live.connect(**config) as session:
-        # Send audio
-        await session.send({"data": audio_bytes, "mime_type": "audio/pcm"})
-
-        # Receive response
-        async for response in session.receive():
-            if response.data:
-                # Audio response
-                yield response.data
-            elif response.text:
-                # Text response
-                print(response.text)
-
-# Available voices: Puck, Charon, Kore, Fenrir, Aoede
-```
-
-### Live Video Analysis
-
-```python
-async def live_video_analysis(video_stream):
-    """Analyze video in real-time."""
-
-    config = {
-        "model": "gemini-2.0-flash-live",
-        "generation_config": {
-            "response_modalities": ["TEXT"]
-        }
-    }
-
-    async with client.aio.live.connect(**config) as session:
-        async for frame in video_stream:
-            await session.send({
-                "data": frame,
-                "mime_type": "image/jpeg"
-            })
-
-            response = await session.receive()
-            yield response.text
-```
-
----
-
-## 📊 Embeddings
-
-```python
-def get_embedding(text: str, model: str = "text-embedding-004"):
-    """
-    Generate embedding vector.
-
-    Models:
-        - text-embedding-004: Latest, best quality (768 dims)
-        - textembedding-gecko: Older model
-    """
-    result = genai.embed_content(
-        model=model,
-        content=text,
-        task_type="retrieval_document"
-    )
-
-    return result['embedding']
-
-def get_embeddings_batch(texts: list):
-    """Batch embedding for multiple texts."""
-
-    result = genai.embed_content(
-        model="text-embedding-004",
-        content=texts,
-        task_type="retrieval_document"
-    )
-
-    return result['embedding']
-
-# Task types:
-# - retrieval_document: For indexing documents
-# - retrieval_query: For search queries
-# - semantic_similarity: For comparing texts
-# - classification: For text classification
-# - clustering: For grouping similar texts
-```
-
----
-
-## 🧠 Thinking Models (Deep Reasoning)
-
-```python
-def deep_reasoning(prompt: str):
-    """
-    Use Gemini 2.0 Flash Thinking for complex problems.
-
-    Shows explicit reasoning steps before answer.
-    """
-    model = genai.GenerativeModel("gemini-2.0-flash-thinking-exp")
-
-    response = model.generate_content(prompt)
-
-    # Response includes thinking process
-    return {
-        "thinking": response.candidates[0].content.parts[0].text,
-        "answer": response.candidates[0].content.parts[-1].text
-    }
-```
-
----
-
-## 🔧 Built-in Tools
-
-### Google Search Grounding
-
-```python
-def grounded_search(query: str):
-    """Get response grounded in real-time Google Search."""
-
-    model = genai.GenerativeModel(
-        "gemini-2.0-flash",
-        tools=["google_search"]
-    )
-
-    response = model.generate_content(query)
-
     return {
         "text": response.text,
-        "grounding_metadata": response.candidates[0].grounding_metadata
+        "grounding": response.candidates[0].grounding_metadata,
     }
 ```
 
-### Code Execution (Sandbox)
+### Code execution (sandbox)
 
 ```python
-def execute_code(prompt: str):
-    """Let Gemini write and execute Python code."""
-
-    model = genai.GenerativeModel(
-        "gemini-2.0-flash",
-        tools=["code_execution"]
+def execute_code(prompt: str) -> str:
+    response = client.models.generate_content(
+        model="gemini-3.5-flash",
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            tools=[types.Tool(code_execution=types.ToolCodeExecution())],
+        ),
     )
-
-    response = model.generate_content(prompt)
-
-    # Get execution results
     for part in response.candidates[0].content.parts:
-        if hasattr(part, 'executable_code'):
-            print(f"Code: {part.executable_code.code}")
-        if hasattr(part, 'code_execution_result'):
-            print(f"Result: {part.code_execution_result.output}")
-
+        if getattr(part, "executable_code", None):
+            print("CODE:", part.executable_code.code)
+        if getattr(part, "code_execution_result", None):
+            print("RESULT:", part.code_execution_result.output)
     return response.text
 ```
 
-### URL Context
+### URL context
 
 ```python
-def analyze_url(url: str, prompt: str):
-    """Analyze content from URL."""
-
-    model = genai.GenerativeModel("gemini-2.0-flash")
-
-    response = model.generate_content([
-        prompt,
-        {"url": url}
-    ])
-
-    return response.text
+response = client.models.generate_content(
+    model="gemini-3.5-flash",
+    contents=f"Summarize: https://example.com/article",
+    config=types.GenerateContentConfig(
+        tools=[types.Tool(url_context=types.UrlContext())],
+    ),
+)
 ```
 
----
+### Function calling
 
-## 💰 API Pricing Reference (2025)
+```python
+def get_weather(city: str) -> str:
+    """Get current weather for a city."""
+    ...
 
-### Text Models
-| Model | Input | Output |
-|-------|-------|--------|
-| gemini-2.0-flash | $0.10/1M | $0.40/1M |
-| gemini-2.0-pro | $1.25/1M | $5.00/1M |
-| gemini-1.5-pro | $1.25/1M | $5.00/1M |
-| gemini-1.5-flash | $0.075/1M | $0.30/1M |
-| gemini-1.5-flash-8b | $0.0375/1M | $0.15/1M |
+response = client.models.generate_content(
+    model="gemini-3.5-flash",
+    contents="Погода в город?",
+    config=types.GenerateContentConfig(tools=[get_weather]),  # SDK сам строит схему из сигнатуры
+)
+```
 
-### Media Generation
-| Model | Price |
-|-------|-------|
-| Imagen 3 Ultra | $0.04/image |
-| Veo 2 | ~$0.05/second |
+## Embeddings
 
-### Other
-| Service | Price |
-|---------|-------|
-| Embeddings (text-embedding-004) | $0.00001/1K chars |
-| Live API | Based on audio duration |
+```python
+def get_embeddings(texts: list[str],
+                   task: str = "RETRIEVAL_DOCUMENT") -> list[list[float]]:
+    """task: RETRIEVAL_DOCUMENT | RETRIEVAL_QUERY | SEMANTIC_SIMILARITY |
+             CLASSIFICATION | CLUSTERING"""
+    result = client.models.embed_content(
+        model="gemini-embedding-001",
+        contents=texts,
+        config=types.EmbedContentConfig(task_type=task),
+    )
+    return [e.values for e in result.embeddings]
+```
 
----
+Альтернатива (основной стек brain/RAG) — OpenAI `text-embedding-3-large`, см. `config/models.md`.
 
-## 🔗 API Endpoints Reference
+## TTS
 
-| Endpoint | Purpose |
-|----------|---------|
-| `generateContent` | Text/multimodal generation |
-| `streamGenerateContent` | Streaming responses |
-| `embedContent` | Text embeddings |
-| `countTokens` | Token counting |
-| `images:generate` | Imagen 3 generation |
-| `images:edit` | Image editing |
-| `videos:generate` | Veo 2 video generation |
-| `live.connect` | Real-time audio/video |
+```python
+def tts(text: str, out_path: str, voice: str = "Kore"):
+    """Голоса: Puck, Charon, Kore, Fenrir, Aoede и др."""
+    response = client.models.generate_content(
+        model="gemini-3.1-flash-tts-preview",
+        contents=text,
+        config=types.GenerateContentConfig(
+            response_modalities=["AUDIO"],
+            speech_config=types.SpeechConfig(
+                voice_config=types.VoiceConfig(
+                    prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice))),
+        ),
+    )
+    with open(out_path, "wb") as f:   # PCM 24kHz — при необходимости завернуть в WAV
+        f.write(response.candidates[0].content.parts[0].inline_data.data)
+```
 
----
+Для продакшн-озвучки основной канон — ElevenLabs (skill `elevenlabs`) / `tts-1-hd`.
+
+## Live API (realtime аудио/STT)
+
+```python
+async def live_session(audio_bytes: bytes):
+    """Realtime диалог: аудио на вход, аудио/текст на выход, tools внутри сессии.
+    Live-модель бери из discovery (live-эндпоинты дрейфуют чаще остальных)."""
+    config = {"response_modalities": ["AUDIO"]}
+    async with client.aio.live.connect(model=LIVE_MODEL, config=config) as session:
+        await session.send_realtime_input(
+            audio=types.Blob(data=audio_bytes, mime_type="audio/pcm;rate=16000"))
+        async for msg in session.receive():
+            if msg.data:
+                yield msg.data
+```
+
+Для батч-транскрипции используй Files API (`transcribe_audio` выше) или Deepgram/Whisper (skill `deepgram`).
+
+## Для ботов: OpenAI-compat shim
+
+Hermes/боты ходят в Gemini через OpenAI-совместимый эндпоинт:
+
+```
+base_url: https://generativelanguage.googleapis.com/v1beta/openai
+model:    gemini-3.5-flash        # bare name, без "models/"
+```
+
+404 → неправильный base_url или модели нет на ключе (прогони discovery). Детали, rate limits (free tier ~1500 req/day), пустой `message {}` при выжранном reasoning-бюджете — в agent-builder tooling/references/gemini-api-models.md`.
+
+## Генерация картинок/видео — указатели (канон)
+
+Здесь НЕ реализуется. Канон-модели из `config/models.md`:
+
+| Задача | Модель | Где |
+|--------|--------|-----|
+| Картинки (default) | `gemini-3.1-flash-image-preview` (NB2) | skill `image-generation` |
+| Картинки (обложки news) | `gemini-3.1-flash-lite-image` (NB2 Lite) | skill `image-generation` |
+| Картинки (флагман) | `gemini-3-pro-image-preview` (NB Pro) | skill `nano-banana-pro` |
+| Видео | `veo-3.1-generate-preview` / `sora-2-pro` | skill `video-generation` |
+
+Ключ для image — `GOOGLE_API_KEY` + `os.environ.pop('GEMINI_API_KEY', None)`; модель отдаёт **JPEG, не PNG**.
+
+## Прайс (ориентир, июнь-июль 2026, USD/1M токенов)
+
+| Модель | Input | Output |
+|--------|-------|--------|
+| gemini-3.5-flash | ~$0.10 | ~$0.40 |
+| gemini-3.1-flash-lite | ~$0.04 | ~$0.20 |
+| gemini-3.1-pro-preview | ~$1.25 | ~$10 |
+
+Gemini Flash ~30× дешевле Sonnet на бот-нагрузках. Актуализация — в reference-файле.
 
 ## Quick Reference
 
-| Task | Code |
-|------|------|
-| Text generation | `model.generate_content(prompt)` |
-| Image analysis | `model.generate_content([prompt, image])` |
-| Generate image | Imagen 3 API |
-| Generate video | Veo 2 API |
-| Embeddings | `genai.embed_content(model, content)` |
-| Streaming | `stream=True` |
-| Search grounding | `tools=["google_search"]` |
-| Code execution | `tools=["code_execution"]` |
-| Live audio | `client.aio.live.connect()` |
-
----
+| Задача | Код |
+|--------|-----|
+| Текст | `client.models.generate_content(model=..., contents=prompt)` |
+| Стриминг | `client.models.generate_content_stream(...)` |
+| Чат | `client.chats.create(model=...)` → `chat.send_message(...)` |
+| Картинка/видео/PDF на вход | `client.files.upload(file=path)` → в `contents` |
+| JSON по схеме | `response_mime_type="application/json"` + `response_schema` |
+| Grounding | `tools=[types.Tool(google_search=types.GoogleSearch())]` |
+| Code exec | `tools=[types.Tool(code_execution=types.ToolCodeExecution())]` |
+| Embeddings | `client.models.embed_content(model="gemini-embedding-001", ...)` |
+| Live | `client.aio.live.connect(model=..., config=...)` |
 
 ## Tips
 
-1. **2M context** - загружай огромные документы и кодовые базы
-2. **Imagen 3 Ultra** - лучшее качество изображений от Google
-3. **Veo 2** - генерация видео до 2 минут в 4K
-4. **Live API** - реальное время для аудио/видео
-5. **Thinking models** - для сложного reasoning
-6. **Code execution** - безопасный sandbox для кода
-7. **Google Search** - grounding для актуальной информации
-8. **gemini-2.0-flash** - лучший баланс скорость/качество
+1. **Discovery перед хардкодом** — модели дрейфуют, `gemini-3-flash` уже один раз молча умер в 404.
+2. **2M контекст** (`gemini-3.1-pro-preview`) — целые кодбазы/книги одним запросом.
+3. **Для ботов** — `gemini-3.5-flash` primary, `gemini-2.5-flash` known-good fallback.
+4. **В Claude Code** — Gemini только для того, что Opus не может: multimodal-анализ, 2M, grounding, embeddings.
+5. **Старый SDK запрещён** — только `from google import genai`.
+6. **Image/video — НЕ здесь** — skill `image-generation` / `video-generation`, канон `config/models.md`.

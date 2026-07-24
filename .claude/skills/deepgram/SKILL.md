@@ -41,6 +41,25 @@ DEEPGRAM_API_KEY=os.getenv('DEEPGRAM_API_KEY')
 pip install deepgram-sdk
 ```
 
+## ⚠️ SDK 6.x сломал старый API — надёжный путь REST (читать первым)
+
+В **deepgram-sdk 6.0.1+** УБРАЛИ `PrerecordedOptions`/`FileSource` (`from deepgram import PrerecordedOptions` → ImportError). Примеры ниже по тексту — для SDK ≤3.x. Чтобы не зависеть от версии SDK, для prerecorded-транскрипции с диаризацией используй **сырой REST** (работает всегда):
+
+```python
+import requests, os
+key = os.getenv('DEEPGRAM_API_KEY')
+# сначала ужать: ffmpeg -i in.mp4 -vn -ac 1 -ar 16000 -b:a 64k meeting.mp3  (3ч ≈ 86 МБ)
+audio = open('meeting.mp3', 'rb').read()
+r = requests.post('https://api.deepgram.com/v1/listen',
+    params={'model': 'nova-3', 'language': 'ru', 'diarize': 'true', 'punctuate': 'true',
+            'smart_format': 'true', 'utterances': 'true', 'paragraphs': 'true'},
+    headers={'Authorization': f'Token {key}', 'Content-Type': 'audio/mpeg'},
+    data=audio, timeout=1800)
+utts = r.json()['results']['utterances']   # [{speaker, start, end, transcript}, ...]
+```
+
+**Разбивка записи по докладчикам/докладам:** группируй `utterances` по полю `speaker`; граница доклада = где доминирующий спикер меняется на длинном отрезке (модератор объявляет следующего). `start`/`end` (секунды) → таймкоды для нарезки видео ffmpeg-ом. Модель **`nova-3`** (не `nova-2`) заметно точнее на русском. Полный кейс «запись → пакет по спикерам» — в skill `webinar-to-pdf`.
+
 ## Basic Usage
 
 ### Setup Client

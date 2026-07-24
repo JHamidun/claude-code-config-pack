@@ -2,8 +2,8 @@
 """VK people search via VK API users.search (needs VK_ACCESS_TOKEN).
 
 Usage:
-  python vk_lookup.py --q "Имя Фамилия" [--city "Москва"] [--company "Компания"]
-  python vk_lookup.py --screen-name some_username   # users.get by screen_name/id
+  python vk_lookup.py --q "John Doe" [--city "Москва"] [--company "крупный банк"]
+  python vk_lookup.py --screen-name durov           # users.get by screen_name/id
 
 Token: VK_ACCESS_TOKEN in ~/.claude/.credentials.master.env. Get it (logged into vk.com):
   https://oauth.vk.com/authorize?client_id=2685278&scope=friends,groups,offline&redirect_uri=https://oauth.vk.com/blank.html&display=page&response_type=token&revoke=1&v=5.131

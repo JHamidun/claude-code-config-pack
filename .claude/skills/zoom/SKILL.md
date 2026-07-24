@@ -21,9 +21,9 @@ Server-to-Server OAuth (no user consent needed).
 ### Credentials (from ~/.claude/.credentials.master.env)
 
 ```
-ZOOM_ACCOUNT_ID=YOUR_ZOOM_ACCOUNT_ID
-ZOOM_CLIENT_ID=YOUR_ZOOM_CLIENT_ID
-ZOOM_CLIENT_SECRET=YOUR_ZOOM_CLIENT_SECRET
+ZOOM_ACCOUNT_ID=<see ZOOM_S2S_CLAUDE_CODE_YOURNAME_ACCOUNT_ID>
+ZOOM_CLIENT_ID=<see ZOOM_S2S_CLAUDE_CODE_YOURNAME_CLIENT_ID>
+ZOOM_CLIENT_SECRET=<see ZOOM_S2S_CLAUDE_CODE_YOURNAME_CLIENT_SECRET>
 ```
 
 ### Get Access Token
@@ -149,6 +149,19 @@ zoom_api("GET", f"/meetings/{meeting_id}/recordings")
 # Returns download URLs for video, audio, transcript
 ```
 
+#### Download a SHARE recording (чужая запись по ссылке + passcode)
+
+API выше работает только для записей **твоего** аккаунта. Если есть только **share-ссылка + passcode** (чужая запись, прислали в чат) — API не поможет, а **yt-dlp НЕ умеет Zoom share-формат** (`Unable to extract data`). Качай через headless Playwright (перехват сетевого .mp4):
+
+```python
+# 1) page.goto(share_url) → page.wait_for_selector('#passcode') → fill(passcode) → click('#passcode_btn')
+# 2) page.on('response'): копить url, где есть 'ssrweb.zoom.us' + '.mp4' (сам файл),
+#    и 'rec/play/vtt?type=cc' (авто-субтитры VTT). Реальный mp4 — на ssrweb.zoom.us (4K ~1.5 ГБ / 3 ч).
+# 3) ctx.cookies() → requests.get(mp4_url, cookies=..., headers={'Referer':'https://us06web.zoom.us/'}, stream=True)
+# Селекторы Vue-страницы пароля: поле #passcode, кнопка #passcode_btn (дождись рендера wait_for_selector).
+```
+Рабочий референс: `presentations/company-mastermind/_download_zoom.py` + `_dl_mp4.py`. Дальше — транскрипт через skill `deepgram` (REST), пакет по спикерам — skill `webinar-to-pdf`.
+
 #### Delete Recording
 
 ```python
@@ -263,7 +276,10 @@ zoom_api("POST", "/users/me/meetings", json={
 
 ## Account Info
 
-- **Email / plan / PMI:** check via `zoom_api("GET", "/users/me")`
-- **App:** create a Server-to-Server OAuth app in the Zoom Marketplace; grant the scopes your workflow needs
-- **App ID / credentials:** from your app's settings → store as `ZOOM_ACCOUNT_ID` / `ZOOM_CLIENT_ID` / `ZOOM_CLIENT_SECRET`
-- **Marketplace:** https://marketplace.zoom.us/develop/apps
+- **Email:** your-email@example.com
+- **Plan:** Zoom Workplace (Licensed, 300 participants, 30h meetings)
+- **PMI:** check via `zoom_api("GET", "/users/me")`
+- **App Name:** Claude Code YourFirstName
+- **Scopes:** ⚠️ granular list, НЕ «все». На 2026-07-03: meeting:{write,read,delete}:meeting:admin, meeting:read:{list_meetings,invitation}:admin, cloud_recording:read:{list_recording_files,list_user_recordings}:admin, user:read (частично) + account/dashboard legacy. Если API вернул `4711 does not contain scopes` — добавь скоуп: marketplace.zoom.us (логин ZOOM_LOGIN_EMAIL/ZOOM_LOGIN_PASSWORD из .credentials.master.env, OTP не спрашивал) → app → Scopes → Add Scopes → поиск по точному id → чекбокс → Done. Активация сохраняется автоматически.
+- **App ID:** YOUR_ZOOM_APP_ID
+- **Marketplace:** https://marketplace.zoom.us/develop/apps/YOUR_ZOOM_APP_ID

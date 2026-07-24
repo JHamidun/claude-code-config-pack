@@ -13,17 +13,17 @@ Analyze past sessions and errors to generate actionable improvements.
 
 1. **Recent errors from memory**:
 ```bash
-python ${WORKSPACE}/tools/vector_memory.py search "ошибка error fix bug" --limit 10
+python ~/.claude/tools/vector_memory.py search "ошибка error fix bug" --limit 10
 ```
 
 2. **Recent decisions**:
 ```bash
-python ${WORKSPACE}/tools/vector_memory.py search "решение выбрали decided" --limit 10
+python ~/.claude/tools/vector_memory.py search "решение выбрали decided" --limit 10
 ```
 
 3. **Recent learnings**:
 ```bash
-python ${WORKSPACE}/tools/vector_memory.py search "learned паттерн pattern" --limit 10
+python ~/.claude/tools/vector_memory.py search "learned паттерн pattern" --limit 10
 ```
 
 4. **Subagent usage patterns**:
@@ -52,7 +52,7 @@ Categories:
 
 For each improvement:
 ```bash
-python ${WORKSPACE}/tools/vector_memory.py learn "[improvement description]" "self-improvement"
+python ~/.claude/tools/vector_memory.py learn "[improvement description]" "self-improvement"
 ```
 
 ## Report Format

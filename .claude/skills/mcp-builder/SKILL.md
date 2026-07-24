@@ -1,6 +1,6 @@
 ---
 name: mcp-builder
-description: Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).
+description: "Guide for building high-quality MCP (Model Context Protocol) servers in Python (FastMCP) or Node/TypeScript (MCP SDK). Also covers agent tool design (reference/agent-tool-design-examples.md). Триггеры: создание MCP серверов, проектирование API для агентов, оптимизация существующих tools, review tool definitions, tool-loop ergonomics (error contract, idempotency, MAX_TOOL_ITERATIONS)."
 license: Complete terms in LICENSE.txt
 type: actionable
 ---
@@ -53,6 +53,8 @@ Before diving into implementation, understand how to design tools for AI agents 
 - Create realistic evaluation scenarios early
 - Let agent feedback drive tool improvements
 - Prototype quickly and iterate based on actual agent performance
+
+**Развёрнутые Python-примеры к каждому из этих принципов + production-паттерны tool-loop'а** (implicit args injection, error contract «никогда не raise», idempotency, staged vs auto mode, from_cache, MAX_TOOL_ITERATIONS): [🧰 Agent Tool Design Examples](./reference/agent-tool-design-examples.md) — ex-скилл agent-tool-design.
 
 #### 1.3 Study MCP Protocol Documentation
 
@@ -319,6 +321,9 @@ Load these resources as needed during development:
   - Tool registration with `server.registerTool`
   - Complete working examples
   - Quality checklist
+
+### Agent Tool Design Examples (Load During Phase 1.1 / tool-loop implementation)
+- [🧰 Agent Tool Design Examples](./reference/agent-tool-design-examples.md) - Python-примеры принципов agent-centric design (consolidated workflows, response format control, semantic IDs, actionable errors, namespacing, token efficiency) + tool-loop ergonomics (раздел 11)
 
 ### Evaluation Guide (Load During Phase 4)
 - [✅ Evaluation Guide](./reference/evaluation.md) - Complete evaluation creation guide with:

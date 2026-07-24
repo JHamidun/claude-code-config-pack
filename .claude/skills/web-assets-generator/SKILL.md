@@ -1,6 +1,6 @@
 ---
 name: web-assets-generator
-description: "Web Assets Generator Skill"
+description: Generate favicons, PWA icons, and social/og images. Branded social cards (og-image, webinar/event banners, covers with avatars) — HTML template → screenshot, crisper than Pillow text. Use when «сделай баннер», «og картинка», «обложка для анонса», «баннер вебинара/события», «фавикон», «иконки PWA», «social card», «og-image 1200×630», «баннер с фото спикеров», «аватары в кружках».
 ---
 
 # Web Assets Generator Skill
@@ -13,6 +13,13 @@ Generate favicons, PWA icons, social media images, and other web assets.
 - Social media meta images (Open Graph, Twitter Cards)
 - App store screenshots
 - Brand asset generation
+- **Branded social/event banner** (og-image, webinar cover, announcement card) — лучше
+  не Pillow-текстом, а вёрсткой → скриншот. См. **`references/branded-social-banner.md`**:
+  готовый шаблон `assets/banner-template.html` (1200×630, dark editorial: grid + brand
+  glow + eyebrow/H1/date-pill/host-row) + `scripts/cut_avatars.py` (портреты → кружки с
+  вырезанным фоном через birefnet-portrait). Рендер: chrome-devtools navigate file:// →
+  resize 1200×630 → screenshot. Доставка: CDN/S3 → Tilda Page Settings `fb_img` или
+  Telegram `sendPhoto` → file_id. Обкатано на og-баннерах edu-проектов и вебинар-баннерах.
 
 ## Asset Types
 

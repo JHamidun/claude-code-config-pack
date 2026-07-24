@@ -84,7 +84,7 @@ curl -s "https://api.your-scraper.example/v1/linkedin/post?url=https://www.linke
 
 ```bash
 # Search ads by company or keyword
-curl -s "https://api.your-scraper.example/v1/linkedin/ads/search?query=YourCompanyGPT" \
+curl -s "https://api.your-scraper.example/v1/linkedin/ads/search?query=YourProduct" \
   -H "x-api-key: $SCRAPER_API_KEY" | python3 -m json.tool
 
 # Get specific ad details

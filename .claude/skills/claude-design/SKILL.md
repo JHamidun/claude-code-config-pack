@@ -32,7 +32,7 @@ Production-tested workflow для Claude Design (`claude.ai/design`) — бра�
 ### 2. Создать новый проект
 - Кнопка `+ New project` (или `Create new`)
 - Выбрать тип (вкладки, June 2026): **Prototype**, **Slide deck**, **Template**, **Other**
-- Дать имя проекту: `Academy — Billing Dashboard`
+- Дать имя проекту: `ExampleProduct — Billing Dashboard`
 
 ### 2a. Slide deck mode (проверено June 2026)
 - Отдельная вкладка «Slide deck» при создании проекта; опция «Use speaker notes»
@@ -56,13 +56,13 @@ Production-tested workflow для Claude Design (`claude.ai/design`) — бра�
 
 ### Пример промпта
 ```
-Контекст: <Название> — онлайн-платформа про AI.
-Аудитория <ваша ЦА>.
+Контекст: ExampleProduct — your example AI platform.
+Audience: senior-engineers (your demographic).
 Задача: страница /dashboard/billing — личный биллинг юзера.
-Бренд: основной #2563EB, ink #0F172A, акцент cyan #38BDF8, cream #F4F1EA.
+Бренд: основной #YOUR_PRIMARY, ink #YOUR_INK, акцент cyan #YOUR_ACCENT, cream #YOUR_CREAM.
 Шрифты: Inter Tight (heading), Manrope (body), JetBrains Mono (numbers).
 Состав:
-  - Hero с текущим тарифом (ваш текущий тариф) и датой следующего списания
+  - Hero с текущим тарифом (Plus $X.XX/mo) и датой следующего списания
   - История платежей (таблица с date, amount, status, invoice link)
   - Способ оплаты (карта в маске)
   - Кнопка «Отменить подписку» (модалка confirm)
@@ -106,18 +106,18 @@ A11y: focus rings, контраст AA для всех текстов.
 - Распаковать zip
 - Создать `design-handoff/` в корне проекта (если ещё нет)
 - Внутри — папка по area: `design-handoff/billing/`, `design-handoff/landing/`, `design-handoff/admin/`
-- Положить туда распакованную папку: `design-handoff/billing/academy-billing/`
-- **Опционально** — закоммитить zip-копию рядом, для архива: `design-handoff/billing/academy-billing.zip`
+- Положить туда распакованную папку: `design-handoff/billing/your-project-billing/`
+- **Опционально** — закоммитить zip-копию рядом, для архива: `design-handoff/billing/your-project-billing.zip`
 - Закоммитить в git (handoff = source-of-truth дизайна, держать в репо)
 
 ### 9. Сказать Claude Code что handoff готов
 Формулировка в чате:
 ```
-В design-handoff/billing/academy-billing/ лежит handoff
+В design-handoff/billing/your-project-billing/ лежит handoff
 из Claude Design для страницы /dashboard/billing.
 Прочитай README + главный HTML целиком, потом перенеси в код проекта,
 используя существующие tokens из globals.css и компоненты из
-components/<area>/. Сначала покажи план — какие файлы создашь,
+components/academy/. Сначала покажи план — какие файлы создашь,
 какие токены добавишь в globals.css. После плана — реализуй.
 ```
 
@@ -129,8 +129,10 @@ URL Claude Design мокапа стабильный (`claude.ai/design/<id>`). �
 ```markdown
 # Source
 
-- Claude Design URL: https://claude.ai/design/<id>
-- Author: <автор>
+- Claude Design URL: https://claude.ai/design/abc123
+- Created: see git history
+- Author: user@
+- Last handoff: see git history
 - Iterations: 7
 ```
 
@@ -177,20 +179,20 @@ URL Claude Design мокапа стабильный (`claude.ai/design/<id>`). �
 
 Эти промпты сработали — оставляю как референс структуры. Не копировать дословно, а использовать как шаблон формы.
 
-### Пример 1: Шаблонизированная система обложек (вебинары)
+### Пример 1: Шаблонизированная система обложек (вебинары пользователя)
 
 **Цель:** не один экран, а **система** где можно подставлять данные → получать варианты.
 
 ```
-Нужен кастомизируемый HTML-шаблон обложки для вебинаров.
+Нужен кастомизируемый HTML-шаблон обложки для вебинаров Your Name.
 Цель — единая система, где я могу подставить данные (название, дата, логотип
 партнёра, акцентный цвет) и получить уникальную обложку за секунду.
 Размер ровно 1200×675 px.
 
-ПАЛИТРА БРЕНДА (ваш домен):
-• #0F172A — глубокая navy (основной фон)
-• #2563EB — насыщенный синий (primary accent)
-• #38BDF8 — cyan (secondary accent / подчёркивания)
+ПАЛИТРА БРЕНДА (your-domain.com):
+• #YOUR_INK — глубокая navy (основной фон)
+• #YOUR_PRIMARY — насыщенный синий (primary accent)
+• #YOUR_ACCENT — cyan (secondary accent / подчёркивания)
 • #FFFFFF — белый (текст)
 • #9CA3AF — средний серый (второстепенный текст)
 
@@ -201,12 +203,12 @@ URL Claude Design мокапа стабильный (`claude.ai/design/<id>`). �
 4. Под заголовком: короткий подзаголовок (~24-28px, светло-серый)
 5. СПРАВА 40-45%: вырезанный портрет (cut-out без фона)
 6. СВЕРХУ СПРАВА: лого партнёра (placeholder)
-7. ВНИЗУ СЛЕВА: pill-бейдж «Ведущий · Имя Фамилия»
-8. НИЗ-ЛЕВЫЙ УГОЛ: подпись «ваш домен» (~18px)
+7. ВНИЗУ СЛЕВА: pill-бейдж «Ведущий · Your Name»
+8. НИЗ-ЛЕВЫЙ УГОЛ: подпись «your-domain.com» (~18px)
 
 ВАРИАТИВНОСТЬ (6 вариантов):
-— A «Вебинар» — navy + cyan diagonal lines, портрет справа
-— B «Подкаст» — фиолетово-чёрный градиент, портрет 60% справа
+— A «Вебинар» — navy + cyan diagonal lines, YourFirstName справа
+— B «Подкаст» — фиолетово-чёрный градиент, YourFirstName 60% справа
 — C «Прямой эфир» — место для 2 портретов
 — D «Код/агенты» — const title = "…" в monospace
 — E «Сравнение нейросетей» — грид иконок
@@ -219,7 +221,7 @@ URL Claude Design мокапа стабильный (`claude.ai/design/<id>`). �
   --portrait-url, --logo-url
 
 Шрифт Inter через Google Fonts. Сделай сначала ВАРИАНТ A
-(«Мастер-класс ИИ-агенты») — посмотрю и скажу ок.
+(«Мастер-класс ИИ-агенты с YourFirstNameом») — посмотрю и скажу ок.
 Потом добавим остальные варианты.
 ```
 
@@ -235,19 +237,19 @@ URL Claude Design мокапа стабильный (`claude.ai/design/<id>`). �
 **Цель:** новый экран в той же brand system, что уже есть.
 
 ```
-Сделай hi-fi design полного лендинга Academy по прикреплённой
+Сделай hi-fi design полного лендинга ExampleProduct по прикреплённой
 спеке (14 секций). Соблюдай brand tokens, используй референсы соседнего
-проекта "News Portal" и Figma `<FIGMA_FILE_ID>`
-(logo node 340:99, Final design node 230:16).
-Output — один HTML canvas `Academy Landing.html`
-по образцу `News Redesign.html`.
+проекта "YourName News Portal" и Figma `YOUR_FIGMA_FILE_ID`
+(H-mark node 340:99, Final design node 230:16).
+Output — один HTML canvas `ExampleProduct Landing.html`
+по образцу `YourName News Redesign.html`.
 ```
 
 **Что хорошо:**
 - Прямая ссылка на готовый соседний проект как brand reference
 - Указан Figma file + конкретные node IDs (если знаешь — давай)
 - Output format: один HTML canvas с конкретным именем
-- Образец-аналог (`News Redesign.html`) — AI берёт точно тот же tone
+- Образец-аналог (`YourName News Redesign.html`) — AI берёт точно тот же tone
 
 ### Пример 3: Multi-project pipeline
 
@@ -255,19 +257,19 @@ Output — один HTML canvas `Academy Landing.html`
 
 **Промпт-1 (design-system foundation):**
 ```
-Создай design system для Academy.
-Brand: #2563EB / #0F172A / #38BDF8 / #F4F1EA.
+Создай design system для ExampleProduct.
+Brand: #YOUR_PRIMARY / #YOUR_INK / #YOUR_ACCENT / #YOUR_CREAM.
 Шрифты: Inter Tight (display), Manrope (body), JetBrains Mono (numbers).
 Output: один styles.css файл с tokens (colors / spacing / radii / shadows /
 type scale / fonts) + components.jsx с базовыми атомами
-(Logo, Button, Input, Card, Badge, Icon).
+(HMark logo, Button, Input, Card, Badge, Icon).
 Это будет shared library для 3 проектов: Landing, Platform, Admin.
 ```
 
 **Промпт-2 (Landing) — после готовой DS:**
 ```
 На основе только что созданной design system сделай лендинг
-Academy. Состав: hero / proof / features / pricing /
+ExampleProduct. Состав: hero / proof / features / pricing /
 testimonials / FAQ / footer. Адаптив desktop+mobile.
 Используй атомы из components.jsx, токены из styles.css.
 ```
@@ -275,20 +277,20 @@ testimonials / FAQ / footer. Адаптив desktop+mobile.
 **Промпт-3 (Platform) — referencing предыдущее:**
 ```
 Используя ту же design system что в предыдущем проекте,
-сделай Platform (личный кабинет) Academy:
+сделай Platform (личный кабинет) ExampleProduct:
 sidebar + topbar + dashboard / tracks / track-detail /
 lesson-reader / simulator / community / settings.
 Reference для mobile screens: Telegram Mini App
-проект <PROJECT_ID>.
+проект YOUR_CLAUDE_DESIGN_PROJECT_ID.
 ```
 
 **Промпт-4 (Admin):**
 ```
-Используя ту же DS, сделай Admin Academy:
+Используя ту же DS, сделай Admin ExampleProduct:
 sidebar + topbar + tracks CRUD / lessons CRUD / users /
 cohorts / organizations / submissions / live sessions /
-analytics. Поддержка multi-tenancy (несколько компаний-клиентов)
-— в структуре orgs → cohorts → users.
+analytics. Поддержка multi-tenancy (ClientCorp1, ClientCorp2,
+ClientCorp4) — в структуре orgs → cohorts → users.
 ```
 
 После каждого — handoff отдельным bundle'ом. Получаешь 3 zip с единой DS, но разной функциональностью.
@@ -311,9 +313,9 @@ analytics. Поддержка multi-tenancy (несколько компаний
 Часто бренд распределён: Figma + основной сайт + лендинг конференции + соцсети. В промпт дать **все источники**, а не один:
 ```
 Бренд распределён в 3 местах:
-1. Figma `<FIGMA_FILE_ID>` (главный source)
-2. Лендинг (ваш домен) (визуальная реальность)
-3. Презентация с конференции (тон выступления)
+1. Figma `YOUR_FIGMA_FILE_ID` (главный source)
+2. Лендинг your-domain.com (визуальная реальность)
+3. Презентация industry conference 2025 (тон выступления)
 Реши конфликты в пользу Figma.
 ```
 
@@ -349,7 +351,7 @@ Update сюда — это коллективная память между се
 └── project/
     ├── <Name>.html              ← главный файл мокапа (читать целиком)
     ├── design-canvas.jsx        ← JSX-версия канваса (опционально)
-    ├── components.jsx           ← shared атомы (Logo, Icon, Button, ...)
+    ├── components.jsx           ← shared атомы (HMark, Icon, Button, ...)
     ├── chrome.jsx               ← chrome платформы (sidebar, topbar) если применимо
     ├── styles.css               ← design tokens + base styles
     ├── components/              ← пустые директории (заглушки export'а)
@@ -423,7 +425,7 @@ Update сюда — это коллективная память между се
 
 - В прототипе кнопка `border-radius: 14px`, в проекте все кнопки `--r-md: 12px` → берём `12px`, не `14px`
 - В прототипе `font-family: 'Manrope'`, в проекте уже есть `--h-font-body: Inter` → ставим в `globals.css` ОДИН раз и заменяем на единый
-- В прототипе цвет `#2563EB`, в проекте `--c-primary: #2563EB` → используем токен, не хардкод
+- В прототипе цвет `#YOUR_PRIMARY`, в проекте `--h-primary: #YOUR_PRIMARY` → используем токен, не хардкод
 - В прототипе компонент Card по своему, в проекте есть `<ACard>` → расширяем `ACard` props, не делаем новый
 
 Если расхождение **визуально критичное** — спросить юзера, не молчать.
@@ -433,7 +435,7 @@ Update сюда — это коллективная память между се
 Это шпаргалка, чтобы юзер получал лучший output из Claude Design:
 
 ### 1. Начинать с дизайн-системы
-Первый промпт: «Создай design tokens (цвета, шрифты, spacing, radii) для онлайн-платформы про AI, аудитория <ваша ЦА>, тон премиум, бренд (ваш домен) (#2563EB / #0F172A)». Получаешь `styles.css` фундамент. Потом — экраны на этих tokens.
+Первый промпт: «Создай design tokens (цвета, шрифты, spacing, radii) для edtech-платформы про AI, аудитория your target users, тон премиум, бренд your-domain.com (#YOUR_PRIMARY / #YOUR_INK)». Получаешь `styles.css` фундамент. Потом — экраны на этих tokens.
 
 ### 2. Просить варианты
 Не «сделай dashboard», а «сделай 3 варианта dashboard: (а) карточный grid, (б) список с metrics в шапке, (в) split с sidebar metrics + main feed». Дешевле, дальше выбираешь.

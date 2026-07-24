@@ -1,0 +1,166 @@
+{
+  "id": "PtPKIqDlz5xrrvHP",
+  "meta": {
+    "instanceId": "workflow-8eedc09f",
+    "versionId": "1.0.0",
+    "createdAt": "2025-09-29T07:07:52.106950",
+    "updatedAt": "2025-09-29T07:07:52.107031",
+    "owner": "n8n-user",
+    "license": "MIT",
+    "category": "automation",
+    "status": "active",
+    "priority": "high",
+    "environment": "production"
+  },
+  "name": "Sync Todoist tasks to Notion",
+  "tags": [
+    "automation",
+    "n8n",
+    "production-ready",
+    "excellent",
+    "optimized"
+  ],
+  "nodes": [
+    {
+      "id": "0122196d-e051-4154-9e39-3ddbfe26858f",
+      "name": "On schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        640,
+        280
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds"
+            }
+          ]
+        }
+      },
+      "typeVersion": 1.1,
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "1a15e1cc-cdd5-4a49-aa7a-a0779f858e69",
+      "name": "Get all tasks with specific label",
+      "type": "n8n-nodes-base.todoist",
+      "position": [
+        860,
+        280
+      ],
+      "parameters": {
+        "filters": {
+          "labelId": "send-to-notion"
+        },
+        "operation": "getAll",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "todoistOAuth2Api": {
+          "id": "E6PTOAR6ysBeLwCB",
+          "name": "Todoist account"
+        }
+      },
+      "typeVersion": 2,
+      "notes": "This todoist node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "35b13f4a-da38-4d63-9fbf-7c36c97cbc11",
+      "name": "Add to Notion database",
+      "type": "n8n-nodes-base.notion",
+      "position": [
+        1080,
+        280
+      ],
+      "parameters": {
+        "title": "={{ $json.content }}",
+        "options": {},
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "5a98bd24-dd2b-41a3-b7e2-3b8a9ee21d41",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "My Todoist Tasks"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "numberValue": "={{ parseInt($json.id) }}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "notionApi": {
+          "id": "5hfWkRpcWCS4KGk5",
+          "name": "n8n-demo-3"
+        }
+      },
+      "typeVersion": 2.1,
+      "notes": "This notion node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "f3144751-28b0-48e1-9331-f25f55a5ddf6",
+      "name": "Replace label on task",
+      "type": "n8n-nodes-base.todoist",
+      "position": [
+        1300,
+        280
+      ],
+      "parameters": {
+        "taskId": "={{ $('Get all tasks with specific label').item.json.id }}",
+        "operation": "update",
+        "updateFields": {
+          "labels": [
+            "sent"
+          ],
+          "description": "=Notion Link:  {{ $json.url }}\n\n{{ $('Get all tasks with specific label').item.json.description }}"
+        },
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "todoistOAuth2Api": {
+          "id": "E6PTOAR6ysBeLwCB",
+          "name": "Todoist account"
+        }
+      },
+      "typeVersion": 2,
+      "notes": "This todoist node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "error-2609082d",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": null,
+    "timezone": "UTC",
+    "executionTimeout": 3600,
+    "maxExecutions": 1000,
+    "retryOnFail": true,
+    "retryCount": 3,
+    "retryDelay": 1000
+  },
+  "versionId": "14cd25c2-0a7b-45d0-b81e-173052ebdde7",
+  "connections": {},
+  "description": "Automated workflow: Sync Todoist tasks to Notion. This workflow processes data and performs automated tasks.",
+  "notes": "Excellent quality workflow: Sync Todoist tasks to Notion. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+}

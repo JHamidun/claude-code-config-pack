@@ -1,0 +1,588 @@
+{
+  "id": "U6cY7PPR0vaRl1I0",
+  "meta": {
+    "instanceId": "workflow-b0a762a0",
+    "versionId": "1.0.0",
+    "createdAt": "2025-09-29T07:07:50.113632",
+    "updatedAt": "2025-09-29T07:07:50.113654",
+    "owner": "n8n-user",
+    "license": "MIT",
+    "category": "automation",
+    "status": "active",
+    "priority": "high",
+    "environment": "production"
+  },
+  "name": "Scrape Web Data with Bright Data, Google Gemini and MCP Automated AI Agent",
+  "tags": [
+    "automation",
+    "n8n",
+    "production-ready",
+    "excellent",
+    "optimized"
+  ],
+  "nodes": [
+    {
+      "id": "0c747f5b-ef72-4e00-a028-4a08461dae28",
+      "name": "AI Agent",
+      "type": "n8n-nodes-base.noOp",
+      "notes": "Bright Data Web Scraping Agent",
+      "position": [
+        -140,
+        60
+      ],
+      "parameters": {
+        "text": "=Scrape the web data as per the provided URL:  {{ $json.url }} using the format as {{ $json.format }}",
+        "options": {
+          "systemMessage": "=You are a helpful assistant."
+        },
+        "promptType": "define"
+      },
+      "notesInFlow": true,
+      "typeVersion": 1.8
+    },
+    {
+      "id": "16c7cd90-39da-47a4-8020-a0aa8f87275a",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -640,
+        -300
+      ],
+      "parameters": {},
+      "typeVersion": 1,
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "7b544505-6b6b-4500-a2ad-f7cf62f98c13",
+      "name": "MCP Client list all tools for Bright Data",
+      "type": "n8n-nodes-mcp.mcpClient",
+      "position": [
+        -380,
+        -300
+      ],
+      "parameters": {},
+      "credentials": {
+        "mcpClientApi": {
+          "id": "JtatFSfA2kkwctYa",
+          "name": "MCP Client (STDIO) account"
+        }
+      },
+      "typeVersion": 1,
+      "notes": "This mcpClient node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "9f5bf319-9414-4974-bad2-ea24f09ae351",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -220,
+        -400
+      ],
+      "parameters": {
+        "color": 3,
+        "width": 440,
+        "height": 320,
+        "content": "## Bright Data Web Scraper"
+      },
+      "typeVersion": 1,
+      "notes": "This stickyNote node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "222e81cf-878e-42de-a325-6b6659145f98",
+      "name": "MCP Client List all tools",
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "position": [
+        440,
+        420
+      ],
+      "parameters": {},
+      "credentials": {
+        "mcpClientApi": {
+          "id": "JtatFSfA2kkwctYa",
+          "name": "MCP Client (STDIO) account"
+        }
+      },
+      "typeVersion": 1,
+      "notes": "This mcpClientTool node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "a10dfd4f-cadf-4952-8449-1865406358d4",
+      "name": "MCP Client Bright Data Web Scraper",
+      "type": "n8n-nodes-mcp.mcpClient",
+      "notes": "Scrape a single webpage URL with advanced options for content extraction and get back the results in MarkDown language.",
+      "position": [
+        60,
+        -300
+      ],
+      "parameters": {
+        "toolName": "=scrape_as_markdown",
+        "operation": "executeTool",
+        "toolParameters": "={\n   \"url\": \"{{ $json.url }}\"\n} "
+      },
+      "credentials": {
+        "mcpClientApi": {
+          "id": "JtatFSfA2kkwctYa",
+          "name": "MCP Client (STDIO) account"
+        }
+      },
+      "notesInFlow": true,
+      "typeVersion": 1
+    },
+    {
+      "id": "0acbd4ff-ce4a-4ff2-b213-2d80dd91e302",
+      "name": "Webhook for web scraper",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        280,
+        -300
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "response",
+              "value": "={{ $json.result.content[0].text }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 4.2,
+      "notes": "This httpRequest node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "009ac29f-8cad-4b58-9ca4-e75470a52dcc",
+      "name": "Set the URLs",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -160,
+        -300
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "214e61a0-3587-453f-baf5-eac013990857",
+              "name": "url",
+              "type": "string",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            },
+            {
+              "id": "45014942-0a2e-4f46-b395-f82f97bfa93e",
+              "name": "webhook_url",
+              "type": "string",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4,
+      "notes": "This set node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "104706dd-ae58-47fd-8fea-cefa986ae40c",
+      "name": "MCP Client to Scrape as Markdown",
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "notes": "Scrape a single webpage URL with advanced options for content extraction and get back the results in MarkDown language.",
+      "position": [
+        -60,
+        400
+      ],
+      "parameters": {
+        "toolName": "scrape_as_markdown",
+        "operation": "executeTool",
+        "toolParameters": "={\n  \"url\": \"{{ $json.url }}\"\n} ",
+        "descriptionType": "manual",
+        "toolDescription": "Scrape a single webpage URL with advanced options for content extraction and get back the results in MarkDown language."
+      },
+      "credentials": {
+        "mcpClientApi": {
+          "id": "JtatFSfA2kkwctYa",
+          "name": "MCP Client (STDIO) account"
+        }
+      },
+      "notesInFlow": false,
+      "typeVersion": 1
+    },
+    {
+      "id": "c03c655e-45c8-4278-a01f-ba48282459c5",
+      "name": "MCP Client to Scrape as HTML",
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "notes": "Scrape a single webpage URL with advanced options for content extraction and get back the results in HTML.",
+      "position": [
+        200,
+        400
+      ],
+      "parameters": {
+        "toolName": "scrape_as_html",
+        "operation": "executeTool",
+        "toolParameters": "{\n  \"url\": \"{{ $json.url }}\"\n} ",
+        "descriptionType": "manual",
+        "toolDescription": "Scrape a single webpage URL with advanced options for content extraction and get back the results in HTML."
+      },
+      "credentials": {
+        "mcpClientApi": {
+          "id": "JtatFSfA2kkwctYa",
+          "name": "MCP Client (STDIO) account"
+        }
+      },
+      "notesInFlow": true,
+      "typeVersion": 1
+    },
+    {
+      "id": "587300ff-44e5-4ff2-9dee-a4f8720ca26b",
+      "name": "Google Gemini Chat Model for AI Agent",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        -520,
+        400
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-2.0-flash-exp"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YeO7dHZnuGBVQKVZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "typeVersion": 1,
+      "notes": "This lmChatGoogleGemini node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "38ba13a1-f8f7-48ce-a05d-2c2526de606d",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -140,
+        340
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 480,
+        "height": 260,
+        "content": "## Bright Data Web Scraper Tools"
+      },
+      "typeVersion": 1,
+      "notes": "This stickyNote node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "e7c8d333-e256-4944-a584-575162072ca4",
+      "name": "Simple Memory",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        -280,
+        400
+      ],
+      "parameters": {
+        "sessionKey": "YOUR_CREDENTIAL_HERE",
+        "sessionIdType": "customKey",
+        "contextWindowLength": 10
+      },
+      "typeVersion": 1.3,
+      "notes": "This memoryBufferWindow node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "5e89519e-8ee5-4c3b-807d-21cef6e36c32",
+      "name": "Webhook for Web Scraper AI Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        260,
+        120
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "response",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 4.2,
+      "notes": "This httpRequest node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "2de093f4-15e5-4710-83d9-e6d9ed852873",
+      "name": "Set the URL with the Webhook URL and data format",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -400,
+        60
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "214e61a0-3587-453f-baf5-eac013990857",
+              "name": "url",
+              "type": "string",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            },
+            {
+              "id": "45014942-0a2e-4f46-b395-f82f97bfa93e",
+              "name": "webhook_url",
+              "type": "string",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            },
+            {
+              "id": "7f6c03f6-9fa3-45f9-bf81-243b7106bdac",
+              "name": "format",
+              "type": "string",
+              "value": "scrape_as_markdown"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4,
+      "notes": "This set node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "04a5b11f-1990-440e-be23-2fbcb985dd4a",
+      "name": "Create a binary data",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        260,
+        -80
+      ],
+      "parameters": {
+        "functionCode": "items[0].binary = {\n  data: {\n    data: new Buffer(JSON.stringify(items[0].json, null, 2)).toString('base64')\n  }\n};\nreturn items;"
+      },
+      "typeVersion": 1,
+      "notes": "This function node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "0765ffcd-4746-45f7-add8-f82d66709321",
+      "name": "Write the scraped content to disk",
+      "type": "n8n-nodes-base.readWriteFile",
+      "position": [
+        460,
+        -80
+      ],
+      "parameters": {
+        "options": {},
+        "fileName": "d:\\Scraped-Content.json",
+        "operation": "write"
+      },
+      "typeVersion": 1,
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "16cd9b48-765d-4f0d-8e78-6c41cfc50b03",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -220,
+        -540
+      ],
+      "parameters": {
+        "width": 440,
+        "height": 120,
+        "content": "## Disclaimer\nThis template is only available on n8n self-hosted as it's making use of the community node for MCP Client."
+      },
+      "typeVersion": 1,
+      "notes": "This stickyNote node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "ff4b9e9c-a0f0-4cdb-ad53-55dc412794fc",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1080,
+        -80
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 480,
+        "height": 380,
+        "content": "## Note\nThe AI agent utilizes Bright Data's MCP tools to perform web scraping based on user requests. It intelligently selects the most suitable web scraping tool to fulfill the user's query.\n\nOnce the web scraping is complete, the AI agent's response is:\n\n1. Used to trigger a webhook call.\n\n2. Persisted to disk for future reference.\n\nGoogle Gemini is employed by the AI agent to understand and interpret user queries. Based on this interpretation, the agent initiates a call to the appropriate MCP client to perform the required web scraping task.\n\nSource - {{ $env.WEBHOOK_URL }}"
+      },
+      "typeVersion": 1,
+      "notes": "This stickyNote node performs automated tasks as part of the workflow."
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": null,
+    "timezone": "UTC",
+    "executionTimeout": 3600,
+    "maxExecutions": 1000,
+    "retryOnFail": true,
+    "retryCount": 3,
+    "retryDelay": 1000
+  },
+  "versionId": "ccf9f9af-82d5-4751-b06d-497c043c85fc",
+  "connections": {
+    "0acbd4ff-ce4a-4ff2-b213-2d80dd91e302": {
+      "main": [
+        [
+          {
+            "node": "error-handler-0acbd4ff-ce4a-4ff2-b213-2d80dd91e302",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-0acbd4ff-ce4a-4ff2-b213-2d80dd91e302-7a7140d3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-0acbd4ff-ce4a-4ff2-b213-2d80dd91e302-5af04b0d",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-0acbd4ff-ce4a-4ff2-b213-2d80dd91e302-161b2358",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-0acbd4ff-ce4a-4ff2-b213-2d80dd91e302-ef7fb1c9",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-0acbd4ff-ce4a-4ff2-b213-2d80dd91e302-8f5900a2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-0acbd4ff-ce4a-4ff2-b213-2d80dd91e302-9db4f3b4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-0acbd4ff-ce4a-4ff2-b213-2d80dd91e302-e8d7b468",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-0acbd4ff-ce4a-4ff2-b213-2d80dd91e302-f10cc0db",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5e89519e-8ee5-4c3b-807d-21cef6e36c32": {
+      "main": [
+        [
+          {
+            "node": "error-handler-5e89519e-8ee5-4c3b-807d-21cef6e36c32",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-5e89519e-8ee5-4c3b-807d-21cef6e36c32-79cbd2f8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-5e89519e-8ee5-4c3b-807d-21cef6e36c32-594aec7a",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-5e89519e-8ee5-4c3b-807d-21cef6e36c32-4cceb303",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-5e89519e-8ee5-4c3b-807d-21cef6e36c32-644d0927",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-5e89519e-8ee5-4c3b-807d-21cef6e36c32-3e2a312e",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-5e89519e-8ee5-4c3b-807d-21cef6e36c32-6abf3597",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-5e89519e-8ee5-4c3b-807d-21cef6e36c32-21cf0222",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-5e89519e-8ee5-4c3b-807d-21cef6e36c32-25944a28",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "587300ff-44e5-4ff2-9dee-a4f8720ca26b": {
+      "main": [
+        [
+          {
+            "node": "error-handler-587300ff-44e5-4ff2-9dee-a4f8720ca26b-946a2cad",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "0765ffcd-4746-45f7-add8-f82d66709321": {
+      "main": [
+        [
+          {
+            "node": "error-handler-0765ffcd-4746-45f7-add8-f82d66709321-d15cb27b",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "description": "Automated workflow: Scrape Web Data with Bright Data, Google Gemini and MCP Automated AI Agent. This workflow integrates 12 different services: stickyNote, httpRequest, lmChatGoogleGemini, agent, mcpClientTool. It contains 25 nodes and follows best practices for error handling and security.",
+  "notes": "Excellent quality workflow: Scrape Web Data with Bright Data, Google Gemini and MCP Automated AI Agent. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+}

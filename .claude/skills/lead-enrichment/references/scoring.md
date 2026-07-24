@@ -18,7 +18,7 @@ How sure are we this is the right person/company.
 
 ## 2. Product-fit (1-10)
 
-Fit for your B2B products. Read your own marketing-context skill (if you have one) for the current ICP/personas; baseline:
+Fit for Company's B2B products. Read `yourname-marketing-context` for the current ICP/personas; baseline:
 
 | Factor (weight) | What raises it |
 |-----------------|----------------|
@@ -26,14 +26,14 @@ Fit for your B2B products. Read your own marketing-context skill (if you have on
 | Роль (25%) | L&D/HRD/корп. университет/CDTO/директор трансформации = ЛПР под обучение/AI |
 | Сигналы «почему сейчас» (20%) | найм AI-навыков, цифровая трансформация, новый CDO, рост штата |
 | Отрасль (15%) | банк/телеком/ритейл/промышленность с программами обучения |
-| Пейн под продукт (15%) | ваш продукт A (напр. корп. AI) / продукт B (b2b) / продукт C (EdTech) |
+| Пейн под продукт (15%) | YourProduct (корп. AI) / Продукт-2 (b2b) / EdTech |
 
 ## 3. Reachability — «легко достучаться» (1-10)
 
 | Criterion | Weight |
 |-----------|--------|
 | Публичность (интервью/спикерства 12 мес.) | 20% |
-| Общая повестка с вашей компанией | 25% |
+| Общая повестка с Company | 25% |
 | Точка входа (конференция, общий контакт, PR-служба, приёмная) | 20% |
 | LinkedIn открыт (→ InMail) | 10% |
 | Публичный Telegram / активные комментарии | 10% |

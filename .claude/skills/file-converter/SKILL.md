@@ -1,6 +1,6 @@
 ---
 name: file-converter
-description: "File Converter MCP Server Skill"
+description: "Локальный MCP-сервер конвертации файлов (file-converter в mcp.json, uvx, без API-ключа): Word↔PDF, изображения и др. форматы. Триггеры: «конвертируй файл», «convert file», «file format», «word в pdf», «pdf в word»."
 ---
 
 # File Converter MCP Server Skill

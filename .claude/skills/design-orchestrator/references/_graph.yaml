@@ -1,0 +1,102 @@
+# skills graph
+# Подсказки оркестратору: какие скиллы рассматривать после данного.
+# Не жёсткий контракт — Claude Code решает сам, граф только напоминает.
+#
+# v1.2.0 = union-merge двух разошедшихся деревьев (2026-07-18):
+#   старое дерево tools/claude-code-skills (граф v1.1.0 @04-29, уникальные рёбра процессов/расширений)
+#   + новое дерево claude-design-output (граф v1.0.0 @04-28, рёбра 14 новых скиллов).
+# Попутно исправлен дубликат ключа animations в v1.0.0 (терялось ребро scaling-stage).
+
+version: 1.2.0
+updated: 2026-07-18
+
+# Базовые памятки — почти всегда уместны
+always_consider:
+  - design-guide
+  - content-rules
+  - content-policy
+  - questions-protocol
+  - frontend-design
+  - canonical-html
+  - tool-search-protocol
+
+# Граф связей: после X стоит подумать о Y
+edges:
+  design-orchestrator: [questions-protocol, frontend-design, content-rules, design-guide, cookbook, project-init]
+
+  # Процесс
+  questions-protocol: [design-orchestrator]
+  project-init: [design-system-create, frontend-design]
+  moodboard: [design-system-create, color-system-builder]
+
+  # Артефакты
+  slides: [deck-themes, animations, placeholders, content-rules, screen-labels, verifier, export-pdf, export-pptx, pptx-editable-extractor, print-styles]
+  interactive-prototype: [device-frames, mobile-overlays, tweaks-panel, claude-in-html, microinteractions, states-checklist, forms-a11y, screen-labels, react-pinning, verifier, proto-smoketest, real-data]
+  device-frames: [mobile-overlays, interactive-prototype]
+  design-canvas: [interactive-prototype, slides, animations]
+  animations: [video-export, scaling-stage, verifier]
+  wireframe: [slides, interactive-prototype, design-canvas]
+  mobile-overlays: [interactive-prototype, microinteractions, device-frames]
+  tweaks-panel: [tweaks-persist, version-snapshots]
+  microinteractions: [animations]
+  placeholders: [interactive-prototype, slides]
+  comment-injector: [live-preview]
+  claude-in-html: [interactive-prototype, real-data]
+  component-playground: [design-system-create, forms-a11y, states-checklist, storybook-bridge]
+  html-email: [verifier, license-check]
+  pwa-shell: [interactive-prototype, device-frames]
+
+  # Системные
+  design-system-create: [color-system-builder, type-scale, dark-mode-add, component-playground, forms-a11y, dev-handoff, design-tokens-w3c]
+  color-system-builder: [dark-mode-add, a11y-audit, design-tokens-w3c]
+  type-scale: [design-system-create, fonts-bundle]
+  dark-mode-add: [color-system-builder, a11y-audit]
+  forms-a11y: [a11y-audit, states-checklist]
+  states-checklist: [design-canvas, microinteractions]
+  onboarding-ux: [interactive-prototype, mobile-overlays, microinteractions]
+
+  # Импорты
+  figma-import: [design-system-create, slides, interactive-prototype, figma-write-back]
+  github-import: [design-system-create, interactive-prototype]
+  document-import: [slides, interactive-prototype, content-rules, pptx-import]
+  sketch-to-html: [wireframe, interactive-prototype]
+  brand-extractor: [color-system-builder, type-scale, frontend-design]
+  pptx-import: [slides, pptx-editable-extractor]
+
+  # Качество
+  verifier: [a11y-audit, perf-audit, screenshot-test]
+  a11y-audit: [forms-a11y, color-system-builder, states-checklist]
+  perf-audit: [standalone-html]
+  i18n-stress-test: [type-scale, states-checklist]
+  screenshot-test: [comparison-mode]
+  comparison-mode: [version-snapshots]
+  license-check: [dev-handoff]
+  proto-smoketest: [verifier, a11y-audit]
+
+  # Финиш
+  standalone-html: [verifier]
+  export-pdf: [print-styles, verifier]
+  export-png: [verifier]
+  export-pptx: [pptx-editable-extractor, verifier]
+  pptx-editable-extractor: [verifier]
+  video-export: [animations, verifier]
+  print-styles: [export-pdf]
+  dev-handoff: [a11y-audit, design-system-create, license-check, standalone-html, design-tokens-w3c]
+  real-data: [states-checklist, microinteractions]
+
+  # Расширения преимуществ (нативной web-среды)
+  live-preview: [tweaks-panel, comment-injector, version-snapshots]
+  visual-edit: [live-preview, version-snapshots, tweaks-persist]
+  version-snapshots: [live-preview]
+  tweaks-persist: [tweaks-panel, version-snapshots]
+
+# Рецепты cookbook → скиллы
+recipes:
+  pitch-deck:        [questions-protocol, document-import, slides, deck-themes, placeholders, content-rules, verifier, export-pdf, pptx-editable-extractor]
+  mobile-onboarding: [questions-protocol, wireframe, frontend-design, design-system-create, interactive-prototype, device-frames, mobile-overlays, tweaks-panel, states-checklist, claude-in-html, verifier, proto-smoketest]
+  design-system:     [questions-protocol, moodboard, frontend-design, color-system-builder, type-scale, design-system-create, component-playground, dark-mode-add, forms-a11y, a11y-audit, dev-handoff]
+  saas-landing:      [questions-protocol, wireframe, figma-import, frontend-design, design-canvas, microinteractions, real-data, print-styles, perf-audit, a11y-audit, standalone-html]
+  social-explainer:  [questions-protocol, wireframe, frontend-design, animations, placeholders, verifier, video-export]
+  email-newsletter:  [questions-protocol, frontend-design, html-email, license-check, verifier]
+  pwa-app:           [questions-protocol, frontend-design, design-system-create, interactive-prototype, mobile-overlays, microinteractions, pwa-shell, verifier, proto-smoketest]
+  iterative-design:  [project-init, live-preview, tweaks-panel, tweaks-persist, version-snapshots, visual-edit]

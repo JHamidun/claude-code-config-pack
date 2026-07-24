@@ -1,6 +1,6 @@
 ---
 name: prompt-engineering
-description: Prompt engineering techniques, patterns, and best practices for LLMs
+description: "Промпт-инжиниринг: системные промпты, few-shot, chain-of-thought, structured outputs, декомпозиция, оценка и итерация промптов. Триггеры: «оптимизируй/улучши промпт», «system prompt», «few-shot», «chain of thought», «structured output», «leaked prompts», prompt patterns. Промпты широкий набор моделей → references/system-prompt-leaks.md. НЕ context-engineering; агент-обёртка → prompt-engineer."
 ---
 
 # Prompt Engineering Skill
@@ -16,6 +16,16 @@ description: Prompt engineering techniques, patterns, and best practices for LLM
 - Создание агентов и ассистентов
 - Настройка Claude/GPT для задач
 - Улучшение качества ответов
+
+## Reference Corpus — реальные production-промпты
+
+Прежде чем писать системный промпт агента/бота с нуля — посмотри, как это делают вендоры на
+аналогичной роли. `references/system-prompt-leaks.md` — навигация по корпусу
+[asgeirtj/system_prompts_leaks](https://github.com/asgeirtj/system_prompts_leaks) (~400 verbatim
+системных промптов широкий набор моделей: Claude, GPT/Codex, Gemini, Grok, Perplexity, Cursor, Copilot;
+CC0). Там же: workflow diff между версиями (папка `Official/` с датированными снимками) и
+дистиллят 15 приёмов, снятых с боевых промптов (два канала commentary/final, «веди с исходом»,
+минимальная правка по умолчанию, tone-блоки в XML, safety-директивы буллетами и т.д.).
 
 ## Core Principles
 

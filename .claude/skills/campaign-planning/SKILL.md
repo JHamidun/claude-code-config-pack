@@ -1,6 +1,6 @@
 ---
 name: campaign-planning
-description: Plan marketing campaigns with objectives, audience segmentation, channel strategy, content calendars, and success metrics. Use when launching a campaign, planning a product launch, building a content calendar, allocating budget across channels, or defining campaign KPIs.
+description: "Plan marketing campaigns: objectives, audience segmentation, channel strategy, content calendars, KPIs, budget allocation, product launch. Builds campaign metrics tree (CPM→CTR→CPC→CR1/CPL→CR2/CPA→LTV→CAC) and «3 hypotheses × 2-3 weeks» experiment template. Триггеры: «дерево метрик кампании», «шаблон гипотезы 3×2-3 недели», «гипотезы кампании», «экспериментальная кампания», content calendar."
 ---
 
 # Campaign Planning Skill
@@ -56,6 +56,8 @@ See the Channel Selection Guide below for detailed guidance.
 
 ### 5. Measure
 Define how you will know the campaign worked. See Success Metrics by Campaign Type below.
+
+For any campaign with a paid/acquisition leg, build a **metrics tree** as a mandatory planning artifact: decompose the objective into the chain CPM → CTR → CPC → CR1/CPL → CR2/CPA/CPO → LTV → CAC, attach a benchmark and a tactic to each node, and identify the bottleneck node before launch. This is what turns "Measure" from a vanity dashboard into a diagnostic map (where to look when the boss says "marketing isn't working / leads are too expensive / we're not growing"). See `references/metrics-tree-artifact.md`. The full mechanics of the tree live in the `funnel-design-ru` skill — do not rebuild it here, cross-link.
 
 ## Channel Selection Guide
 
@@ -200,3 +202,18 @@ A common starting framework (adjust based on goals and historical data):
 | Engagement during event | Questions, polls, chat activity |
 | Post-event conversions | Leads or pipeline from attendees |
 | Content repurposing reach | Downstream audience from recordings |
+
+## Mandatory Planning Artifacts (metrics tree + hypothesis sprint)
+
+Beyond the five-part framework, two artifacts from the metrics-tree methodology make a campaign plan diagnostic and testable rather than a list of activities. Both are written for the RU market and cross-link to RU skills.
+
+| Reference | What it is | When to attach it |
+|-----------|-----------|-------------------|
+| `references/metrics-tree-artifact.md` | Campaign metrics tree CPM → CTR → CPC → CR1/CPL → CR2/CPA/CPO → LTV → CAC, a tactic per node, and how to decompose the objective into metrics (top-down for "we have budget", reverse for "how much to grow X3"). | Every campaign with a paid/acquisition leg — attach next to the media plan and content calendar. |
+| `references/hypothesis-template.md` | "3 hypotheses × 2-3 weeks + why these" template (course homework): one-parameter experiments on the weakest nodes, ICE selection, minimum-data rules. | Experimental campaigns — new channel/offer, or a sagging node you plan a sprint to fix. |
+
+### Cross-links
+
+- **`funnel-design-ru`** — the FULL metrics tree (every node in depth, all improvement tactics, choosing one of 8 funnel types, A/B/C/D lead categorization, ICE prioritization, the 8-step funnel workflow). The two references here are a planning-level slice; for depth, go there. Do not duplicate it.
+- **`ab-testing-ru`** — turns the hypotheses into rigorous experiments: A/B test design, sample size, statistical significance, test duration.
+- **`media-planning-ru`** — channel selection and budget split feeding the top of the tree (CPM/CTR nodes); use it instead of guessing channels for the "Channel" step.

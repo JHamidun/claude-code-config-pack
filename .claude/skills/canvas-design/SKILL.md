@@ -1,7 +1,9 @@
 ---
 name: canvas-design
-description: Create beautiful visual art in .png and .pdf documents using design philosophy. You should use this skill when the user asks to create a poster, piece of art, design, or other static piece. Create original visual designs, never copying existing artists' work to avoid copyright violations.
+description: Create beautiful visual art in .png and .pdf documents using design philosophy. You should use this skill when the user asks to create a poster, piece of art, design, or other static piece. Create original visual designs, never copying existing artists' work to avoid copyright violations. НЕ путать со скиллом design-canvas (тот — сравнение нескольких вариантов макета бок-о-бок с pan/zoom).
 license: Complete terms in LICENSE.txt
+metadata:
+  origin: anthropics/skills@fa0fa64
 ---
 
 These are instructions for creating design philosophies - aesthetic movements that are then EXPRESSED VISUALLY. Output only .md files, .pdf files, and .png files.

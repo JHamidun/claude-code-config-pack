@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Deck</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<!-- Опционально: спикер-ноты. Удали блок, если не нужны. -->
+<script type="application/json" id="speaker-notes">
+[
+  "Что говорить на 1-м слайде. Полный разговорный текст, как сценарий.",
+  "Что говорить на 2-м слайде."
+]
+</script>
+
+<style>
+  :root {
+    --bg: #faf9f6;
+    --fg: #111;
+    --muted: #6b6b6b;
+    --accent: oklch(62% 0.14 25);
+    --rule: rgba(0,0,0,.08);
+
+    --font-display: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  html, body { margin: 0; padding: 0; background: #000; color: var(--fg); }
+  body { font-family: var(--font-body); }
+
+  /* Базовая разметка слайда */
+  section {
+    background: var(--bg);
+    color: var(--fg);
+    padding: 80px;
+    box-sizing: border-box;
+  }
+  section.dark { background: #111; color: #f5f5f5; }
+
+  h1, h2, h3 { font-family: var(--font-display); margin: 0; letter-spacing: -0.02em; }
+  h1 { font-size: 120px; line-height: 1.02; font-weight: 700; }
+  h2 { font-size: 72px;  line-height: 1.05; font-weight: 600; }
+  h3 { font-size: 40px;  line-height: 1.1;  font-weight: 600; }
+  p, li { font-size: 28px; line-height: 1.4; max-width: 30ch; text-wrap: pretty; }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+  .accent { color: var(--accent); }
+
+  /* Архетипы layout-ов */
+  .statement   { display: grid; place-content: center; text-align: center; }
+  .two-col     { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-content: center; height: 100%; }
+  .title-stack { display: grid; align-content: end; gap: 24px; height: 100%; }
+
+  .placeholder {
+    background: repeating-linear-gradient(45deg,#1a1a1a,#1a1a1a 8px,#222 8px,#222 16px);
+    color: #888; font-family: var(--font-mono); font-size: 14px;
+    display: grid; place-items: center; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+
+<deck-stage width="1920" height="1080">
+
+  <!-- 01 — Statement -->
+  <section class="statement dark" data-screen-label="01 Title">
+    <div>
+      <div class="eyebrow" style="margin-bottom: 24px;">Project · 2026</div>
+      <h1>Заголовок<br/>дека.</h1>
+    </div>
+  </section>
+
+  <!-- 02 — Title + supporting -->
+  <section class="title-stack" data-screen-label="02 Problem">
+    <div class="eyebrow">01 · Проблема</div>
+    <h2>Что мы пытаемся решить</h2>
+    <p>Один-два предложения, объясняющие контекст. Без воды.</p>
+  </section>
+
+  <!-- 03 — Two-column -->
+  <section class="two-col" data-screen-label="03 Approach">
+    <div>
+      <div class="eyebrow" style="margin-bottom: 24px;">02 · Подход</div>
+      <h2>Решение</h2>
+      <p style="margin-top: 24px;">Короткое описание подхода, на котором всё держится.</p>
+    </div>
+    <div class="placeholder" style="aspect-ratio: 4/3;">
+      <span>product shot · 1200×900</span>
+    </div>
+  </section>
+
+</deck-stage>
+
+<script src="deck-stage.js"></script>
+</body>
+</html>

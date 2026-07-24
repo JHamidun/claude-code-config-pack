@@ -1,6 +1,6 @@
 ---
 name: research-docs
-description: Document Q&A with visual citations. Parses a folder of PDF/DOCX/PPTX/XLSX/images via LiteParse, answers a question using the parsed text, and generates an HTML report with source page screenshots and bounding-box highlights on the exact cited text. Use when the user asks to "deep research a folder", "проанализируй документы и дай ответ с цитатами", "Q&A по PDF", "сделай отчёт по документам с цитатами", "answer question from documents with citations", "analyze folder of PDFs".
+description: "Document Q&A with visual citations. Parses a folder of PDF/DOCX/PPTX/XLSX/images via LiteParse, answers a question, generates an HTML report with page screenshots and bounding-box highlights of cited text. Триггеры: «deep research a folder», «проанализируй документы и дай ответ с цитатами», «Q&A по PDF», «отчёт по документам с цитатами», «analyze folder of PDFs»."
 argument-hint: "[data_directory] [question]"
 disable-model-invocation: true
 allowed-tools: Bash(python *)
@@ -115,3 +115,39 @@ Tell the user:
 1. Where the report was saved (the file path printed by the script)
 2. A brief summary of the answer (2-3 sentences)
 3. How many citations were found
+
+## Дерево-индекс длинных документов (PageIndex)
+
+Альтернативный движок для **длинных структурированных PDF/MD** (договоры 20+ стр., банковские выписки, годовые отчёты, финдоки), где чтение всего документа в контекст дорого, а векторный RAG теряет структуру. PageIndex (VectifyAI, локальный движок) строит **иерархическое JSON-дерево** — семантическое оглавление с узлами `{node_id, title, summary, страницы}` — и отвечает reasoning-навигацией по дереву БЕЗ эмбеддингов и БД.
+
+**Когда брать вместо основного flow этого скилла:**
+
+- Один длинный документ (50+ стр.) с чёткой структурой разделов, много вопросов к нему → дерево строится один раз, вопросы дешёвые
+- Нужна навигация «найди раздел про X / какая сумма в пункте Y», а не visual citations
+- Основной flow (LiteParse + полный текст в контекст) остаётся дефолтом для папок разнородных документов и отчётов с цитатами
+
+**Команды** (venv уже установлен, ключ берётся из `~/.claude/.credentials.master.env` автоматически):
+
+```bash
+PY=${HOME}/.claude/mcps/pageindex/.venv/Scripts/python.exe
+PI=${HOME}/.claude/mcps/pageindex/pi.py
+"$PY" "$PI" index /path/to/doc.pdf        # один раз: строит дерево, печатает doc_id (персистится в workspace/)
+"$PY" "$PI" list                          # что уже проиндексировано
+"$PY" "$PI" tree <doc_id>                 # семантическое оглавление (титулы + страницы)
+"$PY" "$PI" pages <doc_id> 5-7            # текст конкретных страниц
+"$PY" "$PI" ask <doc_id> "вопрос"         # автономный 2-шаговый reasoning-ответ (2 LLM-вызова)
+```
+
+**Рекомендуемый паттерн в Claude Code:** `tree` → сам выбери страницы по оглавлению → `pages` — навигацию делаешь ты (по подписке, 0 внешних вызовов), OpenAI тратится только на разовый build. `ask` — для автономных пайплайнов; учти, что single-shot навигация может пропустить второй релевантный раздел (например, тему, раскрытую и в MSA, и в SOW) — при сомнении делай `tree`+`pages` итеративно.
+
+**Стоимость** (gpt-4o): build ≈ $0.01/страница (~$0.23 и ~70 сек на 21-стр. договор, ~23 вызова), `ask` ≈ $0.05–0.10/вопрос. Экономика оправдана на длинных документах с повторными вопросами; для разовых коротких (<20 стр.) — дешевле обычный flow этого скилла.
+
+## MinerU — сканы / рукопись / формулы (heavy-job, ПОД РЕСУРС-ГАРД)
+
+Третий движок для **трудных** документов, которые LiteParse не вытягивает: сканы без текстового слоя, рукописный текст, плотные формулы→LaTeX, сложные таблицы→HTML, многоколоночная вёрстка, 109-язычный OCR. Работает **локально бесплатно на your GPU** (VLM+OCR), но тяжёлый: ~20GB диск, 8GB VRAM, скачивание весов моделей.
+
+**⚠️ Heavy-job — НЕ ставить и НЕ качать веса вслепую.** Установка и первый прогон (скачивание весов) проходят через ресурс-гард `ваше локальное хранилище памяти` (#8): idle-check + GPU-check + TG-нотификация. Ставится в отдельный venv.
+
+**Когда брать вместо LiteParse:** только когда LiteParse отдал кашу или пустоту (скан/фото/рукопись/восточные языки/формулы). Для обычных цифровых PDF/DOCX с текстовым слоем — остаётся LiteParse (быстрее + даёт visual citations). MinerU-Markdown цитируется как plaintext (`page: 0`), без bounding-box highlight.
+
+**Паттерн:** прогнать трудный файл через MinerU → `.md` → положить в папку `$0` → дальше обычный flow скилла (Step 2+). Полная инструкция (установка, бэкенды `pipeline`/`vlm-transformers`/`hybrid`, источник весов, ваш регион/конфиденциальность) → `references/mineru-heavy.md`.

@@ -1,11 +1,40 @@
 ---
 name: performance-analytics
-description: Analyze marketing performance with key metrics, trend analysis, and optimization recommendations. Use when building performance reports, reviewing campaign results, analyzing channel metrics (email, social, paid, SEO), or identifying what's working and what needs improvement.
+description: "Analyze marketing performance — метрики каналов (email, social, paid, SEO), отчёты, tracking plan / события / цели. Триггеры: tracking plan, «план аналитики», «настроить цели/трекинг», «модели атрибуции», «ROMI vs ROAS», «CPL CPA CAC LTV», «UTM-структура», server-side GTM, Stape, «фаза обучения по платформам», lookalike quality events."
+metadata:
+  version: 1.2.0
+  reuses: yandex, full-funnel-analytics-ru, capi-no-code-setup, ad-benchmarks-ru
 ---
 
 # Performance Analytics Skill
 
 Frameworks for measuring, reporting, and optimizing marketing performance across channels and campaigns.
+
+## Tracking plan (RU) — события и цели под воронку
+
+Для настройки плана аналитики, событий и целей под реальную воронку (курс/консалтинг/SaaS, лидген через контент) — см. **`references/tracking-plan-ru.md`**. Это event-library + tracking-plan, переложенный с GA4/GTM на **Яндекс Метрику** (цели вместо conversions, параметры вместо custom dimensions) и привязанный к метрикам воронки, которые реально важны: подписчики контент-канала, trial → paid, заявки на консультацию, лиды продукта.
+
+Сначала собери контекст: оффер, ICP, воронка (→ `references/funnel-another-db.md`). Данные тянутся через `yandex` (Metrika API) и вашу продуктовую аналитику (сегменты, воронки) — НЕ дублировать их API-клиенты. Эксперименты над метриками — через `ab-testing-ru`.
+
+> **Сквозная когортная аналитика на масштабе** (12-шаговая когортная воронка, Predict LTV, one-screen дашборд, 9-шаговый процесс еженедельного анализа, выбор модели атрибуции под цикл сделки) вынесена в отдельный скилл **`full-funnel-analytics-ru`**. Этот скилл покрывает метрики отдельных каналов и tracking plan; full-funnel — слой когортного анализа поверх них.
+
+## Performance-аналитика (RU) — справочники по каналам
+
+Дополнительные references с эталонными ориентирами и определениями. Каждый — самодостаточный справочник с cross-links, чтобы не дублировать соседние скиллы.
+
+| Reference | Что внутри | Когда читать |
+|-----------|-----------|--------------|
+| `references/perf-metric-definitions-ru.md` | Словарь метрик: ROMI/ROAS/CPL/CPA/CAC/LTV/AOV/CR/CPQL + ROMI vs ROAS, дерево метрик, 40-80+ касаний/день, 5-7 касаний на покупку, **UTM-структура** (5 параметров + динамические подстановки Яндекса) | «что такое ROMI/ROAS», «определения метрик», «UTM-структура», «динамические параметры» |
+| `references/attribution-models-direct.md` | 5 моделей атрибуции для Директа (Last Click / First Click / Last Non-Direct / Multi-Touch / Last Non-Brand) + правила выбора + **автоцели vs JS-события**, микро/макроконверсии, целевая доля 100%, корреляция Пирсона | «модели атрибуции», «Last Non-Brand Click», «автоцели vs js-события», «как засчитать конверсию» |
+| `references/server-side-tracking-stack.md` | Decision matrix server-side (Stape / GTM Server / Яндекс SSP / self-hosted / no-code) + per-platform CAPI cross-links + обзор сервисов сквозной аналитики ($1k+/мес класс) | «server-side tracking stack», «server-side GTM», «Stape», «чем собирать серверные события» |
+| `references/learning-phase-cross-platform.md` | Пороги обучения на одной оси: Meta 50 событий/7-10 дней vs Google 5-7 дней / ≥50 конв/нед vs Yandex 10 конв/14-21 день vs Telegram (нет фазы) vs VK (ручной) + универсальный паттерн «что сбивает обучение» | «фаза обучения по платформам», «cross-platform learning phase», «сколько событий нужно алгоритму», «что сбивает обучение» |
+| `references/lookalike-quality-events.md` | Cross-platform паттерн «Lookalike на качественных событиях»: VK CS / Meta 1-3-5% / Yandex LAL / Google Demand Gen LAL — строить ядро на оплатах/квал-лидах, не на кликах | «lookalike на качественных событиях», «на чём строить похожую аудиторию», «LAL на оплатах» |
+
+**Границы (не дублировать):**
+- Когортная воронка на масштабе, Predict LTV, Zero Day Revenue, 9 шагов анализа, выбор атрибуции под цикл сделки → **`full-funnel-analytics-ru`**.
+- Пошаговая no-code настройка CAPI, 7 параметров матчинга, Event ID, Test Events, офлайн-конверсии → **`capi-no-code-setup`**.
+- Готовый справочник цифр/бенчмарков по всем каналам → **`ad-benchmarks-ru`**.
+- Аукционная оптимизация конкретного канала → `yandex-direct-pro-ru`, `google-ads-pro-ru`, `telegram-ads-pro-ru`, `vk-ads-pro-ru`, `meta-ads-launch-ru`.
 
 ## Key Marketing Metrics by Channel
 

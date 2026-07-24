@@ -6,10 +6,11 @@
 YAML-frontmatter. Универсально: подаёшь любые md по фазам машины.
 
 CLI:
-    python build_report_docx.py --title "Бренд — SEO" --out report.docx \
+    python build_report_docx.py --title "YourProduct — SEO" --out report.docx \
         --brief research/brief-x.md --cluster research/cluster-x.md --draft drafts/x.md
 Любой из --brief/--cluster/--draft необязателен. Порядок в документе: brief → cluster → draft.
 
+Конкретный «богатый» пример с резюме/таблицами рынка вручную: examples/your-product/build_docx.py
 Требует: pip install python-docx
 """
 import argparse
@@ -26,8 +27,7 @@ try:
 except ImportError:
     sys.exit("pip install python-docx")
 
-# Нейтральный акцентный цвет; поменяйте под свой бренд.
-BRAND = RGBColor(0x25, 0x63, 0xEB)
+BRAND = RGBColor(0x2D, 0x2F, 0xE8)
 DARK = RGBColor(0x1A, 0x1A, 0x1A)
 GREY = RGBColor(0x66, 0x66, 0x66)
 
