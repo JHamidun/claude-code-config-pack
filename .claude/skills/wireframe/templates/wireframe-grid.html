@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Wireframes</title>
+<style>
+  body { margin: 0; background: #ececec; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .wireframe-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 32px; padding: 32px;
+  }
+  .wf header h3 { font-size: 12px; margin: 0 0 10px; color: #333; font-weight: 600; }
+  .wf .note { font-size: 11px; color: #777; margin-top: 8px; }
+  .wf .frame {
+    background: #fff;
+    border: 1px solid #ccc;
+    aspect-ratio: 4/3;
+    display: grid; gap: 8px;
+    padding: 8px;
+  }
+  .wf .block {
+    background: #d8d8d8;
+    display: grid; place-items: center;
+    font-size: 11px; color: #666;
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .row    { grid-auto-flow: row; grid-template-rows: auto 1fr auto; }
+  .stack  { grid-auto-flow: row; grid-template-rows: 80px 1fr 1fr 60px; }
+  .split  { grid-template-columns: 1fr 1fr; }
+  .grid32 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+  .grid32 .cell { background: #c8c8c8; aspect-ratio: 4/3; display: grid; place-items: center; font-size: 10px; color: #666; }
+  .cta   { background: #111; color: #fff; }
+</style>
+</head>
+<body>
+
+<section class="wireframe-grid">
+
+  <article class="wf">
+    <header><h3>A — hero сверху + features 3×2 + CTA band</h3></header>
+    <div class="frame row">
+      <div class="block" style="aspect-ratio: 16/6;">HERO</div>
+      <div class="grid32">
+        <div class="cell">F1</div><div class="cell">F2</div><div class="cell">F3</div>
+        <div class="cell">F4</div><div class="cell">F5</div><div class="cell">F6</div>
+      </div>
+      <div class="block cta">CTA BAND</div>
+    </div>
+  </article>
+
+  <article class="wf">
+    <header><h3>B — split hero, features столбцом</h3></header>
+    <div class="frame split">
+      <div class="block">HERO TEXT</div>
+      <div class="block">HERO IMAGE</div>
+    </div>
+  </article>
+
+  <article class="wf">
+    <header><h3>C — story-mode, последовательные секции</h3></header>
+    <div class="frame stack">
+      <div class="block">NAV</div>
+      <div class="block">PROBLEM</div>
+      <div class="block">SOLUTION</div>
+      <div class="block cta">FOOTER CTA</div>
+    </div>
+  </article>
+
+  <article class="wf">
+    <header><h3>D — full-bleed image, текст в углу</h3></header>
+    <div class="frame">
+      <div class="block" style="position: relative;">
+        FULL-BLEED IMAGE
+        <div style="position: absolute; bottom: 16px; left: 16px; background: #fff; padding: 8px 10px; font-size: 10px; color: #333;">TEXT OVERLAY</div>
+      </div>
+    </div>
+  </article>
+
+</section>
+
+</body>
+</html>

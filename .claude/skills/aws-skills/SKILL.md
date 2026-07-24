@@ -9,28 +9,31 @@ description: AWS development with CDK, Lambda, serverless patterns, infrastructu
 
 Разработка на AWS: CDK, Lambda, serverless паттерны, инфраструктура как код.
 
-## Аккаунт
+## Аккаунт (плейсхолдеры)
 
-- **Account ID:** YOUR_AWS_ACCOUNT_ID
-- **Account Name:** your-aws-username
-- **Region:** us-east-1 (your region)
-- **IAM User:** your-project-backup (S3FullAccess)
+Подставь свои значения из AWS-консоли / IAM. Никогда не хардкодь их в коде — держи в env / Secrets Manager.
 
-### S3 Buckets
+- **Account ID:** `YOUR_ACCOUNT_ID` (12 цифр, AWS Console → верхний правый угол)
+- **Account Name:** `YOUR_ACCOUNT_ALIAS`
+- **Region:** `YOUR_REGION` (например `us-east-1`, `eu-central-1`, `us-east-1`)
+- **IAM User:** `YOUR_IAM_USER` (выдавай least-privilege политику под задачу)
+
+### S3 Buckets (пример)
 
 | Bucket | Назначение |
 |--------|------------|
-| `your-project-backups` | Автобэкапы сервера (PostgreSQL, MongoDB, Redis, configs) |
+| `your-backups-bucket` | Автобэкапы (PostgreSQL, MongoDB, Redis, configs) |
 
-### Backup System
-- **Расписание:** каждые 6 часов (cron)
-- **Хранение:** 7 дней (автоочистка)
-- **Скрипт:** `/opt/backup/s3_backup.sh`
+### Backup System (пример паттерна)
+- **Расписание:** каждые N часов (cron)
+- **Хранение:** retention с автоочисткой (например 7 дней)
+- **Скрипт:** свой `s3_backup.sh` на сервере
 
 ### Credentials
 ```bash
-# API ключи: ~/.claude/.credentials.master.env
+# Ключи храни в env / профиле AWS CLI, НЕ в коде.
 # Переменные: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION
+# Ещё лучше — IAM Role / SSO вместо long-lived ключей.
 ```
 
 ## When to Use

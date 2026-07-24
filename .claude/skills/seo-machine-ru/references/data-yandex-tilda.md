@@ -1,46 +1,55 @@
-# Данные и публикация (Яндекс + ваш CMS)
+# Данные и публикация: адаптеры к `yandex` и `tilda`
 
-> Машина считает (Python-скрипты) и пишет (роли), а данные берёт из Яндекса и публикует в ваш CMS.
-> Здесь — откуда что брать. Реальные клиенты к API подключаете своими (см. ниже).
+> Машина НЕ имеет своих API-клиентов к Яндексу/Tilda — она переиспользует существующие скиллы. Это сознательный выбор: один источник правды по OAuth/токенам. Здесь — как именно дёргать.
 
-## Семантика и частотность — Wordstat
+## Семантика и частотность — Wordstat (скилл `yandex`)
 
-**Главный способ (рабочий, без Direct API):** `references/wordstat-real-recipe.md` — internal API `getTable`
-с залогиненной сессии браузера, скрипты `scripts/wordstat_fetch.py` и `scripts/wordstat_browser_snippet.js`.
-
-Альтернатива (если есть одобренный доступ к Яндекс.Директ API): метод `CreateNewWordstatReport` →
-`GetWordstatReport`. По умолчанию доступ к Direct API закрыт (`error 58`) — используйте браузерный рецепт.
-
-Из результата соберите JSON для `opportunity_scorer.py`:
-```json
-[{"keyword":"ключевая фраза","volume":12000,"position":14,"intent":"commercial","competition":0.6,"cluster_size":8}]
+Wordstat = Direct API v4 (legacy), service 13. Через скилл `yandex`:
+```bash
+# Создать отчёт Wordstat по фразам
+python ~/.claude/skills/yandex/scripts/yandex_api.py  # см. SKILL.md §12 Wordstat
+# Метод CreateNewWordstatReport {"Phrases": ["нейросети для бизнеса", ...]}
+# затем GetWordstatReportList / GetWordstatReport <id>
 ```
-`position` — из Вебмастера, `competition` — оценка по топу выдачи, `intent` — классификация по запросу.
+Берёт частотность фраз и связанные запросы. Из результата собрать JSON для `opportunity_scorer.py`:
+```json
+[{"keyword":"нейросети для бизнеса","volume":12000,"position":14,"intent":"commercial","competition":0.6,"cluster_size":8}]
+```
+`position` — из Вебмастера (ниже), `competition` — оценка по топу выдачи, `intent` — классификация по запросу.
 
-## Позиции, запросы, индексация — Яндекс.Вебмастер
+## Позиции, запросы, индексация — Вебмастер (скилл `yandex`)
 
-Webmaster API v4 (или UI): текущие позиции и показы (для quick-win поз. 11-20), CTR, индексация,
-ошибки, бэклинки. После публикации — отправить URL на переобход.
-Подключите свой OAuth-токен Яндекса (https://oauth.yandex.ru/) — см. `.env.example`.
+Webmaster API v4, service 5:
+```bash
+python ~/.claude/skills/yandex/scripts/yandex_api.py webmaster sites
+# далее по SKILL.md §5: search queries, indexing, backlinks для host_id
+```
+Даёт: текущие позиции и показы (для quick-win поз. 11-20), CTR, проиндексированность, ошибки, бэклинки. После публикации — отправить URL на переобход.
 
-## Трафик и конверсии — Яндекс.Метрика
+## Трафик и конверсии — Метрика (скилл `yandex` / `product-analytics`)
 
-Метрика Reporting API (или UI): визиты, отказы, конверсии, сегменты, UTM. Используется в аудите
-существующих страниц и для приоритизации по реальному трафику.
+```bash
+python ~/.claude/skills/yandex/scripts/yandex_api.py metrika report \
+  --metrics "ym:s:visits,ym:s:pageviews,ym:s:bounceRate" --date1 "30daysAgo" --date2 "today"
+```
+Для YourProduct — лучше `product-analytics` (уже умеет сегменты corporate/individual, воронки buy, UTM). Используется в фазе `performance` и для CRO-приоритизации.
 
 ## Конкуренты / объёмы рынка
 
-- Топ-10 выдачи Яндекса по главному ключу — `WebFetch`/`WebSearch` или браузер (см. wordstat-recipe → анти-завис браузера).
-- Гэп-анализ контента, листиклы-обзоры рынка — прочитать через `WebFetch` и выписать конкурентов/критерии.
+- Гэп-анализ контента, трафик конкурентов → `similarweb-analytics`, `competitive-analysis`.
+- Топ выдачи Яндекса для оценки конкуренции — WebFetch/WebSearch или `dev-browser`.
 
-## Публикация — ваш CMS
+## Публикация — Tilda (скилл `tilda`)
 
-- Блог/медиа: ваш CMS (Tilda Feeds API, WordPress REST, Headless CMS и т.п.).
-- Лендинг/страница: редактор страниц вашего CMS.
-- Мета (title/description/og) — в SEO-полях страницы вашего CMS.
-- Schema (JSON-LD FAQPage/Article) — в `<head>` страницы.
+```bash
+# Пост в фид блога / медиа — Feeds API
+python ~/.claude/skills/tilda/scripts/...   # см. tilda/SKILL.md: posts_Add/Edit/Active
+# Лендинг / страница — page editor, T123 custom HTML, page publish
+```
+Мета (title/description/og) ставятся в SEO-полях страницы/поста Tilda (НЕ Yoast). После публикации обязательно `posts_Active` (Edit сбрасывает active — известная грабля, см. tilda skill memory).
+
+Новостной материал в блог your-domain.com → готовый конвейер `ai-news-bot` (build_tilda_blocks + JSON-LD + push).
 
 ## Принцип
 
-Этот скилл **не содержит** ваших OAuth-токенов и API-клиентов к Яндексу/CMS — подключаете свои
-(через `.env`). Скилл даёт движок (скоринг/читаемость/плотность/чистка/упаковка) и рабочий рецепт Wordstat.
+Машина считает (Python-скрипты) и пишет (роли), но **данные берёт и публикует через `yandex`/`tilda`/`product-analytics`**. Не воспроизводить их OAuth/HTTP-клиенты здесь.

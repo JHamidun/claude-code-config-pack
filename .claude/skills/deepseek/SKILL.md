@@ -1,6 +1,6 @@
 ---
 name: deepseek
-description: "DeepSeek API Skill"
+description: "DeepSeek API (DEEPSEEK_API_KEY, deepseek-chat, OpenAI-совместимый эндпоинт) — кодогенерация, рефакторинг, reasoning, 128K контекст. Триггеры: deepseek, «дипсик», «спроси deepseek»."
 ---
 
 # DeepSeek API Skill
@@ -33,7 +33,7 @@ DEEPSEEK_MODEL=deepseek-chat
 - 128K context window (huge!)
 - Strong coding capabilities
 - Excellent reasoning
-- Cost-effective (cheaper than GPT-4)
+- Cost-effective (cheaper than GPT-5.x)
 - Fast inference
 
 ## Dependencies
@@ -62,8 +62,7 @@ def deepseek_chat(prompt: str, system_prompt: str = None,
     Chat with DeepSeek.
 
     Models:
-        - deepseek-chat: General purpose (fast, smart)
-        - deepseek-coder: Optimized for coding
+        - deepseek-chat: General purpose, coding, refactoring (fast, smart)
         - deepseek-reasoner: Best for complex reasoning
     """
     messages = []
@@ -87,7 +86,7 @@ def deepseek_chat(prompt: str, system_prompt: str = None,
 
 ```python
 def generate_code(task: str, language: str = "python"):
-    """Generate code with DeepSeek Coder."""
+    """Generate code with DeepSeek."""
 
     system_prompt = f"""You are an expert {language} developer.
     Write clean, well-documented, production-ready code.
@@ -97,7 +96,7 @@ def generate_code(task: str, language: str = "python"):
     return deepseek_chat(
         prompt=task,
         system_prompt=system_prompt,
-        model="deepseek-coder"
+        model="deepseek-chat"
     )
 ```
 
@@ -127,7 +126,7 @@ def review_code(code: str, focus: list = None):
 
 Provide structured feedback."""
 
-    return deepseek_chat(prompt, system_prompt, model="deepseek-coder")
+    return deepseek_chat(prompt, system_prompt, model="deepseek-chat")
 ```
 
 ### Large Codebase Analysis (128K context!)
@@ -247,7 +246,7 @@ Original code:
 
 Provide the refactored code with explanations."""
 
-    return deepseek_chat(prompt, model="deepseek-coder")
+    return deepseek_chat(prompt, model="deepseek-chat")
 ```
 
 ### Debug Code
@@ -269,7 +268,7 @@ Code:
 2. Provide the fixed code
 3. Explain what was changed"""
 
-    return deepseek_chat(prompt, model="deepseek-coder")
+    return deepseek_chat(prompt, model="deepseek-chat")
 ```
 
 ### Generate Tests
@@ -290,7 +289,7 @@ Include:
 - Error handling tests
 - Integration tests if applicable"""
 
-    return deepseek_chat(prompt, model="deepseek-coder")
+    return deepseek_chat(prompt, model="deepseek-chat")
 ```
 
 ## API Pricing
@@ -298,26 +297,25 @@ Include:
 | Model | Input | Output |
 |-------|-------|--------|
 | deepseek-chat | $0.14/1M tokens | $0.28/1M tokens |
-| deepseek-coder | $0.14/1M tokens | $0.28/1M tokens |
 | deepseek-reasoner | $0.55/1M tokens | $2.19/1M tokens |
 
-**Note:** DeepSeek is ~10-20x cheaper than GPT-4!
+**Note:** DeepSeek is ~10-20x cheaper than GPT-5.x!
 
 ## Quick Reference
 
 | Task | Model | Code |
 |------|-------|------|
 | General chat | deepseek-chat | `deepseek_chat(prompt)` |
-| Code generation | deepseek-coder | `generate_code(task)` |
-| Code review | deepseek-coder | `review_code(code)` |
+| Code generation | deepseek-chat | `generate_code(task)` |
+| Code review | deepseek-chat | `review_code(code)` |
 | Codebase analysis | deepseek-chat | `analyze_codebase(files)` |
 | Complex reasoning | deepseek-reasoner | `solve_problem(problem)` |
 
 ## Tips
 
 1. **Use 128K context** - можно загружать целые репозитории
-2. **deepseek-coder** лучше для кода, чем deepseek-chat
-3. **Дешевле GPT-4** - используй для heavy tasks
+2. **deepseek-chat** для кода/рефакторинга, **deepseek-reasoner** для сложного reasoning
+3. **Дешевле GPT-5.x** - используй для heavy tasks
 4. **OpenAI-compatible** - тот же синтаксис что и OpenAI
 5. **Streaming** - используй для длинных ответов
 6. **JSON mode** - для структурированных данных

@@ -1,175 +1,126 @@
 ---
 name: type-scale
-description: Modular type scale + проверенные font-pairs. Дает 7-9 размеров от tiny до hero, с чёткой математикой между ними. И 5 готовых пар head+body+mono шрифтов под разные эстетики.
-when_to_use: При создании дизайн-системы (внутри design-system-create), при проверке существующего проекта на типографику. Без модульной шкалы все размеры выглядят случайными.
+version: 1.0.0
+description: Modular typographic scale из base + ratio. Plus 30 проверенных font-pair'ов на выбор.
+when_to_use: В начале проекта без дизайн-системы, или когда нужно «причесать» бардак с размерами.
 ---
 
 # Type scale
 
-Modular scale = одно число (ratio), от которого вырастают все размеры. Меньше произвола, больше согласованности.
+## Modular scale
 
-## Math
+Размеры выводятся из base × ratio^n. Не подбираются «на глаз».
 
-```
-base = 16px (body)
-ratio = выбираешь из таблицы
+| Ratio | Имя | Подходит |
+|---|---|---|
+| 1.125 | Major Second | плотные UI, дашборды |
+| 1.2   | Minor Third  | дефолт |
+| 1.25  | Major Third  | редактирование длинных текстов |
+| 1.333 | Perfect Fourth | питчи, лендинги |
+| 1.414 | Augmented 4th | dramatic, манифесты |
+| 1.5   | Perfect Fifth | максимум контраста |
 
-t-tiny  = base / ratio²
-t-small = base / ratio
-t-body  = base
-t-lead  = base × ratio
-t-h3    = base × ratio²
-t-h2    = base × ratio³
-t-h1    = base × ratio⁴
-t-hero  = base × ratio⁵   (или clamp() для responsive)
-```
+Базовый размер: 16px веб, 17px iOS, 14px компактный UI.
 
-## Готовые ratio
+## Скрипт
 
-| Ratio | Значение | Vibe | Когда |
-|---|---|---|---|
-| 1.125 | Major Second | Спокойный, плотный | Dashboard, dense UI |
-| 1.200 | Minor Third | Сбалансированный | Default, b2b лендинг |
-| 1.250 | Major Third | Дружелюбный | Edtech, b2c, mainstream |
-| 1.333 | Perfect Fourth | Чёткая иерархия | Editorial, longform |
-| 1.414 | Augmented Fourth | Драматичный | Pitch deck, marketing |
-| 1.500 | Perfect Fifth | Бренд-выразительный | Hero-heavy лендинги |
-| 1.618 | Golden Ratio | Премиум | Luxury, fashion, art |
+`templates/type-scale.mjs`:
 
-## Пример: ratio 1.25 (Major Third), base 16
+```js
+const base  = +(process.argv[2] || 16);
+const ratio = +(process.argv[3] || 1.25);
+const names = ['xs','sm','base','lg','xl','2xl','3xl','4xl','5xl','6xl'];
+const offset = -2;
 
-```css
-:root {
-  --t-tiny:  10.24px;   /* 16 ÷ 1.25² */
-  --t-small: 12.8px;    /* 16 ÷ 1.25  */
-  --t-body:  16px;
-  --t-lead:  20px;      /* 16 × 1.25  */
-  --t-h3:    25px;      /* 16 × 1.25² */
-  --t-h2:    31.25px;   /* 16 × 1.25³ */
-  --t-h1:    39.06px;   /* 16 × 1.25⁴ */
-  --t-hero:  clamp(48px, 5vw, 76px);  /* responsive cap */
-}
+console.log(':root {');
+names.forEach((n, i) => {
+  const px = (base * Math.pow(ratio, i + offset)).toFixed(0);
+  console.log(`  --text-${n}: ${px}px;`);
+});
+console.log('}');
 ```
 
-В реальности округляй до целых: 10/13/16/20/25/31/39/76.
+```bash
+node type-scale.mjs 16 1.25
+# → :root { --text-xs: 10px; --text-sm: 13px; --text-base: 16px; ... }
+```
 
-## Line-height по уровню
+## Готовые пары шрифтов
 
-| Размер | line-height |
+Не Inter+Inter и не Roboto-везде. Эти 30 пар проверены:
+
+### Безопасные
+
+| Display | Body |
 |---|---|
-| tiny / small (10-13px) | 1.4-1.5 |
-| body (14-16px) | 1.5-1.65 |
-| lead (18-22px) | 1.4-1.5 |
-| h3 (24-32px) | 1.25-1.35 |
-| h1-h2 (36-60px) | 1.05-1.2 |
-| hero (60+) | 0.9-1.0 |
+| Helvetica Neue Bold | Helvetica Neue Regular |
+| GT Walsheim | Söhne Buch |
+| Söhne | Söhne Mono (для кода) |
+| Gotham | Gotham Book |
 
-## Letter-spacing
+### Sans + Sans
 
-| Размер | letter-spacing |
+| Display | Body |
 |---|---|
-| Заголовки (h1-h2) | -0.02em до -0.05em (tight, хорошо для display) |
-| Body | 0 (default) |
-| Eyebrow / label / mono | +0.04em до +0.16em (loose, читается как «бейдж») |
-| Buttons | +0.02em |
+| Untitled Sans | Untitled Sans (light) |
+| GT America Mono | GT America |
+| Founders Grotesk | Source Sans Pro |
+| Aktiv Grotesk | Aktiv Grotesk |
+| Neue Haas Unica | Neue Haas Unica |
 
-## Font-weight scale
+### Serif + Sans
 
-```
-300 — light (display only, не для body!)
-400 — regular (body default)
-500 — medium (mid emphasis)
-600 — semibold (subheaders, labels)
-700 — bold (headings)
-900 — black (display hero only)
-```
+| Display | Body |
+|---|---|
+| Source Serif Pro | Source Sans Pro |
+| Spectral | Inter (тут уместно) |
+| GT Sectra | GT America |
+| Tiempos Headline | Tiempos Text |
+| Domaine Display | Founders Grotesk |
+| Canela | Söhne |
+| Editorial New | PP Neue Montreal |
 
-**Не миксуй** 5 weights в одном проекте — выбери 2-3.
+### Serif + Serif (только если умеешь)
 
-## 5 проверенных пар head + body + mono
+| Display | Body |
+|---|---|
+| Lyon Display | Lyon Text |
+| Domaine Display | Domaine Text |
+| Tiempos Headline | Tiempos Text |
 
-### 1. Editorial monochrome
-```
-head: "Helvetica Neue", "Inter Tight"
-body: "Helvetica Neue", "Inter"
-mono: "JetBrains Mono", ui-monospace
-```
+### Mono + Sans
 
-### 2. Soft brutalism
-```
-head: "Space Grotesk Black", "Inter Tight Black"
-body: "IBM Plex Sans"
-mono: "IBM Plex Mono"
-```
+| Display | Body |
+|---|---|
+| JetBrains Mono | Inter |
+| GT America Mono | GT America |
+| Berkeley Mono | Söhne |
+| iA Writer Mono | iA Writer Quattro |
 
-### 3. Premium dark
-```
-head: "Inter Tight"
-body: "Inter"
-mono: "Geist Mono"
-```
+### Бесплатные с Google Fonts
 
-### 4. Warm minimalism
-```
-head: "Inter Tight"
-body: "Manrope"
-mono: "JetBrains Mono"
-```
+| Display | Body |
+|---|---|
+| Fraunces | Inter |
+| Bricolage Grotesque | Inter |
+| Outfit | Outfit |
+| Space Grotesk | Space Mono (для меток) |
+| DM Serif Display | DM Sans |
 
-### 5. Data-dense
-```
-head: "Inter"
-body: "Inter"
-mono: "Geist Mono", "JetBrains Mono"
-```
+## Правила пары
 
-**Правило:** не миксуй 3+ font families. Head + body (часто одна family с двумя weights) + mono = достаточно.
+- **Контраст в категории** — serif + sans лучше двух sans.
+- **Один вес для тела** — не используй italic как акцент в теле, это шум.
+- **Один шрифт для длинных пассажей** — не миксуй два serif в одном абзаце.
+- **Mono — только для кода и меток**, не для тела.
 
-## Self-hosted vs Google Fonts
+## Проверка
 
-- **Production:** self-host через `@font-face` в `styles/fonts.css` (RF-safe, GDPR-safe, faster)
-- **Prototype:** через Google Fonts CDN — `<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">`
+После выбора:
+1. Напиши заголовок 5 слов, подзаголовок 12 слов, абзац 60 слов.
+2. Уменьши до 50% масштаба — читаемо?
+3. Распечатай (или PDF) — выглядит ли как «дизайн», а не «Word»?
 
-Для России (your-regulator блокировки) — всегда self-host для production.
+## Legacy reference
 
-## Как применить в tokens.css
-
-```css
-:root {
-  /* Type scale (ratio 1.25, base 16) */
-  --t-tiny:  10px;
-  --t-small: 13px;
-  --t-body:  16px;
-  --t-lead:  20px;
-  --t-h3:    24px;
-  --t-h2:    32px;
-  --t-h1:    40px;
-  --t-hero:  clamp(44px, 5vw, 72px);
-
-  /* Font families */
-  --font-head: "Inter Tight", "Helvetica Neue", sans-serif;
-  --font-body: "Inter", "Helvetica Neue", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
-
-  /* Line heights */
-  --lh-tight: 1.1;
-  --lh-snug:  1.3;
-  --lh-base:  1.55;
-  --lh-loose: 1.7;
-}
-
-body { font: var(--t-body)/var(--lh-base) var(--font-body); }
-h1   { font: 700 var(--t-h1)/var(--lh-tight) var(--font-head); letter-spacing: -0.03em; }
-h2   { font: 700 var(--t-h2)/var(--lh-snug) var(--font-head); letter-spacing: -0.02em; }
-h3   { font: 600 var(--t-h3)/var(--lh-snug) var(--font-head); }
-```
-
-## Антипаттерны
-
-- 12+ размеров в шкале → теряется иерархия
-- Размеры из головы (`14px, 17px, 22px, 29px`) без логики → каждый разработчик добавляет ещё один
-- Mix 4 шрифтов → визуальная фрагментация
-- Body 14px на лендинге → плохо читается, нужно 16px минимум, 18px на hero-section
-- Заголовок hero 32px на 1920×1080 → выглядит как заголовок секции, не как hero
-- line-height 1.0 для body → слиплось
-- Нет mono → числа в таблицах прыгают, не выровнены
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-type-scale.md`. Секции там: Math, Готовые ratio, Пример: ratio 1.25 (Major Third), base 16, Line-height по уровню, Letter-spacing, Font-weight scale, 5 проверенных пар head + body + mono, Self-hosted vs Google Fonts, Как применить в tokens.css, Антипаттерны.

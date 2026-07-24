@@ -1,6 +1,0 @@
-pyyaml
-openpyxl
-pymorphy3
-pymorphy3-dicts-ru
-requests
-telethon

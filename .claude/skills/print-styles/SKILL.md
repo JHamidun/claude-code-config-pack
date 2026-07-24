@@ -1,176 +1,130 @@
 ---
 name: print-styles
-description: CSS @media print стили чтобы артефакт нормально печатался / экспортировался в PDF. Скрывает navigation, ставит правильные page breaks, переключает шрифты под печать, выключает hover.
-when_to_use: Перед export-pdf если артефакт длинный (лендинг, multi-page документ). Не нужен для slides (там размеры уже фиксированные).
+description: Print stylesheet для лендинга / документа / отчёта. Чтобы Cmd+P давал что-то приличное.
+when_to_use: Документы, контракты, лендинги, которые могут быть распечатаны или сохранены в PDF.
 ---
 
 # Print styles
 
-Web и print — два разных медиума. Без `@media print` всё печатается криво — обрезанные блоки, лишние элементы, бледный текст на чёрно-белой.
+90% сайтов при печати выдают мусор: огромные иконки, обрезанная навигация, пустые страницы. Хороший print stylesheet — это уважение.
 
-## Базовый print stylesheet
+## Минимум
 
 ```css
 @media print {
-  /* 1. Скрыть всё что не для печати */
-  nav, header.sticky, footer.dynamic, .toolbar,
-  .cookie-banner, .modal, .toast, .live-chat,
-  button[type="button"]:not(.print-keep),
-  .scroll-to-top, .share-buttons {
-    display: none !important;
-  }
+  /* Сброс */
+  * { background: transparent !important; color: #000 !important; box-shadow: none !important; text-shadow: none !important; }
+  body { font: 11pt/1.4 Georgia, serif; margin: 0; }
 
-  /* 2. Body на всю ширину, без max-width */
-  body { margin: 0; padding: 0; max-width: none; }
+  /* Скрыть навигацию, sticky-элементы, кнопки */
+  nav, header.sticky, footer, .no-print, [data-no-print] { display: none !important; }
 
-  /* 3. Чёрный текст на белом фоне (в больших объёмах) */
-  body { background: white !important; color: black !important; }
+  /* URL у ссылок — раскрыть */
+  a:not(.no-href)::after { content: " (" attr(href) ")"; font-size: 9pt; color: #666; }
+  a[href^="#"]::after, a[href^="javascript:"]::after { content: ""; }
 
-  /* 4. Переключить шрифты на serif для длинного чтения */
-  body { font-family: Georgia, "Times New Roman", serif; font-size: 11pt; line-height: 1.5; }
+  /* Не разрезать заголовки и блоки */
+  h1, h2, h3, h4 { page-break-after: avoid; break-after: avoid; }
+  blockquote, pre, table, figure, ul, ol { page-break-inside: avoid; break-inside: avoid; }
 
-  /* 5. Ссылки без подчёркивания (с URL рядом если важно) */
-  a { color: black !important; text-decoration: none; }
-  a[href]::after {
-    content: " (" attr(href) ")";
-    font-size: 9pt; color: #666;
-  }
-  /* НО: не показывать URL для anchor links и mailto */
-  a[href^="#"]::after, a[href^="mailto:"]::after { content: ""; }
+  /* Картинки — в рамках страницы */
+  img { max-width: 100%; height: auto; page-break-inside: avoid; break-inside: avoid; }
 
-  /* 6. Page breaks */
-  h1, h2, h3 { page-break-after: avoid; }
-  p, li { orphans: 3; widows: 3; }
-  pre, blockquote, table, figure { page-break-inside: avoid; }
-  section, .chapter { page-break-before: auto; }
-  .new-page { page-break-before: always; }
+  /* Размер бумаги */
+  @page { size: A4; margin: 20mm 18mm; }
 
-  /* 7. Не печатать background-images (по умолчанию выключено в большинстве браузеров) */
-  * { background: transparent !important; box-shadow: none !important; }
-  /* Но если фон важен (брендинг): */
-  .keep-bg { background: var(--bg) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-
-  /* 8. Картинки уменьшать */
-  img { max-width: 100% !important; height: auto !important; page-break-inside: avoid; }
-
-  /* 9. Скрыть @media:hover styles */
-  .hover-effect:hover { transform: none !important; }
+  /* Колонки в одну */
+  .grid, .columns, [data-cols] { display: block !important; }
 }
+```
 
-/* @page правила (вне @media print) */
+## A4 vs Letter
+
+```css
+@page { size: A4; }            /* Европа, Азия */
+@page { size: letter; }        /* США, Канада */
+```
+
+Если не уверен — `auto` (берёт из настроек браузера).
+
+## Pagination
+
+Принудительный разрыв перед заголовком уровня h1 / h2:
+
+```css
+@media print {
+  h1 { page-break-before: always; break-before: page; }
+  h1:first-of-type { page-break-before: auto; break-before: auto; }
+}
+```
+
+## Таблицы
+
+```css
+@media print {
+  table { width: 100%; border-collapse: collapse; }
+  thead { display: table-header-group; }   /* Повторять header на каждой странице */
+  tfoot { display: table-footer-group; }
+  tr { page-break-inside: avoid; }
+}
+```
+
+## Цвет в печати
+
+По умолчанию браузеры **отключают** background-printing. Чтобы остался:
+
+```css
+@media print {
+  .keep-bg { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+```
+
+Используй экономно — расход чернил.
+
+## Header / footer
+
+В CSS Print можно задать колонтитулы:
+
+```css
 @page {
-  size: A4 portrait;
-  margin: 20mm 15mm;
-
-  @top-center { content: "ExampleProduct — Pitch Deck"; font-size: 9pt; color: #888; }
-  @bottom-right { content: counter(page) " / " counter(pages); font-size: 9pt; }
-}
-@page :first {
-  margin-top: 30mm;
-  @top-center { content: ""; }    /* без headers на cover */
+  margin: 20mm 18mm;
+  @top-center { content: "Договор № 42"; font: 9pt sans-serif; color: #666; }
+  @bottom-right { content: counter(page) " / " counter(pages); font: 9pt monospace; }
 }
 ```
 
-## Для slides (отдельная стратегия)
+Поддержка частичная — Chromium ✓, Firefox частично, Safari нет. Для надёжности используй `@page` блок и не полагайся на `@top-*`.
 
-Slides уже фиксированы 1920×1080. Print-styles делают:
-1. Активируют все слайды (по дефолту видим только current)
-2. Ставят `page-break-after: always`
-3. Размер страницы = размер слайда
+## Тестирование
 
-```css
-@media print {
-  body { background: white; }
-
-  /* Все слайды visible */
-  .slide { opacity: 1 !important; pointer-events: auto !important;
-           position: static !important; transform: none !important;
-           page-break-after: always; break-after: page; }
-
-  .slide:last-child { page-break-after: auto; }
-}
-
-@page {
-  size: 1920px 1080px;     /* пропорция совпадает со slide */
-  margin: 0;
-}
+```bash
+# Через DevTools: Cmd+Shift+P → "Show rendering" → Emulate CSS media: print
+# Или сразу:
+chrome --headless --print-to-pdf=out.pdf file.html
 ```
 
-## Для лендингов
+Скрипт:
 
-Длинный документ → continuous page-flow:
-
-```css
-@media print {
-  /* Hero — на первой странице */
-  .hero { min-height: auto; padding: 40mm 0; }
-
-  /* Большие секции — break перед */
-  section[id="pricing"], section[id="about"], section[id="faq"] {
-    page-break-before: always;
-  }
-
-  /* Но компактные секции — потоком */
-  section[id="features"], section[id="testimonials"] {
-    page-break-before: auto;
-  }
-}
+```bash
+#!/bin/bash
+chrome --headless --disable-gpu --print-to-pdf="$2" "$1"
 ```
-
-## Footnotes / endnotes для академических
-
-```html
-<p>Текст со сноской<sup class="fn">1</sup></p>
-<p class="footnote" data-num="1">Это сноска</p>
-```
-
-```css
-@media print {
-  .footnote {
-    counter-increment: footnote;
-    font-size: 9pt; line-height: 1.3;
-    padding-left: 1em; text-indent: -1em;
-  }
-  .footnote::before { content: counter(footnote) ". "; }
-  sup.fn { font-size: 7pt; vertical-align: super; }
-}
-```
-
-## Watermark
-
-```css
-@media print {
-  body::before {
-    content: "DRAFT";
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%) rotate(-45deg);
-    font-size: 120pt; color: rgba(0,0,0,0.05);
-    z-index: -1;
-  }
-}
-```
-
-## Тест в браузере
-
-В Chrome DevTools: Console → Cmd+Shift+P → «Show rendering» → «Emulate CSS media → print».
-
-Все @media print применяются, видишь как в PDF. Не нужно реально печатать.
-
-Или Cmd+P → preview.
-
-## Когда не нужны print-styles
-
-- Чистый prototype для browser only
-- Артефакт уже фиксирован под export (slides 1920×1080)
-- Single-page card (постер, обложка) — там нет page breaks
 
 ## Антипаттерны
 
-- Не скрывать navigation → print с nav-bar в шапке
-- `display: none` для всего сразу → нет понимания что должно остаться
-- Полагаться на CSS variables в print → некоторые браузеры не resolve'ят
-- Огромные шрифты (40pt+) для печати → каждый параграф на новой странице
-- Не использовать `orphans` / `widows` → вдова на новой странице
-- Hardcoded `width: 1200px` в layout → не помещается в A4
-- Печатать с тёмным фоном без `print-color-adjust: exact` → текст на чёрном становится белым на белом → невидим
+- ❌ Ничего не делать — браузер напечатает navbar и подвал.
+- ❌ `display: none` на всех `<a>` — пользователь не увидит ссылок.
+- ❌ Полностью «свой» дизайн в print — он должен быть **спокойнее** и **читабельнее** экранного, не другим.
+
+## Чек-лист
+
+- ✅ Cmd+P даёт читаемую первую страницу.
+- ✅ Нет пустой первой страницы.
+- ✅ Картинки помещаются.
+- ✅ Таблицы не обрезаны.
+- ✅ Шрифт ≥10pt в основном тексте.
+- ✅ Ссылки с раскрытым URL.
+
+## Legacy reference
+
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-print-styles.md`. Секции там: Базовый print stylesheet, Для slides (отдельная стратегия), Для лендингов, Footnotes / endnotes для академических, Watermark, Тест в браузере, Когда не нужны print-styles, Антипаттерны.

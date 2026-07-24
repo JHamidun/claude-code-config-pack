@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Domain -> company. Scrape the site for INN/OGRN, then resolve via DaData/EGRUL.
 
-Usage:  python domain_to_company.py example-corp.ru
+Usage:  python domain_to_company.py sberbank.ru
 Output: JSON {domain, inn_candidates:[...], ogrn_candidates:[...], emails:[...], firmographics:[...]}
 
 Strategy: fetch homepage + common contact/legal pages, regex INN/OGRN/emails, then call

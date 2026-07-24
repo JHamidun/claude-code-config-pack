@@ -1,6 +1,6 @@
 ---
 name: tapestry
-description: "Tapestry — Knowledge Weaving"
+description: "Tapestry — knowledge weaving: связывает документы (YouTube-транскрипты, статьи, PDF, код) в интерлинкованный граф знаний + implementation plans. Триггеры: tapestry, weave, «свяжи документы», «граф знаний», «knowledge graph», «interlink docs»."
 ---
 
 # Tapestry — Knowledge Weaving
@@ -109,11 +109,11 @@ Transform knowledge graph into concrete steps:
 
 | Source Type | Extraction Skill | Then |
 |-------------|-----------------|------|
-| YouTube | `youtube-transcript.md` | Tapestry weave |
-| Articles | `content-research.md` | Tapestry weave |
-| PDFs | `document-skills/pdf/` | Tapestry weave |
-| Code | `code-reviewer/` | Tapestry weave |
-| Meetings | `tldv/` | Tapestry weave |
+| YouTube | `youtube-transcript` | Tapestry weave |
+| Articles | `content-research` | Tapestry weave |
+| PDFs | `pdf` | Tapestry weave |
+| Code | Agent `code-reviewer` | Tapestry weave |
+| Meetings | `tldv` | Tapestry weave |
 
 ## Output Format
 

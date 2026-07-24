@@ -1,7 +1,0 @@
-[
-  {"keyword":"система управления задачами","volume":3400,"position":0,"intent":"commercial","competition":0.8,"cluster_size":18,"note":"DEMO-данные, замените на реальный Wordstat"},
-  {"keyword":"таск-менеджер для команды","volume":1200,"position":0,"intent":"commercial","competition":0.6,"cluster_size":8},
-  {"keyword":"канбан-доска онлайн","volume":900,"position":0,"intent":"commercial","competition":0.65,"cluster_size":7},
-  {"keyword":"как организовать задачи в команде","volume":210,"position":0,"intent":"informational","competition":0.4,"cluster_size":5},
-  {"keyword":"трекер задач с оплатой по счёту","volume":40,"position":0,"intent":"transactional","competition":0.3,"cluster_size":3,"note":"узкий лонг-тейл: конверсия, не трафик"}
-]

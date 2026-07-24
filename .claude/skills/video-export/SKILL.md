@@ -1,162 +1,115 @@
 ---
 name: video-export
-description: HTML-анимация → MP4 / GIF через FFmpeg. Запись Playwright, затем encoding. Для social-explainer (15-30 сек), product demo, animated explainer.
-when_to_use: Артефакт через `animations` skill готов, нужно отправить как video file. После `animations` если результат должен быть посланным в TG/Twitter/YouTube Shorts.
+description: Покадровый рендер HTML-анимации в MP4 / GIF через Playwright + ffmpeg.
+when_to_use: Пользователь сделал анимацию (см. animations) и просит "выгрузи как видео / гифку".
 ---
 
 # Video export
 
-HTML → series of frames → FFmpeg encode → MP4/GIF/WebM. Качество и контроль над framerate.
+Алгоритм: открыть страницу с анимацией, попросить движок встать на t=0, t=1/fps, t=2/fps, …, снять каждый кадр как PNG, затем склеить в видео через ffmpeg.
 
 ## Зависимости
 
 ```bash
-brew install ffmpeg          # mac
-sudo apt-get install ffmpeg  # linux
-choco install ffmpeg         # windows
-
 npm i -D playwright
+npx playwright install chromium
+brew install ffmpeg     # mac
+sudo apt-get install ffmpeg  # linux
 ```
 
-## Метод 1: Playwright video recording (простой)
+## Как Stage должен помогать
+
+В `animations/anim-engine.jsx` Stage должен предоставить `window.__setTime(t)` для внешнего управления. Если у тебя своя анимационная сцена — добавь такой хук:
 
 ```js
-const { chromium } = require('playwright');
+window.__setTime = (t) => { /* ставит таймлайн на t секунд и форсит ререндер */ };
+```
+
+Если анимация управляется CSS-keyframes — это не сработает, нужно конвертировать в JS-управляемую.
+
+## Скрипт
+
+`templates/render-video.mjs`:
+
+```js
+import { chromium } from 'playwright';
+import { execSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
+import path from 'node:path';
+import fs from 'node:fs/promises';
+
+const args = parse(process.argv.slice(2));
+const file = args._[0];
+if (!file) { console.error('Usage: node render-video.mjs <html> [--out video.mp4] [--duration 5] [--fps 30] [--width 1920] [--height 1080]'); process.exit(1); }
+
+const out = args.out || file.replace(/\.html?$/, '.mp4');
+const duration = +(args.duration || 5);
+const fps      = +(args.fps      || 30);
+const width    = +(args.width    || 1920);
+const height   = +(args.height   || 1080);
+
+const tmp = '_video_frames';
+await fs.rm(tmp, { recursive: true, force: true });
+await fs.mkdir(tmp, { recursive: true });
 
 const browser = await chromium.launch();
-const ctx = await browser.newContext({
-  viewport: { width: 1920, height: 1080 },
-  recordVideo: { dir: './videos/', size: { width: 1920, height: 1080 } },
-});
+const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1 });
 const page = await ctx.newPage();
-await page.goto('file:///abs/animation.html');
-await page.waitForTimeout(10000);  // record 10 sec
-await ctx.close();   // обязательно — сохраняет видео
+await page.goto(pathToFileURL(path.resolve(file)).href, { waitUntil: 'networkidle' });
+await page.evaluate(() => document.fonts && document.fonts.ready);
+
+const total = Math.ceil(duration * fps);
+for (let i = 0; i <= total; i++) {
+  const t = i / fps;
+  await page.evaluate(time => window.__setTime && window.__setTime(time), t);
+  await page.waitForTimeout(20); // пусть рендер устаканится
+  const num = String(i).padStart(5, '0');
+  await page.screenshot({ path: `${tmp}/frame-${num}.png`, fullPage: false });
+}
+
 await browser.close();
-// → videos/<random>.webm
-```
 
-WebM → конвертить в MP4 для широкой совместимости:
-```bash
-ffmpeg -i videos/animation.webm -c:v libx264 -preset slow -crf 18 \
-       -pix_fmt yuv420p -movflags +faststart out.mp4
-```
+console.log('→ Склеиваю через ffmpeg…');
+if (out.endsWith('.gif')) {
+  // Качественный GIF через двухпроходную палитру
+  execSync(`ffmpeg -y -framerate ${fps} -i ${tmp}/frame-%05d.png -vf "fps=${fps},split[a][b];[a]palettegen[p];[b][p]paletteuse" "${out}"`, { stdio: 'inherit' });
+} else {
+  execSync(`ffmpeg -y -framerate ${fps} -i ${tmp}/frame-%05d.png -c:v libx264 -pix_fmt yuv420p -crf 18 "${out}"`, { stdio: 'inherit' });
+}
+await fs.rm(tmp, { recursive: true, force: true });
+console.log('✓', out);
 
-## Метод 2: Frame-by-frame screenshot (точный)
-
-Контроль над каждым кадром:
-
-```js
-const fps = 60;
-const duration = 5;  // sec
-const frames = fps * duration;
-
-for (let i = 0; i < frames; i++) {
-  const t = i / fps;  // time in seconds
-  // Установить state на момент времени (если animations завязаны на JS time)
-  await page.evaluate((t) => {
-    window.__animTime = t;
-    window.dispatchEvent(new Event('frame'));
-  }, t);
-  await page.screenshot({
-    path: `frames/frame-${String(i).padStart(5, '0')}.png`,
-  });
+function parse(argv) {
+  const a = { _: [] };
+  for (let i = 0; i < argv.length; i++) {
+    const v = argv[i];
+    if (v.startsWith('--')) {
+      const k = v.slice(2);
+      const next = argv[i + 1];
+      if (!next || next.startsWith('--')) a[k] = true; else { a[k] = next; i++; }
+    } else a._.push(v);
+  }
+  return a;
 }
 ```
 
-В animations.jsx использовать `window.__animTime` вместо `Date.now()`:
-```js
-function useTime() {
-  const [t, setT] = useState(0);
-  useEffect(() => {
-    const tick = () => setT(window.__animTime ?? performance.now() / 1000);
-    window.addEventListener('frame', tick);
-    return () => window.removeEventListener('frame', tick);
-  }, []);
-  return t;
-}
-```
-
-Затем FFmpeg:
-```bash
-ffmpeg -framerate 60 -i frames/frame-%05d.png \
-       -c:v libx264 -preset slow -crf 18 \
-       -pix_fmt yuv420p -movflags +faststart out.mp4
-```
-
-Метод 2 даёт **deterministic** видео — кадры идентичны на каждом запуске. Хорошо для CI / regenerable.
-
-## GIF export
-
-GIF — большие файлы, ограниченная палитра. Для коротких циклов (~5 сек) ОК:
+## Использование
 
 ```bash
-# Two-pass: palette generate → encode
-ffmpeg -i frames/frame-%05d.png -vf "fps=30,scale=720:-1:flags=lanczos,palettegen" palette.png
-ffmpeg -framerate 30 -i frames/frame-%05d.png -i palette.png \
-       -filter_complex "fps=30,scale=720:-1:flags=lanczos[x];[x][1:v]paletteuse" out.gif
+node render-video.mjs anim.html --duration 5 --fps 30
+# → anim.mp4
+
+node render-video.mjs anim.html --out anim.gif --fps 24 --width 800 --height 450
+# → anim.gif
 ```
 
-GIF size mistakes:
-- Высота >720px → файл огромный
-- Длительность >10 сек → файл huge
-- 60 fps → большая часть кадров избыточна, 30 fps хватает
+## Подсказки
 
-## Размеры под платформы
+- **MP4 для качества и размера**, GIF для месенджеров и где не работает видео.
+- **Для GIF снижай ширину** до 600-1000px и fps до 24 — иначе файл огромный.
+- **Прозрачный фон:** ни MP4, ни обычный GIF не поддерживают альфу. Для прозрачного видео — WebM (vp9) с `-pix_fmt yuva420p`.
+- **Звук:** добавь после рендера через ffmpeg: `ffmpeg -i video.mp4 -i audio.mp3 -shortest output.mp4`.
 
-| Платформа | Resolution | FPS | Codec | Длительность |
-|---|---|---|---|---|
-| YouTube Shorts | 1080×1920 | 30/60 | H.264 | < 60s |
-| Instagram Reels / TikTok | 1080×1920 | 30 | H.264 | 15-90s |
-| Twitter video | 1280×720 | 30 | H.264 | < 140s |
-| LinkedIn video | 1920×1080 | 30 | H.264 | < 10min |
-| Telegram | 1920×1080 max | 30 | H.264 | unlimited |
-| Email GIF | 600×400 max | 15-30 | GIF | < 6MB |
+## Legacy reference
 
-## Quality settings
-
-| `-crf` | Quality | Размер |
-|---|---|---|
-| 17 | Visually lossless | максимум |
-| 18-22 | Good | high |
-| 23 (default) | Standard | medium |
-| 28-30 | Lower | small |
-| > 35 | Bad | tiny |
-
-Для финального deliverable: `-crf 18` + `-preset slow`.
-Для preview / debug: `-crf 28` + `-preset ultrafast`.
-
-## Audio overlay
-
-Добавить музыку:
-```bash
-ffmpeg -i out.mp4 -i music.mp3 -c:v copy -c:a aac -b:a 192k -shortest out-with-audio.mp4
-```
-
-`-shortest` — обрежется по кратчайшему трекy. Без `-shortest` — видео loops пока музыка играет.
-
-## Loop seamless
-
-Чтобы GIF / видео плавно зацикливалось, последний кадр === первому. В animations.jsx:
-```js
-function useLoopTime(duration) {
-  const t = useTime();
-  return (t % duration);  // 0 → duration → 0 → ...
-}
-```
-
-## Stack
-
-- `animations` skill — каркас анимации (anim-engine.jsx)
-- `verifier` — проверить что HTML открывается без errors
-- `placeholders` — для статичных элементов внутри анимации
-
-## Антипаттерны
-
-- 60 fps на complex анимации без deterministic time → frame drops, дёрганое видео
-- GIF 1920×1080 → 50MB, не отправишь никуда
-- Видео без `-pix_fmt yuv420p` → не работает на Apple devices
-- Без `-movflags +faststart` → видео грузит всё перед началом проигрывания (web-плохо)
-- Записывать через screen capture с курсором → курсор в финале
-- Использовать `Date.now()` вместо deterministic time → каждый запуск разный
-- Качать H.265 (HEVC) → не воспроизводится на старых устройствах. Лучше H.264
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-video-export.md`. Секции там: Зависимости, Метод 1: Playwright video recording (простой), Метод 2: Frame-by-frame screenshot (точный), GIF export, Размеры под платформы, Quality settings, Audio overlay, Loop seamless, Stack, Антипаттерны.

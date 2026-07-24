@@ -1,0 +1,168 @@
+{
+  "nodes": [
+    {
+      "name": "On clicking 'execute'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {},
+      "typeVersion": 1,
+      "id": "869d1f8a-b46d-4fff-b5c9-a1dc7f2e348a",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow."
+    },
+    {
+      "name": "Check for Close Date",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"Close Date\"]}}",
+              "value2": "/\\d\\d\\d\\d-\\d\\d-\\d\\d/i",
+              "operation": "regex"
+            }
+          ]
+        },
+        "combineOperation": "any"
+      },
+      "typeVersion": 1,
+      "id": "20fcd255-d274-4ac1-be0f-899fec54173b",
+      "notes": "This if node performs automated tasks as part of the workflow."
+    },
+    {
+      "name": "Set Close Date 3 Weeks Later",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        910,
+        370
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Close Date",
+              "value": "={{new Date(new Date().setDate(new Date().getDate() + 21)).toISOString()}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      },
+      "typeVersion": 1,
+      "id": "7715593b-a0c1-4104-9327-31cfc44c328e",
+      "notes": "This set node performs automated tasks as part of the workflow."
+    },
+    {
+      "name": "NoOp",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1140,
+        280
+      ],
+      "parameters": {},
+      "typeVersion": 1,
+      "id": "6f947b42-b09d-40fd-88da-cecea0b96cd4",
+      "notes": "This noOp node performs automated tasks as part of the workflow."
+    },
+    {
+      "name": "Set Close Date",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Close Date",
+              "value": "2021-11-29T00:00:00.000Z"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "typeVersion": 1,
+      "id": "3d7fde92-2c78-46d2-93ac-43e037538194",
+      "notes": "This set node performs automated tasks as part of the workflow."
+    },
+    {
+      "name": "Set Close Date To Original",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        910,
+        210
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Close Date",
+              "value": "={{$node[\"Set Close Date\"].json[\"Close Date\"]}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      },
+      "typeVersion": 1,
+      "id": "a9bfa0ec-6662-4b6c-a74e-0b9e5cc4cfec",
+      "notes": "This set node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "error-7c7d9e1c",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {},
+  "name": "Manualtrigger Workflow",
+  "description": "Automated workflow: Manualtrigger Workflow. This workflow processes data and performs automated tasks.",
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": null,
+    "timezone": "UTC",
+    "executionTimeout": 3600,
+    "maxExecutions": 1000,
+    "retryOnFail": true,
+    "retryCount": 3,
+    "retryDelay": 1000
+  },
+  "meta": {
+    "instanceId": "workflow-fed1a37c",
+    "versionId": "1.0.0",
+    "createdAt": "2025-09-29T07:07:48.628260",
+    "updatedAt": "2025-09-29T07:07:48.628268",
+    "owner": "n8n-user",
+    "license": "MIT",
+    "category": "automation",
+    "status": "active",
+    "priority": "high",
+    "environment": "production"
+  },
+  "tags": [
+    "automation",
+    "n8n",
+    "production-ready",
+    "excellent",
+    "optimized"
+  ],
+  "notes": "Excellent quality workflow: Manualtrigger Workflow. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+}

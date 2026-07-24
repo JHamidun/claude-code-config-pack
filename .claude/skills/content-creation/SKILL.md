@@ -1,6 +1,6 @@
 ---
 name: content-creation
-description: Draft marketing content across channels — blog posts, social media, email newsletters, landing pages, press releases, and case studies. Use when writing any marketing content, when you need channel-specific formatting, SEO-optimized copy, headline options, or calls to action.
+description: "Draft generic marketing content across channels — blog posts, social media, email newsletters, landing pages, press releases, case studies; channel-specific formatting, SEO copy, headlines, CTAs. НЕ: пост для ТГ-канала пользователя → tg-post; контент-конвейер/voice capture → content-engine; методология контент-машины → content-machine-instructor2-ru; SEO-статьи под Яндекс → seo-machine-ru."
 ---
 
 # Content Creation Skill

@@ -49,11 +49,11 @@ callback URL ---- code --------> tmux paste-buffer
 ```bash
 ACCOUNT="account-1"
 SESSION="auth1"
-ssh your-server "mkdir -p /root/.claude-accounts/$ACCOUNT"
+ssh your-server "mkdir -p /root/.claude-accounts/  # rename to your convention$ACCOUNT"
 ssh your-server "tmux kill-session -t $SESSION 2>/dev/null; \
   rm -f /tmp/${SESSION}-output.txt; \
   tmux new-session -d -s $SESSION -x 400 -y 30 \
-  'CLAUDE_CONFIG_DIR=/root/.claude-accounts/$ACCOUNT claude setup-token'"
+  'CLAUDE_CONFIG_DIR=/root/.claude-accounts/  # rename to your convention$ACCOUNT claude setup-token'"
 ```
 
 Key flags:
@@ -191,22 +191,22 @@ ssh your-server "tmux capture-pane -t $SESSION -p -S -50"
 ssh your-server "tmux kill-session -t $SESSION 2>/dev/null; \
   rm -f /tmp/${SESSION}-output.txt; \
   tmux new-session -d -s $SESSION -x 400 -y 30 \
-  'CLAUDE_CONFIG_DIR=/root/.claude-accounts/$ACCOUNT claude setup-token'"
+  'CLAUDE_CONFIG_DIR=/root/.claude-accounts/  # rename to your convention$ACCOUNT claude setup-token'"
 # Re-setup pipe-pane and repeat from step 2
 ```
 
-**The 500 error is random and may happen 1-3 times before succeeding.** It may take 1-3 retries before it succeeds. Don't give up.
+**The 500 error is random and may happen 1-3 times before succeeding.** Account-1 took 2 attempts, account-2 took 2 attempts, account-3 took 4 attempts. Don't give up.
 
 **NOTE:** Each retry generates a new `code_challenge` and `state`. The browser must re-authorize with the new URL — old codes won't work with a new challenge.
 
 ### 10. Save and verify token
 
 ```bash
-ssh your-server "echo 'sk-ant-oat01-...' > /root/.claude-accounts/$ACCOUNT/token.txt"
-ssh your-server "chmod 600 /root/.claude-accounts/$ACCOUNT/token.txt"
+ssh your-server "echo 'sk-ant-oat01-...' > /root/.claude-accounts/  # rename to your convention$ACCOUNT/token.txt"
+ssh your-server "chmod 600 /root/.claude-accounts/  # rename to your convention$ACCOUNT/token.txt"
 
 # Verify — use single quotes for SSH to avoid local shell expansion
-ssh your-server 'CLAUDE_CODE_OAUTH_TOKEN=$(cat /root/.claude-accounts/$ACCOUNT/token.txt) claude -p --model claude-haiku-4-5-20251001 --output-format text "respond with just OK"'
+ssh your-server 'CLAUDE_CODE_OAUTH_TOKEN=$(cat /root/.claude-accounts/  # rename to your conventionACCOUNT/token.txt) claude -p --model claude-haiku-4-5-20251001 --output-format text "respond with just OK"'
 # Expected: OK
 ```
 
@@ -236,7 +236,7 @@ When authenticating multiple accounts sequentially, the browser stays logged int
 
 ## Token Rotation Setup
 
-Rotation script at `/root/.claude-accounts/token-rotator.sh`:
+Rotation script at `/root/.claude-accounts/  # rename to your conventiontoken-rotator.sh`:
 
 ```bash
 token-rotator.sh status     # show all accounts and which is active
@@ -249,13 +249,13 @@ token-rotator.sh init       # re-scan account directories
 
 Usage in projects:
 ```bash
-export CLAUDE_CODE_OAUTH_TOKEN=$(bash /root/.claude-accounts/token-rotator.sh get-valid)
+export CLAUDE_CODE_OAUTH_TOKEN=$(bash /root/.claude-accounts/  # rename to your conventiontoken-rotator.sh get-valid)
 claude -p "your prompt"
 ```
 
 Auto-failover logic: `get-valid` tries current token → if error → rotates → tries next → up to 3 attempts.
 
-## auth gateway Integration
+## OpenClaw Integration
 
 Update `auth-profiles.json` with all subscription tokens:
 
@@ -301,7 +301,7 @@ After updating, restart gateway:
 cd ~/your-gateway && docker compose -f docker-compose.hardened.yml restart your-gateway
 ```
 
-auth gateway failover: tries tokens in `order` sequence. If first token hits rate limit, automatically tries the next.
+OpenClaw failover: tries tokens in `order` sequence. If first token hits rate limit, automatically tries the next.
 
 ## Common Mistakes
 
@@ -318,7 +318,7 @@ auth gateway failover: tries tokens in `order` sequence. If first token hits rat
 | Clicking Authorize only once | First click often fails silently (403) | Wait 3s, check page, click again if needed |
 | Reusing code after 500 error | Each retry generates new code_challenge | Must re-authorize in browser with new URL |
 | Not setting up pipe-pane early | Token output lost if tmux exits | Set pipe-pane right after session creation |
-| Forgetting `chown 1000:1000` | auth gateway container can't read profiles | Always chown after writing auth-profiles.json |
+| Forgetting `chown 1000:1000` | OpenClaw container can't read profiles | Always chown after writing auth-profiles.json |
 
 ## Red Flags
 
@@ -347,5 +347,5 @@ auth gateway failover: tries tokens in `order` sequence. If first token hits rat
 - [ ] Verified token works with `'...'` single-quoted SSH command
 - [ ] Cleaned up tmux session and temp files
 - [ ] Updated rotation script (`token-rotator.sh init`)
-- [ ] Updated auth gateway auth-profiles.json with `chown 1000:1000`
-- [ ] Restarted auth gateway gateway
+- [ ] Updated OpenClaw auth-profiles.json with `chown 1000:1000`
+- [ ] Restarted OpenClaw gateway

@@ -1,6 +1,6 @@
 # claude-design-mcp
 
-MCP server для claude.ai/design через Connect-RPC API (internal name: `omelette`).
+MCP server для claude.ai/design через Connect-RPC API (internal RPC service (do not name publicly)).
 
 ## Tools (13 total — 8 минимум + 5 helpers)
 
@@ -37,7 +37,7 @@ visible `__ssid`/`lastActiveOrg`/`anthropic-device-id`.
 4. В `~/.claude/.credentials.master.env`:
    ```bash
    CLAUDE_DESIGN_COOKIES='{"sessionKey":"...","__ssid":"...","lastActiveOrg":"...","anthropic-device-id":"..."}'
-   CLAUDE_DESIGN_ORG_UUID='<ORG_UUID>'
+   CLAUDE_DESIGN_ORG_UUID='YOUR_ANTHROPIC_ORG_UUID'
    ```
 
 ### Способ 2 — через Playwright (автоматически)
@@ -64,7 +64,7 @@ with sync_playwright() as p:
 "claude-design": {
   "type": "stdio",
   "command": "python",
-  "args": ["~/.claude/skills/claude-design/scripts/claude_design_mcp.py"],
+  "args": ["${HOME}/.claude/skills/claude-design/scripts/claude_design_mcp.py"],
   "env": {
     "CLAUDE_DESIGN_COOKIES": "${CLAUDE_DESIGN_COOKIES}",
     "CLAUDE_DESIGN_ORG_UUID": "${CLAUDE_DESIGN_ORG_UUID}"
@@ -77,7 +77,7 @@ with sync_playwright() as p:
 
 ```bash
 export CLAUDE_DESIGN_COOKIES='{...}'
-export CLAUDE_DESIGN_ORG_UUID='<ORG_UUID>'
+export CLAUDE_DESIGN_ORG_UUID='YOUR_ANTHROPIC_ORG_UUID'
 python -c "
 from claude_design_client import get_me, list_projects
 print(get_me())

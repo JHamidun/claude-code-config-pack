@@ -23,10 +23,10 @@ except Exception:
 
 # Невидимые / служебные символы, которые часто оставляют LLM и copy-paste
 INVISIBLE = {
-    "​": "",   # zero-width space
-    "‌": "",   # zero-width non-joiner
-    "‍": "",   # zero-width joiner
-    "﻿": "",   # BOM / zero-width no-break space
+    "": "",   # zero-width space
+    "": "",   # zero-width non-joiner
+    "": "",   # zero-width joiner
+    "": "",   # BOM / zero-width no-break space
     "⁠": "",   # word joiner
     "­": "",   # soft hyphen
     " ": " ",  # narrow no-break space -> обычный nbsp
@@ -106,8 +106,8 @@ def report(text: str) -> dict:
     invisible_found = {
         name: text.count(ch)
         for ch, name in (
-            ("​", "zero-width-space"),
-            ("﻿", "BOM"),
+            ("", "zero-width-space"),
+            ("", "BOM"),
             ("­", "soft-hyphen"),
             (" ", "narrow-nbsp"),
         )

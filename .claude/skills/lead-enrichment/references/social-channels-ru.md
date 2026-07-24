@@ -15,7 +15,7 @@ Person-leg of Mode A. For a name / handle / phone / company, search across all n
 | **Odnoklassniki** (ok.ru) | RU mass (older) | public profile via WebFetch · `WebSearch site:ok.ru` | name |
 | **Habr / vc.ru** | RU tech/business authors | `WebSearch site:habr.com`, `site:vc.ru` "<name>" | author name |
 | **hh.ru** | RU resumes/employers | `headhunter` skill | name, role, city |
-| LinkedIn / Instagram / Facebook / X / TikTok / YouTube / Threads / Bluesky | Western + global | `social-intel`, `linkedin` (ScrapeCreators) | handle, name |
+| LinkedIn / Instagram / Facebook / X / TikTok / YouTube / Threads / Bluesky | Western + global | `social-intel`, `linkedin` (ScraperVendor) | handle, name |
 
 ## VK access — LIVE (`VK_ACCESS_TOKEN` stored, non-expiring)
 
@@ -25,8 +25,8 @@ Kate-Mobile implicit flow (app_id 2685278, scope `friends groups offline`), save
 Public profiles only — VK enforces each user's privacy.
 
 ```bash
-python scripts/vk_lookup.py --q "Имя Фамилия" --company "Компания" --city Москва
-python scripts/vk_lookup.py --screen-name some_username
+python scripts/vk_lookup.py --q "John Doe" --company "крупный банк" --city Москва
+python scripts/vk_lookup.py --screen-name durov
 ```
 
 ## Search patterns (no-API networks)

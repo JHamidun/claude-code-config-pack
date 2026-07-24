@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Match an input list against a Bitrix24 export by INN (exact) + name (fuzzy).
+"""Match an input list against a Your CRM export by INN (exact) + name (fuzzy).
 
 Usage:  python bitrix_match.py list.json bitrix_data.json [--out matches_by_inn.json]
 

@@ -1,6 +1,6 @@
 ---
 name: thinking-frameworks
-description: Structured thinking frameworks for deep analysis. Use when user asks to "проанализируй", "фреймворк", "think deeper", "first principles", or needs structured decision-making.
+description: Structured thinking frameworks for deep analysis. Use when user asks to "проанализируй", "фреймворк", "think deeper", "first principles", or needs structured decision-making. Also covers kaizen / кайдзен / PDCA / continuous improvement — оптимизация процессов, устранение waste (muda), Gemba, A3 Report (режим 7, ex-skill kaizen → references/kaizen.md).
 ---
 
 # Thinking Frameworks
@@ -64,6 +64,8 @@ Dig to the real cause.
 7. FIX the root cause, not the symptoms
 ```
 
+Расширенный шаблон + разобранный пример → `references/kaizen.md` (секция 5 Whys Analysis). Это единственный канон шагов; вторую версию не плодить.
+
 ### 6. Eisenhower Matrix
 Prioritize by urgency x importance.
 
@@ -78,6 +80,10 @@ NOT      | DELEGATE      | ELIMINATE      |
 IMPORTANT| (interrupts,  | (time wasters, |
          |  some emails) |  busywork)     |
 ```
+
+### 7. Kaizen / PDCA (Continuous Improvement)
+Маленькие инкрементальные улучшения процесса: PLAN → DO → CHECK → ACT; устранение 7 типов waste (muda); Gemba — наблюдай процесс на месте; закрепляй успех стандартизацией.
+Полное тело (Kaizen Event, Value Stream Mapping, Gemba Walk, A3 Report, Daily Kaizen, метрики) → `references/kaizen.md`.
 
 ## How to Use
 

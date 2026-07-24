@@ -1,154 +1,126 @@
 ---
 name: document-import
-description: PDF / DOCX / PPTX / sketch.app → структурированный контент для слайдов или лендинга. Извлекает заголовки, текст, цитаты, изображения. Используется для pitch-deck из PRD, лендинга из brief, slides из manifesto.
-when_to_use: Юзер прислал документ как источник контента. Перед slides если контент лежит в Word/PDF. Перед content-engine если нужно вытащить ключевые сообщения.
+description: Извлечь текст и изображения из PDF / DOCX / PPTX / напканного скетча. Чтобы скармливать прототипу или деку.
+when_to_use: Пользователь приложил PRD в PDF, бриф в DOCX, референс-дек в PPTX, или фото скетча.
 ---
 
 # Document import
 
-Источник: PDF / DOCX / PPTX / RTF / Markdown. Цель: вытащить контент в структурированном виде — иерархия (h1/h2/h3) + текст + изображения + cite.
-
-## PDF
-
-### Через pdf-parse (Node)
-```bash
-npm i pdf-parse
-```
-```js
-const pdf = require('pdf-parse');
-const fs = require('fs');
-const data = await pdf(fs.readFileSync('source.pdf'));
-console.log(data.text);   // весь текст
-console.log(data.numpages);
-console.log(data.info);   // metadata
-```
-
-### Через poppler (CLI)
-```bash
-brew install poppler  # mac
-sudo apt-get install poppler-utils  # linux
-
-pdftotext -layout source.pdf source.txt
-pdfimages -all source.pdf images/img    # извлекает картинки
-pdfinfo source.pdf                       # metadata
-```
-
-### Через Read tool
-Claude Code умеет читать PDF напрямую через `Read` (если PDF до 10 страниц, или `pages: "1-5"` для длинных).
+Все документы — это zip-архивы с XML или текстом. Открыть и извлечь можно без специальных SDK.
 
 ## DOCX
 
+`.docx` = zip. Текст лежит в `word/document.xml`. Картинки в `word/media/`.
+
 ```bash
-pip install python-docx
-```
-```python
-from docx import Document
-doc = Document('source.docx')
-for p in doc.paragraphs:
-    style = p.style.name  # "Heading 1", "Heading 2", "Normal"
-    print(f"[{style}] {p.text}")
-for table in doc.tables:
-    for row in table.rows:
-        print([cell.text for cell in row.cells])
+unzip -o file.docx -d docx-out
+# Текст: docx-out/word/document.xml — выдерни <w:t> элементы
+# Картинки: docx-out/word/media/*.{png,jpg}
 ```
 
-Достоинство python-docx: знает styles (h1/h2/h3) которые юзер реально выставил, не парсит «больший шрифт = заголовок».
+Извлечь текст:
+
+```js
+import fs from 'node:fs/promises';
+import { XMLParser } from 'fast-xml-parser';
+const xml = await fs.readFile('docx-out/word/document.xml', 'utf8');
+const j = new XMLParser({ ignoreAttributes: false }).parse(xml);
+function collect(n, out = []) {
+  if (!n) return out;
+  if (typeof n === 'string') { out.push(n); return out; }
+  for (const k of Object.keys(n)) {
+    if (k === 'w:t') {
+      const v = n[k];
+      if (typeof v === 'string') out.push(v);
+      else if (Array.isArray(v)) v.forEach(x => out.push(x['#text'] || x));
+      else out.push(v['#text'] || '');
+    } else if (typeof n[k] === 'object') {
+      Array.isArray(n[k]) ? n[k].forEach(c => collect(c, out)) : collect(n[k], out);
+    }
+  }
+  return out;
+}
+console.log(collect(j).join(' '));
+```
 
 ## PPTX
 
+`.pptx` = zip. Каждый слайд — `ppt/slides/slide1.xml`, `slide2.xml`, …
+Текст — в `<a:t>` тегах. Картинки в `ppt/media/`.
+
 ```bash
-pip install python-pptx
-```
-```python
-from pptx import Presentation
-prs = Presentation('source.pptx')
-for i, slide in enumerate(prs.slides, 1):
-    for shape in slide.shapes:
-        if shape.has_text_frame:
-            for para in shape.text_frame.paragraphs:
-                print(f"slide {i}: {para.text}")
-        elif shape.shape_type == 13:  # Picture
-            print(f"slide {i}: image, {shape.image.size}")
+unzip -o file.pptx -d pptx-out
+ls pptx-out/ppt/slides/   # slide1.xml slide2.xml ...
+ls pptx-out/ppt/media/    # image1.png image2.jpeg ...
 ```
 
-## Sketch (legacy)
+Тот же подход что для docx, только другой XML-namespace.
 
-`.sketch` — это zip с JSON внутри:
+## PDF
+
+Без бинарных тулов сложно. Варианты:
+
+1. **pdf-parse** (Node, чистый JS) — текст:
+   ```bash
+   npm i pdf-parse
+   ```
+   ```js
+   import fs from 'node:fs/promises';
+   import pdf from 'pdf-parse';
+   const buf = await fs.readFile('brief.pdf');
+   const data = await pdf(buf);
+   console.log(data.text);
+   ```
+
+2. **pdftotext** (poppler-utils, через CLI) — лучше качество:
+   ```bash
+   pdftotext -layout brief.pdf brief.txt
+   ```
+
+3. **pdfimages** — извлечь картинки:
+   ```bash
+   pdfimages -all brief.pdf out/img
+   ```
+
+## Скетч / фото доски / .napkin
+
+Если пользователь кинул фото маркерной доски или скетч от руки — это просто картинка. Не пытайся «распознать» руками. Действия:
+
+1. Открой картинку, прочитай глазами (через свой visual capability).
+2. Опиши вслух: «вижу 3 экрана, на первом форма входа, на втором лента, на третьем настройки».
+3. Спроси у пользователя, всё ли правильно понял.
+4. Дальше — обычный flow.
+
+Если файл `.napkin` — это рисовалка с JSON-данными внутри. Картинка-превью обычно лежит рядом — её и читай.
+
+## Что использовать после импорта
+
+- **Тексты PRD/брифа** → как контент слайдов или основу копирайта прототипа.
+- **Картинки из PPTX** → если это диаграммы / скрины из старого дека, можно повторно использовать как ассеты.
+- **Картинки из PDF** → обычно low-res, годятся как референс, не как финальные ассеты.
+- **Скетч-фото** → референс структуры экранов, не финальная разметка.
+
+## Команды-обёртки
+
+`templates/extract-doc.sh`:
+
 ```bash
-unzip source.sketch -d sketch-extracted/
-ls sketch-extracted/pages/    # JSON каждой страницы
-ls sketch-extracted/images/   # PNG ассеты
+#!/usr/bin/env bash
+set -e
+file="$1"; out="${2:-extracted}"
+mkdir -p "$out"
+case "${file##*.}" in
+  docx|DOCX) unzip -qo "$file" -d "$out/docx";;
+  pptx|PPTX) unzip -qo "$file" -d "$out/pptx";;
+  pdf|PDF)
+    command -v pdftotext >/dev/null && pdftotext -layout "$file" "$out/text.txt"
+    command -v pdfimages >/dev/null && pdfimages -all "$file" "$out/img" || true
+    ;;
+  *) echo "Не понимаю расширение: $file"; exit 1;;
+esac
+echo "✓ См. $out/"
 ```
 
-JSON структура complex — лучше поискать `sketchtool` (Sketch CLI):
-```bash
-sketchtool list pages source.sketch    # список страниц
-sketchtool export artboards source.sketch --output=exports/   # все артборды как PNG
-```
+## Legacy reference
 
-## Структурирование вывода
-
-После парсинга → выдаёшь юзеру **content-tree**:
-
-```yaml
-title: "AI in Banking — Trends 2026"
-sections:
-  - h1: "Executive Summary"
-    text: "Three trends will reshape banking..."
-    citations: ["McKinsey 2026", "Gartner Q1"]
-  - h1: "Trend 1: Agentic AI"
-    h2: "What it is"
-    text: "..."
-    images:
-      - path: "images/img-001.png"
-        caption: "AI agent architecture"
-    h2: "Why now"
-    text: "..."
-```
-
-Дальше — этот content-tree feed'ишь в `slides` или `interactive-prototype` как рабочий контент.
-
-## Извлечение по типам
-
-### Pitch deck из PRD (Word/PDF)
-- h1 → новый слайд
-- bullet lists → bullets на слайде
-- tables → table-slide или chart placeholder
-- images → как есть на слайды
-
-### Landing из brief
-- Executive summary → hero text
-- «Why» секция → problem-solution
-- «Who» → target audience block
-- Numbers → metrics row
-- Quote → testimonial
-
-### Slides из manifesto
-- Цитаты → отдельные slide-cards
-- Manifesto text → split на 5-7 слайдов с одной мыслью каждая
-- «Не делать X» → антипаттерн-секция
-
-## Качество текста
-
-Если PDF — скан (изображения), `pdftotext` вернёт мусор. Признаки:
-- Текст с randomized символами
-- 30%+ слов невалидные
-- Много пробелов / переносов
-
-В этом случае → OCR (см. отдельный скилл `ocr-restore` если есть, или внешний tesseract).
-
-## Изображения из документов
-
-- Вытащил → положи в `uploads/source-<doc-name>/img-NNN.png`
-- В content-tree укажи путь
-- На слайдах используй с подписью
-- Не используй автоматически low-res scan'ы — они выглядят плохо. Лучше плейсхолдер с описанием.
-
-## Антипаттерны
-
-- Импортить весь документ как «один длинный текст» → теряется структура
-- Парсить PDF где текст — это картинки → получаешь шум
-- Использовать regex для headers вместо styles → ловишь bold-paragraph как h1
-- Игнорировать таблицы → теряешь часто самый ценный контент
-- Не сохранять source-документ в `uploads/originals/` → теряется provenance
-- Делать lossy преобразование (PDF → текст → slides) на больших docs → лучше через структурированный middle (content-tree YAML/JSON)
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-document-import.md`. Секции там: PDF, DOCX, PPTX, Sketch (legacy), Структурирование вывода, Извлечение по типам, Качество текста, Изображения из документов, Антипаттерны.

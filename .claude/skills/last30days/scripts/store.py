@@ -12,11 +12,18 @@ Database location: ~/.local/share/last30days/research.db
 
 import argparse
 import json
+import os
 import sqlite3
 import sys
-from datetime import datetime, timedelta
+from contextlib import contextmanager
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterator, List, Optional
+
+SCRIPT_DIR = Path(__file__).parent.resolve()
+sys.path.insert(0, str(SCRIPT_DIR))
+
+from lib import schema
 
 DB_DIR = Path.home() / ".local" / "share" / "last30days"
 DB_PATH = DB_DIR / "research.db"
@@ -27,6 +34,45 @@ _db_override = None
 
 def _get_db_path() -> Path:
     return _db_override or DB_PATH
+
+
+@contextmanager
+def scoped_db(db_path: Optional[Path]) -> Iterator[None]:
+    """Route all store access inside the block to ``db_path``.
+
+    ``None`` keeps the shared store. Scoped runs (``--save-dir``) use this so
+    their findings land next to their briefs instead of leaking into the
+    shared research.db that unscoped searches read.
+    """
+    global _db_override
+    if db_path is None:
+        yield
+        return
+    previous = _db_override
+    _db_override = Path(db_path)
+    try:
+        yield
+    finally:
+        _db_override = previous
+
+
+def ensure_private_db_files(db_path: Optional[Path] = None) -> Path:
+    """Create/harden the research database and SQLite sidecars owner-only."""
+    path = db_path or _get_db_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not path.exists():
+        try:
+            fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        except FileExistsError:
+            pass
+        else:
+            os.close(fd)
+    for candidate in (path, Path(f"{path}-wal"), Path(f"{path}-shm")):
+        try:
+            candidate.chmod(0o600)
+        except FileNotFoundError:
+            pass
+    return path
 
 
 SCHEMA_V1 = """
@@ -127,9 +173,56 @@ INSERT OR IGNORE INTO settings (key, value) VALUES ('briefing_format', 'concise'
 INSERT OR IGNORE INTO settings (key, value) VALUES ('default_schedule', '0 9 * * *');
 """
 
+_UPDATABLE_RUN_COLUMNS = frozenset({
+    "source_mode",
+    "prompt_tokens",
+    "completion_tokens",
+    "token_cost",
+    "duration_seconds",
+    "status",
+    "error_message",
+    "findings_new",
+    "findings_updated",
+})
+
+_UPDATABLE_FINDING_COLUMNS = frozenset({
+    "source",
+    "source_url",
+    "source_title",
+    "author",
+    "content",
+    "summary",
+    "engagement_score",
+    "relevance_score",
+    "last_seen",
+    "sighting_count",
+    "dismissed",
+})
+
 # Future migrations keyed by version number
 MIGRATIONS: Dict[int, str] = {
-    # 2: "ALTER TABLE findings ADD COLUMN tags TEXT DEFAULT '[]';",
+    2: """
+CREATE TABLE IF NOT EXISTS finding_sightings (
+    id INTEGER PRIMARY KEY,
+    finding_id INTEGER NOT NULL REFERENCES findings(id) ON DELETE CASCADE,
+    run_id INTEGER REFERENCES research_runs(id) ON DELETE CASCADE,
+    topic_id INTEGER REFERENCES topics(id) ON DELETE CASCADE,
+    source TEXT NOT NULL,
+    source_url TEXT NOT NULL,
+    source_title TEXT,
+    engagement_score REAL,
+    relevance_score REAL,
+    seen_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(run_id, finding_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_finding_sightings_run
+    ON finding_sightings(run_id, topic_id);
+CREATE INDEX IF NOT EXISTS idx_finding_sightings_topic_seen
+    ON finding_sightings(topic_id, seen_at);
+CREATE INDEX IF NOT EXISTS idx_finding_sightings_url
+    ON finding_sightings(source_url);
+""",
 }
 
 
@@ -141,6 +234,10 @@ def _connect(db_path: Optional[Path] = None) -> sqlite3.Connection:
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA synchronous=NORMAL")
     conn.execute("PRAGMA foreign_keys=ON")
+    # WAL lets readers coexist with one writer, but two writers (cron + user)
+    # still contend for the write lock. Default busy_timeout is 0, so the loser
+    # raises "database is locked" instantly; wait instead.
+    conn.execute("PRAGMA busy_timeout=5000")
     return conn
 
 
@@ -295,10 +392,31 @@ def update_run(run_id: int, **kwargs):
     """Update a research run's fields."""
     conn = _connect()
     try:
+        invalid_columns = sorted(set(kwargs) - _UPDATABLE_RUN_COLUMNS)
+        if invalid_columns:
+            raise ValueError(
+                f"Invalid run update fields: {', '.join(invalid_columns)}"
+            )
         sets = ", ".join(f"{k} = ?" for k in kwargs)
         values = list(kwargs.values()) + [run_id]
         conn.execute(f"UPDATE research_runs SET {sets} WHERE id = ?", values)
         conn.commit()
+    finally:
+        conn.close()
+
+
+def get_latest_completed_runs(topic_id: int, limit: int = 2) -> List[Dict[str, Any]]:
+    """Return newest completed runs for a topic."""
+    conn = _connect()
+    try:
+        rows = conn.execute(
+            """SELECT * FROM research_runs
+               WHERE topic_id = ? AND status = 'completed'
+               ORDER BY datetime(run_date) DESC, id DESC
+               LIMIT ?""",
+            (topic_id, limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
     finally:
         conn.close()
 
@@ -312,61 +430,109 @@ def store_findings(
     findings: List[Dict[str, Any]],
 ) -> Dict[str, int]:
     """Store findings with URL-based dedup. Returns counts of new/updated."""
+    # Collect findings that have a URL, preserving order.
+    with_urls: List[tuple[str, Dict[str, Any]]] = []
+    for f in findings:
+        url = f.get("source_url") or f.get("url")
+        if url:
+            with_urls.append((url, f))
+
+    if not with_urls:
+        conn = _connect()
+        try:
+            conn.execute(
+                "UPDATE research_runs SET findings_new = 0, findings_updated = 0 WHERE id = ?",
+                (run_id,),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+        return {"new": 0, "updated": 0}
+
     conn = _connect()
-    new_count = 0
-    updated_count = 0
-
     try:
-        for f in findings:
-            url = f.get("source_url") or f.get("url")
-            if not url:
-                continue
+        # Single batch SELECT to find existing findings by URL.
+        urls = [url for url, _ in with_urls]
+        placeholders = ",".join("?" for _ in urls)
+        rows = conn.execute(
+            f"SELECT id, source_url, engagement_score FROM findings WHERE source_url IN ({placeholders})",
+            urls,
+        ).fetchall()
+        existing_by_url = {row["source_url"]: row for row in rows}
 
-            existing = conn.execute(
-                "SELECT id, engagement_score, sighting_count FROM findings WHERE source_url = ?",
-                (url,),
-            ).fetchone()
+        update_rows: List[tuple] = []
+        insert_rows: List[tuple] = []
 
+        for url, f in with_urls:
+            existing = existing_by_url.get(url)
+            new_engagement = f.get("engagement_score", 0)
             if existing:
-                # Update engagement and re-sighting info
-                new_engagement = f.get("engagement_score", 0)
-                conn.execute(
-                    """UPDATE findings SET
-                           last_seen = datetime('now'),
-                           sighting_count = sighting_count + 1,
-                           engagement_score = ?,
-                           run_id = ?
-                       WHERE id = ?""",
-                    (
-                        max(new_engagement, existing["engagement_score"] or 0),
-                        run_id,
-                        existing["id"],
-                    ),
-                )
-                updated_count += 1
+                update_rows.append((
+                    max(new_engagement, existing["engagement_score"] or 0),
+                    run_id,
+                    existing["id"],
+                ))
             else:
-                # New finding
-                conn.execute(
-                    """INSERT INTO findings
-                       (run_id, topic_id, source, source_url, source_title,
-                        author, content, summary, engagement_score, relevance_score)
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                    (
-                        run_id,
-                        topic_id,
-                        f.get("source", "unknown"),
-                        url,
-                        f.get("source_title") or f.get("title", ""),
-                        f.get("author", ""),
-                        f.get("content") or f.get("text", ""),
-                        f.get("summary", ""),
-                        f.get("engagement_score", 0),
-                        f.get("relevance_score", 0),
-                    ),
-                )
-                new_count += 1
+                insert_rows.append((
+                    run_id,
+                    topic_id,
+                    f.get("source", "unknown"),
+                    url,
+                    f.get("source_title") or f.get("title", ""),
+                    f.get("author", ""),
+                    f.get("content") or f.get("text", ""),
+                    f.get("summary", ""),
+                    new_engagement,
+                    f.get("relevance_score", 0),
+                ))
 
-        # Update run stats
+        if update_rows:
+            conn.executemany(
+                """UPDATE findings SET
+                       last_seen = datetime('now'),
+                       sighting_count = sighting_count + 1,
+                       engagement_score = ?,
+                       run_id = ?
+                   WHERE id = ?""",
+                update_rows,
+            )
+        if insert_rows:
+            # source_url is UNIQUE. The SELECT above is not atomic with this
+            # write, so a concurrent run (cron + user) can insert the same URL
+            # between our read and write. Upsert on conflict instead of letting
+            # IntegrityError abort the whole batch and lose every finding.
+            conn.executemany(
+                """INSERT INTO findings
+                   (run_id, topic_id, source, source_url, source_title,
+                    author, content, summary, engagement_score, relevance_score)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                   ON CONFLICT(source_url) DO UPDATE SET
+                       last_seen = datetime('now'),
+                       sighting_count = sighting_count + 1,
+                       engagement_score = max(
+                           engagement_score, excluded.engagement_score),
+                       run_id = excluded.run_id""",
+                insert_rows,
+            )
+
+        new_count = len(insert_rows)
+        updated_count = len(update_rows)
+        if insert_rows:
+            # A row whose URL was inserted by a concurrent run between our SELECT
+            # and the upsert resolves via ON CONFLICT (an update, not a new row),
+            # bumping its sighting_count above 1. Re-derive the split so
+            # research_runs.findings_new isn't inflated by conflict-resolved rows
+            # (source_url is field index 3 in each insert tuple).
+            inserted_urls = [row[3] for row in insert_rows]
+            placeholders = ",".join("?" for _ in inserted_urls)
+            conflicted = conn.execute(
+                f"SELECT COUNT(*) FROM findings "
+                f"WHERE source_url IN ({placeholders}) AND sighting_count > 1",
+                inserted_urls,
+            ).fetchone()[0]
+            new_count -= conflicted
+            updated_count += conflicted
+        _record_sightings(conn, run_id, topic_id, with_urls, existing_by_url)
         conn.execute(
             "UPDATE research_runs SET findings_new = ?, findings_updated = ? WHERE id = ?",
             (new_count, updated_count, run_id),
@@ -376,6 +542,166 @@ def store_findings(
         conn.close()
 
     return {"new": new_count, "updated": updated_count}
+
+
+def _record_sightings(
+    conn: sqlite3.Connection,
+    run_id: int,
+    topic_id: int,
+    findings_with_urls: List[tuple[str, Dict[str, Any]]],
+    existing_by_url: Optional[Dict[str, sqlite3.Row]] = None,
+) -> None:
+    """Record the findings observed during this run.
+
+    The aggregate findings table keeps one row per URL and updates that row on
+    re-sighting. This ledger preserves the run/topic membership needed for
+    watchlist deltas and dossiers.
+    """
+    if not findings_with_urls:
+        return
+
+    by_url = {url: finding for url, finding in findings_with_urls}
+    rows_by_url = dict(existing_by_url or {})
+
+    missing_urls = [url for url in by_url if url not in rows_by_url]
+    if missing_urls:
+        placeholders = ",".join("?" for _ in missing_urls)
+        rows = conn.execute(
+            f"SELECT id, source_url FROM findings WHERE source_url IN ({placeholders})",
+            missing_urls,
+        ).fetchall()
+        rows_by_url.update({row["source_url"]: row for row in rows})
+
+    sighting_rows = []
+    for url, finding in by_url.items():
+        row = rows_by_url.get(url)
+        if row is None:
+            continue
+        sighting_rows.append((
+            row["id"],
+            run_id,
+            topic_id,
+            finding.get("source", "unknown"),
+            url,
+            finding.get("source_title") or finding.get("title", ""),
+            finding.get("engagement_score") if finding.get("engagement_score") is not None else 0,
+            finding.get("relevance_score") if finding.get("relevance_score") is not None else 0,
+        ))
+
+    if not sighting_rows:
+        return
+
+    conn.executemany(
+        """INSERT INTO finding_sightings
+           (finding_id, run_id, topic_id, source, source_url, source_title,
+            engagement_score, relevance_score)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+           ON CONFLICT(run_id, finding_id) DO UPDATE SET
+             topic_id = excluded.topic_id,
+             source = excluded.source,
+             source_url = excluded.source_url,
+             source_title = excluded.source_title,
+             engagement_score = excluded.engagement_score,
+             relevance_score = excluded.relevance_score""",
+        sighting_rows,
+    )
+
+
+def get_sightings_for_run(topic_id: int, run_id: int) -> List[Dict[str, Any]]:
+    """Return findings observed for a topic during a specific run."""
+    conn = _connect()
+    try:
+        rows = conn.execute(
+            """SELECT * FROM finding_sightings
+               WHERE topic_id = ? AND run_id = ?
+               ORDER BY id""",
+            (topic_id, run_id),
+        ).fetchall()
+        return [dict(r) for r in rows]
+    finally:
+        conn.close()
+
+
+def compute_topic_delta(topic_id: int) -> Dict[str, Any]:
+    """Compare the latest completed watchlist run with the previous run."""
+    runs = get_latest_completed_runs(topic_id, limit=2)
+    topic = _get_topic_by_id(topic_id)
+    topic_name = topic["name"] if topic else str(topic_id)
+    if len(runs) < 2:
+        return {
+            "topic": topic_name,
+            "status": "insufficient_history",
+            "message": "Need at least two completed runs to compute a delta.",
+        }
+
+    current_run, previous_run = runs[0], runs[1]
+    current = _sightings_by_url(get_sightings_for_run(topic_id, current_run["id"]))
+    previous = _sightings_by_url(get_sightings_for_run(topic_id, previous_run["id"]))
+
+    current_urls = set(current)
+    previous_urls = set(previous)
+    new_urls = sorted(current_urls - previous_urls)
+    continued_urls = sorted(current_urls & previous_urls)
+    dropped_urls = sorted(previous_urls - current_urls)
+
+    findings = {
+        "new": [current[url] for url in new_urls],
+        "continued": [current[url] for url in continued_urls],
+        "dropped": [previous[url] for url in dropped_urls],
+    }
+
+    return {
+        "topic": topic_name,
+        "status": "ok",
+        "current_run_id": current_run["id"],
+        "previous_run_id": previous_run["id"],
+        "new": len(new_urls),
+        "continued": len(continued_urls),
+        "dropped": len(dropped_urls),
+        "sources": _delta_source_counts(findings),
+        "findings": findings,
+    }
+
+
+def _get_topic_by_id(topic_id: int) -> Optional[Dict[str, Any]]:
+    conn = _connect()
+    try:
+        row = conn.execute("SELECT * FROM topics WHERE id = ?", (topic_id,)).fetchone()
+        return dict(row) if row else None
+    finally:
+        conn.close()
+
+
+def _sightings_by_url(sightings: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    """Index sightings by stable URL identity for run-to-run delta comparisons.
+
+    URL-less sightings are intentionally excluded because there is no stable
+    cross-run identity to classify them as new, continued, or dropped.
+    """
+    return {
+        sighting["source_url"]: sighting
+        for sighting in sightings
+        if sighting.get("source_url")
+    }
+
+
+def _delta_source_counts(
+    findings: Dict[str, List[Dict[str, Any]]]
+) -> Dict[str, Dict[str, int]]:
+    sources = sorted({
+        finding.get("source") or "unknown"
+        for group in findings.values()
+        for finding in group
+    })
+    counts = {
+        source: {"new": 0, "continued": 0, "dropped": 0}
+        for source in sources
+    }
+    for group_name, group in findings.items():
+        for finding in group:
+            source = finding.get("source") or "unknown"
+            counts[source][group_name] += 1
+    return counts
 
 
 def get_new_findings(
@@ -427,6 +753,11 @@ def update_finding(finding_id: int, **kwargs):
     """Update a finding's fields."""
     conn = _connect()
     try:
+        invalid_columns = sorted(set(kwargs) - _UPDATABLE_FINDING_COLUMNS)
+        if invalid_columns:
+            raise ValueError(
+                f"Invalid finding update fields: {', '.join(invalid_columns)}"
+            )
         sets = ", ".join(f"{k} = ?" for k in kwargs)
         values = list(kwargs.values()) + [finding_id]
         conn.execute(f"UPDATE findings SET {sets} WHERE id = ?", values)
@@ -458,7 +789,7 @@ def get_daily_cost(date: Optional[str] = None) -> float:
     conn = _connect()
     try:
         if not date:
-            date = datetime.now().strftime("%Y-%m-%d")
+            date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         row = conn.execute(
             """SELECT COALESCE(SUM(token_cost), 0) as total
                FROM research_runs
@@ -514,7 +845,7 @@ def get_stats() -> Dict[str, Any]:
         topic_count = conn.execute("SELECT COUNT(*) FROM topics WHERE enabled = 1").fetchone()[0]
         finding_count = conn.execute("SELECT COUNT(*) FROM findings").fetchone()[0]
 
-        week_ago = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
+        week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%d")
         runs_7d = conn.execute(
             "SELECT COUNT(*) FROM research_runs WHERE run_date >= ?", (week_ago,)
         ).fetchone()[0]
@@ -560,7 +891,7 @@ def get_trending(days: int = 7) -> List[Dict[str, Any]]:
     """Get topics ranked by recent finding activity."""
     conn = _connect()
     try:
-        since = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
+        since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
         rows = conn.execute(
             """SELECT t.name, t.id,
                       COUNT(f.id) as new_findings,
@@ -577,6 +908,81 @@ def get_trending(days: int = 7) -> List[Dict[str, Any]]:
         conn.close()
 
 
+def finding_from_candidate(candidate: schema.Candidate) -> Dict[str, Any]:
+    """Convert a ranked candidate into a persisted finding."""
+    primary_item = schema.candidate_primary_item(candidate)
+    corroborating_sources = [
+        source for source in schema.candidate_sources(candidate)
+        if source and source != candidate.source
+    ]
+    summary = candidate.explanation or candidate.snippet or ""
+    if corroborating_sources:
+        prefix = f"Also seen in: {', '.join(corroborating_sources)}."
+        summary = f"{prefix} {summary}".strip()
+    body = (
+        primary_item.body
+        if primary_item and primary_item.body
+        else candidate.snippet or candidate.title
+    )
+    author = primary_item.author if primary_item and primary_item.author else ""
+    return {
+        "source": candidate.source or "unknown",
+        "source_url": candidate.url,
+        "source_title": candidate.title,
+        "author": author,
+        "content": body,
+        "summary": summary,
+        "engagement_score": candidate.engagement or 0,
+        "relevance_score": candidate.final_score or candidate.rerank_score or candidate.local_relevance,
+    }
+
+
+def findings_from_report(
+    report: schema.Report,
+    *,
+    limit: Optional[int] = None,
+) -> List[Dict[str, Any]]:
+    """Convert report into persisted findings.
+
+    Uses ranked candidates (post-rerank) when available for quality scores and explanations.
+    Supplements with raw items from items_by_source for HN/PM that didn't rank highly
+    but are valuable for watchlist persistence. When ranked_candidates is empty
+    (degraded path — rerank failed or was skipped), falls back to supplementing
+    all sources from items_by_source so findings aren't silently dropped.
+    """
+    findings = []
+    seen_urls = set()
+
+    for candidate in report.ranked_candidates:
+        findings.append(finding_from_candidate(candidate))
+        seen_urls.add(candidate.url)
+
+    supplement_sources = (
+        list(report.items_by_source)
+        if not report.ranked_candidates
+        else ["hackernews", "polymarket"]
+    )
+    for source_name in supplement_sources:
+        if source_name not in report.items_by_source:
+            continue
+        for item in report.items_by_source[source_name]:
+            if item.url in seen_urls:
+                continue
+            findings.append({
+                "source": source_name,
+                "source_url": item.url,
+                "source_title": item.title,
+                "author": item.author or "",
+                "content": item.body or "",
+                "summary": item.snippet or (item.body[:500] if item.body else ""),
+                "engagement_score": item.engagement_score or 0.0,
+                "relevance_score": item.local_relevance or 0.5,
+            })
+            seen_urls.add(item.url)
+
+    return findings[:limit] if limit is not None else findings
+
+
 # --- CLI interface ---
 
 
@@ -589,9 +995,10 @@ def _cli_query(args):
 
     since = None
     if args.since:
-        # Parse duration like "7d", "30d"
+        # Parse duration like "7d", "30d". Use UTC to match SQLite's
+        # datetime('now') which writes first_seen in UTC.
         days = int(args.since.rstrip("d"))
-        since = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
+        since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
 
     findings = get_new_findings(topic["id"], since)
     print(json.dumps({"topic": topic["name"], "findings": findings, "count": len(findings)}, default=str))

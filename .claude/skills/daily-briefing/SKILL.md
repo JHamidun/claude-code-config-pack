@@ -1,6 +1,6 @@
 ---
 name: daily-briefing
-description: Start your day with a prioritized sales briefing. Works standalone when you tell me your meetings and priorities, supercharged when you connect your calendar, CRM, and email. Trigger with "morning briefing", "daily brief", "what's on my plate today", "prep my day", or "start my day".
+description: "Prioritized daily sales briefing — meetings, deals, priorities; richer when calendar, CRM, and email are connected. Trigger: 'morning briefing', 'daily brief', 'what's on my plate today', 'prep my day', 'start my day'. НЕ путать с brain-briefing (Second Brain: семейный/личный брифинг из ваше локальное хранилище памяти) — этот скилл про SALES-день: встречи, CRM, пайплайн."
 ---
 
 # Daily Sales Briefing

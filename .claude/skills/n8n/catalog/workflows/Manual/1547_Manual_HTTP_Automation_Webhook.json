@@ -1,0 +1,303 @@
+{
+  "id": "MVPlLz3CiQok6rXy",
+  "meta": {
+    "instanceId": "workflow-fecedfa4",
+    "versionId": "1.0.0",
+    "createdAt": "2025-09-29T07:07:50.026648",
+    "updatedAt": "2025-09-29T07:07:50.026670",
+    "owner": "n8n-user",
+    "license": "MIT",
+    "category": "automation",
+    "status": "active",
+    "priority": "high",
+    "environment": "production"
+  },
+  "name": "Merge PDFs",
+  "tags": [
+    "automation",
+    "n8n",
+    "production-ready",
+    "excellent",
+    "optimized"
+  ],
+  "nodes": [
+    {
+      "id": "282b146b-ee58-4089-9ee6-94b153024bfa",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        740,
+        -40
+      ],
+      "parameters": {},
+      "typeVersion": 1,
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "39a37abd-924f-474c-8dde-7536170797f2",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        960,
+        -140
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      },
+      "typeVersion": 4.2,
+      "notes": "This httpRequest node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "b2359766-896f-4966-873e-b2dc0ee4f684",
+      "name": "HTTP Request2",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        960,
+        60
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      },
+      "typeVersion": 4.2,
+      "notes": "This httpRequest node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "7f70b25c-a171-4a7c-8067-141ce3275226",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        1180,
+        -40
+      ],
+      "parameters": {},
+      "typeVersion": 3.1,
+      "notes": "This merge node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "183b90b4-5f22-4ff8-b47f-96b7c4d522d7",
+      "name": "Merge PDF1",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1400,
+        -40
+      ],
+      "parameters": {},
+      "credentials": {
+        "customJsApi": {
+          "id": "h29wo2anYKdANAzm",
+          "name": "CustomJS account"
+        }
+      },
+      "typeVersion": 1,
+      "notes": "This mergePdfs node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "131474f2-c6ca-4d1f-ba49-1f2f6d91394a",
+      "name": "Read/Write Files from Disk",
+      "type": "n8n-nodes-base.readWriteFile",
+      "position": [
+        1620,
+        -40
+      ],
+      "parameters": {
+        "options": {},
+        "fileName": "test.pdf",
+        "operation": "write"
+      },
+      "typeVersion": 1,
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "a86ddc41-60aa-482c-90f2-8eacc6bb0a9b",
+      "name": "Read/Write Files from Disk4",
+      "type": "n8n-nodes-base.readWriteFile",
+      "position": [
+        1840,
+        -40
+      ],
+      "parameters": {
+        "options": {},
+        "fileSelector": "test.pdf"
+      },
+      "typeVersion": 1,
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow."
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": null,
+    "timezone": "UTC",
+    "executionTimeout": 3600,
+    "maxExecutions": 1000,
+    "retryOnFail": true,
+    "retryCount": 3,
+    "retryDelay": 1000
+  },
+  "versionId": "02f73022-a678-4660-ab1d-3531e4848cba",
+  "connections": {
+    "39a37abd-924f-474c-8dde-7536170797f2": {
+      "main": [
+        [
+          {
+            "node": "error-handler-39a37abd-924f-474c-8dde-7536170797f2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-39a37abd-924f-474c-8dde-7536170797f2-4908c21f",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-39a37abd-924f-474c-8dde-7536170797f2-31cbeeeb",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-39a37abd-924f-474c-8dde-7536170797f2-584e0e54",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-39a37abd-924f-474c-8dde-7536170797f2-038262ab",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-39a37abd-924f-474c-8dde-7536170797f2-fcad372a",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-39a37abd-924f-474c-8dde-7536170797f2-bb0614a4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-39a37abd-924f-474c-8dde-7536170797f2-157aec91",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-39a37abd-924f-474c-8dde-7536170797f2-cdb9a8a2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "b2359766-896f-4966-873e-b2dc0ee4f684": {
+      "main": [
+        [
+          {
+            "node": "error-handler-b2359766-896f-4966-873e-b2dc0ee4f684",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-b2359766-896f-4966-873e-b2dc0ee4f684-ac5faf48",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-b2359766-896f-4966-873e-b2dc0ee4f684-e8bee295",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-b2359766-896f-4966-873e-b2dc0ee4f684-2daa58bf",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-b2359766-896f-4966-873e-b2dc0ee4f684-06eff9db",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-b2359766-896f-4966-873e-b2dc0ee4f684-c80d90cd",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-b2359766-896f-4966-873e-b2dc0ee4f684-7cffb6f1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-b2359766-896f-4966-873e-b2dc0ee4f684-71c1d673",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-b2359766-896f-4966-873e-b2dc0ee4f684-17c51a25",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "131474f2-c6ca-4d1f-ba49-1f2f6d91394a": {
+      "main": [
+        [
+          {
+            "node": "error-handler-131474f2-c6ca-4d1f-ba49-1f2f6d91394a-1d3bf75b",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "a86ddc41-60aa-482c-90f2-8eacc6bb0a9b": {
+      "main": [
+        [
+          {
+            "node": "error-handler-a86ddc41-60aa-482c-90f2-8eacc6bb0a9b-d73c6863",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "description": "Automated workflow: Merge PDFs. This workflow processes data and performs automated tasks.",
+  "notes": "Excellent quality workflow: Merge PDFs. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+}

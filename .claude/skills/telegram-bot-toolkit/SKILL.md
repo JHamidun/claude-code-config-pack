@@ -1,13 +1,19 @@
 ---
 name: telegram-bot-toolkit
-description: Comprehensive toolkit for Telegram bot development, testing, debugging, and deployment. Specializes in python-telegram-bot, Telethon, scene management patterns, middleware configuration, and production deployment strategies.
-keywords: telegram, bot, python-telegram-bot, telethon, scenes, middleware, webhooks, deployment, debugging
+description: Comprehensive toolkit for Telegram bot development, testing, debugging, and deployment. Specializes in python-telegram-bot, Telethon, scene management patterns, middleware configuration, and production deployment strategies. Also covers when NOT to use a bot as a TG Ads funnel — triggers «бот как коллектор базы», «антипаттерн бот-воронки», «бот из TG Ads», «воронка через бот».
+keywords: telegram, bot, python-telegram-bot, telethon, scenes, middleware, webhooks, deployment, debugging, бот как коллектор, антипаттерн бот-воронки, бот из TG Ads, воронка через бот
 ---
 
 # Telegram Bot Toolkit
 
 ## Purpose
 Специализированный навык для разработки, отладки и deployment Telegram ботов на Python. Основан на best practices для production-ready ботов.
+
+> **Бот как воронка из TG Ads?** Сначала прочитай `references/tg-ads-bot-funnel.md` —
+> предупреждение эксперта (методология: 80% бот-воронок из TG Ads убыточны,
+> бот лучше как коллектор базы, а не первичная конверсия. Паттерн: TG Ads → лендинг
+> с регистрацией → бот для прогрева (бот вторичен). Cross-link: `telegram-ads-pro-ru`,
+> `manychat-funnel-ru`.
 
 ## Capabilities
 
@@ -475,8 +481,253 @@ class Database:
 9. **Environment-based config** (не hardcode tokens)
 10. **Test scene transitions** тщательно
 
+## Multi-tenant LLM-driven bot patterns
+
+Когда бот **публичный** (один токен — много юзеров) и **управляется LLM** (агент с tool-calling, не статичный wizard), нужны паттерны которые не покрывает стандартный python-telegram-bot wiki.
+
+### 1. Per-user data isolation
+
+Структура файловой системы — один корневой `data/` с подпапкой на каждого tg_user_id. Никаких глобальных таблиц с user_id-колонкой как ключом — каждый юзер живёт в своей изолированной директории, его можно полностью удалить одной `rm -rf`.
+
+```text
+data/
+  users/<tg_user_id>/
+    profile.json         # язык UI, режим, current_topic
+    secrets.enc          # Fernet-encrypted BYOK creds
+    history.jsonl        # conversation memory (rolling window)
+    topics/<slug>/       # темы/проекты юзера
+      config.json
+      candidates.db      # SQLite
+      drafts/<ts>.md
+```
+
+Хелперы `paths.user_dir(uid)`, `paths.topic_dir(uid, slug)` создают директорию on-demand. Никаких атомарных миграций при росте — каждый юзер мигрирует отдельно при следующем обращении.
+
+### 2. BYOK sidechannel — секреты в обход LLM
+
+Если юзер должен дать токен/ключ (свой Bot API token для auto-publish, свой ScraperVendor key, etc.), это **никогда не должно попасть в context LLM**. Иначе токен утечёт в history.jsonl и далее во все последующие prompt'ы.
+
+Паттерн — FSM-флаг в profile.json, который **перехватывает следующее сообщение до LLM**:
+
+```python
+def dispatch(message):
+    text = message["text"].strip()
+    profile = state.load_profile(user_id)
+
+    # Sidechannel FSM имеет приоритет НАД LLM-агентом
+    dlg = profile.get("dialog")
+    if dlg and dlg.get("flow", "").startswith("byok_") and not text.startswith("/cancel"):
+        handle_byok_input(text, dlg)  # пишет в Fernet blob, отвечает "✅ сохранено"
+        return
+
+    # Команды-инициаторы тоже не идут в LLM — они только заводят dialog flag
+    if text.startswith("/byok"):
+        start_byok_wizard(parts[1:])  # → ставит profile["dialog"] = {"flow": "byok_bot"}
+        return
+
+    # Всё остальное — нормально в агент
+    reply = agent.respond(user_id, chat_id, text)
+    api.send_message(chat_id, reply)
+```
+
+Секрет валидируется (для tg-токена — `getMe` probe) и шифруется (Fernet, ключ из env `SECRET_KEY`):
+
+```python
+import base64, hashlib, json
+from cryptography.fernet import Fernet
+
+def _fernet():
+    pw = os.environ["SECRET_KEY"]  # random 48-char string per deploy
+    key = base64.urlsafe_b64encode(hashlib.sha256(pw.encode()).digest())
+    return Fernet(key)
+
+def secret_put(uid: str, key: str, value: str):
+    p = paths.user_dir(uid) / "secrets.enc"
+    data = json.loads(_fernet().decrypt(p.read_bytes())) if p.exists() else {}
+    data[key] = value
+    p.write_bytes(_fernet().encrypt(json.dumps(data).encode()))
+    p.chmod(0o600)
+```
+
+Ответ юзеру — `✅ сохранён` **без эха** значения. Никогда не `f"saved: {value}"`.
+
+### 3. Reply keyboard как NL-shortcuts (не callbacks)
+
+Reply keyboard внизу под input — кнопки с эмодзи-лейблами **отправляют свой текст как обычное сообщение**. Это означает: один и тот же tool-routing цикл обрабатывает и тыкание кнопки, и свободный ввод.
+
+```python
+def persistent_menu() -> dict:
+    return {
+        "keyboard": [
+            [{"text": "📋 Темы"}, {"text": "➕ Новая тема"}],
+            [{"text": "🔎 Мониторить"}, {"text": "✍️ Черновик"}],
+            [{"text": "🗓 План недели"}, {"text": "📊 Статистика"}],
+            [{"text": "🔐 BYOK"}, {"text": "⚙️ Настройки"}, {"text": "❓ Помощь"}],
+        ],
+        "resize_keyboard": True,
+        "is_persistent": True,
+    }
+```
+
+При `sendMessage` передавать `reply_markup=persistent_menu()` **в каждом ответе агента** — клавиатура держится снизу. Юзер тыкает `📋 Темы` → бот получает буквальный текст `"📋 Темы"` → агент через свой system prompt знает что это shortcut на `list_topics` tool.
+
+**Не использовать `InlineKeyboardMarkup` для shortcuts** — callback_query поток отдельный, у него нет text content, нужно отдельное парсинг и роутинг. Reply keyboard переиспользует существующий text pipeline.
+
+Inline кнопки **только** на preview-сообщениях с действиями (✅ Опубликовать / ✏️ Edit / 🔄 Regen / ❌ Reject) — там callback_data нужен для привязки к конкретному draft_ts.
+
+### 4. Markdown → HTML для LLM-replies
+
+LLM нативно генерит markdown (`**bold**`, `__italic__`, `` `code` ``). Telegram `parse_mode=Markdown` устарел; `MarkdownV2` требует escape всех `_*[]()~>#+-=|{}.!`. `HTML` — единственный реально удобный режим, но LLM в HTML не пишет.
+
+Конвертер перед отправкой:
+
+```python
+import re
+
+def md_to_html(text: str) -> str:
+    text = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", text, flags=re.DOTALL)
+    text = re.sub(r"__(.+?)__", r"<i>\1</i>", text, flags=re.DOTALL)
+    text = re.sub(r"`([^`\n]+)`", r"<code>\1</code>", text)
+    text = re.sub(r"~~(.+?)~~", r"<s>\1</s>", text, flags=re.DOTALL)
+    return text
+```
+
+Без этого юзер видит `**Темы**` буквальными звёздочками. Регулярки прогонять **только** если `parse_mode=HTML` — иначе двойная конверсия.
+
+### 5. Windows Git bash `MSYS_NO_PATHCONV` trap
+
+При тестировании slash-commands через `tg_client.py send @bot "/start"` из Git bash на Windows MSYS конвертирует `/start` → `C:/Program Files/Git/start` ДО запуска python. Бот получает мусор.
+
+```bash
+# WRONG (Git bash on Windows)
+python tg_client.py send @bot "/start"
+# Bot receives: "C:/Program Files/Git/start"
+
+# RIGHT
+MSYS_NO_PATHCONV=1 python tg_client.py send @bot "/start"
+# Bot receives: "/start"
+```
+
+Альтернатива — вызывать Telethon напрямую из Python без bash прослойки. Документировать оба способа в README.
+
+### 6. Telethon channel discovery (`SearchRequest`)
+
+Для нахождения **реальных** существующих каналов/групп по ключевому слову (не LLM-галлюцинации) — `SearchRequest` MTProto:
+
+```python
+from telethon.tl.functions.contacts import SearchRequest
+from telethon.tl.types import Channel
+
+async def discover_channels(query: str, limit: int = 15) -> list[dict]:
+    result = await client(SearchRequest(q=query, limit=limit))
+    out = []
+    for chat in result.chats:
+        if not isinstance(chat, Channel):
+            continue
+        if chat.broadcast or chat.megagroup:
+            out.append({
+                "ref": f"@{chat.username}" if chat.username else str(chat.id),
+                "title": chat.title,
+                "participants": getattr(chat, "participants_count", None),
+                "verified": bool(getattr(chat, "verified", False)),
+                "type": "channel" if chat.broadcast else "group",
+            })
+    out.sort(key=lambda x: x.get("participants") or 0, reverse=True)
+    return out[:limit]
+```
+
+Фильтр `chat.broadcast or chat.megagroup` ловит и **каналы**, и **супергруппы**. Дискриминация — поле `type`.
+
+### 7. FloodWait retry с backoff
+
+`SearchRequest` и `iter_messages` на нагрузке дают `FloodWaitError(seconds=N)`. Короткие waits — retry, длинные — bail с человекочитаемой ошибкой:
+
+```python
+from telethon.errors import FloodWaitError
+
+async def with_flood_retry(coro_factory, max_attempts=2):
+    for attempt in range(max_attempts):
+        try:
+            return await coro_factory()
+        except FloodWaitError as e:
+            if e.seconds <= 20 and attempt < max_attempts - 1:
+                log.info("flood wait %ss, retrying", e.seconds)
+                await asyncio.sleep(e.seconds + 1)
+                continue
+            raise RuntimeError(f"Telegram flood-wait: {e.seconds}s — retry later")
+```
+
+В агенте — добавить в system prompt: `"Call discover_channels AT MOST 2 times per user message"`. Иначе LLM спамит 6 разных query за одно сообщение → flood-wait накапливается.
+
+### 8. `iter_messages` универсален для channel и megagroup
+
+Нет отдельных веток для broadcast и megagroup — `client.iter_messages(entity)` работает одинаково. `entity` через `get_entity(@username)` resolve'ит и каналы, и группы. Разница только в семантике views/reactions:
+
+- Broadcast (`@durov`): `msg.views` отражает охват
+- Megagroup (`@python_ru`): `msg.views = 0`, но `msg.reactions` есть
+
+При scoring виральности — учитывать оба:
+
+```python
+def virality(msg) -> float:
+    views = float(msg.views or 0)
+    reactions = sum(r.count for r in (msg.reactions.results or []))
+    forwards = float(msg.forwards or 0)
+    return views + 3 * reactions + 5 * forwards
+```
+
+### 9. Conversation memory persistence (LLM agent)
+
+LLM-driven bot ≠ scripted FSM bot. Сообщения юзера + ответы агента + **tool_calls трейс** должны жить в файле:
+
+```python
+def history_load(uid, limit=20):
+    p = paths.user_dir(uid) / "history.jsonl"
+    if not p.exists():
+        return []
+    lines = p.read_text(encoding="utf-8").splitlines()
+    return [json.loads(l) for l in lines[-limit:] if l.strip()]
+
+def history_append(uid, message):
+    p = paths.user_dir(uid) / "history.jsonl"
+    with p.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(message, ensure_ascii=False) + "\n")
+```
+
+Что писать в memory:
+
+- user message (`{"role": "user", "content": text}`)
+- assistant с tool_calls (`{"role": "assistant", "content": "", "tool_calls": [...]}`)
+- tool результаты (`{"role": "tool", "tool_call_id": "...", "name": "...", "content": json_string}`)
+- финальный assistant reply
+
+**Без сохранения tool_calls** следующий ход агента не помнит draft_ts/job_id который вернул предыдущий tool. См. `multi-model-gateway` про orphan-tool-message filter — критично при кросс-провайдерном fallback.
+
+### 10. Whitelist в data/ + admin overrides
+
+Для публичного бота на бете — `data/whitelist.txt` с одним tg_user_id на строку, проверка перед dispatch:
+
+```python
+def is_whitelisted(uid: int) -> bool:
+    if os.environ.get("WHITELIST_ON") != "1":
+        return True
+    wl = paths.whitelist_path()
+    if not wl.exists():
+        return False
+    return str(uid) in {line.strip() for line in wl.read_text().splitlines()}
+```
+
+Админ shell:
+
+```bash
+docker exec mybot bash -c "echo 12345 >> /data/whitelist.txt"
+```
+
+В отказе — ссылка на админа: `🚫 Доступ ограничен. Напиши @admin — добавлю.`
+
 ## Resources
 
 - [python-telegram-bot docs](https://docs.python-telegram-bot.org/)
 - [Telegram Bot API](https://core.telegram.org/bots/api)
+- [Telethon docs](https://docs.telethon.dev/)
 - [Best practices guide](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Code-snippets)

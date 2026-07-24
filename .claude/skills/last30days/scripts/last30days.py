@@ -1,2080 +1,2717 @@
 #!/usr/bin/env python3
-"""
-last30days - Research a topic from the last 30 days on Reddit + X + YouTube + Web.
+# ruff: noqa: E402
+"""last30days CLI."""
 
-Usage:
-    python3 last30days.py <topic> [options]
-
-Options:
-    --mock              Use fixtures instead of real API calls
-    --emit=MODE         Output mode: compact|json|md|context|path (default: compact)
-    --sources=MODE      Source selection: auto|reddit|x|both (default: auto)
-    --quick             Faster research with fewer sources (8-12 each)
-    --deep              Comprehensive research with more sources (50-70 Reddit, 40-60 X)
-    --debug             Enable verbose debug logging
-    --store             Persist findings to SQLite database
-    --diagnose          Show source availability diagnostics and exit
-"""
+from __future__ import annotations
 
 import argparse
 import atexit
+import datetime
+import hashlib
 import json
 import os
+import re
 import signal
+import sqlite3
 import sys
 import threading
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
 from pathlib import Path
 
-# Add lib to path
+MIN_PYTHON = (3, 12)
+
+
+def ensure_supported_python(version_info: tuple[int, int, int] | object | None = None) -> None:
+    if version_info is None:
+        version_info = sys.version_info
+    major, minor, micro = tuple(version_info[:3])
+    if (major, minor) >= MIN_PYTHON:
+        return
+    req = f"{MIN_PYTHON[0]}.{MIN_PYTHON[1]}"
+    sys.stderr.write(
+        f"last30days v3 requires Python {req}+.\n"
+        f"Detected Python {major}.{minor}.{micro}.\n"
+        f"Install with:\n"
+        f"  Mac:     brew install python@{req}\n"
+        f"  Windows: winget install Python.Python.{req}\n"
+        f"  Linux:   sudo apt install python{req}  (or pyenv install {req})\n"
+        f"Then rerun: python{req} <path-to-script> setup\n"
+    )
+    raise SystemExit(1)
+
+
+ensure_supported_python()
+
+if os.name == "nt":
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
+
 SCRIPT_DIR = Path(__file__).parent.resolve()
 sys.path.insert(0, str(SCRIPT_DIR))
 
-# ---------------------------------------------------------------------------
-# Global timeout & child process management
-# ---------------------------------------------------------------------------
-_child_pids: set = set()
+from lib import corpus, dates, env, freshness, html_render, http, permission_preflight, pipeline, registers, render, schema, ui
+
+_child_pids: set[int] = set()
 _child_pids_lock = threading.Lock()
 
-TIMEOUT_PROFILES = {
-    "quick":   {"global": 90,  "future": 30, "reddit_future": 60,  "youtube_future": 60,  "tiktok_future": 90,   "instagram_future": 90,   "hackernews_future": 30,  "bluesky_future": 30,  "truthsocial_future": 30,  "polymarket_future": 15,  "http": 15, "enrich_per": 8,  "enrich_total": 30, "enrich_max_items": 10},
-    "default": {"global": 180, "future": 60, "reddit_future": 90,  "youtube_future": 90,  "tiktok_future": 120,  "instagram_future": 120,  "hackernews_future": 60,  "bluesky_future": 60,  "truthsocial_future": 60,  "polymarket_future": 30,  "http": 30, "enrich_per": 15, "enrich_total": 45, "enrich_max_items": 15},
-    "deep":    {"global": 300, "future": 90, "reddit_future": 120, "youtube_future": 120, "tiktok_future": 150,  "instagram_future": 150,  "hackernews_future": 90,  "bluesky_future": 90,  "truthsocial_future": 90,  "polymarket_future": 45,  "http": 30, "enrich_per": 15, "enrich_total": 60, "enrich_max_items": 25},
-}
 
-# Valid source names for the --search flag
-VALID_SEARCH_SOURCES = {
-    "reddit", "x", "hn", "bluesky", "bsky", "truthsocial", "truth", "youtube", "tiktok", "instagram",
-    "polymarket", "web", "xiaohongshu", "xhs",
-}
-
-
-def parse_search_flag(search_str: str) -> set:
-    """Parse and validate the --search flag value.
-
-    Args:
-        search_str: Comma-separated source names (e.g. "reddit,hn")
-
-    Returns:
-        Set of validated source names
-
-    Raises:
-        SystemExit: If invalid sources are specified
-    """
-    sources = set()
-    for s in search_str.split(","):
-        s = s.strip().lower()
-        if not s:
-            continue
-        if s == "xhs":
-            s = "xiaohongshu"
-        if s not in VALID_SEARCH_SOURCES:
-            print(
-                f"Error: Unknown search source '{s}'. "
-                f"Valid: {', '.join(sorted(VALID_SEARCH_SOURCES))}",
-                file=sys.stderr,
-            )
-            sys.exit(1)
-        sources.add(s)
-    if not sources:
-        print("Error: --search requires at least one source.", file=sys.stderr)
-        sys.exit(1)
-    return sources
-
-
-def register_child_pid(pid: int):
-    """Track a child process for cleanup."""
+def register_child_pid(pid: int) -> None:
     with _child_pids_lock:
         _child_pids.add(pid)
 
 
-def unregister_child_pid(pid: int):
-    """Remove a child process from tracking."""
+def unregister_child_pid(pid: int) -> None:
     with _child_pids_lock:
         _child_pids.discard(pid)
 
 
-def _cleanup_children():
-    """Kill all tracked child processes."""
+def _cleanup_children() -> None:
     with _child_pids_lock:
         pids = list(_child_pids)
     for pid in pids:
         try:
-            os.killpg(os.getpgid(pid), signal.SIGTERM)
+            if hasattr(os, "killpg"):
+                os.killpg(os.getpgid(pid), signal.SIGTERM)
+            else:
+                os.kill(pid, signal.SIGTERM)
         except (ProcessLookupError, PermissionError, OSError):
-            pass
+            continue
 
 
 atexit.register(_cleanup_children)
 
 
-def _install_global_timeout(timeout_seconds: int):
-    """Install a global timeout watchdog.
+def parse_search_flag(raw: str, flag_name: str = "--search") -> list[str]:
+    sources = []
+    for source in raw.split(","):
+        source = source.strip().lower()
+        if not source:
+            continue
+        normalized = pipeline.SEARCH_ALIAS.get(source, source)
+        if normalized not in pipeline.MOCK_AVAILABLE_SOURCES:
+            raise SystemExit(f"Unknown search source in {flag_name}: {source}")
+        if normalized not in sources:
+            sources.append(normalized)
+    if not sources:
+        raise SystemExit(f"{flag_name} requires at least one source.")
+    return sources
 
-    Uses SIGALRM on Unix, threading.Timer as fallback.
+def parse_as_of_date_arg(value: str) -> str:
+    try:
+        parsed = dates.parse_as_of_date(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(str(exc)) from exc
+    return parsed
+
+def resolve_requested_sources(args_search: str | None, config: dict) -> list[str] | None:
+    """Resolve the requested source set: explicit --search wins, then the
+    LAST30DAYS_DEFAULT_SEARCH config key (env var or .env file), then None
+    (per-query default behavior). The config fallback lets users pin a fixed
+    source set that survives upgrades without patching SKILL.md (#442).
     """
-    if hasattr(signal, 'SIGALRM'):
-        def _handler(signum, frame):
-            sys.stderr.write(f"\n[TIMEOUT] Global timeout ({timeout_seconds}s) exceeded. Cleaning up.\n")
-            sys.stderr.flush()
-            _cleanup_children()
-            sys.exit(1)
-        signal.signal(signal.SIGALRM, _handler)
-        signal.alarm(timeout_seconds)
+    if args_search:
+        return parse_search_flag(args_search)
+    default_search = (config.get("LAST30DAYS_DEFAULT_SEARCH") or "").strip()
+    if default_search:
+        return parse_search_flag(default_search, flag_name="LAST30DAYS_DEFAULT_SEARCH")
+    return None
+
+
+def slugify(value: str, max_length: int = 180) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+    if len(slug) > max_length:
+        # Filenames built from long topics can exceed the OS 255-byte limit
+        # (macOS errno 63). Truncate and append a hash of the full value so
+        # distinct long topics still get distinct, deterministic names.
+        digest = hashlib.sha1(slug.encode("utf-8")).hexdigest()[:10]
+        slug = f"{slug[:max_length].rstrip('-')}-{digest}"
+    return slug or "last30days"
+
+
+def _report_has_private_corpus(report: schema.Report) -> bool:
+    items_by_source = getattr(report, "items_by_source", {})
+    if isinstance(items_by_source, dict) and items_by_source.get("corpus"):
+        return True
+    candidates = getattr(report, "ranked_candidates", ())
+    if not isinstance(candidates, (list, tuple)):
+        return False
+    return any(
+        candidate.source == "corpus"
+        or any(item.source == "corpus" for item in candidate.source_items)
+        for candidate in candidates
+    )
+
+
+def _ensure_output_directory(path: Path, *, private: bool) -> None:
+    if not private:
+        path.mkdir(parents=True, exist_ok=True)
+        return
+    missing: list[Path] = []
+    current = path
+    while not current.exists():
+        missing.append(current)
+        current = current.parent
+    path.mkdir(parents=True, exist_ok=True, mode=0o700)
+    for directory in missing:
+        directory.chmod(0o700)
+
+
+def save_output(
+    report: schema.Report,
+    emit: str,
+    save_dir: str,
+    suffix: str = "",
+    synthesis_md: str | None = None,
+    topic_override: str | None = None,
+    rendered_content: str | None = None,
+    json_profile: str = "agent",
+    register: str = "default",
+    private: bool | None = None,
+) -> Path:
+    from datetime import datetime
+    path = Path(save_dir).expanduser().resolve()
+    slug = slugify(topic_override or report.topic)
+    extension = "json" if emit == "json" else "html" if emit == "html" else "md"
+    raw_label = "raw-html" if emit == "html" else "raw"
+    suffix_part = f"-{suffix}" if suffix else ""
+    base = path / f"{slug}-{raw_label}{suffix_part}.{extension}"
+    date_str = datetime.now().strftime('%Y-%m-%d')
+    candidates = [base]
+    candidates.append(path / f"{slug}-{raw_label}{suffix_part}-{date_str}.{extension}")
+    for i in range(1, 100):
+        candidates.append(path / f"{slug}-{raw_label}{suffix_part}-{date_str}-{i}.{extension}")
+    # Markdown saves keep the complete debug artifact. JSON and HTML preserve
+    # their requested wire format so file extensions match their content.
+    if rendered_content is not None:
+        content = rendered_content
+    elif emit in {"json", "html"}:
+        content = emit_output(
+            report,
+            emit,
+            synthesis_md=synthesis_md,
+            json_profile=json_profile,
+            register=register,
+        )
     else:
-        # Windows fallback
-        def _watchdog():
-            sys.stderr.write(f"\n[TIMEOUT] Global timeout ({timeout_seconds}s) exceeded. Cleaning up.\n")
-            sys.stderr.flush()
-            _cleanup_children()
-            os._exit(1)
-        timer = threading.Timer(timeout_seconds, _watchdog)
-        timer.daemon = True
-        timer.start()
-
-from lib import (
-    bird_x,
-    bluesky,
-    truthsocial,
-    dates,
-    dedupe,
-    hackernews,
-    xiaohongshu_api,
-    polymarket,
-    entity_extract,
-    env,
-    http,
-    models,
-    normalize,
-    openai_reddit,
-    reddit,
-    reddit_enrich,
-    render,
-    schema,
-    score,
-    scraper-vendor_x,
-    ui,
-    tiktok,
-    instagram,
-    websearch,
-    xai_x,
-    youtube_yt,
-    query_type as qt,
-)
-
-
-def load_fixture(name: str) -> dict:
-    """Load a fixture file."""
-    fixture_path = SCRIPT_DIR.parent / "fixtures" / name
-    if fixture_path.exists():
-        with open(fixture_path) as f:
-            return json.load(f)
-    return {}
-
-
-def _search_reddit(
-    topic: str,
-    config: dict,
-    selected_models: dict,
-    from_date: str,
-    to_date: str,
-    depth: str,
-    mock: bool,
-) -> tuple:
-    """Search Reddit (runs in thread).
-
-    Uses ScraperVendor when SCRAPER_API_KEY is available (preferred).
-    Falls back to OpenAI Responses API otherwise.
-
-    Returns:
-        Tuple of (reddit_items, raw_response, error, used_scraper-vendor)
-    """
-    raw_response = None
-    reddit_error = None
-    used_scraper-vendor = False
-
-    sc_token = config.get("SCRAPER_API_KEY")
-
-    if mock:
-        raw_response = load_fixture("openai_sample.json")
-    elif sc_token:
-        # === ScraperVendor path (preferred) ===
-        used_scraper-vendor = True
+        content = render.render_full(report)
+    private_corpus = _report_has_private_corpus(report) or bool(private)
+    _ensure_output_directory(path, private=private_corpus)
+    encoded = content.encode("utf-8")
+    for candidate in candidates:
         try:
-            sys.stderr.write("[Reddit] Using Scraping API\n")
-            sys.stderr.flush()
-            result = reddit.search_and_enrich(
-                topic, from_date, to_date,
-                depth=depth, token=sc_token,
+            fd = os.open(
+                candidate,
+                os.O_CREAT | os.O_EXCL | os.O_WRONLY,
+                0o600 if private_corpus else 0o644,
             )
-            reddit_items = result.get("items", [])
-            if result.get("error"):
-                reddit_error = result["error"]
-            return reddit_items, result, reddit_error, used_scraper-vendor
-        except Exception as e:
-            reddit_error = f"ScraperVendor: {type(e).__name__}: {e}"
-            sys.stderr.write(f"[Reddit] ScraperVendor failed: {e}\n")
-            sys.stderr.flush()
-            # Fall through to OpenAI if we have that key
-            if not config.get("OPENAI_API_KEY"):
-                # No OpenAI either: try public Reddit fallback.
-                try:
-                    reddit_items = openai_reddit.search_reddit_public(
-                        topic, from_date, to_date, depth=depth,
+        except FileExistsError:
+            continue
+        with os.fdopen(fd, "wb") as f:
+            f.write(encoded)
+        if candidate.suffix.lower() == ".md":
+            try:
+                from lib import library, library_index
+
+                save_root = candidate.parent.resolve()
+                if save_root == Path(library.DEFAULT_MEMORY_DIR).expanduser().resolve():
+                    library_index.sync_library(save_root)
+                else:
+                    # A scoped save must sync a per-directory index with the
+                    # same paths scoped search uses; syncing the shared DB
+                    # from one scope's scan would prune other scopes' rows.
+                    library_index.sync_library(
+                        save_root,
+                        save_root / "briefings",
+                        db_path=save_root / ".last30days-library.db",
                     )
-                    raw_response = {"source": "reddit_public", "items": reddit_items}
-                    return reddit_items, raw_response, None, False
-                except Exception as e2:
-                    return [], {"error": str(e)}, reddit_error, used_scraper-vendor
-            used_scraper-vendor = False
-            sys.stderr.write("[Reddit] Falling back to OpenAI\n")
-            sys.stderr.flush()
-
-    # === OpenAI path (fallback) ===
-    if not mock:
-        if config.get("OPENAI_API_KEY"):
-            try:
-                raw_response = openai_reddit.search_reddit(
-                    config["OPENAI_API_KEY"],
-                    selected_models["openai"],
-                    topic,
-                    from_date,
-                    to_date,
-                    depth=depth,
-                    auth_source=config.get("OPENAI_AUTH_SOURCE", "api_key"),
-                    account_id=config.get("OPENAI_CHATGPT_ACCOUNT_ID"),
-                )
-            except http.HTTPError as e:
-                raw_response = {"error": str(e)}
-                reddit_error = f"API error: {e}"
-            except Exception as e:
-                raw_response = {"error": str(e)}
-                reddit_error = f"{type(e).__name__}: {e}"
-        else:
-            # No OpenAI auth: direct Reddit public JSON fallback.
-            try:
-                reddit_items = openai_reddit.search_reddit_public(
-                    topic, from_date, to_date, depth=depth,
-                )
-                raw_response = {"source": "reddit_public", "items": reddit_items}
-            except http.HTTPError as e:
-                reddit_items = []
-                raw_response = {"error": str(e), "source": "reddit_public"}
-                reddit_error = f"Reddit public API error: {e}"
-            except Exception as e:
-                reddit_items = []
-                raw_response = {"error": str(e), "source": "reddit_public"}
-                reddit_error = f"Reddit public search error: {type(e).__name__}: {e}"
-
-    # Parse response
-    reddit_items = openai_reddit.parse_reddit_response(raw_response or {})
-
-    # Quick retry with simpler query if few results
-    if len(reddit_items) < 5 and not mock and not reddit_error and config.get("OPENAI_API_KEY"):
-        core = openai_reddit._extract_core_subject(topic)
-        if core.lower() != topic.lower():
-            try:
-                retry_raw = openai_reddit.search_reddit(
-                    config["OPENAI_API_KEY"],
-                    selected_models["openai"],
-                    core,
-                    from_date, to_date,
-                    depth=depth,
-                    auth_source=config.get("OPENAI_AUTH_SOURCE", "api_key"),
-                    account_id=config.get("OPENAI_CHATGPT_ACCOUNT_ID"),
-                )
-                retry_items = openai_reddit.parse_reddit_response(retry_raw)
-                existing_urls = {item.get("url") for item in reddit_items}
-                for item in retry_items:
-                    if item.get("url") not in existing_urls:
-                        reddit_items.append(item)
-            except Exception:
+            except (library_index.LibrarySearchUnavailable, OSError, sqlite3.DatabaseError):
+                # Saving research must not depend on the optional local index;
+                # `library search` reports a clear capability error on demand.
                 pass
-
-    # Subreddit-targeted fallback if still < 3 results
-    if len(reddit_items) < 3 and not mock and not reddit_error and config.get("OPENAI_API_KEY"):
-        sub_query = openai_reddit._build_subreddit_query(topic)
-        try:
-            sub_raw = openai_reddit.search_reddit(
-                config["OPENAI_API_KEY"],
-                selected_models["openai"],
-                sub_query,
-                from_date, to_date,
-                depth=depth,
-            )
-            sub_items = openai_reddit.parse_reddit_response(sub_raw)
-            existing_urls = {item.get("url") for item in reddit_items}
-            for item in sub_items:
-                if item.get("url") not in existing_urls:
-                    reddit_items.append(item)
-        except Exception:
-            pass
-
-    return reddit_items, raw_response, reddit_error, used_scraper-vendor
-
-
-def _search_x(
-    topic: str,
-    config: dict,
-    selected_models: dict,
-    from_date: str,
-    to_date: str,
-    depth: str,
-    mock: bool,
-    x_source: str = "xai",
-) -> tuple:
-    """Search X via Bird CLI or xAI (runs in thread).
-
-    Args:
-        x_source: 'bird' or 'xai' - which backend to use
-
-    Returns:
-        Tuple of (x_items, raw_response, error)
-    """
-    raw_response = None
-    x_error = None
-
-    if mock:
-        raw_response = load_fixture("xai_sample.json")
-        x_items = xai_x.parse_x_response(raw_response or {})
-        return x_items, raw_response, x_error
-
-    # Use Bird if specified
-    if x_source == "bird":
-        try:
-            raw_response = bird_x.search_x(
-                topic,
-                from_date,
-                to_date,
-                depth=depth,
-            )
-        except Exception as e:
-            raw_response = {"error": str(e)}
-            x_error = f"{type(e).__name__}: {e}"
-
-        x_items = bird_x.parse_bird_response(raw_response or {}, query=topic)
-
-        # Check for error in response (Bird returns list on success, dict on error)
-        if raw_response and isinstance(raw_response, dict) and raw_response.get("error") and not x_error:
-            x_error = raw_response["error"]
-
-        return x_items, raw_response, x_error
-
-    # Use ScraperVendor if specified
-    if x_source == "scraper-vendor":
-        try:
-            raw_response = scraper-vendor_x.search_x(
-                topic, from_date, to_date,
-                depth=depth,
-                token=config.get("SCRAPER_API_KEY"),
-            )
-        except Exception as e:
-            raw_response = {"error": str(e)}
-            x_error = f"{type(e).__name__}: {e}"
-
-        x_items = scraper-vendor_x.parse_x_response(raw_response or {})
-
-        if raw_response and isinstance(raw_response, dict) and raw_response.get("error") and not x_error:
-            x_error = raw_response["error"]
-
-        return x_items, raw_response, x_error
-
-    # Use xAI (original behavior)
-    try:
-        raw_response = xai_x.search_x(
-            config["XAI_API_KEY"],
-            selected_models["xai"],
-            topic,
-            from_date,
-            to_date,
-            depth=depth,
-        )
-    except http.HTTPError as e:
-        raw_response = {"error": str(e)}
-        x_error = f"API error: {e}"
-    except Exception as e:
-        raw_response = {"error": str(e)}
-        x_error = f"{type(e).__name__}: {e}"
-
-    x_items = xai_x.parse_x_response(raw_response or {})
-
-    return x_items, raw_response, x_error
-
-
-def _search_youtube(
-    topic: str,
-    from_date: str,
-    to_date: str,
-    depth: str,
-) -> tuple:
-    """Search YouTube via yt-dlp (runs in thread).
-
-    Returns:
-        Tuple of (youtube_items, youtube_error)
-    """
-    youtube_error = None
-
-    try:
-        response = youtube_yt.search_and_transcribe(
-            topic, from_date, to_date, depth=depth,
-        )
-    except Exception as e:
-        return [], f"{type(e).__name__}: {e}"
-
-    youtube_items = youtube_yt.parse_youtube_response(response)
-
-    if response.get("error"):
-        youtube_error = response["error"]
-
-    return youtube_items, youtube_error
-
-
-def _search_tiktok(
-    topic: str,
-    from_date: str,
-    to_date: str,
-    depth: str,
-    token: str,
-) -> tuple:
-    """Search TikTok via ScraperVendor (runs in thread).
-
-    Returns:
-        Tuple of (tiktok_items, tiktok_error)
-    """
-    tiktok_error = None
-
-    try:
-        response = tiktok.search_and_enrich(
-            topic, from_date, to_date, depth=depth, token=token,
-        )
-    except Exception as e:
-        return [], f"{type(e).__name__}: {e}"
-
-    tiktok_items = tiktok.parse_tiktok_response(response)
-
-    if response.get("error"):
-        tiktok_error = response["error"]
-
-    return tiktok_items, tiktok_error
-
-
-def _search_instagram(
-    topic: str,
-    from_date: str,
-    to_date: str,
-    depth: str,
-    token: str,
-) -> tuple:
-    """Search Instagram via ScraperVendor (runs in thread).
-
-    Returns:
-        Tuple of (instagram_items, instagram_error)
-    """
-    instagram_error = None
-
-    try:
-        response = instagram.search_and_enrich(
-            topic, from_date, to_date, depth=depth, token=token,
-        )
-    except Exception as e:
-        return [], f"{type(e).__name__}: {e}"
-
-    instagram_items = instagram.parse_instagram_response(response)
-
-    if response.get("error"):
-        instagram_error = response["error"]
-
-    return instagram_items, instagram_error
-
-
-def _search_hackernews(
-    topic: str,
-    from_date: str,
-    to_date: str,
-    depth: str,
-) -> tuple:
-    """Search Hacker News via Algolia (runs in thread).
-
-    Returns:
-        Tuple of (hn_items, hn_error)
-    """
-    hn_error = None
-
-    try:
-        response = hackernews.search_hackernews(
-            topic, from_date, to_date, depth=depth,
-        )
-    except Exception as e:
-        return [], f"{type(e).__name__}: {e}"
-
-    hn_items = hackernews.parse_hackernews_response(response, query=topic)
-
-    if response.get("error"):
-        hn_error = response["error"]
-
-    return hn_items, hn_error
-
-
-def _search_bluesky(
-    topic: str,
-    from_date: str,
-    to_date: str,
-    depth: str,
-    config: dict = None,
-) -> tuple:
-    """Search Bluesky via AT Protocol (runs in thread).
-
-    Returns:
-        Tuple of (bsky_items, bsky_error)
-    """
-    bsky_error = None
-
-    try:
-        response = bluesky.search_bluesky(
-            topic, from_date, to_date, depth=depth, config=config,
-        )
-    except Exception as e:
-        return [], f"{type(e).__name__}: {e}"
-
-    bsky_items = bluesky.parse_bluesky_response(response)
-
-    if response.get("error"):
-        bsky_error = response["error"]
-
-    return bsky_items, bsky_error
-
-
-def _search_truthsocial(
-    topic: str,
-    from_date: str,
-    to_date: str,
-    depth: str,
-    config: dict = None,
-) -> tuple:
-    """Search Truth Social via Mastodon API (runs in thread).
-
-    Returns:
-        Tuple of (ts_items, ts_error)
-    """
-    ts_error = None
-
-    try:
-        response = truthsocial.search_truthsocial(
-            topic, from_date, to_date, depth=depth, config=config,
-        )
-    except Exception as e:
-        return [], f"{type(e).__name__}: {e}"
-
-    ts_items = truthsocial.parse_truthsocial_response(response)
-
-    if response.get("error"):
-        ts_error = response["error"]
-
-    return ts_items, ts_error
-
-
-def _search_polymarket(
-    topic: str,
-    from_date: str,
-    to_date: str,
-    depth: str,
-) -> tuple:
-    """Search Polymarket via Gamma API (runs in thread).
-
-    Returns:
-        Tuple of (pm_items, pm_error)
-    """
-    pm_error = None
-
-    try:
-        response = polymarket.search_polymarket(
-            topic, from_date, to_date, depth=depth,
-        )
-    except Exception as e:
-        return [], f"{type(e).__name__}: {e}"
-
-    pm_items = polymarket.parse_polymarket_response(response, topic=topic)
-
-    if response.get("error"):
-        pm_error = response["error"]
-
-    return pm_items, pm_error
-
-
-def _search_web(
-    topic: str,
-    config: dict,
-    from_date: str,
-    to_date: str,
-    depth: str,
-) -> tuple:
-    """Search the web via native API backend (runs in thread).
-
-    Uses the best available backend: Parallel AI > Brave > OpenRouter.
-
-    Returns:
-        Tuple of (web_items, web_error)
-        web_items are raw dicts ready for websearch.normalize_websearch_items()
-    """
-    from lib import brave_search, parallel_search, openrouter_search
-
-    backend = env.get_web_search_source(config)
-    if not backend:
-        return [], "No web search API keys configured"
-
-    web_error = None
-    raw_results = []
-
-    try:
-        if backend == "parallel":
-            raw_results = parallel_search.search_web(
-                topic, from_date, to_date, config["PARALLEL_API_KEY"], depth=depth,
-            )
-        elif backend == "brave":
-            use_llm_ctx = os.environ.get("BRAVE_LLM_CONTEXT", "").strip() == "1"
-            raw_results = brave_search.search_web(
-                topic, from_date, to_date, config["BRAVE_API_KEY"],
-                depth=depth, use_llm_context=use_llm_ctx,
-            )
-        elif backend == "openrouter":
-            raw_results = openrouter_search.search_web(
-                topic, from_date, to_date, config["OPENROUTER_API_KEY"], depth=depth,
-            )
-    except Exception as e:
-        return [], f"{type(e).__name__}: {e}"
-
-    # Add IDs and date_confidence for websearch.normalize_websearch_items()
-    for i, item in enumerate(raw_results):
-        item.setdefault("id", f"W{i+1}")
-        if item.get("date") and not item.get("date_confidence"):
-            item["date_confidence"] = "med"
-        elif not item.get("date"):
-            item["date_confidence"] = "low"
-        item.setdefault("why_relevant", "")
-
-    return raw_results, web_error
-
-
-def _search_xiaohongshu(
-    topic: str,
-    config: dict,
-    from_date: str,
-    to_date: str,
-    depth: str,
-) -> tuple:
-    """Search Xiaohongshu via xiaohongshu-mcp HTTP API (runs in thread).
-
-    Returns:
-        Tuple of (xiaohongshu_items, xiaohongshu_error)
-        Items are in web-item dict shape and can be normalized with websearch module.
-    """
-    base_url = env.get_xiaohongshu_api_base(config)
-    try:
-        items = xiaohongshu_api.search_feeds(
-            topic=topic,
-            from_date=from_date,
-            to_date=to_date,
-            base_url=base_url,
-            depth=depth,
-        )
-    except Exception as e:
-        return [], f"{type(e).__name__}: {e}"
-
-    # Ensure all required keys exist for normalize_websearch_items()
-    for i, item in enumerate(items):
-        item.setdefault("id", f"XHS{i+1}")
-        item.setdefault("title", "")
-        item.setdefault("url", "")
-        item.setdefault("source_domain", "xiaohongshu.com")
-        item.setdefault("snippet", "")
-        if item.get("date") and not item.get("date_confidence"):
-            item["date_confidence"] = "med"
-        elif not item.get("date"):
-            item["date_confidence"] = "low"
-        item.setdefault("relevance", 0.5)
-        item.setdefault("why_relevant", "")
-
-    return items, None
-
-
-def _run_supplemental(
-    topic: str,
-    reddit_items: list,
-    x_items: list,
-    from_date: str,
-    to_date: str,
-    depth: str,
-    x_source: str,
-    progress: ui.ProgressDisplay = None,
-    skip_reddit: bool = False,
-    resolved_handle: str = None,
-) -> tuple:
-    """Run Phase 2 supplemental searches based on entities from Phase 1.
-
-    Extracts handles/subreddits from initial results, then runs targeted
-    searches to find additional content the broad search missed.
-
-    Args:
-        topic: Original search topic
-        reddit_items: Phase 1 Reddit items (raw dicts)
-        x_items: Phase 1 X items (raw dicts)
-        from_date: Start date
-        to_date: End date
-        depth: Research depth
-        x_source: 'bird' or 'xai'
-        progress: Optional progress display
-        skip_reddit: If True, skip Reddit supplemental (e.g. rate-limited)
-        resolved_handle: X handle resolved by the agent (without @), searched unfiltered
-
-    Returns:
-        Tuple of (supplemental_reddit, supplemental_x)
-    """
-    # Depth-dependent caps
-    if depth == "default":
-        max_handles = 3
-        max_subs = 3
-        count_per = 3
-    else:  # deep
-        max_handles = 5
-        max_subs = 5
-        count_per = 5
-
-    # Extract entities from Phase 1 results
-    entities = entity_extract.extract_entities(
-        reddit_items, x_items,
-        max_handles=max_handles,
-        max_subreddits=max_subs,
+        return candidate
+    # Fallback: all 101 candidates existed (extremely unlikely).
+    raise RuntimeError(
+        f"save_output: could not find a unique filename after 101 attempts in {path}"
     )
 
-    has_handles = entities["x_handles"] and x_source == "bird"
-    has_subs = entities["reddit_subreddits"] and not skip_reddit
 
-    # Always run unfiltered search for resolved handle (even if entity-extracted).
-    # Entity-extracted handles get topic-filtered queries (from:handle topic),
-    # but resolved handles need UNFILTERED search (from:handle) to find posts
-    # that don't mention the topic string (e.g. Dor Brothers' viral tweet about
-    # Logan Paul doesn't contain "dor brothers" in the text).
-    has_resolved = bool(resolved_handle) and x_source == "bird"
-
-    if not has_handles and not has_subs and not has_resolved:
-        return [], []
-
-    parts = []
-    if has_resolved:
-        parts.append(f"@{resolved_handle} (resolved)")
-    if has_handles:
-        parts.append(f"@{', @'.join(entities['x_handles'][:3])}")
-    if has_subs:
-        parts.append(f"r/{', r/'.join(entities['reddit_subreddits'][:3])}")
-    sys.stderr.write(f"[Phase 2] Drilling into {' + '.join(parts)}\n")
-    sys.stderr.flush()
-
-    supplemental_reddit = []
-    supplemental_x = []
-
-    # Collect existing URLs to avoid adding duplicates before dedupe
-    existing_urls = set()
-    for item in reddit_items:
-        existing_urls.add(item.get("url", ""))
-    for item in x_items:
-        existing_urls.add(item.get("url", ""))
-
-    # Run supplemental searches in parallel
-    reddit_future = None
-    x_future = None
-    resolved_future = None
-
-    max_workers = sum([bool(has_subs), bool(has_handles), bool(has_resolved)])
-    with ThreadPoolExecutor(max_workers=max(max_workers, 1)) as executor:
-        if has_subs:
-            reddit_future = executor.submit(
-                openai_reddit.search_subreddits,
-                entities["reddit_subreddits"],
-                topic,
-                from_date,
-                to_date,
-                count_per,
-            )
-
-        if has_handles:
-            x_future = executor.submit(
-                bird_x.search_handles,
-                entities["x_handles"],
-                topic,
-                from_date,
-                count_per,
-            )
-
-        if has_resolved:
-            # Resolved handle: search unfiltered (topic=None) to get all recent posts
-            resolved_future = executor.submit(
-                bird_x.search_handles,
-                [resolved_handle],
-                None,  # No topic filter - get all recent activity
-                from_date,
-                10,  # More results for the topic entity
-            )
-
-        if reddit_future:
-            try:
-                raw_reddit = reddit_future.result(timeout=30)
-                # Filter out URLs already found in Phase 1
-                supplemental_reddit = [
-                    item for item in raw_reddit
-                    if item.get("url", "") not in existing_urls
-                ]
-            except TimeoutError:
-                sys.stderr.write("[Phase 2] Supplemental Reddit timed out (30s)\n")
-            except Exception as e:
-                sys.stderr.write(f"[Phase 2] Supplemental Reddit error: {e}\n")
-
-        if x_future:
-            try:
-                raw_x = x_future.result(timeout=30)
-                supplemental_x = [
-                    item for item in raw_x
-                    if item.get("url", "") not in existing_urls
-                ]
-            except TimeoutError:
-                sys.stderr.write("[Phase 2] Supplemental X timed out (30s)\n")
-            except Exception as e:
-                sys.stderr.write(f"[Phase 2] Supplemental X error: {e}\n")
-
-        if resolved_future:
-            try:
-                raw_resolved = resolved_future.result(timeout=30)
-                # Lower relevance for unfiltered handle posts (no topic keyword signal)
-                for item in raw_resolved:
-                    item["relevance"] = 0.5
-                resolved_new = [
-                    item for item in raw_resolved
-                    if item.get("url", "") not in existing_urls
-                ]
-                supplemental_x.extend(resolved_new)
-                if resolved_new:
-                    sys.stderr.write(f"[Phase 2] +{len(resolved_new)} from @{resolved_handle}\n")
-            except TimeoutError:
-                sys.stderr.write(f"[Phase 2] Resolved handle @{resolved_handle} timed out (30s)\n")
-            except Exception as e:
-                sys.stderr.write(f"[Phase 2] Resolved handle error: {e}\n")
-
-    if supplemental_reddit or supplemental_x:
-        sys.stderr.write(
-            f"[Phase 2] +{len(supplemental_reddit)} Reddit, +{len(supplemental_x)} X\n"
-        )
-        sys.stderr.flush()
-
-    return supplemental_reddit, supplemental_x
+def save_rendered_output(
+    rendered_content: str,
+    output_file: str,
+    *,
+    private: bool = False,
+) -> Path:
+    out_path = Path(output_file).expanduser().resolve()
+    _ensure_output_directory(out_path.parent, private=private)
+    if private and out_path.exists():
+        out_path.chmod(0o600)
+    fd = os.open(
+        out_path,
+        os.O_CREAT | os.O_TRUNC | os.O_WRONLY,
+        0o600 if private else 0o644,
+    )
+    with os.fdopen(fd, "w", encoding="utf-8") as handle:
+        handle.write(rendered_content)
+    if private:
+        out_path.chmod(0o600)
+    return out_path
 
 
-def run_research(
-    topic: str,
-    sources: str,
-    config: dict,
-    selected_models: dict,
-    from_date: str,
-    to_date: str,
-    depth: str = "default",
-    mock: bool = False,
-    progress: ui.ProgressDisplay = None,
-    x_source: str = "xai",
-    run_youtube: bool = False,
-    run_tiktok: bool = False,
-    run_instagram: bool = False,
-    run_xiaohongshu: bool = False,
-    timeouts: dict = None,
-    resolved_handle: str = None,
-    do_hackernews: bool = True,
-    do_bluesky: bool = True,
-    do_truthsocial: bool = True,
-    do_polymarket: bool = True,
-    no_native_web: bool = False,
-) -> tuple:
-    """Run the research pipeline.
+def _publish_metadata_path(html_path: Path) -> Path:
+    return html_path.with_name(f"{html_path.name}.publish.json")
 
-    Returns:
-        Tuple of (reddit_items, x_items, youtube_items, tiktok_items, instagram_items,
-                  hackernews_items, bluesky_items, truthsocial_items, polymarket_items, web_items, web_needed,
-                  raw_openai, raw_xai, raw_reddit_enriched,
-                  reddit_error, x_error, youtube_error, tiktok_error, instagram_error,
-                  hackernews_error, bluesky_error, truthsocial_error, polymarket_error, web_error)
 
-    Note: web_needed is True when web search should be performed by the assistant
-    (i.e., no native web search API keys are configured). When native web search
-    runs, web_items will be populated and web_needed will be False.
-    """
-    if timeouts is None:
-        timeouts = TIMEOUT_PROFILES[depth]
-    future_timeout = timeouts["future"]
+def _write_publish_metadata(html_path: Path, publish_result: dict[str, object]) -> None:
+    payload = {
+        "url": publish_result.get("url"),
+        "site_id": publish_result.get("site_id"),
+        "status": publish_result.get("status"),
+        "published_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    }
+    _publish_metadata_path(html_path).write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
-    reddit_items = []
-    x_items = []
-    youtube_items = []
-    tiktok_items = []
-    instagram_items = []
-    hackernews_items = []
-    bluesky_items = []
-    truthsocial_items = []
-    polymarket_items = []
-    web_items = []
-    raw_openai = None
-    raw_xai = None
-    raw_reddit_enriched = []
-    reddit_error = None
-    x_error = None
-    youtube_error = None
-    tiktok_error = None
-    instagram_error = None
-    hackernews_error = None
-    bluesky_error = None
-    truthsocial_error = None
-    polymarket_error = None
-    web_error = None
-    xiaohongshu_error = None
 
-    # Determine web search mode
-    do_web = sources in ("all", "web", "reddit-web", "x-web")
-    web_backend = env.get_web_search_source(config) if (do_web and not no_native_web) else None
-    web_needed = do_web and not web_backend
+def publish_rendered_html(
+    rendered: str,
+    *,
+    password: str | None = None,
+    companion_paths: list[Path] | None = None,
+) -> dict[str, object]:
+    from lib import html_publish
 
-    # Web-only mode
-    if sources == "web":
-        if web_backend:
-            # Native web search available — run it
-            sys.stderr.write(f"[web] Searching via {web_backend}\n")
-            sys.stderr.flush()
-            try:
-                web_items, web_error = _search_web(topic, config, from_date, to_date, depth)
-                if web_error and progress:
-                    progress.show_error(f"Web error: {web_error}")
-            except Exception as e:
-                web_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"Web error: {e}")
-            sys.stderr.write(f"[web] {len(web_items)} results\n")
-            sys.stderr.flush()
-        else:
-            # No native backend — assistant handles WebSearch
-            if progress:
-                progress.start_web_only()
-                progress.end_web_only()
-        # Optional Xiaohongshu search in web-only mode.
-        if run_xiaohongshu:
-            try:
-                xhs_items, xiaohongshu_error = _search_xiaohongshu(
-                    topic, config, from_date, to_date, depth,
-                )
-                web_items.extend(xhs_items)
-                if xiaohongshu_error and progress:
-                    progress.show_error(f"Xiaohongshu error: {xiaohongshu_error}")
-            except Exception as e:
-                xiaohongshu_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"Xiaohongshu error: {e}")
-        # Still run YouTube/TikTok/Instagram in web-only mode if available
-        if run_youtube:
-            if progress:
-                progress.start_youtube()
-            try:
-                youtube_items, youtube_error = _search_youtube(topic, from_date, to_date, depth)
-                if youtube_error and progress:
-                    progress.show_error(f"YouTube error: {youtube_error}")
-            except Exception as e:
-                youtube_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"YouTube error: {e}")
-            if progress:
-                progress.end_youtube(len(youtube_items))
-        if run_tiktok:
-            if progress:
-                progress.start_tiktok()
-            try:
-                tiktok_items, tiktok_error = _search_tiktok(topic, from_date, to_date, depth, env.get_tiktok_token(config))
-                if tiktok_error and progress:
-                    progress.show_error(f"TikTok error: {tiktok_error}")
-            except Exception as e:
-                tiktok_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"TikTok error: {e}")
-            if progress:
-                progress.end_tiktok(len(tiktok_items))
-        if run_instagram:
-            if progress:
-                progress.start_instagram()
-            try:
-                ig_timeout = timeouts.get("instagram_future", future_timeout)
-                instagram_items, instagram_error = _search_instagram(topic, from_date, to_date, depth, env.get_instagram_token(config))
-                if instagram_error and progress:
-                    progress.show_error(f"Instagram error: {instagram_error}")
-            except Exception as e:
-                instagram_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"Instagram error: {e}")
-            if progress:
-                progress.end_instagram(len(instagram_items))
-        return reddit_items, x_items, youtube_items, tiktok_items, instagram_items, hackernews_items, bluesky_items, truthsocial_items, polymarket_items, web_items, web_needed, raw_openai, raw_xai, raw_reddit_enriched, reddit_error, x_error, youtube_error, tiktok_error, instagram_error, hackernews_error, bluesky_error, truthsocial_error, polymarket_error, web_error
+    result = html_publish.publish_html(rendered, password=password)
+    metadata_errors: list[str] = []
+    for path in companion_paths or []:
+        try:
+            _write_publish_metadata(path, result)
+        except OSError as exc:
+            metadata_errors.append(f"{path}: {exc}")
+    if metadata_errors:
+        result = dict(result)
+        result["_metadata_errors"] = metadata_errors
+    return result
 
-    # Determine which searches to run
-    do_reddit = sources in ("both", "reddit", "all", "reddit-web")
-    do_x = sources in ("both", "x", "all", "x-web")
-    # do_hackernews / do_polymarket are always True by default, but can be
-    # restricted via the --search flag to run a focused source subset.
 
-    # Run Reddit, X, YouTube, HN, Polymarket, and Web searches in parallel
-    reddit_future = None
-    x_future = None
-    youtube_future = None
-    tiktok_future = None
-    instagram_future = None
-    xiaohongshu_future = None
-    hackernews_future = None
-    bluesky_future = None
-    truthsocial_future = None
-    polymarket_future = None
-    web_future = None
-    max_workers = (
-        2
-        + (1 if run_youtube else 0)
-        + (1 if run_tiktok else 0)
-        + (1 if run_instagram else 0)
-        + (1 if run_xiaohongshu else 0)
-        + (1 if do_hackernews else 0)
-        + (1 if do_bluesky else 0)
-        + (1 if do_truthsocial else 0)
-        + (1 if do_polymarket else 0)
-        + (1 if web_backend else 0)
+def _publish_password_for_args(
+    args: argparse.Namespace,
+    config: dict[str, object] | None = None,
+) -> str | None:
+    return (
+        args.publish_password
+        or env.read_secret_env("LAST30DAYS_PUBLISH_PASSWORD")
+        or (config or {}).get("LAST30DAYS_PUBLISH_PASSWORD")
+        or None
     )
 
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        # Submit searches
-        if do_reddit:
-            if progress:
-                progress.start_reddit()
-            reddit_future = executor.submit(
-                _search_reddit, topic, config, selected_models,
-                from_date, to_date, depth, mock
-            )
 
-        if do_x:
-            if progress:
-                progress.start_x()
-            x_future = executor.submit(
-                _search_x, topic, config, selected_models,
-                from_date, to_date, depth, mock, x_source
-            )
+def emit_output(
+    report: schema.Report,
+    emit: str,
+    fun_level: str = "medium",
+    save_path: str | None = None,
+    synthesis_md: str | None = None,
+    json_profile: str = "agent",
+    register: str = "default",
+) -> str:
+    if emit == "json":
+        payload = (
+            schema.to_dict(report)
+            if json_profile == "raw"
+            else schema.to_agent_export(report)
+        )
+        return json.dumps(payload, indent=2, sort_keys=True)
+    if emit == "html":
+        return html_render.render_html(
+            report,
+            fun_level=fun_level,
+            save_path=save_path,
+            synthesis_md=synthesis_md,
+            register=register,
+        )
+    if emit in {"compact", "md"}:
+        return render.render_compact(
+            report,
+            fun_level=fun_level,
+            save_path=save_path,
+            register=register,
+        )
+    if emit == "context":
+        return render.render_context(report)
+    if emit == "brief":
+        return render.render_brief(report)
+    raise SystemExit(f"Unsupported emit mode: {emit}")
 
-        if run_youtube:
-            if progress:
-                progress.start_youtube()
-            youtube_future = executor.submit(
-                _search_youtube, topic, from_date, to_date, depth
-            )
 
-        if run_tiktok:
-            if progress:
-                progress.start_tiktok()
-            tiktok_future = executor.submit(
-                _search_tiktok, topic, from_date, to_date, depth,
-                env.get_tiktok_token(config),
-            )
-
-        if run_instagram:
-            if progress:
-                progress.start_instagram()
-            instagram_future = executor.submit(
-                _search_instagram, topic, from_date, to_date, depth,
-                env.get_instagram_token(config),
-            )
-
-        if run_xiaohongshu:
-            xiaohongshu_future = executor.submit(
-                _search_xiaohongshu, topic, config, from_date, to_date, depth,
-            )
-
-        if do_hackernews:
-            if progress:
-                progress.start_hackernews()
-            hackernews_future = executor.submit(
-                _search_hackernews, topic, from_date, to_date, depth
-            )
-
-        if do_bluesky:
-            bluesky_future = executor.submit(
-                _search_bluesky, topic, from_date, to_date, depth, config
-            )
-
-        if do_truthsocial:
-            truthsocial_future = executor.submit(
-                _search_truthsocial, topic, from_date, to_date, depth, config
-            )
-
-        if do_polymarket:
-            if progress:
-                progress.start_polymarket()
-            polymarket_future = executor.submit(
-                _search_polymarket, topic, from_date, to_date, depth
-            )
-
-        if web_backend:
-            sys.stderr.write(f"[web] Searching via {web_backend}\n")
-            sys.stderr.flush()
-            web_future = executor.submit(
-                _search_web, topic, config, from_date, to_date, depth
-            )
-
-        # Collect results (with timeouts to prevent indefinite blocking)
-        reddit_used_sc = False  # Track if ScraperVendor was used for Reddit
-        if reddit_future:
-            reddit_timeout = timeouts.get("reddit_future", future_timeout)
-            try:
-                reddit_items, raw_openai, reddit_error, reddit_used_sc = reddit_future.result(timeout=reddit_timeout)
-                if reddit_error and progress:
-                    progress.show_error(f"Reddit error: {reddit_error}")
-            except TimeoutError:
-                reddit_error = f"Reddit search timed out after {reddit_timeout}s"
-                if progress:
-                    progress.show_error(reddit_error)
-            except Exception as e:
-                reddit_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"Reddit error: {e}")
-            if progress:
-                progress.end_reddit(len(reddit_items))
-
-        if x_future:
-            try:
-                x_items, raw_xai, x_error = x_future.result(timeout=future_timeout)
-                if x_error and progress:
-                    progress.show_error(f"X error: {x_error}")
-            except TimeoutError:
-                x_error = f"X search timed out after {future_timeout}s"
-                if progress:
-                    progress.show_error(x_error)
-            except Exception as e:
-                x_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"X error: {e}")
-            if progress:
-                progress.end_x(len(x_items))
-
-        if youtube_future:
-            yt_timeout = timeouts.get("youtube_future", future_timeout)
-            try:
-                youtube_items, youtube_error = youtube_future.result(timeout=yt_timeout)
-                if youtube_error and progress:
-                    progress.show_error(f"YouTube error: {youtube_error}")
-            except TimeoutError:
-                youtube_error = f"YouTube search timed out after {yt_timeout}s"
-                if progress:
-                    progress.show_error(youtube_error)
-            except Exception as e:
-                youtube_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"YouTube error: {e}")
-            if progress:
-                progress.end_youtube(len(youtube_items))
-
-        if tiktok_future:
-            tk_timeout = timeouts.get("tiktok_future", future_timeout)
-            try:
-                tiktok_items, tiktok_error = tiktok_future.result(timeout=tk_timeout)
-                if tiktok_error and progress:
-                    progress.show_error(f"TikTok error: {tiktok_error}")
-            except TimeoutError:
-                tiktok_error = f"TikTok search timed out after {tk_timeout}s"
-                if progress:
-                    progress.show_error(tiktok_error)
-            except Exception as e:
-                tiktok_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"TikTok error: {e}")
-            if progress:
-                progress.end_tiktok(len(tiktok_items))
-
-        if instagram_future:
-            ig_timeout = timeouts.get("instagram_future", future_timeout)
-            try:
-                instagram_items, instagram_error = instagram_future.result(timeout=ig_timeout)
-                if instagram_error and progress:
-                    progress.show_error(f"Instagram error: {instagram_error}")
-            except TimeoutError:
-                instagram_error = f"Instagram search timed out after {ig_timeout}s"
-                if progress:
-                    progress.show_error(instagram_error)
-            except Exception as e:
-                instagram_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"Instagram error: {e}")
-            if progress:
-                progress.end_instagram(len(instagram_items))
-
-        if xiaohongshu_future:
-            try:
-                xhs_items, xiaohongshu_error = xiaohongshu_future.result(timeout=future_timeout)
-                web_items.extend(xhs_items)
-                if xiaohongshu_error and progress:
-                    progress.show_error(f"Xiaohongshu error: {xiaohongshu_error}")
-            except TimeoutError:
-                xiaohongshu_error = f"Xiaohongshu search timed out after {future_timeout}s"
-                if progress:
-                    progress.show_error(xiaohongshu_error)
-            except Exception as e:
-                xiaohongshu_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"Xiaohongshu error: {e}")
-
-        if hackernews_future:
-            hn_timeout = timeouts.get("hackernews_future", future_timeout)
-            try:
-                hackernews_items, hackernews_error = hackernews_future.result(timeout=hn_timeout)
-                if hackernews_error and progress:
-                    progress.show_error(f"HN error: {hackernews_error}")
-            except TimeoutError:
-                hackernews_error = f"HN search timed out after {hn_timeout}s"
-                if progress:
-                    progress.show_error(hackernews_error)
-            except Exception as e:
-                hackernews_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"HN error: {e}")
-            if progress:
-                progress.end_hackernews(len(hackernews_items))
-
-        if bluesky_future:
-            bsky_timeout = timeouts.get("bluesky_future", future_timeout)
-            try:
-                bluesky_items, bluesky_error = bluesky_future.result(timeout=bsky_timeout)
-                if bluesky_error and progress:
-                    progress.show_error(f"Bluesky error: {bluesky_error}")
-            except TimeoutError:
-                bluesky_error = f"Bluesky search timed out after {bsky_timeout}s"
-                if progress:
-                    progress.show_error(bluesky_error)
-            except Exception as e:
-                bluesky_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"Bluesky error: {e}")
-
-        if truthsocial_future:
-            ts_timeout = timeouts.get("truthsocial_future", future_timeout)
-            try:
-                truthsocial_items, truthsocial_error = truthsocial_future.result(timeout=ts_timeout)
-                if truthsocial_error and progress:
-                    progress.show_error(f"Truth Social error: {truthsocial_error}")
-            except TimeoutError:
-                truthsocial_error = f"Truth Social search timed out after {ts_timeout}s"
-                if progress:
-                    progress.show_error(truthsocial_error)
-            except Exception as e:
-                truthsocial_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"Truth Social error: {e}")
-
-        if polymarket_future:
-            pm_timeout = timeouts.get("polymarket_future", future_timeout)
-            try:
-                polymarket_items, polymarket_error = polymarket_future.result(timeout=pm_timeout)
-                if polymarket_error and progress:
-                    progress.show_error(f"Polymarket error: {polymarket_error}")
-            except TimeoutError:
-                polymarket_error = f"Polymarket search timed out after {pm_timeout}s"
-                if progress:
-                    progress.show_error(polymarket_error)
-            except Exception as e:
-                polymarket_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"Polymarket error: {e}")
-            if progress:
-                progress.end_polymarket(len(polymarket_items))
-
-        if web_future:
-            try:
-                web_items, web_error = web_future.result(timeout=future_timeout)
-                if web_error and progress:
-                    progress.show_error(f"Web error: {web_error}")
-            except TimeoutError:
-                web_error = f"Web search timed out after {future_timeout}s"
-                if progress:
-                    progress.show_error(web_error)
-            except Exception as e:
-                web_error = f"{type(e).__name__}: {e}"
-                if progress:
-                    progress.show_error(f"Web error: {e}")
-            sys.stderr.write(f"[web] {len(web_items)} results\n")
-            sys.stderr.flush()
-
-    # Enrich Reddit items with real data (parallel, capped)
-    # Skip enrichment if ScraperVendor already provided comments + engagement
-    enrich_max = timeouts["enrich_max_items"]
-    enrich_total_timeout = timeouts["enrich_total"]
-    items_to_enrich = reddit_items[:enrich_max]
-    rate_limited = False  # Set True if Reddit returns 429 during enrichment
-
-    if reddit_used_sc and items_to_enrich:
-        # ScraperVendor already enriched items with comments — just copy to raw list
-        sys.stderr.write(f"[Reddit] Skipping old enrichment — ScraperVendor already provided comments\n")
-        sys.stderr.flush()
-        raw_reddit_enriched = list(reddit_items[:enrich_max])
-        items_to_enrich = []  # Skip the enrichment block below
-
-    if items_to_enrich:
-        if progress:
-            progress.start_reddit_enrich(1, len(items_to_enrich))
-
-        if mock:
-            # Sequential mock enrichment (fast, no need for parallelism)
-            for i, item in enumerate(items_to_enrich):
-                if progress and i > 0:
-                    progress.update_reddit_enrich(i + 1, len(items_to_enrich))
-                try:
-                    mock_thread = load_fixture("reddit_thread_sample.json")
-                    reddit_items[i] = reddit_enrich.enrich_reddit_item(item, mock_thread)
-                except Exception as e:
-                    if progress:
-                        progress.show_error(f"Enrich failed for {item.get('url', 'unknown')}: {e}")
-                raw_reddit_enriched.append(reddit_items[i])
-        else:
-            # Parallel enrichment with bounded concurrency and total timeout
-            # Uses short HTTP timeout (10s) and 1 retry to fail fast on 429
-            completed_count = 0
-            rate_limited = False
-            with ThreadPoolExecutor(max_workers=5) as enrich_pool:
-                futures = {
-                    enrich_pool.submit(reddit_enrich.enrich_reddit_item, item): i
-                    for i, item in enumerate(items_to_enrich)
+def emit_comparison_output(
+    entity_reports: list[tuple[str, schema.Report]],
+    emit: str,
+    fun_level: str = "medium",
+    save_path: str | None = None,
+    synthesis_md: str | None = None,
+    json_profile: str = "agent",
+) -> str:
+    if emit == "json":
+        payload = {
+            "comparison": True,
+            "entities": [label for label, _ in entity_reports],
+            "reports": [
+                {
+                    "entity": label,
+                    "report": (
+                        schema.to_dict(report)
+                        if json_profile == "raw"
+                        else schema.to_agent_export(report)
+                    ),
                 }
-                try:
-                    for future in as_completed(futures, timeout=enrich_total_timeout):
-                        idx = futures[future]
-                        completed_count += 1
-                        if progress:
-                            progress.update_reddit_enrich(completed_count, len(items_to_enrich))
-                        try:
-                            reddit_items[idx] = future.result(timeout=timeouts["enrich_per"])
-                        except reddit_enrich.RedditRateLimitError:
-                            rate_limited = True
-                            if progress:
-                                progress.show_error(
-                                    "Reddit rate-limited (429) — skipping remaining enrichment"
-                                )
-                            # Cancel remaining futures and bail
-                            for f in futures:
-                                f.cancel()
-                            break
-                        except Exception as e:
-                            if progress:
-                                progress.show_error(
-                                    f"Enrich failed for {items_to_enrich[idx].get('url', 'unknown')}: {e}"
-                                )
-                        raw_reddit_enriched.append(reddit_items[idx])
-                except TimeoutError:
-                    if progress:
-                        progress.show_error(
-                            f"Enrichment timed out after {enrich_total_timeout}s "
-                            f"({completed_count}/{len(items_to_enrich)} done)"
-                        )
-                    # Keep unenriched items as-is
-                    for idx in futures.values():
-                        if reddit_items[idx] not in raw_reddit_enriched:
-                            raw_reddit_enriched.append(reddit_items[idx])
-
-        if progress:
-            progress.end_reddit_enrich()
-
-    # Enrich HN stories with comments
-    if hackernews_items:
-        try:
-            hackernews_items = hackernews.enrich_top_stories(hackernews_items, depth=depth)
-        except Exception as e:
-            sys.stderr.write(f"[HN] Enrichment error: {e}\n")
-            sys.stderr.flush()
-
-    # Phase 2: Supplemental search based on entities from Phase 1
-    # Skip on --quick (speed matters), mock mode, or if Reddit is rate-limiting
-    # Also skip Reddit supplemental when ScraperVendor was used (subreddit drilling already done)
-    if depth != "quick" and not mock and (reddit_items or x_items):
-        sup_reddit, sup_x = _run_supplemental(
-            topic, reddit_items, x_items,
-            from_date, to_date, depth, x_source, progress,
-            skip_reddit=(rate_limited or reddit_used_sc),
-            resolved_handle=resolved_handle,
+                for label, report in entity_reports
+            ],
+        }
+        if json_profile == "agent":
+            payload["schema_version"] = schema.AGENT_EXPORT_SCHEMA_VERSION
+        return json.dumps(payload, indent=2, sort_keys=True)
+    if emit == "html":
+        return html_render.render_html_comparison(
+            entity_reports,
+            fun_level=fun_level,
+            save_path=save_path,
+            synthesis_md=synthesis_md,
         )
-        if sup_reddit:
-            reddit_items.extend(sup_reddit)
-        if sup_x:
-            x_items.extend(sup_x)
+    if emit in {"compact", "md"}:
+        return render.render_comparison_multi(
+            entity_reports, fun_level=fun_level, save_path=save_path,
+        )
+    if emit == "context":
+        return render.render_comparison_multi_context(entity_reports)
+    raise SystemExit(f"Unsupported emit mode: {emit}")
 
-    return reddit_items, x_items, youtube_items, tiktok_items, instagram_items, hackernews_items, bluesky_items, truthsocial_items, polymarket_items, web_items, web_needed, raw_openai, raw_xai, raw_reddit_enriched, reddit_error, x_error, youtube_error, tiktok_error, instagram_error, hackernews_error, bluesky_error, truthsocial_error, polymarket_error, web_error
+
+def comparison_topic(entity_reports: list[tuple[str, schema.Report]]) -> str:
+    return " vs ".join(label for label, _ in entity_reports)
 
 
-def main():
-    # Fix Unicode output on Windows (cp1252 can't encode emoji)
-    if sys.platform == "win32":
-        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+def compute_save_path_display(save_dir: str, topic: str, suffix: str, emit: str) -> str:
+    """Compute the user-friendly save path string that will be shown in the footer.
 
+    Uses ~ when the saved file is under the user's home directory; otherwise
+    returns the absolute path.
+    """
+    from pathlib import Path as _Path
+    path = _Path(save_dir).expanduser().resolve()
+    slug = slugify(topic)
+    extension = "json" if emit == "json" else "html" if emit == "html" else "md"
+    raw_label = "raw-html" if emit == "html" else "raw"
+    suffix_part = f"-{suffix}" if suffix else ""
+    raw = path / f"{slug}-{raw_label}{suffix_part}.{extension}"
+    try:
+        home = _Path.home().resolve()
+        relative = raw.relative_to(home)
+        return f"~/{relative.as_posix()}"
+    except ValueError:
+        return raw.as_posix()
+
+
+def compute_output_path_display(output_file: str) -> str:
+    """Compute the user-friendly explicit output path shown in render footers."""
+    raw = Path(output_file).expanduser().resolve()
+    try:
+        home = Path.home().resolve()
+        relative = raw.relative_to(home)
+        return f"~/{relative.as_posix()}"
+    except ValueError:
+        return raw.as_posix()
+
+
+def read_synthesis_file(path: str) -> str:
+    try:
+        return Path(path).expanduser().read_text(encoding="utf-8")
+    except OSError as exc:
+        sys.stderr.write(f"[last30days] Cannot read --synthesis-file: {exc}\n")
+        raise SystemExit(2)
+
+
+def _scoped_store_db(args: argparse.Namespace) -> Path | None:
+    """Scoped runs write findings inside the save dir, matching scoped reads."""
+    save_dir = getattr(args, "save_dir", None)
+    if save_dir:
+        return Path(save_dir).expanduser().resolve() / "research.db"
+    return None
+
+
+def persist_report(report: schema.Report, store_db: Path | None = None) -> dict[str, int]:
+    import store
+
+    private_corpus = _report_has_private_corpus(report)
+    with store.scoped_db(store_db):
+        if private_corpus:
+            store.ensure_private_db_files()
+        store.init_db()
+        if private_corpus:
+            store.ensure_private_db_files()
+        topic_row = store.add_topic(report.topic)
+        topic_id = topic_row["id"]
+        source_mode = ",".join(sorted(report.items_by_source)) or "v3"
+        run_id = store.record_run(topic_id, source_mode=source_mode, status="running")
+        try:
+            findings = store.findings_from_report(report)
+            if private_corpus:
+                store.ensure_private_db_files()
+            counts = store.store_findings(run_id, topic_id, findings)
+            store.update_run(
+                run_id,
+                status="completed",
+                findings_new=counts["new"],
+                findings_updated=counts["updated"],
+            )
+            return counts
+        except Exception as exc:
+            store.update_run(run_id, status="failed", error_message=str(exc)[:500])
+            raise
+        finally:
+            if private_corpus:
+                store.ensure_private_db_files()
+
+
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Research a topic from the last N days on Reddit + X"
+        description="Research a topic across live social, market, and grounded web sources.",
+        allow_abbrev=False,
     )
-    parser.add_argument("topic", nargs="*", help="Topic to research")
-    parser.add_argument("--mock", action="store_true", help="Use fixtures")
+    parser.add_argument("topic", nargs="*", help="Research topic")
+    parser.add_argument("--emit", default="compact", choices=["compact", "json", "context", "md", "html", "brief"])
     parser.add_argument(
-        "--emit",
-        choices=["compact", "json", "md", "context", "path"],
-        default="compact",
-        help="Output mode",
-    )
-    parser.add_argument(
-        "--sources",
-        choices=["auto", "reddit", "x", "both"],
-        default="auto",
-        help="Source selection",
-    )
-    parser.add_argument(
-        "--quick",
-        action="store_true",
-        help="Faster research with fewer sources (8-12 each)",
-    )
-    parser.add_argument(
-        "--deep",
-        action="store_true",
-        help="Comprehensive research with more sources (50-70 Reddit, 40-60 X)",
-    )
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        help="Enable verbose debug logging",
-    )
-    parser.add_argument(
-        "--include-web",
-        action="store_true",
-        help="Include general web search alongside Reddit/X (lower weighted)",
-    )
-    parser.add_argument(
-        "--days",
-        type=int,
-        default=30,
-        choices=range(1, 31),
-        metavar="N",
-        help="Number of days to look back (1-30, default: 30)",
-    )
-    parser.add_argument(
-        "--store",
-        action="store_true",
-        help="Persist findings to SQLite database (~/.local/share/last30days/research.db)",
-    )
-    parser.add_argument(
-        "--diagnose",
-        action="store_true",
-        help="Show source availability diagnostics and exit",
-    )
-    parser.add_argument(
-        "--timeout",
-        type=int,
+        "--register",
+        choices=registers.REGISTER_NAMES,
         default=None,
-        metavar="SECS",
-        help="Global timeout in seconds (default: 180, quick: 90, deep: 300)",
+        help="Audience synthesis preset for the standard brief (default, exec, dev, creator, eli5)",
     )
     parser.add_argument(
-        "--x-handle",
-        type=str,
+        "--json-profile",
+        default="agent",
+        choices=["agent", "raw"],
+        help="JSON export profile for --emit=json (default: agent)",
+    )
+    parser.add_argument("--search", help="Comma-separated source list")
+    parser.add_argument("--quick", action="store_true", help="Lower-latency retrieval profile")
+    parser.add_argument("--deep", action="store_true", help="Higher-recall retrieval profile")
+    freshness_group = parser.add_mutually_exclusive_group()
+    freshness_group.add_argument(
+        "--verify-freshness",
+        action="store_true",
         default=None,
-        metavar="HANDLE",
-        help="Resolved X handle for topic entity (without @). Searched unfiltered in Phase 2.",
+        help="Re-check source-grounded claims after research, or verify the cached report when no topic is supplied",
+    )
+    freshness_group.add_argument(
+        "--no-verify-freshness",
+        dest="verify_freshness",
+        action="store_false",
+        help="Disable freshness verification configured by LAST30DAYS_VERIFY_FRESHNESS",
     )
     parser.add_argument(
-        "--search",
-        type=str,
+        "--drill",
+        metavar="TARGET",
+        help="Deep follow-up on a cluster from the fresh last-report.json cache",
+    )
+    parser.add_argument(
+        "--discover",
+        metavar="DOMAIN",
+        nargs="?",
+        const="",
         default=None,
-        metavar="SOURCES",
         help=(
-            "Comma-separated list of sources to run. "
-            f"Valid: {', '.join(sorted(VALID_SEARCH_SOURCES))}. "
-            "Example: --search reddit,hn  (default: all configured sources)"
+            "Sweep river listings and rank the topics accelerating in a domain; "
+            "each survivor gets a full research pass. Bare --discover (no domain) "
+            "runs global trending across every feed's hot list"
         ),
     )
     parser.add_argument(
-        "--no-native-web",
+        "--discover-shallow",
         action="store_true",
-        default=False,
-        help="Skip native web search backends (Parallel/Brave/OpenRouter). Use when the assistant has its own WebSearch tool.",
+        help=(
+            "Skip the per-topic research pass during --discover: rank on listing "
+            "evidence only (faster, thinner; the confidence floor still applies)"
+        ),
+    )
+    parser.add_argument("--debug", action="store_true", help="Enable HTTP debug logging")
+    parser.add_argument("--mock", action="store_true", help="Use mock retrieval fixtures")
+    parser.add_argument(
+        "--record-fixtures",
+        metavar="DIR",
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument("--diagnose", action="store_true", help="Print provider and source availability")
+    parser.add_argument("--preflight", action="store_true",
+                        help="Print a safe human-readable permission preflight")
+    parser.add_argument("--welcome", action="store_true",
+                        help="Print the first-run welcome text (engine-owned; relay verbatim)")
+    parser.add_argument("--preflight-report-on-save-dir", help=argparse.SUPPRESS)
+    parser.add_argument("--no-browser-cookies", action="store_true",
+                        help="Disable browser-cookie extraction even when FROM_BROWSER is configured")
+    parser.add_argument("--save-dir", help="Optional directory for saving the rendered output")
+    parser.add_argument(
+        "--corpus",
+        action="append",
+        default=[],
+        metavar="DIR",
+        help="Add a local .md/.txt/.pdf directory as a private ranked source (repeatable)",
     )
     parser.add_argument(
-        "--save-dir",
-        type=str,
+        "--corpus-all-time",
+        action="store_true",
+        help="Include matching corpus files older than the research window",
+    )
+    parser.add_argument("--output", help="Optional exact file path for saving the rendered output")
+    parser.add_argument("--synthesis-file", help="Markdown synthesis to embed in --emit=html output")
+    parser.add_argument("--publish-html", action="store_true",
+                        help="Publish --emit=html output to ht-ml.app (explicit opt-in; public by default)")
+    parser.add_argument("--publish", action="store_true",
+                        help="With 'library feed', publish the HTML index and briefs (explicit opt-in; public by default); feed.xml remains local")
+    parser.add_argument("--publish-password",
+                        help="Optional shared password for --publish-html or 'library feed --publish'; prefer LAST30DAYS_PUBLISH_PASSWORD to avoid exposing secrets in process lists")
+    parser.add_argument("--store", action="store_true", help="Persist ranked findings to the SQLite research store")
+    parser.add_argument("--x-handle", help="X handle for targeted supplemental search")
+    parser.add_argument("--x-related", help="Comma-separated related X handles (searched with lower weight)")
+    parser.add_argument("--web-backend", default="auto",
+                        choices=["auto", "brave", "exa", "serper", "parallel", "none"],
+                        help="Web search backend (default: auto, tries Brave then Exa then Serper then Parallel)")
+    parser.add_argument("--deep-research", action="store_true",
+                        help="Use Perplexity Deep Research (~$0.90/query) for in-depth analysis. Requires PERPLEXITY_API_KEY or OPENROUTER_API_KEY.")
+    parser.add_argument("--hiring-signals", action="store_true",
+                        help="Analyze public jobs/careers postings as evidence-backed company focus signals.")
+    parser.add_argument("--plan", help="JSON query plan (skips internal LLM planner). Can be a JSON string or a file path.")
+    parser.add_argument("--save-suffix", help="Suffix for saved output filename (e.g., 'gemini' → kanye-west-raw-gemini.md)")
+    parser.add_argument("--subreddits", help="Comma-separated broad/category subreddit names to search (e.g., SaaS,Entrepreneur)")
+    parser.add_argument("--dedicated-subreddits", help="Comma-separated entity-home subreddit names (e.g., Kanye,WestSubEver). Pulled in full (top+hot+new) and exempt from the relevance floor since the whole sub is the topic.")
+    parser.add_argument("--tiktok-hashtags", help="Comma-separated TikTok hashtags without # (e.g., tella,screenrecording)")
+    parser.add_argument("--tiktok-creators", help="Comma-separated TikTok creator handles (e.g., TellaHQ,taborplace)")
+    parser.add_argument("--ig-creators", help="Comma-separated Instagram creator handles (e.g., tella.tv,laborstories)")
+    parser.add_argument(
+        "--days",
+        "--lookback-days",
+        dest="lookback_days",
+        type=int,
         default=None,
-        metavar="DIR",
-        help="Auto-save raw research output to DIR/{topic-slug}.md",
+        help="Number of days to look back for research (default: 30, watchlist uses 90)",
+    )
+    parser.add_argument(
+        "--as-of",
+        dest="as_of_date",
+        type=parse_as_of_date_arg,
+        help=(
+            "End date for the lookback window in YYYY-MM-DD format. "
+            "When set, --days looks back from this date instead of today."
+            ),
+    )
+    parser.add_argument("--max-results", dest="max_results", type=int,
+                        help="Override the final ranked-pool cap (pool_limit/rerank_limit) from the depth profile. "
+                             "Use for high-volume topics where the default (deep=60) under-covers. See issue #716.")
+    parser.add_argument("--max-per-source", dest="max_per_source", type=int,
+                        help="Override the per-stream cap (per_stream_limit) applied to each (source, subquery) before "
+                             "pooling. Raising it increases unique-item yield when one source has many relevant items. "
+                             "See issue #716.")
+    parser.add_argument("--max-source-fetches", dest="max_source_fetches", type=int,
+                        help="Override the per-source fetch cap (MAX_SOURCE_FETCHES, default x=2) that limits how many "
+                             "subqueries actually fetch a capped source. Raise it so every X subquery in a multi-angle "
+                             "--plan runs instead of just the first two. See issue #716.")
+    parser.add_argument("--auto-resolve", action="store_true",
+                        help="Use web search to discover subreddits/handles before planning (for platforms without WebSearch)")
+    parser.add_argument("--github-user", help="GitHub username for person-mode search (e.g., steipete)")
+    parser.add_argument("--github-repo", help="Comma-separated owner/repo for project-mode search (e.g., your-gateway-project/your-gateway-project,paperclipai/paperclip)")
+    parser.add_argument("--trustpilot-domain", help="Trustpilot review-page domain for the topic (e.g., www.thriftbooks.com). Used verbatim and bypasses the brand-shape gate; find it with `trustpilot-pp-cli search '<name>'`.")
+    parser.add_argument(
+        "--competitors",
+        nargs="?",
+        const=2,
+        type=int,
+        default=None,
+        metavar="N",
+        help="Auto-discover N competitor entities and fan out last30days across all of them as a comparison (default N=2 → 3-way: original + 2 peers; range 1..6). Use --competitors-list to override discovery.",
+    )
+    parser.add_argument(
+        "--competitors-list",
+        dest="competitors_list",
+        help="Comma-separated competitor entities to skip discovery (e.g., 'Anthropic,xAI,Google Gemini'). Implies --competitors.",
+    )
+    parser.add_argument(
+        "--polymarket-keywords",
+        dest="polymarket_keywords",
+        help=(
+            "Comma-separated keywords that Polymarket market titles must match "
+            "to be included. Use for ambiguous single-token topics like 'Warriors' "
+            "(nba,gsw,golden-state) to filter out Glasgow Warriors rugby, Honor "
+            "of Kings Rogue Warriors, etc. When omitted, Polymarket returns all "
+            "matching markets — so expect cross-entity noise on generic topics."
+        ),
+    )
+    parser.add_argument(
+        "--competitors-plan",
+        dest="competitors_plan",
+        help=(
+            "JSON mapping of per-entity Step 0.55 targeting for competitor / vs-mode "
+            "sub-runs. Schema: {entity_name: {x_handle?, x_related?, subreddits?, "
+            "github_user?, github_repos?, context?}}. Accepts inline JSON or a file "
+            "path. Implies --competitors. Preferred over --competitors-list when the "
+            "hosting model has already resolved per-entity handles and subs."
+        ),
+    )
+    return parser
+
+
+def parse_competitors_plan(raw: str | None) -> dict[str, dict]:
+    """Parse a --competitors-plan argument into a {entity_name_lower: plan_entry} dict.
+
+    Accepts inline JSON or a file path (matches --plan). Returns {} on None/empty.
+    Validation: top-level must be a dict; each value must be a dict. Unknown fields
+    in entry values log a warning but do not abort. Invalid JSON or non-dict shape
+    raises SystemExit(2) with a clear stderr message.
+    """
+    if not raw:
+        return {}
+    plan_str = raw
+    if os.path.isfile(plan_str):
+        try:
+            with open(plan_str, encoding="utf-8") as f:
+                plan_str = f.read()
+        except (OSError, UnicodeDecodeError) as exc:
+            sys.stderr.write(f"[CompetitorsPlan] Cannot read plan file: {exc}\n")
+            raise SystemExit(2)
+    try:
+        parsed = json.loads(plan_str)
+    except json.JSONDecodeError as exc:
+        sys.stderr.write(f"[CompetitorsPlan] Invalid JSON: {exc}\n")
+        raise SystemExit(2)
+    if not isinstance(parsed, dict):
+        sys.stderr.write(
+            f"[CompetitorsPlan] Top-level must be a dict of "
+            f"{{entity: {{targeting}}}}, got {type(parsed).__name__}\n"
+        )
+        raise SystemExit(2)
+    known_fields = {
+        "x_handle", "x_related", "subreddits",
+        "github_user", "github_repos", "trustpilot_domain", "context",
+    }
+    normalized: dict[str, dict] = {}
+    for entity, entry in parsed.items():
+        if not isinstance(entry, dict):
+            sys.stderr.write(
+                f"[CompetitorsPlan] Entry for {entity!r} must be a dict, "
+                f"got {type(entry).__name__}; skipping.\n"
+            )
+            continue
+        unknown = set(entry.keys()) - known_fields
+        if unknown:
+            sys.stderr.write(
+                f"[CompetitorsPlan] Unknown fields in {entity!r}: "
+                f"{sorted(unknown)}; ignoring.\n"
+            )
+        normalized[entity.strip().lower()] = {
+            k: v for k, v in entry.items() if k in known_fields
+        }
+    return normalized
+
+
+def subrun_kwargs_for(
+    entity: str,
+    plan_entry: dict,
+    *,
+    resolved: dict,
+) -> dict:
+    """Build an explicit per-entity kwargs dict for pipeline.run().
+
+    Plan values win over auto_resolve values. Returns keys for all per-entity
+    targeting flags so callers never fall through to closure defaults.
+
+    This helper is the single source of truth for sub-run kwargs — main-topic
+    flags can only leak if a caller bypasses it.
+    """
+    def _choose(plan_key: str, resolved_key: str | None = None):
+        if plan_key in plan_entry and plan_entry[plan_key]:
+            return plan_entry[plan_key]
+        if resolved_key is not None and resolved.get(resolved_key):
+            return resolved[resolved_key]
+        return None
+
+    x_handle = _choose("x_handle", "x_handle")
+    if isinstance(x_handle, str):
+        x_handle = x_handle.lstrip("@") or None
+
+    subreddits = _choose("subreddits", "subreddits")
+    if isinstance(subreddits, list):
+        subreddits = [s.strip().removeprefix("r/") for s in subreddits if s.strip()] or None
+
+    x_related = plan_entry.get("x_related")
+    if isinstance(x_related, list):
+        x_related = [h.strip().lstrip("@") for h in x_related if h.strip()] or None
+    else:
+        x_related = None
+
+    github_user = _choose("github_user", "github_user")
+    if isinstance(github_user, str):
+        github_user = github_user.lstrip("@").lower() or None
+
+    github_repos = _choose("github_repos", "github_repos")
+    if isinstance(github_repos, list):
+        github_repos = [r.strip() for r in github_repos if r.strip() and "/" in r.strip()] or None
+
+    trustpilot_domain = _choose("trustpilot_domain", "trustpilot_domain")
+    if isinstance(trustpilot_domain, str):
+        trustpilot_domain = trustpilot_domain.strip() or None
+    # Provenance: a plan-supplied domain is user-set (verbatim-final); one that
+    # only came from auto_resolve is a hint that retries via search on a miss.
+    trustpilot_domain_is_hint = bool(
+        trustpilot_domain and not plan_entry.get("trustpilot_domain")
     )
 
-    args = parser.parse_args()
-    args.topic = " ".join(args.topic) if args.topic else None
+    context = plan_entry.get("context") or resolved.get("context") or ""
 
-    # Enable debug logging if requested
+    return {
+        "x_handle": x_handle,
+        "x_related": x_related,
+        "subreddits": subreddits,
+        "github_user": github_user,
+        "github_repos": github_repos,
+        "trustpilot_domain": trustpilot_domain,
+        "_trustpilot_domain_is_hint": trustpilot_domain_is_hint,
+        "_context": context,
+    }
+
+
+COMPETITORS_MIN = 1
+COMPETITORS_MAX = 6
+COMPETITORS_DEFAULT = 2
+
+
+def resolve_competitors_args(args: argparse.Namespace) -> tuple[bool, int, list[str]]:
+    """Normalize --competitors / --competitors-list into (enabled, count, explicit_list).
+
+    - (False, 0, []) when neither flag is set.
+    - An explicit list always wins; count is derived from list length.
+    - A numeric count outside [1, 6] is clamped with a stderr warning.
+    - count <= 0 (explicit) raises SystemExit(2).
+    """
+    explicit_list: list[str] = []
+    list_flag_provided = args.competitors_list is not None
+    if list_flag_provided:
+        explicit_list = [
+            entity.strip()
+            for entity in args.competitors_list.split(",")
+            if entity.strip()
+        ]
+        if not explicit_list:
+            sys.stderr.write("[Competitors] --competitors-list is empty.\n")
+            raise SystemExit(2)
+
+    competitors_flag = args.competitors
+    list_present = bool(explicit_list)
+    flag_present = competitors_flag is not None
+
+    if not list_present and not flag_present:
+        return False, 0, []
+
+    if list_present:
+        count = len(explicit_list)
+        if flag_present and competitors_flag != count:
+            sys.stderr.write(
+                f"[Competitors] --competitors={competitors_flag} ignored; using "
+                f"{count} entries from --competitors-list.\n"
+            )
+        if count > COMPETITORS_MAX:
+            sys.stderr.write(
+                f"[Competitors] --competitors-list has {count} entries, clamping to {COMPETITORS_MAX}.\n"
+            )
+            explicit_list = explicit_list[:COMPETITORS_MAX]
+            count = COMPETITORS_MAX
+        return True, count, explicit_list
+
+    # flag_present, no explicit list
+    count = competitors_flag
+    if count < COMPETITORS_MIN:
+        sys.stderr.write(
+            f"[Competitors] --competitors must be >= {COMPETITORS_MIN} (got {count}).\n"
+        )
+        raise SystemExit(2)
+    if count > COMPETITORS_MAX:
+        sys.stderr.write(
+            f"[Competitors] --competitors={count} exceeds max {COMPETITORS_MAX}; clamping.\n"
+        )
+        count = COMPETITORS_MAX
+    return True, count, []
+
+
+def _missing_sources_for_promo(diag: dict[str, object]) -> str | None:
+    available = set(diag.get("available_sources") or [])
+    missing = []
+    if "reddit" not in available:
+        missing.append("reddit")
+    if "x" not in available:
+        missing.append("x")
+    # The web promo nudges toward a paid backend for higher-quality web search.
+    # Grounding is now available keyless on non-native hosts, so key the promo on
+    # the absence of a *paid* backend, not on grounding availability. Suppress it
+    # entirely on native-search hosts, where the model's own search is better and
+    # setting a paid engine key would be the wrong advice.
+    if not diag.get("native_web_backend") and not diag.get("native_search"):
+        missing.append("web")
+    if not missing:
+        return None
+    if "reddit" in missing and "x" in missing:
+        return "both"
+    return missing[0]
+
+
+def _show_runtime_ui(
+    report: schema.Report,
+    progress: ui.ProgressDisplay,
+    diag: dict[str, object],
+    suppress_web_promo: bool = False,
+) -> None:
+    counts = {source: len(items) for source, items in report.items_by_source.items()}
+    display_sources = list(
+        dict.fromkeys(
+            [
+                *report.query_plan.source_weights.keys(),
+                *report.items_by_source.keys(),
+                *report.errors_by_source.keys(),
+            ]
+        )
+    )
+    progress.end_processing()
+    progress.show_complete(
+        source_counts=counts,
+        display_sources=display_sources,
+    )
+    promo = _missing_sources_for_promo(diag)
+    # The `web` promo nudges users to set BRAVE_API_KEY / SERPER_API_KEY, which
+    # is wrong advice when a hosting reasoning model (Claude Code, Codex,
+    # Hermes, Gemini) is driving — those already have WebSearch and can
+    # pre-resolve Step 0.55 themselves. Suppress the web promo when a hosting
+    # model signal is present (--plan or --competitors-plan was passed).
+    if promo:
+        if suppress_web_promo and promo == "web":
+            return
+        if suppress_web_promo and promo == "both":
+            # "both" means reddit + web both missing; still nudge reddit but
+            # skip the web line. show_promo has a per-source variant.
+            progress.show_promo("reddit", diag=diag)
+            return
+        progress.show_promo(promo, diag=diag)
+
+
+REPORT_CACHE_VERSION = "last30days-report-cache/v1"
+DEFAULT_REPORT_CACHE_TTL_SECONDS = 3600
+
+
+def _last_report_cache_path() -> Path | None:
+    if env.CONFIG_DIR is None:
+        return None
+    return env.CONFIG_DIR / "last-report.json"
+
+
+def _report_cache_ttl_seconds(config: dict[str, object]) -> int:
+    raw = os.environ.get("LAST30DAYS_REPORT_CACHE_TTL_SECONDS")
+    if raw is None:
+        raw = config.get("LAST30DAYS_REPORT_CACHE_TTL_SECONDS")
+    if raw is None or raw == "":
+        return DEFAULT_REPORT_CACHE_TTL_SECONDS
+    try:
+        return max(0, int(raw))
+    except (TypeError, ValueError):
+        return DEFAULT_REPORT_CACHE_TTL_SECONDS
+
+
+def _is_report_cache_fresh(timestamp: object, ttl_seconds: int) -> bool:
+    return env.is_timestamp_fresh(timestamp, ttl_seconds)
+
+
+def _write_last_run(
+    topic: str,
+    report: "schema.Report",
+    entity_reports: list[tuple[str, schema.Report]] | None = None,
+) -> bool:
+    try:
+        if env.CONFIG_DIR is None:
+            return False
+        target = env.CONFIG_DIR
+        cached_reports = entity_reports or [(report.topic, report)]
+        has_private_corpus = any(
+            cached_report.items_by_source.get("corpus")
+            for _, cached_report in cached_reports
+        )
+        _ensure_output_directory(target, private=has_private_corpus)
+        counts = {source: len(items) for source, items in report.items_by_source.items()}
+        payload = {
+            "topic": topic,
+            "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "sources": counts,
+            "total": sum(counts.values()),
+            "report_cache": str(target / "last-report.json"),
+            "comparison": bool(entity_reports),
+        }
+        (target / "last-run.json").write_text(json.dumps(payload, indent=2))
+        cache_payload = {
+            "schema": REPORT_CACHE_VERSION,
+            "topic": topic,
+            "timestamp": payload["timestamp"],
+            "comparison": bool(entity_reports),
+            "reports": [
+                {"entity": label, "report": schema.to_dict(cached_report)}
+                for label, cached_report in cached_reports
+            ],
+        }
+        report_cache_path = target / "last-report.json"
+        report_cache_path.write_text(json.dumps(cache_payload, indent=2))
+        if has_private_corpus:
+            report_cache_path.chmod(0o600)
+        return True
+    except Exception as exc:
+        # Never fatal, but never silent either (#787's lesson): callers that
+        # promise cache state (drill chaining) branch on the return value.
+        sys.stderr.write(f"[last30days] warning: could not write run cache: {exc}\n")
+        return False
+
+
+def _load_last_report_cache(
+    topic: str | None,
+    ttl_seconds: int = DEFAULT_REPORT_CACHE_TTL_SECONDS,
+) -> tuple[schema.Report, list[tuple[str, schema.Report]] | None, Path] | None:
+    cache_path = _last_report_cache_path()
+    if cache_path is None or not cache_path.exists():
+        return None
+    try:
+        payload = json.loads(cache_path.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            raise TypeError("report cache payload must be a JSON object")
+        if payload.get("schema") != REPORT_CACHE_VERSION:
+            return None
+        if not _is_report_cache_fresh(payload.get("timestamp"), ttl_seconds):
+            return None
+        cached_topic = str(payload.get("topic") or "").strip().lower()
+        if topic is not None and cached_topic != topic.strip().lower():
+            return None
+        reports_payload = payload.get("reports") or []
+        if not reports_payload:
+            return None
+        entity_reports = [
+            (str(item.get("entity") or ""), schema.report_from_dict(item["report"]))
+            for item in reports_payload
+            if isinstance(item, dict) and isinstance(item.get("report"), dict)
+        ]
+        if not entity_reports:
+            return None
+        if payload.get("comparison"):
+            if len(entity_reports) < 2:
+                return None
+            if len(entity_reports) != len(reports_payload):
+                return None
+            return entity_reports[0][1], entity_reports, cache_path
+        return entity_reports[0][1], None, cache_path
+    except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+        sys.stderr.write(
+            f"[last30days] Could not read report cache {cache_path}: "
+            f"{type(exc).__name__}: {exc}\n"
+        )
+        return None
+
+
+def _config_truthy(value: object) -> bool:
+    return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _freshness_enabled(args: argparse.Namespace, config: dict[str, object]) -> bool:
+    if args.verify_freshness is not None:
+        return bool(args.verify_freshness)
+    return _config_truthy(config.get("LAST30DAYS_VERIFY_FRESHNESS"))
+
+
+def _update_cached_freshness(
+    cache_path: Path,
+    report: schema.Report,
+    entity_reports: list[tuple[str, schema.Report]] | None,
+) -> bool:
+    """Rewrite cached report bodies without extending the research-cache TTL."""
+    try:
+        payload = json.loads(cache_path.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict) or payload.get("schema") != REPORT_CACHE_VERSION:
+            return False
+        existing = payload.get("reports") or []
+        if entity_reports:
+            cached_reports = entity_reports
+        else:
+            label = (
+                str(existing[0].get("entity") or report.topic)
+                if existing and isinstance(existing[0], dict)
+                else report.topic
+            )
+            cached_reports = [(label, report)]
+        payload["reports"] = [
+            {"entity": label, "report": schema.to_dict(cached_report)}
+            for label, cached_report in cached_reports
+        ]
+        cache_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        return True
+    except (OSError, json.JSONDecodeError, TypeError, ValueError) as exc:
+        sys.stderr.write(
+            f"[last30days] warning: could not update freshness cache: {exc}\n"
+        )
+        return False
+
+
+def _verify_report_set(
+    report: schema.Report,
+    entity_reports: list[tuple[str, schema.Report]] | None,
+    *,
+    allow_network: bool,
+) -> None:
+    reports = [item for _, item in entity_reports] if entity_reports else [report]
+    for current_report in reports:
+        freshness.verify_report(current_report, allow_network=allow_network)
+    if not any(current_report.freshness_verdicts for current_report in reports):
+        # An empty verdict list is a legitimate outcome, but a silent one has
+        # already misled operators once; say why there is nothing to show.
+        sys.stderr.write(
+            "[last30days] Freshness verification found no re-checkable claims"
+            " in this report; the verdict list is empty.\n"
+        )
+
+
+def _run_cached_freshness(
+    args: argparse.Namespace,
+    config: dict[str, object],
+) -> int:
+    cached = _load_last_report_cache(
+        None,
+        ttl_seconds=_report_cache_ttl_seconds(config),
+    )
+    if cached is None:
+        sys.stderr.write("[last30days] No fresh cached report; run a research pass first.\n")
+        return 2
+    report, entity_reports, cache_path = cached
+    _verify_report_set(report, entity_reports, allow_network=not args.mock)
+    if _update_cached_freshness(cache_path, report, entity_reports):
+        sys.stderr.write(f"[last30days] Updated freshness verdicts in {cache_path}\n")
+    else:
+        sys.stderr.write("[last30days] warning: freshness cache update failed\n")
+    return _render_save_and_print(args, report, entity_reports, None, config)
+
+
+def _drill_config(config: dict[str, object], sources: list[str]) -> dict[str, object]:
+    """Enable configured comment enrichments for a deep follow-up."""
+    drill_config = dict(config)
+    include = {
+        value.strip().lower()
+        for value in str(config.get("INCLUDE_SOURCES") or "").split(",")
+        if value.strip()
+    }
+    comment_flags = {
+        "youtube": "youtube_comments",
+        "tiktok": "tiktok_comments",
+        "instagram": "instagram_comments",
+    }
+    include.update(comment_flags[source] for source in sources if source in comment_flags)
+    if include:
+        drill_config["INCLUDE_SOURCES"] = ",".join(sorted(include))
+    drill_config["_drill_mode"] = True
+    return drill_config
+
+
+def _run_drill(
+    args: argparse.Namespace,
+    config: dict[str, object],
+) -> int:
+    from lib import planner
+
+    cached = _load_last_report_cache(
+        None,
+        ttl_seconds=_report_cache_ttl_seconds(config),
+    )
+    if cached is None:
+        sys.stderr.write(
+            "[last30days] No fresh cached report; run a research pass first.\n"
+        )
+        return 2
+    report, entity_reports, cache_path = cached
+    if entity_reports:
+        sys.stderr.write(
+            "[last30days] Drill mode needs a single-topic cached report; "
+            "run a research pass for one entity first.\n"
+        )
+        return 2
+
+    lookback_days = args.lookback_days
+    if lookback_days is None:
+        range_from = datetime.date.fromisoformat(report.range_from)
+        range_to = datetime.date.fromisoformat(report.range_to)
+        lookback_days = (range_to - range_from).days
+    as_of_date = args.as_of_date or report.range_to
+
+    try:
+        matched_clusters = planner.resolve_drill_clusters(report, args.drill)
+        drill_plan = planner.build_drill_plan(
+            report,
+            args.drill,
+            clusters=matched_clusters,
+        )
+    except planner.DrillTargetError as exc:
+        sys.stderr.write(f"[last30days] {exc}\n")
+        return 2
+
+    sources = list(drill_plan.source_weights)
+    drill_config = _drill_config(config, sources)
+    diag = pipeline.diagnose(drill_config, sources, safe=False)
+    progress = ui.ProgressDisplay(
+        f"{report.topic} — drill: {args.drill}",
+        show_banner=True,
+    )
+    progress.start_processing()
+    resolved = report.artifacts.get("resolved") or {}
+    try:
+        drill_report = pipeline.run(
+            # Keep source gating anchored to the cached entity (for example,
+            # StockTwits needs the original cashtag/finance context). The
+            # external drill plan below remains cluster-focused.
+            topic=report.topic,
+            config=drill_config,
+            depth="deep",
+            requested_sources=sources,
+            mock=args.mock,
+            x_handle=(
+                (args.x_handle or resolved.get("x_handle") or None)
+                if "x" in sources else None
+            ),
+            x_related=(
+                [value.strip() for value in args.x_related.split(",") if value.strip()]
+                if (args.x_related and "x" in sources) else None
+            ),
+            web_backend=args.web_backend,
+            external_plan=schema.to_dict(drill_plan),
+            subreddits=(
+                ([value.strip().removeprefix("r/") for value in args.subreddits.split(",") if value.strip()]
+                 if args.subreddits else list(resolved.get("subreddits") or []) or None)
+                if "reddit" in sources else None
+            ),
+            tiktok_hashtags=(
+                [value.strip().lstrip("#") for value in args.tiktok_hashtags.split(",") if value.strip()]
+                if args.tiktok_hashtags else None
+            ),
+            tiktok_creators=(
+                [value.strip().lstrip("@") for value in args.tiktok_creators.split(",") if value.strip()]
+                if args.tiktok_creators else None
+            ),
+            ig_creators=(
+                [value.strip().lstrip("@") for value in args.ig_creators.split(",") if value.strip()]
+                if args.ig_creators else None
+            ),
+            lookback_days=lookback_days,
+            as_of_date=as_of_date,
+            github_user=(
+                (args.github_user or resolved.get("github_user") or None)
+                if "github" in sources else None
+            ),
+            github_repos=(
+                ([value.strip() for value in args.github_repo.split(",") if value.strip()]
+                 if args.github_repo else list(resolved.get("github_repos") or []) or None)
+                if "github" in sources else None
+            ),
+            trustpilot_domain=(
+                (args.trustpilot_domain or resolved.get("trustpilot_domain") or None)
+                if "trustpilot" in sources else None
+            ),
+            internal_subrun=True,
+            corpus_dirs=args.corpus,
+            corpus_all_time=args.corpus_all_time,
+        )
+    except Exception:
+        progress.end_processing()
+        raise
+
+    _show_runtime_ui(drill_report, progress, diag, suppress_web_promo=True)
+    merged = pipeline.merge_drill_report(
+        report,
+        drill_report,
+        matched_clusters,
+        target=args.drill,
+    )
+    if _freshness_enabled(args, config):
+        _verify_report_set(merged, None, allow_network=not args.mock)
+    else:
+        merged.freshness_verdicts = []
+    if _write_last_run(report.topic, merged):
+        sys.stderr.write(f"[last30days] Updated drill cache in {cache_path}\n")
+    else:
+        sys.stderr.write(
+            "[last30days] warning: drill cache update failed; the next drill "
+            "will see the pre-drill report\n"
+        )
+
+    store_default = str(
+        os.environ.get("LAST30DAYS_STORE")
+        or config.get("LAST30DAYS_STORE")
+        or ""
+    ).lower()
+    if args.store or store_default in {"1", "true", "yes"}:
+        counts = persist_report(merged, store_db=_scoped_store_db(args))
+        sys.stderr.write(
+            f"[last30days] Stored {counts['new']} new, "
+            f"{counts['updated']} updated findings\n"
+        )
+
+    synthesis_md = None
+    if args.synthesis_file:
+        if args.emit == "html":
+            synthesis_md = read_synthesis_file(args.synthesis_file)
+        else:
+            sys.stderr.write(
+                "[last30days] Warning: --synthesis-file is only used with "
+                "--emit=html; ignoring.\n"
+            )
+    return _render_save_and_print(args, merged, None, synthesis_md, config)
+
+
+def _save_discovery_output(
+    rendered: str,
+    *,
+    domain: str,
+    emit: str,
+    save_dir: str,
+    suffix: str = "",
+) -> Path:
+    directory = Path(save_dir).expanduser().resolve()
+    directory.mkdir(parents=True, exist_ok=True)
+    extension = "json" if emit == "json" else "md"
+    suffix_part = f"-{suffix}" if suffix else ""
+    stem = f"{slugify(domain)}-discover-raw{suffix_part}"
+    date_str = datetime.datetime.now().strftime("%Y-%m-%d")
+    candidates = [directory / f"{stem}.{extension}", directory / f"{stem}-{date_str}.{extension}"]
+    candidates.extend(directory / f"{stem}-{date_str}-{index}.{extension}" for index in range(1, 100))
+    encoded = rendered.encode("utf-8")
+    for candidate in candidates:
+        try:
+            fd = os.open(candidate, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)
+        except FileExistsError:
+            continue
+        with os.fdopen(fd, "wb") as output:
+            output.write(encoded)
+        return candidate
+    raise RuntimeError("Could not find a unique discovery output filename")
+
+
+def _run_discover(args: argparse.Namespace, config: dict[str, object]) -> int:
+    domain = " ".join(str(args.discover or "").split())
+    # Empty domain = global trending: sweep every river feed's hot list with no
+    # keyword gate. The confidence floor is what keeps junk out, not a keyword.
+    if args.as_of_date:
+        sys.stderr.write(
+            "[last30days] --as-of cannot be used with --discover because discovery "
+            "sweeps current live listings.\n"
+        )
+        return 2
+    if args.emit == "html" or args.publish_html:
+        sys.stderr.write("[last30days] discovery mode does not support HTML publishing yet.\n")
+        return 2
+    if args.store:
+        sys.stderr.write("[last30days] Warning: --store is not used by discovery mode.\n")
+    if args.synthesis_file:
+        sys.stderr.write("[last30days] Warning: --synthesis-file is not used by discovery mode.\n")
+
+    requested_sources = resolve_requested_sources(args.search, config)
+    # The user's original source boundary, honored by the per-topic research
+    # passes (which reach beyond the discovery-capable listing feeds - e.g.
+    # Techmeme, arXiv, YouTube, Polymarket). None = every available source.
+    enrich_requested_sources = list(requested_sources) if requested_sources else None
+    if requested_sources:
+        discovery_sources = [
+            source for source in requested_sources
+            if source in pipeline.DISCOVERY_SOURCES
+        ]
+        if not discovery_sources:
+            # A configured source boundary holds even when it leaves nothing
+            # to sweep: silently widening to all feeds would query sources
+            # the user filtered out.
+            origin = "--search" if args.search is not None else "LAST30DAYS_DEFAULT_SEARCH"
+            sys.stderr.write(
+                f"[last30days] {origin} has no discovery-capable sources "
+                f"(unsupported: {', '.join(requested_sources)}); discovery "
+                f"sweeps use: {', '.join(pipeline.DISCOVERY_SOURCES)}. Pass "
+                "--search with one of those (or clear the source filter) to "
+                "run a sweep.\n"
+            )
+            return 2
+        requested_sources = discovery_sources
+    subreddits = (
+        [value.strip().removeprefix("r/") for value in args.subreddits.split(",") if value.strip()]
+        if args.subreddits else None
+    )
+    depth = "deep" if args.deep else "quick" if args.quick else "default"
+    try:
+        report = pipeline.run_discover(
+            domain=domain,
+            config=config,
+            depth=depth,
+            requested_sources=requested_sources,
+            mock=args.mock,
+            subreddits=subreddits,
+            lookback_days=args.lookback_days or 30,
+            as_of_date=args.as_of_date,
+            enrich=not args.discover_shallow,
+            enrich_requested_sources=enrich_requested_sources,
+        )
+    except ValueError as exc:
+        sys.stderr.write(f"[last30days] {exc}\n")
+        return 2
+
+    if args.emit == "json":
+        payload = schema.to_dict(report) if args.json_profile == "raw" else schema.to_discovery_export(report)
+        rendered = json.dumps(payload, indent=2, sort_keys=True)
+    else:
+        rendered = render.render_discovery(report)
+
+    if args.output:
+        output_path = save_rendered_output(rendered, args.output)
+        sys.stderr.write(f"[last30days] Saved output to {output_path}\n")
+    if args.save_dir:
+        save_path = _save_discovery_output(
+            rendered,
+            domain=domain or "trending",
+            emit=args.emit,
+            save_dir=args.save_dir,
+            suffix=args.save_suffix or "",
+        )
+        sys.stderr.write(f"[last30days] Saved output to {save_path}\n")
+    print(rendered)
+
+    strict = str(config.get("LAST30DAYS_STRICT_EXIT") or "").strip().lower()
+    degraded = [
+        source for source, outcome in report.source_status.items()
+        if outcome.state not in _STRICT_EXIT_OK_STATES
+    ]
+    if strict in {"1", "true", "yes", "on"} and degraded:
+        sys.stderr.write(
+            f"[last30days] strict-exit: degraded sources: {', '.join(sorted(degraded))}\n"
+        )
+        return 3
+    return 0
+
+
+_STRICT_EXIT_OK_STATES = {"ok", "no-results", "skipped-unconfigured"}
+
+
+def _strict_exit_code(
+    report: schema.Report,
+    entity_reports: list[tuple[str, schema.Report]] | None,
+    config: dict[str, object],
+) -> int:
+    """Opt-in machine-detectable degraded-run signal (issue #384).
+
+    When LAST30DAYS_STRICT_EXIT is truthy, a run whose report carries any
+    source outcome that is neither clean nor a plain no-results exits 3 so
+    cron/CI wrappers can distinguish degraded coverage from success. Default
+    behavior (exit 0, warning rendered in the report footer) is unchanged.
+    """
+    raw = str(config.get("LAST30DAYS_STRICT_EXIT") or "").strip().lower()
+    if raw not in {"1", "true", "yes", "on"}:
+        return 0
+    reports = [report] + [rep for _, rep in (entity_reports or [])]
+    degraded = sorted({
+        name
+        for rep in reports
+        for name, outcome in (rep.source_status or {}).items()
+        if outcome.state not in _STRICT_EXIT_OK_STATES
+    })
+    if not degraded:
+        return 0
+    sys.stderr.write(
+        f"[last30days] strict-exit: degraded sources: {', '.join(degraded)}\n"
+    )
+    sys.stderr.flush()
+    return 3
+
+
+def _audience_register_for_run(
+    args: argparse.Namespace,
+    config: dict[str, object],
+    entity_reports: list[tuple[str, schema.Report]] | None,
+) -> registers.AudienceRegister:
+    """Resolve CLI > config for single-topic standard brief renderers."""
+
+    from lib import planner
+
+    topic = " ".join(getattr(args, "topic", [])).strip()
+    comparison_topic_requested = bool(
+        len(planner._comparison_entities(topic)) >= 2
+        or args.competitors is not None
+        or args.competitors_list
+        or args.competitors_plan
+    )
+    if (
+        entity_reports
+        or comparison_topic_requested
+        or args.drill
+        or args.emit not in {"compact", "md", "html"}
+    ):
+        return registers.get_register()
+    explicit = getattr(args, "register", None)
+    configured = config.get("LAST30DAYS_REGISTER")
+    name = explicit or (str(configured) if configured else "default")
+    # Preserve configs written by the pre-register ELI5 follow-up command.
+    legacy_eli5 = str(config.get("ELI5_MODE") or "").strip().lower()
+    if not explicit and not configured and legacy_eli5 in {"1", "true", "yes", "on"}:
+        name = "eli5"
+    return registers.get_register(name)
+
+
+def _render_save_and_print(
+    args: argparse.Namespace,
+    report: schema.Report,
+    entity_reports: list[tuple[str, schema.Report]] | None,
+    synthesis_md: str | None,
+    config: dict[str, object],
+) -> int:
+    fun_level = str(config.get("FUN_LEVEL", "medium")).lower()
+    try:
+        audience = _audience_register_for_run(args, config, entity_reports)
+    except ValueError as exc:
+        sys.stderr.write(f"[last30days] {exc}\n")
+        return 2
+    if audience.name != "default":
+        sys.stderr.write(f"[last30days] Audience register: {audience.name}\n")
+        sys.stderr.flush()
+    # Comparison HTML is the one case where the saved file's title and content
+    # have to be overridden away from the leading entity's report. Compute the
+    # gate once so the footer-display and save-output paths can't disagree.
+    is_comparison_html = bool(entity_reports) and args.emit == "html"
+    footer_save_path = None
+    if args.output:
+        footer_save_path = compute_output_path_display(args.output)
+    elif args.save_dir:
+        save_topic_for_display = comparison_topic(entity_reports) if is_comparison_html else report.topic
+        footer_save_path = compute_save_path_display(
+            args.save_dir, save_topic_for_display, args.save_suffix or "", args.emit
+        )
+
+    if entity_reports:
+        rendered = emit_comparison_output(
+            entity_reports,
+            args.emit,
+            fun_level=fun_level,
+            save_path=footer_save_path,
+            synthesis_md=synthesis_md,
+            json_profile=args.json_profile,
+        )
+    else:
+        rendered = emit_output(
+            report,
+            args.emit,
+            fun_level=fun_level,
+            save_path=footer_save_path,
+            synthesis_md=synthesis_md,
+            json_profile=args.json_profile,
+            register=audience.name,
+        )
+    has_private_corpus = _report_has_private_corpus(report) or bool(
+        entity_reports
+        and any(_report_has_private_corpus(entity) for _label, entity in entity_reports)
+    )
+    private_saved_format = has_private_corpus
+    publish_companion_paths: list[Path] = []
+    if args.output:
+        output_path = save_rendered_output(
+            rendered,
+            args.output,
+            private=private_saved_format,
+        )
+        if args.emit == "html":
+            publish_companion_paths.append(output_path)
+        sys.stderr.write(f"[last30days] Saved output to {output_path}\n")
+        sys.stderr.flush()
+    if args.save_dir:
+        # Save the main topic's raw file (single-entity or comparison main).
+        save_path = save_output(
+            report,
+            args.emit,
+            args.save_dir,
+            suffix=args.save_suffix or "",
+            synthesis_md=synthesis_md,
+            topic_override=comparison_topic(entity_reports) if is_comparison_html else None,
+            rendered_content=rendered if is_comparison_html else None,
+            json_profile=args.json_profile,
+            register=audience.name,
+            private=private_saved_format,
+        )
+        if args.emit == "html":
+            publish_companion_paths.append(save_path)
+        sys.stderr.write(f"[last30days] Saved output to {save_path}\n")
+        comparison_peer_paths: list[Path] = []
+        # Competitor / vs-mode: also save a per-entity raw file for each peer.
+        # Matches historical vs-mode behavior (N passes -> N save files).
+        if entity_reports and len(entity_reports) > 1:
+            for label, entity_report in entity_reports[1:]:
+                peer_path = save_output(
+                    entity_report, args.emit, args.save_dir,
+                    suffix=args.save_suffix or "",
+                    synthesis_md=synthesis_md,
+                    json_profile=args.json_profile,
+                    private=_report_has_private_corpus(entity_report),
+                )
+                comparison_peer_paths.append(peer_path)
+                sys.stderr.write(f"[last30days] Saved output to {peer_path}\n")
+            peers_display = ", ".join(str(path) for path in comparison_peer_paths)
+            sys.stderr.write(
+                f"[last30days] Comparison artifact set: main={save_path}; "
+                f"peers={peers_display}\n"
+            )
+        sys.stderr.flush()
+    if args.publish_html:
+        try:
+            has_private_corpus = "corpus" in report.source_status or bool(
+                entity_reports
+                and any("corpus" in entity.source_status for _label, entity in entity_reports)
+            )
+            publish_rendered = rendered
+            if has_private_corpus:
+                sys.stderr.write(
+                    "[last30days] Excluding local corpus evidence and synthesis from published HTML.\n"
+                )
+                if entity_reports:
+                    publish_rendered = emit_comparison_output(
+                        [
+                            (label, schema.without_sources(entity, {"corpus"}))
+                            for label, entity in entity_reports
+                        ],
+                        "html",
+                        fun_level=fun_level,
+                        save_path=footer_save_path,
+                        synthesis_md=None,
+                        json_profile=args.json_profile,
+                    )
+                else:
+                    publish_rendered = emit_output(
+                        schema.without_sources(report, {"corpus"}),
+                        "html",
+                        fun_level=fun_level,
+                        save_path=footer_save_path,
+                        synthesis_md=None,
+                        json_profile=args.json_profile,
+                        register=audience.name,
+                    )
+            publish_result = publish_rendered_html(
+                publish_rendered,
+                password=_publish_password_for_args(args, config),
+                companion_paths=publish_companion_paths,
+            )
+            sys.stderr.write(f"[last30days] Published HTML to {publish_result['url']}\n")
+            for warning in publish_result.get("_metadata_errors") or []:
+                sys.stderr.write(f"[last30days] Publish metadata warning: {warning}\n")
+            if publish_result.get("update_key"):
+                sys.stderr.write(
+                    "[last30days] ht-ml.app returned an update key; not writing it "
+                    "to stdout, HTML, or publish metadata.\n"
+                )
+            sys.stderr.flush()
+        except Exception as exc:
+            sys.stderr.write(f"[last30days] HTML publish failed: {exc}\n")
+            sys.stderr.flush()
+    print(rendered)
+    return _strict_exit_code(report, entity_reports, config)
+
+
+def _propagate_config_to_environ(config: dict[str, object]) -> None:
+    """Push relevant env keys to os.environ so provider modules can read them.
+
+    The env.get_config() function reads from a .env file, but providers.py
+    reads from os.environ directly. Without this, OPENAI_BASE_URL and
+    XAI_BASE_URL overrides are silently ignored. This is a no-op for
+    keys that are already set in process env.
+    """
+    for key in ("OPENAI_BASE_URL", "XAI_BASE_URL", "OPENROUTER_BASE_URL"):
+        val = config.get(key)
+        if val and not os.environ.get(key):
+            os.environ[key] = val
+
+
+def _setup_allows_browser_cookies(args: argparse.Namespace, extra_argv: list[str]) -> bool:
+    return (
+        not args.no_browser_cookies
+        and not args.diagnose
+        and not args.preflight
+        and "--allow-browser-cookies" in extra_argv
+    )
+
+
+SETUP_PASSTHROUGH_FLAGS = {
+    "--allow-browser-cookies",
+    "--device-auth",
+    "--github",
+    "--github-start",
+    "--github-poll",
+    "--your-gateway-project",
+}
+
+SKILL_ONLY_FLAGS = {
+    "--agent",
+}
+
+# Doctor passthrough: `doctor --json` / `doctor --cached` mirror the setup
+# passthrough pattern (neither is a global parser flag; they only mean
+# something to doctor). `--cached` serves the stored doctor-cache.json report
+# within its TTL and falls through to a live run otherwise.
+DOCTOR_PASSTHROUGH_FLAGS = {
+    "--json",
+    "--cached",
+    "--postmortem",
+    "--probe",
+}
+
+
+def _validate_extra_argv(parser: argparse.ArgumentParser, topic: str, extra_argv: list[str]) -> None:
+    if not extra_argv:
+        return
+    if topic.lower() == "setup":
+        unsupported = [arg for arg in extra_argv if arg not in SETUP_PASSTHROUGH_FLAGS]
+        if unsupported:
+            parser.error(
+                "unsupported setup argument(s): "
+                + ", ".join(unsupported)
+                + f"; supported setup passthrough flags are {', '.join(sorted(SETUP_PASSTHROUGH_FLAGS))}"
+            )
+        return
+    if topic.lower() == "doctor":
+        unsupported = [arg for arg in extra_argv if arg not in DOCTOR_PASSTHROUGH_FLAGS]
+        if unsupported:
+            parser.error(
+                "unsupported doctor argument(s): "
+                + ", ".join(unsupported)
+                + f"; supported doctor passthrough flags are {', '.join(sorted(DOCTOR_PASSTHROUGH_FLAGS))}"
+            )
+        return
+    skill_only = [arg for arg in extra_argv if arg in SKILL_ONLY_FLAGS]
+    other_unknown = [arg for arg in extra_argv if arg not in SKILL_ONLY_FLAGS]
+    if skill_only:
+        message = (
+            "unsupported Python CLI argument(s): "
+            + ", ".join(skill_only)
+            + "; these are skill arguments and must not be forwarded to scripts/last30days.py"
+        )
+        if other_unknown:
+            message += "; also unsupported: " + ", ".join(other_unknown)
+        parser.error(message)
+    parser.error("unsupported Python CLI argument(s): " + ", ".join(extra_argv))
+
+
+def _config_policy_for_args(args: argparse.Namespace, topic: str, extra_argv: list[str]) -> env.ConfigLoadPolicy:
+    normalized_topic = topic.lower()
+    is_library_command = (
+        normalized_topic == "library feed"
+        or normalized_topic == "library search"
+        or normalized_topic.startswith("library search ")
+    )
+    is_cached_verification = bool(getattr(args, "verify_freshness", None)) and not normalized_topic
+    if args.no_browser_cookies:
+        browser_mode = "off"
+    elif (
+        args.diagnose or args.preflight or normalized_topic == "doctor"
+        or is_library_command or is_cached_verification
+    ):
+        # doctor is plan-only like --diagnose: it must never read cookies.
+        # Cache-only freshness verification hits only point APIs (Polymarket,
+        # GitHub, StockTwits) - no cookie-backed source, so no Keychain prompt.
+        browser_mode = "plan_only"
+    elif normalized_topic == "setup":
+        browser_mode = "read" if _setup_allows_browser_cookies(args, extra_argv) else "off"
+    else:
+        browser_mode = "read"
+    return env.ConfigLoadPolicy(
+        browser_cookies=browser_mode,
+        inspect_ignored_project_config=args.diagnose or args.preflight or normalized_topic == "doctor",
+    )
+
+
+def _run_library_feed(args: argparse.Namespace, config: dict[str, object]) -> int:
+    """Generate the local research index/feed and optionally publish it."""
+    from lib import feed, html_publish, library
+
+    if args.publish_html:
+        sys.stderr.write(
+            "[last30days] library feed uses --publish, not --publish-html.\n"
+        )
+        return 2
+    if args.output:
+        sys.stderr.write(
+            "[last30days] library feed writes index.html and feed.xml to --save-dir; "
+            "--output is not supported.\n"
+        )
+        return 2
+
+    memory_dir = Path(args.save_dir).expanduser() if args.save_dir else library.DEFAULT_MEMORY_DIR
+    output_dir = memory_dir.resolve()
+    # Scoped libraries (--save-dir) must not mix in the global briefing
+    # archive: a client-specific or publishable feed pulling unrelated default
+    # briefings could publish them publicly. The default library keeps the
+    # archive; a scoped one reads only its own directory.
+    briefs_dir = (
+        library.DEFAULT_BRIEFS_DIR if not args.save_dir else memory_dir / "briefings"
+    )
+    entries, notes = library.scan_library(memory_dir, briefs_dir)
+    feed_author = str(
+        config.get("LAST30DAYS_LIBRARY_OWNER") or "last30days research library"
+    )
+    output_dir.mkdir(parents=True, exist_ok=True)
+    library_id = library.get_or_create_library_id(output_dir)
+    rendered_briefs_dir = output_dir / "briefs"
+    has_private_entries = any(
+        render.PRIVATE_CORPUS_START in entry.content for entry in entries
+    )
+    _ensure_output_directory(rendered_briefs_dir, private=has_private_entries)
+
+    def _preserve_hand_written_page(existing_path: Path, generated_marker: str) -> None:
+        """Back up any page library feed did not generate before overwriting it."""
+        if not existing_path.exists():
+            return
+        try:
+            marker_found = generated_marker in existing_path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            marker_found = False
+        if marker_found:
+            return
+        backup = existing_path.with_suffix(existing_path.suffix + ".bak")
+        counter = 1
+        while backup.exists():
+            backup = existing_path.with_suffix(f"{existing_path.suffix}.bak{counter}")
+            counter += 1
+        existing_path.replace(backup)
+        sys.stderr.write(
+            f"[last30days] {existing_path.name} was not generated by "
+            f"library feed; preserved the original at {backup.name}\n"
+        )
+
+    publishable_brief_documents: dict[str, str] = {}
+    for entry in entries:
+        rendered = html_render.render_library_brief(entry)
+        target = rendered_briefs_dir / entry.output_name
+        _preserve_hand_written_page(target, html_render.LIBRARY_BRIEF_MARKER)
+        save_rendered_output(
+            rendered,
+            str(target),
+            private=render.PRIVATE_CORPUS_START in entry.content,
+        )
+        publishable_brief_documents[entry.entry_id] = html_render.render_library_brief(
+            entry, include_private=False
+        )
+
+    current_brief_names = {entry.output_name for entry in entries}
+    for path in rendered_briefs_dir.glob("*.html"):
+        is_orphan = path.name not in current_brief_names
+        if not (is_orphan and library.is_generated_brief_name(path.name)):
+            continue
+        # A generated-looking name is not proof of ownership; only prune
+        # pages that carry the renderer's own marker.
+        try:
+            generated = html_render.LIBRARY_BRIEF_MARKER in path.read_text(
+                encoding="utf-8"
+            )
+        except (OSError, UnicodeDecodeError):
+            generated = False
+        if generated:
+            path.unlink()
+
+    feed_xml = feed.render_atom(entries, library_id=library_id, author=feed_author)
+    index_html = html_render.render_library_index(entries)
+    feed_path = output_dir / "feed.xml"
+    index_path = output_dir / "index.html"
+    _preserve_hand_written_page(feed_path, "urn:last30days:research-library")
+    _preserve_hand_written_page(
+        index_path, "Generated locally by <strong>last30days</strong>"
+    )
+    feed_path.write_text(feed_xml, encoding="utf-8")
+    index_path.write_text(index_html, encoding="utf-8")
+
+    for note in notes:
+        sys.stderr.write(f"[last30days] Library note: {note}\n")
+    sys.stderr.write(
+        f"[last30days] Library feed generated {len(entries)} brief(s): "
+        f"{index_path} and {feed_path}\n"
+    )
+
+    if args.publish:
+        password = _publish_password_for_args(args, config)
+        entry_urls: dict[str, str] = {}
+        try:
+            brief_results = html_publish.publish_html_documents(
+                publishable_brief_documents,
+                password=password,
+            )
+            entry_urls = {
+                entry_id: str(result["url"])
+                for entry_id, result in brief_results.items()
+            }
+            if batch_error := getattr(brief_results, "error", None):
+                raise batch_error
+            published_index = html_render.render_library_index(
+                entries,
+                entry_urls=entry_urls,
+                feed_url=None,
+            )
+            index_result = html_publish.publish_html(published_index, password=password)
+            index_url = str(index_result["url"])
+        except (html_publish.HtmlPublishError, KeyError, OSError) as exc:
+            sys.stderr.write(f"[last30days] Library publish failed: {exc}\n")
+            if entry_urls:
+                sys.stderr.write(
+                    f"[last30days] Partial publish: {len(entry_urls)} public brief "
+                    "page(s) were created before the failure.\n"
+                )
+            return 1
+
+        # Keep the local artifacts useful as a record of the live publication.
+        feed_path.write_text(
+            feed.render_atom(
+                entries,
+                library_id=library_id,
+                entry_urls=entry_urls,
+                author=feed_author,
+            ),
+            encoding="utf-8",
+        )
+        index_path.write_text(
+            html_render.render_library_index(entries, entry_urls=entry_urls),
+            encoding="utf-8",
+        )
+        sys.stderr.write(f"[last30days] Published library to {index_url}\n")
+        sys.stderr.write(f"[last30days] Local Atom feed: {feed_path}\n")
+        print(
+            f"Library: {index_url}\nFeed: {feed_path}\n"
+            "Atom feed is local; host feed.xml on any static host (for example, GitHub Pages) "
+            "to make it subscribable."
+        )
+        return 0
+
+    print(
+        f"Library: {index_path}\nFeed: {feed_path}\n"
+        "Atom feed is local; host feed.xml on any static host (for example, GitHub Pages) "
+        "to make it subscribable."
+    )
+    return 0
+
+
+def _run_library_search(
+    args: argparse.Namespace,
+    config: dict[str, object],
+    query: str,
+) -> int:
+    """Search saved briefs and store sightings without network access."""
+    from lib import library, library_index
+
+    if not query.strip():
+        sys.stderr.write("[last30days] library search requires a non-empty query.\n")
+        return 2
+    if args.publish or args.publish_html:
+        sys.stderr.write("[last30days] library search does not publish output.\n")
+        return 2
+    if args.emit != "compact":
+        sys.stderr.write("[last30days] library search currently supports text output only.\n")
+        return 2
+    if args.output:
+        sys.stderr.write(
+            "[last30days] library search prints to stdout; --output is not supported.\n"
+        )
+        return 2
+
+    memory_dir = Path(args.save_dir).expanduser() if args.save_dir else library.DEFAULT_MEMORY_DIR
+    try:
+        matches, synced = library_index.sync_and_search(
+            query,
+            memory_dir=memory_dir,
+            briefs_dir=(
+                memory_dir / "briefings" if args.save_dir else library.DEFAULT_BRIEFS_DIR
+            ),
+            db_path=(
+                memory_dir.resolve() / ".last30days-library.db"
+                if args.save_dir else library_index.DEFAULT_LIBRARY_DB
+            ),
+            # A scoped search must never merge in the shared store: one
+            # client's sightings would leak into another client's scope. A
+            # scoped store is read only if it exists inside the save dir.
+            store_db_path=(
+                memory_dir.resolve() / "research.db"
+                if args.save_dir else library_index.DEFAULT_STORE_DB
+            ),
+        )
+    except library_index.LibrarySearchUnavailable as exc:
+        sys.stderr.write(f"[last30days] Library search unavailable: {exc}.\n")
+        return 2
+    except (OSError, sqlite3.DatabaseError) as exc:
+        sys.stderr.write(f"[last30days] Library search failed: {exc}.\n")
+        return 1
+    for note in synced.notes:
+        sys.stderr.write(f"[last30days] Library note: {note}\n")
+    if synced.rebuilt:
+        sys.stderr.write("[last30days] Rebuilt a corrupt library search index.\n")
+    print(render.render_library_search(query, matches), end="")
+    return 0
+
+
+def main() -> int:
+    parser = build_parser()
+    # Use parse_known_args so setup sub-flags (--device-auth, --github,
+    # --your-gateway-project) pass through without argparse hard-exiting.
+    args, extra_argv = parser.parse_known_args()
+    if args.record_fixtures:
+        with http.recording_requests(Path(args.record_fixtures)):
+            return _main(parser, args, extra_argv)
+    return _main(parser, args, extra_argv)
+
+
+def _main(
+    parser: argparse.ArgumentParser,
+    args: argparse.Namespace,
+    extra_argv: list[str],
+) -> int:
     if args.debug:
         os.environ["LAST30DAYS_DEBUG"] = "1"
-        # Re-import http to pick up debug flag
-        from lib import http as http_module
-        http_module.DEBUG = True
 
-    # Determine depth
-    if args.quick and args.deep:
-        print("Error: Cannot use both --quick and --deep", file=sys.stderr)
-        sys.exit(1)
-    elif args.quick:
-        depth = "quick"
-    elif args.deep:
-        depth = "deep"
-    else:
-        depth = "default"
+    if args.welcome:
+        from lib import setup_wizard
+        print(setup_wizard.render_welcome())
+        return 0
 
-    # Install global timeout watchdog
-    timeouts = TIMEOUT_PROFILES[depth]
-    global_timeout = args.timeout or timeouts["global"]
-    _install_global_timeout(global_timeout)
-
-    # Load config
-    config = env.get_config()
-
-    # Inject .env credentials into Bird module before auth check
-    bird_x.set_credentials(config.get('AUTH_TOKEN'), config.get('CT0'))
-
-    # Auto-detect Bird (no prompts - just use it if available)
-    x_source_status = env.get_x_source_status(config)
-    x_source = x_source_status["source"]  # 'bird', 'xai', or None
-
-    # Auto-detect yt-dlp for YouTube search
-    has_ytdlp = env.is_ytdlp_available()
-
-    # Auto-detect ScraperVendor/Apify for TikTok
-    has_tiktok = env.is_tiktok_available(config)
-
-    # Auto-detect ScraperVendor for Instagram
-    has_instagram = env.is_instagram_available(config)
-
-    # Auto-detect Xiaohongshu HTTP API (requires service + login)
-    has_xiaohongshu = env.is_xiaohongshu_available(config)
-
-    # Auto-detect Bluesky (requires BSKY_HANDLE + BSKY_APP_PASSWORD)
-    has_bluesky = env.is_bluesky_available(config)
-
-    # Auto-detect Truth Social (requires TRUTHSOCIAL_TOKEN)
-    has_truthsocial = env.is_truthsocial_available(config)
-
-    # --diagnose: show source availability and exit
-    if args.diagnose:
-        web_source = env.get_web_search_source(config)
-        diag = {
-            "openai": bool(config.get("OPENAI_API_KEY")),
-            "reddit_public": True,
-            "xai": bool(config.get("XAI_API_KEY")),
-            "x_source": x_source_status["source"],
-            "bird_installed": x_source_status["bird_installed"],
-            "bird_authenticated": x_source_status["bird_authenticated"],
-            "bird_username": x_source_status.get("bird_username"),
-            "youtube": has_ytdlp,
-            "tiktok": has_tiktok,
-            "instagram": has_instagram,
-            "xiaohongshu": has_xiaohongshu,
-            "xiaohongshu_api_base": env.get_xiaohongshu_api_base(config),
-            "hackernews": True,
-            "bluesky": has_bluesky,
-            "truthsocial": has_truthsocial,
-            "polymarket": True,
-            "web_search_backend": web_source,
-            "parallel_ai": bool(config.get("PARALLEL_API_KEY")),
-            "brave": bool(config.get("BRAVE_API_KEY")),
-            "openrouter": bool(config.get("OPENROUTER_API_KEY")),
-        }
-        print(json.dumps(diag, indent=2))
-        sys.exit(0)
-
-    # Validate topic (--diagnose doesn't need one)
-    if not args.topic:
-        print("Error: Please provide a topic to research.", file=sys.stderr)
-        print("Usage: python3 last30days.py <topic> [options]", file=sys.stderr)
-        sys.exit(1)
-
-    # Initialize progress display with topic
-    progress = ui.ProgressDisplay(args.topic, show_banner=True)
-
-    # Show diagnostic banner when sources are missing
-    web_source = env.get_web_search_source(config)
-    diag = {
-        "openai": bool(config.get("OPENAI_API_KEY")),
-        "reddit_public": True,
-        "xai": bool(config.get("XAI_API_KEY")),
-        "x_source": x_source_status["source"],
-        "bird_installed": x_source_status["bird_installed"],
-        "bird_authenticated": x_source_status["bird_authenticated"],
-        "bird_username": x_source_status.get("bird_username"),
-        "youtube": has_ytdlp,
-        "tiktok": has_tiktok,
-        "instagram": has_instagram,
-        "xiaohongshu": has_xiaohongshu,
-        "hackernews": True,
-        "bluesky": True,
-        "truthsocial": has_truthsocial,
-        "polymarket": True,
-        "web_search_backend": "deferred to assistant" if args.no_native_web else web_source,
-    }
-    ui.show_diagnostic_banner(diag)
-
-    # Check available sources (accounting for Bird auto-detection)
-    available = env.get_available_sources(config)
-
-    # Override available if Bird provides X
-    if x_source == 'bird':
-        if available == 'reddit':
-            available = 'both'  # Now have both Reddit + X
-        elif available == 'reddit-web':
-            available = 'all'  # Reddit + X + Web
-        elif available == 'web':
-            available = 'x-web'  # X + Web
-
-    # Mock mode can work without keys
-    if args.mock:
-        if args.sources == "auto":
-            sources = "both"
-        else:
-            sources = args.sources
-    else:
-        # Validate requested sources against available
-        sources, error = env.validate_sources(args.sources, available, args.include_web)
-        if error:
-            # If it's a warning about WebSearch fallback, print but continue
-            if "WebSearch fallback" in error:
-                print(f"Note: {error}", file=sys.stderr)
-            else:
-                print(f"Error: {error}", file=sys.stderr)
-                sys.exit(1)
-
-    # Get date range
-    from_date, to_date = dates.get_date_range(args.days)
-
-    # Check what keys are missing for promo messaging
-    missing_keys = env.get_missing_keys(config)
-
-    # Show NUX / promo for missing keys BEFORE research
-    if missing_keys != 'none':
-        progress.show_promo(missing_keys, diag=diag)
-
-    # Select models
-    if args.mock:
-        # Use mock models
-        mock_openai_models = load_fixture("models_openai_sample.json").get("data", [])
-        mock_xai_models = load_fixture("models_xai_sample.json").get("data", [])
-        selected_models = models.get_models(
-            {
-                "OPENAI_API_KEY": "mock",
-                "XAI_API_KEY": "mock",
-                **config,
-            },
-            mock_openai_models,
-            mock_xai_models,
-        )
-    else:
-        selected_models = models.get_models(config)
-
-    # Determine mode string
-    if sources == "all":
-        mode = "all"  # reddit + x + web
-    elif sources == "both":
-        mode = "both"  # reddit + x
-    elif sources == "reddit":
-        mode = "reddit-only"
-    elif sources == "reddit-web":
-        mode = "reddit-web"
-    elif sources == "x":
-        mode = "x-only"
-    elif sources == "x-web":
-        mode = "x-web"
-    elif sources == "web":
-        mode = "web-only"
-    else:
-        mode = sources
-
-    # Detect query type for source tiering and scoring adjustments
-    query_type = qt.detect_query_type(args.topic)
-
-    # Apply --search flag: restrict sources to the specified subset
-    # Source defaults are query-type-aware (Truth Social always opt-in,
-    # Bluesky only for query types where it adds signal)
-    search_do_hackernews = qt.is_source_enabled("hn", query_type) if not args.search else True
-    search_do_bluesky = has_bluesky and qt.is_source_enabled("bluesky", query_type)
-    search_do_truthsocial = False  # Always opt-in (requires --search truthsocial)
-    search_do_polymarket = qt.is_source_enabled("polymarket", query_type)
-    search_run_youtube = has_ytdlp and qt.is_source_enabled("youtube", query_type)
-    search_run_tiktok = has_tiktok and qt.is_source_enabled("tiktok", query_type)
-    search_run_instagram = has_instagram and qt.is_source_enabled("instagram", query_type)
-    search_run_xiaohongshu = has_xiaohongshu
-    if args.search:
-        search_sources = parse_search_flag(args.search)
-        has_reddit = "reddit" in search_sources
-        has_x = "x" in search_sources
-        search_do_hackernews = "hn" in search_sources
-        search_do_bluesky = ("bluesky" in search_sources or "bsky" in search_sources) and has_bluesky
-        search_do_truthsocial = ("truthsocial" in search_sources or "truth" in search_sources) and has_truthsocial
-        search_do_polymarket = "polymarket" in search_sources
-        search_run_youtube = "youtube" in search_sources and has_ytdlp
-        search_run_tiktok = "tiktok" in search_sources and has_tiktok
-        search_run_instagram = "instagram" in search_sources and has_instagram
-        # If explicitly requested, attempt Xiaohongshu even when preflight says unavailable.
-        search_run_xiaohongshu = "xiaohongshu" in search_sources
-        include_search_web = "web" in search_sources
-        # Map to existing sources string
-        if has_reddit and has_x:
-            sources = "both" + ("-web" if include_search_web else "")
-            sources = "all" if include_search_web else "both"
-        elif has_reddit:
-            sources = "reddit-web" if include_search_web else "reddit"
-        elif has_x:
-            sources = "x-web" if include_search_web else "x"
-        else:
-            sources = "web"  # hn/polymarket only; no Reddit/X
-
-    # Run research
-    reddit_items, x_items, youtube_items, tiktok_items, instagram_items, hackernews_items, bluesky_items, truthsocial_items, polymarket_items, web_items, web_needed, raw_openai, raw_xai, raw_reddit_enriched, reddit_error, x_error, youtube_error, tiktok_error, instagram_error, hackernews_error, bluesky_error, truthsocial_error, polymarket_error, web_error = run_research(
-        args.topic,
-        sources,
-        config,
-        selected_models,
-        from_date,
-        to_date,
-        depth,
-        args.mock,
-        progress,
-        x_source=x_source or "xai",
-        run_youtube=search_run_youtube,
-        run_tiktok=search_run_tiktok,
-        run_instagram=search_run_instagram,
-        run_xiaohongshu=search_run_xiaohongshu,
-        timeouts=timeouts,
-        resolved_handle=args.x_handle,
-        do_hackernews=search_do_hackernews,
-        do_bluesky=search_do_bluesky,
-        do_truthsocial=search_do_truthsocial,
-        do_polymarket=search_do_polymarket,
-        no_native_web=args.no_native_web,
-    )
-
-    # Processing phase
-    progress.start_processing()
-
-    # Normalize items
-    normalized_reddit = normalize.normalize_reddit_items(reddit_items, from_date, to_date)
-    normalized_x = normalize.normalize_x_items(x_items, from_date, to_date)
-    normalized_youtube = normalize.normalize_youtube_items(youtube_items, from_date, to_date) if youtube_items else []
-    normalized_tiktok = normalize.normalize_tiktok_items(tiktok_items, from_date, to_date) if tiktok_items else []
-    normalized_ig = normalize.normalize_instagram_items(instagram_items, from_date, to_date) if instagram_items else []
-    normalized_hn = normalize.normalize_hackernews_items(hackernews_items, from_date, to_date) if hackernews_items else []
-    normalized_bsky = normalize.normalize_bluesky_items(bluesky_items, from_date, to_date) if bluesky_items else []
-    normalized_ts = normalize.normalize_truthsocial_items(truthsocial_items, from_date, to_date) if truthsocial_items else []
-    normalized_pm = normalize.normalize_polymarket_items(polymarket_items, from_date, to_date) if polymarket_items else []
-    normalized_web = websearch.normalize_websearch_items(web_items, from_date, to_date) if web_items else []
-
-    # Hard date filter: exclude items with verified dates outside the range
-    # This is the safety net - even if prompts let old content through, this filters it
-    filtered_reddit = normalize.filter_by_date_range(normalized_reddit, from_date, to_date)
-    filtered_x = normalize.filter_by_date_range(normalized_x, from_date, to_date)
-    # YouTube: skip hard date filter — youtube_yt.py already applies a soft filter
-    # that prefers recent videos but keeps older ones for evergreen topics.
-    # YouTube content has a longer shelf life than tweets/posts.
-    filtered_youtube = normalized_youtube
-    # TikTok: hard date filter (tiktok.py already pre-filters, but safety net)
-    filtered_tiktok = normalize.filter_by_date_range(normalized_tiktok, from_date, to_date) if normalized_tiktok else []
-    # Instagram: hard date filter (instagram.py already pre-filters, but safety net)
-    filtered_ig = normalize.filter_by_date_range(normalized_ig, from_date, to_date) if normalized_ig else []
-    filtered_hn = normalize.filter_by_date_range(normalized_hn, from_date, to_date) if normalized_hn else []
-    filtered_bsky = normalize.filter_by_date_range(normalized_bsky, from_date, to_date) if normalized_bsky else []
-    filtered_ts = normalize.filter_by_date_range(normalized_ts, from_date, to_date) if normalized_ts else []
-    # Polymarket: skip hard date filter - markets are active/traded, updatedAt is fine
-    filtered_pm = normalized_pm
-    filtered_web = normalize.filter_by_date_range(normalized_web, from_date, to_date) if normalized_web else []
-
-    # Score items
-    scored_reddit = score.score_reddit_items(filtered_reddit)
-    scored_x = score.score_x_items(filtered_x)
-    scored_youtube = score.score_youtube_items(filtered_youtube) if filtered_youtube else []
-    scored_tiktok = score.score_tiktok_items(filtered_tiktok) if filtered_tiktok else []
-    scored_ig = score.score_instagram_items(filtered_ig) if filtered_ig else []
-    scored_hn = score.score_hackernews_items(filtered_hn) if filtered_hn else []
-    scored_bsky = score.score_bluesky_items(filtered_bsky) if filtered_bsky else []
-    scored_ts = score.score_truthsocial_items(filtered_ts) if filtered_ts else []
-    scored_pm = score.score_polymarket_items(filtered_pm) if filtered_pm else []
-    scored_web = score.score_websearch_items(filtered_web, query_type=query_type) if filtered_web else []
-
-    # Sort items (query-type-aware tiebreaker ordering)
-    sorted_reddit = score.sort_items(scored_reddit, query_type=query_type)
-    sorted_x = score.sort_items(scored_x, query_type=query_type)
-    sorted_youtube = score.sort_items(scored_youtube, query_type=query_type) if scored_youtube else []
-    sorted_tiktok = score.sort_items(scored_tiktok, query_type=query_type) if scored_tiktok else []
-    sorted_ig = score.sort_items(scored_ig, query_type=query_type) if scored_ig else []
-    sorted_hn = score.sort_items(scored_hn, query_type=query_type) if scored_hn else []
-    sorted_bsky = score.sort_items(scored_bsky, query_type=query_type) if scored_bsky else []
-    sorted_ts = score.sort_items(scored_ts, query_type=query_type) if scored_ts else []
-    sorted_pm = score.sort_items(scored_pm, query_type=query_type) if scored_pm else []
-    sorted_web = score.sort_items(scored_web, query_type=query_type) if scored_web else []
-
-    # Dedupe items
-    deduped_reddit = dedupe.dedupe_reddit(sorted_reddit)
-    deduped_x = dedupe.dedupe_x(sorted_x)
-    deduped_youtube = dedupe.dedupe_youtube(sorted_youtube) if sorted_youtube else []
-    deduped_tiktok = dedupe.dedupe_tiktok(sorted_tiktok) if sorted_tiktok else []
-    deduped_ig = dedupe.dedupe_instagram(sorted_ig) if sorted_ig else []
-    deduped_hn = dedupe.dedupe_hackernews(sorted_hn) if sorted_hn else []
-    deduped_bsky = dedupe.dedupe_bluesky(sorted_bsky) if sorted_bsky else []
-    deduped_ts = dedupe.dedupe_truthsocial(sorted_ts) if sorted_ts else []
-    deduped_pm = dedupe.dedupe_polymarket(sorted_pm) if sorted_pm else []
-    deduped_web = websearch.dedupe_websearch(sorted_web) if sorted_web else []
-
-    # Post-retrieval relevance filter: drop low-relevance items per source
-    deduped_reddit = score.relevance_filter(deduped_reddit, "REDDIT")
-    deduped_x = score.relevance_filter(deduped_x, "X")
-    deduped_youtube = score.relevance_filter(deduped_youtube, "YOUTUBE")
-    deduped_tiktok = score.relevance_filter(deduped_tiktok, "TIKTOK")
-    deduped_ig = score.relevance_filter(deduped_ig, "INSTAGRAM")
-    deduped_hn = score.relevance_filter(deduped_hn, "HN")
-    deduped_bsky = score.relevance_filter(deduped_bsky, "BLUESKY")
-    deduped_ts = score.relevance_filter(deduped_ts, "TRUTHSOCIAL")
-    deduped_pm = score.relevance_filter(deduped_pm, "POLYMARKET") if deduped_pm else []
-
-    # Cross-source linking: annotate items that discuss the same story
-    dedupe.cross_source_link(
-        deduped_reddit, deduped_x, deduped_youtube, deduped_tiktok, deduped_ig, deduped_hn, deduped_bsky, deduped_ts, deduped_pm, deduped_web,
-    )
-
-    progress.end_processing()
-
-    # Create report
-    report = schema.create_report(
-        args.topic,
-        from_date,
-        to_date,
-        mode,
-        selected_models.get("openai"),
-        selected_models.get("xai"),
-    )
-    report.reddit = deduped_reddit
-    report.x = deduped_x
-    report.youtube = deduped_youtube
-    report.tiktok = deduped_tiktok
-    report.instagram = deduped_ig
-    report.hackernews = deduped_hn
-    report.bluesky = deduped_bsky
-    report.truthsocial = deduped_ts
-    report.polymarket = deduped_pm
-    report.web = deduped_web
-    report.reddit_error = reddit_error
-    report.x_error = x_error
-    report.youtube_error = youtube_error
-    report.tiktok_error = tiktok_error
-    report.instagram_error = instagram_error
-    report.hackernews_error = hackernews_error
-    report.bluesky_error = bluesky_error
-    report.truthsocial_error = truthsocial_error
-    report.polymarket_error = polymarket_error
-    report.web_error = web_error
-    report.resolved_x_handle = args.x_handle
-
-    # Generate context snippet
-    report.context_snippet_md = render.render_context_snippet(report)
-
-    # Write outputs
-    render.write_outputs(report, raw_openai, raw_xai, raw_reddit_enriched)
-
-    # Show completion
-    if sources == "web":
-        progress.show_web_only_complete()
-    else:
-        progress.show_complete(len(deduped_reddit), len(deduped_x), len(deduped_youtube), len(deduped_hn), len(deduped_pm), len(deduped_tiktok), len(deduped_ig))
-
-    # Build source info for status footer
-    source_info = {}
-    if not x_source:
-        if x_source_status["bird_installed"]:
-            source_info["x_skip_reason"] = "Bird installed but not authenticated — log into x.com in browser"
-        else:
-            source_info["x_skip_reason"] = "No Bird CLI, XAI_API_KEY, or SCRAPER_API_KEY"
-    if not has_ytdlp:
-        source_info["youtube_skip_reason"] = "yt-dlp not installed — fix: brew install yt-dlp"
-    elif has_ytdlp and not report.youtube:
-        source_info["youtube_skip_reason"] = "0 results (query may be too specific)"
-    if not has_tiktok:
-        source_info["tiktok_skip_reason"] = "No SCRAPER_API_KEY - sign up at your-scraper.example (100 free credits)"
-    if not has_instagram:
-        source_info["instagram_skip_reason"] = "No SCRAPER_API_KEY - sign up at your-scraper.example (100 free credits)"
-    if not has_xiaohongshu:
-        source_info["xiaohongshu_skip_reason"] = (
-            f"Xiaohongshu API unavailable or not logged in - start xiaohongshu-mcp and login "
-            f"(base: {env.get_xiaohongshu_api_base(config)})"
-        )
-    if not web_source:
-        source_info["web_skip_reason"] = "assistant will use WebSearch (add BRAVE_API_KEY for native search)"
-
-    # Output result
-    output_result(report, args.emit, web_needed, args.topic, from_date, to_date, missing_keys, args.days, source_info)
-
-    # Auto-save raw research to file if --save-dir is set
-    if args.save_dir:
-        import re
-        save_dir = Path(args.save_dir).expanduser()
-        save_dir.mkdir(parents=True, exist_ok=True)
-        slug = re.sub(r'[^a-z0-9]+', '-', args.topic.lower()).strip('-')[:60]
-        save_path = save_dir / f"{slug}-raw.md"
-        if save_path.exists():
-            save_path = save_dir / f"{slug}-raw-{datetime.now().strftime('%Y-%m-%d')}.md"
-        content = render.render_compact(report, missing_keys=missing_keys)
-        content += "\n" + render.render_source_status(report, source_info)
-        save_path.write_text(content, encoding="utf-8")
-        print(f"📎 {save_path}", file=sys.stderr)
-
-    # Persist findings to SQLite if requested
-    if args.store:
-        import store as store_mod
-        store_mod.init_db()
-        topic_row = store_mod.add_topic(args.topic)
-        topic_id = topic_row["id"]
-        run_id = store_mod.record_run(topic_id, source_mode=mode, status="completed")
-
-        findings = []
-        for item in deduped_reddit:
-            findings.append({
-                "source": "reddit",
-                "url": item.url,
-                "title": item.title,
-                "author": item.subreddit,
-                "content": item.title,
-                "engagement_score": item.engagement.score if item.engagement else 0,
-                "relevance_score": item.relevance,
-            })
-        for item in deduped_x:
-            findings.append({
-                "source": "x",
-                "url": item.url,
-                "title": item.text[:100],
-                "author": item.author_handle,
-                "content": item.text,
-                "engagement_score": item.engagement.likes if item.engagement else 0,
-                "relevance_score": item.relevance,
-            })
-        for item in deduped_youtube:
-            findings.append({
-                "source": "youtube",
-                "url": item.url,
-                "title": item.title,
-                "author": item.channel_name,
-                "content": item.transcript_snippet[:500] if item.transcript_snippet else item.title,
-                "engagement_score": item.engagement.views if item.engagement and item.engagement.views else 0,
-                "relevance_score": item.relevance,
-            })
-        for item in deduped_hn:
-            findings.append({
-                "source": "hackernews",
-                "url": item.hn_url,
-                "title": item.title,
-                "author": item.author,
-                "content": item.title,
-                "engagement_score": item.engagement.score if item.engagement else 0,
-                "relevance_score": item.relevance,
-            })
-        for item in deduped_bsky:
-            findings.append({
-                "source": "bluesky",
-                "url": item.url,
-                "title": item.text[:100],
-                "author": item.author_handle,
-                "content": item.text,
-                "engagement_score": item.engagement.likes if item.engagement else 0,
-                "relevance_score": item.relevance,
-            })
-        for item in deduped_pm:
-            findings.append({
-                "source": "polymarket",
-                "url": item.url,
-                "title": item.question,
-                "author": "polymarket",
-                "content": item.title,
-                "engagement_score": item.engagement.volume if item.engagement and item.engagement.volume else 0,
-                "relevance_score": item.relevance,
-            })
-        for item in deduped_ig:
-            findings.append({
-                "source": "instagram",
-                "url": item.url,
-                "title": item.text[:100],
-                "author": item.author_name,
-                "content": item.caption_snippet[:500] if item.caption_snippet else item.text,
-                "engagement_score": item.engagement.views if item.engagement and item.engagement.views else 0,
-                "relevance_score": item.relevance,
-            })
-        for item in deduped_web:
-            findings.append({
-                "source": "web",
-                "url": item.url,
-                "title": item.title,
-                "author": item.source_domain,
-                "content": item.snippet,
-                "engagement_score": 0,
-                "relevance_score": item.relevance,
-            })
-
-        counts = store_mod.store_findings(run_id, topic_id, findings)
-        store_mod.update_run(
-            run_id,
-            status="completed",
-            findings_new=counts["new"],
-            findings_updated=counts["updated"],
-        )
+    topic = " ".join(args.topic).strip()
+    original_topic = topic
+    _validate_extra_argv(parser, topic, extra_argv)
+    if args.publish and topic.lower() != "library feed":
         sys.stderr.write(
-            f"[store] Saved {counts['new']} new, {counts['updated']} updated findings\n"
+            "[last30days] --publish is only supported by the 'library feed' command.\n"
+        )
+        return 2
+    config = env.get_config(policy=_config_policy_for_args(args, topic, extra_argv))
+    resolved_corpus_dirs = corpus.resolve_directories(
+        args.corpus, config.get("LAST30DAYS_CORPUS_DIRS")
+    )
+    # EXCLUDE_SOURCES=corpus disables corpus retrieval entirely; the hosted
+    # privacy bypass below must use the same predicate, or hosted users with
+    # configured-but-excluded dirs silently lose the remote backend.
+    excluded_sources = {
+        value.strip().lower()
+        for value in str(config.get("EXCLUDE_SOURCES") or "").split(",")
+        if value.strip()
+    }
+    if "corpus" in excluded_sources:
+        resolved_corpus_dirs = []
+    if resolved_corpus_dirs:
+        config["_CORPUS_DIRS"] = [str(path) for path in resolved_corpus_dirs]
+    if _config_truthy(config.get("LAST30DAYS_CORPUS_IN_EXPORT")):
+        config["_CORPUS_IN_EXPORT"] = True
+    _propagate_config_to_environ(config)
+
+    # Env-var fallback for --save-dir, mirroring the LAST30DAYS_STORE pattern below.
+    # Uses `is None` / `is not None` checks (not truthy `or`) at every layer so that
+    # `--save-dir ""`, `LAST30DAYS_MEMORY_DIR=""` (shell-export-empty), and explicit
+    # absence each correctly suppress save. An `or` chain would collapse the empty
+    # shell-export into the same path as unset, silently falling through to .env.
+    if args.save_dir is None:
+        env_val = os.environ.get("LAST30DAYS_MEMORY_DIR")
+        args.save_dir = env_val if env_val is not None else config.get("LAST30DAYS_MEMORY_DIR")
+
+    # Surface SSH-routing config as an env var so library modules (e.g.
+    # youtube_yt) can read it without taking a config dependency. This
+    # routes yt-dlp through `ssh <host>` to bypass YouTube's bot-wall on
+    # datacenter IPs (see lib/youtube_yt.py for details).
+    if config.get("LAST30DAYS_YOUTUBE_SSH_HOST") and "LAST30DAYS_YOUTUBE_SSH_HOST" not in os.environ:
+        os.environ["LAST30DAYS_YOUTUBE_SSH_HOST"] = config["LAST30DAYS_YOUTUBE_SSH_HOST"]
+
+    if args.preflight:
+        requested_sources = resolve_requested_sources(args.search, config)
+        diag = pipeline.diagnose(config, requested_sources, safe=True)
+        if args.save_dir or args.preflight_report_on_save_dir:
+            preflight = permission_preflight.build(
+                config,
+                diag,
+                planned_save_dir=args.save_dir,
+                report_on_save_dir=args.preflight_report_on_save_dir,
+            )
+        else:
+            preflight = diag["permission_preflight"]
+        if args.emit == "json":
+            print(json.dumps(preflight, indent=2, sort_keys=True))
+        else:
+            print(permission_preflight.render_text(preflight), end="")
+        return 0
+
+    # Handle doctor subcommand: topic-word dispatch mirroring setup (exact
+    # match only, so multi-word research topics containing "doctor" still
+    # research normally). Aggregates probes/descriptors/prescriptions into
+    # one grouped health surface; always exits 0.
+    if topic.lower() == "doctor":
+        from lib import doctor
+        return doctor.run(
+            config,
+            emit_json=(args.emit == "json" or "--json" in extra_argv),
+            cached="--cached" in extra_argv,
+            postmortem="--postmortem" in extra_argv,
+            probe="--probe" in extra_argv,
+        )
+
+    if topic.lower() == "library feed":
+        return _run_library_feed(args, config)
+    if topic.lower() == "library search" or topic.lower().startswith("library search "):
+        return _run_library_search(args, config, topic[len("library search") :].strip())
+
+    # Handle setup subcommand
+    if topic.lower() == "setup":
+        from lib import setup_wizard
+        if "--your-gateway-project" in extra_argv:
+            results = setup_wizard.run_your-gateway-project_setup(config)
+            print(json.dumps(results))
+            return 0
+        if any(f in extra_argv for f in ("--github", "--device-auth", "--github-start", "--github-poll")):
+            if "--github-start" in extra_argv:
+                results = setup_wizard.run_github_start()
+            elif "--github-poll" in extra_argv:
+                results = setup_wizard.run_github_poll()
+            elif "--github" in extra_argv:
+                results = setup_wizard.run_github_auth()
+            else:
+                results = setup_wizard.run_full_device_auth()
+            # Persist the returned key so the paid sources activate on the next
+            # run, and mask it in stdout so the secret never lands in the host
+            # model's captured Bash output.
+            api_key = results.get("api_key")
+            status = results.get("status")
+            if api_key:
+                if status == "success":
+                    results["persisted"] = setup_wizard.write_api_key(env.CONFIG_FILE, api_key)
+                elif status == "already_registered":
+                    results["persisted"] = True  # key was already saved
+                else:
+                    results.setdefault("persisted", False)
+                # Mask for EVERY status that carries a key, not just success, so
+                # the raw secret never reaches the host model's captured stdout.
+                results["api_key"] = setup_wizard.mask_api_key(api_key)
+            else:
+                results["persisted"] = False
+            print(json.dumps(results))
+            return 0
+        sys.stderr.write("Running auto-setup...\n")
+        results = setup_wizard.run_auto_setup(
+            config,
+            allow_browser_cookies=_setup_allows_browser_cookies(args, extra_argv),
+        )
+        # Persist FROM_BROWSER only when every service's cookies came from the
+        # SAME single browser — then we can fast-path future runs to it. If
+        # different services matched different browsers, or none matched, leave
+        # FROM_BROWSER unset so the safe default remains no browser-cookie
+        # reads. We deliberately do NOT pin "auto" here (it would re-probe
+        # Chrome and re-trigger the prompt) nor a single browser (it would
+        # silently skip the service that used the other one).
+        found_browsers = set(results.get("cookies_found", {}).values())
+        from_browser = found_browsers.pop() if len(found_browsers) == 1 else None
+        # Pin only a silent winner (firefox/safari). Pinning a Chromium browser
+        # would make every steady-state run re-read its Keychain-encrypted store
+        # and can re-trigger the "Always Allow" prompt, so Chrome is used for the
+        # first-run scan but never pinned.
+        if from_browser in {"chrome", "brave", "edge", "vivaldi", "opera", "arc", "chromium"}:
+            from_browser = None
+        setup_wizard.write_setup_config(env.CONFIG_FILE, from_browser=from_browser)
+        results["env_written"] = True
+        sys.stderr.write(setup_wizard.get_setup_status_text(results) + "\n")
+        return 0
+
+    # Bare --discover (no domain) is global trending, so the dispatch keys on
+    # "flag present" (is not None), never on the domain string's truthiness.
+    if args.discover is not None:
+        if topic:
+            sys.stderr.write(
+                "[last30days] --discover supplies the domain and cannot be combined "
+                "with a positional topic.\n"
+            )
+            return 2
+        if args.drill:
+            sys.stderr.write("[last30days] --discover and --drill are mutually exclusive.\n")
+            return 2
+        return _run_discover(args, config)
+
+    if args.discover_shallow:
+        # Without --discover this flag would silently no-op into a full
+        # research run - reject it instead of ignoring the requested mode.
+        sys.stderr.write(
+            "[last30days] --discover-shallow only applies to --discover runs; "
+            "add --discover [domain] or drop the flag.\n"
+        )
+        return 2
+
+    if args.drill:
+        if topic:
+            sys.stderr.write(
+                "[last30days] --drill uses the cached topic and cannot be "
+                "combined with a new topic.\n"
+            )
+            return 2
+        if args.publish_html and args.emit != "html":
+            sys.stderr.write("[last30days] --publish-html requires --emit=html\n")
+            return 2
+        if args.dedicated_subreddits:
+            config["_dedicated_subreddits"] = [
+                value.strip().removeprefix("r/")
+                for value in args.dedicated_subreddits.split(",")
+                if value.strip()
+            ]
+        if args.polymarket_keywords:
+            config["_polymarket_keywords"] = [
+                value.strip().lower()
+                for value in args.polymarket_keywords.split(",")
+                if value.strip()
+            ]
+        return _run_drill(args, config)
+
+    if args.verify_freshness and not topic:
+        return _run_cached_freshness(args, config)
+
+    if args.lookback_days is None:
+        args.lookback_days = 30
+
+    # Reject a misspelled configured register before remote submission or any
+    # local source retrieval. Excluded modes resolve to default and remain
+    # unaffected by the register setting.
+    try:
+        _audience_register_for_run(args, config, None)
+    except ValueError as exc:
+        sys.stderr.write(f"[last30days] {exc}\n")
+        return 2
+
+    # Remote API path: when BOTH LAST30DAYS_API_KEY and LAST30DAYS_API_BASE are
+    # set (and --mock is not), the search runs through the configured remote API
+    # instead of local sources; no local provider keys are needed (see
+    # lib/hosted.py). With either env var unset, behavior below is byte-identical
+    # to local-only runs - there is no built-in endpoint.
+    if (
+        topic
+        and resolved_corpus_dirs
+        and env.read_secret_env("LAST30DAYS_API_KEY")
+        and os.environ.get("LAST30DAYS_API_BASE")
+    ):
+        sys.stderr.write(
+            "[last30days] Local corpus configured; bypassing the hosted backend so files stay on this machine.\n"
+        )
+    if (
+        topic
+        and not args.diagnose
+        and not args.mock
+        and not args.record_fixtures
+        and env.read_secret_env("LAST30DAYS_API_KEY")
+        and os.environ.get("LAST30DAYS_API_BASE")
+        and not resolved_corpus_dirs
+    ):
+        if _freshness_enabled(args, config):
+            if args.verify_freshness is True:
+                sys.stderr.write(
+                    "[last30days] Freshness verification is not supported by the hosted backend; "
+                    "run locally or omit --verify-freshness.\n"
+                )
+                return 2
+            sys.stderr.write(
+                "hosted backend does not support freshness verification; skipping\n"
+            )
+        if args.emit == "json" and args.json_profile == "agent":
+            sys.stderr.write(
+                "[last30days] --json-profile=agent requires the local Report; "
+                "the remote API backend only supports --json-profile=raw.\n"
+            )
+            return 2
+        from lib import hosted
+        depth = "deep" if args.deep else "quick" if args.quick else "default"
+        try:
+            audience = _audience_register_for_run(args, config, None)
+        except ValueError as exc:
+            sys.stderr.write(f"[last30days] {exc}\n")
+            return 2
+        hosted_kwargs = {
+            "emit": args.emit,
+            "save_dir": args.save_dir,
+            "save_suffix": args.save_suffix or "",
+        }
+        if audience.name != "default":
+            hosted_kwargs["register"] = audience.name
+        return hosted.run_hosted(topic, depth, **hosted_kwargs)
+
+    requested_sources = resolve_requested_sources(args.search, config)
+    diag = pipeline.diagnose(config, requested_sources, safe=args.diagnose)
+
+    if args.diagnose:
+        print(json.dumps(diag, indent=2, sort_keys=True))
+        return 0
+
+    if not topic:
+        parser.print_usage(sys.stderr)
+        return 2
+    if args.publish_html and args.emit != "html":
+        sys.stderr.write("[last30days] --publish-html requires --emit=html\n")
+        return 2
+
+    synthesis_md = None
+    if args.synthesis_file:
+        if args.emit == "html":
+            synthesis_md = read_synthesis_file(args.synthesis_file)
+        else:
+            sys.stderr.write("[last30days] Warning: --synthesis-file is only used with --emit=html; ignoring.\n")
+
+    if not os.environ.get("LAST30DAYS_SKIP_PREFLIGHT"):
+        from lib import preflight
+        refuse_msg = preflight.check_class_1_trap(topic)
+        if refuse_msg:
+            sys.stderr.write(refuse_msg)
+            return 2
+
+    if args.emit == "html" and synthesis_md is not None:
+        cached = _load_last_report_cache(
+            topic,
+            ttl_seconds=_report_cache_ttl_seconds(config),
+        )
+        if cached is not None:
+            cached_report, cached_entity_reports, cache_path = cached
+            sys.stderr.write(
+                f"[last30days] Reusing cached report data from {cache_path}\n"
+            )
+            sys.stderr.flush()
+            if _freshness_enabled(args, config):
+                _verify_report_set(
+                    cached_report,
+                    cached_entity_reports,
+                    allow_network=not args.mock,
+                )
+                _update_cached_freshness(
+                    cache_path,
+                    cached_report,
+                    cached_entity_reports,
+                )
+            return _render_save_and_print(
+                args, cached_report, cached_entity_reports, synthesis_md, config
+            )
+        sys.stderr.write(
+            "[last30days] No matching cached report data for "
+            "--emit=html --synthesis-file; running fresh research.\n"
         )
         sys.stderr.flush()
 
+    progress = ui.ProgressDisplay(topic, show_banner=True)
+    progress.start_processing()
 
-def output_result(
-    report: schema.Report,
-    emit_mode: str,
-    web_needed: bool = False,
-    topic: str = "",
-    from_date: str = "",
-    to_date: str = "",
-    missing_keys: str = "none",
-    days: int = 30,
-    source_info: dict = None,
-):
-    """Output the result based on emit mode."""
-    if emit_mode == "compact":
-        print(render.render_compact(report, missing_keys=missing_keys))
-        # Append source status footer
-        print(render.render_source_status(report, source_info))
-    elif emit_mode == "json":
-        print(json.dumps(report.to_dict(), indent=2))
-    elif emit_mode == "md":
-        print(render.render_full_report(report))
-    elif emit_mode == "context":
-        print(report.context_snippet_md)
-    elif emit_mode == "path":
-        print(render.get_context_path())
+    depth = "deep" if args.deep else "quick" if args.quick else "default"
+    # CLI overrides for the depth profile's result caps (issue #716). Stashed on
+    # config so pipeline.run() can apply them without widening its signature; the
+    # comparison path inherits them via `entity_config = dict(config)`.
+    if args.max_results is not None:
+        config["_max_results"] = args.max_results
+    if args.max_per_source is not None:
+        config["_max_per_source"] = args.max_per_source
+    if args.max_source_fetches is not None:
+        config["_max_source_fetches"] = args.max_source_fetches
+    try:
+        x_related = [h.strip() for h in args.x_related.split(",") if h.strip()] if args.x_related else None
+        subreddits = [s.strip().removeprefix("r/") for s in args.subreddits.split(",") if s.strip()] if args.subreddits else None
+        dedicated_subreddits = [s.strip().removeprefix("r/") for s in args.dedicated_subreddits.split(",") if s.strip()] if args.dedicated_subreddits else None
+        tiktok_hashtags = [h.strip().lstrip("#") for h in args.tiktok_hashtags.split(",") if h.strip()] if args.tiktok_hashtags else None
+        tiktok_creators = [c.strip().lstrip("@") for c in args.tiktok_creators.split(",") if c.strip()] if args.tiktok_creators else None
+        ig_creators = [c.strip().lstrip("@") for c in args.ig_creators.split(",") if c.strip()] if args.ig_creators else None
+        # Parse external plan if provided via --plan flag
+        external_plan = None
+        if args.plan:
+            import json as _json
+            plan_str = args.plan
+            if os.path.isfile(plan_str):
+                try:
+                    with open(plan_str, encoding="utf-8") as f:
+                        plan_str = f.read()
+                except (OSError, UnicodeDecodeError) as exc:
+                    sys.stderr.write(f"[Planner] Cannot read --plan file: {exc}\n")
+                    raise SystemExit(2)
+            try:
+                external_plan = _json.loads(plan_str)
+            except _json.JSONDecodeError as exc:
+                sys.stderr.write(f"[Planner] Invalid --plan JSON: {exc}\n")
+                # Fail fast instead of silently dropping to the internal planner
+                # and burning a paid run the user did not ask for. Mirrors the
+                # --plan file-read branch above and parse_competitors_plan.
+                raise SystemExit(2)
 
-    # Output WebSearch instructions if needed
-    if web_needed:
-        print("\n" + "="*60)
-        print("### WEBSEARCH REQUIRED ###")
-        print("="*60)
-        print(f"Topic: {topic}")
-        print(f"Date range: {from_date} to {to_date}")
-        print("")
-        print("Assistant: Use your web search tool to find 8-15 relevant web pages.")
-        print("EXCLUDE: reddit.com, x.com, twitter.com (already covered above)")
-        print(f"INCLUDE: blogs, docs, news, tutorials from the last {days} days")
-        print("")
-        print("After searching, synthesize WebSearch results WITH the Reddit/X")
-        print("results above. WebSearch items should rank LOWER than comparable")
-        print("Reddit/X items (they lack engagement metrics).")
-        print("="*60)
+        # Auto-resolve: use web search to discover subreddits/handles before planning.
+        # This is the engine-side equivalent of SKILL.md Steps 0.55/0.75 for platforms
+        # without WebSearch (OpenClaw, Codex, raw CLI).
+        repos_from_auto_resolve = False
+        trustpilot_domain_is_hint = False
+        if args.auto_resolve and not external_plan:
+            from lib import resolve
+            resolution = resolve.auto_resolve(topic, config)
+            if resolution.get("subreddits") and not subreddits:
+                subreddits = resolution["subreddits"]
+                sys.stderr.write(f"[AutoResolve] Subreddits: {', '.join(subreddits)}\n")
+            if resolution.get("x_handle") and not args.x_handle:
+                args.x_handle = resolution["x_handle"]
+                sys.stderr.write(f"[AutoResolve] X handle: @{args.x_handle}\n")
+            if resolution.get("github_user") and not args.github_user:
+                args.github_user = resolution["github_user"]
+                sys.stderr.write(f"[AutoResolve] GitHub user: @{args.github_user}\n")
+            if resolution.get("github_repos") and not args.github_repo:
+                args.github_repo = ",".join(resolution["github_repos"])
+                # auto_resolve already canonicalized via canonicalize_github_repos(cap=5);
+                # mark so we don't re-canonicalize below and clobber its relevance order.
+                repos_from_auto_resolve = True
+                sys.stderr.write(f"[AutoResolve] GitHub repos: {args.github_repo}\n")
+            if resolution.get("trustpilot_domain") and not args.trustpilot_domain:
+                # Hint provenance matters: only user-set flags are verbatim-final;
+                # a resolved hint retries via the CLI search when it misses.
+                args.trustpilot_domain = resolution["trustpilot_domain"]
+                trustpilot_domain_is_hint = True
+                sys.stderr.write(f"[AutoResolve] Trustpilot domain: {args.trustpilot_domain} (hint)\n")
+            if resolution.get("context"):
+                # Inject context into external_plan metadata for the planner to use
+                if not external_plan:
+                    external_plan = None  # planner will use its own, but with context
+                # Store context for the planner prompt injection
+                config["_auto_resolve_context"] = resolution["context"]
+                sys.stderr.write(f"[AutoResolve] Context: {resolution['context'][:80]}...\n")
+
+        github_user = args.github_user.lstrip("@").lower() if args.github_user else None
+        github_repos = [r.strip() for r in args.github_repo.split(",") if r.strip() and "/" in r.strip()] if args.github_repo else None
+        trustpilot_domain = args.trustpilot_domain.strip() if args.trustpilot_domain else None
+
+        # Only canonicalize when repos came from a user-supplied --github-repo flag.
+        # When repos_from_auto_resolve is True, auto_resolve already ran
+        # canonicalize_github_repos(cap=5) and ranked by relevance; re-running here
+        # with cap=None can re-sort by topic-slug match and lose that ordering.
+        if github_repos and not repos_from_auto_resolve:
+            from lib import resolve as resolve_lib
+            original_github_repos = github_repos[:]
+            github_repos = resolve_lib.canonicalize_github_repos(topic, github_repos, cap=None)
+            if github_repos != original_github_repos:
+                sys.stderr.write(
+                    "[GitHub] Canonicalized repos: "
+                    f"{','.join(original_github_repos)} -> {','.join(github_repos)}\n"
+                )
+
+        # --deep-research: auto-enable perplexity source and set deep flag
+        if args.deep_research:
+            if not (config.get("PERPLEXITY_API_KEY") or config.get("OPENROUTER_API_KEY")):
+                print("Error: --deep-research requires PERPLEXITY_API_KEY or OPENROUTER_API_KEY", file=sys.stderr)
+                sys.exit(1)
+            config["_deep_research"] = True
+            # Auto-enable perplexity in INCLUDE_SOURCES
+            include = config.get("INCLUDE_SOURCES") or ""
+            if "perplexity" not in include.lower():
+                config["INCLUDE_SOURCES"] = f"{include},perplexity" if include else "perplexity"
+
+        comp_enabled, comp_count, comp_explicit = resolve_competitors_args(args)
+        comp_plan = parse_competitors_plan(args.competitors_plan)
+
+        # Polymarket disambiguation: if user passed --polymarket-keywords,
+        # store on config so the polymarket adapter can filter matches.
+        if args.polymarket_keywords:
+            keywords = [
+                k.strip().lower()
+                for k in args.polymarket_keywords.split(",")
+                if k.strip()
+            ]
+            if keywords:
+                config["_polymarket_keywords"] = keywords
+
+        # vs-mode: if the topic string contains " vs " / " versus " and the
+        # planner can split it into >=2 entities, route through the same
+        # N-pass fanout path as --competitors. The first entity becomes the
+        # main topic; remaining entities become the competitor list. пользователя
+        # outer --x-handle / --subreddits apply to the first entity unless
+        # --competitors-plan covers it.
+        from lib import planner as _planner
+        vs_entities = _planner._comparison_entities(topic)
+        if len(vs_entities) >= 2 and not comp_enabled:
+            topic = vs_entities[0]
+            comp_enabled = True
+            comp_count = len(vs_entities) - 1
+            comp_explicit = vs_entities[1:]
+            sys.stderr.write(
+                f"[Competitors] vs-mode: routing to N-pass fanout: "
+                f"{' vs '.join(vs_entities)}\n"
+            )
+
+        # Dedicated subs ride the config dict (already threaded to every source
+        # fetch) so the keyless Reddit path can pull them floor-exempt without
+        # widening pipeline.run / _retrieve_stream signatures.
+        if dedicated_subreddits:
+            config["_dedicated_subreddits"] = dedicated_subreddits
+
+        def _main_runner() -> schema.Report:
+            r = pipeline.run(
+                topic=topic,
+                config=config,
+                depth=depth,
+                requested_sources=requested_sources,
+                mock=args.mock,
+                x_handle=args.x_handle,
+                x_related=x_related,
+                web_backend=args.web_backend,
+                external_plan=external_plan,
+                subreddits=subreddits,
+                tiktok_hashtags=tiktok_hashtags,
+                tiktok_creators=tiktok_creators,
+                ig_creators=ig_creators,
+                lookback_days=args.lookback_days,
+                as_of_date=args.as_of_date,
+                github_user=github_user,
+                github_repos=github_repos,
+                trustpilot_domain=trustpilot_domain,
+                trustpilot_domain_is_hint=trustpilot_domain_is_hint,
+                internal_subrun=comp_enabled,
+                hiring_signals_mode=args.hiring_signals,
+                save_dir=args.save_dir,
+                corpus_dirs=args.corpus,
+                corpus_all_time=args.corpus_all_time,
+            )
+            r.artifacts["resolved"] = {
+                "entity": topic,
+                "x_handle": (args.x_handle or "").lstrip("@"),
+                "subreddits": list(subreddits or []),
+                "github_user": (github_user or ""),
+                "github_repos": list(github_repos or []),
+                "trustpilot_domain": (trustpilot_domain or ""),
+                "context": config.get("_auto_resolve_context", "") or "",
+            }
+            return r
+
+        if comp_enabled:
+            from lib import competitors as competitors_mod
+            from lib import fanout, resolve as resolve_mod
+
+            if comp_explicit:
+                discovered = comp_explicit
+            else:
+                if not resolve_mod._has_backend(config) and not args.mock:
+                    sys.stderr.write(
+                        "[Competitors] Cannot auto-discover peers without help.\n"
+                        "\n"
+                        "RECOMMENDED PATH (hosting reasoning models — Claude Code, Codex, "
+                        "Hermes, Gemini, any agent with a WebSearch tool): YOU have "
+                        "WebSearch. Use it to run full Step 0.55 per entity, then invoke "
+                        "the engine with a vs-topic plus --competitors-plan:\n"
+                        "  1. WebSearch for '{topic} competitors' or '{topic} alternatives'.\n"
+                        "  2. For each peer, WebSearch for handles/subs/github (Step 0.55).\n"
+                        "  3. Re-invoke: /last30days '{topic} vs {peer1} vs {peer2}' "
+                        "--competitors-plan '{\"Peer1\":{\"x_handle\":\"h1\",\"subreddits\":"
+                        "[\"s1\"],...},\"Peer2\":{...}}'.\n"
+                        "See SKILL.md 'Competitor mode' for the full protocol.\n"
+                        "\n"
+                        "HEADLESS / CRON PATH (no hosting model available): set "
+                        "BRAVE_API_KEY / EXA_API_KEY / SERPER_API_KEY / PARALLEL_API_KEY / "
+                        "PERPLEXITY_API_KEY / OPENROUTER_API_KEY and re-run.\n"
+                        "\n"
+                        "MINIMUM ESCAPE HATCH: pass --competitors-list 'A,B,C' to skip "
+                        "discovery. Without --competitors-plan, peer sub-runs fall back to "
+                        "planner defaults and produce visibly thinner data than the main.\n"
+                    )
+                    return 2
+                discovered = competitors_mod.discover_competitors(
+                    topic, comp_count, config, lookback_days=args.lookback_days,
+                )
+                if not discovered:
+                    sys.stderr.write(
+                        f"[Competitors] No peers discovered for {topic!r}; aborting "
+                        "comparison run. Pass --competitors-list to override.\n"
+                    )
+                    return 2
+
+            sys.stderr.write(
+                f"[Competitors] Comparing: {topic} vs " + " vs ".join(discovered) + "\n"
+            )
+
+            def _competitor_runner(entity: str) -> schema.Report:
+                # Deep-copy config so per-entity auto_resolve context does not
+                # leak across sub-runs. Each sub-run writes its own
+                # `_auto_resolve_context` into its local config copy.
+                entity_config = dict(config)
+                plan_entry = comp_plan.get(entity.strip().lower(), {})
+                resolved = {
+                    "entity": entity,
+                    "x_handle": "",
+                    "subreddits": [],
+                    "github_user": "",
+                    "github_repos": [],
+                    "trustpilot_domain": "",
+                    "context": "",
+                }
+                # Skip engine-internal auto_resolve when the hosting model
+                # pre-resolved via --competitors-plan (saves a redundant
+                # round-trip and makes per-entity Step 0.55 purely
+                # hosting-model-driven).
+                plan_covers_fully = bool(plan_entry.get("x_handle")) and bool(
+                    plan_entry.get("subreddits")
+                )
+                if (
+                    not args.mock
+                    and not plan_covers_fully
+                    and resolve_mod._has_backend(entity_config)
+                ):
+                    try:
+                        r = resolve_mod.auto_resolve(entity, entity_config)
+                    except Exception as exc:
+                        sys.stderr.write(
+                            f"[Competitors] auto_resolve failed for {entity!r}: "
+                            f"{type(exc).__name__}: {exc}\n"
+                        )
+                        r = {}
+                    resolved["x_handle"] = r.get("x_handle", "") or ""
+                    resolved["subreddits"] = list(r.get("subreddits") or [])
+                    resolved["github_user"] = r.get("github_user", "") or ""
+                    resolved["github_repos"] = list(r.get("github_repos") or [])
+                    resolved["trustpilot_domain"] = r.get("trustpilot_domain", "") or ""
+                    resolved["context"] = r.get("context", "") or ""
+                kwargs = subrun_kwargs_for(entity, plan_entry, resolved=resolved)
+                # Record effective per-entity targeting for the Resolved block.
+                resolved_effective = {
+                    "entity": entity,
+                    "x_handle": kwargs["x_handle"] or "",
+                    "subreddits": kwargs["subreddits"] or [],
+                    "github_user": kwargs["github_user"] or "",
+                    "github_repos": kwargs["github_repos"] or [],
+                    "trustpilot_domain": kwargs["trustpilot_domain"] or "",
+                    "context": kwargs["_context"],
+                }
+                if kwargs["_context"]:
+                    entity_config["_auto_resolve_context"] = kwargs["_context"]
+                sys.stderr.write(
+                    f"[Competitors] {entity}: "
+                    f"x=@{resolved_effective['x_handle'] or '-'} "
+                    f"subs={len(resolved_effective['subreddits'])} "
+                    f"gh={resolved_effective['github_user'] or '-'} "
+                    f"({'plan' if plan_entry else 'auto'})\n"
+                )
+                report = pipeline.run(
+                    topic=entity,
+                    config=entity_config,
+                    depth=depth,
+                    requested_sources=requested_sources,
+                    mock=args.mock,
+                    x_handle=kwargs["x_handle"],
+                    x_related=kwargs["x_related"],
+                    subreddits=kwargs["subreddits"],
+                    github_user=kwargs["github_user"],
+                    github_repos=kwargs["github_repos"],
+                    trustpilot_domain=kwargs["trustpilot_domain"],
+                    trustpilot_domain_is_hint=kwargs["_trustpilot_domain_is_hint"],
+                    web_backend=args.web_backend,
+                    lookback_days=args.lookback_days,
+                    as_of_date=args.as_of_date,
+                    hiring_signals_mode=args.hiring_signals,
+                    internal_subrun=True,
+                    save_dir=args.save_dir,
+                    corpus_dirs=args.corpus,
+                    corpus_all_time=args.corpus_all_time,
+                )
+                report.artifacts["resolved"] = resolved_effective
+                return report
+
+            entity_reports = fanout.run_competitor_fanout(
+                main_topic=topic,
+                main_runner=_main_runner,
+                competitors=discovered,
+                competitor_runner=_competitor_runner,
+            )
+            if len(entity_reports) < 2:
+                progress.end_processing()
+                sys.stderr.write(
+                    f"[Competitors] Fewer than 2 sub-runs survived ({len(entity_reports)}); "
+                    "cannot render a comparison. Re-run without --competitors or check the "
+                    "warnings above.\n"
+                )
+                return 1
+            report = entity_reports[0][1]
+        else:
+            entity_reports = None
+            report = _main_runner()
+    except Exception as exc:
+        progress.end_processing()
+        progress.show_error(str(exc))
+        raise
+    if _freshness_enabled(args, config):
+        _verify_report_set(report, entity_reports, allow_network=not args.mock)
+
+    _show_runtime_ui(
+        report, progress, diag,
+        suppress_web_promo=bool(external_plan or comp_plan),
+    )
+    _write_last_run(original_topic, report, entity_reports=entity_reports)
+    # LAST30DAYS_STORE env var = persistence default-on. Read both os.environ
+    # (for shell-exported users) and config (for users who set it in
+    # ~/.config/last30days/.env, which env.py loads but does not propagate
+    # to os.environ). Mirrors the LAST30DAYS_DEBUG / LAST30DAYS_SKIP_PREFLIGHT
+    # convention; env-var or config wins, with `--store` flag still working.
+    _store_env = (
+        os.environ.get("LAST30DAYS_STORE")
+        or config.get("LAST30DAYS_STORE")
+        or ""
+    ).lower()
+    if args.store or _store_env in ("1", "true", "yes"):
+        counts = persist_report(report, store_db=_scoped_store_db(args))
+        sys.stderr.write(
+            f"[last30days] Stored {counts['new']} new, {counts['updated']} updated findings\n"
+        )
+        sys.stderr.flush()
+
+    # Show quality nudge if applicable. Explicit hiring-signal runs are
+    # intentionally jobs-focused, so generic source setup advice is noise.
+    if not args.hiring_signals:
+        try:
+            from lib import quality_nudge
+            from lib import youtube_yt as _youtube_yt
+            # Populate transcript-fetch ratio so quality_nudge can detect the
+            # degraded-YouTube failure mode (videos returned but transcripts
+            # silently failed - typically a stale yt-dlp binary).
+            youtube_items = report.items_by_source.get("youtube") or []
+            _yt_fetch_stats = _youtube_yt.get_transcript_fetch_stats()
+            instagram_items = report.items_by_source.get("instagram") or []
+            research_results = {
+                "youtube_videos_count": len(youtube_items),
+                "youtube_transcripts_count": sum(
+                    1 for it in youtube_items
+                    if (it.metadata.get("transcript_highlights") or it.metadata.get("transcript_snippet"))
+                ),
+                "youtube_error": report.errors_by_source.get("youtube"),
+                "x_error": report.errors_by_source.get("x"),
+                # Captions-disabled videos can never produce a transcript regardless
+                # of yt-dlp version; subtract them from the degraded-ratio
+                # denominator so a single uploader-disabled video does not trip the
+                # "stale yt-dlp" nudge.
+                "youtube_captions_disabled_count": sum(
+                    1 for it in youtube_items if it.metadata.get("captions_disabled")
+                ),
+                # Actual yt-dlp fetch outcomes for this run. The counts above are
+                # computed from post-pruning items, so they can't tell "fetches
+                # failed (stale binary)" from "fetches succeeded but the videos
+                # were pruned downstream"; the latter was producing false
+                # stale-yt-dlp nudges (#531).
+                "youtube_transcript_fetch_attempts": _yt_fetch_stats["attempts"],
+                "youtube_transcript_fetch_failures": _yt_fetch_stats["failures"],
+                # Track Instagram returned-zero-items so quality_nudge can detect
+                # the silent-failure case (SC configured but the v2 reels endpoint
+                # 500'd through both the original query and the hashtag retry).
+                "instagram_items_count": len(instagram_items),
+            }
+            quality = quality_nudge.compute_quality_score(config, research_results)
+            if quality.get("nudge_text"):
+                sys.stderr.write(f"\n{quality['nudge_text']}\n")
+                sys.stderr.flush()
+        except Exception:
+            pass
+
+    # Signal to render_compact whether pre-research flags were supplied.
+    # Used to emit a Pre-Research Status warning when the model skipped
+    # Step 0.5 / 0.55 and invoked the engine bare on an eligible topic.
+    pre_research_flags_present = bool(
+        args.x_handle
+        or args.github_user
+        or args.subreddits
+        or args.plan
+        or args.auto_resolve
+        or args.tiktok_creators
+        or args.ig_creators
+    )
+    report.artifacts["pre_research_flags_present"] = pre_research_flags_present
+
+    return _render_save_and_print(args, report, entity_reports, synthesis_md, config)
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

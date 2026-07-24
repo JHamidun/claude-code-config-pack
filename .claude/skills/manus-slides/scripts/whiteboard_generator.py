@@ -49,7 +49,12 @@ from google.genai import types
 from PIL import Image
 import io
 
-MODEL = "gemini-3.1-flash-image-preview"
+# Default image model = Nano Banana 2 (fast, cheap, great Cyrillic). Override for premium decks:
+#   MANUS_SLIDES_MODEL=nano-banana-pro-preview   (Nano Banana Pro — richest detail + best incidental text)
+#   MANUS_SLIDES_MODEL=gemini-3-pro-image        (Nano Banana Pro alias)
+#   MANUS_SLIDES_MODEL=gemini-3.1-flash-lite-image (Nano Banana 2 Lite — cheaper)
+# NOTE: gemini-3.5-flash is TEXT-ONLY (no image output) — do NOT use it here.
+MODEL = os.getenv("MANUS_SLIDES_MODEL", "gemini-3.1-flash-image-preview")
 
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
@@ -63,6 +68,11 @@ STYLES = {
     # ================================================================
     # CUSTOM STYLES
     # ================================================================
+
+    "exec-sketch": """A professional business presentation slide, 16:9, on a warm off-white cream background (#YOUR_CREAM) that COMPLETELY covers all four corners — NO white rectangles, NO empty blocks, NO containers, NO reserved boxes in any corner. Clean editorial layout with generous whitespace. Crisp modern sans-serif typography (Manrope/Inter style) — titles bold dark indigo (#YOUR_INK), body in dark gray, clear visual hierarchy. Content is structured in neat rounded white cards with thin borders and very soft shadows (corporate style). BUT all icons, diagrams, arrows, underlines and small illustrations are HAND-DRAWN in marker/sketch style with slightly imperfect lines, using indigo-blue (#YOUR_PRIMARY) and copper-orange (#C77B30) markers — this blend of clean corporate typography with playful hand-drawn marker icons is the signature look. ALL TEXT IN RUSSIAN, perfectly readable Cyrillic (use Cyrillic letters И, С, Н, Р, К, Т — NOT Latin lookalikes I, C, H, P, K, T), no errors, NO duplicates, NO repeated words, NO truncated phrases. Render each text element EXACTLY ONCE as written.
+The slide content:
+
+""",
 
     "clean-marker": """A presentation slide on a pure clean white background. No room, no furniture, no whiteboard frame, no magnets, no chairs, no walls — just a clean white canvas.
 Content is drawn in thick dry-erase marker style — hand-drawn, slightly imperfect lines, colorful marker strokes.
@@ -248,6 +258,93 @@ The bold statement on this slide:
 """,
 
     # ================================================================
+    # MANUS 1.6 IMAGE THEMES — gpt-image replicas (added 2026-07-02)
+    # Reverse-engineered from the Manus 1.6 slide catalog (ListSlideTemplatesPublic).
+    # Reference sample slides: references/manus-theme-samples/<Theme>__gpt-image/
+    # ================================================================
+
+    "etching": """A refined pen-and-ink engraving / etching style presentation slide on a warm off-white cream paper background (#F4F1EA) that FULLY covers all four corners — NO white rectangles, NO empty boxes, NO reserved containers in any corner.
+Delicate fine-line ink illustration with subtle crosshatching and a soft pale grey watercolor wash, in the elegant restrained manner of a New Yorker illustration or a vintage encyclopedia engraving.
+Title in a classic letterpress serif with generous letter-spacing (spaced roman capitals, Caslon/Garamond feel), thin dark charcoal ink.
+Small understated italic serif subtitle beneath, often framed between two short em-dashes.
+Muted monochrome palette: warm cream paper, charcoal/graphite ink, pale grey washes — no bright colors.
+Extremely refined, quiet, literary and editorial, with very generous whitespace and a small italic caption or roman-numeral page mark near the bottom.
+ALL TEXT IN RUSSIAN, perfectly readable Cyrillic (use Cyrillic letters И, С, Н, Р, К, Т — NOT Latin lookalikes I, C, H, P, K, T), no errors, NO duplicates, render each text element EXACTLY ONCE.
+The refined engraved content on this slide:
+
+""",
+
+    "editorial": """A premium print-magazine editorial presentation slide in the sophisticated style of Kinfolk or Monocle, with TWO layout variants — pick by the slide content below:
+
+IF the content below is a TITLE or SECTION slide: two-column split layout.
+LEFT column: a moody, warm, photorealistic editorial photograph lit by soft natural window light — tactile objects (stacked design books, a ceramic coffee cup, dried flowers, textured linen, a film camera, loose paper sheets — vary the objects), gentle shadows.
+RIGHT column: a solid dark charcoal/espresso panel (#211E1B). On it: a large high-contrast Didone serif display headline (Playfair Display style) in warm cream/ivory stacked over several lines; a single thin copper-orange rule under the headline; a refined serif subtitle in soft warm grey; at the bottom a small letter-spaced ALL-CAPS footer line in muted copper.
+
+OTHERWISE (lists, diagrams, comparisons, data — any content slide): a light editorial "paper" layout on warm cream (#F4F1EA) covering the WHOLE slide, no dark panel.
+Headline in the same dark charcoal Didone serif, moderate size (2–3 lines max, upper-left, avoid hyphenating or breaking words), with a thin copper-orange rule beneath. ONLY if the content below explicitly provides a subtitle or kicker, set it in italic serif under the rule; if NO subtitle is given, leave that area empty — NEVER invent a kicker or subtitle, never render instruction words.
+Body set in an elegant editorial grid with generous whitespace: numbered lists with bold serif lead-ins separated by thin hairlines; comparisons and diagrams as columns divided by a thin vertical hairline, with large Didone numerals or copper accents for key figures and arrows in fine charcoal line; optionally a small editorial photograph inside a thin-bordered frame on one side.
+Footer: a small letter-spaced ALL-CAPS line in muted copper at the bottom, above or below a thin hairline.
+
+BOTH variants: a thin charcoal border frame around the whole slide; palette strictly warm cream, dark charcoal/espresso, muted copper-orange; understated luxury print aesthetic; body text clearly smaller than the headline, headline never taking more than a third of the layout on content slides.
+ALL TEXT IN RUSSIAN, perfectly readable Cyrillic (use Cyrillic letters И, С, Н, Р, К, Т — NOT Latin lookalikes I, C, H, P, K, T), no errors, NO duplicates, render each text element EXACTLY ONCE.
+The sophisticated editorial content on this slide:
+
+""",
+
+    "pixel": """A nostalgic late-1990s / early-2000s classic Mac OS desktop-GUI style presentation slide.
+The entire slide is one beveled 'Platinum'/Aqua application window: a light grey pinstriped title bar with a short centered label (use the window label given in the content; if none is given, label it "Presentation") and three traffic-light dots (red, yellow, green) in the top-left corner.
+The area around the window is a bright Bondi-blue retro desktop with a subtle dotted / pinstripe halftone texture.
+Inside the window, on an off-white panel: a big, bold, slightly rounded grotesque headline (Charcoal/Chicago-era feel) in near-black, tightly set across two or three lines, with a short orange underline accent beneath it.
+If the content provides a subtitle, set it in a lighter grey sans-serif below the headline; if NO subtitle is given, leave that area empty — NEVER invent one.
+Footer: ONLY if the content explicitly lists footer tags, render a recessed inset status/footer bar at the bottom holding exactly those bullet-separated tags in bold or monospaced text. If NO footer tags are given, OMIT the footer bar entirely — never invent tag words, never reuse words from the body as tags.
+Skeuomorphic beveled edges, soft inset shadows, warm retro-computing nostalgia; optionally a faint blue line-art of a vintage gadget in one corner.
+Render ONLY the text given in the content below — no extra labels, captions or filler words of your own.
+ALL TEXT IN RUSSIAN, perfectly readable Cyrillic (use Cyrillic letters И, С, Н, Р, К, Т — NOT Latin lookalikes I, C, H, P, K, T), no errors, NO duplicates, render each text element EXACTLY ONCE.
+The retro-computing content on this slide:
+
+""",
+
+    "vellum": """A serene East-Asian ink-wash (sumi-e / shan-shui) style presentation slide on a warm rice-paper cream background (#F2ECDD) with a subtle paper texture that covers all corners.
+A soft monochrome ink-wash painting of misty, layered mountains with a gnarled pine tree occupies the lower portion, in muted grey-green and charcoal ink with gentle bleeds and plenty of negative space; on dense content slides (lists, comparisons, diagrams) keep the landscape within roughly the bottom 25%, faint and semi-transparent, so it NEVER touches or sits behind the text.
+Title in an elegant serif (refined Song/Ming-inspired or classic Western serif) in deep ink-green (#2E4034), calm and balanced.
+If the content provides a subtitle, set it in a restrained fine serif or sans-serif beneath the title; if NO subtitle is given, leave that area empty — NEVER invent one.
+ALWAYS include exactly one small red seal / chop stamp (vermilion #B23A2E) — the ONLY bright accent color, present on every slide: place it quietly right beneath the title block or in the bottom-right corner — never floating in the middle of the content area.
+Zen, meditative, classical, spacious; all text sits in the clear upper area above the mountains.
+Render ONLY the text given in the content below — no extra labels, captions or filler words of your own.
+ALL TEXT IN RUSSIAN, perfectly readable Cyrillic (use Cyrillic letters И, С, Н, Р, К, Т — NOT Latin lookalikes I, C, H, P, K, T), no errors, NO duplicates, render each text element EXACTLY ONCE.
+The tranquil content on this slide:
+
+""",
+
+    "dossier": """A vintage archival 'dossier' flat-lay presentation slide — a top-down photorealistic still-life.
+The centerpiece is a large aged, slightly torn cream paper note (faint ruled lines, soft drop shadow, held by a small brass pin) resting on a warm textured cork or tan-leather desk surface that fills the whole frame.
+Curated antique objects are arranged ONLY around the outer edges of the frame — a brass service bell, old postage stamps, a wax-seal stamp with a small red wax seal, an antique brass key on a fob, white gloves, a fountain pen, a wax-sealed envelope — all in warm brass, sepia and cream tones; objects may be partly cropped by the frame but must NEVER overlap or touch the paper's text. ALL text sits in the clean center of the aged paper.
+On the aged paper: the title in a classic serif (Playfair / Georgia feel) in deep navy (#1F3A5F), with small ornamental serif dividers above or below it.
+If the content provides a subtitle, set it in a clean serif beneath the title; if NO subtitle is given, leave that area empty — NEVER invent one.
+If the content provides a short red accent line (e.g. an "Est. ..." year), render it in small red italic serif between two fine flourishes; if NO red accent line is given, OMIT it entirely — never invent dates, mottos or slogans.
+On dense content slides (lists, comparisons, diagrams): list items get small brass ornament markers and are separated by thin sepia hairlines; comparisons form two columns divided by a thin vertical sepia hairline; body text in dark ink serif, clearly smaller than the title.
+Warm brown/sepia lighting with rich soft shadows and tactile realism — an elegant heritage / detective-dossier aesthetic.
+Render ONLY the text given in the content below — no extra labels, captions, worded stamps or filler words of your own.
+ALL TEXT IN RUSSIAN, perfectly readable Cyrillic (use Cyrillic letters И, С, Н, Р, К, Т — NOT Latin lookalikes I, C, H, P, K, T), no errors, NO duplicates, render each text element EXACTLY ONCE.
+The archival content on this slide:
+
+""",
+
+    "sketch-notebook": """A friendly hand-drawn ink doodle presentation slide on a warm off-white cream notebook paper background (#F7F4EC) with a very faint light-grey graph-paper grid, covering the whole frame including all corners.
+Everything is drawn in thin black ink pen / fine felt-tip with a charming, slightly imperfect hand-drawn quality — pure monochrome black ink on cream, NO other colors.
+Big friendly rounded hand-lettered headline in black ink: soft rounded letterforms like careful casual handwriting, generously sized.
+If the content provides a subtitle, hand-letter it smaller beneath or below the main drawing; if NO subtitle is given, leave that area empty — NEVER invent one.
+Cute simple ink-line cartoon people (thin outlines, simple dot-and-line faces, light scribble hatching on hair and trousers) interacting with the content — pointing, presenting, walking.
+Simple doodle icons and props drawn in the same thin ink line (coffee cup, clock, arrows, picture frames, classical columns as pedestals for list items), wavy hand-drawn underlines and dividers.
+A few loose decorative spiral doodles in the corners. Generous whitespace, light and airy, warm and approachable — like a beautifully doodled Moleskine page or a friendly explainer comic.
+For lists and diagrams: each item gets its own little doodle icon, hand-written labels beneath, connected by sketchy arrows.
+Render ONLY the text given in the content below — no extra labels, captions or filler words of your own.
+ALL TEXT IN RUSSIAN, perfectly readable Cyrillic (use Cyrillic letters И, С, Н, Р, К, Т — NOT Latin lookalikes I, C, H, P, K, T), no errors, NO duplicates, render each text element EXACTLY ONCE.
+The hand-doodled content on this slide:
+
+""",
+
+    # ================================================================
     # BONUS STYLES — Additional original styles
     # ================================================================
 
@@ -343,6 +440,10 @@ The content on this slide:
 
 # Style aliases for convenience
 STYLE_ALIASES = {
+    # exec-sketch aliases (business deck + hand-drawn marker icons)
+    "yourname": "exec-sketch",
+    "business-sketch": "exec-sketch",
+    "exec": "exec-sketch",
     # Whiteboard aliases
     "office": "whiteboard",
     "marker": "whiteboard",
@@ -405,6 +506,30 @@ STYLE_ALIASES = {
     "paint": "watercolor",
     "clean": "minimal-clean",
     "minimal": "minimal-clean",
+    # Manus 1.6 image-theme aliases (added 2026-07-02)
+    "engraving": "etching",
+    "ink-engraving": "etching",
+    "newyorker": "etching",
+    "magazine": "editorial",
+    "kinfolk": "editorial",
+    "monocle": "editorial",
+    "retro-mac": "pixel",
+    "macos": "pixel",
+    "aqua": "pixel",
+    "y2k": "pixel",
+    "ink-wash": "vellum",
+    "sumi": "vellum",
+    "sumi-e": "vellum",
+    "zen": "vellum",
+    "shanshui": "vellum",
+    "archival": "dossier",
+    "flatlay": "dossier",
+    "flat-lay": "dossier",
+    "vintage-desk": "dossier",
+    "heritage": "dossier",
+    "manus-sketch": "sketch-notebook",
+    "ink-doodle": "sketch-notebook",
+    "notebook-sketch": "sketch-notebook",
 }
 
 # Category groupings for display
@@ -419,6 +544,9 @@ STYLE_CATEGORIES = {
         "chalkboard", "notebook", "blueprint", "glassmorphism",
         "corporate", "dark-tech", "dashboard", "infographic",
         "watercolor", "minimal-clean",
+    ],
+    "Manus 1.6 image themes (replicas)": [
+        "etching", "editorial", "pixel", "vellum", "dossier", "sketch-notebook",
     ],
 }
 
@@ -454,6 +582,18 @@ STYLE_RECOMMENDATIONS = {
     "gaming": ["neon", "dark-tech", "chromatic"],
     "music": ["vinyl", "neon", "sketch"],
     "event": ["neon", "chromatic", "diorama"],
+    # Manus 1.6 image themes (added 2026-07-02)
+    "magazine": ["editorial", "glamour", "minimal-clean"],
+    "editorial": ["editorial", "etching", "glamour"],
+    "brand": ["editorial", "glamour", "vinyl"],
+    "hospitality": ["dossier", "editorial", "patina"],
+    "heritage": ["dossier", "patina", "vellum"],
+    "mindfulness": ["vellum", "amber", "watercolor"],
+    "zen": ["vellum", "amber", "minimal-clean"],
+    "literary": ["etching", "editorial", "minimal-clean"],
+    "retro": ["pixel", "vinyl", "neon"],
+    "nostalgia": ["pixel", "vinyl", "patina"],
+    "product design": ["pixel", "editorial", "arctic"],
 }
 
 DEFAULT_STYLE = "whiteboard"

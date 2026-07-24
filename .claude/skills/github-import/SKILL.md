@@ -1,137 +1,83 @@
 ---
 name: github-import
-description: Github репо → исходники как контекст для дизайна. Скачивает дизайн-систему, компоненты, CSS-токены из репо, чтобы новый прототип использовал существующие конвенции проекта. Не клонирование — выборочный pull нужных файлов.
-when_to_use: Юзер указал GitHub репо, прототип делается ДЛЯ существующего проекта (не green-field). Перед design-system-create когда уже есть код.
+description: Импорт файлов из GitHub-репозитория как контекст. Темы, токены, компоненты, стили. Для воссоздания UI или дизайна "в стиле репозитория".
+when_to_use: Пользователь дал ссылку на github.com/owner/repo (или папку/файл внутри) и просит "сделать в стиле этого", "воссоздать UI", "взять токены".
 ---
 
-# Github import
+# GitHub import
 
-Цель — понять что у проекта уже есть (tokens, компоненты, конвенции), не конфликтовать, а продолжить.
+Без авторизации можно тянуть публичные репы через raw.githubusercontent.com и API. Для приватных нужен токен.
 
-## Использование
+## Парсинг URL
+
+```
+https://github.com/OWNER/REPO                          → весь реп, default branch
+https://github.com/OWNER/REPO/tree/REF/PATH            → папка
+https://github.com/OWNER/REPO/blob/REF/PATH/file.ext   → один файл
+```
+
+```js
+function parseGithubUrl(url) {
+  const u = new URL(url);
+  const [, owner, repo, type, ref, ...path] = u.pathname.split('/');
+  return { owner, repo, type, ref: ref || 'HEAD', path: path.join('/') };
+}
+```
+
+## Получение
+
+**Один файл (raw):**
+```
+https://raw.githubusercontent.com/OWNER/REPO/REF/PATH
+```
+
+**Список папки (API):**
+```
+https://api.github.com/repos/OWNER/REPO/contents/PATH?ref=REF
+```
+
+**Дерево целиком (API, может быть большим):**
+```
+https://api.github.com/repos/OWNER/REPO/git/trees/REF?recursive=1
+```
+
+Без токена rate-limit 60 запросов/час с IP. С токеном — 5000. Токен передаётся как `Authorization: Bearer ghp_...`.
+
+## Стратегия импорта
+
+Дерево — это меню, не еда. Не клади себе в контекст рекурсивный листинг на 5000 файлов. Вместо этого:
+
+1. **Не-рекурсивный листинг корня.** Понять, какой это стек (есть ли `package.json`, `tailwind.config`, `theme.ts`, `_variables.scss`).
+2. **Прицельные файлы.** Скачивай только то, что точно нужно:
+   - **Тема/токены:** `theme.ts`, `colors.ts`, `tokens.css`, `_variables.scss`, `tailwind.config.{js,ts}`, `globals.css`.
+   - **Конкретные компоненты, упомянутые пользователем.**
+   - **Глобальные стили.**
+3. **Прочитай эти файлы.** Не строй UI по «памяти, как этот сайт примерно выглядит» — это даёт generic look-alike. Бери hex-коды, шрифты, скейлы отступов, радиусы прямо оттуда.
+
+## Скрипт
+
+`templates/gh-pull.sh` — bash-скрипт-обёртка:
 
 ```bash
-# Через gh CLI (если auth настроен)
-gh repo view YourUsername/your-project --json name
-gh repo clone YourUsername/your-project /tmp/repo
-
-# Точечный pull без клонирования
-gh api repos/YourUsername/your-project/contents/apps/web/src/styles/globals.css \
-  -H "Accept: application/vnd.github.raw" > tokens-from-project.css
+./gh-pull.sh https://github.com/owner/repo/tree/main/src/theme
+# → выкачает все файлы из этой папки в ./gh-import/owner-repo/src/theme/
 ```
 
-Или через `git clone --depth 1` если уже есть git auth.
+Использует только `curl` и `jq`.
 
-## Что искать в существующем проекте
+## После импорта
 
-### 1. Design tokens (CSS variables)
-Типичные файлы:
-- `globals.css`, `tokens.css`, `vars.css`
-- `tailwind.config.{js,ts}` (если Tailwind)
-- `theme.{js,ts}` (Material UI / Chakra / styled-components)
+В корне импорта оставь `_INDEX.md` с:
+- Что это за реп.
+- Какие файлы импортированы и зачем.
+- Какие ключевые значения (палитра, шрифт, радиусы) уже извлечены.
 
-```bash
-# Найти tokens файлы
-find /tmp/repo -name "*.css" -path "*styles*" | head
-find /tmp/repo -name "tailwind.config.*"
-grep -r "design tokens\|css variables\|--color-" /tmp/repo/src --include="*.css" -l
-```
+Потом на это ссылайся при дизайне: «использую палитру из gh-import/owner-repo/src/theme/colors.ts».
 
-Извлечь все `--*: value` пары → это токены проекта. **Используй ИХ имена**, не свои.
+## Важно
 
-### 2. UI компоненты
-```bash
-# Найти shared компоненты
-ls /tmp/repo/src/components/
-ls /tmp/repo/components/
-ls /tmp/repo/packages/ui/  # если monorepo
-```
+Не воспроизводи защищённые товарным знаком интерфейсы 1:1, даже если код открыт. Бери токены и принципы, но делай **оригинальный** дизайн. Особенно если репо принадлежит крупному продукту (мессенджеры, соцсети, известные SaaS) — повторение их UI попадает под претензии по интеллектуальной собственности.
 
-Какие atoms уже есть? `Button`, `Input`, `Card`, `Badge`, `Avatar`?
-Если есть — **расширяй существующие props**, не создавай дубликаты.
+## Legacy reference
 
-### 3. Type system
-```bash
-# Найти size scale
-grep -rE "fontSize:|font-size:" /tmp/repo/src --include="*.{ts,tsx,css}" | head
-```
-
-### 4. Routing / pages
-```bash
-ls /tmp/repo/src/app/        # Next.js 13+ app router
-ls /tmp/repo/src/pages/      # Next.js pages router
-ls /tmp/repo/src/routes/     # React Router / TanStack
-```
-
-Понять структуру URL'ов чтобы прототип использовал реальные пути.
-
-### 5. Stack / dependencies
-```bash
-cat /tmp/repo/package.json | jq '.dependencies'
-```
-
-Tailwind? styled-components? CSS Modules? Это влияет на то как переноситься handoff.
-
-## Output: project-context.md
-
-После анализа — пишешь summary который потом используется в любых прототипах:
-
-```markdown
-# Project context: your-project
-
-## Stack
-- Next.js 14 (app router)
-- TypeScript
-- Tailwind CSS + custom CSS variables
-- shadcn/ui компоненты
-
-## Tokens (use these names)
-- `--h-primary: #YOUR_PRIMARY`
-- `--h-deep: #YOUR_INK`
-- `--h-cyan: #YOUR_ACCENT`
-- `--h-cream: #YOUR_CREAM`
-- (см. apps/web/src/app/globals.css)
-
-## Components (use these instead of building new)
-- `<Button>` — variants: default, secondary, ghost (см. components/ui/button.tsx)
-- `<Card>`, `<CardHeader>`, `<CardContent>`
-- `<Avatar>` — берёт image + fallback initials
-
-## Conventions
-- Cyrillic UI text on production
-- Animations через framer-motion
-- Forms через react-hook-form + zod
-- Icons из lucide-react
-
-## Routes
-- `/` landing
-- `/dashboard/*` authed
-- `/admin/*` admin only
-```
-
-Этот файл живёт в `design-handoff/<area>/PROJECT_CONTEXT.md` рядом с handoff'ом, чтобы coding agent читал перед имплементацией.
-
-## Что НЕ копировать
-
-- Бизнес-логику (auth, db, API) — не дизайнерский concern
-- node_modules / build артефакты
-- .env / credentials
-- Большие assets (видео, .psd) — только если правда нужны
-
-## Multi-repo контекст
-
-Если проект split на репо (FE / BE / mobile), бери только relevant:
-```
-your-project-web        — берём styles + components
-your-project-api        — игнорируем
-your-project-mobile     — берём design tokens только если shared
-```
-
-## Антипаттерны
-
-- Клонировать full репо в Claude context → лишние мегабайты
-- Игнорировать существующие компоненты → дублирование
-- Использовать свои имена токенов вместо проектных → переписка после handoff
-- Пропустить `tailwind.config` если проект на Tailwind → теряешь screen breakpoints, custom colors
-- Не зафиксировать commit hash → следующая сессия вытаскивает другую версию
-- Не положить PROJECT_CONTEXT.md рядом с handoff → coding-agent на handoff не знает о tokens
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-github-import.md`. Секции там: Использование, Что искать в существующем проекте, Output: project-context.md, Stack, Tokens (use these names), Components (use these instead of building new), Conventions, Routes, Что НЕ копировать, Multi-repo контекст, Антипаттерны.

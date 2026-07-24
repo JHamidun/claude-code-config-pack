@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Build the multi-sheet enriched workbook.
+"""Build the multi-sheet enriched workbook. Generalized port of the proven build_xlsx.
 
 Usage:  python build_enriched_xlsx.py --list list.json --agg aggregated.json \
             [--firmographics firmographics.json] [--research research/results.json] \
-            [--linkedin linkedin.json] [--out Enriched.xlsx] [--base https://your-portal.bitrix24.ru] \
+            [--linkedin linkedin.json] [--out Enriched.xlsx] [--base https://we.company.example] \
             [--days-reanimate 90]
 
 Sheets (see references/excel-schema.md): Пересечения (summary) · Готовый обзвон ·
@@ -53,7 +53,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--list', required=True); ap.add_argument('--agg', required=True)
     ap.add_argument('--firmographics'); ap.add_argument('--research'); ap.add_argument('--linkedin')
-    ap.add_argument('--out', default='Enriched.xlsx'); ap.add_argument('--base', default='https://your-portal.bitrix24.ru')
+    ap.add_argument('--out', default='Enriched.xlsx'); ap.add_argument('--base', default='https://we.company.example')
     ap.add_argument('--days-reanimate', type=int, default=90)
     a = ap.parse_args()
 
@@ -79,7 +79,7 @@ def main():
     # 2. Готовый обзвон (Tier S/A priority with contacts)
     ws = wb.create_sheet('Готовый обзвон')
     h = ['Приоритет', 'Компания', 'ИНН', 'ФИО контакта', 'Должность', 'Телефон', 'Email',
-         'LinkedIn', 'Менеджер', 'Продукты в работе', 'Последнее касание', 'Источник']
+         'LinkedIn', 'Менеджер Company', 'Продукты в работе', 'Последнее касание', 'Источник']
     ws.append(h)
     for inn, info in sorted(agg.items(), key=lambda kv: 0 if kv[1]['touch_count'] > 0 else 1):
         tier = 'S' if info['touch_count'] > 0 else 'B'

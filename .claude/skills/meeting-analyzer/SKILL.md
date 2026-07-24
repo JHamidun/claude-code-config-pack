@@ -1,375 +1,210 @@
 ---
 name: meeting-analyzer
-description: Analyze meeting transcripts for insights, action items, decisions
+description: "Превращает транскрипт встречи в структурный отчёт: решения, action items (владелец + дедлайн), риски/блокеры, открытые вопросы, next steps. Вход — готовый транскрипт (текст) или ссылка на источник (tl;dv / Plaud / Spark / kb), либо аудио для транскрипции через Deepgram. Триггеры: «проанализируй встречу», «meeting notes», «саммари звонка», «разбери транскрипт», «action items из встречи», «протокол совещания», «meeting analyzer»."
 ---
 
-# Meeting Analyzer Skill
+# Meeting Analyzer
 
-## Overview
+## Что делает
 
-Анализ транскриптов встреч: извлечение решений, action items, ключевых моментов.
+Берёт транскрипт встречи и превращает его в чёткий протокол:
+**решения → action items с владельцами и дедлайнами → риски/блокеры → открытые вопросы → next steps.**
 
-## When to Use
+Анализ выполняешь **ты (Claude), читая транскрипт** — не regex, не внешний LLM-API. Python в этом скилле нужен только для механики: получить транскрипт из источника, транскрибировать аудио, посчитать участие спикеров, залить action items в таск-систему. Всё «понимание» смысла делается моделью напрямую.
 
-- Обработка записей встреч
-- Извлечение action items
-- Анализ принятых решений
-- Создание meeting notes
-- Выявление паттернов коммуникации
+## Когда использовать
 
-## Meeting Analysis Framework
+- Есть транскрипт/запись встречи, нужен протокол или саммари
+- Нужно вытащить action items с владельцами и сроками
+- Нужно зафиксировать принятые решения и риски
+- Нужен executive-summary для тех, кто не был на встрече
 
-### 1. Extract Key Elements
+Не для: живого стенографирования в реальном времени (это транскрипция → skill `deepgram`); поиска по архиву встреч (→ `/kb`, skill `plaud`/`tldv`/`spark-transcripts`).
 
-```markdown
-## Meeting Analysis Template
+## Источники транскрипта (реальные инструменты)
 
-### Basic Info
-- **Date:** [Date]
-- **Duration:** [Duration]
-- **Participants:** [List]
-- **Meeting Type:** [Standup/Planning/Review/etc.]
+Прежде чем анализировать — нужен текст. Откуда его взять:
 
-### Decisions Made
-1. [Decision 1]
-2. [Decision 2]
+| Источник | Как получить | Инструмент |
+|----------|--------------|-----------|
+| **tl;dv** запись | Локальный экспорт `${HOME}/tldv-export/transcripts/` (655 встреч) или API | skill `tldv` |
+| **Plaud** запись | Транскрипт/саммари по записи через Workspace Token | skill `plaud` |
+| **Spark** звонок (AI) | Локальные SQLite (мета + контент) | `/spark-transcripts` |
+| **Поиск по всем встречам** | FTS5+BM25 по tldv/spark/gmail/outlook/telegram | `python ${WORKSPACE}/tools/kb.py search "<q>"` |
+| **Аудио/видео файл** | Транскрипция с диаризацией | skill `deepgram` (см. ниже) |
+| **Просто текст** | Пользователь вставил транскрипт | — |
 
-### Action Items
-| Task | Owner | Deadline | Priority |
-|------|-------|----------|----------|
-| [Task] | [Name] | [Date] | [H/M/L] |
+### Транскрипция аудио (если источник — файл)
 
-### Key Discussion Points
-- [Topic 1]: [Summary]
-- [Topic 2]: [Summary]
+Через Deepgram REST (устойчиво к версии SDK). Русский → модель `nova-3`:
 
-### Open Questions
-- [Question 1]
-- [Question 2]
-
-### Next Steps
-1. [Step 1]
-2. [Step 2]
+```bash
+# 1. Ужать аудио (3ч ≈ 86 МБ)
+ffmpeg -i meeting.mp4 -vn -ac 1 -ar 16000 -b:a 64k meeting.mp3
 ```
-
-## Extraction Patterns
-
-### Action Item Detection
 
 ```python
-import re
-
-ACTION_PATTERNS = [
-    r"(I|we|you|he|she|they)\s+will\s+(.+)",
-    r"(I|we|you|he|she|they)\s+need to\s+(.+)",
-    r"action item[:\s]+(.+)",
-    r"todo[:\s]+(.+)",
-    r"let'?s\s+(.+)",
-    r"can you\s+(.+)\??",
-    r"please\s+(.+)",
-    r"@(\w+)\s+(.+)",  # @mentions
-]
-
-def extract_action_items(transcript: str) -> list:
-    """Extract action items from meeting transcript"""
-    actions = []
-
-    for pattern in ACTION_PATTERNS:
-        matches = re.findall(pattern, transcript, re.IGNORECASE)
-        for match in matches:
-            if isinstance(match, tuple):
-                actions.append(" ".join(match))
-            else:
-                actions.append(match)
-
-    return actions
+import requests, os
+key = os.getenv('DEEPGRAM_API_KEY')  # из ~/.claude/.credentials.master.env
+audio = open('meeting.mp3', 'rb').read()
+r = requests.post('https://api.deepgram.com/v1/listen',
+    params={'model': 'nova-3', 'language': 'ru', 'diarize': 'true',
+            'punctuate': 'true', 'smart_format': 'true',
+            'utterances': 'true', 'paragraphs': 'true'},
+    headers={'Authorization': f'Token {key}', 'Content-Type': 'audio/mpeg'},
+    data=audio, timeout=1800)
+utts = r.json()['results']['utterances']   # [{speaker, start, end, transcript}, ...]
 ```
 
-### Decision Detection
+`utterances` уже размечены по спикерам (`speaker` = 0,1,2…) с таймкодами `start/end` в секундах. Полный референс — skill `deepgram`.
 
-```python
-DECISION_PATTERNS = [
-    r"we decided to\s+(.+)",
-    r"decision[:\s]+(.+)",
-    r"we agreed (that|to)\s+(.+)",
-    r"the plan is to\s+(.+)",
-    r"we'll go with\s+(.+)",
-    r"let's do\s+(.+)",
-    r"approved[:\s]+(.+)",
-]
+## Процедура анализа
 
-def extract_decisions(transcript: str) -> list:
-    """Extract decisions from transcript"""
-    decisions = []
+1. **Получи транскрипт** из источника выше. Если разметки спикеров нет, но встреча важна — попроси диаризацию (Deepgram `diarize=true`).
+2. **Прочитай транскрипт целиком** прежде чем писать выводы. Не выдёргивай фразы по шаблону — восстанови контекст.
+3. **Извлеки по каждой категории** (это делаешь ты, рассуждая по тексту):
+   - **Решения** — что окончательно согласовали (не обсуждения, а закрытые вопросы). Формулируй как факт: «Решили: X».
+   - **Action items** — задача + владелец + дедлайн. Владельца бери из того, кто взял на себя («я сделаю», «давай я»), или к кому адресовали. Если владелец/срок не назван явно — пометь `владелец: не назначен` / `срок: не задан`, НЕ выдумывай.
+   - **Риски / блокеры** — что мешает или угрожает; кто/что зависит.
+   - **Открытые вопросы** — то, что подняли, но не закрыли.
+   - **Next steps** — что происходит дальше, следующая встреча.
+4. **Разметь action items** приоритетом (H/M/L) и, если названо, привязкой к дате.
+5. **Собери отчёт** по шаблону ниже (executive для короткого, detailed для важного).
+6. **(Опционально) действия постобработки** — только по явной просьбе:
+   - Завести задачи → skill `crm` (Company) или `/gtasks`
+   - Создать встречу-фоллоу-ап → `/gcalendar` или `/gmeet`
+   - Разослать саммари → `/gmail` (личная) / `/outlook` (рабочая)
 
-    for pattern in DECISION_PATTERNS:
-        matches = re.findall(pattern, transcript, re.IGNORECASE)
-        decisions.extend(matches)
+### Проверка честности перед выдачей
 
-    return decisions
-```
+- Каждое «решение» реально согласовано в тексте, а не предположено?
+- Каждый владелец action item произнесён в транскрипте? Если нет — `не назначен`.
+- Каждый дедлайн назван явно? Если нет — `срок не задан`, без выдуманных дат.
+- Не приписал ли реплику не тому спикеру (проверь при плохой диаризации)?
 
-### Participant Analysis
+## Участие спикеров (опционально, механика)
+
+Реальный рабочий расчёт баланса участия из размеченного транскрипта:
 
 ```python
 from collections import Counter
 
-def analyze_participation(transcript_with_speakers: list) -> dict:
-    """
-    Analyze speaker participation
-    Input: [{"speaker": "John", "text": "..."}, ...]
-    """
-    # Count speaking turns
-    speaker_turns = Counter(entry["speaker"] for entry in transcript_with_speakers)
-
-    # Count words per speaker
-    speaker_words = {}
-    for entry in transcript_with_speakers:
-        speaker = entry["speaker"]
-        word_count = len(entry["text"].split())
-        speaker_words[speaker] = speaker_words.get(speaker, 0) + word_count
-
-    # Calculate talk time percentage
-    total_words = sum(speaker_words.values())
-    participation = {
-        speaker: {
-            "turns": speaker_turns[speaker],
-            "words": words,
-            "percentage": round(words / total_words * 100, 1)
-        }
-        for speaker, words in speaker_words.items()
+def analyze_participation(entries: list) -> dict:
+    """entries: [{"speaker": "Иван", "text": "..."}, ...]"""
+    turns = Counter(e["speaker"] for e in entries)
+    words = {}
+    for e in entries:
+        words[e["speaker"]] = words.get(e["speaker"], 0) + len(e["text"].split())
+    total = sum(words.values()) or 1
+    return {
+        sp: {"turns": turns[sp], "words": w, "percentage": round(w / total * 100, 1)}
+        for sp, w in words.items()
     }
-
-    return participation
 ```
 
-## AI-Powered Analysis
+Полезно ловить перекос: один говорит 80% — встреча-монолог, решения могли не устояться.
 
-### With Claude/GPT
+## Формат выхода
 
-```python
-def analyze_meeting_with_ai(transcript: str) -> dict:
-    """Comprehensive meeting analysis using LLM"""
-
-    prompt = f"""Analyze this meeting transcript and extract:
-
-1. **Summary** (2-3 sentences)
-2. **Key Decisions** (bullet list)
-3. **Action Items** with owners and deadlines (table format)
-4. **Topics Discussed** (brief summary of each)
-5. **Risks/Blockers** mentioned
-6. **Sentiment** (overall meeting tone)
-7. **Follow-up Questions** (unresolved issues)
-
-Transcript:
-{transcript}
-
-Provide structured JSON output.
-"""
-
-    # Call your LLM API here
-    response = call_llm(prompt)
-    return parse_json(response)
-```
-
-### Sentiment Analysis
-
-```python
-def analyze_meeting_sentiment(transcript: str) -> dict:
-    """Analyze overall meeting sentiment"""
-
-    prompt = """Analyze the sentiment of this meeting:
-
-1. Overall tone: [Positive/Neutral/Negative]
-2. Energy level: [High/Medium/Low]
-3. Collaboration: [Excellent/Good/Needs Improvement]
-4. Tension points: [List any conflicts or disagreements]
-5. Enthusiasm about decisions: [High/Medium/Low]
-
-Provide scores 1-10 for each category.
-"""
-
-    return call_llm(prompt + transcript)
-```
-
-## Report Templates
-
-### Executive Summary
+### Executive summary (короткая встреча / для тех, кто не был)
 
 ```markdown
-# Meeting Summary
-**Date:** [Date] | **Duration:** [Duration]
+# Саммари встречи — [дата]
+**Участники:** [список] · **Длительность:** [—]
 
 ## TL;DR
-[One paragraph executive summary]
+[1 абзац: о чём была встреча и главный итог]
 
-## Key Decisions
-1. ✅ [Decision 1]
-2. ✅ [Decision 2]
+## Решения
+1. ✅ [решение 1]
+2. ✅ [решение 2]
 
-## Critical Action Items
-| Priority | Task | Owner | Due |
-|----------|------|-------|-----|
-| 🔴 High | [Task] | @name | [Date] |
-| 🟡 Med | [Task] | @name | [Date] |
+## Action items
+| Приоритет | Задача | Владелец | Срок |
+|-----------|--------|----------|------|
+| 🔴 H | [задача] | @имя | [дата / не задан] |
+| 🟡 M | [задача] | не назначен | — |
 
-## Blockers/Risks
-- ⚠️ [Blocker 1]
-- ⚠️ [Blocker 2]
+## Риски / блокеры
+- ⚠️ [блокер]
 
-## Next Meeting
-[Date/Time] - [Agenda]
+## Next steps
+1. [шаг]
+2. Следующая встреча: [дата / не назначена]
 ```
 
-### Detailed Notes
+### Detailed notes (важное совещание, есть повестка)
 
 ```markdown
-# [Meeting Title] - [Date]
+# [Название встречи] — [дата]
 
-## Attendees
-- [Name 1] (Role)
-- [Name 2] (Role)
-- Absent: [Name 3]
+## Участники
+- [Имя] ([роль]) · Отсутствовал: [имя]
 
-## Agenda vs Actual
-| Planned | Covered | Time |
-|---------|---------|------|
-| Topic A | ✅ | 15m |
-| Topic B | ✅ | 20m |
-| Topic C | ❌ (postponed) | - |
+## Обсуждение по темам
+### Тема A: [заголовок]
+- **Контекст:** [фон]
+- **Обсудили:** [ключевые точки]
+- **Решение:** [что решили / вопрос открыт]
+- **Action:** [что делать, кто, к какому сроку]
 
-## Discussion Summary
+## Решения
+1. [решение]
 
-### Topic A: [Title]
-**Context:** [Background]
-**Discussion:** [Key points]
-**Decision:** [What was decided]
-**Action:** [What needs to be done]
+## Action items
+### Срочные (эта неделя)
+- [ ] @имя: [задача] — до [дата]
+### На спринт
+- [ ] @команда: [задача] — до [дата]
 
-### Topic B: [Title]
-...
+## Открытые вопросы
+1. [вопрос без ответа]
 
-## Parking Lot
-Items to discuss later:
-- [ ] [Item 1]
-- [ ] [Item 2]
+## Parking lot (отложено)
+- [ ] [тема на потом]
 
-## Action Items
-
-### Immediate (This Week)
-- [ ] @john: [Task] - by [Date]
-- [ ] @jane: [Task] - by [Date]
-
-### Short-term (This Sprint)
-- [ ] @team: [Task] - by [Date]
-
-## Open Questions
-1. [Question requiring follow-up]
-2. [Unresolved issue]
-
-## Next Steps
-1. [Step 1]
-2. [Step 2]
-3. Schedule follow-up: [Topic]
+## Next steps
+1. [шаг]
 ```
 
-## Automation
+Отдавай отчёт прямо в ответе (Markdown). Файл пиши только если пользователь попросил сохранить.
 
-### Post-Meeting Workflow
+## Пример
 
-```python
-def process_meeting_recording(audio_path: str) -> dict:
-    """Full meeting processing pipeline"""
-
-    # 1. Transcribe audio
-    transcript = transcribe_audio(audio_path)  # Deepgram/Whisper
-
-    # 2. Identify speakers (diarization)
-    speakers_transcript = diarize_speakers(transcript)
-
-    # 3. Extract structured data
-    analysis = analyze_meeting_with_ai(speakers_transcript)
-
-    # 4. Generate report
-    report = generate_meeting_report(analysis)
-
-    # 5. Create action items in task system
-    for action in analysis['action_items']:
-        create_task(
-            title=action['task'],
-            assignee=action['owner'],
-            due_date=action['deadline']
-        )
-
-    # 6. Send summary to participants
-    send_summary_email(analysis['participants'], report)
-
-    return analysis
+**Вход** (фрагмент транскрипта):
+```
+Иван: По интеграции с 1С — я думаю, берём REST, не SOAP.
+Мария: Согласна, SOAP у нас нигде больше не используется.
+Иван: Ок, решили. Мария, сделаешь до пятницы черновик схемы обмена?
+Мария: Да, к пятнице накидаю.
+Пётр: Только учтите, доступ к тестовому 1С нам ещё не дали — это риск.
 ```
 
-### Integration with Calendar
+**Выход:**
+```markdown
+## Решения
+1. ✅ Интеграция с 1С — через REST (SOAP отклонён, нигде больше не используется).
 
-```python
-def schedule_follow_ups(action_items: list, participants: list):
-    """Create calendar events for action items"""
+## Action items
+| Приоритет | Задача | Владелец | Срок |
+|-----------|--------|----------|------|
+| 🔴 H | Черновик схемы обмена с 1С | @Мария | пятница |
 
-    for item in action_items:
-        if item.get('requires_meeting'):
-            create_calendar_event(
-                title=f"Follow-up: {item['task']}",
-                attendees=[item['owner']],
-                date=item['deadline'],
-                description=item['context']
-            )
+## Риски / блокеры
+- ⚠️ Нет доступа к тестовому контуру 1С — блокирует разработку интеграции (озвучил Пётр).
+
+## Открытые вопросы
+1. Когда предоставят доступ к тестовому 1С? (владелец не назначен)
 ```
 
-## Metrics & Insights
+## Чек-лист
 
-### Meeting Effectiveness Score
-
-```python
-def calculate_meeting_effectiveness(analysis: dict) -> dict:
-    """Score meeting effectiveness"""
-
-    scores = {
-        "decisions_made": min(len(analysis['decisions']) * 20, 100),
-        "action_items_assigned": min(len(analysis['action_items']) * 15, 100),
-        "time_efficiency": analysis.get('on_time_percentage', 50),
-        "participation_balance": calculate_participation_balance(analysis),
-        "follow_up_clarity": 100 if analysis['next_steps'] else 0
-    }
-
-    overall = sum(scores.values()) / len(scores)
-
-    return {
-        "scores": scores,
-        "overall": round(overall, 1),
-        "grade": "A" if overall >= 80 else "B" if overall >= 60 else "C"
-    }
+- [ ] Транскрипт получен из источника (tldv / plaud / spark / kb / deepgram / вставлен)
+- [ ] Прочитан целиком до выводов
+- [ ] Решения = только реально согласованное
+- [ ] У каждого action item владелец и срок (или явно «не назначен» / «не задан»)
+- [ ] Риски и открытые вопросы выделены отдельно
+- [ ] Никаких выдуманных имён, дат, решений
+- [ ] Формат выбран под аудиторию (executive vs detailed)
+- [ ] Постобработка (задачи/письмо/календарь) — только если попросили
 ```
-
-### Historical Analysis
-
-```python
-def analyze_meeting_trends(meetings: list) -> dict:
-    """Analyze patterns across multiple meetings"""
-
-    return {
-        "avg_duration": calculate_avg_duration(meetings),
-        "avg_action_items": calculate_avg_actions(meetings),
-        "completion_rate": calculate_action_completion(meetings),
-        "most_active_participants": top_participants(meetings),
-        "recurring_topics": extract_common_topics(meetings),
-        "decision_velocity": decisions_per_meeting(meetings)
-    }
-```
-
-## Tips
-
-1. **Записывай** - всегда записывай встречи (с согласия)
-2. **Структура** - используй agenda template
-3. **Time-box** - ограничивай время обсуждения
-4. **Assign owners** - каждый action item = владелец
-5. **Follow up** - отслеживай выполнение
-6. **Automate** - автоматизируй рутину
-7. **Review** - периодически анализируй эффективность

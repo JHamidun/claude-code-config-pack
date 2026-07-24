@@ -1,6 +1,6 @@
 ---
 name: linkedin-profile-optimizer
-description: Audit and rewrite a LinkedIn profile end-to-end for 2026 — headline formula, About section 7-step structure, Featured section strategy, banner design, photo rules, Experience metrics, Skills pinning, custom URL, recommendations. Triggers on requests like "review my LinkedIn profile", "rewrite my headline", "fix my About section", "optimize banner", "profile audit", "LinkedIn bio", "Featured section", "profile conversion", "profile keywords". Converts default/resume-style profiles into one that converts visitors 3-5x better.
+description: 'Audit and rewrite a LinkedIn profile end-to-end — headline, About section, Featured, banner, photo, Experience metrics, Skills pinning, custom URL, recommendations. Triggers: "review my LinkedIn profile", "rewrite my headline", "fix my About section", "optimize banner", "profile audit", "LinkedIn bio", "Featured section", "profile conversion", "profile keywords".'
 ---
 
 # LinkedIn Profile Optimizer
@@ -85,6 +85,6 @@ A structured audit + rewrite in this shape:
 
 ## Related skills
 
-- `linkedin-content-planner` — post pillars should echo the profile's headline/About thesis
+- `linkedin-post-writer` (режим CONTENT PLANNER, `references/linkedin-content-planner/`) — post pillars should echo the profile's headline/About thesis
 - `linkedin-post-writer` — Featured section rotates quarterly; pin your flagship post
 - `linkedin-humanizer` — scrub profile copy for the same AI tells we scrub from posts

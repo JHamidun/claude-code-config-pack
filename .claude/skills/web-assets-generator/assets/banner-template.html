@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<!--
+  Branded social/og banner template (1200×630).
+  Render via chrome-devtools: navigate file:// → resize 1200×630 → screenshot PNG.
+  This is VECTOR layout → screenshot = crisp text at any DPI, fully editable.
+  Far better than Pillow draw.text for branded cards.
+
+  Customize: --accent / --bg colors, EYEBROW / KICKER / H1 / SUB / WHEN / hosts.
+  Avatar circles are optional — drop the .host-pics block if no portraits.
+  Cut portrait backgrounds first with scripts/cut_avatars.py (→ transparent PNG).
+-->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  :root {
+    --accent: #0028F5;          /* brand blue */
+    --accent-light: #5BB3FF;
+    --bg: #0A0A12;              /* near-black */
+    --glow: rgba(0,40,245,.38);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1200px; height:630px; overflow:hidden; }
+  .banner {
+    width:1200px; height:630px; position:relative; background:var(--bg); color:#fff;
+    font-family:'Inter',sans-serif; padding:56px 64px;
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+  /* subtle grid */
+  .banner::before {
+    content:''; position:absolute; inset:0;
+    background-image:linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+                     linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size:48px 48px;
+  }
+  .glow  { position:absolute; width:720px; height:720px; border-radius:50%; right:-220px; top:-260px;
+           background:radial-gradient(circle, var(--glow) 0%, rgba(0,40,245,0) 62%); }
+  .glow2 { position:absolute; width:520px; height:520px; border-radius:50%; left:-180px; bottom:-220px;
+           background:radial-gradient(circle, rgba(0,40,245,.22) 0%, rgba(0,40,245,0) 60%); }
+  .z { position:relative; z-index:2; }
+
+  .top { display:flex; justify-content:space-between; align-items:center; }
+  .eyebrow { font-size:17px; font-weight:700; letter-spacing:.18em; color:var(--accent-light); text-transform:uppercase; }
+  .badge { font-size:15px; font-weight:600; letter-spacing:.1em; color:rgba(255,255,255,.66);
+    border:1px solid rgba(255,255,255,.22); padding:9px 18px; border-radius:100px; text-transform:uppercase; }
+
+  .mid { margin-top:-6px; }
+  .kicker { font-size:21px; font-weight:600; color:rgba(255,255,255,.62); margin-bottom:16px; }
+  h1 { font-size:62px; line-height:1.07; font-weight:800; letter-spacing:-.025em; max-width:980px; }
+  h1 .accent { color:var(--accent-light); }
+  .sub { margin-top:18px; font-size:22px; line-height:1.4; color:rgba(255,255,255,.72); max-width:860px; }
+  .when { display:inline-flex; align-items:center; gap:14px; margin-top:26px; background:var(--accent);
+    border-radius:14px; padding:15px 26px; font-size:23px; font-weight:700; letter-spacing:-.01em; }
+  .when .sep { opacity:.45; font-weight:400; }
+
+  .bottom { display:flex; justify-content:space-between; align-items:flex-end; }
+  .hosts { display:flex; align-items:center; gap:18px; }
+  .host-pics { display:flex; flex-shrink:0; }
+  .host-pic { width:96px; height:96px; border-radius:50%; overflow:hidden; position:relative;
+    background:radial-gradient(circle at 32% 26%, #2247e8 0%, #0a1c6e 72%);
+    border:2px solid rgba(91,179,255,.6); box-shadow:0 8px 28px rgba(0,20,130,.5); }
+  .host-pic + .host-pic { margin-left:-18px; }                 /* overlap */
+  .host-pic img { position:absolute; width:112%; left:50%; transform:translateX(-50%); bottom:-5%; }
+  .host-text { font-size:18px; line-height:1.5; color:rgba(255,255,255,.78); }
+  .host-text b { color:#fff; font-weight:700; }
+  .host-text .role { color:rgba(255,255,255,.55); }
+  .brands { display:flex; gap:10px; }
+  .brand { font-size:15px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    border:1px solid rgba(255,255,255,.25); border-radius:10px; padding:10px 18px; color:rgba(255,255,255,.85); }
+  .brand.blue { background:rgba(0,40,245,.25); border-color:rgba(0,80,255,.55); }
+</style>
+</head>
+<body>
+<div class="banner">
+  <div class="glow"></div><div class="glow2"></div>
+  <div class="top z">
+    <div class="eyebrow">EYEBROW · ORG LINE</div>
+    <div class="badge">BADGE</div>
+  </div>
+  <div class="mid z">
+    <div class="kicker">Подзаголовок-кикер над H1</div>
+    <h1>Главный заголовок <span class="accent">с акцентом</span></h1>
+    <div class="sub">Одно-два предложения подводки — что внутри и зачем.</div>
+    <div class="when">ДАТА <span class="sep">·</span> ВРЕМЯ <span class="sep">·</span> формат</div>
+  </div>
+  <div class="bottom z">
+    <div class="hosts">
+      <div class="host-pics">
+        <div class="host-pic"><img src="avatar_1.png" alt=""></div>
+        <div class="host-pic"><img src="avatar_2.png" alt=""></div>
+      </div>
+      <div class="host-text">
+        <b>Имя Фамилия</b> <span class="role">— роль</span><br>
+        <b>Имя Фамилия</b> <span class="role">— роль</span>
+      </div>
+    </div>
+    <div class="brands">
+      <div class="brand blue">BRAND</div>
+      <div class="brand">BRAND2</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

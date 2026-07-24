@@ -1,0 +1,257 @@
+[
+  {
+    "display_name": "Cinematic Studio 2.5",
+    "job_set_type": "cinematic_studio_2_5",
+    "type": "image"
+  },
+  {
+    "display_name": "Cinematic Studio Image",
+    "job_set_type": "cinematic_studio_image",
+    "type": "image"
+  },
+  {
+    "display_name": "FLUX.2",
+    "job_set_type": "flux_2",
+    "type": "image"
+  },
+  {
+    "display_name": "Flux Kontext",
+    "job_set_type": "flux_kontext",
+    "type": "image"
+  },
+  {
+    "display_name": "GPT Image 2",
+    "job_set_type": "gpt_image_2",
+    "type": "image"
+  },
+  {
+    "display_name": "Grok Image",
+    "job_set_type": "grok_image",
+    "type": "image"
+  },
+  {
+    "display_name": "Higgsfield Soul V2",
+    "job_set_type": "text2image_soul_v2",
+    "type": "image"
+  },
+  {
+    "display_name": "Image Auto",
+    "job_set_type": "image_auto",
+    "type": "image"
+  },
+  {
+    "display_name": "Image Background Remover",
+    "job_set_type": "image_background_remover",
+    "type": "image"
+  },
+  {
+    "display_name": "Kling O1 Image",
+    "job_set_type": "kling_omni_image",
+    "type": "image"
+  },
+  {
+    "display_name": "MS Image",
+    "job_set_type": "ms_image",
+    "type": "image"
+  },
+  {
+    "display_name": "Marketing Studio Image",
+    "job_set_type": "marketing_studio_image",
+    "type": "image"
+  },
+  {
+    "display_name": "Nano Banana",
+    "job_set_type": "nano_banana",
+    "type": "image"
+  },
+  {
+    "display_name": "Nano Banana 2",
+    "job_set_type": "nano_banana_flash",
+    "type": "image"
+  },
+  {
+    "display_name": "Nano Banana Pro",
+    "job_set_type": "nano_banana_2",
+    "type": "image"
+  },
+  {
+    "display_name": "Nano Banana Pro",
+    "job_set_type": "nano_banana_2_ai_stylist",
+    "type": "image"
+  },
+  {
+    "display_name": "Nano Banana Pro",
+    "job_set_type": "nano_banana_2_skin_enhancer",
+    "type": "image"
+  },
+  {
+    "display_name": "Nano Banana Pro",
+    "job_set_type": "nano_banana_2_shots",
+    "type": "image"
+  },
+  {
+    "display_name": "OpenAI Hazel",
+    "job_set_type": "openai_hazel",
+    "type": "image"
+  },
+  {
+    "display_name": "Recraft V4.1",
+    "job_set_type": "recraft_v4_1",
+    "type": "image"
+  },
+  {
+    "display_name": "Seedream 4.5",
+    "job_set_type": "seedream_v4_5",
+    "type": "image"
+  },
+  {
+    "display_name": "Seedream V5 Lite",
+    "job_set_type": "seedream_v5_lite",
+    "type": "image"
+  },
+  {
+    "display_name": "Soul Cinematic",
+    "job_set_type": "soul_cinematic",
+    "type": "image"
+  },
+  {
+    "display_name": "Soul Location",
+    "job_set_type": "soul_location",
+    "type": "image"
+  },
+  {
+    "display_name": "Topaz",
+    "job_set_type": "topaz_image",
+    "type": "image"
+  },
+  {
+    "display_name": "Z Image",
+    "job_set_type": "z_image",
+    "type": "image"
+  },
+  {
+    "display_name": "soul_cinema_studio",
+    "job_set_type": "soul_cinema_studio",
+    "type": "image"
+  },
+  {
+    "display_name": "Brain Activity",
+    "job_set_type": "brain_activity",
+    "type": "text"
+  },
+  {
+    "display_name": "3D Objects",
+    "job_set_type": "sam_3_3d",
+    "type": "video"
+  },
+  {
+    "display_name": "Cinematic Studio 3.0",
+    "job_set_type": "cinematic_studio_3_0",
+    "type": "video"
+  },
+  {
+    "display_name": "Cinematic Studio Video",
+    "job_set_type": "cinematic_studio_video",
+    "type": "video"
+  },
+  {
+    "display_name": "Cinematic Studio Video V2",
+    "job_set_type": "cinematic_studio_video_v2",
+    "type": "video"
+  },
+  {
+    "display_name": "Draw To Video",
+    "job_set_type": "draw_to_video",
+    "type": "video"
+  },
+  {
+    "display_name": "Google Veo 3",
+    "job_set_type": "veo3",
+    "type": "video"
+  },
+  {
+    "display_name": "Google Veo 3.1",
+    "job_set_type": "veo3_1",
+    "type": "video"
+  },
+  {
+    "display_name": "Google Veo 3.1 Lite",
+    "job_set_type": "veo3_1_lite",
+    "type": "video"
+  },
+  {
+    "display_name": "Grok Video",
+    "job_set_type": "grok_video",
+    "type": "video"
+  },
+  {
+    "display_name": "Grok Video 1.5",
+    "job_set_type": "grok_video_v15",
+    "type": "video"
+  },
+  {
+    "display_name": "Kling 2.6 Video",
+    "job_set_type": "kling2_6",
+    "type": "video"
+  },
+  {
+    "display_name": "Kling v3.0",
+    "job_set_type": "kling3_0",
+    "type": "video"
+  },
+  {
+    "display_name": "LLM Generation",
+    "job_set_type": "llm_text",
+    "type": "video"
+  },
+  {
+    "display_name": "Marketing Studio Video",
+    "job_set_type": "marketing_studio_video",
+    "type": "video"
+  },
+  {
+    "display_name": "Minimax Hailuo",
+    "job_set_type": "minimax_hailuo",
+    "type": "video"
+  },
+  {
+    "display_name": "Reframe",
+    "job_set_type": "reframe",
+    "type": "video"
+  },
+  {
+    "display_name": "Remove Background",
+    "job_set_type": "sam_3_video",
+    "type": "video"
+  },
+  {
+    "display_name": "Seedance 1.5 Pro",
+    "job_set_type": "seedance1_5",
+    "type": "video"
+  },
+  {
+    "display_name": "Seedance 2.0",
+    "job_set_type": "seedance_2_0",
+    "type": "video"
+  },
+  {
+    "display_name": "Soul Cast",
+    "job_set_type": "soul_cast",
+    "type": "video"
+  },
+  {
+    "display_name": "Topaz",
+    "job_set_type": "topaz_video",
+    "type": "video"
+  },
+  {
+    "display_name": "Wan 2.6 Video",
+    "job_set_type": "wan2_6",
+    "type": "video"
+  },
+  {
+    "display_name": "Wan 2.7",
+    "job_set_type": "wan2_7",
+    "type": "video"
+  }
+]

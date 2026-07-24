@@ -1,6 +1,6 @@
 ---
 name: tender-search-ru
-description: Search Russian procurement tenders (госзакупки/закупки/тендеры) via the Playwright browser and shortlist contracts matching a product or company profile. Use when the user asks to find tenders, contracts, госзакупки, закупки, подходящие контракты on zakupki.gov.ru or aggregators like rostender.info. Covers the foreign-IP geo-block workaround (zakupki.gov.ru blocks non-RU IPs - use the rostender aggregator), rostender search/pagination/extraction selectors, free-tier limits, client-side relevance filtering, and ready keyword + OKPD2 sets (incl. AI/LLM products like an LLM aggregator). Do NOT use for non-Russian procurement or for writing the bid/КП itself (see draft-outreach / kp-deck-factory for that).
+description: "Search Russian procurement tenders (госзакупки/закупки/тендеры) via Playwright and shortlist contracts for a product/company. Use for: найди тендеры, подходящие контракты, zakupki.gov.ru, rostender. Covers geo-block workaround (zakupki blocks non-RU IPs → rostender), relevance filtering, keyword+OKPD2 sets. NOT for non-RU procurement or writing the bid/КП (draft-outreach/kp-deck-factory)."
 metadata:
   version: 1.0.0
   updated: 2026-06-18
@@ -10,7 +10,7 @@ metadata:
 
 ## Overview
 
-Find Russian procurement tenders relevant to a product/company and return a curated, filtered shortlist (number, subject, region, deadline, price, link). Built from a real session searching AI/LLM tenders for an LLM-aggregator product. The core difficulty is not search syntax - it is the **geo-block** on the official portal and the **weak free-tier relevance** on aggregators. This skill encodes the workarounds.
+Find Russian procurement tenders relevant to a product/company and return a curated, filtered shortlist (number, subject, region, deadline, price, link). Built from a real session searching AI/LLM tenders for YourProduct. The core difficulty is not search syntax - it is the **geo-block** on the official portal and the **weak free-tier relevance** on aggregators. This skill encodes the workarounds.
 
 ## When to Use
 
@@ -32,10 +32,20 @@ Not for: writing the commercial proposal (КП) or outreach - that is `kp-deck-f
 | rostender **free tier hides** customer, НМЦК, documentation, and ЭТП/source link behind registration | Free scan gives subject + region + deadline + method only. To unlock fields -> 7-day demo, or zakupki.gov.ru via RU IP. |
 | rostender search ranks **by date, not relevance**, and multi-word queries become fuzzy AND-matches | Use ONE broad phrase + filter client-side. Do not chain 3+ keywords. |
 
+### Эскалация при бот-стене / гео-блоке (patchright)
+
+Обход по умолчанию — уходить с zakupki.gov.ru на **rostender** (см. Key Facts). Но если и
+агрегатор начинает палить автоматизацию (Cloudflare-challenge, «Access denied», пустой
+контент при headless-скрапе), либо появился RU-прокси и нужно всё-таки открыть саму
+zakupki.gov.ru под анти-ботом — эскалируй на **patchright** (стелс-форк Playwright,
+drop-in `from patchright.sync_api import sync_playwright`, `channel="chrome"` + persistent
+context). Он скрывает `navigator.webdriver` и CDP-утечки, которые ловит защита порталов.
+Полный рецепт и таблица «симптом бана → инструмент» — `../playwright-automation/references/stealth-scraping.md`.
+
 ## Workflow
 
 ### 1. Build the product profile -> query set
-Translate the product into procurement language. For an AI/LLM aggregator (e.g. an LLM-access SaaS): subjects are *доступ к нейросетям / большим языковым моделям*, *ИИ-ассистент*, *чат-бот*, *генеративный ИИ*, *неисключительные права на ПО*. Keyword + OKPD2 sets are in `references/playbook.md`.
+Translate the product into procurement language. For an AI/LLM aggregator (YourProduct-type): subjects are *доступ к нейросетям / большим языковым моделям*, *ИИ-ассистент*, *чат-бот*, *генеративный ИИ*, *неисключительные права на ПО*. Keyword + OKPD2 sets are in `references/playbook.md`.
 
 ### 2. Check the IP / decide the route
 Navigate to `http://ip-api.com/json/?fields=query,country,countryCode,city` (plain HTTP - `ipapi.co` is Cloudflare-walled).

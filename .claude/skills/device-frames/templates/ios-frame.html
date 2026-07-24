@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>iOS frame</title>
+<style>
+  body {
+    margin: 0; min-height: 100vh;
+    display: grid; place-items: center;
+    background: #e7e5e0;
+    font-family: -apple-system, "SF Pro Text", system-ui, sans-serif;
+  }
+
+  .ios-frame {
+    width: 390px;
+    height: 844px;
+    background: #000;
+    border-radius: 54px;
+    padding: 12px;
+    box-shadow:
+      0 0 0 2px #1a1a1a,
+      0 30px 80px rgba(0,0,0,.35);
+    position: relative;
+  }
+  .ios-frame::before {
+    /* Side button */
+    content: ""; position: absolute; right: -3px; top: 200px;
+    width: 3px; height: 100px; background: #1a1a1a; border-radius: 2px;
+  }
+
+  .ios-screen {
+    width: 100%; height: 100%;
+    background: #fff;
+    border-radius: 42px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .ios-status-bar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 47px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 0 32px;
+    font-weight: 600;
+    font-size: 17px;
+    z-index: 10;
+  }
+  .ios-status-time { justify-self: start; }
+  .ios-status-icons { justify-self: end; display: flex; gap: 6px; align-items: center; }
+  .ios-island {
+    width: 120px; height: 36px;
+    background: #000; border-radius: 20px;
+    margin: 4px auto 0;
+  }
+
+  .ios-home-indicator {
+    position: absolute; bottom: 8px; left: 50%;
+    transform: translateX(-50%);
+    width: 134px; height: 5px;
+    background: #000; border-radius: 3px;
+    z-index: 10;
+  }
+
+  /* Контентная зона между статус-баром и хоум-индикатором */
+  .ios-content {
+    position: absolute;
+    top: 47px; left: 0; right: 0; bottom: 34px;
+    overflow: auto;
+  }
+
+  /* Иконки SVG */
+  .icon-signal, .icon-wifi, .icon-battery { width: 18px; height: 12px; fill: currentColor; }
+  .icon-battery-body {
+    width: 24px; height: 11px; border: 1px solid #000; border-radius: 3px;
+    position: relative; padding: 1px;
+  }
+  .icon-battery-body::after {
+    content: ""; position: absolute; right: -3px; top: 3px;
+    width: 2px; height: 5px; background: #000; border-radius: 0 2px 2px 0;
+  }
+  .icon-battery-fill { background: #000; height: 100%; width: 78%; border-radius: 1px; }
+</style>
+</head>
+<body>
+
+<div class="ios-frame">
+  <div class="ios-screen">
+
+    <div class="ios-status-bar">
+      <span class="ios-status-time">09:24</span>
+      <div class="ios-island"></div>
+      <div class="ios-status-icons">
+        <svg class="icon-signal" viewBox="0 0 18 12">
+          <rect x="0"  y="8" width="3" height="4" rx="0.5"/>
+          <rect x="5"  y="5" width="3" height="7" rx="0.5"/>
+          <rect x="10" y="2" width="3" height="10" rx="0.5"/>
+          <rect x="15" y="0" width="3" height="12" rx="0.5"/>
+        </svg>
+        <svg class="icon-wifi" viewBox="0 0 18 12">
+          <path d="M9 11.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM9 7c1.7 0 3.2.6 4.4 1.7L15 7.1A8 8 0 009 5a8 8 0 00-6 2.1l1.6 1.6A6 6 0 019 7zM9 3a10 10 0 016.8 2.6L17 4A12 12 0 009 1a12 12 0 00-8 3l1.2 1.6A10 10 0 019 3z"/>
+        </svg>
+        <div class="icon-battery-body"><div class="icon-battery-fill"></div></div>
+      </div>
+    </div>
+
+    <div class="ios-content">
+      <!-- Замени всё внутри на свой макет -->
+      <div style="padding: 24px; font-size: 17px;">
+        <h1 style="font-size: 34px; margin: 0 0 16px;">Screen</h1>
+        <p style="color: #666; margin: 0;">Замени содержимое <code>.ios-content</code> своим макетом.</p>
+      </div>
+    </div>
+
+    <div class="ios-home-indicator"></div>
+  </div>
+</div>
+
+</body>
+</html>
