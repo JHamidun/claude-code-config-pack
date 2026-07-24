@@ -1,6 +1,6 @@
 ---
 name: ad-spy
-description: "Ad Library intelligence across Facebook, Google, LinkedIn, and Reddit — monitor competitor ads, analyze creatives, track spending. Uses a 3rd-party scraping API. Trigger: реклама конкурентов, ad spy, ad library, что рекламируют, competitor ads, креативы конкурентов, рекламные кампании, мониторинг рекламы."
+description: "Ad Library intelligence: Facebook, Google, LinkedIn, Reddit — мониторинг рекламы конкурентов, креативы, бюджеты via Scraping API. Российские каналы: Яндекс.Директ, Google Transparency Center, Telegram Ads (TGMaps/TGSpice), VK, Meta через Atria. Триггеры: реклама конкурентов, ad spy, ad library, competitor ads, креативы конкурентов, vk ads spy, admobispy, TGMaps, Atria, tryatria."
 allowed-tools: Bash, Read, Write, WebSearch
 ---
 
@@ -16,8 +16,22 @@ allowed-tools: Bash, Read, Write, WebSearch
 - "ad spy [бренд]" — полный анализ рекламы
 - "креативы конкурентов" — сбор рекламных материалов
 - "мониторинг рекламы" — периодический трекинг
-- Your Tracker: мониторинг рекламы конкурентов в вашей категории
-- YourCompanyGPT: что рекламируют AI-конкуренты
+- Your Tracker: мониторинг рекламы конкурентов строительных смесей
+- YourProduct: что рекламируют AI-конкуренты
+- "spy за Яндекс Директом / VK / Telegram Ads" — российские каналы (см. references)
+- "лучшие креативы конкурентов в FB", "бюджет конкурента", "Atria" — Meta-креативный спай
+
+## Российские каналы и Meta-креативы (экспертные материалы курса)
+
+Scraping API хорошо покрывает FB/Google/LinkedIn/Reddit, но российские каналы и
+продвинутый Meta-креативный анализ требуют отдельных инструментов. Подробности — в references:
+
+| Reference | Что внутри |
+|-----------|-----------|
+| `references/russian-channels-spy.md` | Яндекс.Директ (нет полноценного spy — ручной reverse-engineering через ключи), Google Transparency Center (adstransparency.google.com) + keywordtoolcollector.io, Telegram Ads (TGMaps + TGSpice — наценки CPM/эмодзи/таргетинг), VK (Admobispy устарел до 2024, спикер VK Ads за актуальным + «защита от копирования» — вычитать конкурентов-таргетологов) |
+| `references/meta-creative-spy-atria.md` | Поиск по точному имени FB-страницы (не по компании), workflow analyze→company_ads→ad_details→longest running, **Atria (tryatria.com)** — клонирование креативов + оценка бюджета + рейтинг A+/High iteration/Underperforming |
+
+**Связанные скиллы:** `meta-ads-launch-ru` (запуск своих Meta-кампаний на основе разведки), `ai-creative-factory-ru` (декомпозиция найденных виральных креативов), `telegram-ads-pro-ru` / `vk-ads-pro-ru` (запуск в найденных каналах), `ad-benchmarks-ru` (нормы для оценки увиденных кампаний).
 
 ## API Endpoints
 
@@ -157,7 +171,7 @@ for company in "Comp1" "Comp2" "Comp3" "Comp4"; do
 done
 ```
 
-## Use Case: YourCompanyGPT Competitive Intel
+## Use Case: YourProduct Competitive Intel
 
 AI competitors to monitor:
 - ChatGPT, Claude, Gemini
@@ -181,7 +195,20 @@ Combine with `/loop` or `/schedule` for recurring checks:
 /loop 24h ad-spy YourCompetitor your-industry
 ```
 
-Or integrate into your own cron collectors.
+Or integrate into Your Tracker cron collectors on your-server.
+
+## Если банят: прямой скрап Ad Library в обход API
+
+ScraperVendor — основной путь (не требует обхода защит). Но при прямом скрапе Ad Library
+(FB/Google/TikTok) или витрин конкурентов, когда встаёт анти-бот (Cloudflare/Datadome,
+«Access denied», капча, пустой ответ на `requests`):
+
+- **Лёгкий скрап без браузера:** `curl_cffi` с `impersonate="chrome"` — подделывает TLS/JA3
+  под реальный Chrome, requests-совместимый API. Первый выбор для JSON/HTML-эндпоинтов.
+- **Полный браузер под анти-ботом:** **patchright** вместо `playwright` (drop-in импорт,
+  `channel="chrome"` + persistent context) — скрывает `navigator.webdriver` и CDP-утечки.
+
+Рецепты + таблица «симптом бана → инструмент»: `../playwright-automation/references/stealth-scraping.md`.
 
 ## Integration
 
@@ -192,4 +219,4 @@ Or integrate into your own cron collectors.
 | Meta Ads optimization | `meta-ads-analyzer` skill |
 | Content inspiration | `content-creation` skill |
 | Report to stakeholders | `stakeholder-comms` skill |
-| Save to your DB | your collector (your server) |
+| Save to radar DB | Your Tracker PostgreSQL (your-server) |

@@ -1,6 +1,6 @@
 ---
 name: deck-themes
-description: Несколько готовых "тем" для slides — минимал, editorial, dark, data, brutalist. Стартовая точка вместо пустого шаблона.
+description: Несколько готовых "тем" для slides — минимал, editorial, dark, data, brutalist. Стартовая точка вместо пустого шаблона. Соседние: theme-factory (10 универсальных тем для любых артефактов), frontend-design (эстетика без дизайн-системы); развилка — в design-orchestrator.
 when_to_use: Когда нужен дек, и пользователь не дал бренд. Выбери тему, дальше работай с ней.
 ---
 

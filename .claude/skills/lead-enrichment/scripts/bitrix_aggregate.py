@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Aggregate Bitrix24 history per matched INN.
+"""Aggregate Your CRM history per matched INN. Port of the proven Outreach×Bitrix aggregator.
 
-Usage:  python bitrix_aggregate.py bitrix_data.json [--out aggregated.json] [--base https://your-portal.bitrix24.ru]
+Usage:  python bitrix_aggregate.py bitrix_data.json [--out aggregated.json] [--base https://we.company.example]
 
 bitrix_data.json keys (see references/bitrix-export.md):
   companies, deals_by_company, contacts_by_company, deal_activities,
@@ -39,7 +39,7 @@ def fmt_date(s):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('bitrix_json'); ap.add_argument('--out', default='aggregated.json')
-    ap.add_argument('--base', default='https://your-portal.bitrix24.ru')
+    ap.add_argument('--base', default='https://we.company.example')
     a = ap.parse_args()
     bd = json.load(open(a.bitrix_json, encoding='utf-8'))
     BASE = a.base

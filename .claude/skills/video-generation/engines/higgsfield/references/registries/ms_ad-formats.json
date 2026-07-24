@@ -1,0 +1,416 @@
+[
+  {
+    "id": "18e9f327-b667-40f1-84d1-f234c67a4929",
+    "name": "Headline",
+    "type": "headline",
+    "priority": 3,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/c8a5a0fc-2338-408c-b354-6ea0ca573d2a.webp"
+    }
+  },
+  {
+    "id": "c4c9ee3e-c161-4cc6-b401-77f122cd3c3c",
+    "name": "Special Offer",
+    "type": "headline",
+    "priority": 4,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/6152707a-7c5d-43b5-a222-c928df9f8e37.webp"
+    }
+  },
+  {
+    "id": "e961f13c-c96d-4504-bb70-77abeeaa9027",
+    "name": "Customer Quote",
+    "type": "headline",
+    "priority": 5,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/e1dec622-3e6e-4206-9a82-e5435b366fde.webp"
+    }
+  },
+  {
+    "id": "4b71d6d0-4a79-4241-8f3a-60bb766d1945",
+    "name": "Key Features",
+    "type": "headline",
+    "priority": 6,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/bf80b536-2b9b-4899-bbfb-30c4dd7acaf5.webp"
+    }
+  },
+  {
+    "id": "fd9b886c-8b4d-4e9a-aa4d-11b4a67456a5",
+    "name": "Benefits",
+    "type": "headline",
+    "priority": 7,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/ec861862-3507-4379-be98-65c74bb25af4.webp"
+    }
+  },
+  {
+    "id": "30ab1615-9b6f-4d73-bf84-9436b0861cb4",
+    "name": "Social Proof",
+    "type": "headline",
+    "priority": 8,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/294cc40e-ce8c-486a-ba46-1c5d4c30cb00.webp"
+    }
+  },
+  {
+    "id": "3f222376-f468-4ba7-a7b8-f76102c9af5f",
+    "name": "Why We're Different",
+    "type": "headline",
+    "priority": 9,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/9dc5a94d-1359-4d57-bdd2-dcb144bfa471.webp"
+    }
+  },
+  {
+    "id": "ad65db31-3e4f-4aa9-99a4-0e00b994580e",
+    "name": "Then vs Now",
+    "type": "headline",
+    "priority": 10,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/38b6845e-2866-4812-8f50-6bd4ed8e204f.webp"
+    }
+  },
+  {
+    "id": "80e37aad-f80d-468d-ab6f-b32562aaccc1",
+    "name": "Unexpected Twist",
+    "type": "headline",
+    "priority": 11,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/f750e309-8cae-45b9-9b7c-9c29815f88a6.webp"
+    }
+  },
+  {
+    "id": "302922f4-8415-45af-affe-406b3fd0ebb3",
+    "name": "Media Mentions",
+    "type": "headline",
+    "priority": 12,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/8267dd8e-8460-430f-be15-59b9f317dae6.webp"
+    }
+  },
+  {
+    "id": "c3884bf7-5d3b-460b-8815-81f82e5bc0fb",
+    "name": "Star Review",
+    "type": "headline",
+    "priority": 13,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/3575a35b-e04d-48d6-9183-f56ebbec446e.webp"
+    }
+  },
+  {
+    "id": "c7932132-dbe5-4806-a7cc-ee9bc5094367",
+    "name": "Product in Action",
+    "type": "headline",
+    "priority": 14,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/11d1e653-bd3a-417f-aa14-5a31bf514e7f.webp"
+    }
+  },
+  {
+    "id": "1a4cf715-4e32-4a26-ba66-bdfe1573cbaf",
+    "name": "Stat Surround",
+    "type": "headline",
+    "priority": 15,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/8d0a2b09-3390-4915-963b-41ec8b77bfa3.webp"
+    }
+  },
+  {
+    "id": "7a5f4059-e019-4862-ae82-c639fda59655",
+    "name": "Bundle Deal",
+    "type": "headline",
+    "priority": 16,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/ccaa9f5d-b75d-44b4-ac07-0cd4438b578e.webp"
+    }
+  },
+  {
+    "id": "9ba08f5b-5646-4735-8832-bd12c79de8c8",
+    "name": "Social Comment",
+    "type": "headline",
+    "priority": 17,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/f4497906-d11c-4ad3-bfcf-d20d1dae88af.webp"
+    }
+  },
+  {
+    "id": "c5012751-8b86-4e28-8b31-f86f36c62085",
+    "name": "Mystery Hook",
+    "type": "headline",
+    "priority": 18,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/b3d391e0-0eb0-4502-a12f-1c8ede1894bc.webp"
+    }
+  },
+  {
+    "id": "eb75ceef-f0fc-416c-aea4-85ceed38b97c",
+    "name": "Trusted Review",
+    "type": "headline",
+    "priority": 19,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/7b28106a-91ba-40c2-90c1-5e735873f3bf.webp"
+    }
+  },
+  {
+    "id": "3c2fee96-41f6-4fb0-bdbd-6a66e5b464b2",
+    "name": "Stat Surround",
+    "type": "headline",
+    "priority": 20,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/f6caf8fa-1b52-43ce-8d4a-9226b99a37f8.webp"
+    }
+  },
+  {
+    "id": "6cfbeb24-0fa1-4739-99dd-ba1fc14afd15",
+    "name": "Highlighted Hook",
+    "type": "headline",
+    "priority": 21,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/260f68ad-0d6e-499a-a4e2-e4235cdcce98.webp"
+    }
+  },
+  {
+    "id": "9f83c485-959d-4ea1-a2ff-7a4e7370dd62",
+    "name": "Magazine Style",
+    "type": "headline",
+    "priority": 22,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/0e9b5bac-5be2-44bd-88ab-25c2573cf7cf.webp"
+    }
+  },
+  {
+    "id": "a9f3b512-35e2-42c2-8981-3c57f0853ddd",
+    "name": "Reaction Quote",
+    "type": "headline",
+    "priority": 23,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/ee37eed1-ed76-494b-9004-d7bfb8b9372d.webp"
+    }
+  },
+  {
+    "id": "8050ddd7-60e6-45d6-9a33-50f6530f2a79",
+    "name": "Behind the Product",
+    "type": "headline",
+    "priority": 24,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/d480b399-eecc-492d-80ee-bb2fbf5ba337.webp"
+    }
+  },
+  {
+    "id": "16edbd6e-453b-4dc6-9c02-740406a47083",
+    "name": "Personal Note",
+    "type": "headline",
+    "priority": 25,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/8d948720-ece8-4949-a3cd-2c8791b24457.webp"
+    }
+  },
+  {
+    "id": "95026fac-f6d8-473c-bceb-4ff70325a16e",
+    "name": "Highlighted Comment",
+    "type": "headline",
+    "priority": 26,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/8e041e23-d896-4d88-b9c8-d9d67e333c61.webp"
+    }
+  },
+  {
+    "id": "92710076-a082-489d-9976-74a30fbf0cbf",
+    "name": "Color Block",
+    "type": "headline",
+    "priority": 27,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/be75495b-ede9-4ab9-b7b6-adfc23d6450d.webp"
+    }
+  },
+  {
+    "id": "f100144f-e015-49f5-ac88-7641e29731d9",
+    "name": "Lifestyle with Numbers",
+    "type": "headline",
+    "priority": 28,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/6ab6f428-ac0b-4c94-96a3-390a3be385e7.webp"
+    }
+  },
+  {
+    "id": "cb2da9cc-f477-4fd3-b9d6-aa9cbfa14dcd",
+    "name": "Benefits Checklist",
+    "type": "headline",
+    "priority": 29,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/63d85933-f3d3-4f35-afd0-371812d4de35.webp"
+    }
+  },
+  {
+    "id": "821b881b-b9c2-40ab-8364-0ee90c23eb90",
+    "name": "Callout Notes",
+    "type": "headline",
+    "priority": 30,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/d380a4b9-a6e0-48c1-ba70-9dff7b2507c5.webp"
+    }
+  },
+  {
+    "id": "7c3a2785-08e8-406f-b47a-35307276f1ab",
+    "name": "Trending Post",
+    "type": "headline",
+    "priority": 31,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/3f8d5ac4-6eba-45fd-a8ff-716eb08e50fa.webp"
+    }
+  },
+  {
+    "id": "bccb652b-2352-4d91-b640-99cb19d61895",
+    "name": "Bold Statement",
+    "type": "headline",
+    "priority": 32,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/cde42ea5-5977-4be8-b3dd-14748404b04b.webp"
+    }
+  },
+  {
+    "id": "4ac40ba6-79a7-4004-a9e4-95012f8737d5",
+    "name": "Comparison Table",
+    "type": "headline",
+    "priority": 33,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/ddd2e986-7963-4bc0-8d0c-823ee99585c5.webp"
+    }
+  },
+  {
+    "id": "6d1aef3b-c814-474c-bb62-29bb40643aee",
+    "name": "Customer Story",
+    "type": "headline",
+    "priority": 34,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/b182c44c-f770-4b0c-8377-e520e3533d68.webp"
+    }
+  },
+  {
+    "id": "ac333ce6-f86e-4ce1-9ffe-e75f48b3df53",
+    "name": "Press Screenshot",
+    "type": "headline",
+    "priority": 35,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/7b0a0bcd-f8e0-43b3-943b-8efe8722f6e3.webp"
+    }
+  },
+  {
+    "id": "3462be30-d918-4602-992c-81298d0f31ab",
+    "name": "App Screenshot",
+    "type": "headline",
+    "priority": 36,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/c3ac42b7-1baf-442f-9882-6b3531a8ad69.webp"
+    }
+  },
+  {
+    "id": "b5fbe451-ef9b-494d-8460-df16dc31f9a9",
+    "name": "Product Spotlight",
+    "type": "headline",
+    "priority": 37,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/cf30055a-7cf6-46cd-9316-980310752ff1.webp"
+    }
+  },
+  {
+    "id": "0e20e37e-6a34-4a36-bbd9-4d3cc79e8d50",
+    "name": "Whiteboard Explainer",
+    "type": "headline",
+    "priority": 38,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/04b081c5-1de5-4946-b25b-601c07ed12e2.webp"
+    }
+  },
+  {
+    "id": "cfb067f6-735a-46d8-a2f0-22e5a47b122e",
+    "name": "Hero Statement",
+    "type": "headline",
+    "priority": 39,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/48fb22b1-f4e4-4bd2-a31f-ecb721fc90e9.webp"
+    }
+  },
+  {
+    "id": "50fa82ca-8a7e-4c8d-99dd-e1c3692a5787",
+    "name": "UGC Side-by-Side",
+    "type": "headline",
+    "priority": 40,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/f36cb873-a941-4cb2-b320-7c9077be18e6.webp"
+    }
+  },
+  {
+    "id": "01de1013-d33a-4c67-b658-799eac3aa11f",
+    "name": "Scroll Break",
+    "type": "headline",
+    "priority": 41,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/32265bc2-9760-4ea8-b58f-a399f0c31ddc.webp"
+    }
+  },
+  {
+    "id": "7200218e-d78e-492c-ae9b-a3a08af2b923",
+    "name": "Organic Post",
+    "type": "headline",
+    "priority": 42,
+    "media": {
+      "thumbnail_url": "",
+      "url": "https://cdn.higgsfield.ai/ms_image_style/4cc6aace-1b38-4409-9922-a645a5222491.webp"
+    }
+  },
+  {
+    "id": "0c20621b-b90a-42ca-a7dc-5217a94b3beb",
+    "name": "librarian",
+    "type": "headline",
+    "priority": 44,
+    "media": null
+  },
+  {
+    "id": "200cb3a0-6220-4d0c-b353-51443dae7e90",
+    "name": "picker",
+    "type": "headline",
+    "priority": 45,
+    "media": null
+  }
+]

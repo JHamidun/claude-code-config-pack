@@ -1,128 +1,108 @@
 ---
 name: interactive-prototype
-description: Кликабельный прототип на React + JSX через Babel-standalone в HTML. Сценарии переходов между экранами, навигация, состояния. Один файл — один прототип, никакого webpack. Стек с device-frames для рамки устройства, mobile-overlays для UI-слоёв, tweaks-panel для крутилок.
-when_to_use: Юзер просит «прототип», «кликабельный», «как настоящее приложение», «можно покликать», «потыкать UX», «flow между экранами». Лучше slides когда нужны переходы и состояния.
+description: Полностью интерактивный кликабельный прототип на React + inline JSX. С реальным state, переходами, валидацией форм.
+when_to_use: Пользователь просит "прототип", "кликабельный мокап", "как настоящее приложение", "флоу", "онбординг", "несколько экранов с переходами".
 ---
 
 # Interactive prototype
 
-React 18 + Babel standalone через CDN unpkg. JSX-секции через `<script type="text/babel" src=...>`. Никакой сборки.
+Один HTML-файл с inline JSX через Babel-standalone. React-приложение, имитирующее настоящее.
 
-## Каркас
+## Когда подключать
+
+- Многошаговый флоу (онбординг, чекаут, регистрация).
+- Состояние UI: формы, табы, аккордеоны, модалки.
+- Переходы между экранами с анимацией.
+- Имитация работы реального приложения, а не статический мокап.
+
+Если задача — статичный экран или один лендинг, прототип не нужен. Делай обычный HTML.
+
+## Технический каркас
+
+Используй точно эти версии React + Babel — другие могут отвалиться:
 
 ```html
-<!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><title><Project></title>
-<link rel="stylesheet" href="styles/tokens.css">
-<style>html,body{margin:0;background:#f0eee9;font-family:var(--font-body)}</style>
-</head><body>
-<div id="root"></div>
-
-<!-- React + Babel через CDN -->
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
-
-<!-- Атомы и секции -->
-<script type="text/babel" src="components/icons.jsx"></script>
-<script type="text/babel" src="components/shared.jsx"></script>
-<script type="text/babel" src="screens/welcome.jsx"></script>
-<script type="text/babel" src="screens/main.jsx"></script>
-
-<!-- Главный entry -->
-<script type="text/babel" data-presets="env,react">
-  const { useState } = React;
-  const { Welcome, Main } = window;
-
-  function App() {
-    const [screen, setScreen] = useState('welcome');
-    const screens = {
-      welcome: <Welcome onNext={() => setScreen('main')} />,
-      main:    <Main onBack={() => setScreen('welcome')} />,
-    };
-    return screens[screen] || screens.welcome;
-  }
-
-  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-</script>
-</body></html>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+        crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+        crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+        crossorigin="anonymous"></script>
 ```
 
-## Файловая структура
-
-```
-<project>/
-├── <Project>.html
-├── styles/tokens.css
-├── components/
-│   ├── icons.jsx          # SVG-icons в JSX
-│   ├── shared.jsx         # Button, Input, Card, Badge
-│   └── chrome.jsx         # Topbar, Sidebar если есть
-├── screens/
-│   ├── welcome.jsx        # каждый экран — отдельный файл
-│   ├── main.jsx
-│   └── settings.jsx
-└── uploads/               # картинки от юзера
-```
-
-## Правила JSX в Babel-standalone
-
-- **Каждый файл-секция вешает компонент на `window`** в конце:
-  ```jsx
-  function Welcome({ onNext }) { return <div>...</div>; }
-  window.Welcome = Welcome;
-  ```
-- **Не используй `import` / `export`** — Babel standalone их не выполняет в этой конфигурации
-- **`useState` берёшь как `const { useState } = React`** в каждом файле где нужен
-- **JSX-кавычки нормальные** — `"prop"` или `'prop'`, не curly
-
-## Состояние между экранами
-
-Простой паттерн для prototype:
+Точку входа держи в одном `<script type="text/babel">` в конце body, а компоненты раскидай по отдельным файлам и подключай тоже как `text/babel`. Каждый Babel-скрипт получает собственный scope при транспиляции, поэтому компоненты, которые используются из другого файла, в конце экспортируй на window:
 
 ```jsx
-function App() {
-  const [screen, setScreen] = useState('welcome');
-  const [data, setData] = useState({ name: '', email: '' });
-
-  // Передаешь setData в формы как onChange
-  return screens[screen];
-}
+Object.assign(window, { Button, Card, Input });
 ```
 
-Если состояние сложное — заменяй на `useReducer` в App, передавай `dispatch` вниз.
+## Правила состояния
 
-## Сценарии типового прототипа
+- **Не выдумывай данные.** Если нужны имена, товары, числа — используй реалистичные заглушки, согласованные с темой приложения. Не «Lorem ipsum».
+- **Состояние локальное по умолчанию.** Поднимай его выше только когда два компонента действительно разделяют данные.
+- **Реальные переходы.** Кнопка «Далее» должна правда переключать экран, а не быть украшением.
+- **Валидация форм.** Хотя бы базовая (required, длина, формат email) с человеческим текстом ошибок.
+- **Состояния всех состояний.** Hover, focus, active, disabled, loading, empty, error. Не только default.
 
-| Тип | Экраны (минимум) |
-|---|---|
-| Onboarding | welcome → personal-info → permissions → done |
-| Authentication | login → 2fa → forgot-password → reset |
-| E-commerce | catalog → product → cart → checkout → confirmation |
-| Dashboard | empty-state → loaded → drill-down → settings |
-| Form-flow | step-1 → step-2 → step-3 → review → submitted |
+## Анти-паттерны
 
-## Стек со связанными скиллами
+- Глобальный объект `const styles = { ... }`. Если он определён в двух babel-скриптах — коллизия. Имя должно быть уникальным: `cardStyles`, `formStyles`. Или используй inline-стили / Tailwind / CSS-модули.
+- `scrollIntoView` — иногда ломает iframe-хосты. Используй `element.scrollTo()`.
+- Анимации через JS-таймауты вместо CSS-transitions / `requestAnimationFrame`.
+- Один `useEffect` на всё. Разбивай по отдельным эффектам с понятными зависимостями.
 
-- `device-frames` — обернуть прототип в iPhone / Android / Browser frame
-- `mobile-overlays` — клавиатура, sheet, тосты, action sheet поверх экрана
-- `tweaks-panel` — sidebar с крутилками (цвет primary, размер шрифта, состояние demo)
-- `microinteractions` — hover, skeleton, scroll-reveal внутри экранов
-- `claude-in-html` — встроить LLM в прототип (чат-бот / AI-консультант)
-- `states-checklist` — empty / loading / error / disabled на каждом экране
-- `forms-a11y` — если в прототипе есть формы
+## Размер и контейнер
 
-## Антипаттерны
+- Если прототип мобильный — оборачивай в рамку устройства (см. `device-frames`).
+- Если десктопный — оборачивай в окно браузера или macOS (тоже `device-frames`).
+- Свободный лендинг — full-bleed с разумными max-width.
 
-- Один монолитный файл `App.jsx` 800 строк → невозможно править секции
-- `import` / `export` в Babel standalone → не работает, путает
-- Реальные API вызовы → прототип должен работать офлайн с mock-data
-- Lorem ipsum → плохо считывается реальным юзером, лучше realistic dummy («John Doe», «456 ₽»)
-- Анимации сложнее opacity/transform → JS-производительность падает на mobile
-- 10+ экранов в одном прототипе → сложно тестить, лучше разбить на несколько проектов
+## Persistence
 
-## Когда НЕ делать interactive-prototype
+Если в прототипе важно сохранять состояние между перезагрузками (для итеративного дизайна), пиши его в `localStorage` при изменении и читай при старте:
 
-- Нужно показать только статичный flow → `slides` с скриншотами проще
-- Нужен один экран → просто HTML без React
-- Юзер хочет реальный код → не прототип, иди в `feature-dev` agent
+```jsx
+const [step, setStep] = useState(() => {
+  const saved = localStorage.getItem('proto.step');
+  return saved ? parseInt(saved, 10) : 0;
+});
+
+useEffect(() => {
+  localStorage.setItem('proto.step', String(step));
+}, [step]);
+```
+
+Особенно полезно для видео-таймера, текущего экрана флоу, заполненных полей формы.
+
+## Использование Claude из прототипа (опционально)
+
+Если прототипу нужна «магия» — суммаризация, генерация ответа, классификация ввода — можешь дёрнуть LLM напрямую через Anthropic SDK или fetch на твой бэк. В Claude Code это работает иначе, чем в этой среде: ключ ставит сам пользователь.
+
+Простейший вариант — спросить пользователя, готов ли он вставить ключ. Дальше:
+
+```html
+<script type="module">
+  import Anthropic from "https://esm.sh/@anthropic-ai/sdk";
+  const client = new Anthropic({
+    apiKey: localStorage.getItem('anthropic_key'),
+    dangerouslyAllowBrowser: true,
+  });
+  // ... client.messages.create({...})
+</script>
+```
+
+Если `apiKey` нет — оставляй прототип статическим, не блокируй UI.
+
+## Чек-лист перед сдачей
+
+- [ ] Все основные кнопки кликабельны и ведут куда обещают.
+- [ ] Формы валидируются.
+- [ ] Есть hover/focus/active.
+- [ ] Loading и error состояния хотя бы заглушены.
+- [ ] Никаких console-ошибок (открой DevTools).
+- [ ] Прототип влезает в типичный viewport без горизонтального скролла.
+- [ ] Если флоу — пройден от начала до конца.
+
+## Legacy reference
+
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-interactive-prototype.md`. Секции там: Каркас, Файловая структура, Правила JSX в Babel-standalone, Состояние между экранами, Сценарии типового прототипа, Стек со связанными скиллами, Антипаттерны, Когда НЕ делать interactive-prototype.

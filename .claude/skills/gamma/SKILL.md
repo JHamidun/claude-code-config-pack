@@ -1,357 +1,144 @@
 ---
 name: gamma
-description: "Gamma.app AI presentations and documents. Use when asked to create presentations, slides, or pitch decks with AI."
+description: "Generate presentations, documents, social posts and webpages with Gamma's Generate API (v1.0). Use when asked to make slides/decks/one-pagers via Gamma, or to export a Gamma to PDF/PPTX/PNG. Triggers: «сделай презентацию в Gamma», «gamma api», «сгенерируй слайды gamma», «экспортируй в pptx через gamma»."
 ---
 
-# Gamma.app API Skill
+# Gamma Generate API
 
-## Overview
+## What this skill really does
 
-Expert skill for using Gamma.app - AI-powered presentation and document generation platform.
+Gamma's **Generate API** (v1.0, GA since Nov 2025) creates a Gamma (presentation /
+document / social / webpage) from text — a one-line prompt up to ~400k characters of
+content — and can export it to PDF, PPTX or PNG. It is a **generation-only** API:
+you send input text, poll for completion, and get a shareable `gammaUrl` plus an
+optional `exportUrl`.
 
-## API Key
+It is **asynchronous** and one-shot per generation. There is **no** slide-by-slide edit
+API, no "outline" endpoint, no templates endpoint. (The previous version of this skill
+documented `api.gamma.app/v1/generate`, `/v1/presentations`, `update_slide`,
+`list_templates` — none of those exist. They were removed.)
+
+Helper: `scripts/gamma_client.py` (correct endpoints, verified against the live API).
+
+## Status / honesty notes (verified 2026-07-22)
+
+- Base URL, path and header below were probed live and are correct (a bad key returns
+  HTTP 401 `Invalid API key`, i.e. the request reaches the real endpoint).
+- ⚠️ The `GAMMA_API_KEY` stored in `~/.claude/.credentials.master.env` currently returns
+  **401 Invalid API key** — it is expired/revoked or on the wrong plan. `GAMMA_API_KEY_2`
+  is a broken placeholder (`os.getenv(...)`), ignore it.
+- Before anything works: regenerate a key at **gamma.app → Settings → API keys**
+  (needs a paid plan: Pro / Ultra / Teams / Business) and replace `GAMMA_API_KEY`.
+- Fields marked "(unverified)" below are from Gamma's docs but were not exercised with a
+  live generation here. Treat exact allowed-value lists as best-effort, not gospel.
+
+## API surface
+
+| Property | Value |
+|----------|-------|
+| Base URL | `https://public-api.gamma.app` |
+| Create | `POST /v1.0/generations` |
+| Poll | `GET /v1.0/generations/{generationId}` |
+| Auth header | `X-API-KEY: sk-gamma-...` (custom header, **not** `Authorization: Bearer`) |
+| Plan required | Pro / Ultra / Teams / Business |
+| Deprecated | `v0.2` retired 2026-01-16 — use `v1.0` |
+
+### Request body (`POST /v1.0/generations`)
+
+| Field | Type | Values / limit |
+|-------|------|----------------|
+| `inputText` | string (required) | prompt / outline / full content, ≤ 400,000 chars |
+| `format` | enum (required) | `presentation`, `document`, `social`, `webpage` |
+| `textMode` | enum | `generate` (expand), `condense`, `preserve` |
+| `numCards` | int | 1–75 (plan-dependent) |
+| `exportAs` | enum | `pdf`, `pptx`, `png` (png → zip of one PNG per card) |
+| `themeId` | string | a theme id (from your workspace) — (unverified) |
+| `title` | string | Gamma name, ≤ 500 chars |
+| `additionalInstructions` | string | free-text steering — (unverified) |
+| `textOptions.tone` | string | e.g. "professional", ≤ 500 chars |
+| `textOptions.audience` | string | e.g. "executives", ≤ 500 chars |
+| `imageOptions.source` | enum | `aiGenerated`, `webFreeToUseCommercially`, `webFreeToUse`, `noImages`, … |
+| `imageOptions.model` | enum | e.g. `dall-e-3`, `flux-1-pro`, `imagen-3-flash` — (unverified list) |
+| `folderIds` | array | ≤ 10 folder ids — (unverified) |
+
+Response: `{ "generationId": "..." }`.
+
+### Poll response (`GET /v1.0/generations/{generationId}`)
+
+- `status`: `pending` → `completed` | `failed`
+- on `completed`: `gammaUrl`, `gammaId`, `exportUrl` (present only if `exportAs` was set),
+  `credits.deducted`, `credits.remaining`
+- rate-limit headers: `x-ratelimit-remaining`, `x-ratelimit-remaining-burst`,
+  `x-ratelimit-remaining-daily`. Poll every ~5 s.
+- export URLs expire in ~1 week and are public-with-link.
+
+## Procedure
+
+1. Ensure a valid `GAMMA_API_KEY` (see status notes). Quick auth check:
+   `curl -s -o /dev/null -w "%{http_code}\n" -H "X-API-KEY: $GAMMA_API_KEY" \
+   https://public-api.gamma.app/v1.0/generations/x` — expect `404` (key OK) vs `401` (bad key).
+2. Build `inputText`. For tighter control, pass a structured outline and use
+   `textMode: preserve` or `condense` instead of `generate`.
+3. `POST /v1.0/generations`; keep the `generationId`.
+4. Poll `GET /v1.0/generations/{generationId}` every ~5 s until `completed`/`failed`.
+5. Use `gammaUrl` (view/share) and `exportUrl` (download, if `exportAs` set).
+
+## Output
+
+- `gammaUrl` — editable/shareable Gamma
+- `exportUrl` — PDF/PPTX/PNG download (only when `exportAs` requested)
+- `gammaId`, credits deducted/remaining
+
+## Usage — helper script
 
 ```bash
-# Configured in .env.agents
-GAMMA_API_KEY=YOUR_GAMMA_API_KEY
+# generate + wait for completion + export to pptx
+python ~/.claude/skills/gamma/scripts/gamma_client.py generate \
+  "AI in Healthcare: trends, applications, and outlook" \
+  --format presentation --num-cards 10 --export pptx \
+  --tone professional --audience "hospital executives" --wait
+
+# poll an existing generation
+python ~/.claude/skills/gamma/scripts/gamma_client.py poll <generationId> --wait
 ```
 
-## When to Use Gamma
-
-**Best for:**
-- AI-generated presentations
-- Slide decks from text/outline
-- Professional documents
-- One-pagers and pitch decks
-- Interactive web pages
-- Marketing materials
-- Reports and proposals
-
-**Advantages:**
-- Beautiful AI-generated designs
-- Multiple export formats (PDF, PPT, Web)
-- Automatic layout and styling
-- Image integration
-- Brand customization
-- Collaborative editing
-- Embed support
-
-## Dependencies
+## Usage — raw curl
 
 ```bash
-pip install requests
+KEY="$GAMMA_API_KEY"
+GEN=$(curl -s -X POST https://public-api.gamma.app/v1.0/generations \
+  -H "X-API-KEY: $KEY" -H "Content-Type: application/json" \
+  -d '{"inputText":"Quarterly sales report Q4: metrics, wins, 2025 outlook",
+       "format":"presentation","textMode":"generate","numCards":10,"exportAs":"pptx"}' \
+  | python -c "import sys,json;print(json.load(sys.stdin)['generationId'])")
+
+# poll
+curl -s https://public-api.gamma.app/v1.0/generations/$GEN -H "X-API-KEY: $KEY"
 ```
 
-## API Endpoints
+## Credits (rough, from docs — unverified against a live run)
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/v1/presentations` | POST | Create presentation |
-| `/v1/presentations/{id}` | GET | Get presentation |
-| `/v1/presentations/{id}` | PUT | Update presentation |
-| `/v1/presentations/{id}/export` | POST | Export to PDF/PPT |
-| `/v1/generate` | POST | Generate from prompt |
-| `/v1/templates` | GET | List templates |
+- text: ~1–3 credits per card (model-dependent)
+- images: ~2–15 (standard) up to 30–125 (ultra) credits each
+- example: 10-card deck + 5 images ≈ 20–60 credits
 
-## Basic Usage
+## Checklist before shipping a Gamma job
 
-### Setup Client
+- [ ] `GAMMA_API_KEY` valid (auth probe returns 404, not 401)
+- [ ] `format` is one of presentation/document/social/webpage
+- [ ] `inputText` ≤ 400k chars
+- [ ] `numCards` within plan limit (1–75)
+- [ ] set `exportAs` only if you need a downloadable file
+- [ ] poll to `completed` before using `exportUrl` (async!)
+- [ ] grab `exportUrl` promptly — it expires in ~1 week
 
-```python
-import requests
-import os
+## Not this skill
 
-GAMMA_API_KEY = os.getenv('GAMMA_API_KEY')
-BASE_URL = "https://api.gamma.app"
+- Local slide building / templated decks without Gamma → `manus-slides`, `pptx`, `slides`
+- KP / Company decks (HTML→PNG→PPTX) → `kp-deck-factory`
+- Editing an existing `.pptx` → `pptx`
 
-headers = {
-    "Authorization": f"Bearer {GAMMA_API_KEY}",
-    "Content-Type": "application/json"
-}
-```
+## References
 
-### Generate Presentation from Prompt
-
-```python
-def generate_presentation(prompt: str, slides_count: int = 10, style: str = "professional"):
-    """
-    Generate presentation from text prompt.
-
-    Args:
-        prompt: Topic or detailed description
-        slides_count: Number of slides (5-20)
-        style: "professional", "creative", "minimal", "bold"
-    """
-    payload = {
-        "prompt": prompt,
-        "slides_count": slides_count,
-        "style": style,
-        "include_images": True
-    }
-
-    response = requests.post(
-        f"{BASE_URL}/v1/generate",
-        headers=headers,
-        json=payload
-    )
-
-    return response.json()
-
-# Usage
-result = generate_presentation(
-    prompt="AI in Healthcare: Current trends, applications, and future outlook",
-    slides_count=12,
-    style="professional"
-)
-print(f"Presentation ID: {result['id']}")
-print(f"URL: {result['url']}")
-```
-
-### Create Presentation from Outline
-
-```python
-def create_from_outline(title: str, outline: list, template: str = None):
-    """
-    Create presentation from structured outline.
-
-    Args:
-        title: Presentation title
-        outline: List of slide topics/content
-        template: Optional template ID
-    """
-    payload = {
-        "title": title,
-        "slides": [
-            {"content": slide} for slide in outline
-        ]
-    }
-
-    if template:
-        payload["template_id"] = template
-
-    response = requests.post(
-        f"{BASE_URL}/v1/presentations",
-        headers=headers,
-        json=payload
-    )
-
-    return response.json()
-
-# Usage
-outline = [
-    "Introduction to Machine Learning",
-    "Types of ML: Supervised, Unsupervised, Reinforcement",
-    "Real-world Applications",
-    "Getting Started with ML",
-    "Future of Machine Learning"
-]
-
-presentation = create_from_outline(
-    title="Machine Learning 101",
-    outline=outline
-)
-```
-
-### Export Presentation
-
-```python
-def export_presentation(presentation_id: str, format: str = "pdf"):
-    """
-    Export presentation to file.
-
-    Args:
-        presentation_id: ID of presentation
-        format: "pdf", "pptx", "html"
-    """
-    payload = {
-        "format": format
-    }
-
-    response = requests.post(
-        f"{BASE_URL}/v1/presentations/{presentation_id}/export",
-        headers=headers,
-        json=payload
-    )
-
-    result = response.json()
-    return result.get("download_url")
-
-# Usage
-pdf_url = export_presentation("pres_123abc", format="pdf")
-pptx_url = export_presentation("pres_123abc", format="pptx")
-```
-
-### Get Presentation
-
-```python
-def get_presentation(presentation_id: str):
-    """Get presentation details."""
-
-    response = requests.get(
-        f"{BASE_URL}/v1/presentations/{presentation_id}",
-        headers=headers
-    )
-
-    return response.json()
-```
-
-### List Templates
-
-```python
-def list_templates(category: str = None):
-    """
-    Get available templates.
-
-    Categories: "business", "education", "marketing", "pitch", "report"
-    """
-    params = {}
-    if category:
-        params["category"] = category
-
-    response = requests.get(
-        f"{BASE_URL}/v1/templates",
-        headers=headers,
-        params=params
-    )
-
-    return response.json()["templates"]
-```
-
-### Update Presentation
-
-```python
-def update_slide(presentation_id: str, slide_index: int, content: dict):
-    """Update specific slide content."""
-
-    payload = {
-        "slides": [
-            {
-                "index": slide_index,
-                "content": content
-            }
-        ]
-    }
-
-    response = requests.put(
-        f"{BASE_URL}/v1/presentations/{presentation_id}",
-        headers=headers,
-        json=payload
-    )
-
-    return response.json()
-```
-
-## Style Options
-
-| Style | Description | Best For |
-|-------|-------------|----------|
-| `professional` | Clean, corporate look | Business, reports |
-| `creative` | Bold colors, dynamic layouts | Marketing, pitches |
-| `minimal` | Lots of whitespace, simple | Tech, startups |
-| `bold` | Strong typography, impactful | Sales, presentations |
-| `elegant` | Sophisticated, refined | Luxury, formal |
-
-## Content Types
-
-Gamma supports various content blocks:
-
-| Block | Description |
-|-------|-------------|
-| `text` | Rich text content |
-| `heading` | Title/subtitle |
-| `bullet_list` | Bullet points |
-| `numbered_list` | Numbered items |
-| `image` | Images with captions |
-| `chart` | Data visualizations |
-| `table` | Data tables |
-| `quote` | Blockquotes |
-| `embed` | External embeds (YouTube, etc.) |
-
-## Complete Example
-
-```python
-import requests
-import os
-import time
-
-class GammaClient:
-    def __init__(self):
-        self.api_key = os.getenv('GAMMA_API_KEY')
-        self.base_url = "https://api.gamma.app"
-        self.headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
-        }
-
-    def generate(self, prompt: str, **kwargs):
-        """Generate presentation from prompt."""
-        payload = {
-            "prompt": prompt,
-            "slides_count": kwargs.get("slides_count", 10),
-            "style": kwargs.get("style", "professional"),
-            "include_images": kwargs.get("include_images", True)
-        }
-
-        response = requests.post(
-            f"{self.base_url}/v1/generate",
-            headers=self.headers,
-            json=payload
-        )
-        return response.json()
-
-    def export(self, presentation_id: str, format: str = "pdf"):
-        """Export to file format."""
-        response = requests.post(
-            f"{self.base_url}/v1/presentations/{presentation_id}/export",
-            headers=self.headers,
-            json={"format": format}
-        )
-        return response.json().get("download_url")
-
-    def create_and_export(self, prompt: str, format: str = "pdf"):
-        """Generate and export in one call."""
-        # Generate
-        result = self.generate(prompt)
-        presentation_id = result["id"]
-
-        # Wait for generation
-        time.sleep(5)
-
-        # Export
-        download_url = self.export(presentation_id, format)
-
-        return {
-            "id": presentation_id,
-            "url": result["url"],
-            "download_url": download_url
-        }
-
-# Usage
-gamma = GammaClient()
-presentation = gamma.create_and_export(
-    prompt="Quarterly Sales Report Q4 2024: Key metrics, achievements, and 2025 outlook",
-    format="pptx"
-)
-print(f"View: {presentation['url']}")
-print(f"Download: {presentation['download_url']}")
-```
-
-## Use Cases
-
-| Scenario | Approach |
-|----------|----------|
-| Quick pitch deck | `generate()` with "pitch" style |
-| Detailed report | `create_from_outline()` with sections |
-| Marketing materials | `generate()` with "creative" style |
-| Training content | `create_from_outline()` with detailed content |
-| Sales presentation | `generate()` with "bold" style |
-
-## Tips
-
-1. **Detailed prompts** - более детальные промпты дают лучшие результаты
-2. **Outline структура** - для контроля используй outline вместо prompt
-3. **Templates** - проверь доступные шаблоны перед созданием
-4. **Export timing** - дай время на генерацию перед экспортом
-5. **Branding** - настрой цвета и шрифты через templates
-6. **Images** - Gamma автоматически подбирает релевантные изображения
-7. **Iteration** - используй `update_slide()` для точечных правок
+- Developer docs: <https://developers.gamma.app>
+- Endpoint spec: <https://github.com/gamma-app/gamma-docs>

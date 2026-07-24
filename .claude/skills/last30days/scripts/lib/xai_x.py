@@ -5,13 +5,24 @@ import re
 import sys
 from typing import Any, Dict, List, Optional
 
-from . import http
+from . import http, log
+
+
+def _safe_text(val) -> str:
+    """Extract text from string or localized object."""
+    if isinstance(val, str):
+        return val
+    if isinstance(val, dict):
+        return str(val.get("text", val.get("en", "")))
+    return str(val) if val is not None else ""
+
+
+def _log(msg: str):
+    log.source_log("xAI", msg, tty_only=False)
 
 
 def _log_error(msg: str):
-    """Log error to stderr."""
-    sys.stderr.write(f"[X ERROR] {msg}\n")
-    sys.stderr.flush()
+    log.source_log("xAI ERROR", msg, tty_only=False)
 
 # xAI uses responses endpoint with Agent Tools API
 XAI_RESPONSES_URL = "https://api.x.ai/v1/responses"
@@ -130,7 +141,7 @@ def parse_x_response(response: Dict[str, Any]) -> List[Dict[str, Any]]:
         error = response["error"]
         err_msg = error.get("message", str(error)) if isinstance(error, dict) else str(error)
         _log_error(f"xAI API error: {err_msg}")
-        if http.DEBUG:
+        if log.is_debug():
             _log_error(f"Full error response: {json.dumps(response, indent=2)[:1000]}")
         return items
 
@@ -164,16 +175,24 @@ def parse_x_response(response: Dict[str, Any]) -> List[Dict[str, Any]]:
                 break
 
     if not output_text:
-        return items
+        response_preview = str(response)[:200] if response else "(empty)"
+        raise http.HTTPError(
+            f"xAI API returned empty response (no output text found; response preview: {response_preview})"
+        )
 
     # Extract JSON from the response
     json_match = re.search(r'\{[\s\S]*"items"[\s\S]*\}', output_text)
-    if json_match:
-        try:
-            data = json.loads(json_match.group())
-            items = data.get("items", [])
-        except json.JSONDecodeError:
-            pass
+    if not json_match:
+        raise http.HTTPError(
+            f"xAI API returned output without valid JSON items structure (output: {output_text[:200]})"
+        )
+    try:
+        data = json.loads(json_match.group())
+        items = data.get("items", [])
+    except json.JSONDecodeError:
+        raise http.HTTPError(
+            f"xAI API returned valid output but invalid JSON structure (output: {output_text[:200]})"
+        )
 
     # Validate and clean items
     clean_items = []
@@ -190,20 +209,20 @@ def parse_x_response(response: Dict[str, Any]) -> List[Dict[str, Any]]:
         eng_raw = item.get("engagement")
         if isinstance(eng_raw, dict):
             engagement = {
-                "likes": int(eng_raw.get("likes", 0)) if eng_raw.get("likes") else None,
-                "reposts": int(eng_raw.get("reposts", 0)) if eng_raw.get("reposts") else None,
-                "replies": int(eng_raw.get("replies", 0)) if eng_raw.get("replies") else None,
-                "quotes": int(eng_raw.get("quotes", 0)) if eng_raw.get("quotes") else None,
+                "likes": int(eng_raw["likes"]) if eng_raw.get("likes") is not None else None,
+                "reposts": int(eng_raw["reposts"]) if eng_raw.get("reposts") is not None else None,
+                "replies": int(eng_raw["replies"]) if eng_raw.get("replies") is not None else None,
+                "quotes": int(eng_raw["quotes"]) if eng_raw.get("quotes") is not None else None,
             }
 
         clean_item = {
             "id": f"X{i+1}",
-            "text": str(item.get("text", "")).strip()[:500],  # Truncate long text
+            "text": _safe_text(item.get("text", "")).strip()[:500],  # Truncate long text
             "url": url,
-            "author_handle": str(item.get("author_handle", "")).strip().lstrip("@"),
+            "author_handle": _safe_text(item.get("author_handle", "")).strip().lstrip("@"),
             "date": item.get("date"),
             "engagement": engagement,
-            "why_relevant": str(item.get("why_relevant", "")).strip(),
+            "why_relevant": _safe_text(item.get("why_relevant", "")).strip(),
             "relevance": min(1.0, max(0.0, float(item.get("relevance", 0.5)))),
         }
 

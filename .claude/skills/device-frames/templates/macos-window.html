@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>macOS window</title>
+<style>
+  body {
+    margin: 0; min-height: 100vh;
+    display: grid; place-items: center;
+    background: #d8d4cc;
+    font-family: -apple-system, "SF Pro Text", system-ui, sans-serif;
+  }
+
+  .macos-window {
+    width: 1200px; height: 800px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,.1),
+      0 30px 80px rgba(0,0,0,.25),
+      0 12px 30px rgba(0,0,0,.15);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  .macos-titlebar {
+    height: 38px;
+    background: linear-gradient(#f6f6f6, #ececec);
+    border-bottom: 1px solid #d6d6d6;
+    display: grid;
+    grid-template-columns: 88px 1fr 88px;
+    align-items: center;
+    padding: 0 12px;
+    flex-shrink: 0;
+  }
+
+  .macos-traffic { display: flex; gap: 8px; }
+  .macos-traffic span {
+    width: 12px; height: 12px; border-radius: 50%;
+    display: block;
+  }
+  .macos-traffic .close    { background: #ff5f57; }
+  .macos-traffic .minimize { background: #febc2e; }
+  .macos-traffic .maximize { background: #28c840; }
+
+  .macos-title {
+    text-align: center;
+    font-size: 13px; font-weight: 500;
+    color: #3a3a3a;
+  }
+
+  .macos-content {
+    flex: 1;
+    overflow: auto;
+    background: #fff;
+  }
+</style>
+</head>
+<body>
+
+<div class="macos-window">
+  <div class="macos-titlebar">
+    <div class="macos-traffic">
+      <span class="close"></span>
+      <span class="minimize"></span>
+      <span class="maximize"></span>
+    </div>
+    <div class="macos-title">Document</div>
+    <div></div>
+  </div>
+  <div class="macos-content">
+    <!-- Замени содержимое .macos-content своим макетом -->
+    <div style="padding: 48px;">
+      <h1>Window content</h1>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

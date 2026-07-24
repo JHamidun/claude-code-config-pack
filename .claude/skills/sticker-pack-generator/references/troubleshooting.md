@@ -1,6 +1,6 @@
 # Troubleshooting — реальные провалы и фиксы
 
-Извлечено из production-сессии май 2026 (75-стикерный пак).
+Из production-сессии май 2026 (75-стикерный пак `promptegga`).
 
 ## Encoding
 
@@ -59,11 +59,11 @@
   ```
   + установить `nvidia-cublas-cu12` через pip + `os.add_dll_directory` перед import
 
-### BiRefNet OOM на 32GB server
+### BiRefNet OOM на 32GB your-server server
 - **Причина**: BiRefNet требует ~40GB VRAM при batch processing
-- **Фикс**: переехать на машину с большим объёмом VRAM (high-end GPU 96GB system / similar)
+- **Фикс**: переехать на локальный 96GB ноут с your GPU
 
-### N-wide parallel rembg на vCPU в десятки раз медленнее single
+### your-server 3-wide parallel rembg в 30x медленнее single
 - **Причина**: ONNX thread thrashing на vCPU без isolation
 - **Фикс**: либо `--single-thread` ONNX, либо локальная GPU
 
@@ -77,7 +77,7 @@
 - **Причина**: Telegram локальный кеш
 - **Фикс**: пользователю — удалить пак и добавить заново. Серверный пропагейт ~1ч.
 
-### Стикеры в паке не маппятся на список имён
+### Стикеры в паке не маппятся на 75-имён список
 - **Причина**: эмодзи в паке нестандартные (тестовые загрузки, garbage)
 - **Фикс**: map by emoji (с VS16 norm) → name; ADD missing; DELETE extras
 

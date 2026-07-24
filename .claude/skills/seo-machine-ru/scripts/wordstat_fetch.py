@@ -12,7 +12,7 @@
 
 CLI:
     python wordstat_fetch.py phrases.txt --cookie "Session_id=...; yandexuid=..." [--region 225] [--json]
-    python wordstat_fetch.py --kw "система управления задачами" "таск-менеджер" --cookie "..."
+    python wordstat_fetch.py --kw "агрегатор нейросетей" "нейросети для бизнеса" --cookie "..."
 phrases.txt — по фразе на строку.
 """
 import argparse
@@ -44,7 +44,7 @@ def fetch_one(phrase, cookie, region="225", start="01.06.2024", end="31.05.2026"
         "cookie": cookie,
         "referer": "https://wordstat.yandex.ru/",
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                      "(KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+                      "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
     }
     # Direct API v4 / Wordstat требует UTF-8 body bytes
     data = json.dumps(body, ensure_ascii=False).encode("utf-8")

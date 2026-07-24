@@ -1,6 +1,6 @@
 ---
 name: epub-tools
-description: "EPUB Tools — Read & Create EPUB Books"
+description: "EPUB: чтение/анализ/поиск по главам (ebooklib + BeautifulSoup) и сборка EPUB из Markdown. Триггеры: epub, ebook, «электронная книга», kindle, «конвертируй в epub», «прочитай epub»."
 ---
 
 # EPUB Tools — Read & Create EPUB Books

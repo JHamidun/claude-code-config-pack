@@ -34,11 +34,7 @@
 | test-driven-development | P | TDD workflow and practices |
 | testing-anti-patterns | P | Common testing mistakes to avoid |
 | run-quality-gate | P | Quality gate checks (type-check, build, test, lint) |
-| bug-health-inline | P | Inline bug health check orchestration |
-| cleanup-health-inline | P | Inline cleanup health check orchestration |
-| deps-health-inline | P | Dependency health check orchestration |
-| reuse-health-inline | P | Code reuse health check orchestration |
-| security-health-inline | P | Security health check orchestration |
+| health-inline | P | Codebase health orchestration — 5 modes: bug/cleanup/deps/reuse/security (merged 2026-07-18) |
 | defense-in-depth | P | Defense-in-depth validation patterns |
 | verification-before-completion | P | Pre-completion verification checklist |
 

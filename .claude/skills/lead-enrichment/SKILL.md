@@ -1,10 +1,12 @@
 ---
 name: lead-enrichment
-description: "Enrich and qualify B2B leads for the Russian market — two modes. Mode A (digital-trace qualification): given a fragment a lead left (email, phone, full name, @username, domain, UTM), figure out who the person is, which company, whether they are a decision-maker, their fit and how to reach them. Mode B (list enrichment): take a raw company/contact list (Excel/CSV) plus a Bitrix24 export, match by INN, pull legal/firmographic data (DaData, EGRUL, Rusprofile/Checko), find decision-makers (LinkedIn/HH/socials), score by tier, and package a multi-sheet enriched Excel. Reuses bitrix24, social-intel, linkedin, headhunter, maps-places, lead-research, perplexity. Trigger with: дообогати базу, обогати лиды, обогати список, квалифицируй контакт, кто оставил заявку, пробей по цифровому следу, кто этот человек по email/телефону, enrich leads, lead qualification, matched against Bitrix, checko, egrul, ЕГРЮЛ, DaData фирмографика. NOT for writing outreach copy (see draft-outreach), building a list from scratch by ICP (see lead-research), or pure social dossier when you already have the handle (see social-intel)."
+description: "Enrich and qualify B2B leads (RU), two modes. Mode A (digital-trace): from a fragment (email, phone, name, domain) find person, company, DM status. Mode B: raw list + Your CRM export, by INN, firmographics (DaData/EGRUL/Checko). Triggers: дообогати базу, обогати лиды/список, enrich leads, checko, ЕГРЮЛ. NOT: outreach→draft-outreach; list from scratch→lead-research; social dossier→social-intel."
 allowed-tools: Bash, Read, Write, WebSearch, WebFetch, Skill
 metadata:
   version: 1.0.0
-  reuses: bitrix24, social-intel, linkedin, headhunter, maps-places, lead-research, perplexity, draft-outreach, call-prep
+  updated: 2026-06-09
+  reuses: crm, social-intel, linkedin, headhunter, maps-places, lead-research, perplexity, draft-outreach, call-prep
+  origin: "Generalized from the Outreach Company × Your CRM enrichment (session 0dd7acf7) + the 8-step LPR qualification methodology (session 8b20af94)"
 ---
 
 # Lead Enrichment (RU)
@@ -19,7 +21,7 @@ Engine for enriching and qualifying B2B leads on the Russian market. Two modes s
 - "дообогати базу", "обогати список / лиды", "обогати контакты для обзвона" → **Mode B**
 - "квалифицируй контакт", "кто оставил заявку", "пробей по цифровому следу", "кто этот человек по email/телефону", "понять что за человек" → **Mode A**
 - Before a call (`call-prep`) or outreach (`draft-outreach`) when only a fragment is known
-- Matching an external company list against your Bitrix24 base by INN
+- Matching an external company list against the Company Your CRM base by INN
 
 Do NOT use for: writing the outreach message (`draft-outreach`), building a fresh list from an ICP definition (`lead-research`), or a social-only dossier when the handle is already known (`social-intel`).
 
@@ -27,7 +29,7 @@ Do NOT use for: writing the outreach message (`draft-outreach`), building a fres
 
 Public and official sources only. Legal basis: the lead left *us* a trace, or the data is public B2B firmographics.
 
-- Sources: corporate email → company → EGRUL/DaData; full name → LinkedIn/HH/public socials; phone → operator/region + match in **your own** Bitrix; phones/emails published on the company site, 2GIS, Yandex Business; a phone the lead gave you → consented Telegram resolve (their own privacy setting governs).
+- Sources: corporate email → company → EGRUL/DaData; full name → LinkedIn/HH/public socials; phone → operator/region + match in **our** Bitrix; phones/emails published on the company site, 2GIS, Yandex Business; a phone the lead gave you → consented Telegram resolve (their own privacy setting governs).
 - For every enriched field, record **source + date** (152-ФЗ lineage). ≥2 independent sources = High confidence.
 - For a B2B lead, focus on *which company, what role, what budget* — that is what qualification needs.
 
@@ -36,7 +38,7 @@ Public and official sources only. Legal basis: the lead left *us* a trace, or th
 ```bash
 # Firmographics (Mode A company-leg + Mode B): DaData primary, EGRUL fallback (both supported)
 grep DADATA_API_KEY ~/.claude/.credentials.master.env   # optional; EGRUL works key-free
-grep SCRAPECREATORS_API_KEY ~/.claude/.credentials.master.env  # LinkedIn/socials (via social-intel/linkedin skills)
+grep SCRAPER_API_KEY ~/.claude/.credentials.master.env  # LinkedIn/socials (via social-intel/linkedin skills)
 pip install openpyxl requests rapidfuzz phonenumbers  # build/match deps
 ```
 
@@ -53,14 +55,14 @@ Goal: from a fragment, produce a one-page dossier + a verdict (qualify / hand to
 2. Route by type:
    - corporate email / domain  → domain_to_company.py → INN → firmographics (step 4)
    - free email (gmail/ya/mail) → treat as individual: use name + WebSearch
-   - phone                      → phone_lookup.py (operator/region) + check your Bitrix.
+   - phone                      → phone_lookup.py (operator/region) + check OUR Bitrix.
                                    If the lead GAVE you this number (inbound): phone_identify.py → Telegram native
                                    resolve (consented, respects their privacy) + web/CRM.
    - full name                  → WebSearch + social-intel + headhunter
    - @username / social url     → social-intel (forward dossier)
 3. Person leg (public): social_discover.py → cross-network plan (VK/Сетка/TenChat/MAX/Telegram/OK + Western). Run its programmatic connectors (max-messenger, telegram, headhunter, social-intel) + WebSearch site: queries; WebFetch found profiles. See references/social-channels-ru.md.
 4. Company leg: dadata_lookup.py <inn|name>  (or egrul_lookup.py)  → ИНН, ОГРН, гендир, выручка, численность, ОКВЭД, статус, аффилированность.
-5. CRM cross: bitrix_match.py with a 1-row list, or query bitrix24 by email/phone/INN → existing deals, touches, manager, duplicate/reanimation flag.
+5. CRM cross: bitrix_match.py with a 1-row list, or query crm by email/phone/INN → existing deals, touches, manager, duplicate/reanimation flag.
 6. Signals: recent posts/interviews/talks (social-intel, perplexity) → what they care about, what they react to.
 7. Score: confidence "who is this" (1-10) + product-fit + reachability (references/scoring.md).
 8. Output: write a dossier MD (assets/dossier-template below) + optional one-row xlsx via build_enriched_xlsx.py.
@@ -70,25 +72,37 @@ Goal: from a fragment, produce a one-page dossier + a verdict (qualify / hand to
 
 ```bash
 SK=~/.claude/skills/lead-enrichment/scripts
-python $SK/normalize_input.py "i.ivanov@example-corp.ru"  # → {type:email, domain:example-corp.ru, ...}
-python $SK/domain_to_company.py example-corp.ru           # → INN candidates from site/whois
-python $SK/dadata_lookup.py 7707083893                     # → full firmographic card (JSON)
-python $SK/phone_lookup.py "+7 916 123-45-67"              # → operator + region (no PII)
+python $SK/normalize_input.py "i.petrov@company.example"      # → {type:email, domain:company.example, ...}
+python $SK/domain_to_company.py company.example                # → INN candidates from site/whois
+python $SK/dadata_lookup.py 7700000000                     # → full firmographic card (JSON)
+python $SK/phone_lookup.py "+1234567890"              # → operator + region (no PII)
 ```
 
 Then drive the public person/social research with the `social-intel`, `linkedin`, `headhunter` skills, and score per `references/scoring.md`. Emit the dossier using the template at the end of this file.
 
 ---
 
-## Mode B — List enrichment (list × Bitrix pipeline)
+## Mode B — List enrichment (the proven Outreach×Bitrix pipeline, generalized)
 
 Goal: raw list + Bitrix export → scored, segmented, multi-sheet enriched Excel.
+
+**Основной путь — готовый оркестратор `scripts/list_pipeline/orchestrate.py`** (бывший скилл `prospect-list-enrichment`, влит 2026-07-18; полное тело и опции → `references/list-pipeline/prospect-list-enrichment.md`):
+
+```bash
+SK=~/.claude/skills/lead-enrichment/scripts/list_pipeline
+python $SK/orchestrate.py --input "C:/path/my_list.xlsx" --output "C:/path/enriched.xlsx" \
+    --workdir "${HOME}/.claude/scratchpad/prospect-list-<date>"
+# Стадии по одной: 01_extract.py → 02_match_bitrix.py → 03_research_perplexity.py → 04_build_xlsx.py
+# Все стадии идемпотентны: повторный запуск продолжает с места падения.
+```
+
+Пороги: **<20 компаний — быстрее руками** (без пайплайна); **одна компания глубоко → `account-research`**; нет ИНН в источнике → сначала Mode A, чтобы их добыть. Ручной пайплайн ниже — для нестандартных случаев / когда нужен контроль по шагам.
 
 ### Pipeline (deterministic — low freedom, follow exactly)
 
 ```
 1. Parse input list → normalize INNs/names → list.json  (rows: {name, inn, ul, phone, email, rev2024, segment, ...})
-2. Export Bitrix24 → bitrix_data.json   (see references/bitrix-export.md; uses the bitrix24 skill)
+2. Export Your CRM → bitrix_data.json   (see references/bitrix-export.md; uses the crm skill)
 3. python scripts/bitrix_match.py list.json bitrix_data.json   → matches_by_inn.json   (INN exact + fuzzy name via rapidfuzz)
 4. python scripts/bitrix_aggregate.py bitrix_data.json matches_by_inn.json → aggregated.json
        (per company: touches, products, stages, last_touch, days_since, managers, contacts)
@@ -133,6 +147,11 @@ Goal: raw list + Bitrix export → scored, segmented, multi-sheet enriched Excel
 | `qualify_trace.py` | Mode A orchestrator: normalize → route → assemble dossier skeleton | medium |
 | `social_discover.py` | Cross-network plan (VK/Сетка/TenChat/MAX/Telegram/OK + Western) for name/handle/phone | medium |
 | `vk_lookup.py` | VK `users.search`/`users.get` by name+city+company (VK_ACCESS_TOKEN, public profiles) | low |
+| `list_pipeline/orchestrate.py` | Mode B основной путь: 01→02→03→04 с checkpoint'ами (ex-prospect-list-enrichment) | low |
+| `list_pipeline/01_extract.py` | xlsx/csv → нормализованный JSON (мультилист, ИНН-нормализация) | low |
+| `list_pipeline/02_match_bitrix.py` | Bulk ИНН-матч + сборка 360° по каждому матчу (батчи по 50) | low |
+| `list_pipeline/03_research_perplexity.py` | Приоритезированный batch research (S+B все + топ холодных по выручке) | low |
+| `list_pipeline/04_build_xlsx.py` | Финальный enriched.xlsx 10-12 вкладок + LinkedIn-мердж | low |
 
 ## References
 
@@ -141,7 +160,11 @@ Goal: raw list + Bitrix export → scored, segmented, multi-sheet enriched Excel
 - `references/oss-engines.md` — optional open-source connectors (holehe, Maigret, PhoneInfoga, ignorant, theHarvester, SpiderFoot) + the firmographic OSS landscape. Read to extend coverage.
 - `references/scoring.md` — confidence / product-fit / reachability matrices and the color bands. Read before scoring (both modes).
 - `references/excel-schema.md` — exact sheet + column spec for the enriched workbook. Read before `build_enriched_xlsx.py`.
-- `references/bitrix-export.md` — how to produce `bitrix_data.json` via the `bitrix24` skill. Read at Mode B step 2.
+- `references/bitrix-export.md` — how to produce `bitrix_data.json` via the `crm` skill. Read at Mode B step 2.
+- `references/list-pipeline/prospect-list-enrichment.md` — полное тело бывшего скилла prospect-list-enrichment: опции orchestrate.py, гочи, цветовая палитра, quality bar. Read before running the Mode B main path.
+- `references/list-pipeline/pipeline.md` — детальная архитектура 4 стадий list_pipeline, checkpoint'ы.
+- `references/list-pipeline/excel-structure.md` — 12-вкладочная спецификация enriched.xlsx для `list_pipeline/04_build_xlsx.py`. NB: расходится с `excel-schema.md` (схема для `build_enriched_xlsx.py`) по набору вкладок/колонок — для list_pipeline канон ЭТОТ файл, для build_enriched_xlsx.py — excel-schema.md.
+- `references/list-pipeline/tier-formulas.md` — формулы Tier S/A/B, активные/закрытые стадии, edge-кейсы (несколько компаний на один ИНН).
 
 ## Common Errors
 
@@ -174,7 +197,26 @@ Goal: raw list + Bitrix export → scored, segmented, multi-sheet enriched Excel
 - О чём пишет / на что реагирует (1-3 пункта, со ссылкой)
 
 ## Вердикт
-- Fit под продукт: <ваш продукт A | ваш продукт B | ваш продукт C> · score N/10
+- Fit под продукт: <YourProduct | Продукт-2 | EdTech> · score N/10
 - Reachability: N/10 · точка входа: <...>
 - Рекомендация: квалифицировать / отдать менеджеру <...> / отбросить — почему
 ```
+
+## KYC по ИНН/ОГРН → MCP fns-check (disabled по умолчанию)
+
+Для юр-проверки контрагента (Mode A «Компания» и Mode B колонки риска) есть локальный MCP-сервер **fns-check** (`~/.claude/mcps/mcp-fns-check/`, код-аудит пройден 2026-07-19): ЕГРЮЛ/ЕГРИП + ЕФРСБ (банкротства) + Прозрачный бизнес (налоговые долги) + ФССП (исполнительные производства) + КАД (арбитраж) → детерминированный вердикт риска. Ключи не нужны — источники публичные.
+
+**Включение:** в `~/.claude/settings.json` → `mcpServers.fns-check` → `"disabled": false`, перезапуск сессии.
+
+**Вызов (главный тул):**
+
+```
+mcp__fns-check__check_contractor(identifier="7700000000")
+→ card (наименование/адрес/директор/ОКВЭД), legal_status, risks (8 флагов, score 0..100),
+  verdict_action: safe_to_proceed | manual_review_required | high_risk_do_not_proceed | impossible_contractor_defunct,
+  recommendations[]
+```
+
+Гранулярные: `check_inn`, `check_ogrn`, `get_legal_status`, `get_okveds`, `check_for_red_flags`.
+
+**Гочи:** ФССП/КАД/ПБ гео-блочат не-РФ IP (451/503) → эти проверки уходят в `errors[]`, вердикт деградирует до `manual_review_required` (ЕГРЮЛ-карточка и статус приходят всегда). Реестры массовых адресов/директоров — bundled synthetic seed; для продакшен-скрининга догрузить Open Data ФНС через `atomno-mcp-fns-etl`. Для выручки/численности по-прежнему DaData/Checko — fns-check их не отдаёт.

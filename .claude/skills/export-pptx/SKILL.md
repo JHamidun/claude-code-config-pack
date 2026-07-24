@@ -1,146 +1,94 @@
 ---
 name: export-pptx
-description: HTML слайды → PPTX где каждый слайд — картинка-скриншот. Простой путь, никакой текстовой редактируемости. Если нужны редактируемые текст-боксы — используй pptx-editable-extractor.
-when_to_use: Юзер просит «сохрани в PowerPoint», «pptx», «отправь в Keynote». Когда финальные слайды и редактировать в PPT не нужно (только показать).
+description: Конверт HTML-дека в PPTX. Два режима — картинки (всегда работает) и редактируемый (текст и фигуры остаются нативными).
+when_to_use: Пользователь просит "выгрузить в PowerPoint", "PPTX-файл", "сделать редактируемым в PowerPoint".
 ---
 
-# Export PPTX (screenshots)
+# Export PPTX
 
-Каждый слайд → PNG → вставлен в PPTX слайд. Простой, надёжный, не редактируемый по тексту.
+Два режима. Выбирай по запросу.
 
-## Зависимости
+## Режим 1: screenshots (надёжно, не редактируется)
 
-```bash
-pip install python-pptx pillow
-# Для экспорта PNG из HTML — playwright (см. export-png)
-```
+Каждый слайд → PNG → вставка в пустой PPTX. Pixel-perfect, но текст внутри картинки.
 
-## Каркас
-
-```python
-# scripts/export_pptx.py
-from pptx import Presentation
-from pptx.util import Emu, Inches, Pt
-from PIL import Image
-import os, sys
-
-def export_pptx(slides_dir, out_pptx, width_in=13.333, height_in=7.5):
-    """
-    slides_dir/  должна содержать slide-01.png, slide-02.png, ...
-    PPTX-стандарт 16:9 = 13.333" × 7.5"
-    """
-    prs = Presentation()
-    prs.slide_width  = Inches(width_in)
-    prs.slide_height = Inches(height_in)
-
-    blank = prs.slide_layouts[6]  # blank layout
-
-    for img_name in sorted(os.listdir(slides_dir)):
-        if not img_name.lower().endswith(('.png', '.jpg', '.jpeg')):
-            continue
-        slide = prs.slides.add_slide(blank)
-        slide.shapes.add_picture(
-            os.path.join(slides_dir, img_name),
-            left=0, top=0,
-            width=prs.slide_width,
-            height=prs.slide_height,
-        )
-
-    prs.save(out_pptx)
-    print(f"✓ {out_pptx} ({len(prs.slides)} slides)")
-
-if __name__ == '__main__':
-    slides_dir = sys.argv[1]      # ./slides/
-    out = sys.argv[2] if len(sys.argv) > 2 else 'output.pptx'
-    export_pptx(slides_dir, out)
-```
+**Зависимости:** Node + Playwright + python-pptx + Pillow (или JS-аналог).
 
 ```bash
-# Сначала экспортить все слайды как PNG (см. export-png)
-node scripts/export-png.js slides.html  # или skill 'export-png'
-# Получит slides/slide-01.png ... slide-12.png
-
-# Потом упаковать в PPTX
-python3 scripts/export_pptx.py ./slides/ output.pptx
+npm i -D playwright pptxgenjs
+npx playwright install chromium
 ```
 
-## Workflow целиком
+Скрипт `templates/pptx-screenshots.mjs` — рендерит слайды через тот же путь, что `export-png`, и собирает их через **pptxgenjs**:
 
-```
-1. slides skill → slides.html (1920×1080 канва)
-2. export-png skill → slides/slide-01.png ... slide-NN.png (по одной странице)
-3. export-pptx skill → output.pptx (картинки)
-4. Открыть в PowerPoint / Keynote / Google Slides
-```
+```js
+import pptxgen from 'pptxgenjs';
+import { chromium } from 'playwright';
+import { pathToFileURL } from 'node:url';
+import path from 'node:path';
 
-## PPTX размеры
+const [, , file, out = 'deck.pptx'] = process.argv;
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }});
+await page.goto(pathToFileURL(path.resolve(file)).href, { waitUntil: 'networkidle' });
 
-| Тип | Inches | Pixels @ 96 dpi |
-|---|---|---|
-| 16:9 standard (default) | 13.333 × 7.5 | 1280 × 720 |
-| 16:9 widescreen HD | 13.333 × 7.5 | 1280 × 720 (тот же aspect) |
-| 4:3 | 10 × 7.5 | 960 × 720 |
-| 1:1 (Instagram) | 7.5 × 7.5 | 720 × 720 |
-| Custom A4 portrait | 8.27 × 11.69 | 794 × 1122 |
+const total = await page.evaluate(() => document.querySelector('deck-stage').total);
+await page.evaluate(() => document.querySelector('deck-stage').setAttribute('noscale', ''));
 
-Для презентаций — 16:9 always. Для печати handout — 4:3.
+const pres = new pptxgen();
+pres.layout = 'LAYOUT_WIDE'; // 13.33×7.5 inch ~ 1920×1080
 
-## Альтернативный путь: LibreOffice
+for (let i = 0; i < total; i++) {
+  await page.evaluate(idx => document.querySelector('deck-stage').go(idx), i);
+  await page.waitForTimeout(600);
+  const buf = await page.screenshot({ type: 'png' });
+  const slide = pres.addSlide();
+  slide.background = { data: 'data:image/png;base64,' + buf.toString('base64') };
+}
 
-Если установлен LibreOffice — конвертит HTML напрямую в PPTX:
-
-```bash
-soffice --headless --convert-to pptx slides.html
-```
-
-⚠ Качество хуже чем через screenshots — LibreOffice ре-рендерит HTML по-своему. Используй только если screenshots-путь не работает.
-
-## Когда нужен **редактируемый** PPTX
-
-Если после export юзер хочет менять текст/стили — `export-pptx` (этот скилл) НЕ подходит, картинки не редактируются. Иди в `pptx-editable-extractor` — он выкачивает текст и расположение из HTML и собирает нативные text boxes.
-
-## Скрытые слайды
-
-```python
-slide = prs.slides.add_slide(blank)
-slide.shapes.add_picture(...)
-slide.element.set('show', '0')  # скрыть в режиме показа
+await pres.writeFile({ fileName: out });
+await browser.close();
+console.log('✓', out);
 ```
 
-Полезно для вспомогательных слайдов (notes, draft).
+## Режим 2: editable (текст и фигуры — нативные)
 
-## Speaker notes
+Сложнее. Идея: пройти по DOM каждого слайда, для каждого text-node создать `slide.addText(...)`, для прямоугольника — `slide.addShape(...)`, для картинки — `slide.addImage(...)`.
 
-```python
-notes_slide = slide.notes_slide
-notes_text_frame = notes_slide.notes_text_frame
-notes_text_frame.text = "Тут заметки для докладчика — не покажутся аудитории."
-```
+`pptxgenjs` это умеет. Но 1:1 не получится — отказывайся от градиентов, теней, нестандартных шрифтов. Хорошо работает для деков, где макет = заголовок + текст + 1–2 фигуры.
 
-Если в `slides` HTML есть `<aside data-notes>...</aside>` — extract их и кладём в notes:
+Алгоритм:
 
-```python
-# В каждый slide-NN.png парсим заметки из соответствующего HTML
-# и вставляем в notes
-```
+1. Запусти страницу в Playwright.
+2. На каждом слайде через `page.evaluate` собери список объектов:
+   ```js
+   [
+     { type: 'text', x, y, w, h, text, font, size, color, bold, align },
+     { type: 'rect', x, y, w, h, fill, stroke },
+     { type: 'image', x, y, w, h, src },
+   ]
+   ```
+   Координаты — относительно слайда, в пикселях, потом конвертируй в дюймы (`px / 96`).
+3. Для каждого объекта вызови соответствующий `slide.addX(...)`.
+4. `pres.writeFile({ fileName })`.
 
-## Метаданные
+Минимальный экстрактор лежит в `templates/extract-shapes.js`. Это **черновик** — для сложных макетов потребуется ручная подкрутка.
 
-```python
-prs.core_properties.title = "ExampleProduct — Pitch Deck"
-prs.core_properties.author = "Your Name"
-prs.core_properties.subject = "Edtech про AI"
-prs.core_properties.created = datetime.utcnow()
-```
+## Что выбирать когда
 
-Это видно в file properties и в email-attachments превью.
+| Ситуация | Режим |
+|---|---|
+| Дек уйдёт в PowerPoint, его будут править | editable (с компромиссами по визуалу) |
+| Просто переслать как PPTX, без правок | screenshots |
+| В деке много кастомных эффектов / SVG | screenshots, иначе сломается |
+| Текст должен искаться / переводиться в PowerPoint | editable |
 
-## Антипаттерны
+## Замечания
 
-- Ожидать что текст в PPTX будет редактируемый → screenshots не редактируются. Для этого `pptx-editable-extractor`
-- Использовать LibreOffice convert на сложном HTML (с React/Babel) → mess
-- 1920×1080 PNG в 4:3 PPTX → растянутые слайды
-- Низкое разрешение PNG (1200×675) на 16:9 PPTX → блёрит на full-screen
-- Не вписать metadata → файл «без названия»
-- Не speaker-notes → потерял весь скрипт презентации
-- Огромные images (>2MB каждый) × 30 слайдов → PPTX 60MB, не отправишь
+- Шрифты: PowerPoint использует системные шрифты получателя. Если в HTML Helvetica Neue, а у получателя Windows — он увидит fallback. Закладывай это в выбор шрифтов.
+- 16:9 в PowerPoint — `LAYOUT_WIDE` (13.33×7.5 in). 4:3 — `LAYOUT_STANDARD` (10×7.5 in).
+- Если используешь Google Fonts — заранее предупреди пользователя, что PPT не подтянет их и шрифт подменится.
+
+## Legacy reference
+
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-export-pptx.md`. Секции там: Зависимости, Каркас, Workflow целиком, PPTX размеры, Альтернативный путь: LibreOffice, Когда нужен **редактируемый** PPTX, Скрытые слайды, Speaker notes, Метаданные, Антипаттерны.

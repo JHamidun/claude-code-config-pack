@@ -1,11 +1,27 @@
 ---
-name: competitive-analysis
-description: Research competitors and compare positioning, messaging, content strategy, and market presence. Use when analyzing a competitor, building battlecards, identifying content gaps, comparing feature messaging, or preparing competitive positioning recommendations.
+name: competitive-analysis-mktg
+description: "Research competitors: positioning, messaging, content strategy, battlecards, content gaps, comparison/alternative pages (vs-pages) for SEO+sales, профили RU AI-education/consulting конкурентов. Triggers: «сравнительная страница», «vs страница», «альтернатива конкуренту», «профиль конкурента», «реклама конкурентов» (указатель на ad-spy). Контекст вашего бизнеса → yourname-marketing-context."
+metadata:
+  version: 1.1.0
+  updated: 2026-05-29
+  ported_from: coreyhaines31/marketingskills (competitors + competitor-profiling references)
+  reuses: yourname-marketing-context, seo-machine-ru, tilda, schema-markup-ru, similarweb-analytics, yandex
 ---
 
 # Competitive Analysis Skill
 
 Frameworks and methodologies for researching competitors, comparing positioning, and identifying market opportunities.
+
+## RU-расширения под ваш бизнес
+
+Для задач под реальный бизнес (AI-консалтинг + воркшопы + ExampleProduct) сначала прочитай `yourname-marketing-context` → `business.md`, затем используй references:
+
+- **`references/comparison-pages-ru.md`** — форматы сравнительных / alternative-страниц для SEO + продаж: «ваша академия vs другие курсы по AI», «AI-консультант vs нанять inhouse», «воркшоп vs самообучение», «Concierge vs прямые подписки». Шаблоны секций (TL;DR, цены в ₽, кому подходит, миграция). SEO/публикация — `seo-machine-ru` + `tilda`, FAQ-разметка — `schema-markup-ru`.
+- **`references/competitor-profiling-ru.md`** — профилирование RU-конкурентов в AI-образовании/консалтинге из их URL. Инструменты-замены: Яндекс Wordstat/Вебмастер + `similarweb-analytics` (вместо DataForSEO), otzovik/startpack/CNews/Яндекс Бизнес (вместо G2/Capterra). Шаблон профиля + сводка.
+
+Связки: `competitive-intelligence` (sales-battlecard) · `sales-enablement-ru` · `pricing-strategy-ru` (анализ цен конкурентов).
+
+> **Анализ рекламы конкурентов**: для разведки рекламных кампаний/креативов конкурентов используй `ad-spy` (Facebook/Google/LinkedIn ad libraries + российские каналы Яндекс/VK/TG + Atria для Meta-креативов с оценкой бюджета). Этот скилл — про продуктовую/рыночную конкурентную разведку, ad-spy — про рекламную.
 
 ## Competitive Research Methodology
 

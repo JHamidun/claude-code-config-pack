@@ -23,7 +23,7 @@ ACCESSORIES — all clearly visible:
 OUTFIT:
 <full description of clothes, including any branded badge/logo with exact
 colours, position, size, dimensions. Be specific — "tiny dark-blue rounded
-square badge with white sans-serif letter and cyan glow at bottom-left".>
+square badge with white sans-serif H letter and cyan glow at bottom-left".>
 
 BASE / PLATFORM:
 <what the character stands ON — gives composition stability and brand identity.
@@ -58,5 +58,5 @@ apprentice peeking out.>
 
 COMPOSITION: centered, main character fills 55-65% of frame. <Anchor
 elements>. Plain white background (alpha will be cut later). Must read clearly
-at 32×32 AND look beautiful at 512×512. Original signature design — NOT a
-copy of a known meme, NOT generic anime mascot, NOT robot.
+at 32×32 AND look beautiful at 512×512. Original signature design — NOT Pepe,
+NOT generic anime mascot, NOT robot.

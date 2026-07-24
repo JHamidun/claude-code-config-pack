@@ -23,7 +23,7 @@ Generate a short session recap for returning after a break.
 
 ## Example Output
 
-> Building the Your admin panel with AI chat integration. Next: test the briefing cron job and verify collector scheduling.
+> Building the admin panel with AI chat integration. Next: test the briefing cron job and verify collector scheduling.
 
 ## How to Generate
 

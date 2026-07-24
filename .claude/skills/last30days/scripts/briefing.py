@@ -14,7 +14,7 @@ Usage:
 import argparse
 import json
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent.resolve()
@@ -23,6 +23,10 @@ sys.path.insert(0, str(SCRIPT_DIR))
 import store
 
 BRIEFS_DIR = Path.home() / ".local" / "share" / "last30days" / "briefs"
+
+
+def _parse_sqlite_utc_timestamp(value: str) -> datetime:
+    return datetime.strptime(value, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
 
 
 def generate_daily(since: str = None) -> dict:
@@ -63,8 +67,8 @@ def generate_daily(since: str = None) -> dict:
         hours_ago = None
         if last_run:
             try:
-                run_dt = datetime.fromisoformat(last_run.replace("Z", "+00:00"))
-                hours_ago = (datetime.now() - run_dt.replace(tzinfo=None)).total_seconds() / 3600
+                run_dt = _parse_sqlite_utc_timestamp(last_run)
+                hours_ago = (datetime.now(timezone.utc) - run_dt).total_seconds() / 3600
                 stale = hours_ago > 36  # Stale if > 36 hours
             except (ValueError, TypeError):
                 stale = True
@@ -81,7 +85,7 @@ def generate_daily(since: str = None) -> dict:
 
         # Extract top finding by engagement
         if findings:
-            top = max(findings, key=lambda f: f.get("engagement_score", 0))
+            top = max(findings, key=lambda f: f.get("engagement_score") or 0)
             topic_data["top_finding"] = {
                 "title": top.get("source_title", ""),
                 "source": top.get("source", ""),
@@ -106,7 +110,7 @@ def generate_daily(since: str = None) -> dict:
 
     top_overall = None
     if all_findings:
-        top_overall = max(all_findings, key=lambda f: f.get("engagement_score", 0))
+        top_overall = max(all_findings, key=lambda f: f.get("engagement_score") or 0)
 
     result = {
         "status": "ok",
@@ -168,8 +172,8 @@ def generate_weekly() -> dict:
         finally:
             conn.close()
 
-        this_engagement = sum(f.get("engagement_score", 0) for f in this_week)
-        last_engagement = sum(f.get("engagement_score", 0) for f in last_week)
+        this_engagement = sum(f.get("engagement_score") or 0 for f in this_week)
+        last_engagement = sum(f.get("engagement_score") or 0 for f in last_week)
 
         # Trend calculation
         if last_engagement > 0:
@@ -184,7 +188,15 @@ def generate_weekly() -> dict:
             "this_week_engagement": this_engagement,
             "last_week_engagement": last_engagement,
             "engagement_change_pct": round(engagement_change, 1),
-            "top_findings": this_week[:5],  # Top 5 by engagement (already sorted)
+            # get_new_findings returns first_seen DESC, so sort by engagement
+            # before slicing — otherwise the digest headlines the most recent
+            # items, not the highest-engagement ones (the daily path keys on
+            # engagement too).
+            "top_findings": sorted(
+                this_week,
+                key=lambda f: f.get("engagement_score") or 0,
+                reverse=True,
+            )[:5],
         })
 
     result = {
@@ -212,7 +224,7 @@ def show_briefing(date: str = None) -> dict:
     if not path.exists():
         return {"status": "not_found", "message": f"No briefing found for {date}."}
 
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -221,7 +233,7 @@ def _save_briefing(data: dict, suffix: str = ""):
     BRIEFS_DIR.mkdir(parents=True, exist_ok=True)
     date = datetime.now().strftime("%Y-%m-%d")
     path = BRIEFS_DIR / f"{date}{suffix}.json"
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, default=str)
 
 

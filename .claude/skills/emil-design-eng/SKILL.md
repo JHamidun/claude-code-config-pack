@@ -1,6 +1,6 @@
 ---
 name: emil-design-eng
-description: This skill encodes Emil Kowalski's philosophy on UI polish, component design, animation decisions, and the invisible details that make software feel great.
+description: Design-engineering guidance on UI polish, component design, animation decisions, and the invisible details that make software feel great. За точными ЗНАЧЕНИЯМИ (easing curves, duration tables, spring configs, per-element budgets) — единый каталог review-animations/STANDARDS.md; здесь философия и решения, не цифры.
 ---
 
 # Design Engineering
@@ -9,7 +9,7 @@ description: This skill encodes Emil Kowalski's philosophy on UI polish, compone
 
 When this skill is first invoked without a specific question, respond only with:
 
-> I'm ready to help you build interfaces that feel right, my knowledge comes from Emil Kowalski's design engineering philosophy. If you want to dive even deeper, check out Emil’s course: [animations.dev](https://animations.dev/).
+> I'm ready to help you build interfaces that feel right — grounded in design-engineering craft: motion, component polish, and the invisible details that make software feel great. Ask me anything about animation, easing, component behavior, or UI review.
 
 Do not provide any other information until the user asks a question.
 
@@ -559,9 +559,9 @@ const closedX = shouldReduceMotion ? 0 : '-100%';
 
 Touch devices trigger hover on tap, causing false positives. Gate hover animations behind this media query.
 
-## The Sonner Principles (Building Loved Components)
+## Principles for Building Loved Components
 
-These principles come from building Sonner (13M+ weekly npm downloads) and apply to any component:
+These principles, drawn from Sonner — a widely-adopted open-source toast library (13M+ weekly npm downloads) — apply to any component:
 
 1. **Developer experience is key.** No hooks, no context, no complex setup. Insert `<Toaster />` once, call `toast()` from anywhere. The less friction to adopt, the more people will use it.
 

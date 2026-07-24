@@ -1,138 +1,125 @@
 ---
 name: i18n-stress-test
-description: Стресс-тест UI на i18n — длинные слова (немецкий), RTL (арабский, иврит), CJK (японский, китайский), emoji в тексте. Чтобы кнопка не разъехалась когда «Submit» = «Senden in den Warenkorb».
-when_to_use: Артефакт пойдёт в i18n / multilingual продукт. Перед dev-handoff. Особенно если текущий язык — английский (текст самый короткий), всё может выглядеть нормально, а на немецком/русском всё разъедется.
+version: 1.0.0
+description: Подставляет в макет немецкий, арабский (RTL), японский и emoji-переполнение. Подсвечивает места поломки.
+when_to_use: Перед сдачей продуктового макета, который пойдёт в локализацию.
 ---
 
 # i18n stress test
 
-UI который ОК на английском часто разваливается на других языках. Стресс-тест предотвращает это.
+90% макетов сделаны под английский. Локализаторы потом плачут. Этот скилл — превентивная проверка.
 
-## 4 категории риска
+## Стресс-наборы
 
-### 1. Длинные слова / фразы
-- **Немецкий:** «Geschwindigkeitsbegrenzung» (ограничение скорости) = 1 слово
-- **Финский / венгерский:** аналогично
-- **Русский:** до +30% длины относительно английского
-- **Французский:** +20-25%
+### DE (длинные слова)
+- «Кнопка» → `Bestätigungseinstellungen`
+- «Настройки» → `Anwendungseinstellungen`
+- «Загрузить» → `Herunterladen`
 
-```
-EN: "Submit"           (6 символов)
-DE: "Absenden"         (8)
-RU: "Отправить"        (9)
-FR: "Soumettre"        (9)
-HU: "Beküldés"         (8)
-```
+### AR (RTL + другая ширина)
+- `إعدادات الإشعارات`
+- Тестирует: направление текста, иконки рядом с текстом, выравнивание чисел.
 
-### 2. CJK (китайский / японский / корейский)
-- **Короче по символам**, но каждый символ = слово
-- Нет word-break как в латинице
-- Шрифт с CJK glyphs обязателен (Noto Sans CJK)
-- Vertical text bonus (`writing-mode: vertical-rl`) для японского
+### JA (плотный текст без пробелов)
+- `通知設定をカスタマイズする方法`
+- Тестирует: word-break, длина строк.
 
-### 3. RTL (арабский, иврит, фарси)
-- Весь layout зеркалится
-- Иконки тоже зеркалятся (стрелки, прогресс-бары)
-- Числа остаются LTR (123 пишутся слева направо даже в RTL-text)
-- `dir="rtl"` на `<html>` или нужном контейнере
+### ZH (вертикальная плотность)
+- `通知设置自定义方法`
 
-### 4. Emoji в тексте
-- 👨👩👧👦 = 7 codepoints, 1 «character» — длина строки разная в JS vs визуально
-- Variation selectors: ❤️ = 2 codepoints
-- Скайн-тоны: 👋🏽 = 2 codepoints
-- Нужно `Intl.Segmenter` для правильного counting
+### Emoji-переполнение
+- `🌟⭐✨💫🌠☄️🌌🌃🌁🌉🌆🏙️`
 
-## Test fixtures
+## Скрипт
+
+`templates/i18n-stress.mjs`:
 
 ```js
-const fixtures = {
-  en: { hello: "Hello", submit: "Submit", error_required: "This field is required" },
-  ru: { hello: "Здравствуйте", submit: "Отправить", error_required: "Это поле обязательно" },
-  de: { hello: "Hallo", submit: "Geschwindigkeitsbegrenzung", error_required: "Dieses Feld muss ausgefüllt werden" },
-  zh: { hello: "你好", submit: "提交", error_required: "此栏必填" },
-  ja: { hello: "こんにちは", submit: "送信する", error_required: "この欄は必須です" },
-  ar: { hello: "مرحبا", submit: "إرسال", error_required: "هذا الحقل إلزامي", dir: "rtl" },
-  he: { hello: "שלום", submit: "שלח", error_required: "שדה זה חובה", dir: "rtl" },
-  hi: { hello: "नमस्ते", submit: "सबमिट करें" },
-  emoji: { hello: "Hello 👋🏽", submit: "Submit ➡️", name: "👨👩👧👦 Family" },
+import { chromium } from 'playwright';
+import { pathToFileURL } from 'node:url';
+import path from 'node:path';
+import fs from 'node:fs/promises';
+
+const file = process.argv[2];
+if (!file) { console.error('Usage: node i18n-stress.mjs <file>'); process.exit(1); }
+
+const samples = {
+  de: ['Anwendungseinstellungen', 'Benachrichtigungseinstellungen', 'Bestätigungs-E-Mail'],
+  ar: ['إعدادات الإشعارات', 'احفظ التغييرات', 'تسجيل الدخول'],
+  ja: ['通知設定をカスタマイズ', '保存', 'サインイン'],
+  emoji: ['🌟⭐✨💫🌠☄️', '🎉🎊🥳', '👨👩👧👦'],
 };
+
+const browser = await chromium.launch();
+for (const [lang, words] of Object.entries(samples)) {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  await page.goto(pathToFileURL(path.resolve(file)).href);
+
+  // RTL для арабского
+  if (lang === 'ar') await page.evaluate(() => document.documentElement.setAttribute('dir', 'rtl'));
+
+  // Заменим текстовые узлы
+  await page.evaluate((words) => {
+    function walk(node) {
+      if (node.nodeType === 3 && node.textContent.trim().length > 3) {
+        node.textContent = words[Math.floor(Math.random() * words.length)];
+      }
+      for (const c of node.childNodes) walk(c);
+    }
+    walk(document.body);
+  }, words);
+
+  // Найдём переполнения
+  const overflows = await page.evaluate(() => {
+    const out = [];
+    document.querySelectorAll('*').forEach(el => {
+      if (el.scrollWidth > el.clientWidth + 1 && el.clientWidth > 0) {
+        out.push({ tag: el.tagName, text: el.textContent.slice(0, 40), w: el.scrollWidth, cw: el.clientWidth });
+      }
+    });
+    return out.slice(0, 20);
+  });
+
+  await page.screenshot({ path: `i18n-${lang}.png` });
+  await page.close();
+
+  console.log(`\n[${lang.toUpperCase()}] screenshot → i18n-${lang}.png`);
+  if (overflows.length) {
+    console.log('  Переполнения:');
+    for (const o of overflows) console.log(`    ${o.tag} (${o.cw}px < ${o.w}px): "${o.text}"`);
+  } else {
+    console.log('  ✓ нет переполнений');
+  }
+}
+await browser.close();
 ```
 
-## Stress-test mode
+## Использование
 
-В прототипе: добавь `?lang=de` URL-параметр и переключай fixtures:
-
-```jsx
-const lang = new URL(location).searchParams.get('lang') || 'en';
-const t = fixtures[lang];
-
-document.documentElement.lang = lang;
-document.documentElement.dir = t.dir || 'ltr';
-
-return (
-  <button>{t.submit}</button>
-);
+```bash
+node i18n-stress.mjs index.html
+# → i18n-de.png, i18n-ar.png, i18n-ja.png, i18n-emoji.png
+# + список элементов, у которых текст не помещается
 ```
 
-Прогон: открыть прототип с `?lang=de`, `?lang=ja`, `?lang=ar`, `?lang=emoji`. Что сломалось?
+## Что нужно сделать в макете заранее
 
-## Чек-лист
+1. **Не используй `width: <px>` для контейнеров с текстом.** Используй `min-width` + `max-width`.
+2. **Иконка рядом с текстом** — через flex с gap, не через абсолют.
+3. **Числа в сложных форматах** — через `Intl.NumberFormat`, не вручную.
+4. **Дата** — `Intl.DateTimeFormat`.
+5. **Множественные формы** — через `Intl.PluralRules`, не «1 файл / 2 файлов».
+6. **Поддержка RTL** — `margin-inline-start` вместо `margin-left`, `inset-inline-end` вместо `right`. CSS logical properties.
+7. **Шрифт с поддержкой нужных алфавитов** — `font-family: Inter, "Noto Sans Arabic", "Noto Sans JP", sans-serif`.
 
-| Что проверить | Признак сломанности |
-|---|---|
-| Кнопки вмещают текст | Текст обрезан / button разъехалась на 2 строки |
-| Заголовки на 2 строки | Hero h1 стал 4 строки |
-| Lables форм не overlap | Label наезжает на input или соседнее поле |
-| Меню navbar не переполнено | Items не помещаются, нет overflow handling |
-| Modal не разъехалась | Title из 4 слов на немецком переполнил |
-| Иконки + RTL | Стрелки направлены не туда |
-| CJK glyphs показываются | Вместо них квадраты ☐☐☐ — нет шрифта |
-| Эмодзи colored | На некоторых платформах monochrome — игнорируй |
+## Что точно сломается
 
-## Решения проблем
+- Кнопки фиксированной ширины.
+- Tabs с фиксированными % ширины.
+- Сетки `grid-template-columns: 1fr 200px` где справа — текст.
+- Иконки с `position: absolute; right: 16px` — в RTL должны быть слева.
+- Хедеры с лого, навом и кнопкой в одну строку — на DE сжимается.
 
-### Длинные слова разъезжают layout
-```css
-.button { word-break: keep-all; }   /* плохо для DE/HU */
-.button { hyphens: auto; }          /* OK с lang attr */
-.button { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }  /* radical */
-```
+## Legacy reference
 
-Лучше: **flexible buttons + min/max widths**, текст занимает столько места сколько нужно.
-
-### RTL зеркалирует ВСЕ
-```css
-[dir="rtl"] .arrow-icon { transform: scaleX(-1); }
-[dir="rtl"] .progress { direction: ltr; }   /* ← кроме number-rich UI */
-```
-
-В CSS используй logical properties:
-```css
-/* Плохо */
-.card { padding-left: 16px; margin-right: 12px; }
-
-/* Хорошо */
-.card { padding-inline-start: 16px; margin-inline-end: 12px; }
-```
-
-### CJK font fallback
-```css
-body { font-family: 'Inter', 'Noto Sans CJK JP', 'Noto Sans CJK KR', system-ui, sans-serif; }
-```
-
-Или подгружай CJK font только когда `lang=ja|zh|ko`.
-
-### Emoji counting
-```js
-const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-const count = [...segmenter.segment('👨👩👧')].length;  // 1, не 5
-```
-
-## Антипаттерны
-
-- Тестировать только на английском → всё разъедется на немецком в prod
-- Жёсткие `width: 200px` на кнопках → длинные translations не помещаются
-- Полагаться на `string.length` для проверки длины → CJK / emoji нет
-- Игнорировать RTL потому что «у нас не Ближний Восток» → жёсткие `padding-left` потом ломаются если решат
-- Использовать `&nbsp;` чтобы не break слово → ломается i18n
-- Машинный перевод как final → пропадают культурные нюансы (формат дат, валюта, имена-формы)
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-i18n-stress-test.md`. Секции там: 4 категории риска, Test fixtures, Stress-test mode, Чек-лист, Решения проблем, Антипаттерны.

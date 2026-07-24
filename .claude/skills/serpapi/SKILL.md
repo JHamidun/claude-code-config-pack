@@ -1,6 +1,6 @@
 ---
 name: serpapi
-description: "SerpAPI Skill"
+description: "Real-time Google Search API через SerpAPI (SERPAPI_API_KEY): scraping выдачи Google Search / Maps / Shopping / News / Images / YouTube. Триггеры: serpapi, «google search API», «спарси выдачу гугла», «google maps данные», «цены google shopping»."
 ---
 
 # SerpAPI Skill
@@ -16,6 +16,10 @@ Expert skill for using SerpAPI - real-time Google Search API for scraping search
 # Переменная: SERPAPI_API_KEY
 SERPAPI_API_KEY=os.getenv('SERPAPI_API_KEY')
 ```
+
+## Локальная бесплатная альтернатива
+
+Для простого парсинга живой выдачи (без carousels/Maps/Shopping/Trends — за структурой оставайся на SerpAPI) — self-hosted `karust/openserp` в Docker, `127.0.0.1:7000`, 0 кредитов. Поддерживает Google/Yandex/Bing/DuckDuckGo. DuckDuckGo/Bing работают из коробки; Google и особенно **Yandex** (которого SerpAPI не отдаёт вообще) из коробки капчатся/ратлимитятся без прокси — нужен `--proxy`/`--2captcha_key` на старте контейнера. Полные детали, эндпоинты, гочи → `~/.claude/skills/seo-machine-ru/SKILL.md`, секция «Яндекс/Google SERP локально (openserp)».
 
 ## When to Use SerpAPI
 

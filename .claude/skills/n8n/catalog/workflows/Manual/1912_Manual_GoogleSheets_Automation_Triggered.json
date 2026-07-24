@@ -1,0 +1,251 @@
+{
+  "id": "lifB7iUXlDzr5dmI",
+  "meta": {
+    "instanceId": "workflow-b9eb9d03",
+    "versionId": "1.0.0",
+    "createdAt": "2025-09-29T07:07:50.228304",
+    "updatedAt": "2025-09-29T07:07:50.228313",
+    "owner": "n8n-user",
+    "license": "MIT",
+    "category": "automation",
+    "status": "active",
+    "priority": "high",
+    "environment": "production"
+  },
+  "name": "LinkedIn Profile Discovery",
+  "tags": [
+    "automation",
+    "n8n",
+    "production-ready",
+    "excellent",
+    "optimized"
+  ],
+  "nodes": [
+    {
+      "id": "9ae64a3a-c7e7-45ca-88ee-ebf6144f3197",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {},
+      "typeVersion": 1,
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "a22416bb-ef9e-422f-b480-cd52d8c93bfa",
+      "name": "Person info",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Sheet1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1rjlKzphEbknNh_ToS9pR_dP_Tw93FsxDte5AI4LH5_E",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Linkedin Profile URLs"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CwpCAR1HwgHZpRtJ",
+          "name": "Google Drive"
+        }
+      },
+      "typeVersion": 4.5,
+      "notes": "This googleSheets node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "a4699dd8-54ef-478e-9ff8-2c2046ad6ea8",
+      "name": "Search profile",
+      "type": "n8n-nodes-base.airtop",
+      "notes": "This could take a few minutes depending on the number of rows",
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "prompt": "=This is Google Search results. the first results should be the Linkedin Page of {{ $json['Person Info'] }} \nReturn the Linkedin URL and nothing else.\nIf you cannot find the Linkedin URL, return an empty string. \nA valid Linkedin profile URL starts with \"{{ $env.WEBHOOK_URL }}\"",
+        "resource": "extraction",
+        "operation": "query",
+        "sessionMode": "new",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "airtopApi": {
+          "id": "byhouJF8RLH5DkmY",
+          "name": "Airtop"
+        }
+      },
+      "notesInFlow": true,
+      "typeVersion": 1
+    },
+    {
+      "id": "2dd4d350-743e-48a7-ab69-d0996bc46f49",
+      "name": "Parse response",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        660,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const linkedInProfile = $json.data.modelResponse\nconst rowData = $('Person info').item.json\n\nreturn { json: {\n  ...rowData,\n  'LinkedIn URL': linkedInProfile\n}};"
+      },
+      "typeVersion": 2,
+      "notes": "This code node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "3efc182a-8707-4c8d-8263-a2aebe62b0a7",
+      "name": "Update row",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        880,
+        0
+      ],
+      "parameters": {
+        "columns": {
+          "value": {},
+          "schema": [
+            {
+              "id": "Person Info",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Person Info",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Linkedin URL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Linkedin URL",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Validated",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Validated",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": true,
+              "required": false,
+              "displayName": "row_number",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "autoMapInputData",
+          "matchingColumns": [
+            "row_number"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {},
+        "operation": "update",
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Sheet1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1rjlKzphEbknNh_ToS9pR_dP_Tw93FsxDte5AI4LH5_E",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Linkedin Profile URLs"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CwpCAR1HwgHZpRtJ",
+          "name": "Google Drive"
+        }
+      },
+      "typeVersion": 4.5,
+      "notes": "This googleSheets node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "error-e402f642",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": null,
+    "timezone": "UTC",
+    "executionTimeout": 3600,
+    "maxExecutions": 1000,
+    "retryOnFail": true,
+    "retryCount": 3,
+    "retryDelay": 1000
+  },
+  "versionId": "97cd5141-63d5-4ece-83eb-e544455097d3",
+  "connections": {
+    "a22416bb-ef9e-422f-b480-cd52d8c93bfa": {
+      "main": [
+        [
+          {
+            "node": "error-handler-a22416bb-ef9e-422f-b480-cd52d8c93bfa-622a351d",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3efc182a-8707-4c8d-8263-a2aebe62b0a7": {
+      "main": [
+        [
+          {
+            "node": "error-handler-3efc182a-8707-4c8d-8263-a2aebe62b0a7-96989377",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "description": "Automated workflow: LinkedIn Profile Discovery. This workflow processes data and performs automated tasks.",
+  "notes": "Excellent quality workflow: LinkedIn Profile Discovery. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+}

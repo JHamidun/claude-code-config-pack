@@ -1,168 +1,140 @@
 ---
 name: roadmap-management
-description: Plan and prioritize product roadmaps using frameworks like RICE, MoSCoW, and ICE. Use when creating a roadmap, reprioritizing features, mapping dependencies, choosing between Now/Next/Later or quarterly formats, or presenting roadmap tradeoffs to stakeholders.
+description: Построение и приоритизация продуктового роадмапа — пошаговая процедура от входов до готового документа. Скоринг RICE/ICE/MoSCoW, форматы Now/Next/Later, кварталы, OKR, зависимости, capacity. Триггеры «построй роадмап», «приоритизируй бэклог/фичи», «RICE», «Now/Next/Later», «что пилим в следующем квартале». НЕ для спеки одной фичи (feature-spec), спринт-планирования (sprint-planning-pm), апдейтов стейкхолдерам (stakeholder-comms).
 ---
 
-# Roadmap Management Skill
+# Roadmap Management
 
-You are an expert at product roadmap planning, prioritization, and communication. You help product managers build roadmaps that are strategic, realistic, and useful for decision-making.
+Скилл строит продуктовый роадмап: собирает входы, прогоняет бэклог через скоринг, раскладывает по горизонтам и выдаёт готовый роадмап-документ. Детальный каталог фреймворков — в `references/frameworks.md`.
 
-## Roadmap Frameworks
+## Когда использовать
 
-### Now / Next / Later
-The simplest and often most effective roadmap format:
+- «Построй роадмап на квартал/полгода» для YourProduct
+- «Приоритизируй этот бэклог из N фичей» — нужен защищаемый порядок
+- Репприоритизация: появился новый вводный (клиент, конкурент, техдолг), надо пересобрать план
+- Скоупинг релиза: что входит, что нет (MoSCoW-разговор со стейкхолдерами)
+- Подготовка роадмапа к показу руководству/клиентам (без ложной точности дат)
+- Проверка реалистичности: влезает ли план в capacity команды
 
-- **Now** (current sprint/month): Committed work. High confidence in scope and timeline. These are the things the team is actively building.
-- **Next** (next 1-3 months): Planned work. Good confidence in what, less confidence in exactly when. Scoped and prioritized but not yet started.
-- **Later** (3-6+ months): Directional. These are strategic bets and opportunities we intend to pursue, but scope and timing are flexible.
+НЕ использовать для: детальной спецификации одной фичи (→ feature-spec), разбивки на задачи спринта (→ sprint-planning-pm), письма об изменении плана (→ stakeholder-comms; методика коммуникации изменений есть в references, но артефакт-письмо — не здесь).
 
-When to use: Most teams, most of the time. Especially good for communicating externally or to leadership because it avoids false precision on dates.
+## Процедура
 
-### Quarterly Themes
-Organize the roadmap around 2-3 themes per quarter:
+### Шаг 1: Собери входы
 
-- Each theme represents a strategic area of investment (e.g., "Enterprise readiness", "Activation improvements", "Platform extensibility")
-- Under each theme, list the specific initiatives planned
-- Themes should map to company or team OKRs
-- This format makes it easy to explain WHY you are building what you are building
+Запроси у пользователя (или извлеки из контекста/файлов) минимум:
 
-When to use: When you need to show strategic alignment. Good for planning meetings and executive communication.
+1. **Бэклог кандидатов** — список инициатив/фич (5-30 штук). Если нет — попроси braindump или собери из issues/документов.
+2. **Цель периода** — целевая метрика или OKR («растим активацию», «выходим в enterprise»). Без цели скоринг Impact невозможен.
+3. **Capacity** — сколько инженеров × период; известный оверхед (отпуска, дежурства). Правило: 60-70% времени идёт на плановую работу.
+4. **Горизонт и аудитория** — квартал/полгода; для команды, руководства или клиентов.
+5. **Известные ограничения** — дедлайны-обязательства, зависимости от других команд/вендоров.
 
-### OKR-Aligned Roadmap
-Map roadmap items directly to Objectives and Key Results:
+Чего-то нет → задай 1 короткий блок вопросов сразу (не по одному), либо явно пометь допущения в документе.
 
-- Start with the team's OKRs for the period
-- Under each Key Result, list the initiatives that will move that metric
-- Include the expected impact of each initiative on the Key Result
-- This creates clear accountability between what you build and what you measure
+### Шаг 2: Выбери формат и фреймворк скоринга
 
-When to use: Organizations that run on OKRs. Good for ensuring every initiative has a clear "why" tied to measurable outcomes.
+По таблице (детали → `references/frameworks.md`):
 
-### Timeline / Gantt View
-Calendar-based view with items on a timeline:
+| Ситуация | Формат | Скоринг |
+| --- | --- | --- |
+| Дефолт: команда + руководство | Now / Next / Later | RICE |
+| Нужно показать стратегию, есть OKR | Квартальные темы / OKR-aligned | RICE |
+| Большой бэклог, есть данные | любой | RICE |
+| Ранний продукт, данных мало | Now / Next / Later | ICE |
+| Скоупинг релиза, торг со стейкхолдерами | список релиза | MoSCoW |
+| Живая сессия с командой | 2×2 | Value vs Effort |
+| Execution-план с инженерами | Timeline/Gantt | — (после скоринга) |
 
-- Shows start dates, end dates, and durations
-- Visualizes parallelism and sequencing
-- Good for identifying resource conflicts
-- Shows dependencies between items
+### Шаг 3: Прогони скоринг
 
-When to use: Execution planning with engineering. Identifying scheduling conflicts. NOT good for communicating externally (creates false precision expectations).
+Для каждой инициативы заполни строку таблицы (RICE-пример):
 
-## Prioritization Frameworks
+- Reach — конкретное число за период; Impact — 3/2/1/0.5/0.25; Confidence — 100/80/50%; Effort — человеко-месяцы.
+- RICE = (Reach × Impact × Confidence) / Effort. Отсортируй по убыванию.
+- Пометь стратегические ставки, которые скоринг занижает (низкий Confidence ≠ не делать) — вынеси их отдельной строкой с пояснением, не подкручивай числа.
 
-### RICE Score
-Score each initiative on four dimensions, then calculate RICE = (Reach x Impact x Confidence) / Effort
+### Шаг 4: Разложи по горизонтам с учётом capacity и зависимостей
 
-- **Reach**: How many users/customers will this affect in a given time period? Use concrete numbers (e.g., "500 users per quarter").
-- **Impact**: How much will this move the needle for each person reached? Score on a scale: 3 = massive, 2 = high, 1 = medium, 0.5 = low, 0.25 = minimal.
-- **Confidence**: How confident are we in the reach and impact estimates? 100% = high confidence (backed by data), 80% = medium (some evidence), 50% = low (gut feel).
-- **Effort**: How many person-months of work? Include engineering, design, and any other functions.
+1. Сверху отсортированного списка наполняй **Now**, пока суммарный Effort ≤ capacity периода × 0.7 (остальное — техздоровье 20% + буфер 10%).
+2. Следующие по списку → **Next**; стратегические ставки и всё «направленческое» → **Later**.
+3. Для каждого пункта Now/Next проверь зависимости (технические / командные / внешние / знаниевые / последовательные) — заполни таблицу зависимостей: владелец + дата need-by + план Б.
+4. Если обязательства не влезают в capacity — режь скоуп, а не рисуй оптимизм. Каждое «добавить» = ответ на «что снимаем?».
 
-When to use: When you need a quantitative, defensible prioritization. Good for comparing a large backlog of initiatives. Less good for strategic bets where impact is hard to estimate.
+### Шаг 5: Собери роадмап-документ
 
-### MoSCoW
-Categorize items into Must have, Should have, Could have, Won't have:
+Заполни шаблон из «## Выход». Обязательно: секция «Won't have / не делаем» — явный список отрезанного с причинами.
 
-- **Must have**: The roadmap is a failure without these. Non-negotiable commitments.
-- **Should have**: Important and expected, but delivery is viable without them.
-- **Could have**: Desirable but clearly lower priority. Include only if capacity allows.
-- **Won't have**: Explicitly out of scope for this period. Important to list for clarity.
+### Шаг 6: Проверь по чек-листу
 
-When to use: Scoping a release or quarter. Negotiating with stakeholders about what fits. Good for forcing prioritization conversations.
+Прогони «## Чек-лист» ниже. Провал любого пункта → вернись на соответствующий шаг.
 
-### ICE Score
-Simpler than RICE. Score each item 1-10 on three dimensions:
+## Выход
 
-- **Impact**: How much will this move the target metric?
-- **Confidence**: How confident are we in the impact estimate?
-- **Ease**: How easy is this to implement? (Inverse of effort — higher = easier)
+Один markdown-документ «Роадмап <Продукт> — <период>». Скелет для копипаста:
 
-ICE Score = Impact x Confidence x Ease
+```markdown
+# Роадмап YourProduct — Q_ 20__
 
-When to use: Quick prioritization of a feature backlog. Good for early-stage products or when you do not have enough data for RICE.
+## 1. Контекст и цель периода
+- Цель/OKR: <метрика и целевое значение>
+- Capacity: <N инженеров × M недель − оверхед ≈ X чел-мес; 70/20/10 = Y чел-мес на фичи>
+- Допущения: <что принято без данных>
 
-### Value vs Effort Matrix
-Plot initiatives on a 2x2 matrix:
+## 2. Скоринг (RICE)
+| # | Инициатива | Reach | Impact | Conf | Effort | RICE | Комментарий |
+|---|-----------|-------|--------|------|--------|------|-------------|
+| 1 | ... | 500/кв | 2 | 80% | 2 | 400 | ... |
 
-- **High value, Low effort** (Quick wins): Do these first.
-- **High value, High effort** (Big bets): Plan these carefully. Worth the investment but need proper scoping.
-- **Low value, Low effort** (Fill-ins): Do these when you have spare capacity.
-- **Low value, High effort** (Money pits): Do not do these. Remove from the backlog.
+## 3. Роадмап: Now / Next / Later
+### Now (текущий месяц) — закоммичено
+- [ ] <Инициатива> — <ожидаемый эффект>, effort <X>, owner <роль>
+### Next (1-3 мес) — запланировано
+- [ ] ...
+### Later (3-6+ мес) — направление
+- ...
 
-When to use: Visual prioritization in team planning sessions. Good for building shared understanding of tradeoffs.
+## 4. Не делаем в этом периоде (Won't have)
+- <Инициатива> — причина: <низкий RICE / не влезает / вне стратегии>
 
-## Dependency Mapping
+## 5. Зависимости и риски
+| Пункт | Зависимость | Тип | Владелец | Need by | План Б |
+|-------|-------------|-----|----------|---------|--------|
+| ... | ... | командная | ... | ... | ... |
 
-### Identifying Dependencies
-Look for dependencies across these categories:
+## 6. Открытые вопросы
+- ...
+```
 
-- **Technical dependencies**: Feature B requires infrastructure work from Feature A
-- **Team dependencies**: Feature requires work from another team (design, platform, data)
-- **External dependencies**: Waiting on a vendor, partner, or third-party integration
-- **Knowledge dependencies**: Need research or investigation results before starting
-- **Sequential dependencies**: Must ship Feature A before starting Feature B (shared code, user flow)
+## Пример
 
-### Managing Dependencies
-- List all dependencies explicitly in the roadmap
-- Assign an owner to each dependency (who is responsible for resolving it)
-- Set a "need by" date: when does the depending item need this resolved
-- Build buffer around dependencies — they are the highest-risk items on any roadmap
-- Flag dependencies that cross team boundaries early — these require coordination
-- Have a contingency plan: what do you do if the dependency slips?
+**Вход:** YourProduct (B2B SaaS), цель квартала — активация trial→paid с 8% до 12%. Команда 3 инженера × 12 недель ≈ 9 чел-мес → 6.3 чел-мес на фичи (70%). Бэклог: онбординг-визард, SSO для ClientCo-сегмента, редизайн дашборда, email-дожимы, публичный API.
 
-### Reducing Dependencies
-- Can you build a simpler version that avoids the dependency?
-- Can you parallelize by using an interface contract or mock?
-- Can you sequence differently to move the dependency earlier?
-- Can you absorb the work into your team to remove the cross-team coordination?
+Скоринг по RICE даёт:
 
-## Capacity Planning
+| Инициатива | Reach | Impact | Conf | Effort | RICE |
+| --- | --- | --- | --- | --- | --- |
+| Онбординг-визард | 900/кв | 2 | 80% | 2 | 720 |
+| Email-дожимы | 900/кв | 1 | 80% | 1 | 720 |
+| Редизайн дашборда | 1200/кв | 0.5 | 50% | 4 | 75 |
+| SSO | 40/кв | 3 | 100% | 3 | 40 |
+| Публичный API | 100/кв | 2 | 50% | 5 | 20 |
 
-### Estimating Capacity
-- Start with the number of engineers and the time period
-- Subtract known overhead: meetings, on-call rotations, interviews, holidays, PTO
-- A common rule of thumb: engineers spend 60-70% of time on planned feature work
-- Factor in team ramp time for new members
+**Роадмап →** Now: онбординг-визард + email-дожимы (3 чел-мес ≤ 6.3, остаток — буфер под SSO-дизайн и техздоровье). Next: SSO (стратегическая ставка: скоринг низкий из-за Reach, но открывает enterprise-сегмент — берём осознанно). Later: публичный API. **Won't have:** редизайн дашборда — низкий Impact/Confidence, не двигает активацию. **Зависимость:** SSO ← аудит безопасности у внешнего подрядчика, need by середина квартала, план Б — сдвиг SSO в Later.
 
-### Allocating Capacity
-A healthy allocation for most product teams:
+Готово = документ по скелету выше со всеми 6 секциями заполнен.
 
-- **70% planned features**: Roadmap items that advance strategic goals
-- **20% technical health**: Tech debt, reliability, performance, developer experience
-- **10% unplanned**: Buffer for urgent issues, quick wins, and requests from other teams
+## Чек-лист
 
-Adjust ratios based on team context:
-- New product: more feature work, less tech debt
-- Mature product: more tech debt and reliability investment
-- Post-incident: more reliability, less features
-- Rapid growth: more scalability and performance
+- [ ] У каждого пункта Now есть: effort, owner, ожидаемый эффект на целевую метрику
+- [ ] Σ Effort(Now) ≤ 70% capacity периода (20% техздоровье + 10% буфер сохранены)
+- [ ] Скоринг-таблица заполнена для ВСЕХ кандидатов — включая отклонённые
+- [ ] Секция «Won't have» существует и у каждого пункта есть причина
+- [ ] Все кросс-командные/внешние зависимости имеют владельца, need-by и план Б
+- [ ] Стратегические ставки с низким скорингом помечены явно (не «подкручены» числа)
+- [ ] Формат соответствует аудитории: наружу/руководству — без точных дат (Now/Next/Later), Gantt только для execution с инженерами
+- [ ] Допущения (где не было данных) перечислены в секции «Контекст»
 
-### Capacity vs Ambition
-- If roadmap commitments exceed capacity, something must give
-- Do not solve capacity problems by pretending people can do more — solve by cutting scope
-- When adding to the roadmap, always ask: "What comes off?"
-- Better to commit to fewer things and deliver reliably than to overcommit and disappoint
+## Справочник
 
-## Communicating Roadmap Changes
-
-### When the Roadmap Changes
-Common triggers for roadmap changes:
-- New strategic priority from leadership
-- Customer feedback or research that changes priorities
-- Technical discovery that changes estimates
-- Dependency slip from another team
-- Resource change (team grows or shrinks, key person leaves)
-- Competitive move that requires response
-
-### How to Communicate Changes
-1. **Acknowledge the change**: Be direct about what is changing and why
-2. **Explain the reason**: What new information drove this decision?
-3. **Show the tradeoff**: What was deprioritized to make room? Or what is slipping?
-4. **Show the new plan**: Updated roadmap with the changes reflected
-5. **Acknowledge impact**: Who is affected and how? Stakeholders who were expecting deprioritized items need to hear it directly.
-
-### Avoiding Roadmap Whiplash
-- Do not change the roadmap for every piece of new information. Have a threshold for change.
-- Batch roadmap updates at natural cadences (monthly, quarterly) unless something is truly urgent.
-- Distinguish between "roadmap change" (strategic reprioritization) and "scope adjustment" (normal execution refinement).
-- Track how often the roadmap changes. Frequent changes may signal unclear strategy, not good responsiveness.
+Полные описания фреймворков (Now/Next/Later, Quarterly Themes, OKR-aligned, Timeline; RICE, MoSCoW, ICE, Value vs Effort), карта зависимостей, capacity-планирование и методика коммуникации изменений роадмапа → `references/frameworks.md`.

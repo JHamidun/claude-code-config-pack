@@ -1,168 +1,199 @@
 ---
 name: microinteractions
-description: Skeleton loaders, hover-эффекты, scroll-reveal, button feedback. Маленькие анимации которые делают прототип живым. Не тяжёлый motion (см. animations) — а micro-feedback на действия пользователя.
-when_to_use: Юзер просит «оживи прототип», «добавь hover», «когда грузится — что показываем», «при клике должно реагировать». В interactive-prototype после статики.
+description: Готовые snippets для частых анимированных мелочей — skeleton, success-tick, draggable list, infinite scroll, stagger reveal, counter, parallax.
+when_to_use: Когда нужна одна конкретная микро-фича. Не используй как мудборд.
 ---
 
 # Microinteractions
 
-Маленькие анимации = большая разница в восприятии «это live» vs «это макет».
+Каждый snippet — копипаст в проект. Минимум зависимостей.
 
-## 1. Skeleton loader
+## Skeleton loader
 
-Серая плашка-плейсхолдер пока грузится контент. Используй вместо спиннера для контента-предсказуемой формы (карточка, строка таблицы, аватар).
+```html
+<div class="skel-line" style="width: 60%"></div>
+<div class="skel-line" style="width: 80%"></div>
+<div class="skel-line" style="width: 40%"></div>
+```
 
 ```css
-@keyframes skel-shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-.skel {
-  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+.skel-line {
+  height: 14px; border-radius: 4px;
+  background: linear-gradient(90deg, #eee 0%, #f6f6f6 50%, #eee 100%);
   background-size: 200% 100%;
-  animation: skel-shimmer 1.5s linear infinite;
-  border-radius: 6px;
+  animation: skel-pulse 1.4s linear infinite;
+  margin-bottom: 8px;
 }
-.skel-line { height: 12px; margin: 6px 0; }
-.skel-line.short { width: 40%; }
-.skel-line.long  { width: 90%; }
-.skel-circle { width: 40px; height: 40px; border-radius: 50%; }
+@keyframes skel-pulse { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }
 ```
 
-```jsx
-{loading ? (
-  <div style={{ padding: 16 }}>
-    <div className="skel skel-circle" />
-    <div className="skel skel-line long" />
-    <div className="skel skel-line short" />
-  </div>
-) : <RealCard data={data} />}
+## Success-tick (галочка появляется по SVG-stroke)
+
+```html
+<svg class="check" viewBox="0 0 52 52">
+  <circle cx="26" cy="26" r="25" fill="none" stroke="#4caf50" stroke-width="2"/>
+  <path fill="none" stroke="#4caf50" stroke-width="3" stroke-linecap="round"
+        d="M14 27l8 8 16-18"/>
+</svg>
 ```
-
-## 2. Hover effects
-
-Стандартный набор для interactive elements:
 
 ```css
-.btn { transition: background .15s, transform .15s, box-shadow .15s; }
-.btn:hover { background: var(--primary-hover); }
-.btn:active { transform: translateY(1px); }
-
-.card { transition: transform .2s, box-shadow .2s; }
-.card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
-
-.link { position: relative; }
-.link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%;
-               height: 1px; background: currentColor; transform: scaleX(0); transform-origin: right;
-               transition: transform .25s; }
-.link:hover::after { transform: scaleX(1); transform-origin: left; }
+.check { width: 56px; height: 56px; }
+.check circle { stroke-dasharray: 166; stroke-dashoffset: 166;
+  animation: stroke .6s cubic-bezier(0.65,0,0.45,1) forwards; }
+.check path { stroke-dasharray: 48; stroke-dashoffset: 48;
+  animation: stroke .3s cubic-bezier(0.65,0,0.45,1) .6s forwards; }
+@keyframes stroke { to { stroke-dashoffset: 0 } }
 ```
 
-**Правило:** hover работает только на устройствах с курсором. Мобильные: используй `:active` или JS-туч-фидбек.
+## Counter (число анимируется до значения)
 
-## 3. Scroll-reveal (intersection observer)
-
-Появление при скролле, без библиотек:
-
-```jsx
-function Reveal({ children, delay = 0 }) {
-  const ref = useRef(null);
-  const [shown, setShown] = useState(false);
-  useEffect(() => {
-    const o = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { setShown(true); o.disconnect(); }
-    }, { threshold: 0.1 });
-    if (ref.current) o.observe(ref.current);
-    return () => o.disconnect();
-  }, []);
-  return (
-    <div ref={ref} style={{
-      opacity: shown ? 1 : 0,
-      transform: shown ? 'translateY(0)' : 'translateY(20px)',
-      transition: `opacity .6s ${delay}ms, transform .6s ${delay}ms`,
-    }}>{children}</div>
-  );
-}
+```html
+<span data-counter="42893">0</span>
 ```
 
-```jsx
-<Reveal>           <Hero /></Reveal>
-<Reveal delay={100}><Features /></Reveal>
-<Reveal delay={200}><Pricing /></Reveal>
+```js
+document.querySelectorAll('[data-counter]').forEach(el => {
+  const target = +el.dataset.counter;
+  const start = performance.now();
+  const dur = 1200;
+  const fmt = n => n.toLocaleString('ru-RU');
+  function tick(t) {
+    const p = Math.min(1, (t - start) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = fmt(Math.round(target * eased));
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+});
 ```
 
-## 4. Click ripple (Material-style)
+## Stagger reveal (элементы появляются по очереди)
 
 ```css
-.ripple { position: relative; overflow: hidden; }
-.ripple::after {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 60%);
-  background-size: 0 0; background-position: var(--rx, 50%) var(--ry, 50%);
-  transition: background-size .5s;
+.reveal > * {
+  opacity: 0; transform: translateY(20px);
+  animation: reveal .5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
-.ripple:active::after { background-size: 200% 200%; }
+.reveal > *:nth-child(1) { animation-delay: 0.05s }
+.reveal > *:nth-child(2) { animation-delay: 0.10s }
+.reveal > *:nth-child(3) { animation-delay: 0.15s }
+.reveal > *:nth-child(4) { animation-delay: 0.20s }
+.reveal > *:nth-child(5) { animation-delay: 0.25s }
+@keyframes reveal { to { opacity: 1; transform: none } }
 ```
 
-```jsx
-<button className="ripple" onMouseDown={(e) => {
-  const r = e.currentTarget.getBoundingClientRect();
-  e.currentTarget.style.setProperty('--rx', `${e.clientX - r.left}px`);
-  e.currentTarget.style.setProperty('--ry', `${e.clientY - r.top}px`);
-}}>Click</button>
+Запуск через intersection observer:
+
+```js
+new IntersectionObserver(es => {
+  es.forEach(e => e.isIntersecting && e.target.classList.add('reveal'));
+}, { threshold: 0.2 }).observe(document.querySelector('.list'));
 ```
 
-## 5. Number ticker
+## Draggable list (HTML5 native)
 
-Цифры «крутятся» к финальному значению:
-
-```jsx
-function Tick({ value, duration = 1000 }) {
-  const [n, setN] = useState(0);
-  useEffect(() => {
-    const start = Date.now();
-    const id = setInterval(() => {
-      const t = Math.min(1, (Date.now() - start) / duration);
-      setN(Math.round(value * (1 - Math.pow(1 - t, 3))));  // easeOut cubic
-      if (t === 1) clearInterval(id);
-    }, 16);
-    return () => clearInterval(id);
-  }, [value]);
-  return <span>{n.toLocaleString()}</span>;
-}
+```html
+<ul id="list">
+  <li draggable="true">Один</li>
+  <li draggable="true">Два</li>
+  <li draggable="true">Три</li>
+</ul>
 ```
 
-## 6. Pulse (attention)
+```js
+const list = document.getElementById('list');
+let dragging = null;
+list.addEventListener('dragstart', e => { dragging = e.target; e.target.style.opacity = .4; });
+list.addEventListener('dragend',   e => { e.target.style.opacity = ''; });
+list.addEventListener('dragover',  e => {
+  e.preventDefault();
+  const after = [...list.children].find(c => {
+    const r = c.getBoundingClientRect();
+    return e.clientY < r.top + r.height / 2 && c !== dragging;
+  });
+  if (after) list.insertBefore(dragging, after);
+  else list.appendChild(dragging);
+});
+```
+
+## Infinite scroll
+
+```js
+const sentinel = document.querySelector('#load-more-sentinel');
+let page = 1;
+new IntersectionObserver(async es => {
+  if (es[0].isIntersecting) {
+    const items = await fetch(`/api/items?page=${++page}`).then(r => r.json());
+    items.forEach(renderItem);
+    if (items.length < 20) sentinel.remove();   // конец
+  }
+}, { rootMargin: '200px' }).observe(sentinel);
+```
+
+## Parallax (мягкий, не агрессивный)
 
 ```css
-@keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-  50% { box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); }
-}
-.pulse { animation: pulse 2s infinite; }
+.parallax { transform: translateY(var(--p, 0px)); transition: transform .1s linear; }
 ```
 
-Используй на одном CTA, не на каждой кнопке.
+```js
+addEventListener('scroll', () => {
+  const y = window.scrollY;
+  document.querySelectorAll('[data-parallax]').forEach(el => {
+    const factor = +el.dataset.parallax || 0.3;
+    el.style.setProperty('--p', `${-y * factor}px`);
+  });
+}, { passive: true });
+```
+
+```html
+<img src="hero.jpg" data-parallax="0.4" class="parallax">
+```
+
+## Toast queue
+
+```js
+const toasts = [];
+function toast(msg, ms = 2500) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  el.style.transform = `translateY(${toasts.length * 60}px)`;
+  document.body.appendChild(el);
+  toasts.push(el);
+  requestAnimationFrame(() => el.classList.add('on'));
+  setTimeout(() => {
+    el.classList.remove('on');
+    el.addEventListener('transitionend', () => {
+      el.remove();
+      const idx = toasts.indexOf(el);
+      toasts.splice(idx, 1);
+      toasts.forEach((t,i) => t.style.transform = `translateY(${i*60}px)`);
+    }, { once: true });
+  }, ms);
+}
+```
+
+## Что НЕ делать
+
+- ❌ Loop-анимации без триггера. Раздражают.
+- ❌ Анимация всего сразу. Глаз не знает, на что смотреть.
+- ❌ Длительность >300ms для UI-микро. Только для больших переходов экранов.
+- ❌ Без `prefers-reduced-motion` опт-аут.
 
 ## prefers-reduced-motion
-
-Уважай accessibility:
 
 ```css
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: 0s !important;
-    transition-duration: 0s !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 ```
 
-## Антипаттерны
+## Legacy reference
 
-- Анимации длиннее 400мс на UI-feedback → юзер думает что лагает
-- Параллакс-эффекты на каждом блоке → headache + JS performance
-- Pulse на каждой кнопке → теряет сигнальность
-- Hover-эффект меняющий layout (margin / padding) → дёрганье соседей
-- Анимация без `prefers-reduced-motion` → ломаешь a11y
-- Skeleton дольше 2 сек → юзер думает что зависло, лучше показать «still loading...»
-- Scroll-reveal с длинным delay (>200мс) → секции «гонятся» друг за другом
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-microinteractions.md`. Секции там: 1. Skeleton loader, 2. Hover effects, 3. Scroll-reveal (intersection observer), 4. Click ripple (Material-style), 5. Number ticker, 6. Pulse (attention), prefers-reduced-motion, Антипаттерны.

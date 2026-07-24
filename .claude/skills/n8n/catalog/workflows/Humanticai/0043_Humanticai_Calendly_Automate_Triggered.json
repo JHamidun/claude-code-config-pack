@@ -1,0 +1,142 @@
+{
+  "nodes": [
+    {
+      "name": "Notion",
+      "type": "n8n-nodes-base.notion",
+      "position": [
+        1050,
+        300
+      ],
+      "parameters": {
+        "blockUi": {
+          "blockValues": [
+            {
+              "textContent": "=Name: {{$json[\"display_name\"]}}\nPersonality: {{$json[\"personality_analysis\"][\"summary\"][\"ocean\"][\"description\"].join(', ')}}, {{$json[\"personality_analysis\"][\"summary\"][\"disc\"][\"description\"].join(', ')}}\nOpenness: {{$json[\"personality_analysis\"][\"ocean_assessment\"][\"openness\"][\"level\"]}} {{$json[\"personality_analysis\"][\"ocean_assessment\"][\"openness\"][\"score\"]}}\nCalculativeness: {{$json[\"personality_analysis\"][\"disc_assessment\"][\"calculativeness\"][\"level\"]}} {{$json[\"personality_analysis\"][\"disc_assessment\"][\"calculativeness\"][\"score\"]}}"
+            }
+          ]
+        },
+        "resource": "databasePage",
+        "databaseId": "",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "title": "={{$json[\"display_name\"]}}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "notionApi": ""
+      },
+      "typeVersion": 1,
+      "id": "82063607-c06e-4ad4-a57d-a766356021e9",
+      "notes": "This notion node performs automated tasks as part of the workflow."
+    },
+    {
+      "name": "Humantic AI",
+      "type": "n8n-nodes-base.humanticAi",
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "userId": "={{$json[\"payload\"][\"questions_and_responses\"][\"1_response\"]}}"
+      },
+      "credentials": {
+        "humanticAiApi": "humantic"
+      },
+      "typeVersion": 1,
+      "id": "9c51b571-64bb-4294-883f-89e00ef9845e",
+      "notes": "This humanticAi node performs automated tasks as part of the workflow."
+    },
+    {
+      "name": "Calendly Trigger",
+      "type": "n8n-nodes-base.calendlyTrigger",
+      "position": [
+        450,
+        300
+      ],
+      "webhookId": "6d38c1f6-42ee-4f44-b424-20943075087b",
+      "parameters": {
+        "events": [
+          "invitee.created"
+        ]
+      },
+      "credentials": {
+        "calendlyApi": ""
+      },
+      "typeVersion": 1,
+      "id": "d9fc03fb-bbd0-4345-ba23-bc4724225d6b",
+      "notes": "This calendlyTrigger node performs automated tasks as part of the workflow."
+    },
+    {
+      "name": "Humantic AI1",
+      "type": "n8n-nodes-base.humanticAi",
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "userId": "={{$json[\"results\"][\"userid\"]}}",
+        "options": {},
+        "operation": "get"
+      },
+      "credentials": {
+        "humanticAiApi": ""
+      },
+      "typeVersion": 1,
+      "id": "549d8f90-296d-4c09-a034-ae6c2b342e60",
+      "notes": "This humanticAi node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "error-1b2e37c5",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {},
+  "name": "Notion Workflow",
+  "description": "Automated workflow: Notion Workflow. This workflow processes data and performs automated tasks.",
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": null,
+    "timezone": "UTC",
+    "executionTimeout": 3600,
+    "maxExecutions": 1000,
+    "retryOnFail": true,
+    "retryCount": 3,
+    "retryDelay": 1000
+  },
+  "meta": {
+    "instanceId": "workflow-abb075a2",
+    "versionId": "1.0.0",
+    "createdAt": "2025-09-29T07:07:47.173921",
+    "updatedAt": "2025-09-29T07:07:47.173943",
+    "owner": "n8n-user",
+    "license": "MIT",
+    "category": "automation",
+    "status": "active",
+    "priority": "high",
+    "environment": "production"
+  },
+  "tags": [
+    "automation",
+    "n8n",
+    "production-ready",
+    "excellent",
+    "optimized"
+  ],
+  "notes": "Excellent quality workflow: Notion Workflow. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+}

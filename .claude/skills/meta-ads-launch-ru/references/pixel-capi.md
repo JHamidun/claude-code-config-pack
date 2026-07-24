@@ -1,7 +1,7 @@
 # Pixel + события + CAPI — полный setup-playbook
 
 > ⚠️ Meta признана экстремистской в РФ. Раздел — для международных/СНГ-проектов.
-> Практический плейбук: пиксель, настройка событий, Events Manager, CAPI.
+> Источник: экспертная методология. «Пиксель, настройка событий, Events Manager», курс методология.
 
 Трекинг — **фундамент** Meta-рекламы. Без чистых данных алгоритму не на чём учиться: кампания не выйдет из learning phase, как бы хороши ни были креативы. Поэтому пиксель + CAPI настраиваем **до** запуска бюджета.
 
@@ -101,7 +101,7 @@ PageView  →  ViewContent  →  AddToCart  →  InitiateCheckout  →  Purchase
 | Способ | Когда |
 |--------|-------|
 | **No-code: Zapier / Albato / Make / n8n** | нет разработчика; быстрый старт; **Albato** — российская альтернатива Zapier (важно для РФ-юрлица из-за санкций) |
-| **Готовая интеграция CRM** (HubSpot, amoCRM) | CRM имеет нативный коннектор к Meta CAPI |
+| **Готовая интеграция CRM** (HubSpot, your CRM) | CRM имеет нативный коннектор к Meta CAPI |
 | **Кастомная разработка** | сложная логика, высокая нагрузка, полный контроль |
 
 **No-code пайплайн (логика для любого из инструментов):**
@@ -112,7 +112,7 @@ PageView  →  ViewContent  →  AddToCart  →  InitiateCheckout  →  Purchase
    → проверка в Events Manager → Test Events
 ```
 
-> Готовый workflow в `n8n` (если есть скилл `n8n`). Для deduplication связки Pixel+CAPI используй `event_id` + `event_time`.
+> Готовый workflow в `n8n` (если есть скилл `n8n`). Если выделен отдельный скилл `capi-no-code-setup` — детальные blueprint'ы для Zapier/Make/n8n + deduplication (`event_id` + `event_time`) там.
 
 ---
 
@@ -152,13 +152,14 @@ PageView  →  ViewContent  →  AddToCart  →  InitiateCheckout  →  Purchase
 
 ---
 
-## Практические задания (для самопроверки)
+## Домашки / шаблоны курса
 
-- Составить **ТЗ на установку пикселя** ИЛИ провести аудит своих событий.
-- **Описать этапы воронки** + составить список аудиторий **для ремаркетинга и для исключения** (таблица: сегмент → источник → окно → назначение).
+- **ТЗ на установку пикселя** ИЛИ аудит своих событий.
+- **Описать этапы воронки** + составить список аудиторий **для ремаркетинга и для исключения** — шаблон Google Sheets: `docs.google.com/spreadsheets/d/1jaFC-4T4lAVpbq-lQTROOMkXRev4mpuFUi-zA2jQ4cM`
+- Куратор ДЗ: `@alinkasworld`.
 
 ## Cross-links
 
 - `references/audiences-targeting.md` — как из событий строятся lookalike-аудитории.
 - `meta-ads-analyzer` — диагностика learning phase и метрик уже работающей кампании.
-- `n8n` — готовые server-side пайплайны.
+- `n8n` / `capi-no-code-setup` (если есть) — готовые server-side пайплайны.
