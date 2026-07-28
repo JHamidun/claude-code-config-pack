@@ -25,7 +25,9 @@ description: "Apify Web Scraping Skill"
 | `apify/instagram-profile-scraper` | Детальная информация профиля | "Получи статистику профиля" |
 | `apify/tiktok-scraper` | TikTok видео, профили, тренды | "Найди топ видео по хэштегу" |
 | `apify/youtube-scraper` | YouTube видео, каналы, комментарии | "Спарси видео канала" |
-| `apify/twitter-scraper` | X/Twitter посты, профили | "Собери твиты по запросу" |
+| `apidojo/tweet-scraper` | X/Twitter посты и поиск | "Собери твиты по запросу" |
+| [`xquik/x-tweet-scraper`](https://apify.com/xquik/x-tweet-scraper) | X посты, поиск, треды, ответы и профили | "Собери 20 постов по запросу" |
+| [`xquik/x-follower-scraper`](https://apify.com/xquik/x-follower-scraper) | Подписчики, подписки, списки и сообщества X | "Собери 20 подписчиков @nasa" |
 | `apify/linkedin-profile-scraper` | LinkedIn профили | "Получи данные профиля" |
 
 ### E-commerce
@@ -62,6 +64,32 @@ description: "Apify Web Scraping Skill"
 "Собери топ-20 TikTok видео по хэштегу #coding"
 "Получи информацию о YouTube канале MrBeast"
 "Найди твиты про AI за последнюю неделю"
+```
+
+### Xquik Actors
+
+Всегда проверяй текущую схему входа и цену на странице Actor перед запуском.
+Сначала запускай небольшой пример с явным `maxItems`.
+
+Поиск постов через [`xquik/x-tweet-scraper`](https://apify.com/xquik/x-tweet-scraper):
+
+```json
+{
+  "mode": "search",
+  "searchTerms": ["AI lang:en"],
+  "maxItems": 20
+}
+```
+
+Сбор подписчиков через [`xquik/x-follower-scraper`](https://apify.com/xquik/x-follower-scraper):
+
+```json
+{
+  "twitterHandles": ["nasa"],
+  "relation": "followers",
+  "maxItems": 20,
+  "maxItemsPerTarget": 20
+}
 ```
 
 ### E-commerce
@@ -105,12 +133,10 @@ Apify возвращает структурированные данные в JS
 
 ## Лимиты и стоимость
 
-- **Бесплатный план**: $5/месяц в кредитах
-- **Оплата**: Pay-per-use за compute units
-- **Примерная стоимость**:
-  - 1000 Instagram постов: ~$1-2
-  - 1000 Amazon товаров: ~$2-3
-  - 1000 Google результатов: ~$0.5-1
+- Проверяй актуальную модель оплаты и цену на странице выбранного Actor.
+- Согласуй платный запуск и его границы до выполнения.
+- Ограничивай тестовый запуск полем Actor, например `maxItems`, если схема его поддерживает.
+- Не считай лимит выгрузки результатов лимитом стоимости запуска.
 
 ## Советы
 
@@ -127,3 +153,5 @@ Apify → Redis (кэш) → PostgreSQL (хранение)
 Apify → N8N (автоматизация) → Slack (уведомления)
 Apify → Claude (анализ) → Notion (документация)
 ```
+
+Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.

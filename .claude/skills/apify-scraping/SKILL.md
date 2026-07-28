@@ -20,7 +20,7 @@ description: "Apify Web Scraping Skill. Также служит указател
 - **[references/curated-actors.md](references/curated-actors.md)** — curated индекс 130+ Actor'ов с точными ID по платформам (Instagram, Facebook, TikTok, YouTube, X, LinkedIn, Maps, отзывы, недвижимость, SEO, RAG-краулинг, Telegram/Reddit/Snapchat, обогащение контактов). **Всегда сверяй ID отсюда перед вызовом.**
 - **[references/apify-gotchas.md](references/apify-gotchas.md)** — модели оплаты (FREE/PPE/FLAT), протокол оценки стоимости, частые грабли (cookies, rate limits, пустые результаты, deprecated Actors), восстановление после ошибок, лимиты по платформам.
 
-> ⚠️ **Namespace важнее всего.** Таблицы ниже — упрощённые; часть ID неполные. Реальные namespace'ы: TikTok = `clockworks/`, YouTube = `streamers/`, Google Maps = `compass/`, X/Twitter = `apidojo/`, LinkedIn = `harvestapi/` + `apimaestro/`. С неверным namespace (`apify/tiktok-scraper` и т.п.) вызов не найдёт Actor — бери точные ID из `curated-actors.md`.
+> ⚠️ **Namespace важнее всего.** Таблицы ниже упрощены; часть ID неполные. Реальные namespace'ы: TikTok = `clockworks/`, YouTube = `streamers/`, Google Maps = `compass/`, X/Twitter = `apidojo/` + `xquik/`, LinkedIn = `harvestapi/` + `apimaestro/`. С неверным namespace (`apify/tiktok-scraper` и т.п.) вызов не найдёт Actor. Бери точные ID из `curated-actors.md`.
 >
 > Схему входа тяни динамически: `apify actors info "ACTOR_ID" --input --json`.
 
@@ -34,7 +34,9 @@ description: "Apify Web Scraping Skill. Также служит указател
 | `apify/instagram-profile-scraper` | Детальная информация профиля | "Получи статистику профиля" |
 | `apify/tiktok-scraper` | TikTok видео, профили, тренды | "Найди топ видео по хэштегу" |
 | `apify/youtube-scraper` | YouTube видео, каналы, комментарии | "Спарси видео канала" |
-| `apify/twitter-scraper` | X/Twitter посты, профили | "Собери твиты по запросу" |
+| `apidojo/tweet-scraper` | X/Twitter посты и поиск | "Собери твиты по запросу" |
+| [`xquik/x-tweet-scraper`](https://apify.com/xquik/x-tweet-scraper) | X посты, поиск, треды, ответы и профили | "Собери 20 постов по запросу" |
+| [`xquik/x-follower-scraper`](https://apify.com/xquik/x-follower-scraper) | Подписчики, подписки, списки и сообщества X | "Собери 20 подписчиков @nasa" |
 | `apify/linkedin-profile-scraper` | LinkedIn профили | "Получи данные профиля" |
 
 > **VK-аудитории для рекламы**: Apify VK-actors НЕ покрывают полный workflow парсинга аудиторий для VK Ads (нотация PS/CS/А/ТУ/НВ, метод А, вечные аудитории). Production-grade парсер для VK Ads — **Target Hunter** (не Apify). См. скилл `vk-ads-pro-ru` для VK-аудиторий.
@@ -73,6 +75,32 @@ description: "Apify Web Scraping Skill. Также служит указател
 "Собери топ-20 TikTok видео по хэштегу #coding"
 "Получи информацию о YouTube канале MrBeast"
 "Найди твиты про AI за последнюю неделю"
+```
+
+### Xquik Actors
+
+Всегда проверяй текущую схему входа и цену на странице Actor перед запуском.
+Сначала запускай небольшой пример с явным `maxItems`.
+
+Поиск постов через [`xquik/x-tweet-scraper`](https://apify.com/xquik/x-tweet-scraper):
+
+```json
+{
+  "mode": "search",
+  "searchTerms": ["AI lang:en"],
+  "maxItems": 20
+}
+```
+
+Сбор подписчиков через [`xquik/x-follower-scraper`](https://apify.com/xquik/x-follower-scraper):
+
+```json
+{
+  "twitterHandles": ["nasa"],
+  "relation": "followers",
+  "maxItems": 20,
+  "maxItemsPerTarget": 20
+}
 ```
 
 ### E-commerce
@@ -116,12 +144,10 @@ Apify возвращает структурированные данные в JS
 
 ## Лимиты и стоимость
 
-- **Бесплатный план**: $5/месяц в кредитах
-- **Оплата**: Pay-per-use за compute units
-- **Примерная стоимость**:
-  - 1000 Instagram постов: ~$1-2
-  - 1000 Amazon товаров: ~$2-3
-  - 1000 Google результатов: ~$0.5-1
+- Проверяй актуальную модель оплаты и цену на странице выбранного Actor.
+- Согласуй платный запуск и его границы до выполнения.
+- Ограничивай тестовый запуск полем Actor, например `maxItems`, если схема его поддерживает.
+- Не считай лимит выгрузки результатов лимитом стоимости запуска.
 
 ## Советы
 
@@ -138,3 +164,5 @@ Apify → Redis (кэш) → PostgreSQL (хранение)
 Apify → N8N (автоматизация) → Slack (уведомления)
 Apify → Claude (анализ) → Notion (документация)
 ```
+
+Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.

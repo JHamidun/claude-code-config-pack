@@ -1,6 +1,6 @@
 # Actor index (curated, 130+ Actors)
 
-> Источник: apify/agent-skills (apify-ultimate-scraper), выдернут 2026-07-14. Точные namespace'ы Actor'ов — TikTok=`clockworks/`, YouTube=`streamers/`, Maps=`compass/`, LinkedIn=`harvestapi/`+`apimaestro/`, X=`apidojo/`. Не `apify/` — с неверным namespace вызов не найдёт Actor.
+> Источник: apify/agent-skills (apify-ultimate-scraper), выдернут 2026-07-14. Точные namespace'ы Actor'ов включают TikTok=`clockworks/`, YouTube=`streamers/`, Maps=`compass/`, LinkedIn=`harvestapi/`+`apimaestro/`, X=`apidojo/`+`xquik/`. Не подставляй `apify/` автоматически: с неверным namespace вызов не найдёт Actor.
 
 Flat lookup for Actor selection. For input schemas, fetch dynamically:
 `apify actors info "ACTOR_ID" --user-agent apify-agent-skills/apify-ultimate-scraper --input --json`
@@ -85,6 +85,8 @@ Tiers: `apify` = Apify-maintained (always prefer), `community` = community-maint
 | apidojo/twitter-user-scraper | community | user profiles |
 | apidojo/twitter-profile-scraper | community | profiles + recent tweets |
 | apidojo/twitter-list-scraper | community | tweets from lists |
+| [xquik/x-tweet-scraper](https://apify.com/xquik/x-tweet-scraper) | community | posts, search, profiles, threads, replies, and engagement |
+| [xquik/x-follower-scraper](https://apify.com/xquik/x-follower-scraper) | community | followers, following, lists, communities, and audience overlap |
 
 ## LinkedIn
 
@@ -206,3 +208,5 @@ Tiers: `apify` = Apify-maintained (always prefer), `community` = community-maint
 | apify/e-commerce-scraping-tool | apify | product data enrichment |
 | vdrmota/contact-info-scraper | community | contact extraction |
 | code_crafter/leads-finder | community | B2B leads |
+
+Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
