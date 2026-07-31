@@ -34,7 +34,7 @@ Enable it with `/plugin` — the skills then activate automatically when relevan
 
 ## Related plugins
 
-`integrations` · `session-tools`
+`integrations` · `session-tools` · `social-posting`
 
 ---
 

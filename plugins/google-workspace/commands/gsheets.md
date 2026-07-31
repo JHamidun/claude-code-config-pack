@@ -1,3 +1,8 @@
+---
+description: "Google Sheets: чтение, запись, анализ таблиц (OAuth для личных, service account + gspread для расшаренных). Триггеры: «google sheets», «гугл таблица», «прочитай таблицу», «запиши в таблицу», «анализ таблицы»."
+argument-hint: "[read <sheet_id> [лист] | analyze <sheet_id> | write <sheet_id> <данные> | search <запрос>]"
+---
+
 # Google Sheets Operations
 
 /gsheets - Работа с Google Таблицами

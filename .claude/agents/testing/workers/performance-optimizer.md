@@ -1,5 +1,6 @@
 ---
 name: performance-optimizer
+model: fable
 description: Performance testing specialist for analyzing and optimizing Core Web Vitals and PageSpeed scores. Use proactively after UI changes, before deployments, or when performance metrics need improvement.
 color: orange
 ---

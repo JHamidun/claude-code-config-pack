@@ -62,6 +62,18 @@ Don't exhaustively read everything. Look only for things you already suspect mat
 
 For every conflict found — mark it for the supersede protocol in Phase 3. Do NOT resolve conflicts by deleting or rewriting the older note.
 
+## Phase 2b — Transcript pass (по запросу / когда заметки отстали)
+
+Фазы 1-2 смотрят только на то, что УЖЕ записано. Отдельный слой сырья — транскрипты прошлых сессий: там лежат уроки, которые в заметки не попали вовсе. Запускай этот проход, когда dream вызван с фокусом («dream по проекту X», «что я вынес за неделю») или когда сессий прошло много, а новых заметок почти нет.
+
+- **Фокус — параметр прохода.** Тот же корпус под разным фокусом раскладывается по-разному; это ожидаемо. Фиксируй формулировку фокуса в отчёте, иначе потом не понять, почему память организована именно так. Без фокуса — обычный полный проход по Фазам 1-2.
+- **Не грузить транскрипты целиком.** Работай точечно: `search_chats.py search "<тема>" --days N` → `timeline <id>` → `get <id,id>` только по отобранным якорям. Тот же принцип, что и с любыми большими данными: сузить, потом читать.
+- **Извлекать только durable:** root cause + фикс, решения владельца («выбрал X потому что Y»), неочевидное поведение инструментов/библиотек, рабочие конфиги, сработавшие неочевидные подходы. Ход задачи, промежуточные попытки и одноразовые детали — не память.
+- **Извлечённое из транскрипта не канон по умолчанию:** пока не выполнен authority criterion (см. Ground Rules) — `status: pending`. Ссылку на сессию-источник клади в `evidence`.
+- Дальше извлечённое идёт обычным путём: Фаза 3 (merge/supersede), Фаза 4 (decay/prune/promote).
+
+**Кандидатный слой для крупной реорганизации.** Если проход переписывает не пару файлов, а перекладывает структуру памяти — пиши сначала в `_candidate/`, сравни с живыми файлами, и только после просмотра принимай (принятое переносится, отклонённый кандидат удаляется целиком). Для точечных правок это лишняя церемония — там действует anti-churn.
+
 ## Phase 3 — Consolidate (with supersede protocol)
 
 For each thing worth updating:
@@ -146,6 +158,7 @@ This produces data-driven insights: hot entities, frequent memories, contact pat
 ### Dream Report
 
 **File Memory (Phases 1-5):**
+- Фокус прохода (если задавался) + сколько сессий-транскриптов просмотрено в Фазе 2b и сколько уроков из них извлечено (или «transcript pass не запускался»)
 - Files updated / created / superseded / archived / promoted
 - TOP-INSTINCTS: rebuilt or unchanged (list the K entries if rebuilt)
 - MEMORY.md line count and size

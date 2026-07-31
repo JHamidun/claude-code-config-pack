@@ -1,3 +1,8 @@
+---
+description: "Комплексный security-аудит проекта: секреты в коде, pip/npm audit зависимостей, OWASP Top 10, конфигурация (DEBUG/CORS/rate limiting) — с приоритизированным отчётом. Триггеры: «security audit», «аудит безопасности», «проверь на уязвимости». Воркер-пайплайн скан→фикс → /health-security; пентест → agent pentest-engineer."
+argument-hint: "[путь к проекту]"
+---
+
 # Комплексный Security Audit
 
 **Аргументы:** $ARGUMENTS (путь к проекту или пусто для текущей директории)

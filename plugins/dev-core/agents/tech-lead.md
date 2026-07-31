@@ -1,7 +1,7 @@
 ---
 name: tech-lead
 description: "Coordinates team, makes architectural decisions, unblocks developers, manages technical debt"
-model: opus
+model: fable
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 

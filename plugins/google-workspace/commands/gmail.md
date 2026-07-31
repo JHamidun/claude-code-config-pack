@@ -1,3 +1,8 @@
+---
+description: "Gmail (ЛИЧНАЯ почта your-email@gmail.com): inbox, непрочитанные, поиск, чтение, отправка через Gmail API. Триггеры: «gmail», «личная почта», «письмо», «непрочитанные письма». РАБОЧАЯ почта your-work-email@company.com → /outlook."
+argument-hint: "[inbox <N> | unread | search <запрос> | read <message_id> | send <кому> <тема>]"
+---
+
 # Gmail Operations
 
 /gmail - Работа с Gmail

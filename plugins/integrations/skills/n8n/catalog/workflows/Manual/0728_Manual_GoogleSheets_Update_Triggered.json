@@ -1,0 +1,439 @@
+{
+  "meta": {
+    "instanceId": "workflow-d9c8922f",
+    "versionId": "1.0.0",
+    "createdAt": "2025-09-29T07:07:49.209528",
+    "updatedAt": "2025-09-29T07:07:49.209541",
+    "owner": "n8n-user",
+    "license": "MIT",
+    "category": "automation",
+    "status": "active",
+    "priority": "high",
+    "environment": "production"
+  },
+  "nodes": [
+    {
+      "id": "53e93a66-468a-4df8-b2cb-58ff0563f83f",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -160,
+        0
+      ],
+      "parameters": {},
+      "typeVersion": 1,
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "70692fd5-d575-49d2-9e3c-71bdddb0782e",
+      "name": "AI Agent",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1000,
+        0
+      ],
+      "parameters": {
+        "text": "=keyword: {{ $json.Keyword }}",
+        "options": {
+          "systemMessage": "=Check the keyword I provided and define if this keyword has a name of the known IT software, service, tool or app as a part of it (for example, ServiceNow or Salesforce) and return yes or no."
+        },
+        "promptType": "define",
+        "hasOutputParser": true
+      },
+      "typeVersion": 1.7,
+      "notes": "This agent node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "587e6283-32c0-4599-a024-2ce0079bdaeb",
+      "name": "OpenAI Chat Model",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1000,
+        240
+      ],
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "ju5aHhTljmCDxSl9",
+          "name": "OpenAi account Polina's"
+        }
+      },
+      "typeVersion": 1.2,
+      "notes": "This lmChatOpenAi node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "0e3e7d09-202e-47cc-8704-16ab70bc4077",
+      "name": "Structured Output Parser",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1180,
+        240
+      ],
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Isservice\": \"yes\"\n}"
+      },
+      "typeVersion": 1.2,
+      "notes": "This outputParserStructured node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "900ac097-c6de-41c0-8270-c9de60424d5f",
+      "name": "Fetch Keywords from Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        120,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 1319606837,
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Copy of Sheet1 1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1jzDvszQoVDV-jrAunCXqTVsiDxXVLMGqQ1zGXwfy5eU",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "AI + agents"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DeaHa70CotH7MPX6",
+          "name": "Google Sheets account NN DB test"
+        }
+      },
+      "typeVersion": 4.5,
+      "notes": "This googleSheets node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "73e208d1-e8d8-4c8b-90f3-06202ed73986",
+      "name": "Process Keywords in Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "batchSize": 6
+      },
+      "typeVersion": 3,
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "93646bfc-b79d-4ec3-ba8d-8922773fd36b",
+      "name": "Prevent API Rate Limiting",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        720,
+        0
+      ],
+      "webhookId": "035cfc06-099c-453b-aadc-0cce420b8171",
+      "parameters": {},
+      "typeVersion": 1.1,
+      "notes": "This wait node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "313474f7-a53d-479c-a33e-9327ca29e570",
+      "name": "Update Sheet with Analysis Results",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1360,
+        0
+      ],
+      "parameters": {
+        "columns": {
+          "value": {
+            "Number": "={{ $('Process Keywords in Batches').item.json.Number }}",
+            "Service?": "={{ $json.output.Isservice }}"
+          },
+          "schema": [
+            {
+              "id": "Number",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Number",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service?",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Service?",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Keyword",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "Keyword",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Country",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "Country",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Difficulty",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "Difficulty",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Volume",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "Volume",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CPC",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "CPC",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CPS",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "CPS",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Parent Keyword",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "Parent Keyword",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Update",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "Last Update",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SERP Features",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "SERP Features",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Global volume",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "Global volume",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Traffic potential",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "Traffic potential",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Global traffic potential",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "Global traffic potential",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "First seen",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "First seen",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Intents",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "Intents",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "row_number",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "Number"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {},
+        "operation": "update",
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 1319606837,
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Copy of Sheet1 1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1jzDvszQoVDV-jrAunCXqTVsiDxXVLMGqQ1zGXwfy5eU",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "AI + agents"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DeaHa70CotH7MPX6",
+          "name": "Google Sheets account NN DB test"
+        }
+      },
+      "typeVersion": 4.5,
+      "notes": "This googleSheets node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "error-b43234bd",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "587e6283-32c0-4599-a024-2ce0079bdaeb": {
+      "main": [
+        [
+          {
+            "node": "error-handler-587e6283-32c0-4599-a024-2ce0079bdaeb-30e4cb79",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "900ac097-c6de-41c0-8270-c9de60424d5f": {
+      "main": [
+        [
+          {
+            "node": "error-handler-900ac097-c6de-41c0-8270-c9de60424d5f-3a7ac0d5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "313474f7-a53d-479c-a33e-9327ca29e570": {
+      "main": [
+        [
+          {
+            "node": "error-handler-313474f7-a53d-479c-a33e-9327ca29e570-5d439c40",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "name": "Manualtrigger Workflow",
+  "description": "Automated workflow: Manualtrigger Workflow. This workflow processes data and performs automated tasks.",
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": null,
+    "timezone": "UTC",
+    "executionTimeout": 3600,
+    "maxExecutions": 1000,
+    "retryOnFail": true,
+    "retryCount": 3,
+    "retryDelay": 1000
+  },
+  "tags": [
+    "automation",
+    "n8n",
+    "production-ready",
+    "excellent",
+    "optimized"
+  ],
+  "notes": "Excellent quality workflow: Manualtrigger Workflow. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+}

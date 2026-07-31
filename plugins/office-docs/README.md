@@ -10,15 +10,12 @@ Part of the **[hamidun marketplace](../../README.md)**.
 |-------|--------------|
 | `csv-analysis` | Analyze CSV/Excel data files - statistics, visualization, transformations, insights |
 | `docx` | Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. |
-| `epub-tools` | EPUB Tools — Read & Create EPUB Books |
-| `excel-xlsx` | Excel / XLSX Skill |
-| `file-converter` | File Converter MCP Server Skill |
+| `epub-tools` | EPUB: чтение/анализ/поиск по главам (ebooklib + BeautifulSoup) и сборка EPUB из Markdown. |
+| `file-converter` | Конвертация файлов локально, без API-ключей: (1) формат→формат через MCP file-converter — Word↔PDF, изображения, Excel→CSV; (2) ЧТО УГОДНО→Markdown… |
 | `file-organizer` | Intelligent file organization by context, type, date with automation |
 | `invoice-organizer` | Organize invoices and receipts for tax preparation and expense tracking |
 | `pdf` | Comprehensive PDF manipulation toolkit for extracting text and tables, creating new PDFs, merging/splitting documents, and handling forms. |
-| `pdf-generation` | PDF Generation & Manipulation Skill |
-| `word-docx` | Word / DOCX Skill |
-| `xlsx` | Comprehensive spreadsheet creation, editing, and analysis with support for formulas, formatting, data analysis, and visualization. |
+| `xlsx` | Comprehensive spreadsheet creation, editing, and analysis with formulas, formatting, data analysis, and visualization. |
 
 ## Install
 

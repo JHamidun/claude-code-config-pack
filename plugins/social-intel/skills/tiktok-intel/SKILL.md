@@ -17,7 +17,7 @@ allowed-tools: Bash, Read, Write, WebSearch
 - "популярные рилсы" — тренды Instagram Reels
 - "аудитория [блогер]" — демография подписчиков
 - "популярные хештеги/песни" — для контент-планирования
-- Поиск блогеров для your project (your niche)
+- Поиск блогеров для Your Tracker (строительная ниша)
 - Контент-идеи для YourChannel YouTube канала
 
 ## API Endpoints
@@ -141,7 +141,7 @@ wait
 
 ```bash
 # Search products
-curl -s "$API/v1/tiktok/shop/search?query=example+query" -H "$H" > /tmp/shop_results.json
+curl -s "$API/v1/tiktok/shop/search?query=строительный клей" -H "$H" > /tmp/shop_results.json
 
 # Get reviews for top product
 curl -s "$API/v1/tiktok/shop/product/reviews?product_id=PRODUCT_ID" -H "$H" > /tmp/shop_reviews.json
@@ -178,4 +178,4 @@ curl -s "$API/v1/tiktok/song/videos?id=SONG_ID" -H "$H" > /tmp/song_vids.json
 | Ad analysis | `ad-spy` |
 | YouTube content ideas | `youtube-analytics` |
 | Create content brief | `content-creation` |
-| Your-Brand blogger monitoring | your project (your cron) |
+| Your-Brand blogger monitoring | Your Tracker (your-server cron) |

@@ -1,26 +1,26 @@
-# Bitrix24 export → bitrix_data.json
+# Your CRM export → bitrix_data.json
 
 Mode B step 2. The match/aggregate scripts expect a single `bitrix_data.json`. Produce it via
-the `bitrix24` skill (REST/webhook). Pull once, cache, reuse — the export is the slow part.
+the `crm` skill (REST/webhook). Pull once, cache, reuse — the export is the slow part.
 
 ## Required shape
 
 ```json
 {
   "companies":            {"<cid>": {"TITLE": "...", "ASSIGNED_BY_ID": "..."}},
-  "company_ids_to_inn":   {"<cid>": "7707083893"},
+  "company_ids_to_inn":   {"<cid>": "7700000000"},
   "deals_by_company":     {"<cid>": [{"ID","TITLE","CATEGORY_ID","STAGE_ID","OPPORTUNITY","DATE_CREATE","ASSIGNED_BY_ID"}]},
   "contacts_by_company":  {"<cid>": [{"ID","NAME","LAST_NAME","SECOND_NAME","POST","PHONE":[{"VALUE":""}],"EMAIL":[{"VALUE":""}]}]},
   "deal_activities":      {"<deal_id>": [{"CREATED","TYPE_ID","SUBJECT","COMPLETED"}]},
   "activities_by_company":{"<cid>": [{"CREATED","TYPE_ID","SUBJECT","COMPLETED"}]},
   "timeline_by_company":  {"<cid>": [{"CREATED","COMMENT"}]},
-  "categories":           {"<category_id>": "Воронка B2B"},
+  "categories":           {"<category_id>": "Product B2B"},
   "stages":               {"<STAGE_ID>": "Назначена встреча"},
-  "users":                {"<uid>": {"name": "Имя Фамилия"}}
+  "users":                {"<uid>": {"name": "Иванов Иван"}}
 }
 ```
 
-## How to pull (bitrix24 skill)
+## How to pull (crm skill)
 
 - `crm.company.list` (select TITLE, ASSIGNED_BY_ID, UF_* INN field) → `companies` + `company_ids_to_inn`.
   INN often lives in a user field (e.g. `UF_CRM_INN`) or the requisite (`crm.requisite.list` → RQ_INN). Map cid→INN from whichever the portal uses.
@@ -39,5 +39,5 @@ Use **batch** (`batch` method, 50 calls/request) to stay under rate limits on la
 
 ## Base URL
 
-Pass `--base https://your-portal.bitrix24.ru` to aggregate/build scripts to make card URLs clickable
+Pass `--base https://we.company.example` to aggregate/build scripts to make card URLs clickable
 (`/crm/company/details/<cid>/`, `/crm/contact/details/<cid>/`).

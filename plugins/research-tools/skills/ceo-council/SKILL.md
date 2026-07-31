@@ -141,6 +141,12 @@ After all experts report, create a synthesis document:
 _To be filled after discussion._
 ```
 
+### Consensus Rules (evidence > votes)
+
+- **Triage, not averaging.** Sort expert outputs into: Consensus (2+ agree) / Expert-only (unique points per expert) / Disagreements. Adjudicate each disagreement explicitly — never split the difference.
+- **Evidence beats vote count.** One expert citing a verifiable number/source from the data block beats three experts agreeing from intuition. All experts run on the same base model — unanimous agreement without evidence is a shared-prior echo (consensus hallucination), not a truth signal. Tag such items `[CONSENSUS-only — no supporting data]` in the synthesis.
+- **MODEL_ECHO (if experts run on different models** via `gpt-agent`/`gemini-agent`): require first line `MODEL_ECHO=<model id>` in each expert reply — catches silent fallback where "diverse council" is secretly one model. Mismatched echo → mark that expert degraded.
+
 ### Save Results
 
 Save to a logical location:

@@ -10,7 +10,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 |-------|--------------|
 | `dev-browser` | Browser automation with persistent page state. |
 | `gstack` | Fast headless browser for QA testing and site dogfooding. |
-| `playwright-automation` | Browser automation with Playwright - testing, scraping, screenshots |
+| `playwright-automation` | Browser automation with Playwright - testing, scraping, screenshots, AND a live daemon-browser controllable via CLI (bdo.py) for parallel online work… |
 | `webapp-testing` | Toolkit for interacting with and testing local web applications using Playwright. |
 
 ### Agents

@@ -1,6 +1,6 @@
 ---
 name: linkedin-comment-drafter
-description: "Draft a high-quality LinkedIn comment on any post from a URL. Use when the user gives a LinkedIn post URL and asks to comment on it. The skill parses the URL, reads the post context, drafts 1-3 comment variants in the user's voice using 2026 hook patterns (first-commenter, data-first, answer-the-closing-question, quotable-reframe), picks a reaction type, and waits for approval before posting via SocialPublisher. Keywords: linkedin comment, engage post, comment draft, first commenter, linkedin reply strategy."
+description: "LinkedIn comments, replies, thread follow-ups по URL поста. COMMENT: 1-3 варианта в голосе юзера + reaction, approval → post via SocialPublisher. REPLY HANDLER: ответ на коммент по URL (parent URN). THREAD ENGAGEMENT: трекинг ответов автора, follow-up, DM. Триггеры: linkedin comment, коммент на linkedin, ответ на коммент, thread engagement. NOT YourFirstName-voice RU replies без автопостинга → comment-replies."
 ---
 
 # LinkedIn Comment Drafter
@@ -30,13 +30,13 @@ Then waits for user approval. On "post", calls SocialPublisher to react + commen
 ## Steps
 
 1. **Parse the URL.** Use `lib.url_parser.parse_linkedin_url` to get `post_urn` and, if present, the post's activity ID.
-2. **Fetch the post body.** If HarvestAPI is available via `your-knowledge-base/tools/your-poster/harvest_client.py`, pull the post text and top 3 existing comments (to avoid duplicate takes). If not, ask the user to paste the post text.
+2. **Fetch the post body.** HarvestAPI-клиент (corporate-knowledge repo) в этом окружении ОТСУТСТВУЕТ — fallback по умолчанию: попроси пользователя вставить текст поста + топ-3 существующих комментария (чтобы не дублировать takes), либо вытяни пост через ScraperVendor/browser (skill `dev-browser`).
 3. **Detect the author's closing question.** If the post ends with a "?" line, the Answer-the-Closing-Question template usually wins.
 4. **Draft comment variants.** Pick 2-3 templates from `references/comment-templates.md` that fit the post's topic. Fill them with user-voice phrasing.
 5. **Run the humanizer pass.** Strip em dashes, AI vocab, uniform sentence rhythm. Add a specific number or named entity if missing.
 6. **Present drafts for approval** using `lib.approval.render_approval_card`. Include: target URL, each variant, reaction suggestion, a one-line "why this template fits".
 7. **On approval — adapt to the active backend.** Call `lib.active_backend()`:
-   - **`social-poster`** (SOCIAL_POSTER_API_KEY set) → react to the post with the chosen reaction type, pause 8-15s, then post via `lib.SocialPublisherClient.create_comment` (top-level, no `parent_comment`). Return the comment URN.
+   - **`socialpublisher`** (SOCIALPUBLISHER_API_KEY set) → react to the post with the chosen reaction type, pause 8-15s, then post via `lib.SocialPublisherClient.create_comment` (top-level, no `parent_comment`). Return the comment URN.
    - **`manual`** (no backend configured — the default) → output the approved draft via `lib.manual_mode_message(draft_text, target_url, kind="comment")`. This gives the user a copy-paste block plus a one-time setup prompt for SocialPublisher (the preferred auto-post path). Do NOT attempt to post programmatically.
    - **`diy`** (LINKEDIN_SKILLS_CUSTOM_POSTER set) → invoke the user's configured custom poster command with the draft text + target URL as arguments.
 
@@ -53,7 +53,7 @@ Then waits for user approval. On "post", calls SocialPublisher to react + commen
 ## Hard rules
 
 - 200-350 chars. Don't exceed.
-- Always capitalize the author's name (e.g., "Creator", not "creator").
+- Always capitalize the author's name (e.g., "Dharmesh", not "dharmesh").
 - No em dashes, no hashtags, no emoji unless the post itself uses them.
 - No mention of the user's own product by name. Describe what they do instead.
 - Never paste generic praise ("Great post!", "This.", "100%"). The skill refuses.
@@ -61,7 +61,7 @@ Then waits for user approval. On "post", calls SocialPublisher to react + commen
 
 ## Example invocation
 
-> User: "Comment on this: https://www.linkedin.com/posts/creator_activity-1234567890123456789-iW20"
+> User: "Comment on this: https://www.linkedin.com/posts/dharmesh_activity-7448808898326654978-iW20"
 >
 > Skill: [parses URL, fetches post, detects closing question "Seen this in your market?", drafts 3 variants]
 >
@@ -75,6 +75,6 @@ Then waits for user approval. On "post", calls SocialPublisher to react + commen
 
 ## Related skills
 
-- `linkedin-reply-handler` — if you're replying to a comment (not posting top-level)
+- `references/linkedin-reply-handler/` — if you're replying to a comment (not posting top-level)
 - `linkedin-humanizer` — for aggressive AI-tell scrubbing
-- `linkedin-hook-extractor` — if you want to use the author's own hook as the basis for your reply
+- `../linkedin-post-writer/references/linkedin-hook-extractor/` — if you want to use the author's own hook as the basis for your reply

@@ -1,6 +1,6 @@
 ---
 name: claude-cli-runner
-description: "Claude CLI Runner"
+description: "Запуск моделей Claude из Python БЕЗ API-ключа — через claude CLI binary с авторизацией подписки Claude Code. Модуль ~/.claude/tools/claude_cli.py (claude, claude_async, claude_json, claude_stream, validate_response). Триггеры: «claude CLI», «без API ключа», «claude binary», «run Claude from Python», «call Claude without API key», «клод из скрипта»."
 ---
 
 # Claude CLI Runner
@@ -16,7 +16,7 @@ Use this skill when the user needs to run Claude models from Python code WITHOUT
 
 ## Module Location
 
-`${WORKSPACE}/tools/claude_cli.py`
+`~/.claude/tools/claude_cli.py`
 
 ## Quick Usage
 
@@ -32,7 +32,7 @@ result = claude("Fix spelling: Привет мр")
 result = claude(
     "Review this code for bugs",
     system="You are a senior developer",
-    model="claude-opus-4-6",
+    model="claude-opus-4-8",
 )
 
 # Async
@@ -51,9 +51,12 @@ ok, cleaned = validate_response(original_text, llm_response)
 
 ## Available Models
 
-- `claude-opus-4-6` — most capable
+- `claude-opus-4-8` — most capable (алиас `opus`)
+- `claude-fable-5` — канон text-субагентов/воркеров (алиас `fable`, ≤5 одновременно)
 - `claude-sonnet-4-5` — balanced (default)
 - `claude-haiku-4-5` — fastest, cheapest
+
+Канон актуальных ID/алиасов → `config/models.md`.
 
 ## Requirements
 

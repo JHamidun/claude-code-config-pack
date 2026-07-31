@@ -85,6 +85,8 @@ _To be filled after discussion._
 
 The council pattern is based on the idea that multiple independent opinions produce better decisions than a single comprehensive analysis. Like doctors at a medical council — each examines the same patient but sees different things.
 
+Read more: [Three agents found different problems in the same project](https://sereja.tech/blog/agent-consilium-independent-opinions/) (Russian)
+
 ## See Also
 
 - [Agent Teams Skill](../agent-teams/) — for collaborative work (shared state, coordination)

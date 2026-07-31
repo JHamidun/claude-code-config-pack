@@ -1,6 +1,6 @@
 ---
 name: competitive-analysis
-description: Competitor research, market analysis, ad intelligence, positioning
+description: Competitor research, market analysis, ad intelligence, positioning. Триггер «реклама конкурентов» — указатель на скилл ad-spy.
 ---
 
 # Competitive Analysis Skill
@@ -69,6 +69,8 @@ description: Competitor research, market analysis, ad intelligence, positioning
 ```
 
 ## Ad Intelligence
+
+> **Анализ рекламы конкурентов**: для разведки рекламных кампаний/креативов конкурентов используй `ad-spy` (Facebook/Google/LinkedIn ad libraries + российские каналы Яндекс/VK/TG + Atria для Meta-креативов с оценкой бюджета). Этот скилл — про продуктовую/рыночную конкурентную разведку, ad-spy — про рекламную.
 
 ### Sources
 

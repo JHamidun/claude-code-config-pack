@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "cro-funnels",
+  "displayName": "CRO & Funnels",
+  "version": "0.1.0",
+  "description": "Conversion optimization for landing pages, signup, onboarding, paywalls, popups and forms; funnel design, A/B testing, full-funnel analytics.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "cro",
+    "conversion",
+    "funnel",
+    "ab-testing"
+  ]
+}

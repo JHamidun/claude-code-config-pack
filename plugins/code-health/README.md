@@ -8,13 +8,10 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `bug-health-inline` | Inline orchestration workflow for automated bug detection and fixing. |
-| `cleanup-health-inline` | Inline orchestration workflow for dead code detection and removal. |
-| `defense-in-depth` | Use when invalid data causes failures deep in execution - validates at every layer data passes through to make bugs structurally impossible |
-| `deps-health-inline` | Inline orchestration workflow for dependency audit and updates. |
-| `reuse-health-inline` | Inline orchestration workflow for code duplication detection and consolidation. |
+| `health-inline` | Inline codebase-health orchestration in five modes — bugs, cleanup, dependencies, reuse, security — detect, fix, verify. |
+| `osint-recon` | Open-source recon on infrastructure and counterparties — IP/ASN, DNS, RDAP whois, BGP, subdomains, exposed ports, CVEs. |
+| `privacy-filter` | Local on-device PII detection and redaction (OpenAI `opf` model). |
 | `security-audit` | Security auditing - vulnerability scanning, code review, OWASP checks, penetration testing guidance |
-| `security-health-inline` | Inline orchestration workflow for security vulnerability detection and remediation. |
 | `threat-hunting` | Threat hunting with Sigma rules, detection engineering, security analysis |
 
 ### Agents
@@ -37,7 +34,6 @@ Part of the **[hamidun marketplace](../../README.md)**.
 - `/health-bugs`
 - `/health-cleanup`
 - `/health-deps`
-- `/health-metrics`
 - `/health-reuse`
 - `/health-security`
 - `/security-scan`

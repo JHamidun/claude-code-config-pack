@@ -1,0 +1,154 @@
+{
+  "meta": {
+    "instanceId": "workflow-90ec9a69",
+    "versionId": "1.0.0",
+    "createdAt": "2025-09-29T07:07:48.828086",
+    "updatedAt": "2025-09-29T07:07:48.828095",
+    "owner": "n8n-user",
+    "license": "MIT",
+    "category": "automation",
+    "status": "active",
+    "priority": "high",
+    "environment": "production"
+  },
+  "nodes": [
+    {
+      "id": "4e670880-61cf-4870-8d29-525f4e677162",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -40,
+        600
+      ],
+      "parameters": {},
+      "typeVersion": 1,
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "cd21e063-59fe-42a5-87c7-b4d63df2e2b7",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        500,
+        480
+      ],
+      "parameters": {
+        "width": 682,
+        "height": 280,
+        "content": "## Save SQL table as a CSV file\n### You can send it via e-mail, upload to the file storage or download on your computer.\n### Just connect one or two extra n8n Nodes here!"
+      },
+      "typeVersion": 1,
+      "notes": "This stickyNote node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "f960451e-d04e-4023-aed2-e039898b7cab",
+      "name": "TableName",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        160,
+        600
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "TableName",
+              "value": "SalesLT.ProductCategory"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "typeVersion": 1,
+      "notes": "This set node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "e2b4f557-663e-4b1c-b90e-9fde44dcd63a",
+      "name": "LoadMSSQLData",
+      "type": "n8n-nodes-base.microsoftSql",
+      "position": [
+        340,
+        600
+      ],
+      "parameters": {
+        "query": "=SELECT * FROM {{ $json[\"TableName\"] }}",
+        "operation": "executeQuery"
+      },
+      "credentials": {
+        "microsoftSql": {
+          "id": "{{ $credentials.microsoftSql.id }}",
+          "name": "Microsoft SQL account"
+        }
+      },
+      "typeVersion": 1,
+      "notes": "This microsoftSql node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "cec2452f-e3e9-47ad-bcc6-4d411b1cd532",
+      "name": "SaveCSV",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "position": [
+        760,
+        600
+      ],
+      "parameters": {
+        "options": {
+          "fileName": "={{ $('TableName').first().json.TableName }}.{{ $parameter[\"fileFormat\"] }}"
+        },
+        "operation": "toFile",
+        "fileFormat": "csv"
+      },
+      "typeVersion": 1,
+      "notes": "This spreadsheetFile node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "error-908fb626",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "cec2452f-e3e9-47ad-bcc6-4d411b1cd532": {
+      "main": [
+        [
+          {
+            "node": "error-handler-cec2452f-e3e9-47ad-bcc6-4d411b1cd532-8b1e5dc4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "name": "Manualtrigger Workflow",
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": null,
+    "timezone": "UTC",
+    "executionTimeout": 3600,
+    "maxExecutions": 1000,
+    "retryOnFail": true,
+    "retryCount": 3,
+    "retryDelay": 1000
+  },
+  "description": "Automated workflow: Manualtrigger Workflow. This workflow integrates 6 different services: stickyNote, spreadsheetFile, set, stopAndError, microsoftSql. It contains 6 nodes and follows best practices for error handling and security.",
+  "tags": [
+    "automation",
+    "n8n",
+    "production-ready",
+    "excellent",
+    "optimized"
+  ],
+  "notes": "Excellent quality workflow: Manualtrigger Workflow. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+}

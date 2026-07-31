@@ -1,4 +1,13 @@
+---
+description: "Пакетное извлечение знаний из истории чатов по топикам (легаси chat_ingester_v2.py: extract-knowledge / dedupe / scan) — ошибки, код, решения, learnings. Триггеры: «извлеки знания из чатов», «сгруппируй знания по топикам». Повседневный поиск/индексация → /search-chats (канон)."
+argument-hint: "[extract-knowledge | dedupe | scan]"
+---
+
 # Извлечь знания из памяти
+
+> **Канон поиска/индексации — `~/.claude/tools/search_chats.py`** (SQLite FTS5, `~/.claude/chats.db`).
+> Эта команда использует легаси-скрипт `chat_ingester_v2.py` для пакетного извлечения знаний по топикам.
+> Для повседневного поиска и обновления индекса используй `/search-chats` (canonical).
 
 ## Задача
 

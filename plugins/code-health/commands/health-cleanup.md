@@ -4,13 +4,13 @@ description: Dead code detection and cleanup workflow (inline orchestration)
 
 # Cleanup Health Check
 
-Execute the `cleanup-health-inline` skill for inline orchestration.
+Execute the `health-inline` skill (mode: cleanup) for inline orchestration.
 
 **You ARE the orchestrator.** Do not spawn a separate orchestrator agent.
 
 ## Quick Start
 
-1. Read `.claude/skills/cleanup-health-inline/SKILL.md`
+1. Read `.claude/skills/health-inline/SKILL.md` (mode table) + `.claude/skills/health-inline/references/modes/cleanup.md` (full workflow)
 2. Follow the workflow phases directly
 3. Use Task tool only for workers (dead-code-hunter, dead-code-remover)
 4. Run quality gates inline via Bash
@@ -27,4 +27,4 @@ Pre-flight → Detect → [Remove by Priority] → Verify → Report
 
 ---
 
-Now read and execute the skill: `.claude/skills/cleanup-health-inline/SKILL.md`
+Now read and execute the workflow: `.claude/skills/health-inline/references/modes/cleanup.md`

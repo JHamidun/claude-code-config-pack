@@ -15,7 +15,7 @@ argument-hint: [название фичи]
 
 ## Фаза 2: Параллельная разработка
 2. Назначь специализированных агентов:
-   - @architect: Подход A (performance-focused) в worktree feature-performance
+   - @software-architect: Подход A (performance-focused) в worktree feature-performance
    - @frontend-dev: Подход B (UX-focused) в worktree feature-ux
    - @backend-dev: Подход C (maintainability-focused) в worktree feature-maintainable
 

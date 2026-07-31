@@ -1,3 +1,8 @@
+---
+description: "Анализ производительности КОДА: CPU/memory-профилирование (cProfile, memory_profiler, node --prof), медленные SQL-запросы, N+1, кэширование — с отчётом bottleneck→fix. Триггеры: «производительность кода», «профилирование», «медленный код», «оптимизируй функцию». Маркетинг-отчёт → /performance-report; Web Vitals сайта → agent performance-optimizer."
+argument-hint: "[путь к файлу/модулю | cpu|memory|io|all]"
+---
+
 # Performance Analysis & Optimization
 
 **Аргументы:** $ARGUMENTS (путь к файлу/модулю или тип анализа: cpu/memory/io/all)

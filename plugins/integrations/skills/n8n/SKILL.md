@@ -1,6 +1,6 @@
 ---
 name: n8n
-description: "n8n workflow automation - API integration, nodes, triggers, expressions, MCP. Expert skill for using n8n with 400+ integrations."
+description: "n8n workflow automation — API integration, nodes, triggers, expressions, MCP, 400+ integrations. Ready-made recipes: CAPI через n8n, server-side события Meta, передать квал-лид в Meta, LTV в Pixel, webhook CRM в Facebook (CRM webhook → SHA-256 → Meta Conversions API), programmatic AI-SEO factory. EN: n8n CAPI workflow, server-side Meta events, CRM webhook to Facebook Conversions API."
 ---
 
 # N8N Workflow Automation Skill
@@ -8,6 +8,112 @@ description: "n8n workflow automation - API integration, nodes, triggers, expres
 ## Overview
 
 Expert skill for using n8n - powerful workflow automation platform with 400+ integrations.
+
+## ПРАВИЛО: сначала ищи готовый воркфлоу, потом строй с нуля
+
+**ПЕРЕД сборкой любого n8n-воркфлоу с нуля — сначала проверь каталог 2061 готового воркфлоу ниже** (grep по папке или локальный FastAPI-поиск). Часто нужная интеграция (Telegram/RSS/OpenAI/CRM/Slack/...) уже собрана — быстрее адаптировать готовый JSON (перевесить credentials, поправить 2-3 ноды), чем рисовать граф с нуля.
+
+## Каталог 4343 готовых воркфлоу (Zie619)
+
+Источник: [github.com/Zie619/n8n-workflows](https://github.com/Zie619/n8n-workflows) (55.7k★). **Важно:** бейдж репозитория заявляет «4,343 workflows», но верифицировано (GitHub Trees API `git/trees/main?recursive=1` + локальный `git ls-tree`) — на текущем `main` реально **2061** JSON-файл воркфлоу. Бейдж в README не обновлён после чистки/дедупа коллекции — ориентируйся на реальную цифру 2061, не на маркетинговую 4343.
+
+### Где лежит локально
+
+```text
+~/.claude/skills/n8n/catalog/       # git clone --depth 1, ~55 MB
+├── workflows/                           # 2061 JSON, сгруппированы в 188 папок по интеграции
+│   ├── Telegram/                        #   (Telegram, Openai, Rssfeedread, Slack, Httprequest...)
+│   ├── Openai/
+│   ├── Rssfeedread/
+│   └── ...
+├── context/                             # def_categories.json / search_categories.json / unique_categories.json
+│                                         #   (маппинг node-type → 15 бизнес-категорий, полезно для grep-подхода)
+├── database/workflows.db                # SQLite FTS5, уже проиндексирована (2061 записей)
+├── .venv_search/                        # venv с FastAPI/uvicorn (см. ниже — версии requirements.txt не собираются на Python 3.13)
+├── run.py                               # launcher локального поиск-сервера
+├── api_server.py                        # FastAPI-приложение
+└── README.md
+```
+
+Каждый воркфлоу — самостоятельный JSON в формате n8n-импорта: `{id, meta, name, tags, nodes, active, pinData, settings, versionId, connections}`. Имя файла кодирует интеграции/тип триггера, напр. `1941_Telegram_Stickynote_Automate_Triggered.json`.
+
+Метрики каталога (из `/api/stats`): 311 уникальных интеграций, 30774 нод суммарно, 4 типа триггера (Webhook 588 / Manual 582 / Scheduled 244 / Complex-мультитриггер 647), 3 уровня сложности (low 467 / medium 844 / high 750), 215 активных / 1846 неактивных шаблонов. 15 бизнес-категорий + Uncategorized (через `/api/categories`): AI Agent Development, Business Process Automation, CRM & Sales, Cloud Storage & File Management, Communication & Messaging, Creative Content & Video Automation, Creative Design Automation, Data Processing & Analysis, E-commerce & Retail, Financial & Accounting, Marketing & Advertising Automation, Project Management, Social Media Management, Technical Infrastructure & DevOps, Web Scraping & Data Extraction.
+
+### Как искать нужный воркфлоу — 3 способа
+
+**1. Локальный FastAPI + SQLite FTS5 (рекомендуется — полнотекст, фильтры, <100мс)**
+
+БД уже собрана. Запуск сервера (Python 3.13 gotcha ниже):
+
+```bash
+cd ~/.claude/skills/n8n/catalog
+./.venv_search/Scripts/python.exe run.py --port 8123 --skip-index   # переиспользовать готовую БД
+# или --reindex вместо --skip-index, если папка workflows/ изменилась
+```
+
+Веб-UI: `http://127.0.0.1:8123/` · Swagger: `http://127.0.0.1:8123/docs`. Ключевые эндпоинты:
+
+| Эндпоинт | Что делает |
+|----------|-----------|
+| `GET /api/workflows?q=<term>&per_page=N` | полнотекстовый поиск по имени/описанию/интеграциям |
+| `GET /api/workflows/category/{category}` | фильтр по одной из 15 бизнес-категорий |
+| `GET /api/workflows/{filename}` | детали воркфлоу (без скачивания) |
+| `GET /api/workflows/{filename}/download` | **raw JSON, готовый к импорту в n8n** |
+| `GET /api/categories` · `/api/integrations` · `/api/stats` | справочники и метрики |
+
+**Gotcha (Python 3.13):** `requirements.txt` пинует `pydantic==2.5.3` / `pydantic-core` — эта версия не собирается на Python 3.13 (падает в maturin/rust: `ForwardRef._evaluate() missing 'recursive_guard'`, т.к. `requirements.txt` рассчитан на 3.9-3.12). Фикс — ставить без пинов последние версии:
+```bash
+python -m venv .venv_search
+./.venv_search/Scripts/python.exe -m pip install fastapi uvicorn pydantic PyJWT passlib httpx requests psutil email-validator python-multipart
+```
+Приложение работает без изменений кода — API не завязан на конкретный минорный pydantic.
+
+**2. Grep по папке (без установки, мгновенно)** — когда сервер поднимать не нужно:
+
+```bash
+# по имени файла/папке интеграции (папки = 188 шт, по имени ноды: Telegram, Openai, Rssfeedread...)
+find /c/~/.claude/skills/n8n/catalog/workflows -iname "*rss*"
+ls /c/~/.claude/skills/n8n/catalog/workflows/Telegram/
+
+# по точному node-type внутри JSON (точнее чем FTS, который матчит широко)
+grep -ril "n8n-nodes-base.openAi" /c/~/.claude/skills/n8n/catalog/workflows
+```
+Grep даёт точные совпадения по node-type, но без ранжирования/синонимов — FTS находит больше (например `q=openai` — 507 совпадений против 32 у точного grep по node-type, т.к. FTS матчит ещё в названии/описании/связанных интеграциях).
+
+**3. Веб-UI без установки** — `https://zie619.github.io/n8n-workflows` — тот же каталог онлайн, «Direct Downloads» скачивает JSON без клонирования репо. Годится, если каталог локально не поднят или это одноразовый поиск.
+
+### Как забрать найденный воркфлоу и адаптировать под наш n8n
+
+1. Скачать raw JSON — `GET /api/workflows/{filename}/download` (локальный сервер) или Read/скопировать файл напрямую из `workflows/<Категория>/<filename>.json`.
+2. Импорт в наш n8n:
+   - **Cloud** (`your-name.app.n8n.cloud`) — UI: Workflows → Import from File; либо API `POST {N8N_CLOUD_URL}/workflows` с телом JSON (см. `create_workflow()` выше в этом скилле).
+   - **Server** (`YOUR_SERVER_IP:5678`) — аналогично через UI или `POST {N8N_SERVER_URL}/workflows`.
+   - Перед импортом по API убери/не задавай `id`/`versionId` — n8n сгенерирует свои.
+3. **Credentials-gotcha:** воркфлоу из каталога хранят только *тип* credential (напр. `telegramApi`), без секретов. После импорта ноды будут падать с "credential not found", пока вручную не перевесишь на реальные credentials Company (Telegram bot token, OpenAI key и т.д. — уже настроены в нашем n8n).
+4. Проверь ноды на актуальность версий (`typeVersion`) — старые шаблоны из каталога иногда используют устаревшие версии нод, при открытии n8n сам предложит апгрейд.
+
+### Смоук-тест поиска (реально выполнено, локальный FastAPI-сервер)
+
+| Запрос | Результат | Примеры |
+|--------|-----------|---------|
+| `q=telegram` | 185 совпадений | `1941_Telegram_Stickynote_Automate_Triggered.json` — Telegram echo-bot (Webhook); `0748_Noop_Telegram_Automation_Scheduled.json` — RSS to Telegram (Scheduled) |
+| `q=rss` | 9 совпадений | `1180_Rssfeedread_Htmlextract_Create_Scheduled.json` — Get only new RSS with Photo; `1176_Rssfeedread_Slack_Automation_Scheduled.json` — Post RSS feed items to Slack |
+| `q=openai` | 507 совпадений | `Academic Assistant Chatbot (Telegram + OpenAI).json`; `1543_Manual_Openai_Automation_Triggered.json` — Summarize Google Sheets feedback via GPT-4 |
+
+Поиск и скачивание (`/download`) проверены живьём — сервер поднимается, БД индексируется, JSON скачивается в валидном n8n-импорт формате.
+
+## Ready-Made Workflow Recipes (методология)
+
+Готовые рецепты на базе n8n  — конкретные workflow «под ключ»:
+
+| Рецепт | Что делает | Reference |
+|--------|-----------|-----------|
+| **CAPI без кода через n8n** | CRM webhook (your CRM/HubSpot/Битрикс24) → нормализация → SHA-256 → Meta Conversions API → Test Events. Передача квал-лида/оплаты/LTV в Meta server-side. | `references/recipe-capi-meta.md` |
+| **Программатическая AI-SEO фабрика** | Массовая генерация SEO-страниц под длинный хвост на n8n + Perplexity + OpenAI («1 запрос = 1 статья = 1 страница»). | скилл `ai-seo-agent-pipeline` |
+
+**Cross-links на методологию (не дублируем здесь):**
+- `capi-no-code-setup` — полная методология server-side трекинга: зачем CAPI, 7 параметров матчинга, хеширование, Event ID дедупликация, офлайн-конверсии, атрибуция. n8n — один из 4 инструментов (Zapier/Make/n8n/Albato); reference выше даёт готовый n8n-workflow.
+- `ai-seo-agent-pipeline` — второй n8n-рецепт из того же курса.
 
 **Two versions available:**
 1. **Server (self-hosted)** - full control, no limits

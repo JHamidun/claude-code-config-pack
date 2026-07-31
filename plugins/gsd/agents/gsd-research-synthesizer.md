@@ -1,5 +1,6 @@
 ---
 name: gsd-research-synthesizer
+model: fable
 description: Synthesizes research outputs from parallel researcher agents into SUMMARY.md. Spawned by /gsd:new-project after 4 researcher agents complete.
 tools: Read, Write, Bash
 color: purple

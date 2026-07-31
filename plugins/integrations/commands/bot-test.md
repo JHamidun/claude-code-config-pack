@@ -381,7 +381,7 @@ Recommendations:
 ## Examples:
 
 ```
-/bot-test example-bot/src/bot
+/bot-test digital-buddy-v3/src/bot
 ```
 
 ```

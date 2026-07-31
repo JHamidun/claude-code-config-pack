@@ -1,5 +1,6 @@
 ---
 name: mobile-fixes-implementer
+model: fable
 description: Use proactively to automatically implement mobile responsiveness fixes from test reports. Specialist for systematically applying CSS, JavaScript, and viewport optimizations to resolve mobile UX issues.
 color: purple
 ---

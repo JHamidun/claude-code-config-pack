@@ -1,3 +1,8 @@
+---
+description: "Поиск по локальной базе знаний kb.py (SQLite FTS5+BM25): встречи tl;dv/Spark, письма Gmail/Outlook, Telegram-экспорты, Calendar; + ingest новых данных. Триггеры: «kb», «база знаний», «найди в встречах», «поиск по транскриптам». История чатов Claude Code → /search-chats."
+argument-hint: "\"<запрос>\" [--source tldv|spark|gmail|outlook|telegram] [--after DATE] [--speaker Name]"
+---
+
 # Knowledge Base Search
 
 **Arguments:** $ARGUMENTS
@@ -86,7 +91,7 @@ python ${WORKSPACE}/tools/kb.py doc <id>
 ```
 /kb example-query
 /kb спринт --source tldv --after 2025-01-01
-/kb "ExampleGPT" --source spark
+/kb "YourProduct" --source spark
 /kb stats
 /kb sources
 ```

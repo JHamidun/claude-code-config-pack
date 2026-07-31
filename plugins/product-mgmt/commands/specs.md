@@ -5,7 +5,7 @@ argument-hint: [feature name]
 
 # Technical Specifications: $ARGUMENTS
 
-Ask @system-analyst and @architect to create detailed tech specs:
+Ask @system-analyst and @software-architect to create detailed tech specs:
 
 ## 1. System Architecture
 - Components involved

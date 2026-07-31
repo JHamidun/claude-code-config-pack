@@ -74,13 +74,36 @@ Generate Excalidraw-compatible JSON for various diagram types.
 | Database | `#d0bfff` (light purple) |
 | External | `#e9ecef` (light gray) |
 
-## Process
+## Process (с визуальным циклом)
 
-1. User describes what they need diagrammed
-2. Identify diagram type (flowchart/arch/sequence/ER/mind map)
-3. Generate Excalidraw JSON with proper layout
-4. Save to `.excalidraw` file
-5. User opens in Excalidraw (VS Code extension or excalidraw.com)
+1. Пользователь описывает, что диаграммировать
+2. Определи тип (flowchart/arch/sequence/ER/mind map)
+3. Сгенерируй Excalidraw JSON с layout (правила ниже) → сохрани `.excalidraw`
+4. **Визуальный цикл (render → смотрю → правлю)** — см. секцию ниже: отрендерь в PNG, ПОСМОТРИ, поправь композицию. НЕ отдавай one-shot вслепую — сложные схемы почти всегда требуют 1-2 итерации.
+5. Отдай `.excalidraw` (+ PNG). Открывается в VS Code Excalidraw-расширении или excalidraw.com.
+
+## Визуальный цикл (render → смотрю → правлю) — без постоянного сервера
+
+Итеративная доводка через **playwright** (уже в стеке; НЕ нужен постоянный :3000-сервер — открываем/закрываем per-render):
+
+1. Сгенерь `.excalidraw` JSON.
+2. Отрендерь в PNG: playwright открывает `https://excalidraw.com` (или локальный excalidraw) → импортирует JSON (drag-drop/localStorage/`?json=`) → `browser_take_screenshot`. Скрипт-обёртка: `skills/excalidraw-flowchart/scripts/render.py` (Playwright, headless, load→screenshot→close).
+3. **ПОСМОТРИ PNG** (Read) — наложения, пересечения стрелок, кривой layout, обрезка.
+4. Поправь JSON (координаты/spacing/routing) → перерендерь. Гейт: нет наложений, стрелки читаемы, всё в кадре.
+
+Для агента этого достаточно; постоянный canvas-сервер (mcp_excalidraw) нужен только для ЖИВОГО интерактивного холста с человеком — это отдельный кейс, не ставим ради генерации.
+
+## Layout-операции (align / distribute / group)
+- **Выравнивание**: одна ось — общий x (столбец) или y (ряд); фиксируй числом, не «на глаз».
+- **Распределение**: равные зазоры между 3+ элементами = `(max-min)/(n-1)`.
+- **Группировка**: связанные узлы — общий `groupIds:[id]`; подпись-контейнер — `frame`.
+- **Grid-snap** 20px, орто-роутинг стрелок (см. Layout Rules ниже).
+
+## Из Mermaid
+Есть Mermaid-текст → конверсия: (а) excalidraw.com имеет встроенный «Mermaid to Excalidraw» (через playwright-фронт), либо (б) Cloud MCP Mermaid_Chart для самой Mermaid-диаграммы, если excalidraw-стиль не критичен.
+
+## Визуализация memory-графа (тай-ин с твоим графом)
+Нарисовать связи из `memory_graph.py` (5137 узлов): `python ~/.claude/scripts/memory_graph.py neighbors "<узел>"` (или `path`/`hubs`) → распарси узлы/рёбра → сгенерь Excalidraw (узлы=прямоугольники, рёбра=стрелки с подписью типа связи) → визуальный цикл. Так граф «кто связан с X» становится картинкой.
 
 ## Layout Rules
 

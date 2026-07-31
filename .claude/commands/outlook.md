@@ -1,3 +1,8 @@
+---
+description: "РАБОЧАЯ почта Exchange your-work-email@company.com (mail.company.com, exchangelib, autodiscover=False): inbox, поиск, чтение, отправка, ответ, папки. Триггеры: «outlook», «рабочая почта», «exchange», «письма company», «рабочие треды». Личная почта → /gmail."
+argument-hint: "[inbox <N> | unread | search <запрос> | read <id> | send <кому> <тема> | reply <id> | folders]"
+---
+
 # Outlook / Exchange Operations
 
 /outlook - Work with Exchange email (your-work-email@company.com)

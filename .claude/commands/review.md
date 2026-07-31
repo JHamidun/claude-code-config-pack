@@ -15,7 +15,7 @@ Conduct thorough review with appropriate agents:
 ## For Code:
 - @code-reviewer: Code quality, standards, best practices
 - @security-engineer: Security vulnerabilities
-- @architect: Architecture compliance
+- @software-architect: Architecture compliance
 
 ## Review Checklist:
 

@@ -10,12 +10,12 @@ Quick upload a video to YouTube.
 - `/youtube-upload video.mp4 --title "Title" --tags "ai,tech" --thumbnail thumb.png`
 
 **Prerequisites:**
-1. Run `python ~/.claude/skills/youtube-publisher/scripts/yt_oauth_setup.py` once for OAuth
+1. Run `python ~/.claude/skills/youtube-channel/scripts/upload/yt_oauth_setup.py` once for OAuth
 2. Need `~/.claude/.youtube-client-secrets.json` from Google Cloud Console
 
 **CLI Reference:**
 ```bash
-python ~/.claude/skills/youtube-publisher/scripts/yt_upload.py upload $ARGUMENTS
+python ~/.claude/skills/youtube-channel/scripts/upload/yt_upload.py upload $ARGUMENTS
 ```
 
-Read skill `youtube-publisher` for full documentation.
+Read skill `youtube-channel` for full documentation (section «1. Upload»; ex-youtube-publisher archived 2026-07-18, scripts identical).

@@ -1,3 +1,8 @@
+---
+description: "Глубокий reasoning через Kimi K2 (k2-thinking, MoE 1T): сложные алгоритмы, трудные баги, архитектурные и математические задачи. Триггеры: «kimi», «спроси kimi», «глубокий анализ алгоритма». Агент-обёртка для делегирования → kimi-algorithm-specialist."
+argument-hint: "<problem>"
+---
+
 # /kimi-reasoning - Глубокий анализ с Kimi K2
 
 **Назначение:** Используй Kimi K2 (k2-thinking модель) для глубокого reasoning и анализа сложных проблем.

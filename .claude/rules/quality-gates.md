@@ -64,6 +64,20 @@ Verification means **proving the code works**, not confirming it exists.
 
 A verifier that rubber-stamps weak work undermines everything.
 
+## Anti-Claim-Fabrication (self-check перед заявлениями)
+
+| Вид | Проверка перед заявлением |
+| --- | --- |
+| **UNFULFILLED** («создал X») | X реально на диске / в результатах последнего tool call? Не изобретай — перечитай, а не вспоминай. |
+| **MISREPORTED** («тесты прошли») | Последний РЕАЛЬНО увиденный вывод тест-раннера — зелёный? Не пересказывай ожидаемое как случившееся. |
+| **HOLLOWED** (тест/чек ослаблен) | Не подменил ли я строгую проверку (`==`) на мягкую (`startswith`), не замаскировал ли exit code (`\|\| true`), не выхолостил ли тело чекера (`return True`/`pass`)? |
+| **SELF-CONTRADICTING** | Не противоречит ли это заявление открытому todo/обещанию из этой же сессии? |
+| **BYPASSED** | Не отключил ли я гейт/хук/линт, чтобы протолкнуть блокировку, вместо того чтобы её устранить? |
+| **FABRICATED ACTION** («я запустил X») | Был ли реальный tool call за этим заявлением в этом ходе, или это пересказ намерения? |
+| **PHANTOM CITATION** (URL/SHA/цитата) | Видел ли я это РЕАЛЬНО в выводе tool call этой сессии, или подставил по памяти/правдоподобию? |
+
+Makoto не установлен намеренно: конфликт с Co-Authored-By трейлером + ~500мс/вызов на каждом tool call.
+
 ## Cross-Model Validation (Advisor Pattern)
 
 For architectural decisions and complex tradeoffs:
@@ -79,3 +93,30 @@ For architectural decisions and complex tradeoffs:
 | Model not found (Gemini) | Используй config/models.md |
 | Rate limit exceeded | Добавь delays между запросами |
 | Connection refused | ssh your-server "docker ps" |
+
+## Position-Bias Guard для LLM-as-Judge (auto-improve)
+
+Когда судья-LLM выбирает лучший из 2 вариантов (копирайт/дизайн/КП/фикс/ревью, «оставить или откатить»):
+- LLM систематически предпочитает ПЕРВЫЙ вариант. Прогоняй ОБА порядка: A-vs-B и B-vs-A.
+- Keep кандидата ТОЛЬКО при перевесе голосов (2:0); ничья → держится текущий чемпион.
+- Решение по голосам двустороннего сравнения, НЕ по самоотчётной цифре автора.
+- Генератор НИКОГДА не судит свою работу — оценщик в отдельном контексте. Промпт судьи: «Judge quality only; do not favor a version because it appears first; if equivalent, tie.»
+- Полный паттерн: `skills/verifier/references/gan-adversarial-improve.md`.
+
+## Adversarial Role Gate (SHARP)
+
+Для дорогих/необратимых артефактов (публикуемые посты, оферы, КП, shipping-код, направления рисёрча) — гейт отдельной ролью **Critic**, оценка SHARP (Sharpness/Horizon/Asymmetry/Resistance/Parsimony, каждая 1-5, /25). **Pass ≥18**; ниже — вернуть автору с 3 самыми жёсткими критиками. Варьирует *позицию* (одна модель ок) — дополняет cross-*model* validation. Дешёвый обратимый вывод НЕ гейтить. См. `skills/agent-builder tooling/references/adversarial-agent-pairs-pattern.md`.
+
+## YAGNI-иерархия (ponytail)
+
+Перед написанием кода — пройди лестницу, остановись на первой ступени, которая держит:
+
+1. **Нужно ли это вообще?** Спекулятивная потребность = скип, скажи об этом одной строкой.
+2. **Уже есть в кодбазе?** Helper/util/паттерн рядом → переиспользуй. Сначала ищи, потом пиши.
+3. **Stdlib умеет?** Используй stdlib.
+4. **Нативная фича платформы?** `<input type="date">` вместо picker-либы, CSS вместо JS, DB constraint вместо кода.
+5. **Уже установленная зависимость решает?** Используй её. Новую не добавляй ради пары строк.
+6. **Можно одной строкой?** Одна строка.
+7. **Только потом** — минимальный работающий код.
+
+Правила: никаких абстракций «на будущее» (interface с одной имплементацией, factory для одного продукта); удаление лучше добавления; скучное лучше умного. Лестница сокращает РЕШЕНИЕ, не ПОНИМАНИЕ — сначала прочитай задачу и код полностью, потом ленись. НЕ упрощать: валидацию на trust boundaries, error handling от потери данных, security, явно запрошенное.

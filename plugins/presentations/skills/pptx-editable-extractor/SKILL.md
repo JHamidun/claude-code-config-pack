@@ -1,207 +1,267 @@
 ---
 name: pptx-editable-extractor
-description: HTML слайды → PPTX с НАТИВНЫМИ text-боксами (можно редактировать в PowerPoint). Парсит DOM, извлекает text-узлы с координатами, создаёт корректно-позиционированные shapes. Сложнее чем export-pptx, но даёт настоящий PowerPoint, не картинки.
-when_to_use: Юзер просит «pptx с редактируемым текстом», «дай мне финальные слайды что-бы я мог дальше делать в PowerPoint», «не картинки». После slides когда финал нужен в PPTX.
+description: HTML → редактируемый PPTX. Каждый текст-узел становится нативным TextBox с координатами, шрифтом, цветом. Пользователь редактирует в PowerPoint.
+when_to_use: Нужен PPTX, который можно править. Не путать с export-pptx (screenshots).
 ---
 
 # PPTX editable extractor
 
-Парсит HTML слайдов, извлекает каждый text-узел с его computed-координатами, создаёт PPTX с нативными `text_frame`'ами. Картинки и фоны идут отдельно как shapes.
+Алгоритм: открыть HTML в headless, обойти DOM, для каждого видимого текстового / графического узла собрать `{x, y, w, h, text, fontFamily, fontSize, fontWeight, color, bgColor, image?}`. Сериализовать в JSON. Затем Python через `python-pptx` собрать PPTX, где каждая «коробка» — настоящий TextBox или Picture.
 
 ## Зависимости
 
 ```bash
-pip install python-pptx pillow lxml
-npm i -D playwright   # для extraction координат
+npm i -D playwright
+npx playwright install chromium
+pip install python-pptx pillow
 ```
 
-## Принцип
+## Скрипт-экстрактор
 
-1. Открыть HTML в Playwright headless
-2. Для каждого text-узла вытянуть: text, bbox (x/y/width/height), font, size, color, weight
-3. Для каждого `<img>` / `background-image` — координаты + asset path
-4. Сложить в PPTX через python-pptx с тем же расположением
+`templates/extract.mjs`:
 
-## Extraction script (Node)
-
-`scripts/extract.js`:
 ```js
-const { chromium } = require('playwright');
-const fs = require('fs');
+import { chromium } from 'playwright';
+import { pathToFileURL } from 'node:url';
+import path from 'node:path';
+import fs from 'node:fs/promises';
 
-async function extract(htmlPath, outJson) {
-  const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
-  await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle' });
+const args = parse(process.argv.slice(2));
+const file = args._[0];
+if (!file) { console.error('Usage: node extract.mjs <html> [--slide-selector "deck-stage > section"] [--width 1920] [--height 1080] [--out slides.json]'); process.exit(1); }
 
-  const slides = await page.$$eval('.slide', (slides) => {
-    return slides.map((slide, idx) => {
-      const result = { i: idx + 1, texts: [], images: [], shapes: [] };
+const sel = args['slide-selector'] || 'deck-stage > section';
+const width  = +(args.width  || 1920);
+const height = +(args.height || 1080);
+const out = args.out || file.replace(/\.html?$/, '.json');
 
-      // Активировать слайд
-      slide.classList.add('active');
+const browser = await chromium.launch();
+const ctx = await browser.newContext({ viewport: { width, height } });
+const page = await ctx.newPage();
+await page.goto(pathToFileURL(path.resolve(file)).href, { waitUntil: 'networkidle' });
+await page.evaluate(() => document.fonts && document.fonts.ready);
 
-      // Текст-узлы
-      const walker = document.createTreeWalker(slide, NodeFilter.SHOW_TEXT);
-      let node;
-      while (node = walker.nextNode()) {
-        const text = node.textContent.trim();
-        if (!text) continue;
-        const range = document.createRange();
-        range.selectNodeContents(node);
-        const rect = range.getBoundingClientRect();
-        const slideRect = slide.getBoundingClientRect();
-        const cs = getComputedStyle(node.parentElement);
-        result.texts.push({
-          text,
-          x: rect.left - slideRect.left,
-          y: rect.top - slideRect.top,
-          w: rect.width,
-          h: rect.height,
-          font: cs.fontFamily.split(',')[0].replace(/['"]/g, ''),
-          size: parseFloat(cs.fontSize),
-          weight: cs.fontWeight,
-          color: cs.color,
-          align: cs.textAlign,
-          lineHeight: cs.lineHeight,
-        });
-      }
+const slides = await page.$$eval(sel, (nodes, args) => {
+  function rgbToHex(rgb) {
+    const m = rgb.match(/\d+/g);
+    if (!m) return null;
+    return '#' + m.slice(0,3).map(n => (+n).toString(16).padStart(2,'0')).join('');
+  }
+  function visible(el) {
+    const cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) return false;
+    const r = el.getBoundingClientRect();
+    return r.width > 1 && r.height > 1;
+  }
+  function isTextLeaf(el) {
+    if (!el.childNodes.length) return false;
+    return [...el.childNodes].every(n =>
+      n.nodeType === Node.TEXT_NODE ||
+      (n.nodeType === Node.ELEMENT_NODE && ['B','I','EM','STRONG','SPAN','BR','A'].includes(n.tagName))
+    );
+  }
 
-      // Изображения
-      slide.querySelectorAll('img').forEach(img => {
-        const rect = img.getBoundingClientRect();
-        const slideRect = slide.getBoundingClientRect();
-        result.images.push({
-          src: img.src.replace('file://', ''),
-          x: rect.left - slideRect.left,
-          y: rect.top - slideRect.top,
-          w: rect.width,
-          h: rect.height,
-        });
+  return nodes.map(slide => {
+    const sr = slide.getBoundingClientRect();
+    const items = [];
+
+    // Тексты
+    slide.querySelectorAll('*').forEach(el => {
+      if (!visible(el)) return;
+      if (!el.textContent || !el.textContent.trim()) return;
+      if (!isTextLeaf(el)) return;
+      const r = el.getBoundingClientRect();
+      const cs = getComputedStyle(el);
+      items.push({
+        kind: 'text',
+        x: r.left - sr.left, y: r.top - sr.top, w: r.width, h: r.height,
+        text: el.innerText,
+        fontFamily: cs.fontFamily.split(',')[0].replace(/"/g,'').trim(),
+        fontSize: parseFloat(cs.fontSize),
+        fontWeight: cs.fontWeight,
+        italic: cs.fontStyle === 'italic',
+        color: rgbToHex(cs.color),
+        align: cs.textAlign,
+        lineHeight: cs.lineHeight,
+        letterSpacing: cs.letterSpacing,
       });
-
-      slide.classList.remove('active');
-      return result;
     });
+
+    // Картинки
+    slide.querySelectorAll('img').forEach(el => {
+      if (!visible(el)) return;
+      const r = el.getBoundingClientRect();
+      items.push({
+        kind: 'image',
+        x: r.left - sr.left, y: r.top - sr.top, w: r.width, h: r.height,
+        src: el.currentSrc || el.src,
+      });
+    });
+
+    // Прямоугольники с фоном (карточки, плашки)
+    slide.querySelectorAll('div, section, article, header, footer').forEach(el => {
+      if (!visible(el)) return;
+      const cs = getComputedStyle(el);
+      const bg = cs.backgroundColor;
+      if (!bg || bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') return;
+      const r = el.getBoundingClientRect();
+      items.push({
+        kind: 'rect',
+        x: r.left - sr.left, y: r.top - sr.top, w: r.width, h: r.height,
+        fill: rgbToHex(bg),
+        radius: parseFloat(cs.borderRadius),
+        z: -1,
+      });
+    });
+
+    // Фон слайда
+    const sCs = getComputedStyle(slide);
+    return {
+      width: sr.width, height: sr.height,
+      bg: rgbToHex(sCs.backgroundColor),
+      items: items.sort((a,b) => (a.z||0) - (b.z||0)),
+    };
   });
+}, { width, height });
 
-  fs.writeFileSync(outJson, JSON.stringify(slides, null, 2));
-  await browser.close();
-  console.log(`✓ extracted ${slides.length} slides → ${outJson}`);
+await browser.close();
+await fs.writeFile(out, JSON.stringify({ width, height, slides }, null, 2));
+console.log('✓', out, '—', slides.length, 'слайдов');
+
+function parse(argv) {
+  const a = { _: [] };
+  for (let i=0; i<argv.length; i++) {
+    const v = argv[i];
+    if (v.startsWith('--')) { const k = v.slice(2), n = argv[i+1]; if (!n||n.startsWith('--')) a[k]=true; else { a[k]=n; i++; } }
+    else a._.push(v);
+  }
+  return a;
 }
-
-extract(process.argv[2], process.argv[3] || 'slides.json');
 ```
 
-```bash
-node scripts/extract.js /abs/path/slides.html slides.json
-```
+## Скрипт-сборщик PPTX
 
-## Сборка PPTX (Python)
+`templates/build_pptx.py`:
 
-`scripts/build_pptx.py`:
 ```python
+#!/usr/bin/env python3
+import json, sys, os, urllib.request, tempfile
 from pptx import Presentation
 from pptx.util import Emu, Pt
 from pptx.dml.color import RGBColor
-import json, sys, re
+from pptx.enum.text import PP_ALIGN
 
-def px_to_emu(px, slide_w_px=1920, slide_w_in=13.333):
-    """Convert pixel coords (1920×1080 canvas) → EMU (PPTX unit)."""
-    return Emu(int(px * slide_w_in / slide_w_px * 914400))
+EMU_PER_PX = 9525  # PowerPoint
 
-def parse_color(s):
-    """rgb(255, 0, 0) → RGBColor(0xff, 0x00, 0x00)"""
-    m = re.match(r'rgba?\((\d+),\s*(\d+),\s*(\d+)', s)
-    if m: return RGBColor(int(m[1]), int(m[2]), int(m[3]))
-    return RGBColor(0, 0, 0)
+def px(v): return Emu(int(round(v * EMU_PER_PX)))
 
-def build(slides_data, out):
+def hex_to_rgb(s):
+    s = s.lstrip('#')
+    return RGBColor(int(s[0:2],16), int(s[2:4],16), int(s[4:6],16))
+
+def fetch_image(src, tmp):
+    if src.startswith('data:'):
+        import base64
+        head, b64 = src.split(',', 1)
+        ext = 'png' if 'png' in head else 'jpg'
+        path = os.path.join(tmp, f"img_{abs(hash(src))}.{ext}")
+        with open(path, 'wb') as f: f.write(base64.b64decode(b64))
+        return path
+    elif src.startswith('http'):
+        path = os.path.join(tmp, f"img_{abs(hash(src))}")
+        urllib.request.urlretrieve(src, path)
+        return path
+    elif src.startswith('file://'):
+        return src.replace('file://','')
+    else:
+        return src  # относительный путь
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: build_pptx.py slides.json [out.pptx]"); sys.exit(1)
+
+    data = json.load(open(sys.argv[1]))
+    out = sys.argv[2] if len(sys.argv) > 2 else sys.argv[1].replace('.json', '.pptx')
+    W, H = data['width'], data['height']
+
     prs = Presentation()
-    prs.slide_width = Emu(int(13.333 * 914400))
-    prs.slide_height = Emu(int(7.5 * 914400))
+    prs.slide_width  = px(W)
+    prs.slide_height = px(H)
     blank = prs.slide_layouts[6]
 
-    for s in slides_data:
+    tmp = tempfile.mkdtemp()
+
+    for s in data['slides']:
         slide = prs.slides.add_slide(blank)
+        # Фон
+        if s.get('bg'):
+            try:
+                slide.background.fill.solid()
+                slide.background.fill.fore_color.rgb = hex_to_rgb(s['bg'])
+            except Exception: pass
 
-        # Изображения сначала (под текстом)
-        for img in s['images']:
-            slide.shapes.add_picture(
-                img['src'],
-                left=px_to_emu(img['x']), top=px_to_emu(img['y']),
-                width=px_to_emu(img['w']), height=px_to_emu(img['h']),
-            )
+        for item in s['items']:
+            x,y,w,h = px(item['x']), px(item['y']), px(item['w']), px(item['h'])
 
-        # Текст
-        for t in s['texts']:
-            tb = slide.shapes.add_textbox(
-                left=px_to_emu(t['x']), top=px_to_emu(t['y']),
-                width=px_to_emu(t['w'] + 20),  # +20px запас на text-flow
-                height=px_to_emu(t['h']),
-            )
-            tf = tb.text_frame
-            tf.word_wrap = True
-            tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = 0
-            p = tf.paragraphs[0]
-            run = p.add_run()
-            run.text = t['text']
-            run.font.name = t['font']
-            run.font.size = Pt(t['size'] * 0.75)  # CSS px → PT
-            run.font.bold = int(t['weight']) >= 600
-            run.font.color.rgb = parse_color(t['color'])
+            if item['kind'] == 'rect':
+                shp = slide.shapes.add_shape(1, x, y, w, h)  # MSO_SHAPE.RECTANGLE
+                shp.fill.solid()
+                if item.get('fill'): shp.fill.fore_color.rgb = hex_to_rgb(item['fill'])
+                shp.line.fill.background()
+
+            elif item['kind'] == 'text':
+                tb = slide.shapes.add_textbox(x, y, w, h)
+                tf = tb.text_frame
+                tf.word_wrap = True
+                tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = 0
+                p = tf.paragraphs[0]
+                p.text = item['text']
+                run = p.runs[0]
+                run.font.name = item.get('fontFamily') or 'Helvetica'
+                run.font.size = Pt(item.get('fontSize', 16) * 0.75)  # px → pt approx
+                if item.get('color'): run.font.color.rgb = hex_to_rgb(item['color'])
+                fw = str(item.get('fontWeight','400'))
+                run.font.bold = fw in ('bold','600','700','800','900')
+                run.font.italic = bool(item.get('italic'))
+                a = (item.get('align') or 'left')
+                p.alignment = {'left':PP_ALIGN.LEFT,'center':PP_ALIGN.CENTER,'right':PP_ALIGN.RIGHT,'justify':PP_ALIGN.JUSTIFY}.get(a, PP_ALIGN.LEFT)
+
+            elif item['kind'] == 'image':
+                try:
+                    p = fetch_image(item['src'], tmp)
+                    slide.shapes.add_picture(p, x, y, w, h)
+                except Exception as e:
+                    print("img fail:", item['src'], e)
 
     prs.save(out)
-    print(f"✓ {out} ({len(prs.slides)} slides)")
+    print("✓", out)
 
-if __name__ == '__main__':
-    data = json.load(open(sys.argv[1]))
-    build(data, sys.argv[2] if len(sys.argv) > 2 else 'output.pptx')
+if __name__ == "__main__":
+    main()
 ```
+
+## Использование
 
 ```bash
-python3 scripts/build_pptx.py slides.json output.pptx
+node extract.mjs deck.html --slide-selector "deck-stage > section"
+python build_pptx.py deck.json deck.pptx
 ```
 
-## End-to-end
+## Ограничения
 
-```bash
-# 1. Generate slides.html через slides skill
-# 2. Extract structure
-node scripts/extract.js /abs/slides.html slides.json
-# 3. Build editable PPTX
-python3 scripts/build_pptx.py slides.json output.pptx
-# 4. Open в PowerPoint — текст редактируется, картинки на месте
-```
+- **Шрифты.** PowerPoint использует свои метрики; идентичной верстки не будет. Согласись на 95%.
+- **CSS-эффекты** (тени, фильтры, gradients) — не переносятся в editable. Для пиксель-точности используй `export-pptx` в screenshot-режиме.
+- **Слои с z-index** — алгоритм вытаскивает фоновые прямоугольники, но overlap может быть неидеальным.
+- **SVG-инлайн** — не переносится. Замени на PNG-плейсхолдеры.
 
-## Что **не** перенесётся
+## Когда использовать что
 
-- `backdrop-filter: blur(...)` — Chromium растрирует, в PPTX потеряется
-- CSS gradients — становятся flat color (PowerPoint поддерживает gradients нативно, но extraction сложен)
-- SVG inline — становятся текст или вообще пропадают
-- box-shadow — частично (PowerPoint имеет shadows, mapping ручной)
-- Анимации / переходы — нет вообще
-- Custom fonts — если шрифт не установлен на машине открывающего, fallback
+| Задача | Скилл |
+|---|---|
+| Презентация будет редактироваться в PowerPoint | `pptx-editable-extractor` |
+| Нужна пиксель-идентичность с HTML | `export-pptx` (screenshots) |
+| Нужно и то, и другое | оба, два разных файла |
 
-## Решения для шрифтов
+## Legacy reference
 
-**Embed fonts** в PPTX:
-```python
-# python-pptx не поддерживает font-embedding напрямую,
-# нужно через manipulating XML внутри .pptx (zip)
-import zipfile
-with zipfile.ZipFile(out, 'a') as z:
-    z.write('fonts/InterTight-Bold.ttf', 'ppt/fonts/InterTight-Bold.ttf')
-# + добавить reference в presentation.xml
-```
-
-Или просто **используй системные шрифты в slides.html** (Helvetica / Arial / Times New Roman), которые есть везде.
-
-## Антипаттерны
-
-- Использовать pptx-editable-extractor на сложном HTML с position: absolute everywhere → координаты будут off
-- Пропустить шрифт-fallback → у юзера PPTX выглядит криво
-- Включать background-color body как «слой» → дублируется на каждый slide
-- Не fix'ить overflow text → text frame обрезает на edit'е
-- Использовать non-pixel units (em, rem, %) → extraction врут координаты, всё съезжает
-- Не testить открыв реальный PPTX в PowerPoint → могут быть rendering quirks
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-pptx-editable-extractor.md`. Секции там: Зависимости, Принцип, Extraction script (Node), Сборка PPTX (Python), End-to-end, Что **не** перенесётся, Решения для шрифтов, Антипаттерны.

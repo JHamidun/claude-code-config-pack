@@ -1,5 +1,10 @@
 {
   "cleanupPeriodDays": 90,
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "MCP_TIMEOUT": "120000",
+    "MCP_TOOL_TIMEOUT": "180000"
+  },
   "permissions": {
     "allow": [
       "Bash(npm run *)",
@@ -37,81 +42,95 @@
       "Bash(rm -rf C:/)",
       "Bash(rm -rf C:/Users)",
       "Bash(rm -rf C:/Windows)",
-      "Bash(rm -rf .*)",
-      "Bash(rm -fr *)",
-      "Bash(rm -r -f *)",
-      "Bash(rm --recursive --force *)",
-      "Bash(:(){ :|:& };:)",
       "Bash(*DROP DATABASE*)",
       "Bash(*DROP TABLE*)",
       "Bash(*DROP SCHEMA*)",
       "Bash(*TRUNCATE TABLE*)",
-      "Bash(python -c *rmtree*)",
-      "Bash(python3 -c *rmtree*)",
-      "Bash(*node -e *rmSync*)",
-      "Bash(*node -e *unlinkSync*)",
       "Bash(git push --force origin main*)",
       "Bash(git push --force origin master*)",
       "Bash(git push -f origin main*)",
       "Bash(git push -f origin master*)",
-      "Bash(git push --force*)",
-      "Bash(git push -f *)",
-      "Bash(git push -f*)",
-      "Bash(git push * --force*)",
-      "Bash(git push origin +*)",
-      "Bash(git push * +*:*)",
       "Bash(git reset --hard HEAD~*)",
-      "Bash(git clean -f*)",
       "Bash(*shutdown*)",
       "Bash(*format C:*)",
       "Bash(dd if=*of=/dev/sd*)",
       "PowerShell(*Remove-Item -Recurse -Force C:\\*)",
       "PowerShell(*Format-Volume*)",
       "PowerShell(*Stop-Computer*)",
-      "PowerShell(*Restart-Computer*)",
-      "Bash(curl * | sh)",
-      "Bash(curl * | sh *)",
-      "Bash(curl *|sh*)",
-      "Bash(curl * | bash)",
-      "Bash(curl * | bash *)",
-      "Bash(wget * | sh)",
-      "Bash(wget * | sh *)",
-      "Bash(wget * | bash)",
-      "Bash(* | sh -s*)",
-      "Bash(* | sudo sh)",
-      "Bash(* | sudo bash)",
-      "Bash(del /s*)",
-      "Bash(del /q*)",
-      "Bash(* del /s*)",
-      "Bash(rmdir /s*)",
-      "Bash(* rmdir /s*)",
-      "Bash(mkfs*)",
-      "Bash(*> /dev/sd*)",
-      "PowerShell(*del /s*)",
-      "PowerShell(*rmdir /s*)",
-      "PowerShell(*Invoke-Expression*)",
-      "PowerShell(*| iex*)",
-      "PowerShell(*Clear-Disk*)",
-      "PowerShell(*diskpart*)",
-      "PowerShell(*cipher /w*)"
+      "PowerShell(*Restart-Computer*)"
     ],
     "ask": [],
-    "defaultMode": "acceptEdits",
+    "defaultMode": "default",
     "additionalDirectories": [
       "${HOME}\\.claude",
-      "${HOME}\\.claude.json"
+      "${WORKSPACE}",
+      "${HOME}\\.claude\\projects\\C--Users-youruser",
+      "${HOME}\\.claude\\skills\\kp-deck-factory\\references",
+      "${HOME}\\.claude\\projects\\C--Users-youruser\\5ef9c08f-f49a-4b03-a8ea-6cf4a20a3d04\\tool-results",
+      "${HOME}\\.claude\\skills\\heygen",
+      "${HOME}\\.claude\\skills\\video-generation\\luts",
+      "${HOME}\\.claude\\skills\\higgsfield\\references",
+      "${HOME}\\.claude\\skills\\higgsfield\\references\\registries",
+      "${HOME}\\.claude\\skills\\higgsfield-local",
+      "${HOME}\\.claude\\scratchpad",
+      "${HOME}\\.claude\\skills\\higgsfield",
+      "${HOME}\\.claude\\scratchpad\\higgsfield-merge",
+      "${HOME}\\.claude\\skills\\lead-enrichment\\scripts\\__pycache__",
+      "${HOME}\\.claude\\skills\\lead-enrichment\\scripts",
+      "${WORKSPACE}\\phoenix-attention-os\\agents\\hermes\\.git",
+      "${HOME}\\.claude\\skills\\headhunter\\candidate",
+      "${HOME}\\.claude\\projects\\C--Users-youruser\\88ec1200-407d-469b-9c50-82e364bff5b2\\tool-results",
+      "${HOME}\\.claude\\skills\\your-product-admin",
+      "${HOME}\\.claude\\projects\\C--Users-youruser\\memory",
+      "${HOME}\\.claude\\skills\\prospect-list-enrichment",
+      "${HOME}\\.claude\\skills\\leak-scan",
+      "${HOME}\\.claude\\skills\\google-ads-pro-ru",
+      "${HOME}\\.claude\\skills\\geo-aeo-ru\\references",
+      "${HOME}\\.claude\\skills\\ai-marketing-stack-ru",
+      "${HOME}\\.claude\\skills\\full-funnel-analytics-ru",
+      "${HOME}\\.claude\\skills\\ajtbd-instructor-ru",
+      "${HOME}\\.claude\\skills\\ai-creative-factory-ru",
+      "${HOME}\\.claude\\skills\\b2b-marketing-ru",
+      "${HOME}\\.claude\\skills\\sales-team-ru",
+      "${HOME}\\.claude\\skills\\tg-channel-buyout-ru",
+      "${HOME}\\.claude\\skills\\manychat-funnel-ru",
+      "${HOME}\\.claude\\skills\\media-planning-ru",
+      "${HOME}\\.claude\\skills\\ninja-marketing-orchestrator",
+      "${HOME}\\.claude\\skills\\user-research-synthesis",
+      "${HOME}\\.claude\\skills\\launch-strategy-ru\\references",
+      "${HOME}\\.claude\\skills\\campaign-planning",
+      "${HOME}\\.claude\\skills\\product-analytics",
+      "${HOME}\\.claude\\projects\\C--Users-youruser\\443495a2-9f5c-433b-90bb-d8c4b4cd1481\\tool-results",
+      "${HOME}\\.claude\\projects\\C--Users-youruser\\2d94bb67-3ae2-4544-a65c-2d5842ffee79\\tool-results",
+      "${HOME}\\.claude\\skills\\ai-news-bot\\scripts\\orchestrator",
+      "${HOME}\\.claude\\workflows-progress\\news-w6",
+      "${HOME}\\.claude\\workflows-progress\\news-review",
+      "${WORKSPACE}\\vibecoding-course\\.claude\\skills",
+      "${HOME}\\.claude\\workflows-progress",
+      "${HOME}\\.claude\\workflows-progress\\news-w7",
+      "${HOME}\\.claude\\scripts",
+      "${HOME}\\.claude\\skills",
+      "${HOME}\\.claude\\scratchpad\\academy-panel",
+      "${HOME}\\.claude\\scratchpad\\academy-funnel",
+      "${HOME}\\.claude\\scratchpad\\config-audit-2026-07-17",
+      "${HOME}\\.claude\\scratchpad\\config-audit-2026-07-17\\_tmp5",
+      "${HOME}\\.claude\\scratchpad\\nomad-research",
+      "${HOME}\\.claude\\skills\\geo-aeo-ru"
     ]
   },
+  "fallbackModel": [
+    "claude-opus-4-8"
+  ],
   "enableAllProjectMcpServers": false,
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash(git commit)",
+        "matcher": "Bash|PowerShell",
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -c \"Write-Output 'COMMIT_FORMAT: Use Conventional Commits (feat/fix/chore/docs/refactor/test/ci). Example: feat(auth): add OAuth2 login'\"",
-            "timeout": 3
+            "command": "node \"${HOME}/.claude/hooks/bash-guard.js\"",
+            "timeout": 5
           }
         ]
       },
@@ -121,6 +140,16 @@
           {
             "type": "command",
             "command": "node \"${HOME}/.claude/hooks/security-guard.js\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
             "timeout": 5
           }
         ]
@@ -134,6 +163,16 @@
             "command": "node \"${HOME}/.claude/hooks/gsd-check-update.js\""
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "Stop": [
@@ -142,8 +181,174 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -c \"[console]::beep(800,200); [console]::beep(1000,200)\"",
+            "command": "powershell -c \"if (-not (Test-Path '/tmp/claude-no-beep')) { [console]::beep(800,200); [console]::beep(1000,200) }\"",
             "timeout": 3
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
+            "timeout": 120
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "CwdChanged": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "FileChanged": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:VSCODE_PORT/hook",
+            "timeout": 5
           }
         ]
       }
@@ -154,7 +359,7 @@
     "command": "node \"${HOME}/.claude/hooks/gsd-statusline.js\""
   },
   "enabledPlugins": {
-    "adspirer-ads-agent@claude-plugins-official": true,
+    "adspirer-ads-agent@claude-plugins-official": false,
     "agent-sdk-dev@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
@@ -163,16 +368,16 @@
     "coderabbit@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "dev-browser@dev-browser-marketplace": false,
+    "dev-browser@dev-browser-marketplace": true,
     "feature-dev@claude-plugins-official": true,
     "figma@claude-plugins-official": true,
     "firecrawl@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "github@claude-plugins-official": true,
     "greptile@claude-plugins-official": true,
-    "huggingface-skills@claude-plugins-official": true,
+    "huggingface-skills@claude-plugins-official": false,
     "laravel-boost@claude-plugins-official": false,
-    "legalzoom@claude-plugins-official": true,
+    "legalzoom@claude-plugins-official": false,
     "linear@claude-plugins-official": true,
     "mintlify@claude-plugins-official": false,
     "notion@claude-plugins-official": true,
@@ -183,19 +388,43 @@
     "pyright-lsp@claude-plugins-official": true,
     "ralph-loop@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": false,
-    "semgrep@claude-plugins-official": true,
+    "semgrep@claude-plugins-official": false,
     "sentry@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
-    "slack@claude-plugins-official": true,
+    "slack@claude-plugins-official": false,
     "sourcegraph@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
     "telegram@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
-    "zapier@claude-plugins-official": false
+    "zapier@claude-plugins-official": false,
+    "commercial-legal@claude-for-legal": false,
+    "ip-legal@claude-for-legal": false,
+    "privacy-legal@claude-for-legal": false
   },
+  "extraKnownMarketplaces": {
+    "claude-for-legal": {
+      "source": {
+        "source": "directory",
+        "path": "${WORKSPACE}\\temp-clones\\claude-for-legal"
+      }
+    }
+  },
+  "outputStyle": "Proactive",
+  "language": "ru",
+  "effortLevel": "xhigh",
+  "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": false,
   "preferredNotifChannel": "terminal_bell",
   "mcpServers": {
+    "second-brain": {
+      "command": "python",
+      "args": [
+        "${HOME}\\.brain\\brain_mcp.py"
+      ],
+      "env": {
+        "PYTHONIOENCODING": "utf-8"
+      }
+    },
     "graph-memory": {
       "command": "python",
       "args": [
@@ -220,6 +449,16 @@
       "command": "python",
       "args": [
         "${HOME}\\.claude\\mcps\\google-studio-mcp\\src\\server.py"
+      ],
+      "env": {
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "disabled": true
+    },
+    "plaud": {
+      "command": "python",
+      "args": [
+        "${HOME}\\.claude\\skills\\plaud\\scripts\\plaud_mcp.py"
       ],
       "env": {
         "PYTHONIOENCODING": "utf-8"
@@ -251,7 +490,103 @@
       "command": "python",
       "args": [
         "-u",
-        "${HOME}/.claude/skills/runway-api/scripts/runway_mcp.py"
+        "${HOME}/.claude/skills/video-generation/scripts/runway_mcp.py"
+      ],
+      "disabled": true
+    },
+    "playwright-live1": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--user-data-dir",
+        "${HOME}/.claude/pw-profiles/live1"
+      ]
+    },
+    "playwright-live2": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--user-data-dir",
+        "${HOME}/.claude/pw-profiles/live2"
+      ]
+    },
+    "playwright-live3": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--user-data-dir",
+        "${HOME}/.claude/pw-profiles/live3"
+      ]
+    },
+    "playwright-live4": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--user-data-dir",
+        "${HOME}/.claude/pw-profiles/live4"
+      ]
+    },
+    "playwright-live5": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--user-data-dir",
+        "${HOME}/.claude/pw-profiles/live5"
+      ]
+    },
+    "playwright-live6": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--user-data-dir",
+        "${HOME}/.claude/pw-profiles/live6"
+      ]
+    },
+    "playwright-live7": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--user-data-dir",
+        "${HOME}/.claude/pw-profiles/live7"
+      ]
+    },
+    "playwright-live8": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--user-data-dir",
+        "${HOME}/.claude/pw-profiles/live8"
+      ]
+    },
+    "playwright-live9": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--user-data-dir",
+        "${HOME}/.claude/pw-profiles/live9"
+      ]
+    },
+    "playwright-live10": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--user-data-dir",
+        "${HOME}/.claude/pw-profiles/live10"
+      ]
+    },
+    "fns-check": {
+      "command": "${HOME}\\.claude\\mcps\\mcp-fns-check\\.venv\\Scripts\\atomno-mcp-fns-check.exe",
+      "env": {
+        "PYTHONIOENCODING": "utf-8",
+        "MCP_FNS_CACHE_DB": "${HOME}\\.claude\\mcps\\mcp-fns-check\\cache.sqlite"
+      },
+      "disabled": true
+    },
+    "pageindex": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@pageindex/mcp"
       ],
       "disabled": true
     }

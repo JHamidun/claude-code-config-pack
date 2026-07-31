@@ -1,3 +1,8 @@
+---
+description: "Профессиональный перевод через DeepL Pro: текст (авто-определение → RU по умолчанию), formality, документы docx/pptx/pdf/xlsx, лимиты API. Триггеры: «переведи», «translate», «перевод документа». Полный референс → skill deepl-pro; массовый Google-перевод → /gtranslate."
+argument-hint: "<text> [target_lang] [formal] | file <path> <lang> | usage"
+---
+
 # Translate
 
 /translate - Professional translation via DeepL Pro API
@@ -13,7 +18,7 @@
 
 ## Instructions for Claude
 
-Uses DeepL Pro API. Full reference: `~/.claude/skills/deepl-pro.md`
+Uses DeepL Pro API. Full reference: `~/.claude/skills/deepl-pro/SKILL.md`
 
 ### Quick translate
 

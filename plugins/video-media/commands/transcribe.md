@@ -1,3 +1,8 @@
+---
+description: "Транскрибация аудио/видео через Deepgram (nova-2): файл или URL, SRT-субтитры, диаризация спикеров, выбор языка. Триггеры: «транскрибируй», «расшифруй запись», «распознай речь», «субтитры из аудио». Полный референс → skill deepgram."
+argument-hint: "<file_path|url> [--srt] [--speakers] [--lang ru]"
+---
+
 # Transcribe
 
 /transcribe - Audio/video transcription via Deepgram
@@ -13,7 +18,7 @@
 
 ## Instructions for Claude
 
-Uses Deepgram API (nova-2 model). Full reference: `~/.claude/skills/deepgram.md`
+Uses Deepgram API (nova-2 model). Full reference: `~/.claude/skills/deepgram/SKILL.md`
 
 ### Quick transcribe
 

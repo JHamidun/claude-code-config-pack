@@ -1,11 +1,24 @@
 ---
 name: meta-ads-analyzer
-description: "Expert-level analysis and diagnosis for Meta Ads (Facebook/Instagram) campaigns. Interpret performance data, identify root causes of issues via Breakdown Effect analysis, and generate actionable recommendations. Use when analyzing Meta Ads, Facebook Ads, or Instagram advertising data."
+description: "Analysis and DIAGNOSIS of existing Meta Ads (Facebook/Instagram) campaigns — what broke, why it's expensive: Breakdown Effect (Marginal vs Average CPA), Learning Phase. Triggers: «диагностика Meta кампании», «почему дорого в Meta», «не выходит из обучения», analyzing Meta/FB/IG ad data. NOT for launching/scaling campaigns (meta-ads-launch-ru) or competitor creatives (ad-spy)."
 ---
 
 # Meta Ads Analysis & Diagnosis
 
 Expert framework for Meta Ads campaign analysis with focus on the Breakdown Effect.
+
+## Scope & Boundary
+
+**Этот скилл — ДИАГНОСТИКА существующих Meta-кампаний:** что сломалось, почему стало дорого, выходит ли кампания из обучения, не паузить ли сегмент по высокому avg CPA. Работаешь с метриками уже запущенной рекламы.
+
+| Задача | Куда идти |
+|:---|:---|
+| Анализ метрик, что сломалось, почему дорого, Breakdown Effect, Learning Phase, Ad Relevance | **этот скилл** |
+| ЗАПУСК / настройка пикселя+CAPI / выбор события / стратегии ставок / lookalike / масштабирование | **`meta-ads-launch-ru`** |
+| Анализ КОНКУРЕНТОВ, шпионаж за креативами, Meta Ad Library, longest-running ads | **`ad-spy`** |
+| Нормы CPM/CPL/CPA/ROAS по каналам и нишам | **`ad-benchmarks-ru`** |
+
+> Граница: `meta-ads-launch-ru` **запускает и ведёт** кампанию (setup → launch → scale). Этот скилл **диагностирует** уже работающую. Если по ходу диагностики выясняется, что причина — в неправильной настройке (событие, аудитория, lookalike), передавай в `meta-ads-launch-ru`.
 
 ## Core Principle
 
@@ -94,7 +107,9 @@ df = pd.read_csv("meta_ads_export.csv")
 
 ## When to Use
 
-**Trigger words:** "meta ads", "facebook ads", "instagram ads", "рекламный кабинет", "CPA analysis", "breakdown effect", "ad performance", "campaign optimization", "ROAS", "cost per result"
+**Trigger words:** "meta ads", "facebook ads", "instagram ads", "рекламный кабинет", "CPA analysis", "breakdown effect", "ad performance", "campaign optimization", "ROAS", "cost per result", "диагностика Meta кампании", "почему дорого в Meta", "воронка обучения Meta", "не выходит из обучения", "Meta vs Google различие", "когда не Meta", "проблема не Meta-специфична"
+
+**НЕ для:** запуска/настройки/масштабирования (→ `meta-ads-launch-ru`), анализа конкурентов (→ `ad-spy`), норм по каналам (→ `ad-benchmarks-ru`).
 
 ## Reference Documents
 
@@ -102,3 +117,11 @@ For deep analysis, read these bundled references:
 - `references/breakdown_effect.md` — The Breakdown Effect with examples
 - `references/core_concepts.md` — Ad Auction, Pacing, Learning Phase
 - `references/analysis_checklist.md` — Step-by-step analysis template
+- `references/meta-vs-google-diagnostic.md` — Meta vs Google различие при диагностике: разная длительность Learning Phase (Google 5-7 дней vs Meta <24ч), привязка событий, как отличить Meta-специфику от универсальной проблемы аукциона
+- `references/learning-funnel-diagnostic.md` — воронка обучения Meta (общая → CPC-кластер → ядро) + 7 факторов сброса + 4 безопасных действия как диагностический чеклист «почему не выходит из обучения»
+
+## Related Skills
+
+- **`meta-ads-launch-ru`** — ЗАПУСК/настройка/масштабирование Meta (пиксель+CAPI, выбор события, стратегии ставок, lookalike-лестница, scaling rules). Куда передавать, если диагноз — «неправильно настроено».
+- **`ad-spy`** — анализ креативов КОНКУРЕНТОВ (Meta Ad Library, longest-running ads, Atria).
+- **`ad-benchmarks-ru`** — нормы CPM/CPL/CPA/ROAS по каналам и нишам для сверки.

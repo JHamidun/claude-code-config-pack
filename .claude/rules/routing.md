@@ -1,349 +1,81 @@
 # Auto-Routing: Задача → Инструмент
 
-> Авто-загружается при каждой сессии. Маршрутная карта.
+> Авто-загружается при каждой сессии. Короткий рабочий роутер.
+> **Полная карта ВСЕХ триггеров → `config/routing-ext.md`** (Read по требованию). Здесь — ходовые триггеры + указатели на свёрнутые семьи; «⤷ routing-ext» = полный список строк там.
 
 | Категория | Триггеры | Инструмент |
 |-----------|----------|------------|
-| Open Design | "open design", "open-design", "открой дизайн тул", "nexu-io", "72 дизайн-системы", "дизайн системой Stripe/Linear/Vercel", "local design tool", "guizang-ppt", "запусти дизайн приложение" | Skill `open-design`, CLI: `cd ${WORKSPACE}/tools/open-design && pnpm tools-dev run web` |
+| Сохранить в память (база знаний) | "запомни эту инструкцию", "сохрани в память", "чтобы не забыл", "добавь в постоянную память", "запомни мои X", "сохрани знание о", "save knowledge base", "сделай чтобы при запросе X выдавал" | Skill `save-knowledge-base` — 4 уровня (memory topic + MEMORY.md + routing.md + vector_memory) |
+| Dream (память) | "dream", "консолидируй память", "почисти память" | Skill `dream` |
+| your accounting service (бухгалтерия вашего региона) | "контабилизей", "your-accounting-service", "налоги бразильской компании", "DAS", "DARF", "MAED", "guia", "impostos a pagar", "перевыпусти guia", "какие налоги висят", "штраф PGDAS-D", "TFE/TLF Miami", "NOMAD NET налоги" | `python ${WORKSPACE}/tools/your-accounting-service_client.py {impostos\|guia <id>\|pix <pdf>\|recalcular\|empresa\|api}` — cookie-сессия + авто-2FA из Gmail; API-реверс → `${WORKSPACE}/tools/your-accounting-service-re/API.md`. ГРАБЛИ: headless режется бот-защитой; guia отдаётся подписанной GCS-ссылкой (v3); recalcular платный (~R$15,90) |
+| Тендеры/закупки | "тендеры", "госзакупки", "закупки", "найди контракты", "подходящие контракты", "zakupki", "rostender", "тендерные закупки", "ОКПД2" | Skill `tender-search-ru` (Playwright + rostender; обход гео-блока zakupki) |
+| Де-аифай | "убери ИИ стиль", "де-аифай", "humanize" | Skill `de-ai-ify` |
+| LinkedIn-инструменты (3 канона + 2) | "viral hook", "humanize linkedin", "audit my linkedin draft", "эмодзи детектор", "коммент на linkedin", "ответ на коммент", "thread engagement", "linkedin content plan", "разбери viral пост" | Skills `linkedin-humanizer` (анти-AI-tells: скраб/правила/эмодзи/детекторы/аудит), `linkedin-post-writer` (+hooks/план), `linkedin-comment-drafter` (+reply/threads), `linkedin-profile-optimizer`, `linkedin-employee-advocacy` — ⤷ routing-ext |
+| LinkedIn | "linkedin", "outreach", "контакты" | Skill `linkedin` |
 | Музыка/аудио | "сгенерируй музыку", "сделай трек", "music generation", "ace-step", "напиши песню", "soundtrack", "jingle", "background music", "сгенерируй аудио" | Skill `ace-step`, CLI: `cd ~/your-ace-step && uv run python ~/.claude/skills/ace-step/scripts/generate.py` |
-| Реставрация фото | "реставрируй фото", "улучши старую фотку", "восстанови фото", "photo restoration", "шакальная фотка", "улучши качество фото" | Skill `nano-banana-pro` (раздел Photo Restoration) |
-| Видео аватар | "видео с аватаром", "аватар" | Skill `heygen` |
 | Видеомонтаж | "склей видео", "монтаж", "concat videos", "склейка", "видеоредактор", "наложи музыку на видео" | Skill `video-editor`, CLI: `python ~/.claude/skills/video-editor/video_editor.py` |
-| VOID (удаление объектов) | "удали объект из видео", "remove object from video", "VOID", "video inpainting", "убери из видео", "video object removal" | Skill `void-video`, CLI: `python ~/.claude/skills/void-video/void_remove.py` |
-| Видео фабрика | "полный ролик", "video factory", "ролик под ключ", "сделай видео и выложи", "запиши и выложи" | Agent `video-factory` |
+| Reels-продакшн с нуля | "собери рилс", "рилс с нуля", "вертикалка с озвучкой", "текст-рилс", "словарные карточки", "lip sync клип", "уникализируй видео", "анти-фингерпринт", "залей репост" | Skill `video-montage` (9:16 полный цикл: Whisper-субтитры, TTS-сегменты, word-sync DTW, pop-up карточки, safe zones, анти-fingerprint) — НЕ video-editor (готовый футаж) |
+| Монтаж-подкоманды | "вырежи паузы", "под биты", "виральные субтитры", "цветокор", "LUT", "сделай вертикалку", "слоумо", "переходы", "sfx", "профессиональный монтаж" | `video-editor/scripts/*` (silence_cut, beat_sync_edit, karaoke_captions, transitions, color_grade, reframe_9x16, speed_ramp, sfx) + `references/montage-toolkit.md` — полные CLI ⤷ routing-ext |
 | Озвучка | "озвучь", "голос", "TTS" | Skill `elevenlabs` |
 | Субтитры | "субтитры" | Skill `submagic` |
 | Транскрипция | "транскрибируй", "распознай речь" | Command `transcribe` (обёртка), Skill `deepgram` (reference) |
-| База знаний | "найди в встречах", "kb", "knowledge base", "в истории" | Command `kb` |
-| Перевод | "переведи", "translate" | Command `translate` (обёртка), Skill `deepl-pro` (reference) |
-| Figma design | "сверстай из фигмы", "implement design" | Plugin `figma:implement-design` |
-| Figma connect | "code connect", "компоненты фигмы" | Plugin `figma:code-connect-components` |
-| Баги | "найди баги", "ошибки" | Agent `bug-hunter` → `bug-fixer` |
-| Безопасность | "security", "уязвимости" | Agent `security-scanner` |
-| Тесты | "напиши тесты" | Agent `test-writer` |
-| Деплой | "задеплой", "deploy" | Command `deploy` |
-| Last 30 Days | "last30", "за последние 30 дней", "что обсуждают", "тренды соцсетей", "social media research", "what's trending" | Skill `last30days` |
-| Social Intel | "досье на", "найди соцсети", "обогати контакт", "due diligence", "KYC check", "кто этот человек", "social profile" | Skill `social-intel` |
-| Ad Spy | "реклама конкурентов", "ad spy", "ad library", "что рекламируют", "креативы конкурентов", "мониторинг рекламы" | Skill `ad-spy` |
-| TikTok Intel | "тикток тренды", "инфлюенсеры", "TikTok Shop", "популярные рилсы", "тикток аналитика", "trending TikTok" | Skill `tiktok-intel` |
-| Obsidian | "obsidian", "vault", "заметки obsidian" | Obsidian MCP (WebSocket :OBSIDIAN_PORT, NOT CONFIGURED — порт не активен) |
-| GSD | "gsd", "get shit done", "новый проект GSD", "фазы разработки" | `/gsd:new-project`, `/gsd:next`, `/gsd:autonomous` |
 | Исследование | "research", "найди информацию" | Command `deep-research` |
 | Research Docs | "research docs", "Q&A по документам", "отчёт по PDF с цитатами", "проанализируй папку документов", "answer from documents", "visual citations", "deep research folder", "liteparse" | Skill `research-docs` (`/research-docs ./folder Question`) |
-| Google Docs | "документ", "gdoc" | Command `gdocs` |
-| Google Sheets | "таблица", "gsheet" | Command `gsheets` |
-| Gmail | "письмо", "email" | Command `gmail` |
-| Google Contacts | "контакты google", "gcontacts" | Command `gcontacts` |
-| Google Tasks | "задачи google", "gtasks" | Command `gtasks` |
-| Google Meet | "meet", "видеозвонок google" | Command `gmeet` |
-| Zoom | "zoom", "зум", "zoom meeting", "создай встречу zoom", "запланируй зум", "zoom recording", "записи зум" | Skill `zoom` |
-| Google Chat | "google chat", "gchat" | Command `gchat` |
-| Google Analytics | "GA4", "google analytics", "ganalytics" | Command `ganalytics` |
-| Google Ads | "google ads", "реклама google", "gads" | Command `gads` |
-| Search Console | "search console", "GSC", "gsearch" | Command `gsearch-console` |
-| Cloud Translation | "переведи через google", "gtranslate" | Command `gtranslate` |
-| Cloud Storage | "GCS", "бакеты", "gcloud storage" | Command `gcloud-storage` |
-| Telegram бот | "бот", "telegram бот" | Skill `telegram-bot-toolkit` |
-| MAX переписка | "чат в максе", "max chat", "прочитай макс" | `python ${WORKSPACE}/tools/max_client.py read-chat <target>` |
-| MAX каналы | "канал в максе", "max channel", "посты макс" | `python ${WORKSPACE}/tools/max_client.py parse-channel <@username>` |
-| MAX поиск каналов | "найди канал макс", "public search max" | `python ${WORKSPACE}/tools/max_client.py public-search <query>` |
-| MAX глобальный поиск | "поиск в максе", "max search" | `python ${WORKSPACE}/tools/max_client.py global-search <query>` |
-| MAX участники | "участники макс", "members max" | `python ${WORKSPACE}/tools/max_client.py parse-members <@username>` |
-| MAX статистика | "статистика макс канала" | `python ${WORKSPACE}/tools/max_client.py channel-stats <@username>` |
-| MAX отправить | "напиши в макс", "отправь в max" | `python ${WORKSPACE}/tools/max_client.py send <chat_id> "text"` |
-| MAX файл | "отправь файл в макс" | `python ${WORKSPACE}/tools/max_client.py send-file <chat_id> <file>` |
-| MAX юзер инфо | "кто это в максе", "max user info" | `python ${WORKSPACE}/tools/max_client.py user-info <user_id>` |
-| MAX онлайн | "онлайн ли в максе", "max online" | `python ${WORKSPACE}/tools/max_client.py online-status <user_id>` |
-| MAX поиск телефон | "найди в максе по телефону" | `python ${WORKSPACE}/tools/max_client.py search-phone <phone>` |
-| MAX вступить | "вступи в канал макс" | `python ${WORKSPACE}/tools/max_client.py join <@username>` |
-| MAX экспорт | "экспортируй чат макс" | `python ${WORKSPACE}/tools/max_client.py export-chat <chat_id>` |
-| MAX папки | "папки макс" | `python ${WORKSPACE}/tools/max_client.py folders` |
-| MAX устройства | "устройства макс", "сессии max" | `python ${WORKSPACE}/tools/max_client.py active-sessions` |
-| MAX слушать | "слушай макс", "listen max" | `python ${WORKSPACE}/tools/max_client.py listen [--ai]` |
-| MAX рассылка | "рассылка макс", "broadcast max" | `python ${WORKSPACE}/tools/max_client.py broadcast "text" --targets` |
-| MAX упоминания | "упоминания макс", "mentions max" | `python ${WORKSPACE}/tools/max_client.py mentions` |
-| MAX медиа | "медиа из макс чата", "фото макс" | `python ${WORKSPACE}/tools/max_client.py chat-media <chat_id>` |
-| MAX профиль | "обнови био макс", "max bio" | `python ${WORKSPACE}/tools/max_client.py set-bio/set-name/set-photo` |
-| MAX группа | "создай группу макс" | `python ${WORKSPACE}/tools/max_client.py create-group "name" <user_ids>` |
-| MAX канал создать | "создай канал макс" | `python ${WORKSPACE}/tools/max_client.py create-channel "name"` |
-| MAX архив | "архивируй макс чат" | `python ${WORKSPACE}/tools/max_client.py archive/unarchive <chat_id>` |
-| MAX мьют | "замьють макс" | `python ${WORKSPACE}/tools/max_client.py mute/unmute <chat_id>` |
-| MAX блок | "заблокируй в максе" | `python ${WORKSPACE}/tools/max_client.py block/unblock <user_id>` |
-| N8N | "автоматизация", "workflow" | Skill `n8n` |
-| CEO Council | "совет директоров", "ceo council", "стратегическое решение", "параллельные эксперты", "мнения экспертов" | Skill `ceo-council` |
-| Investor Materials | "питч-дек", "investor", "one-pager", "финмодель", "инвестор", "фандрейзинг", "pitch deck" | Skill `investor-materials` |
-| Content Engine | "контент-конвейер", "content engine", "контент для соцсетей", "контент-план" | Skill `content-engine` |
-| Build Fix | "build broken", "ошибки сборки", "fix build", "build-fix", "не собирается" | Skill `build-fix` |
-| Архитектура | "архитектура", "дизайн системы" | Agent `software-architect` |
-| Фронтенд | "React", "UI", "компонент" | Agent `frontend-dev` |
-| Бэкенд | "API", "endpoint" | Agent `backend-dev` |
-| БД | "миграция", "schema", "SQL" | Command `setup-db` |
-| CI/CD | "pipeline", "docker" | Skill `senior-devops` |
-| Презентация | "слайды", "презентация", "pitch deck", "whiteboard", "маркерная доска" | Agent `slide-designer`, Skill `manus-slides`, Command `slides` |
-| Manus Slides | "manus slides", "html slides", "html презентация" | Skill `manus-slides`, Command `slides` |
-| Marp слайды | "marp", "slides from markdown", "слайды из markdown" | Skill `marp-presentations` |
-| Рефакторинг | "рефакторинг", "legacy" | Agent `legacy-modernizer` |
-| Performance | "оптимизируй", "медленно" | Agent `performance-optimizer` |
-| Мёртвый код | "dead code", "unused" | Agent `dead-code-hunter` |
-| Дубли кода | "дублирование" | Agent `reuse-hunter` |
-| Зависимости | "dependencies", "outdated" | Agent `dependency-auditor` → `dependency-updater` |
-| Уязвимости фикс | "исправь уязвимости", "fix vulnerabilities" | Agent `vulnerability-fixer` (после `security-scanner`) |
-| Дубли фикс | "консолидируй дубли", "fix duplicates" | Agent `reuse-fixer` (после `reuse-hunter`) |
-| Мёртвый код фикс | "удали мёртвый код", "remove dead code" | Agent `dead-code-remover` (после `dead-code-hunter`) |
-| Код-ревью | "проверь код", "ревью", "review" | Agent `code-reviewer`, Skill `code-reviewer`, Plugin `pr-review-toolkit` |
-| Ошибки/баги | "ошибка", "error", "stack trace", "не работает" | Agent `error-handler` |
-| Бизнес-анализ | "бизнес-анализ", "market sizing", "ROI", "stakeholder mapping" | Agent `business-analyst` |
-| DevOps | "CI/CD", "docker", "pipeline", "infrastructure" | Agent `devops-engineer`, Skill `senior-devops` |
-| Интеграции | "интеграция", "webhook", "third-party API" | Agent `integration-dev` |
-| Kimi алгоритмы | "алгоритм", "data structure", "computational", "kimi" | Agent `kimi-algorithm-specialist` |
-| Memory agent | "запомни контекст", "memory agent", "long-term memory" | Agent `memory-agent` |
-| ML/AI | "machine learning", "model training", "ML pipeline" | Agent `ml-specialist` |
-| Оркестратор | "orchestrate", "координируй агентов", "multi-agent" | Agent `orchestrator` |
-| Пентест | "pentest", "penetration test", "exploit" | Agent `pentest-engineer` |
-| Презентация мастер | "мастер презентаций", "presentation master", "training program" | Agent `presentation-master` |
-| Product дизайн | "UX", "UI дизайн", "wireframe", "user flow", "accessibility" | Agent `product-designer` |
-| Промпт инженер | "промпт агент", "optimize prompt agent" | Agent `prompt-engineer` |
-| Корректура | "проверь текст", "корректура" | Agent `proofreader-ortho` → `proofreader-punctuation` → `proofreader-typography`, Command `proofread` |
-| QA | "QA", "test strategy", "test automation" | Agent `qa-specialist` |
-| Security инженер | "security engineer", "secure coding", "compliance" | Agent `security-engineer` |
-| Senior dev | "напиши код", "implement feature", "production code" | Agent `senior-developer` |
-| Системный аналитик | "feasibility", "data flow", "migration plan" | Agent `system-analyst` |
-| Tech lead | "tech lead", "architectural decision", "technical debt" | Agent `tech-lead` |
-| GPT agent | "спроси GPT", "ask GPT" | Agent `gpt-agent` |
-| Gemini agent | "спроси Gemini", "ask Gemini" | Agent `gemini-agent` |
-| Meta agent | "создай агента", "generate agent" | Agent `meta-agent-v3` |
-| Accessibility | "accessibility", "WCAG", "screen reader" | Agent `accessibility-tester` |
-| Интеграционные тесты | "integration test", "acceptance test", "e2e test" | Agent `integration-tester` |
-| Мобильная адаптация | "mobile responsiveness", "мобильная версия" | Agent `mobile-responsiveness-tester` → `mobile-fixes-implementer` |
-| Де-аифай | "убери ИИ стиль", "де-аифай", "humanize" | Skill `de-ai-ify` |
-| Фреймворки | "фреймворк", "think deeper", "first principles" | Skill `thinking-frameworks` |
-| Итоги недели | "итоги недели", "weekly synthesis" | Command `weekly-synthesis` |
-| Статистика | "статистика сессий", "prompt log" | Command `prompt-log` |
-| Dream (память) | "dream", "консолидируй память", "почисти память" | Skill `dream` |
-| Away Summary | "где остановился", "что делал", "recap", "while you were away" | Skill `away-summary` |
-| BTW (side question) | "/btw", "кстати", "side question" | Skill `btw` |
-| Year/Month Review | "итоги месяца", "итоги года", "work analytics", "year review" | Skill `year-review` |
-| Саморефлексия | "проанализируй себя", "self-reflect" | Skill `self-reflect` |
-| GitHub доки | "документация репо", "deepwiki" | Skill `deepwiki` |
-| План дня | "спланируй день", "plan my day" | Command `plan-my-day` |
-| Диаграммы | "диаграмма", "flowchart", "excalidraw" | Skill `excalidraw-flowchart` |
+| Перевод | "переведи", "translate" | Command `translate` (обёртка), Skill `deepl-pro` (reference) |
+| Last 30 Days | "last30", "за последние 30 дней", "что обсуждают", "тренды соцсетей", "social media research", "what's trending" | Skill `last30days` |
+| Social Intel | "досье на", "найди соцсети", "обогати контакт", "due diligence", "KYC check", "кто этот человек", "social profile" | Skill `social-intel` |
+| OSINT инфраструктуры (zero-daemon) | "пробей домен", "чей это IP", "найди субдомены", "что торчит наружу", "открытые порты", "security-заголовки", "whois/RDAP", "ASN/BGP", "есть ли CVE", "санкции/OFAC по компании", "recon домена" | Skill `osint-recon` + `python ${WORKSPACE}/tools/osint_client.py <cmd>` (11 команд, публичные API, без демонов). НЕ люди → social-intel; НЕ ЕГРЮЛ → lead-enrichment |
+| Ad Spy | "реклама конкурентов", "ad spy", "ad library", "что рекламируют", "креативы конкурентов", "мониторинг рекламы" | Skill `ad-spy` |
+| TikTok Intel | "тикток тренды", "инфлюенсеры", "TikTok Shop", "популярные рилсы", "тикток аналитика", "trending TikTok" | Skill `tiktok-intel` |
+| Reddit/HN | "reddit", "hacker news", "мнения" | Skill `reddit-hn` |
+| Дообогащение/квалификация лидов | "дообогати базу", "обогати список/лиды/контакты", "квалифицируй контакт", "кто оставил заявку", "пробей по цифровому следу", "checko", "ЕГРЮЛ обогащение", "enrich leads" | Skill `lead-enrichment` (Mode A: цифровой след→досье+вердикт; Mode B: список+Bitrix→multi-sheet Excel; только открытые источники) — полные триггеры ⤷ routing-ext |
+| Маркетинг-петли | "маркетинг-петля", "marketing loop", "растущая петля", "маркетинг на автопилоте", "weekly marketing review", "зациклить маркетинг", "цикл для бота", "loop для Bot-Aа/Bot-B", "churn watch", "flywheel", "маховик" | Skill `marketing-loops-ru` (петли для офиса ботов; из coreyhaines, RU-адаптация 2026-07-18) |
+| Оффер-конструктор | "оффер", "собери оффер", "grand slam offer", "Хормози", "value stack", "бонус-стек", "гарантия", "риск-реверсал", "почему оффер не конвертит", "high-ticket", "продуктизировать услугу" | Skill `offers-ru` (НЕ pricing-strategy-ru — тот про уровень цен) |
+| Рефералка/партнёрка | "рефералка", "реферальная программа", "приведи друга", "партнёрка", "affiliate", "амбассадоры", "сарафанное радио", "промокод другу", "комиссия партнёру" | Skill `referrals-ru` (ЮKassa промокоды, t.me deep-links, партнёрка ТГ-каналов) |
+| Лид-магниты/free tools | "лид-магнит", "lead magnet", "бесплатный инструмент", "engineering as marketing", "ROI-калькулятор", "грейдер", "квиз", "чек-лист для скачивания", "gated content", "что отдать за email" | Skill `free-tools-lead-magnets-ru` (виджет-конструкция → interactive-prototype) |
+| PM (knowledge-work) | "PRD", "спецификация", "роадмап", "OKR", "продуктовые метрики", "стейкхолдер", "user research" | Skills `feature-spec`/`roadmap-management`/`metrics-tracking`/`stakeholder-comms`/`user-research-synthesis` + Commands `write-spec`/`roadmap-update`/`roadmap`/`metrics-review`/`stakeholder-update`/`synthesize-research`/`competitive-brief`/`sprint-planning-pm` — ⤷ routing-ext |
+| Sales (knowledge-work) | "подготовься к звонку", "саммари звонка", "прогноз продаж", "sales deck", "one-pager", "утренний брифинг", "расскажи про компанию", "cold email" | Skills `call-prep`/`create-an-asset`/`daily-briefing`/`account-research`/`sales-enablement-ru`/`revops-ru` + Commands `call-summary`/`forecast`/`pipeline-review` — ⤷ routing-ext |
+| Marketing (knowledge-work) | "кампания", "напиши пост", "блог", "email sequence", "seo audit", "бренд", "brand voice", "ROAS", "маркетинг отчёт" | Skills `content-creation`/`campaign-planning`/`brand-voice`/`performance-analytics` + Commands `campaign-plan`/`draft-content`/`email-sequence`/`seo-audit`/`brand-review`/`performance-report` — ⤷ routing-ext |
+| Конкурентный анализ | "конкуренты", "competitive analysis", "конкурентная разведка" | Skill `competitive-analysis` (PM), `competitive-analysis-mktg` (маркетинг), `competitive-intelligence` (sales battlecard); Commands `/competitive-brief` (PM), `/competitive-brief-mktg` (маркетинг) |
+| Сервер | "сервер", "server health", "docker ps" | Skill `server-health` |
+| Деплой | "задеплой", "deploy" | Command `deploy` |
 | Мониторинг | "мониторинг", "uptime" | Skill `uptime-kuma-ops` |
 | DNS/Домены | "DNS", "домен", "cloudflare" | Command `domain-dns-ops` |
-| Reddit/HN | "reddit", "hacker news", "мнения" | Skill `reddit-hn` |
-| LinkedIn | "linkedin", "outreach", "контакты" | Skill `linkedin` |
-| LinkedIn хук-формулы | "viral hook", "hook formula", "linkedin formulas", "F1-F10", "anaphora hook", "RIP obituary hook", "year-over-year pivot" | Skill `linkedin-post-writer` (10 формул 2026 от Jake Ward, Lara Acosta, Cam Trew, Noam Nisand) |
-| LinkedIn humanizer | "убери AI tells", "humanize linkedin", "scrub AI", "oaicite", "knowledge cutoff", "forensic strict aesthetic", "humanizer tier" | Skill `linkedin-humanizer` (3-tier scrubber) + `linkedin-rules-explainer` (объяснение правил) |
-| LinkedIn audit | "audit my linkedin draft", "pre-publish check", "20-point linkedin", "проверь черновик linkedin", "post audit" | Skill `linkedin-post-audit` |
-| LinkedIn emoji detector | "ai emoji", "lightbulb tell", "rocket sparkles tell", "проверь эмодзи в посте", "ChatGPT emoji" | Skill `linkedin-emoji-detector` |
-| LinkedIn AI detector тест | "GPTZero", "originality.ai", "zerogpt", "детекторы AI", "false positive linkedin", "разброс детекторов" | Skill `linkedin-detector-tester` (5 детекторов параллельно — Stanford 2023 receipts) |
-| LinkedIn comment drafter | "коммент на linkedin", "comment on linkedin post", "first commenter", "engage with this post", "linkedin url comment", "draft me a comment" | Skill `linkedin-comment-drafter` (7 паттернов 2026) |
-| LinkedIn reply handler | "ответь на коммент в linkedin", "reply to linkedin comment", "thread continuation", "автор ответил", "follow up в треде" | Skill `linkedin-reply-handler` (фикс 2-level flattening) |
-| LinkedIn hook extractor | "разбери viral пост", "reverse engineer hook", "какая формула у поста", "teardown linkedin", "blank template из поста" | Skill `linkedin-hook-extractor` |
-| LinkedIn content planner | "linkedin content plan", "план на неделю linkedin", "weekly linkedin calendar", "Authority Personal Community pillars" | Skill `linkedin-content-planner` (40-30-20-10 mix) |
-| LinkedIn thread engagement | "follow-up linkedin", "PublicAuthor3 window", "автор реплайнул", "thread monitoring", "inbound from comments", "compounding engagement" | Skill `linkedin-thread-engagement` (6-24h window) |
-| LinkedIn profile audit | "review my profile", "rewrite my headline", "fix my About", "linkedin profile audit", "optimize bio", "Featured section linkedin" | Skill `linkedin-profile-optimizer` (9 секций) |
-| LinkedIn employee advocacy | "team posting linkedin", "employee advocacy", "scale linkedin across team", "advocacy ROI", "брендовая адвокатура" | Skill `linkedin-employee-advocacy` (14-day launch + ROI) |
-| Design orchestrator | "сделай дизайн", "сделай прототип", "сделай слайды", "лендинг", "макет", "дизайн-задача" | Skill `design-orchestrator` (главный — решает какие design-скиллы запустить) |
-| Design guide | "design taste", "иерархия дизайн", "ритм визуала", "дизайн-памятка" | Skill `design-guide` (общий гайд о вкусе) |
-| Design content rules | "анти-слоп", "не лей воду в дизайн", "design content rules" | Skill `content-rules` (что НЕ делать в дизайне) |
-| Design cookbook | "готовый сценарий дизайна", "pitch deck workflow", "saas landing workflow", "social explainer" | Skill `cookbook` (5 готовых рецептов от запроса к результату) |
-| Design critique | "покритикуй мой дизайн", "design critique", "design review" | Skill `critique-mode` (не делать, а критиковать) |
-| Design system create | "создай дизайн-систему", "tokens", "design system from scratch" | Skill `design-system-create` |
-| Color system | "палитра", "9-step scale", "color tokens", "построй цветовую систему" | Skill `color-system-builder` |
-| Dark mode | "добавь dark mode", "тёмная тема к дизайну", "dark theme tokens" | Skill `dark-mode-add` |
-| Deck themes | "тема презентации", "minimal/editorial/dark/data/brutalist", "5 готовых тем слайдов" | Skill `deck-themes` (5 готовых CSS тем) |
-| Design canvas | "несколько вариантов бок-о-бок", "сравни 3 версии", "артборды в одном файле", "pan/zoom canvas" | Skill `design-canvas` |
-| Animations skill | "анимация в HTML", "timeline scrubber", "motion design HTML", "video-стиль" | Skill `animations` (anim-engine.jsx) |
-| Component playground | "storybook страница", "компонент со всеми вариантами", "all states UI" | Skill `component-playground` |
-| Comment injector | "click-to-comment overlay", "Alt+click selector", "ревью прототипа в браузере" | Skill `comment-injector` |
-| Claude in HTML | "LLM прямо в артефакте", "встрой Claude в HTML", "AI inside prototype" | Skill `claude-in-html` |
-| A11y audit | "проверь accessibility", "axe-core", "WCAG нарушения", "контраст AA" | Skill `a11y-audit` |
-| Device frames | "iOS frame", "Android рамка", "macOS window", "browser frame для скриншота" | Skill `device-frames` |
-| Dev handoff | "пакет для разраба", "design handoff zip", "specs для разработчика" | Skill `dev-handoff` |
-| Design questions | "уточни задачу", "вопросы перед дизайном", "что мне нужно знать", "questions protocol" | Skill `questions-protocol` |
-| Frontend design preset | "5 пресетов", "editorial monochrome", "soft brutalism", "premium dark", "warm minimalism", "data dense" | Skill `frontend-design` |
-| Wireframe | "вайрфрейм", "wireframe", "грубый каркас", "структура без стиля", "lo-fi" | Skill `wireframe` |
-| Project init | "инициализация дизайн-проекта", "scaffold дизайн", "wizard старта" | Skill `project-init` |
-| Moodboard | "moodboard", "мудборд", "извлеки палитру из картинок", "vibe-tags" | Skill `moodboard` |
-| Slides skill | "html слайды", "1920x1080 дек", "slides канва" | Skill `slides` |
-| Interactive prototype | "кликабельный прототип", "react babel прототип", "interactive prototype" | Skill `interactive-prototype` |
-| Mobile overlays | "iOS клавиатура", "bottom sheet", "action sheet", "toast", "mobile UI overlay" | Skill `mobile-overlays` |
-| Tweaks panel | "крутилки в прототипе", "tweaks panel", "live tweaks", "слайдер для primary color" | Skill `tweaks-panel` |
-| Microinteractions | "skeleton loader", "hover эффекты", "scroll-reveal", "click ripple", "оживи прототип" | Skill `microinteractions` |
-| Type scale | "modular scale", "type ratio", "typography scale", "font pair" | Skill `type-scale` |
-| Forms a11y | "доступная форма", "accessible form", "label aria error", "fieldset" | Skill `forms-a11y` |
-| States checklist | "8 состояний UI", "empty loading error", "states checklist", "happy path только" | Skill `states-checklist` |
-| Onboarding UX | "первый запуск", "tour", "setup wizard", "permissions request", "TTV" | Skill `onboarding-ux` |
-| Figma import | "из Figma в код", "figma tokens import", "figma node как png", "figma file id" | Skill `figma-import` |
-| Document import | "из PDF в слайды", "DOCX в лендинг", "PPTX парсинг", "import документа" | Skill `document-import` |
-| Github import | "из репо токены", "project context из github", "сохрани конвенции проекта" | Skill `github-import` |
-| Verifier | "проверь артефакт", "headless console error", "screenshot verify", "перед export" | Skill `verifier` |
-| Perf audit | "lighthouse", "Core Web Vitals", "LCP CLS TBT", "оптимизация перформанс" | Skill `perf-audit` |
-| i18n stress | "длинные слова", "RTL тест", "CJK", "стресс-тест локализации", "emoji в строке" | Skill `i18n-stress-test` |
-| License check | "лицензии шрифтов", "Helvetica можно", "Getty риск", "OFL Apache MIT" | Skill `license-check` |
-| Proto smoketest | "playwright smoke", "E2E прототипа", "happy path тест", "playwright test" | Skill `proto-smoketest` |
-| Export PDF | "html в pdf", "сохрани в pdf", "pdf через playwright" | Skill `export-pdf` |
-| Export PNG | "html в png", "screenshot для twitter", "1080x1080 для instagram", "социалки cover" | Skill `export-png` |
-| Export PPTX | "html в pptx", "powerpoint screenshots", "pptx из html" | Skill `export-pptx` |
-| PPTX editable | "редактируемый pptx", "native text-боксы pptx", "pptx с editable text" | Skill `pptx-editable-extractor` |
-| Video export | "html в mp4", "анимация в видео", "ffmpeg encode", "GIF из html" | Skill `video-export` |
-| Standalone HTML | "один файл html", "embed all assets", "self-contained html", "inline base64" | Skill `standalone-html` |
-| Print styles | "@media print", "стили для печати", "page-break", "print css" | Skill `print-styles` |
-| Real data | "подключи к API", "real data в прототип", "static JSON для демо", "fake data faker" | Skill `real-data` |
-| Live preview | "browser-sync", "live reload", "локальный сервер для дизайна", "auto-reload" | Skill `live-preview` |
-| Visual edit | "drag handle в браузере", "visual edit overlay", "alt+click resize" | Skill `visual-edit` |
-| Version snapshots | "история версий артефакта", "snapshot перед правкой", "откати к baseline" | Skill `version-snapshots` |
-| Tweaks persist | "сохрани tweaks", "запиши обратно в tokens.css", "tweaks в localStorage" | Skill `tweaks-persist` |
-| Sketch to HTML | "из скетча в html", "whiteboard photo в каркас", "excalidraw в html" | Skill `sketch-to-html` |
-| HTML email | "newsletter html", "email html outlook gmail", "MJML", "transactional email" | Skill `html-email` |
-| PWA shell | "PWA обёртка", "install prompt", "manifest.json", "service worker offline" | Skill `pwa-shell` |
-| Outlook | "outlook", "exchange", "рабочая почта" | Command `outlook` |
+| Build Fix | "build broken", "ошибки сборки", "fix build", "build-fix", "не собирается" | Skill `build-fix` |
+| Инсталляторы (Win+Mac) | "сделай инсталлятор", "установщик в один клик", "офлайн-инсталлятор", "exe + dmg", "вшить ПО в один установщик", "накатить софт на чистую машину", "offline installer", "bundle apps installer", "electron installer" | Skill `installer-builder` (Electron portable exe + dmg, офлайн-vendor, паки, GitHub Actions mac-сборка; грабли BOM/stderr/100МБ) |
+| N8N | "автоматизация", "workflow" | Skill `n8n` |
 | Multi-model | "спроси GPT", "ask GPT", "ask Gemini", "compare models", "cross-model", "consensus", "мульти-модель", "gateway models" | Skill `multi-model-gateway`, Agents: `gpt-agent`, `gemini-agent` |
-| AI модели | "replicate", "FLUX", "stable diffusion" | Skill `replicate` |
-| Аватар видео | "D-ID", "talking head" | Skill `did` |
-| Сервер | "сервер", "server health", "docker ps" | Skill `server-health` |
-| Презентация AI | "gamma", "AI презентация" | Skill `gamma` |
-| Slack | "slack", "напиши в slack" | Plugin `slack` (official MCP) |
-| Linear | "linear", "задачи linear", "issues" | Plugin `linear` (official MCP), также: Command `sprint-planning` |
-| AI ревью PR | "greptile", "AI review PR" | Plugin `greptile` |
-| Tapestry (документы) | "tapestry", "weave", "свяжи документы", "interlink docs" | Skill `tapestry` (интерлинкинг внешних документов, YouTube, PDF) |
-| EPUB | "epub", "ebook", "электронная книга", "kindle" | Skill `epub-tools` |
+| Фактчек (анти-галлюцинации) | "проверь факты", "фактчек", "проверь на галлюцинации", "verify claims", "fact-check", "проверь цитаты и ссылки" | Skill `check-skill-solo` (мульти-LLM: Claude WebSearch + gemini/codex CLI; механическая проверка URL+цитат, independence accounting) — комплементарен `multi-model-gateway` |
+| Эвалы LLM/агентов | "сделай эвал", "как измерить агента", "промпт стал лучше?", "это улучшение или шум", "golden set", "LLM-as-judge", "аудит эвала", "какую модель под задачу", "свип по моделям", "регресс агента", "pass rate" | Skill `llm-evals` (двухуровневый грейдинг + быстрый пробник vs полный прогон + свип model×effort; `scripts/eval_harness.py`, `pairwise_judge.py`). RAG-метрики → verifier/references/rag-eval-opik.md |
 | Claude CLI | "claude CLI", "без API ключа", "without API key", "claude binary" | Skill `claude-cli-runner`, модуль `${WORKSPACE}/tools/claude_cli.py` |
 | Claude серверная авторизация | "авторизуй на сервере", "setup-token", "токен подписки", "server auth" | Skill `claude-server-auth` |
-| Акции/Финансы | "stock", "акции", "курс", "биржа", "yfinance" | Skill `stock-analysis`, CLI: `python ~/.claude/skills/stock-analysis/scripts/stock_analysis.py` |
-| Трафик сайта | "similarweb", "трафик сайта", "посещаемость", "web analytics" | Skill `similarweb-analytics` |
-| Meta Ads | "meta ads", "facebook ads", "рекламный кабинет", "breakdown effect" | Skill `meta-ads-analyzer` |
-| GitHub поиск | "найди библиотеку", "open source tool", "github gem", "найди репо" | Skill `github-gem-seeker` |
-| Создать плагин | "создай плагин", "plugin dev" | Plugin `plugin-dev` |
-| PRD/Спецификация | "PRD", "спецификация", "write spec", "напиши спеку" | Command `write-spec`, Skill `feature-spec` |
-| Роадмап | "роадмап", "roadmap", "приоритизация фич" | Skill `roadmap-management`, Command `roadmap-update` (обновление) / `roadmap` (генерация XLSX/PPTX) |
-| Стейкхолдеры | "стейкхолдер", "апдейт для руководства", "stakeholder" | Skill `stakeholder-comms`, Command `stakeholder-update` |
-| Продуктовые метрики | "OKR", "north star metric", "продуктовые метрики", "product metrics" | Skill `metrics-tracking`, Command `metrics-review` |
-| UX исследования | "user research", "синтез интервью", "юзабилити" | Skill `user-research-synthesis`, Command `synthesize-research` |
-| Конкурентный анализ | "конкуренты", "competitive analysis", "конкурентная разведка" | Skill `competitive-analysis` (PM), `competitive-analysis-mktg` (маркетинг), `competitive-intelligence` (sales battlecard) |
-| Подготовка к звонку | "подготовься к звонку", "call prep", "предстоящий звонок" | Skill `call-prep` |
-| Саммари звонка | "саммари звонка", "итоги встречи", "call summary" | Command `call-summary` |
-| Sales прогноз | "прогноз продаж", "forecast", "pipeline" | Command `forecast`, Command `pipeline-review` |
-| Sales outreach | "напиши письмо клиенту", "cold email", "outreach" | Skill `draft-outreach` (персонализированный), Skill `linkedin` (bulk LinkedIn) |
-| Sales материалы | "sales deck", "one-pager", "коммерческое предложение" | Skill `create-an-asset` |
-| Sales брифинг | "утренний брифинг", "daily briefing", "с чего начать день" | Skill `daily-briefing` (sales), Command `daily` (dev standup) |
-| Исследование компании | "расскажи про компанию", "account research", "что за компания" | Skill `account-research` |
-| Маркетинг контент | "напиши пост", "блог", "draft content", "копирайт" | Skill `content-creation`, Command `draft-content` |
-| Маркетинг кампания | "кампания", "campaign plan", "маркетинговый план" | Skill `campaign-planning`, Command `campaign-plan` |
-| Email рассылка | "email sequence", "цепочка писем", "nurture" | Command `email-sequence` |
-| SEO | "SEO", "seo audit", "ключевые слова" | Command `seo-audit` |
-| Бренд | "бренд", "brand voice", "tone of voice" | Skill `brand-voice`, Command `brand-review` |
-| Маркетинг аналитика | "маркетинг отчёт", "performance report", "ROAS", "CPL" | Skill `performance-analytics`, Command `performance-report` |
-| Браузер (dev) | "открой в браузере", "dev browser", "browse with cookies" | Skill `dev-browser` (лёгкий, с куками) / Plugin `playwright` (полный) |
-| Браузер (gstack) | "gstack browse", "browse fast", "скриншот headless", "быстрый браузер" | `~/.claude/skills/gstack/browse/dist/browse.exe` (~100ms/cmd, daemon auto-start) |
-| Алгоритм-арт | "generative art", "алгоритмическое искусство", "p5.js art" | Skill `algorithmic-art` |
-| API документация | "API docs", "swagger", "openapi", "postman collection" | Skill `api-documentation` |
-| Apify скрапинг | "apify", "scrape website", "actors" | Skill `apify-scraping` |
-| Артефакты | "artifact", "интерактивный HTML", "shadcn artifact" | Skill `artifacts-builder` |
-| AWS | "aws", "lambda", "CDK", "serverless", "S3" | Skill `aws-skills` |
-| Брейнсторм | "brainstorm", "мозговой штурм", "идеи" | Skill `brainstorming` |
-| Бренд гайдлайн | "brand guidelines", "стиль Anthropic", "фирменный стиль" | Skill `brand-guidelines` |
-| Canvas дизайн | "canvas", "poster", "визуальный дизайн", "постер" | Skill `canvas-design` |
-| Changelog | "changelog", "что нового", "release notes" | Skill `changelog-generator` |
-| CSV анализ | "CSV", "анализ данных", "Excel анализ", "статистика данных" | Skill `csv-analysis` |
-| D3 визуализация | "D3", "chart", "график данных", "data visualization" | Skill `d3-visualization` |
-| Дизайн БД | "schema design", "дизайн базы", "нормализация", "индексы" | Skill `database-design` |
-| Домены | "придумай домен", "domain name", "доменное имя" | Skill `domain-brainstormer` |
-| Конвертер файлов | "конвертируй файл", "convert file", "file format" | Skill `file-converter` |
-| Организация файлов | "организуй файлы", "sort files", "разбери папку" | Skill `file-organizer` |
-| Gemini Pro | "gemini 3 pro", "gemini API" | Skill `gemini-3-pro` |
-| Git workflow | "git workflow", "merge conflict", "git branches" | Skill `git-workflow` |
-| Счета/чеки | "invoice", "чеки", "счета", "expense tracking" | Skill `invoice-organizer` |
-| Кайдзен | "kaizen", "continuous improvement", "улучшение процессов" | Skill `kaizen` |
-| Лиды | "lead research", "поиск лидов", "qualify leads" | Skill `lead-research` |
-| Manus | "manus agent", "autonomous agent", "manus task" | Skill `manus` |
-| MCP builder | "создай MCP", "build MCP server", "MCP сервер" | Skill `mcp-builder` |
-| MCP usage | "как использовать MCP", "MCP tools" | Skill `mcp-usage` |
-| Анализ встреч | "анализ встречи", "meeting analysis", "action items" | Skill `meeting-analyzer` |
-| OCR восстановление | "OCR", "распознай скан", "garbled text" | Skill `ocr-restore` |
-| PDF обработка | "обработай PDF", "merge PDF", "split PDF", "fill PDF form" | Skill `pdf` |
-| PDF генерация | "сгенерируй PDF", "create PDF" | Skill `pdf-generation` |
-| Perplexity | "perplexity", "AI search" | Skill `perplexity` |
-| Pinecone | "pinecone", "vector database", "embeddings" | Skill `pinecone` |
-| Playwright | "playwright test", "e2e test", "browser automation" | Skill `playwright-automation` |
-| PPTX | "PowerPoint", "pptx", "слайды pptx" | Skill `pptx` |
-| Prompt engineering | "промпт инжиниринг", "оптимизируй промпт", "system prompt" | Skill `prompt-engineering` / `senior-prompt-engineer` |
-| Python dev | "python", "django", "fastapi", "flask" | Skill `python-fullstack-dev` |
-| JS/TS dev | "javascript", "typescript", "react", "next.js", "node" | Skill `javascript-typescript-dev` |
-| Архитектор | "архитектура системы", "system design", "tech stack" | Skill `senior-architect`, Agent `software-architect` |
-| SerpAPI | "serpapi", "google search API" | Skill `serpapi` |
-| Slack GIF | "gif для slack", "slack emoji", "animated gif" | Skill `slack-gif-creator` |
-| Тема/стиль | "theme", "тема оформления", "стилизация" | Skill `theme-factory` |
-| Скачать видео | "скачай видео", "yt-dlp", "download video" | Skill `video-downloader` |
-| Видео генерация | "сгенерируй видео", "Veo", "Sora", "AI video" | Skill `video-generation` |
-| Тестирование веб | "протестируй сайт", "webapp test", "test UI" | Skill `webapp-testing` |
-| Создание сайта | "создай сайт", "лендинг", "landing page", "website" | Skill `website-creation` |
-| Word/DOCX | "word", "docx", "документ Word" | Skill `word-docx` |
-| XLSX | "xlsx", "spreadsheet", "таблица Excel" | Skill `xlsx` |
-| YouTube транскрипт | "транскрипт ютуба", "youtube transcript", "субтитры видео" | Skill `youtube-transcript` |
-| Mermaid диаграммы | "mermaid", "mermaid chart", "рендер mermaid" | Cloud MCP `claude_ai_Mermaid_Chart` (validate_and_render_mermaid_diagram) |
-| Airtable | "airtable", "база airtable", "таблица airtable" | Cloud MCP `claude_ai_Airtable` (search_bases, list_records, create_records) |
-| Canva | "canva", "дизайн canva", "постер canva", "презентация canva" | Cloud MCP `claude_ai_Canva` (generate-design, export-design, edit) |
-| Gamma cloud | "gamma", "AI презентация gamma", "gamma slides" | Cloud MCP `claude_ai_Gamma` (generate, get_themes), Skill `gamma` |
-| Gmail cloud | "gmail cloud", "письмо gmail", "черновик gmail" | Cloud MCP `claude_ai_Gmail` (search, read, create_draft), Command `gmail` |
-| Google Calendar cloud | "google calendar", "календарь google", "встреча google" | Cloud MCP `claude_ai_Google_Calendar` (create/list/update events, find free time) |
-| Granola | "granola", "заметки встречи granola", "meeting notes" | Cloud MCP `claude_ai_Granola` (list_meetings, get_transcript) |
-| n8n cloud | "n8n cloud", "workflow n8n cloud" | Cloud MCP `claude_ai_n8n` (search/execute/get workflows) |
-| Figma cloud | "figma cloud", "figma MCP", "дизайн figma" | Cloud MCP `claude_ai_Figma` (get_design_context, screenshot, generate_diagram) |
-| Context7 cloud | "context7 cloud", "docs library" | Cloud MCP `claude_ai_Context7` (resolve-library-id, query-docs) |
-| Sentry | "sentry", "ошибки production", "error monitoring" | Plugin `sentry` (sentry-workflow, sentry-sdk-setup, seer) |
-| Semgrep | "semgrep", "static analysis", "SAST" | Plugin `semgrep` (setup-semgrep-plugin) |
-| Sourcegraph | "sourcegraph", "поиск по репо", "code search" | Plugin `sourcegraph` (sg-search, sg-file) |
-| Firecrawl | "firecrawl", "scrape URL", "crawl site", "extract web" | Plugin `firecrawl` (firecrawl-cli, skill-gen) |
-| CodeRabbit | "coderabbit", "AI review PR" | Plugin `coderabbit` (code-review) |
-| Adspirer Ads | "google ads agent", "meta ads agent", "linkedin ads agent", "keyword research" | Plugin `adspirer-ads-agent` (ad-campaign-best-practices, keyword-research) |
-| HuggingFace | "huggingface", "train model", "dataset HF", "gradio", "HF jobs" | Plugin `huggingface-skills` (model-trainer, datasets, gradio, jobs, vision-trainer) |
-| Notion | "notion", "notion page", "notion database", "notion task" | Plugin `notion` (search, create-page, database-query, tasks) |
-| Slack расширенный | "slack digest", "slack announcement", "slack standup" | Plugin `slack` (channel-digest, draft-announcement, find-discussions, standup) |
-| Beads issues | "beads", "issue tracking", "баг-трекер" | Skill `beads`, Command `beads-init` |
-| Context Engineering | "context engineering", "контекст инжиниринг" | Skill `context-engineering` |
-| Threat Hunting | "threat hunting", "sigma rules", "detection engineering" | Skill `threat-hunting` |
-| DOCX | "docx", "word document", "tracked changes" | Skill `docx` |
-| PPTX skill | "pptx", "PowerPoint", "слайды pptx" | Skill `pptx` |
-| Internal Comms | "internal comms", "status report", "leadership update", "incident report" | Skill `internal-comms` |
-| Content Research | "content research", "fact-checking", "source verification" | Skill `content-research` |
-| Defense in Depth | "validation layers", "defense in depth" | Skill `defense-in-depth` |
-| GTD | "GTD", "todoist", "getting things done" | Command `gtd` |
-| Figma library | "figma library", "design system figma", "figma tokens" | Plugin `figma:figma-generate-library` |
-| Figma write | "write to figma", "push to figma", "create in figma" | Plugin `figma:figma-generate-design` + `figma:figma-use` |
-| Voice mode | "голосовой режим", "voice", "диктовка", "push to talk" | `/voice` (CLI + VSCode, push-to-talk пробелом) |
-| Remote Control | "удалённый доступ", "remote", "с телефона", "веб сессия", "QR код" | `/remote` → URL claude.ai/code или QR-код (CLI + VSCode) |
-| Channels | "channels", "telegram channel", "discord channel", "управление через тг" | `claude --channels plugin:telegram@claude-plugins-official` |
-| Loop | "повторяй", "loop", "каждые N минут", "мониторь", "следи" | `/loop 5m <prompt>`, дефолт 10 мин |
-| Schedule | "schedule", "cron", "запланируй агента", "по расписанию" | `/schedule` — cron-задачи для remote agents |
-| Цвет сессии | "цвет сессии", "color" | `/color` |
-| Переименовать сессию | "переименуй сессию", "rename session" | `/rename` |
-| Effort | "effort", "глубина ответа", "ultrathink", "думай глубже" | `/effort low\|medium\|high\|max\|auto`, `/model ultrathink` |
-| Fork/Branch | "форк", "ветка разговора", "branch", "эксперимент" | `/fork` или `/branch` — ответвление диалога |
-| Rewind | "откати", "rewind", "верни назад", "отмени изменения" | `/rewind` — откат кода и диалога к checkpoint |
-| Resume | "продолжи сессию", "resume", "восстанови" | `/resume` — восстановить предыдущую сессию |
-| Diff | "покажи изменения", "diff", "что поменялось" | `/diff` — интерактивный просмотр uncommitted изменений |
-| Fast mode | "быстрый режим", "fast mode" | `/fast` — toggle быстрого режима |
-| Cost | "сколько потрачено", "cost", "токены" | `/cost` — usage текущей сессии |
-| Usage | "лимиты", "usage", "квота", "rate limit" | `/usage` — статус подписки и лимитов |
-| Init | "инициализация проекта claude", "init" | `/init` — генерация CLAUDE.md для проекта |
-| Batch | "массовые правки", "batch", "bulk edit" | `/batch` — параллельные правки нескольких файлов |
-| PR Comments | "комменты PR", "pr-comments", "отзывы на PR" | `/pr-comments` — подтянуть комменты GitHub PR |
-| Security Review | "security review", "проверь безопасность" | `/security-review` — сканирование уязвимостей |
-| Config | "настройки claude", "config", "settings" | `/config` — панель настроек |
-| Permissions | "разрешения", "permissions" | `/permissions` — управление правами доступа |
-| MCP | "mcp серверы", "подключи mcp" | `/mcp` — управление MCP серверами |
-| Desktop | "открой в десктопе", "desktop app" | `/desktop` — передать сессию в Desktop приложение |
-| Mobile | "открой на телефоне", "mobile" | `/mobile` — QR-код для мобильного |
-| Context | "контекст", "сколько занято", "context window" | `/context` — визуализация использования контекста |
-| Doctor | "диагностика", "doctor", "проверь установку" | `/doctor` — диагностика конфигурации |
-| Debug | "дебаг сессии", "debug session" | `/debug` — troubleshoot текущей сессии |
-| Copy | "скопируй ответ", "copy" | `/copy N` — копировать N-й ответ, `w` записать в файл |
-| Reload plugins | "обнови плагины", "reload plugins" | `/reload-plugins` — применить изменения плагинов без рестарта |
-| Keybindings | "горячие клавиши", "keybindings", "шорткаты" | `/keybindings` — настройка клавиатурных сокращений |
-| Memory | "память claude", "memory", "что запомнил" | `/memory` — управление auto-memory |
-| Model | "смени модель", "model", "переключи на opus" | `/model opus\|sonnet\|haiku`, `/model ultrathink` |
-| Plan | "план", "plan mode", "спланируй" | `/plan` — режим планирования |
-| Compact | "сожми контекст", "compact" | `/compact` — сжатие истории диалога |
-| Clear | "очисти", "clear", "начни заново" | `/clear` — полный сброс сессии |
-| Help | "помощь", "help", "команды" | `/help` — список всех команд |
+| CEO Council | "совет директоров", "ceo council", "стратегическое решение", "параллельные эксперты", "мнения экспертов" | Skill `ceo-council` |
+| GSD | "gsd", "get shit done", "новый проект GSD", "фазы разработки" | `/gsd:new-project`, `/gsd:next`, `/gsd:autonomous` |
+| Браузер | "открой в браузере", "dev browser", "browse with cookies", "gstack browse", "быстрый браузер", "playwright test", "browser automation" | Skill `dev-browser` (лёгкий, с куками) / Plugin `playwright` (полный); headless ~100ms → `~/.claude/skills/gstack/browse/dist/browse.exe`; e2e → Skill `playwright-automation` — ⤷ routing-ext |
+| Privacy Filter / Обезличивание | "обезличь текст", "деперсонализация", "убери персональные данные", "privacy filter", "opf", "redact PII", "найди ПД", "обезличить перед отправкой в GPT", "де-идентификация", "вырежи имена/телефоны/адреса" | Skill `privacy-filter` (локальная on-device модель openai/privacy-filter, обратимое обезличивание + fine-tune RU) |
+| Security прочее | "threat hunting", "sigma rules", "validation layers", "defense in depth" | Skill `threat-hunting`, `/security-review`; defense-in-depth → плагин `superpowers:systematic-debugging` + graveyard-reference — ⤷ routing-ext |
+| Код-качество (агенты) | "найди баги", "ревью", "проверь код", "security", "уязвимости", "напиши тесты", "оптимизируй", "dead code", "рефакторинг", "dependencies" | Обязательные делегации → rules/delegation.md: Agents `bug-hunter`→`bug-fixer`, `code-reviewer`, `security-scanner`→`vulnerability-fixer`, `test-writer`, `performance-optimizer`, `dead-code-hunter`→`remover`, `reuse-hunter`→`fixer`, `dependency-auditor`→`updater`, `legacy-modernizer` — полная карта 13 строк ⤷ routing-ext |
+| Граф кода (codegraph) | "используй граф на проекте X", "раскопай проект по графу", "граф кода", "codegraph", "кто вызывает", "callers/callees", "что затронет изменение", "blast-radius", "impact анализ", "трейс вызовов", "где определён символ", "зависимости проекта", "прежде чем править — кто использует" | Skill `codegraph` — 48 проектов уже графлены (`${WORKSPACE}/graph-pilot/<name>/`, карта в skill); CLI `codegraph callers/callees/impact/explore/node` из папки графа; 5-8× vs grep + транзитив |
+| Авто-документация кодбазы (agent wiki) | "авто-документация кодбазы", "openwiki", "agent wiki для репо", "свежие доки для агента", "AGENTS.md автогенерация", "PR с доками в CI", "документируй репозиторий для агентов" | Skill `openwiki` (langchain-ai CLI, установлен глоб; code-mode + CI-PR; для больших репо без доков — ClientProjectB/Academy). НЕ путать: OpenAPI→api-documentation, fetch чужих доков→deepwiki, граф вызовов→codegraph |
+| Ошибки/баги | "ошибка", "error", "stack trace", "не работает" | Agent `error-handler` |
+| Dev-агенты по ролям | "архитектура", "React", "UI", "API", "endpoint", "миграция SQL", "pipeline", "docker", "напиши код", "orchestrate", "pentest", "ML pipeline", "алгоритм" | Agents `software-architect`/`frontend-dev`/`backend-dev`/`senior-developer`/`devops-engineer`/`orchestrator`/`pentest-engineer`/`ml-specialist`/`kimi-algorithm-specialist`/`integration-dev`/`qa-specialist`/`system-analyst`/`tech-lead`/`security-engineer`/`prompt-engineer`/`meta-agent-v3` + Command `setup-db` — полная карта 18 строк ⤷ routing-ext (skill senior-devops = graveyard-стаб 2026-07-18, живой DevOps → Agent `devops-engineer`) |
+| Корректура | "проверь текст", "корректура" | Agent `proofreader-ortho` → `proofreader-punctuation` → `proofreader-typography`, Command `proofread` |
+| Dev-разное | "beads", "issue tracking", "GTD", "context engineering", "git workflow", "merge conflict", "создай плагин" | Skills `beads`/`context-engineering`/`git-workflow` + Commands `gtd`/`beads-init` + Plugin `plugin-dev` — ⤷ routing-ext |
+| Telegram бот (разработка) | "бот", "telegram бот", "напиши бота", "handlers", "scenes", "deploy бота" | Skill `telegram-bot-toolkit` |
+| Публикация через бота (Bot API) | "опубликуй через бота", "пост в канал от бота", "rich-пост с таблицей", "рассылка подписчикам бота", "вебхук бота", "tg_bot.py" | Skill `tg-bot-publish`, CLI: `python ${WORKSPACE}/tools/tg_bot.py` (+ TG_BOT_CAPABILITIES.md, TG_BOT_API_REFERENCE.md) — полный список триггеров ⤷ routing-ext |
+| WhatsApp (личный, 19 команд) | "whatsapp", "вотсап", "ватсап", "напиши в whatsapp", "прочитай переписку в вотсапе", "непрочитанные whatsapp", "группы whatsapp", "экспортируй чат whatsapp", "привяжи whatsapp/QR" | Skill `whatsapp-client` + `python ${WORKSPACE}/tools/wa_client.py <cmd>` (локальный Baileys-мост; ⚠️ рассылки = риск бана по ToS Meta) |
+| Почта по IMAP/SMTP (произвольный ящик) | "почта по imap", "яндекс почта письма", "корпоративный ящик", "письмо через smtp", "скачай вложения из письма" | Skill `email-imap` + `python ${WORKSPACE}/tools/email_client.py <cmd>`. НЕ личная Gmail → /gmail; НЕ рабочая Exchange → /outlook |
+| SMS (Twilio) | "отправь смс", "sms", "twilio", "рассылка по телефонам", "статус доставки смс", "баланс twilio" | Skill `sms-twilio` + `python ${WORKSPACE}/tools/sms_client.py <cmd>` (нужны TWILIO_* в credentials) |
+| Приём вебхуков | "вебхук", "webhook", "поймай событие github/stripe", "проверь подпись вебхука", "endpoint для колбэка", "лови POST от формы" | Skill `webhook-receiver` + `python ${WORKSPACE}/tools/webhook_server.py serve` (HMAC GitHub/Stripe, JSONL-лог, action) |
+| Google Workspace (семья) | "письмо"→`gmail`, "таблица"→`gsheets`, "документ"→`gdocs`, "meet", "google chat", "GA4", "google ads", "search console", "GCS", "переведи через google", "контакты google", "задачи google" | Commands `gdocs`/`gsheets`/`gmail`/`gcontacts`/`gtasks`/`gmeet`/`gchat`/`ganalytics`/`gads`/`gsearch-console`/`gtranslate`/`gcloud-storage` — полные триггеры ⤷ routing-ext |
+| Outlook | "outlook", "exchange", "рабочая почта" | Command `outlook` |
+| Zoom | "zoom", "зум", "zoom meeting", "создай встречу zoom", "запланируй зум", "zoom recording", "записи зум" | Skill `zoom` |
+| Финансы/веб-аналитика прочее | "акции", "stock", "трафик сайта", "similarweb", "meta ads", "найди библиотеку", "github gem" | Skills `stock-analysis`/`similarweb-analytics`/`meta-ads-analyzer`/`github-gem-seeker` — ⤷ routing-ext |
+| Design (семья, 59 скиллов) | "сделай дизайн", "сделай прототип", "сделай слайды", "лендинг", "макет", "дизайн-задача", "html в pdf/png/pptx", "wireframe", "moodboard", "lottie", "open design", "настрой вкус/плотность/движение", "анти-slop", "проверь на ИИ-шаблонность", "pixel-perfect", "сверь с референсом", "в стиле Stripe/Linear/Vercel", "DESIGN.md бренда" | Skill `design-orchestrator` (главный — сам решает какие design-скиллы запустить); полная карта 59 скиллов + новые: `design-taste` (3 шкалы вкуса + AI-tells сканер, ДО генерации), `design-guardrails` (Visual Diff PASS/FAIL, финальный QA), `design-md-brands` (банк 73+ DESIGN.md брендов on-demand) ⤷ routing-ext |
+| Презентация | "слайды", "презентация", "pitch deck", "whiteboard", "маркерная доска" | Agent `slide-designer`, Skill `manus-slides`, Command `slides` |
+| Утилиты-скиллы (~44) | "обработай PDF", "xlsx", "docx", "CSV", "конвертируй файл", "диаграмма", "excalidraw", "создай сайт", "скачай видео", "replicate", "perplexity", "brainstorm", "changelog", "OCR", "python", "typescript" | Skills `pdf`/`xlsx`/`docx`/`pptx`/`csv-analysis`/`file-converter`/`excalidraw-flowchart`/`website-creation`/`video-downloader`/`replicate`/`perplexity`/`superpowers:brainstorming` (плагин)/`changelog-generator`/`ocr-restore`/`python-fullstack-dev`/`javascript-typescript-dev`… — узкая утилита ищется по имени в Skill-листинге; полная карта ⤷ routing-ext |
+| Cloud MCP | "mermaid", "airtable", "canva", "gamma cloud", "gmail cloud", "google calendar", "granola", "n8n cloud", "figma cloud", "context7 cloud" | Cloud MCP `claude_ai_*` (Mermaid_Chart/Airtable/Canva/Gamma/Gmail/Google_Calendar/Granola/n8n/Figma/Context7) — ⤷ routing-ext |
+| Плагины-интеграции | "sentry", "semgrep", "sourcegraph", "firecrawl", "coderabbit", "slack", "linear", "greptile", "notion", "huggingface", "google ads agent" | Plugin по имени (sentry/semgrep/sourcegraph/firecrawl/coderabbit/notion/slack/linear/greptile/huggingface-skills/adspirer-ads-agent) — ⤷ routing-ext |
+| Личное/рефлексия | "где остановился", "recap", "итоги недели", "итоги месяца", "итоги года", "спланируй день", "/btw", "кстати", "проанализируй себя", "статистика сессий", "think deeper" | Skills `away-summary`/`year-review`/`self-reflect`/`btw`/`thinking-frameworks` + Commands `weekly-synthesis`/`plan-my-day`/`prompt-log` — ⤷ routing-ext |
+| Как я работаю с Claude Code | "session mentor", "как я работаю", "проанализируй мои сессии", "отчёт по работе", "где теряю время", "какие фичи не использую", "статистика за N дней" | Skill `session-mentor` (локально: `scripts/collect.py` → анализ 8 секций → `render_report.py` → самодостаточный HTML). Одна текущая сессия → /prompt-log |
+| CLI built-ins (~35) | "/voice", "/remote", "/loop", "/schedule", "/effort", "/fork", "/rewind", "/resume", "/diff", "/cost", "/usage", "/batch", "/config", "/doctor", "channels" | `/help` — полный список команд; карта всех 35 строк ⤷ routing-ext |

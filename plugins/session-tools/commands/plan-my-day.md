@@ -22,7 +22,7 @@ Ask user or check:
 
 ### 3. Recent Context
 ```bash
-python ${WORKSPACE}/tools/vector_memory.py recall-recent 1
+python ~/.claude/tools/vector_memory.py recall-recent 1
 ```
 
 ## Energy-Based Scheduling

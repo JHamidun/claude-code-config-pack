@@ -1,3 +1,8 @@
+---
+description: "Google Analytics 4: аккаунты, ресурсы (properties), отчёты по трафику/страницам через GA4 Data+Admin API. Триггеры: «GA4», «google analytics», «аналитика google», «трафик сайта в GA». НЕ Яндекс Метрика → skill yandex."
+argument-hint: "[accounts | properties | report <property_id>]"
+---
+
 # Google Analytics (GA4) Operations
 
 /ganalytics - Работа с Google Analytics 4

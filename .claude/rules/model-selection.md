@@ -1,116 +1,86 @@
 # Model Selection Guide
 
-## Quick Decision Table
+> **КАНОН (config/models.md):** движок ВСЕХ text-субагентов = **Fable 5** (`model: "fable"`), ≤5 одновременно (комфорт 3-4); Fable упал на лимите → подхватить Opus (resume + смена model). **Opus 4.8** = основная сессия / оркестратор. Уровни ниже (opus/standard/light) выбирают СЛОЖНОСТЬ задачи — глубину промпта, контекст, верификацию — а НЕ движок воркера.
 
-| Task Type | Model | Why |
+## Модели (компакт)
+
+| Алиас | Модель | Роль |
+|-------|--------|------|
+| `opus` | Opus 4.8 (`claude-opus-4-8`) | Оркестратор сессии; максимум reasoning; 1M контекст |
+| `fable` | Fable 5 (`claude-fable-5`) | **Движок ВСЕХ text-воркеров** (дефолт спавна) |
+| `haiku` | Haiku 4.5 | Массовые дешёвые прогоны (10+ параллельных), классификация |
+| `sonnet` | Sonnet 4.5 | Доступен, но для воркеров НЕ дефолт (легаси) |
+
+## Уровни сложности задачи
+
+| Уровень | Что означает для промпта воркера |
+|---------|----------------------------------|
+| **opus-level** | Богатый контекст, явные quality-gates, верификация результата; оркестрирует сессия (Opus) |
+| **standard-level** | Обычный промпт с целью и file paths; Fable справляется сам |
+| **light-level** | Короткий промпт, низкий effort; для 10+ параллельных простых прогонов допустим `model: "haiku"` |
+
+## Quick Decision Table (уровень, не движок)
+
+| Task Type | Level | Why |
 |-----------|-------|-----|
-| Architecture decisions | Opus | Deep reasoning, tradeoff analysis |
-| Complex debugging | Opus | Root cause analysis, multi-file context |
-| Code implementation | Opus/Sonnet | Opus for complex, Sonnet for routine |
-| Code review | Sonnet | Fast, good at pattern matching |
-| Quick search/exploration | Haiku | Fast, cheap, good for simple queries |
-| File operations | Haiku | Rename, move, simple edits |
-| Subagent tasks | Sonnet/Haiku | Balance speed vs quality per task |
-| Writing documentation | Sonnet | Good prose, fast enough |
-| Security audit | Opus | Thoroughness matters most |
-| Refactoring | Sonnet | Pattern recognition, speed |
-| Test writing | Sonnet | Coverage patterns, mocking |
-| Bug hunting | Opus | Systematic root cause analysis |
-| Translation/i18n | Haiku | Simple string operations |
-| Data migration scripts | Sonnet | Structured, predictable logic |
-| API design | Opus | Consistency, edge cases, naming |
+| Architecture decisions | opus-level | Deep reasoning, tradeoff analysis |
+| Complex debugging | opus-level | Root cause analysis, multi-file context |
+| Code implementation | standard (opus-level if complex) | Routine vs complex |
+| Code review | standard | Pattern matching |
+| Quick search/exploration | light | Simple queries |
+| File operations | light | Rename, move, simple edits |
+| Writing documentation | standard | Good prose, fast enough |
+| Security audit | opus-level | Thoroughness matters most |
+| Refactoring | standard | Pattern recognition, speed |
+| Test writing | standard | Coverage patterns, mocking |
+| Bug hunting | opus-level | Systematic root cause analysis |
+| Translation/i18n | light | Simple string operations |
+| Data migration scripts | standard | Structured, predictable logic |
+| API design | opus-level | Consistency, edge cases, naming |
 
-## Model Capabilities
+## Decision Flow for Subagents
 
-### Opus 4.6 (default, most capable)
+1. Search/lookup/classification? -> light-level (короткий промпт; массово — haiku)
+2. Generates or modifies code? -> standard-level (Fable, обычный промпт)
+3. Reasoning about tradeoffs or security? -> opus-level (расширенный контекст + верификация)
+4. Worker in a multi-agent pipeline? -> Fable (default)
+5. Orchestrator of a multi-agent pipeline? -> сессия/Opus (не спавнить лишнего оркестратора)
 
-- **Best for:** Complex reasoning, architecture, deep analysis, extended thinking
-- **Context:** 1M tokens
-- **Speed:** Slowest
-- **Cost:** Highest (covered by Max subscription)
-- **Use when:** Quality > speed, complex multi-step tasks
-- **Strengths:** Nuanced tradeoffs, long-range coherence, planning, security analysis
-- **Avoid when:** Simple repetitive tasks (wastes time)
+### Калибровка уровня
 
-### Sonnet 4.5 (balanced)
+- ВНИЗ к light: exploring codebase, rename/search-and-replace, классификация, commit messages, well-defined boilerplate/CRUD.
+- ВВЕРХ к opus-level: production-дебаг, дизайн систем/API, security-аудит, решения при неполной информации, 500K+ контекст.
 
-- **Best for:** Code generation, reviews, routine tasks, good speed/quality balance
-- **Context:** 200K tokens
-- **Speed:** Medium
-- **Use when:** Need good results fast, routine development
-- **Strengths:** Code quality, pattern matching, refactoring, prose
-- **Avoid when:** Tasks requiring deep multi-step reasoning
+## Spawn Patterns
 
-### Haiku 4.5 (fastest)
+```python
+Task(subagent_type="general-purpose", model="fable", prompt="...")  # text-воркер (ВСЕГДА дефолт)
+Task(subagent_type="general-purpose", model="haiku", prompt="...")  # массовое простое (10+ параллельных)
+Task(subagent_type="general-purpose", model="opus",  prompt="...")  # оркестратор / подхват после лимита Fable
+```
 
-- **Best for:** Simple queries, file search, classification, quick operations
-- **Context:** 200K tokens
-- **Speed:** Fastest
-- **Use when:** Speed > quality, simple tasks, subagent work
-- **Strengths:** Low latency, classification, extraction, simple transforms
-- **Avoid when:** Complex logic, architecture, anything requiring nuance
+- В frontmatter агентов: `model: fable` (канон, проставлен во всех agents/; исключение — orchestrator.md = opus).
+- Смена модели сессии: `/model opus|fable|sonnet|haiku`.
 
 ## External Models (via AI Gateway)
 
 | Model | When to Use |
 |-------|------------|
-| GPT-5.4 | Cross-model validation, function calling patterns |
+| GPT-5.6 (Codex CLI) / GPT-5.4 | Cross-model validation, второе мнение, function calling |
 | Gemini 3.1 Pro | 2M context, multimodal, Google ecosystem |
-| Gemini Flash Image | Image generation (default model) |
-| o4-mini | Math, logic, structured reasoning tasks |
+| Gemini Flash Image (NB2) | Image generation (канон → config/models.md) |
+| o4-mini | Math, logic, structured reasoning |
 | Kimi K2 | Algorithm problems, deep reasoning |
 | deep-research-pro | Multi-step research with citations |
 
-## Subagent Model Selection
-
-```
-model: "haiku"   -- exploration, simple search, file operations
-model: "sonnet"  -- code generation, reviews, moderate complexity
-model: "opus"    -- architecture, security, complex analysis
-```
-
-### Decision Flow for Subagents
-
-1. Is it a search/lookup/classification task? -> Haiku
-2. Does it generate or modify code? -> Sonnet
-3. Does it require reasoning about tradeoffs or security? -> Opus
-4. Is it a worker in a multi-agent pipeline? -> Sonnet (default)
-5. Is it the orchestrator of a multi-agent pipeline? -> Opus
-
-## When to Override Default (Opus)
-
-Switch DOWN to Sonnet when:
-- Implementing a well-defined feature (clear spec, no ambiguity)
-- Running code reviews on small PRs
-- Writing tests for existing code
-- Generating boilerplate or CRUD operations
-
-Switch DOWN to Haiku when:
-- Exploring codebase structure
-- Renaming variables or files
-- Running simple search-and-replace
-- Classifying or categorizing items
-- Generating commit messages
-
-Stay on Opus when:
-- Debugging production issues
-- Designing new systems or APIs
-- Performing security audits
-- Making decisions with incomplete information
-- Working with 500K+ token context
-
-## Switching Models
-
-- `/model opus` or `/use-opus` -- switch to Opus 4.6
-- `/model sonnet` or `/use-sonnet` -- switch to Sonnet 4.5
-- `/model haiku` or `/use-haiku` -- switch to Haiku 4.5
-- In agent definition: `model: opus|sonnet|haiku` in YAML frontmatter
-- In Task(): `Task(subagent_type="general-purpose", model="sonnet", ...)`
-
 ## Cost-Efficiency Rules
 
-1. Never use Opus for tasks Haiku can handle -- saves time, not money (Max sub)
-2. Prefer Sonnet as the default subagent model -- best speed/quality ratio
-3. Reserve Opus for orchestrators and complex decisions
-4. Use Haiku for high-volume parallel subagents (10+ concurrent)
-5. External models cost real money -- use only when Claude models lack capability
+1. Text-воркеры = Fable всегда; уровень сложности регулируй промптом/контекстом, не сменой движка.
+2. ≤5 Fable одновременно; при rate-limit снижай параллелизм, упал — Opus подхватывает.
+3. Haiku — для high-volume параллельных простых задач (10+), не для нюансных.
+4. Opus не спавнить как воркера без причины — он оркестратор сессии.
+5. External models стоят реальных денег — только когда Claude-модели не умеют (медиа, 2M контекст, кросс-валидация).
+
+---
+
+Полный каталог ID/алиасов (Opus 4.8, Fable 5, image-модели NB2/Lite/Pro, внешние) → `config/models.md`.

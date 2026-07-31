@@ -5,7 +5,7 @@ argument-hint: "<content to review>"
 
 # Brand Review
 
-> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+> If you see unfamiliar placeholders or need to check which tools are connected, see the MCP registry: `~/.claude/config/mcp-servers.md`.
 
 Review marketing content against brand voice, style guidelines, and messaging standards. Flag deviations and provide specific improvement suggestions.
 
@@ -17,7 +17,7 @@ User runs `/brand-review` or asks to review, check, or audit content against bra
 
 1. **Content to review** — accept content in any of these forms:
    - Pasted directly into the conversation
-   - A file path or ~~knowledge base reference (e.g. Notion page, shared doc)
+   - A file path or knowledge base reference (e.g. Notion page, shared doc)
    - A URL to a published page
    - Multiple pieces for batch review
 

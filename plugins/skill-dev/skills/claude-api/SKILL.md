@@ -1,6 +1,6 @@
 ---
 name: claude-api
-description: "Claude API Skill"
+description: "Anthropic Claude API (ANTHROPIC_API_KEY) из Python: text generation, vision, tool use, streaming. Триггеры: «claude api», «вызови клода из кода», «anthropic sdk». Для запуска БЕЗ ключа по подписке → claude-cli-runner. Model ID актуализированы 2026-07-18 (opus-4-8 / sonnet-4-5-20250929 / haiku-4-5-20251001 / fable-5); канон — config/models.md."
 ---
 
 # Claude API Skill
@@ -16,9 +16,9 @@ Expert skill for using Anthropic Claude API - Claude 4.5 Sonnet, Opus, and Haiku
 # ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
 
 # Models
-CLAUDE_SONNET_MODEL=claude-sonnet-4-5-20250514
-CLAUDE_OPUS_MODEL=claude-opus-4-5-20250514
-CLAUDE_HAIKU_MODEL=claude-haiku-4-5-20250514
+CLAUDE_SONNET_MODEL=claude-sonnet-4-5-20250929
+CLAUDE_OPUS_MODEL=claude-opus-4-8
+CLAUDE_HAIKU_MODEL=claude-haiku-4-5-20251001
 ```
 
 ## When to Use Claude API
@@ -48,9 +48,12 @@ pip install anthropic
 
 | Model | ID | Best For | Context |
 |-------|-----|----------|---------|
-| Claude 4.5 Opus | claude-opus-4-5-20250514 | Complex reasoning, research | 200K |
-| Claude 4.5 Sonnet | claude-sonnet-4-5-20250514 | Balanced performance | 200K |
-| Claude 4.5 Haiku | claude-haiku-4-5-20250514 | Fast, cost-effective | 200K |
+| Claude Opus 4.8 | claude-opus-4-8 | Complex reasoning, research | 1M |
+| Claude Sonnet 4.5 | claude-sonnet-4-5-20250929 | Balanced performance | 200K |
+| Claude Haiku 4.5 | claude-haiku-4-5-20251001 | Fast, cost-effective | 200K |
+| Fable 5 | claude-fable-5 | Text-субагенты (канон воркеров) | 200K |
+
+Канон актуальных ID → `config/models.md`.
 
 ## Basic Usage
 
@@ -66,14 +69,14 @@ client = Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
 ### Text Generation
 
 ```python
-def chat(prompt: str, system: str = None, model: str = "claude-sonnet-4-5-20250514"):
+def chat(prompt: str, system: str = None, model: str = "claude-sonnet-4-5-20250929"):
     """
     Chat with Claude.
 
-    Models:
-        - claude-opus-4-5-20250514: Best quality
-        - claude-sonnet-4-5-20250514: Balanced
-        - claude-haiku-4-5-20250514: Fast & cheap
+    Models (канон → config/models.md):
+        - claude-opus-4-8: Best quality
+        - claude-sonnet-4-5-20250929: Balanced
+        - claude-haiku-4-5-20251001: Fast & cheap
     """
     message = client.messages.create(
         model=model,
@@ -87,7 +90,7 @@ def chat(prompt: str, system: str = None, model: str = "claude-sonnet-4-5-202505
     return message.content[0].text
 
 # Usage
-response = chat("Explain quantum computing", model="claude-sonnet-4-5-20250514")
+response = chat("Explain quantum computing", model="claude-sonnet-4-5-20250929")
 ```
 
 ### Vision (Image Analysis)
@@ -112,7 +115,7 @@ def analyze_image(image_path: str, prompt: str):
         media_type = "image/jpeg"
 
     message = client.messages.create(
-        model="claude-sonnet-4-5-20250514",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=1024,
         messages=[
             {
@@ -145,7 +148,7 @@ def with_tools(prompt: str, tools: list):
     """Use Claude with tools/function calling."""
 
     message = client.messages.create(
-        model="claude-sonnet-4-5-20250514",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=1024,
         tools=tools,
         messages=[{"role": "user", "content": prompt}]
@@ -188,7 +191,7 @@ def stream_chat(prompt: str, system: str = None):
     """Stream response for real-time output."""
 
     with client.messages.stream(
-        model="claude-sonnet-4-5-20250514",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=4096,
         system=system or "You are a helpful assistant.",
         messages=[{"role": "user", "content": prompt}]
@@ -208,7 +211,7 @@ def multi_turn(messages: list, system: str = None):
         [{"role": "user", "content": "..."}, {"role": "assistant", "content": "..."}]
     """
     response = client.messages.create(
-        model="claude-sonnet-4-5-20250514",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=4096,
         system=system,
         messages=messages
@@ -232,7 +235,7 @@ def with_thinking(prompt: str, budget_tokens: int = 10000):
     """Use extended thinking for complex reasoning."""
 
     response = client.messages.create(
-        model="claude-sonnet-4-5-20250514",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=16000,
         thinking={
             "type": "enabled",
@@ -270,7 +273,7 @@ def with_thinking(prompt: str, budget_tokens: int = 10000):
 
 | Model | Input | Output |
 |-------|-------|--------|
-| Claude 4.5 Opus | $15/1M tokens | $75/1M tokens |
+| Claude Opus 4.8 | $15/1M tokens | $75/1M tokens |
 | Claude 4.5 Sonnet | $3/1M tokens | $15/1M tokens |
 | Claude 4.5 Haiku | $0.25/1M tokens | $1.25/1M tokens |
 
@@ -296,7 +299,7 @@ def search_and_answer(query: str):
     Requires server-side implementation via MCP or Claude.ai.
     """
     response = client.messages.create(
-        model="claude-sonnet-4-5-20250514",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=4096,
         tools=[{
             "type": "web_search",
@@ -325,7 +328,7 @@ def analyze_pdf(pdf_path: str, prompt: str):
         pdf_data = base64.standard_b64encode(f.read()).decode("utf-8")
 
     message = client.messages.create(
-        model="claude-sonnet-4-5-20250514",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=4096,
         messages=[
             {
@@ -363,21 +366,21 @@ def computer_use_task(task: str, display_size: tuple = (1920, 1080)):
     Requires computer_use tool and screen access.
     """
     response = client.messages.create(
-        model="claude-sonnet-4-5-20250514",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=4096,
         tools=[
             {
-                "type": "computer_20241022",
+                "type": "computer_20250124",
                 "name": "computer",
                 "display_width_px": display_size[0],
                 "display_height_px": display_size[1]
             },
             {
-                "type": "text_editor_20241022",
+                "type": "text_editor_20250124",
                 "name": "str_replace_editor"
             },
             {
-                "type": "bash_20241022",
+                "type": "bash_20250124",
                 "name": "bash"
             }
         ],
@@ -403,7 +406,7 @@ def create_batch(requests: list):
             {
                 "custom_id": f"request-{i}",
                 "params": {
-                    "model": "claude-sonnet-4-5-20250514",
+                    "model": "claude-sonnet-4-5-20250929",
                     "max_tokens": 1024,
                     "messages": [{"role": "user", "content": req}]
                 }
@@ -451,7 +454,7 @@ def with_mcp_tools(prompt: str, mcp_server: str):
 
     # Example: using MCP tools in messages
     response = client.messages.create(
-        model="claude-sonnet-4-5-20250514",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=4096,
         messages=[{"role": "user", "content": prompt}],
         # MCP tools injected by client
@@ -478,7 +481,7 @@ def with_mcp_tools(prompt: str, mcp_server: str):
 
 | Model | Input | Output |
 |-------|-------|--------|
-| Claude 4.5 Opus | $15/1M | $75/1M |
+| Claude Opus 4.8 | $15/1M | $75/1M |
 | Claude 4.5 Sonnet | $3/1M | $15/1M |
 | Claude 4.5 Haiku | $0.25/1M | $1.25/1M |
 | Batch API | 50% discount | 50% discount |

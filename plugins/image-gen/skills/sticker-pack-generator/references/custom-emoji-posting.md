@@ -24,7 +24,7 @@ from telethon.tl.types import (
 
 # 1. Resolve your emoji set into an alt -> document_id map.
 pack = await client(GetStickerSetRequest(
-    InputStickerSetShortName('<your_pack_name>'),
+    InputStickerSetShortName('<your_pack_short_name>'),
     hash=0,
 ))
 doc_by_alt = {}
@@ -73,7 +73,7 @@ Practical consequences:
 | `🔥` (surrogate pair, non-BMP) | 2 |
 | `🤣` (surrogate pair, non-BMP) | 2 |
 | `🤩` (surrogate pair, non-BMP) | 2 |
-| `👨‍👩‍👧` (ZWJ sequence, 4 codepoints + ZWJ) | 11 |
+| `👨👩👧` (ZWJ sequence, 4 codepoints + ZWJ) | 11 |
 | `a`, `я` (BMP letter) | 1 |
 
 ZWJ sequences are rare in practice — most emoji you'll bind to custom

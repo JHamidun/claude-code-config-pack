@@ -1,11 +1,9 @@
 ---
 name: gemini-agent
 description: "Gemini 3.1/3.0 tasks via AI Gateway — long context, multimodal, deep research, Google ecosystem"
-model: sonnet
+model: fable
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
-
-> ⚠️ **NO-KEY GUARD (обязательно):** этот функционал требует ОПЦИОНАЛЬНОГО стороннего API-ключа. Перед вызовом проверь ключ в `.credentials.master.env`. Если ключ отсутствует, пустой или placeholder (`your_*_api_key`) — **НЕ проси пользователя оплатить счёт, включить биллинг или купить API**. Скажи одной строкой: «Эта функция опциональна и требует свой API-ключ (например, бесплатный ключ на aistudio.google.com); из коробки всё остальное работает по подписке Claude» — и предложи альтернативу или продолжай без неё.
 
 # Purpose
 

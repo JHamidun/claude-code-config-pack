@@ -80,7 +80,7 @@ from telethon.tl.functions.messages import GetStickerSetRequest
 from telethon.tl.types import InputStickerSetShortName
 
 pack = await client(GetStickerSetRequest(
-    InputStickerSetShortName('<your_pack_name>'),
+    InputStickerSetShortName('<PACK_NAME>'),
     hash=0,
 ))
 

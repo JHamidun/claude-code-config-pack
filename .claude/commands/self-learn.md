@@ -1,9 +1,13 @@
 ---
-description: Self-learning mechanism - анализ ошибок и автоматическое улучшение
+description: Self-learning mechanism - анализ ошибок и автоматическое улучшение (см. rules/auto-learning.md)
 argument-hint: [analyze|session|daily|weekly]
 ---
 
 # Self-Learning: $ARGUMENTS
+
+> **Дублирует / расширяет `~/.claude/rules/auto-learning.md`** (авто-загружаемое правило AUTO-LEARNING + Auto Memory).
+> Правило описывает постоянную стратегию памяти (`~/.claude/projects/<project>/memory/`, MEMORY.md, topic-файлы, dream consolidation).
+> Эта команда — ручной триггер разбора сессии; сохраняй learnings в те же memory-файлы, что и правило.
 
 **Анализирую сессию и сохраняю learnings для улучшения будущих взаимодействий**
 
@@ -116,7 +120,7 @@ Criteria:
 ### Step 4: Save to Memory
 ```bash
 # Для каждого validated learning:
-python ${WORKSPACE}/tools/vector_memory.py learn "$LEARNING" "$CATEGORY"
+python ~/.claude/tools/vector_memory.py learn "$LEARNING" "$CATEGORY"
 ```
 
 ### Step 5: Update Workflows (if applicable)
@@ -189,7 +193,7 @@ learning = {
 }
 
 # Save via vector_memory.py
-python ${WORKSPACE}/tools/vector_memory.py learn "{learning['content']}" "{learning['category']}"
+python ~/.claude/tools/vector_memory.py learn "{learning['content']}" "{learning['category']}"
 ```
 
 ### Retrieval перед ответами

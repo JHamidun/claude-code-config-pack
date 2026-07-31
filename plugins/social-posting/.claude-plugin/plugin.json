@@ -1,9 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "social-posting",
-  "displayName": "Social Posting",
+  "displayName": "Messaging & Posting",
   "version": "0.1.0",
-  "description": "Publish to X, Threads, Bluesky, Instagram, TikTok; multi-platform post drafting.",
+  "description": "Publish to Telegram channels via bot, message over WhatsApp, send SMS (Twilio), work with any IMAP/SMTP mailbox.",
   "author": {
     "name": "Zhemal Khamidun",
     "url": "https://github.com/JHamidun"
@@ -11,8 +11,9 @@
   "repository": "https://github.com/JHamidun/claude-code-config-pack",
   "license": "MIT",
   "keywords": [
-    "social",
-    "posting",
-    "content"
+    "telegram",
+    "whatsapp",
+    "sms",
+    "email"
   ]
 }

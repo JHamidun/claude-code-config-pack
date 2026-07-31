@@ -1,3 +1,8 @@
+---
+description: "Делегирование многоступенчатых задач платформе Manus AI через manus_helper.py: создание задач (режимы speed/quality/balanced), мониторинг, получение результатов. Триггеры: «manus», «делегируй манусу», «задача для manus». API-референс и capabilities платформы → skill manus (одноимённый)."
+argument-hint: "\"<задача>\" [speed|quality|balanced]"
+---
+
 # Manus AI Agent - Автоматизация сложных задач
 
 Используй Manus AI для делегирования сложных многоступенчатых задач AI агенту.

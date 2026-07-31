@@ -1,7 +1,7 @@
 ---
 name: slide-designer
 description: Creates complete, production-ready HTML slides with embedded images, diagrams, and interactive elements
-model: opus
+model: fable
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
@@ -201,7 +201,7 @@ If user requests one of these, use HTML mode.
 - 8-12 slides per presentation (not more, not less)
 - Every slide has a visual element (not just text)
 - Consistent style across all slides
-- Use the user's preferred language (ask if not specified)
+- Russian text by default (unless user specifies otherwise)
 - Content from provided docs, not generic filler
 - Professional color palette matching chosen style
 - Clear information hierarchy

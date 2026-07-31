@@ -1,0 +1,2633 @@
+[
+{
+  "display_name": "Cinematic Studio 2.5",
+  "job_set_type": "cinematic_studio_2_5",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "4:3",
+        "3:4",
+        "16:9",
+        "9:16"
+      ]
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "1k",
+      "required": false,
+      "enum": [
+        "1k",
+        "2k",
+        "4k"
+      ]
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Cinematic Studio Image",
+  "job_set_type": "cinematic_studio_image",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "1:1",
+        "4:3",
+        "3:4",
+        "16:9",
+        "9:16",
+        "3:2",
+        "2:3",
+        "21:9"
+      ]
+    },
+    {
+      "name": "batch_size",
+      "type": "integer",
+      "default": 1,
+      "required": false
+    },
+    {
+      "name": "camera_aperture_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "camera_focal_length_id",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "camera_lens_id",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "camera_model_id",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "2k",
+      "required": false,
+      "enum": [
+        "1k",
+        "2k",
+        "4k"
+      ]
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "FLUX.2",
+  "job_set_type": "flux_2",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "4:3",
+        "3:4",
+        "16:9",
+        "9:16"
+      ]
+    },
+    {
+      "name": "input_images",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "model",
+      "type": "string",
+      "default": "pro",
+      "required": false,
+      "enum": [
+        "pro",
+        "flex",
+        "max"
+      ]
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "1k",
+      "required": false,
+      "enum": [
+        "1k",
+        "2k"
+      ]
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Flux Kontext",
+  "job_set_type": "flux_kontext",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "4:3",
+        "3:4",
+        "16:9",
+        "9:16"
+      ]
+    },
+    {
+      "name": "input_images",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "GPT Image 2",
+  "job_set_type": "gpt_image_2",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "4:3",
+        "3:4",
+        "16:9",
+        "9:16",
+        "3:2",
+        "2:3"
+      ]
+    },
+    {
+      "name": "batch_size",
+      "type": "integer",
+      "default": 1,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "quality",
+      "type": "string",
+      "default": "high",
+      "required": false,
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "2k",
+      "required": false,
+      "enum": [
+        "1k",
+        "2k",
+        "4k"
+      ]
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Grok Image",
+  "job_set_type": "grok_image",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "4:3",
+        "3:4",
+        "16:9",
+        "9:16"
+      ]
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "mode",
+      "type": "string",
+      "default": "std",
+      "required": false,
+      "enum": [
+        "std",
+        "quality"
+      ]
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Higgsfield Soul V2",
+  "job_set_type": "text2image_soul_v2",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "16:9",
+        "9:16",
+        "4:3",
+        "3:4",
+        "3:2",
+        "2:3"
+      ]
+    },
+    {
+      "name": "custom_reference_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "quality",
+      "type": "string",
+      "default": "2k",
+      "required": false,
+      "enum": [
+        "1.5k",
+        "2k"
+      ]
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Image Auto",
+  "job_set_type": "image_auto",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "4:3",
+        "3:4",
+        "16:9",
+        "9:16"
+      ]
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Image Background Remover",
+  "job_set_type": "image_background_remover",
+  "params": [
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Kling O1 Image",
+  "job_set_type": "kling_omni_image",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "auto",
+        "16:9",
+        "9:16",
+        "4:3",
+        "3:4",
+        "3:2",
+        "2:3",
+        "21:9"
+      ]
+    },
+    {
+      "name": "input_images",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "1k",
+      "required": false,
+      "enum": [
+        "1k",
+        "2k"
+      ]
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "MS Image",
+  "job_set_type": "ms_image",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "auto",
+        "1:1",
+        "3:2",
+        "2:3",
+        "4:3",
+        "3:4",
+        "4:5",
+        "5:4",
+        "9:16",
+        "16:9",
+        "21:9"
+      ]
+    },
+    {
+      "name": "avatars",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "batch_size",
+      "type": "integer",
+      "default": 1,
+      "required": false
+    },
+    {
+      "name": "brand_kit_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "folder_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "product_ids",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "quality",
+      "type": "string",
+      "default": "low",
+      "required": false,
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "1k",
+      "required": false
+    },
+    {
+      "name": "style_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Marketing Studio Image",
+  "job_set_type": "marketing_studio_image",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "auto",
+        "1:1",
+        "3:2",
+        "2:3",
+        "4:3",
+        "3:4",
+        "4:5",
+        "5:4",
+        "9:16",
+        "16:9",
+        "21:9"
+      ]
+    },
+    {
+      "name": "input_images",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "1k",
+      "required": false,
+      "enum": [
+        "1k",
+        "2k",
+        "4k"
+      ]
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Nano Banana",
+  "job_set_type": "nano_banana",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "auto",
+        "1:1",
+        "3:2",
+        "2:3",
+        "4:3",
+        "3:4",
+        "4:5",
+        "5:4",
+        "9:16",
+        "16:9",
+        "21:9"
+      ]
+    },
+    {
+      "name": "input_images",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Nano Banana 2",
+  "job_set_type": "nano_banana_flash",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "3:2",
+        "2:3",
+        "4:3",
+        "3:4",
+        "4:5",
+        "5:4",
+        "9:16",
+        "16:9",
+        "21:9"
+      ]
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "1k",
+      "required": false,
+      "enum": [
+        "1k",
+        "2k",
+        "4k"
+      ]
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Nano Banana Pro",
+  "job_set_type": "nano_banana_2",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "auto",
+        "1:1",
+        "3:2",
+        "2:3",
+        "4:3",
+        "3:4",
+        "4:5",
+        "5:4",
+        "9:16",
+        "16:9",
+        "21:9"
+      ]
+    },
+    {
+      "name": "folder_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "input_images",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "2k",
+      "required": false,
+      "enum": [
+        "1k",
+        "2k",
+        "4k"
+      ]
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Nano Banana Pro",
+  "job_set_type": "nano_banana_2_ai_stylist",
+  "params": [
+    {
+      "name": "background_preset_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "folder_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "input_image",
+      "type": "object",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "outfit_preset_ids",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "pose_preset_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "user_outfit_ids",
+      "type": "array",
+      "default": null,
+      "required": false
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Nano Banana Pro",
+  "job_set_type": "nano_banana_2_skin_enhancer",
+  "params": [
+    {
+      "name": "folder_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "height",
+      "type": "integer",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "input_image",
+      "type": "object",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "preset_id",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "width",
+      "type": "integer",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Nano Banana Pro",
+  "job_set_type": "nano_banana_2_shots",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "auto",
+      "required": false,
+      "enum": [
+        "auto",
+        "1:1",
+        "3:2",
+        "2:3",
+        "4:3",
+        "3:4",
+        "4:5",
+        "5:4",
+        "9:16",
+        "16:9",
+        "21:9"
+      ]
+    },
+    {
+      "name": "folder_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "height",
+      "type": "integer",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "input_images",
+      "type": "array",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "width",
+      "type": "integer",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "OpenAI Hazel",
+  "job_set_type": "openai_hazel",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "3:2",
+        "2:3",
+        "auto"
+      ]
+    },
+    {
+      "name": "input_images",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "quality",
+      "type": "string",
+      "default": "medium",
+      "required": false,
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Recraft V4.1",
+  "job_set_type": "recraft_v4_1",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "3:4",
+        "4:3",
+        "4:5",
+        "5:4",
+        "3:2",
+        "2:3",
+        "16:9",
+        "9:16",
+        "21:9"
+      ]
+    },
+    {
+      "name": "background_color",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "batch_size",
+      "type": "integer",
+      "default": 1,
+      "required": false
+    },
+    {
+      "name": "colors",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "model_type",
+      "type": "string",
+      "default": "standard",
+      "required": false,
+      "enum": [
+        "standard",
+        "vector",
+        "utility",
+        "utility_vector"
+      ]
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "1k",
+      "required": false,
+      "enum": [
+        "1k",
+        "2k"
+      ]
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Seedream 4.5",
+  "job_set_type": "seedream_v4_5",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "4:3",
+        "16:9",
+        "3:2",
+        "21:9",
+        "3:4",
+        "9:16",
+        "2:3"
+      ]
+    },
+    {
+      "name": "input_images",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "quality",
+      "type": "string",
+      "default": "basic",
+      "required": false,
+      "enum": [
+        "basic",
+        "high"
+      ]
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Seedream V5 Lite",
+  "job_set_type": "seedream_v5_lite",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "4:3",
+        "3:4",
+        "16:9",
+        "9:16"
+      ]
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "quality",
+      "type": "string",
+      "default": "basic",
+      "required": false,
+      "enum": [
+        "basic",
+        "high"
+      ]
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Soul Cinematic",
+  "job_set_type": "soul_cinematic",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "16:9",
+        "9:16",
+        "4:3",
+        "3:4",
+        "3:2",
+        "2:3",
+        "21:9"
+      ]
+    },
+    {
+      "name": "custom_reference_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "quality",
+      "type": "string",
+      "default": "2k",
+      "required": false,
+      "enum": [
+        "1.5k",
+        "2k"
+      ]
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Soul Location",
+  "job_set_type": "soul_location",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "16:9",
+        "9:16",
+        "4:3",
+        "3:4",
+        "3:2",
+        "2:3",
+        "21:9",
+        "9:21"
+      ]
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Topaz",
+  "job_set_type": "topaz_image",
+  "params": [
+    {
+      "name": "denoise",
+      "type": "number",
+      "default": 0,
+      "required": false
+    },
+    {
+      "name": "face_enhancement",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "face_enhancement_creativity",
+      "type": "number",
+      "default": 0,
+      "required": false
+    },
+    {
+      "name": "face_enhancement_strength",
+      "type": "number",
+      "default": 0,
+      "required": false
+    },
+    {
+      "name": "folder_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "height",
+      "type": "integer",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "input_image",
+      "type": "object",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "model",
+      "type": "string",
+      "default": "Standard V2",
+      "required": false,
+      "enum": [
+        "Standard V2",
+        "Low Resolution V2",
+        "CGI",
+        "High Fidelity V2",
+        "Text Refine"
+      ]
+    },
+    {
+      "name": "output_height",
+      "type": "integer",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "output_width",
+      "type": "integer",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "sharpen",
+      "type": "number",
+      "default": 0,
+      "required": false
+    },
+    {
+      "name": "width",
+      "type": "integer",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Z Image",
+  "job_set_type": "z_image",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "4:3",
+        "3:4",
+        "16:9",
+        "9:16"
+      ]
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "soul_cinema_studio",
+  "job_set_type": "soul_cinema_studio",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "1:1",
+        "16:9",
+        "9:16",
+        "4:3",
+        "3:4",
+        "3:2",
+        "2:3",
+        "21:9"
+      ]
+    },
+    {
+      "name": "custom_reference_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "enhance_prompt",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "quality",
+      "type": "string",
+      "default": "2k",
+      "required": false,
+      "enum": [
+        "1.5k",
+        "2k"
+      ]
+    },
+    {
+      "name": "style_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    }
+  ],
+  "type": "image"
+}
+,
+{
+  "display_name": "Brain Activity",
+  "job_set_type": "brain_activity",
+  "params": [
+    {
+      "name": "folder_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "text"
+}
+,
+{
+  "display_name": "3D Objects",
+  "job_set_type": "sam_3_3d",
+  "params": [
+    {
+      "name": "detection_threshold",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "export_textured_glb",
+      "type": "boolean",
+      "default": true,
+      "required": false
+    },
+    {
+      "name": "folder_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": "",
+      "required": false
+    },
+    {
+      "name": "seed",
+      "type": "object",
+      "default": null,
+      "required": false
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Cinematic Studio 3.0",
+  "job_set_type": "cinematic_studio_3_0",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1"
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "integer",
+      "default": 5,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Cinematic Studio Video",
+  "job_set_type": "cinematic_studio_video",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "1:1",
+        "4:3",
+        "3:4",
+        "16:9",
+        "9:16"
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "string",
+      "default": 5,
+      "required": false,
+      "enum": [
+        "5",
+        "10"
+      ]
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "slow_motion",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "sound",
+      "type": "boolean",
+      "default": true,
+      "required": false
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Cinematic Studio Video V2",
+  "job_set_type": "cinematic_studio_video_v2",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "1:1",
+        "4:3",
+        "3:4",
+        "16:9",
+        "9:16"
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "integer",
+      "default": 5,
+      "required": false
+    },
+    {
+      "name": "genre",
+      "type": "string",
+      "default": "auto",
+      "required": false,
+      "enum": [
+        "auto",
+        "action",
+        "horror",
+        "comedy",
+        "western",
+        "suspense",
+        "intimate",
+        "spectacle"
+      ]
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "mode",
+      "type": "string",
+      "default": "std",
+      "required": false,
+      "enum": [
+        "pro",
+        "std"
+      ]
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Draw To Video",
+  "job_set_type": "draw_to_video",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "auto",
+      "required": false,
+      "enum": [
+        "auto",
+        "21:9",
+        "16:9",
+        "4:3",
+        "1:1",
+        "3:4",
+        "9:16"
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "enhancer",
+      "type": "boolean",
+      "default": true,
+      "required": false
+    },
+    {
+      "name": "folder_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "generate_audio",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "ref_image",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "720p",
+      "required": false,
+      "enum": [
+        "480p",
+        "720p",
+        "1080p"
+      ]
+    },
+    {
+      "name": "sketch",
+      "type": "object",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "video",
+      "type": "object",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Google Veo 3",
+  "job_set_type": "veo3",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "16:9",
+        "9:16"
+      ]
+    },
+    {
+      "name": "input_image",
+      "type": "object",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "model",
+      "type": "string",
+      "default": "veo-3-fast",
+      "required": false,
+      "enum": [
+        "veo-3-preview",
+        "veo-3-fast"
+      ]
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Google Veo 3.1",
+  "job_set_type": "veo3_1",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "16:9",
+        "9:16"
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "string",
+      "default": 8,
+      "required": false,
+      "enum": [
+        "4",
+        "6",
+        "8"
+      ]
+    },
+    {
+      "name": "input_image",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "model",
+      "type": "string",
+      "default": "veo-3-1-fast",
+      "required": false,
+      "enum": [
+        "veo-3-1-preview",
+        "veo-3-1-fast"
+      ]
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "quality",
+      "type": "string",
+      "default": "basic",
+      "required": false,
+      "enum": [
+        "basic",
+        "high",
+        "ultra"
+      ]
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Google Veo 3.1 Lite",
+  "job_set_type": "veo3_1_lite",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "16:9",
+        "9:16",
+        "auto"
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "string",
+      "default": 8,
+      "required": false,
+      "enum": [
+        "4",
+        "6",
+        "8"
+      ]
+    },
+    {
+      "name": "generate_audio",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Grok Video",
+  "job_set_type": "grok_video",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1"
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "integer",
+      "default": 5,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Grok Video 1.5",
+  "job_set_type": "grok_video_v15",
+  "params": [
+    {
+      "name": "duration",
+      "type": "integer",
+      "default": 5,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "720p",
+      "required": false,
+      "enum": [
+        "480p",
+        "720p"
+      ]
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Kling 2.6 Video",
+  "job_set_type": "kling2_6",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1"
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "string",
+      "default": 5,
+      "required": false,
+      "enum": [
+        "5",
+        "10"
+      ]
+    },
+    {
+      "name": "input_image",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "sound",
+      "type": "boolean",
+      "default": true,
+      "required": false
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Kling v3.0",
+  "job_set_type": "kling3_0",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1"
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "integer",
+      "default": 5,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "mode",
+      "type": "string",
+      "default": "std",
+      "required": false,
+      "enum": [
+        "pro",
+        "std",
+        "4k"
+      ]
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "sound",
+      "type": "string",
+      "default": "on",
+      "required": false,
+      "enum": [
+        "on",
+        "off"
+      ]
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "LLM Generation",
+  "job_set_type": "llm_text",
+  "params": [
+    {
+      "name": "input_images",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "model",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "reasoning_effort",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "system_prompt",
+      "type": "string",
+      "default": "",
+      "required": false
+    },
+    {
+      "name": "user_prompt",
+      "type": "string",
+      "default": "",
+      "required": false
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Marketing Studio Video",
+  "job_set_type": "marketing_studio_video",
+  "params": [
+    {
+      "name": "ad_reference_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "auto",
+        "21:9",
+        "16:9",
+        "4:3",
+        "1:1",
+        "3:4",
+        "9:16"
+      ]
+    },
+    {
+      "name": "avatars",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "duration",
+      "type": "integer",
+      "default": 15,
+      "required": false
+    },
+    {
+      "name": "generate_audio",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "hook_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "mode",
+      "type": "string",
+      "default": "ugc",
+      "required": false,
+      "enum": [
+        "ugc",
+        "ugc_how_to",
+        "ugc_unboxing",
+        "product_showcase",
+        "product_review",
+        "tv_spot",
+        "wild_card",
+        "ugc_virtual_try_on",
+        "virtual_try_on"
+      ]
+    },
+    {
+      "name": "product_ids",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "720p",
+      "required": false,
+      "enum": [
+        "480p",
+        "720p",
+        "1080p"
+      ]
+    },
+    {
+      "name": "setting_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "web_product_ids",
+      "type": "array",
+      "default": null,
+      "required": false
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Minimax Hailuo",
+  "job_set_type": "minimax_hailuo",
+  "params": [
+    {
+      "name": "duration",
+      "type": "string",
+      "default": 6,
+      "required": false,
+      "enum": [
+        "6",
+        "10"
+      ]
+    },
+    {
+      "name": "input_images",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "model",
+      "type": "string",
+      "default": "minimax-2.3",
+      "required": false,
+      "enum": [
+        "minimax",
+        "minimax-fast",
+        "minimax-2.3",
+        "minimax-2.3-fast"
+      ]
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "768",
+      "required": false,
+      "enum": [
+        "512",
+        "768",
+        "1080"
+      ]
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Reframe",
+  "job_set_type": "reframe",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": null,
+      "required": true,
+      "enum": [
+        "21:9",
+        "16:9",
+        "4:3",
+        "1:1",
+        "3:4",
+        "9:16"
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "folder_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "720p",
+      "required": false,
+      "enum": [
+        "480p",
+        "720p",
+        "1080p"
+      ]
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Remove Background",
+  "job_set_type": "sam_3_video",
+  "params": [
+    {
+      "name": "apply_mask",
+      "type": "boolean",
+      "default": true,
+      "required": false
+    },
+    {
+      "name": "folder_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "frames_count",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": "",
+      "required": false
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Seedance 1.5 Pro",
+  "job_set_type": "seedance1_5",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "auto",
+        "16:9",
+        "9:16",
+        "4:3",
+        "3:4",
+        "1:1",
+        "21:9"
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "string",
+      "default": 4,
+      "required": false,
+      "enum": [
+        "4",
+        "8",
+        "12"
+      ]
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "720p",
+      "required": false,
+      "enum": [
+        "480p",
+        "720p",
+        "1080p"
+      ]
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Seedance 2.0",
+  "job_set_type": "seedance_2_0",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "auto",
+        "16:9",
+        "9:16",
+        "4:3",
+        "3:4",
+        "1:1",
+        "21:9"
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "integer",
+      "default": 5,
+      "required": false
+    },
+    {
+      "name": "genre",
+      "type": "string",
+      "default": "auto",
+      "required": false,
+      "enum": [
+        "auto",
+        "action",
+        "horror",
+        "comedy",
+        "noir",
+        "drama",
+        "epic"
+      ]
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "mode",
+      "type": "string",
+      "default": "std",
+      "required": false,
+      "enum": [
+        "std",
+        "fast"
+      ]
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "720p",
+      "required": false,
+      "enum": [
+        "480p",
+        "720p",
+        "1080p"
+      ]
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Soul Cast",
+  "job_set_type": "soul_cast",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "1:1",
+      "required": false,
+      "enum": [
+        "1:1",
+        "16:9",
+        "9:16",
+        "4:3",
+        "3:4",
+        "3:2",
+        "2:3",
+        "5:4",
+        "4:5",
+        "21:9",
+        "9:21"
+      ]
+    },
+    {
+      "name": "budget",
+      "type": "integer",
+      "default": 50,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "object",
+      "default": null,
+      "required": false
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Topaz",
+  "job_set_type": "topaz_video",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "auto",
+      "required": false,
+      "enum": [
+        "auto",
+        "21:9",
+        "16:9",
+        "4:3",
+        "1:1",
+        "3:4",
+        "9:16"
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "enhancement",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "folder_id",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "frame_interpolation",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "frame_rate",
+      "type": "number",
+      "default": 30,
+      "required": false
+    },
+    {
+      "name": "frames_count",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "input_height",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "input_video",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "input_video_size",
+      "type": "integer",
+      "default": 0,
+      "required": false
+    },
+    {
+      "name": "input_width",
+      "type": "object",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "1080p",
+      "required": false,
+      "enum": [
+        "1080p",
+        "2160p"
+      ]
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Wan 2.6 Video",
+  "job_set_type": "wan2_6",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1"
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "string",
+      "default": 5,
+      "required": false,
+      "enum": [
+        "5",
+        "10",
+        "15"
+      ]
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "quality",
+      "type": "string",
+      "default": "720p",
+      "required": false,
+      "enum": [
+        "720p",
+        "1080p"
+      ]
+    }
+  ],
+  "type": "video"
+}
+,
+{
+  "display_name": "Wan 2.7",
+  "job_set_type": "wan2_7",
+  "params": [
+    {
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "16:9",
+      "required": false,
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1",
+        "4:3",
+        "3:4"
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "integer",
+      "default": 5,
+      "required": false
+    },
+    {
+      "name": "medias",
+      "type": "array",
+      "default": null,
+      "required": false
+    },
+    {
+      "name": "prompt",
+      "type": "string",
+      "default": null,
+      "required": true
+    },
+    {
+      "name": "resolution",
+      "type": "string",
+      "default": "720p",
+      "required": false,
+      "enum": [
+        "720p",
+        "1080p"
+      ]
+    }
+  ],
+  "type": "video"
+}
+]

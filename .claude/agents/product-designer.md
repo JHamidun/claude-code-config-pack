@@ -1,7 +1,7 @@
 ---
 name: product-designer
 description: Senior Product Designer specializing in UX/UI design, user flows, wireframes, design systems, responsive layouts, accessibility (WCAG 2.2 AA), interaction design, and developer handoff. Produces structured design specs, component definitions, and implementation-ready documentation.
-model: opus
+model: fable
 tools: Read, Write, Edit, Glob, Grep
 ---
 

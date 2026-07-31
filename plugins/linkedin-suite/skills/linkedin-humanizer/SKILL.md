@@ -1,6 +1,6 @@
 ---
 name: linkedin-humanizer
-description: Remove AI tells from any LinkedIn post or comment draft. Tier-based scrubber (forensic / strict / aesthetic / all) that strips real AI signals like oaicite tokens and knowledge-cutoff disclaimers, optionally also corporate-speak (leverage, delve, utilize) and aesthetic patterns (em dashes, rule of three) on demand. Use before publishing any AI-drafted content. Keywords humanizer, AI detection, OriginalityAI, GPTZero, scrub AI tells, rewrite human, forensic, strict, aesthetic.
+description: "Anti-AI-tells suite for LinkedIn (EN), 5 modes: humanize/scrub (tiers forensic/strict/aesthetic), rules explainer, emoji detector, detector tester (GPTZero, Originality.ai, ZeroGPT, Copyleaks), pre-publish post audit vs 2026 algorithm. Триггеры: humanize linkedin, scrub AI tells, AI detector, эмодзи детектор, audit my linkedin draft. НЕ: русские тексты на любых площадках → skill de-ai-ify."
 ---
 
 # LinkedIn Humanizer V2
@@ -15,12 +15,12 @@ The previous version applied every rule equally. We learned that some rules catc
 - **Strict** rules catch corporate-speak that's bad style regardless of who wrote it. On by default.
 - **Aesthetic** rules catch patterns that AI uses but humans also use legitimately (em dashes, rule of three, "robust"). Off by default. Opt in if you want maximum scrub.
 
-See `linkedin-rules-explainer` for per-rule justification, defenses, and citations.
+See `references/linkedin-rules-explainer/` for per-rule justification, defenses, and citations.
 
 ## When to use
 
 - Before publishing any AI-drafted post or comment
-- When `linkedin-post-audit` flags AI tells
+- When `references/linkedin-post-audit/` (detection-only pass) flags AI tells
 - When a draft feels off and you can't pinpoint why
 
 ## Input
@@ -165,7 +165,7 @@ If the input lacks these, ask the user for a specific number or anecdote to plug
 ## Non-negotiable rules
 
 - Preserve the user's actual claim. Humanizing does not mean changing meaning.
-- Capitalize all names (Creator, Felix, HubSpot, Claude).
+- Capitalize all names (Dharmesh, Felix, HubSpot, Claude).
 - Never introduce facts that weren't in the input. If a number is missing, ask.
 - Keep the user's sentence-level voice quirks (lowercase starts, `..` soft pauses).
 - Negative parallelism is a HARD ban (per author internal note): the strict tier always strips all 6 forms.
@@ -174,11 +174,11 @@ If the input lacks these, ask the user for a specific number or anecdote to plug
 
 The forensic tier exists because oaicite tokens, knowledge-cutoff disclaimers, and Mad-Libs blanks are pure model leakage that no human writer ever produces. Catching them is undefendable. The strict tier exists because corporate-speak ("leverage", "fundamentally", "in today's fast-paced world") is bad LinkedIn style regardless of origin, so stripping it improves the post even if the writer is human. The aesthetic tier exists because patterns like single em dashes, rule of three, "robust", and curly quotes appear in AI output but also appear in Lincoln, Dickinson, every epidemiologist, and every book printed since 1500. Banning them blindly catches Hemingway as AI. Run aesthetic mode only when audience-fit demands it.
 
-For per-rule justification and famous human defenders, see the `linkedin-rules-explainer` skill.
+For per-rule justification and famous human defenders, see `references/linkedin-rules-explainer/`.
 
-For the unreliability of AI detectors generally (61.3% false positive on TOEFL essays per Stanford 2023), see the `linkedin-detector-tester` skill.
+For the unreliability of AI detectors generally (61.3% false positive on TOEFL essays per Stanford 2023), see `references/linkedin-detector-tester/`.
 
-For emoji-pattern detection (lightbulb, rocket, sparkles signature), see the `linkedin-emoji-detector` skill.
+For emoji-pattern detection (lightbulb, rocket, sparkles signature), see `references/linkedin-emoji-detector/`.
 
 ## Example
 
@@ -206,10 +206,11 @@ For emoji-pattern detection (lightbulb, rocket, sparkles signature), see the `li
 
 ## Related skills
 
-- `linkedin-rules-explainer` — per-rule deep dive with citations and defenses
-- `linkedin-detector-tester` — run text through 5 AI detectors in parallel, show divergence
-- `linkedin-emoji-detector` — flag AI-pattern emoji usage (lightbulb / rocket / sparkles)
-- `linkedin-post-audit` — detection-only pass (no rewrite)
+- `de-ai-ify` — КАНОН для русских текстов (все площадки): RU-таблицы клише («данный→этот», «является→тире», «в рамках→в»). This skill is EN/LinkedIn-specific; route Russian-language humanizing there. Language-agnostic techniques here (forensic leakage markers, negative parallelism ban, burstiness, human fingerprints) are cross-referenced in its body.
+- `references/linkedin-rules-explainer/` — per-rule deep dive with citations and defenses
+- `references/linkedin-detector-tester/` — run text through 5 AI detectors in parallel, show divergence
+- `references/linkedin-emoji-detector/` — flag AI-pattern emoji usage (lightbulb / rocket / sparkles)
+- `references/linkedin-post-audit/` — detection-only pass (no rewrite)
 - `linkedin-post-writer` — generates drafts that already pass the humanizer
 
 ## Changelog

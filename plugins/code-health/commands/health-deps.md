@@ -4,13 +4,13 @@ description: Dependency audit and update workflow (inline orchestration)
 
 # Dependency Health Check
 
-Execute the `deps-health-inline` skill for inline orchestration.
+Execute the `health-inline` skill (mode: deps) for inline orchestration.
 
 **You ARE the orchestrator.** Do not spawn a separate orchestrator agent.
 
 ## Quick Start
 
-1. Read `.claude/skills/deps-health-inline/SKILL.md`
+1. Read `.claude/skills/health-inline/SKILL.md` (mode table) + `.claude/skills/health-inline/references/modes/deps.md` (full workflow)
 2. Follow the workflow phases directly
 3. Use Task tool only for workers (dependency-auditor, dependency-updater)
 4. Run quality gates inline via Bash
@@ -27,4 +27,4 @@ Pre-flight → Audit → [Update by Priority] → Verify → Report
 
 ---
 
-Now read and execute the skill: `.claude/skills/deps-health-inline/SKILL.md`
+Now read and execute the workflow: `.claude/skills/health-inline/references/modes/deps.md`

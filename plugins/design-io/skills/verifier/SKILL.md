@@ -1,159 +1,60 @@
 ---
 name: verifier
-description: Headless-проверка HTML артефакта — открыть в Chromium, прочитать console (errors / warnings), сделать скриншот для review, проверить network errors. Финальный gate перед handoff.
-when_to_use: После каждого крупного изменения в HTML/JSX, перед export, перед демонстрацией юзеру. Должен запускаться автоматически design-orchestrator после finalize.
+description: Открыть готовый HTML в headless-браузере, поймать console-ошибки и снять скриншот. Замыкает цикл "сделал → проверил".
+when_to_use: После завершения дизайна/прототипа, перед сдачей пользователю.
 ---
 
 # Verifier
 
-Открывает артефакт в headless Chromium, проверяет ничего ли не сломалось, делает референсный скриншот.
+Sub-роль для Claude Code. Открывает результат в Playwright headless, проверяет:
+- console errors / warnings
+- невыполнившиеся network requests
+- наличие ключевых элементов (опционально через селектор)
+- размер документа (не пусто ли)
 
-## Зависимости
+И сохраняет один скриншот для визуальной самопроверки.
 
-```bash
-npm i -D playwright
-npx playwright install chromium
-```
+## Скрипт
 
-Или через cli:
-```bash
-npm exec --package=playwright -- playwright install chromium
-```
-
-## Базовый verifier
-
-`scripts/verify.js`:
-
-```js
-const { chromium } = require('playwright');
-const path = require('path');
-const fs = require('fs');
-
-async function verify(htmlPath, opts = {}) {
-  const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-
-  const errors = [];
-  const warnings = [];
-  const networkErrors = [];
-
-  page.on('pageerror', (e) => errors.push({ msg: e.message, stack: e.stack }));
-  page.on('console', (msg) => {
-    const t = msg.type();
-    if (t === 'error') errors.push({ msg: msg.text() });
-    else if (t === 'warning') warnings.push({ msg: msg.text() });
-  });
-  page.on('requestfailed', (req) => {
-    networkErrors.push({ url: req.url(), failure: req.failure()?.errorText });
-  });
-
-  const url = `file://${path.resolve(htmlPath)}`;
-  await page.goto(url, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(opts.wait || 1000);
-
-  // Скриншот для review
-  const out = opts.screenshot || htmlPath.replace(/\.html$/, '.verify.png');
-  await page.screenshot({ path: out, fullPage: true });
-
-  // Меряем размер DOM (если очень большой — проблема)
-  const domSize = await page.evaluate(() => document.querySelectorAll('*').length);
-
-  await browser.close();
-
-  return {
-    file: htmlPath,
-    screenshot: out,
-    errors, warnings, networkErrors,
-    domSize,
-    passed: errors.length === 0 && networkErrors.length === 0,
-  };
-}
-
-if (require.main === module) {
-  verify(process.argv[2]).then((r) => {
-    console.log(JSON.stringify(r, null, 2));
-    process.exit(r.passed ? 0 : 1);
-  });
-}
-
-module.exports = { verify };
-```
+`templates/verify.mjs`:
 
 ```bash
-node scripts/verify.js path/to/artifact.html
+node verify.mjs deck.html
+# → verify-out/console.log + verify-out/screenshot.png
+# Exit code: 0 если всё чисто, 1 если есть ошибки.
 ```
 
-## Что проверяет
+Опции:
+- `--require-selector ".some-class"` — упасть, если элемента нет
+- `--width 1920 --height 1080` — viewport
+- `--wait 1000` — дополнительная задержка перед снимком
+- `--out verify-out/` — куда писать
 
-| Чек | Хорошо | Плохо |
-|---|---|---|
-| Console errors | 0 | >0 → fix |
-| Console warnings | 0-2 | >5 → review (часто React StrictMode noise) |
-| Network errors | 0 | >0 → ассет не загрузился |
-| Page errors (uncaught) | 0 | >0 → JS sintax broke |
-| DOM size | <2000 nodes | >5000 → производительность падает |
-| Screenshot | визуально корректный | пустой / overflow / layout broken |
+## Когда главный агент должен дёргать verifier
 
-## Скриншот для review
+1. Прототип / дек / макет готов.
+2. Перед тем как писать «готово» в чат.
+3. Если получит exit 1 — прочитать `console.log`, исправить, повторить.
 
-`<artifact>.verify.png` — приложи к ответу юзеру:
-> «Готово. Скриншот ниже. 0 errors, 1 warning (React 18 deprecation, безопасно).»
+Это **не** замена ручному просмотру пользователем — это санитарный фильтр, чтобы пользователь не открывал заведомо сломанное.
 
-Юзер видит результат сразу, не открывая файл.
+## Анти-анкоринг (проверка чужой работы)
 
-## Multi-viewport проверка
+Когда verifier зовут проверять результат другого агента/воркера (кросс-чек, ревью артефакта):
 
-```js
-const viewports = [
-  { name: 'desktop', width: 1440, height: 900 },
-  { name: 'tablet',  width: 768,  height: 1024 },
-  { name: 'mobile',  width: 375,  height: 812 },
-];
+1. Сначала сформируй **свой** вердикт: прогони verify.mjs, собери свой список проблем по артефакту.
+2. Только потом читай отчёт/самооценку автора и сверяй.
 
-for (const vp of viewports) {
-  await page.setViewportSize({ width: vp.width, height: vp.height });
-  await page.screenshot({ path: `${out}.${vp.name}.png`, fullPage: true });
-}
-```
+Чтение чужих выводов до собственной проверки анкерит на их версии — получаются «подтверждающие» проверки вместо независимых. Драфт своего вердикта ДО чтения чужого — обязательный порядок.
 
-## Custom assertions
+## Выбор лучшего из вариантов + GAN-паттерн
 
-Можно расширить под конкретный артефакт:
+Когда verifier сравнивает 2+ результата воркеров (или adversarial-review решает «оставить/откатить»):
+LLM-судья предпочитает первый вариант — прогоняй ОБА порядка A-vs-B и B-vs-A, оставляй кандидата
+только при перевесе голосов, а не по самоотчётной цифре. Генератор не оценивает свою работу.
+Полный паттерн (двусторонний pairwise против position bias, скептик-оценщик, crash-proof apply ladder) —
+`references/gan-adversarial-improve.md`.
 
-```js
-// Проверить что hero имеет нужный текст
-const heroText = await page.locator('.hero h1').textContent();
-if (!heroText.includes('ExampleProduct')) throw new Error('Hero text missing');
+## Legacy reference
 
-// Проверить что есть нужное число секций
-const sections = await page.locator('section').count();
-if (sections < 8) throw new Error(`Expected 8+ sections, got ${sections}`);
-
-// Проверить что тёмная тема активна (если применимо)
-const bg = await page.locator('body').evaluate(el => getComputedStyle(el).background);
-if (!bg.includes('rgb(1, 3, 52)')) throw new Error('Dark theme not applied');
-```
-
-## Когда запускать
-
-| Триггер | Что проверяем |
-|---|---|
-| После генерации каждого артефакта | базовый verifier (errors+screenshot) |
-| Перед export-pdf / export-pptx | full verifier + multi-viewport |
-| Перед dev-handoff | + a11y-audit + perf-audit |
-| Перед демонстрацией юзеру | + custom assertions |
-
-## Не путать с
-
-- `a11y-audit` — accessibility-специфичный, использует axe-core
-- `perf-audit` — Lighthouse метрики
-- `proto-smoketest` — E2E кликабельный тест (не просто открыл и посмотрел)
-
-## Антипаттерны
-
-- Не запускать verifier и сдавать → проблемы вылезают у юзера на показе
-- Игнорировать console.warning'и → когда станут errors не заметишь
-- Проверять только desktop → mobile сломается у юзера
-- Делать скриншот не fullpage → пропустишь нижние секции
-- Запускать verifier на `localhost:3000` без проверки что сервер up → false positives
-- Не возвращать exit 1 при failures → CI пропускает сломанные артефакты
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-verifier.md`. Секции там: Зависимости, Базовый verifier, Что проверяет, Скриншот для review, Multi-viewport проверка, Custom assertions, Когда запускать, Не путать с, Антипаттерны.

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Identify a person from a phone number THEY gave you (inbound, consented).
 
-Usage:  python phone_identify.py "+79161234567"
+Usage:  python phone_identify.py "+1234567890"
 
 Legitimate "number -> who is this" for a number the lead voluntarily left you (form, chat,
 business card). Three legitimate channels:
@@ -9,7 +9,7 @@ business card). Three legitimate channels:
      target's OWN privacy setting ("who can find me by phone"). If they hid it, returns nothing.
      The contact is deleted right after, so your contact list is not polluted.
   2. (plan) Public web search of the number in quotes — site/signature/2GIS/public profile.
-  3. (plan) your Bitrix24 — maybe already a contact.
+  3. (plan) Our Your CRM — maybe already a contact.
 
 Requires: TELEGRAM_API_ID / TELEGRAM_API_HASH in ~/.claude/.credentials.master.env and the
 existing session ~/.claude/telegram_session.session (same as tg_client.py).
@@ -63,7 +63,7 @@ def main(phone):
     load_env()
     result = {'phone': phone, 'telegram': [], 'plan': [
         f'Публичный веб: WebSearch "{phone}" в кавычках — сайт/подпись/2ГИС/публичный профиль.',
-        'Наша Bitrix: Skill bitrix24 — поиск контакта по телефону (может уже быть в базе).',
+        'Наша Bitrix: Skill crm — поиск контакта по телефону (может уже быть в базе).',
         'Если найден @username — Skill social-intel для forward-досье.',
     ]}
     if os.environ.get('TELEGRAM_API_ID') and os.environ.get('TELEGRAM_API_HASH'):

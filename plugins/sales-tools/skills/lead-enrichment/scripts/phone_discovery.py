@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Discover a company's / decision-maker's PUBLIC phone numbers — legitimate sources only.
 
-Usage:  python phone_discovery.py --domain example-corp.ru
-        python phone_discovery.py --inn 7707083893
-        python phone_discovery.py --name "Название компании" --city Москва
+Usage:  python phone_discovery.py --domain company.ru
+        python phone_discovery.py --inn 7700000000
+        python phone_discovery.py --name "Company Паблишер" --city Москва
 
 Pulls phones that the company/person published themselves or that come from official
 registries. Public/published sources only — no reverse phone→identity lookups.
@@ -16,7 +16,7 @@ Sources to drive via skills (printed as a plan, not scraped here):
   - hh.ru employer page     -> Skill headhunter
   - LinkedIn contact info    -> Skill linkedin / social-intel
   - public Telegram profile  -> tg_client.py user-info
-  - your Bitrix contacts      -> Skill bitrix24
+  - OUR Bitrix contacts      -> Skill crm
 """
 import sys, io, re, json, os, subprocess, argparse
 import urllib.request
@@ -95,6 +95,6 @@ if __name__ == '__main__':
         f"Skill headhunter: страница работодателя '{label}' — иногда телефон HR/приёмной.",
         "Skill linkedin / social-intel: contact info ЛПР (если открыт).",
         "tg_client.py user-info <@username> — публичный ТГ-профиль (если есть).",
-        "Skill bitrix24: контакты компании в НАШЕЙ базе (телефоны уже собранных контактов).",
+        "Skill crm: контакты компании в НАШЕЙ базе (телефоны уже собранных контактов).",
     ]
     print(json.dumps(out, ensure_ascii=False, indent=2))

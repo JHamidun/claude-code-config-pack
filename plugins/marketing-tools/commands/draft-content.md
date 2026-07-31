@@ -5,7 +5,7 @@ argument-hint: "<content type and topic>"
 
 # Draft Content
 
-> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+> If you see unfamiliar placeholders or need to check which tools are connected, see the MCP registry: `~/.claude/config/mcp-servers.md`.
 
 Generate marketing content drafts tailored to a specific content type, audience, and brand voice.
 

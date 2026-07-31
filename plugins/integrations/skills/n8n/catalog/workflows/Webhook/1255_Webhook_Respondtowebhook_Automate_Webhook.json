@@ -1,0 +1,529 @@
+{
+  "id": "tMiRJYDrXzpKysTX",
+  "meta": {
+    "instanceId": "workflow-64acb495",
+    "versionId": "1.0.0",
+    "createdAt": "2025-09-29T07:08:01.070169",
+    "updatedAt": "2025-09-29T07:08:01.070188",
+    "owner": "n8n-user",
+    "license": "MIT",
+    "category": "automation",
+    "status": "active",
+    "priority": "high",
+    "environment": "production"
+  },
+  "name": "Stock Q&A Workflow",
+  "tags": [
+    "automation",
+    "n8n",
+    "production-ready",
+    "excellent",
+    "optimized"
+  ],
+  "nodes": [
+    {
+      "id": "ec3b86be-4113-4fd5-8365-02adb67693e9",
+      "name": "Embeddings OpenAI1",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1960,
+        720
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "fOF5kro9BJ6KMQ7n",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1,
+      "notes": "This embeddingsOpenAi node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "42fd8020-3861-4d0f-a7a2-70e2c35f0bed",
+      "name": "On new manual Chat Message",
+      "type": "n8n-nodes-base.noOp",
+      "disabled": true,
+      "position": [
+        1620,
+        240
+      ],
+      "parameters": {},
+      "typeVersion": 1,
+      "notes": "This manualChatTrigger node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "a9b48d04-691e-4537-90f8-d7a4aa6153af",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1560,
+        120
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 903.0896125323785,
+        "height": 733.5099670584011,
+        "content": "## Step 2: Setup the Q&A \n### The incoming message from the webhook is queried from the Supabase Vector Store. The response is provided in the response webhook. "
+      },
+      "typeVersion": 1,
+      "notes": "This stickyNote node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "472b4800-745a-4337-9545-163247f7e9ae",
+      "name": "Retrieval QA Chain",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1880,
+        240
+      ],
+      "parameters": {
+        "query": "={{ $json.body.input }}"
+      },
+      "typeVersion": 1,
+      "notes": "This chainRetrievalQa node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "e58bd82d-abc6-44ed-8e93-ec5436126d66",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        2280,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "respondWith": "text",
+        "responseBody": "={{ $json.response.text }}"
+      },
+      "typeVersion": 1,
+      "notes": "This respondToWebhook node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "04bbf01e-8269-47c7-897d-4ea94a1bd1c0",
+      "name": "Vector Store Retriever",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        2020,
+        440
+      ],
+      "parameters": {
+        "topK": 5
+      },
+      "typeVersion": 1,
+      "notes": "This retrieverVectorStore node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "feee6d68-2e0d-4d40-897e-c1d833a13bf2",
+      "name": "Webhook1",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        1620,
+        420
+      ],
+      "webhookId": "679f4afb-189e-4f04-9dc0-439eec2ec5f1",
+      "parameters": {
+        "path": "19f5499a-3083-4783-93a0-e8ed76a9f742",
+        "options": {},
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      },
+      "typeVersion": 1.1,
+      "notes": "This webhook node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "1b8d251f-7069-4d7d-b6d6-4bfa683d4ad1",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        280,
+        260
+      ],
+      "parameters": {},
+      "typeVersion": 1,
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "b746a7a4-ed94-4332-bf7b-65aadcf54130",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        580,
+        260
+      ],
+      "parameters": {
+        "fileId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1LZezppYrWpMStr4qJXtoIX-Dwzvgehll",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "crowdstrike.pdf"
+        },
+        "options": {},
+        "operation": "download"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "1tsDIpjUaKbXy0be",
+          "name": "Google Drive account"
+        }
+      },
+      "typeVersion": 3,
+      "notes": "This googleDrive node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "83a7d470-f934-436d-ba3f-1ae7c776f5a5",
+      "name": "Binary to Document",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        860,
+        480
+      ],
+      "parameters": {
+        "loader": "pdfLoader",
+        "options": {}
+      },
+      "typeVersion": 1,
+      "notes": "This documentBinaryInputLoader node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "b52b4a90-99a1-49cc-a6f0-7551d6754496",
+      "name": "Recursive Character Text Splitter",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        860,
+        640
+      ],
+      "parameters": {
+        "options": {},
+        "chunkSize": 3000,
+        "chunkOverlap": 200
+      },
+      "typeVersion": 1,
+      "notes": "This textSplitterRecursiveCharacterTextSplitter node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "b525e130-2029-4f55-a603-1fdc05a19c17",
+      "name": "Embeddings OpenAI",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1160,
+        480
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "fOF5kro9BJ6KMQ7n",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1,
+      "notes": "This embeddingsOpenAi node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "5358c53f-55f9-431d-8956-c6bae7ad25bc",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        540,
+        120
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 772.0680602743597,
+        "height": 732.3675002130781,
+        "content": "## Step 1: Upserting the PDF\n### Fetch file from Google Drive, split it into chunks and insert into Supabase index\n\n"
+      },
+      "typeVersion": 1,
+      "notes": "This stickyNote node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "fb91e2da-0eeb-47a5-aa49-65bf56986857",
+      "name": "Qdrant Vector Store",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        940,
+        260
+      ],
+      "parameters": {
+        "mode": "insert",
+        "options": {},
+        "qdrantCollection": {
+          "__rl": true,
+          "mode": "id",
+          "value": "=crowd"
+        }
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "U5CpjAgFeXziP3I1",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 1,
+      "notes": "This vectorStoreQdrant node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "89e14837-d1fc-4b1e-9ebc-7cf3e7fd9a70",
+      "name": "Qdrant Vector Store1",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1980,
+        600
+      ],
+      "parameters": {
+        "qdrantCollection": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.body.company }}"
+        }
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "U5CpjAgFeXziP3I1",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 1,
+      "notes": "This vectorStoreQdrant node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "c619245b-5ea0-4354-974d-21ec6b8efa93",
+      "name": "OpenAI Chat Model",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1880,
+        460
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "fOF5kro9BJ6KMQ7n",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1,
+      "notes": "This lmChatOpenAi node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "e4aa780d-8069-4308-a61f-82ed876af71a",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -560,
+        120
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 710.9124489067698,
+        "height": 726.4452519516944,
+        "content": "## Start here: Step-by Step Youtube Tutorial :star:\n\n[![Building an AI Crew to Analyze Financial Data with CrewAI and n8n]({{ $env.WEBHOOK_URL }}]({{ $env.WEBHOOK_URL }}\n"
+      },
+      "typeVersion": 1,
+      "notes": "This stickyNote node performs automated tasks as part of the workflow."
+    }
+  ],
+  "active": true,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": null,
+    "timezone": "UTC",
+    "executionTimeout": 3600,
+    "maxExecutions": 1000,
+    "retryOnFail": true,
+    "retryCount": 3,
+    "retryDelay": 1000
+  },
+  "versionId": "463aec94-26a6-436d-8732-fc01d637c6ae",
+  "connections": {
+    "e58bd82d-abc6-44ed-8e93-ec5436126d66": {
+      "main": [
+        [
+          {
+            "node": "error-handler-e58bd82d-abc6-44ed-8e93-ec5436126d66",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-e58bd82d-abc6-44ed-8e93-ec5436126d66-1a074c21",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-e58bd82d-abc6-44ed-8e93-ec5436126d66-bc8053c5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-e58bd82d-abc6-44ed-8e93-ec5436126d66-b3962627",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-e58bd82d-abc6-44ed-8e93-ec5436126d66-e54657eb",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-e58bd82d-abc6-44ed-8e93-ec5436126d66-1c7829f2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-e58bd82d-abc6-44ed-8e93-ec5436126d66-12bd5071",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-e58bd82d-abc6-44ed-8e93-ec5436126d66-ce69a536",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-e58bd82d-abc6-44ed-8e93-ec5436126d66-683991b7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "feee6d68-2e0d-4d40-897e-c1d833a13bf2": {
+      "main": [
+        [
+          {
+            "node": "error-handler-feee6d68-2e0d-4d40-897e-c1d833a13bf2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-feee6d68-2e0d-4d40-897e-c1d833a13bf2-3f0c7e07",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-feee6d68-2e0d-4d40-897e-c1d833a13bf2-ed7c1e06",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-feee6d68-2e0d-4d40-897e-c1d833a13bf2-fdbf0de2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-feee6d68-2e0d-4d40-897e-c1d833a13bf2-d259580b",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-feee6d68-2e0d-4d40-897e-c1d833a13bf2-8e92f5f2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-feee6d68-2e0d-4d40-897e-c1d833a13bf2-421b72fd",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-feee6d68-2e0d-4d40-897e-c1d833a13bf2-430b35bd",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-feee6d68-2e0d-4d40-897e-c1d833a13bf2-b55bb73f",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ec3b86be-4113-4fd5-8365-02adb67693e9": {
+      "main": [
+        [
+          {
+            "node": "error-handler-ec3b86be-4113-4fd5-8365-02adb67693e9-d33b19ae",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "b746a7a4-ed94-4332-bf7b-65aadcf54130": {
+      "main": [
+        [
+          {
+            "node": "error-handler-b746a7a4-ed94-4332-bf7b-65aadcf54130-dc97a000",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "b525e130-2029-4f55-a603-1fdc05a19c17": {
+      "main": [
+        [
+          {
+            "node": "error-handler-b525e130-2029-4f55-a603-1fdc05a19c17-8b6b9a37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "c619245b-5ea0-4354-974d-21ec6b8efa93": {
+      "main": [
+        [
+          {
+            "node": "error-handler-c619245b-5ea0-4354-974d-21ec6b8efa93-2d39743d",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "description": "Automated workflow: Stock Q&A Workflow. This workflow integrates 14 different services: webhook, stickyNote, textSplitterRecursiveCharacterTextSplitter, chainRetrievalQa, vectorStoreQdrant. It contains 25 nodes and follows best practices for error handling and security.",
+  "notes": "Excellent quality workflow: Stock Q&A Workflow. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+}

@@ -1,11 +1,11 @@
 ---
 name: sticker-pack-generator
-description: End-to-end Telegram sticker pack pipeline — static WEBP packs, animated VP9-alpha video packs, and custom emoji packs. Handles source PNG sequences from artists or AI-generated frames (gpt-image-2), mask extraction via SAM2 + rembg UNION, VP9 alpha encoding via Google `alpha_encoder` (the ONLY tool that survives BlockAdditional muxing), Telethon upload through @Stickers, custom emoji posting via MessageEntityCustomEmoji with UTF-16 offsets, and channel reactions setup. Includes the negative finding that hand-authored painterly TGS Lottie CANNOT fit Telegram's 64KB cap — always use video WebM. Triggers - "стикерпак", "видео-эмодзи", "альбом для канала", "кастом эмодзи", "VP9 alpha", "SAM2 mask", "sticker pack", "custom emoji", "vp9 alpha encoder", "telegram pack pipeline".
+description: 'End-to-end Telegram sticker pack pipeline — static WEBP, animated VP9-alpha video, custom emoji packs. PNG-секвенции или AI-кадры, маски SAM2+rembg, VP9 alpha_encoder, Telethon upload через @Stickers, MessageEntityCustomEmoji, реакции канала; TGS Lottie в 64KB не влезает — только WebM. Triggers: «стикерпак», «видео-эмодзи», «кастом эмодзи», "sticker pack", "custom emoji", "VP9 alpha".'
 ---
 
 # Sticker Pack Generator
 
-End-to-end pipeline for Telegram sticker assets — covers all three pack types, both for hand-drawn PNG sequences from an artist and for AI-generated frames. Battle-tested on a `<your_pack_name>`-style static, animated, and custom emoji set for `<your_channel>`.
+End-to-end pipeline for Telegram sticker assets — covers all three pack types, both for hand-drawn PNG sequences from an artist and for AI-generated frames. Battle-tested on `<your_pack_short_name>`-style static, animated, and custom emoji packs for `<YOUR_CHANNEL>`.
 
 ## When to use
 
@@ -146,7 +146,7 @@ Outline of ≥3px on key features (eyes, mouth, glasses) is mandatory or they di
 
 ## Step 5 — Upload to Telegram (Telethon: NewStickerPack / AddSticker)
 
-All upload scripts use Telethon, share `scripts/_telethon_base.py`, and read credentials from environment (`TELEGRAM_API_ID`, `TELEGRAM_API_HASH`) — loaded from `.env` next to the skill or from `~/.claude/.credentials.master.env`. Session file: `<HOME>/.claude/telegram_session` (override with `TELEGRAM_SESSION`).
+All upload scripts use Telethon, share `scripts/_telethon_base.py`, and key off `~/.claude/.credentials.master.env` (`TELEGRAM_API_ID`, `TELEGRAM_API_HASH`). Session file: `~/.claude/telegram_session`.
 
 Pack short_name convention: `<base>_by_<your_bot>`. For emoji packs: `<base>_emoji_by_<your_bot>`.
 
@@ -229,6 +229,7 @@ Keep the bookkeeping packs (`<name>_vector_test`, `<name>_static_test`) around a
 
 Bonus:
 - **No parallel Telethon processes on the same `.session`** — SQLite lock; copy the session file (`shutil.copy`) and override `SESSION=` env var for each worker.
+- **`tg_client.py` has NO `send-album`** — older docs sometimes claim it does.
 - **`@Stickers` FloodWaitError** after ~37 fast replaces; catch and `await asyncio.sleep(fw.seconds + 5)`.
 - **Mapping by position** is wrong — Telegram resorts video packs by upload date. Always key off emoji (VS16-normalised).
 - **`pipe | tail`** on a long-running encode can SIGPIPE-kill the producer when the tail buffer fills. Pipe to a file instead.
@@ -237,13 +238,12 @@ Bonus:
 
 ```
 scripts/
-├── _config.py                  — loads creds from .env (or ~/.claude/.credentials.master.env)
+├── _config.py                  — loads creds from ~/.claude/.credentials.master.env
 ├── _telethon_base.py           — shared Telethon client init
 ├── cuda_init.py                — CUDA DLL bootstrap (must import BEFORE sam2/rembg/torch)
 │
 ├── process_png_seq.py          — PNG seq → SAM2+rembg UNION → yuva420p → alpha_encoder
-├── process_one.py              — single MP4 → 512x512 VP9-alpha WebM
-├── batch_process.py            — batch wrapper around process_one for a dir of mp4s
+├── batch_process.py            — batch wrapper around process_png_seq for a dir of seqs
 ├── make_emoji_variant.py       — 512px webm → 100×100 ≤256KB (union bbox + margin)
 │
 ├── gen_mascot_reference.py     — gpt-image-2 master frame
@@ -253,11 +253,13 @@ scripts/
 │
 ├── upload_static_pack.py       — /newpack flow
 ├── create_pack.py              — /newvideopack flow
+├── create_emoji_pack.py        — /newemojipack flow
 ├── add_to_pack.py              — /addsticker, skips already-present emojis
 ├── replace_in_pack.py          — /replacesticker, preserves slot, keyed by emoji
 ├── replace_all_custom_emojis.py — bulk text replace via MessageEntityCustomEmoji
 ├── clean_pack.py               — /delsticker (extras / duplicates)
-└── check_pack.py               — GetStickerSet, dump current state
+├── check_pack.py               — GetStickerSet, dump current state
+└── set_channel_reactions.py    — EditChannelReactionsRequest (mix standard + custom)
 ```
 
 ## References
@@ -273,39 +275,39 @@ scripts/
 - `references/troubleshooting.md` — failure-mode → diagnosis → fix.
 - `references/static-character-design.md` — consistency strategy for 75 emotions on one mascot.
 - `references/sample-mascot-prompt.txt` — reusable mascot prompt template.
-- `references/sample-emotions.json` — 5-emotion seed sample (extend to your full set).
+- `references/sample-emotions.json` — 75-emotion list with constraint blocks.
 - `references/sample-mapping.json` — sticker→emoji mapping example.
-- `references/telegram-stickers-spec.md` — bare-bones WebM video sticker spec.
 
 ## Triggers
 
-- **ru**: "стикерпак", "видео-эмодзи", "альбом для канала", "кастом эмодзи", "VP9 alpha", "SAM2 mask", "пак для канала", "залей в Telegram", "transparent webm", "пак из mp4", "PNG-секвенция от художника", "TGS не лезет в 64KB"
+- **ru**: "стикерпак", "видео-эмодзи", "альбом для канала", "кастом эмодзи", "VP9 alpha", "SAM2 mask", "пак для @-канала", "залей в Telegram", "transparent webm", "пак из mp4", "PNG-секвенция от художника", "TGS не лезет в 64KB"
 - **en**: "sticker pack", "custom emoji", "vp9 alpha encoder", "telegram pack pipeline", "alpha_encoder cbr", "BlockAdditional alpha", "sam2 union mask", "rembg+sam2", "tgs lottie 64kb fail"
 
-## Setup
+## GitHub depersonalization checklist (when packaging for public)
 
-Copy `.env.example` (provided next to the scripts) to `.env` and fill in:
+When publishing this skill or its scripts as a standalone repo:
 
-```
-TELEGRAM_API_ID=<your_api_id_from_my.telegram.org>
-TELEGRAM_API_HASH=<your_api_hash_from_my.telegram.org>
-TELEGRAM_SESSION=<absolute_path_to_session_file>
-OPENAI_API_KEY=<your_openai_key_for_gpt_image_2>
+**SCRUB:**
+- All `@`-handles → replace with `<your_pack_short_name>`, `<your_channel>`, `<your_bot>`.
+- Real names of channels, packs, persons, products.
+- Absolute paths containing user names: `C:/Users/<user>/...` → `<HOME>/...`.
+- API keys, tokens, channel IDs, `TELEGRAM_API_ID`, `TELEGRAM_API_HASH`.
+- Session files (`*.session`, `*.session-journal`).
+- Sample `.env` only as `.env.example` with placeholder values.
+- Channel and pack screenshots — blur any identifying handles before checking in.
 
-# Optional — SAM2 + WSL alpha_encoder paths
-SAM2_CHECKPOINT=./sam2_checkpoints/sam2.1_hiera_small.pt
-SAM2_CONFIG=configs/sam2.1/sam2.1_hiera_s.yaml
-WSL_DISTRO=Ubuntu-22.04
-ALPHA_ENCODER_PATH=/opt/webm-tools/alpha_encoder/alpha_encoder
-```
+**KEEP (this is the gold for other users):**
+- The technique: SAM2+rembg UNION, chromakey threshold 215, morph close + re-threshold.
+- The libvpx `alpha_encoder` patch + CBR config.
+- The TGS Lottie dead-end writeup — so nobody else wastes a week on it.
+- UTF-16 offset helper for `MessageEntityCustomEmoji`.
+- Boost-level story cap notes.
+- All 9 gotchas as a top-of-README "DO NOT REDO" block.
 
-`_config.py` also falls back to `~/.claude/.credentials.master.env` if `.env` is absent.
-
-## Placeholder legend (for forking this skill)
-
-- `<your_pack_name>` — your sticker pack short_name (e.g. `mymascot_by_examplebot`)
-- `<your_channel>` — your Telegram channel handle (e.g. `@example_channel`)
-- `<your_bot>` — the `@Stickers`-required suffix (always `_by_<bot>`)
-- `<character>` — sticker pack subject name (e.g. `mymascot`)
-- `<HOME>` — your home directory (e.g. `C:/Users/<you>` on Windows, `~/` on POSIX)
-- `<TELEGRAM_API_ID>`, `<TELEGRAM_API_HASH>` — credential placeholders from my.telegram.org
+**PLACEHOLDERS to use consistently:**
+- `<your_pack_short_name>` — e.g. `mymascot_by_examplebot`
+- `<YOUR_CHANNEL>` — e.g. `@example_channel`
+- `<HOME>` — user home directory
+- `<TELEGRAM_API_ID>`, `<TELEGRAM_API_HASH>` — credential placeholders
+- `<your_bot>` — the bot suffix all packs must end with
+- `<character>` — sticker-pack subject name

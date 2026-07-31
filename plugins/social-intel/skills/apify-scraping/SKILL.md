@@ -1,6 +1,6 @@
 ---
 name: apify-scraping
-description: "Apify Web Scraping Skill"
+description: "Apify Web Scraping Skill. Также служит указателем: для парсинга аудиторий VK Ads (парсер vk, target hunter) Apify не подходит — см. скилл vk-ads-pro-ru."
 ---
 
 # Apify Web Scraping Skill
@@ -15,6 +15,15 @@ description: "Apify Web Scraping Skill"
 - Мониторинг цен и отзывов
 - Скрапинг любых веб-сайтов
 
+## Справочники (references/)
+
+- **[references/curated-actors.md](references/curated-actors.md)** — curated индекс 130+ Actor'ов с точными ID по платформам (Instagram, Facebook, TikTok, YouTube, X, LinkedIn, Maps, отзывы, недвижимость, SEO, RAG-краулинг, Telegram/Reddit/Snapchat, обогащение контактов). **Всегда сверяй ID отсюда перед вызовом.**
+- **[references/apify-gotchas.md](references/apify-gotchas.md)** — модели оплаты (FREE/PPE/FLAT), протокол оценки стоимости, частые грабли (cookies, rate limits, пустые результаты, deprecated Actors), восстановление после ошибок, лимиты по платформам.
+
+> ⚠️ **Namespace важнее всего.** Таблицы ниже — упрощённые; часть ID неполные. Реальные namespace'ы: TikTok = `clockworks/`, YouTube = `streamers/`, Google Maps = `compass/`, X/Twitter = `apidojo/`, LinkedIn = `harvestapi/` + `apimaestro/`. С неверным namespace (`apify/tiktok-scraper` и т.п.) вызов не найдёт Actor — бери точные ID из `curated-actors.md`.
+>
+> Схему входа тяни динамически: `apify actors info "ACTOR_ID" --input --json`.
+
 ## Популярные Actors
 
 ### Социальные сети
@@ -27,6 +36,8 @@ description: "Apify Web Scraping Skill"
 | `apify/youtube-scraper` | YouTube видео, каналы, комментарии | "Спарси видео канала" |
 | `apify/twitter-scraper` | X/Twitter посты, профили | "Собери твиты по запросу" |
 | `apify/linkedin-profile-scraper` | LinkedIn профили | "Получи данные профиля" |
+
+> **VK-аудитории для рекламы**: Apify VK-actors НЕ покрывают полный workflow парсинга аудиторий для VK Ads (нотация PS/CS/А/ТУ/НВ, метод А, вечные аудитории). Production-grade парсер для VK Ads — **Target Hunter** (не Apify). См. скилл `vk-ads-pro-ru` для VK-аудиторий.
 
 ### E-commerce
 

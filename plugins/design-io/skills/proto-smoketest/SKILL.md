@@ -1,173 +1,126 @@
 ---
 name: proto-smoketest
-description: E2E кликабельный smoke-test через Playwright. Проходит критичные user-paths в interactive-prototype, проверяет что переходы работают, формы сабмитятся, navigation не сломан. Не unit-test — happy-path смоук.
-when_to_use: После interactive-prototype с >3 экранами, перед dev-handoff. Лучше verifier когда нужно проверить что юзер реально может пройти flow, а не только что страница открывается.
+description: Минимальные e2e-тесты для прототипа — критичные пути не отвалились. Не unit-тесты, а защита от регрессий.
+when_to_use: Прототип большой, итераций много, и хочется быстро ловить когда сломалось.
 ---
 
-# Proto smoke test
+# Proto smoketest
 
-Прогоняет 1-3 happy paths через прототип. Цель — поймать сломанные переходы, не покрыть 100%.
+Не пытайся писать unit-тесты для прототипа — это не production. Зато 5 e2e-проверок «не сломалось ли главное» окупаются с первой регрессии.
 
-## Инсталляция
+## Стек
+
+Playwright Test — самый простой запуск.
 
 ```bash
 npm i -D @playwright/test
 npx playwright install chromium
 ```
 
-## Структура
+## smoketest.spec.js
 
-`tests/smoke.spec.js`:
+`templates/smoketest.spec.js`:
+
 ```js
-const { test, expect } = require('@playwright/test');
-const path = require('path');
+import { test, expect } from '@playwright/test';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
-const ARTIFACT = `file://${path.resolve(__dirname, '../artifact.html')}`;
+const FILE = pathToFileURL(path.resolve('proto.html')).href;
 
-test.beforeEach(async ({ page }) => {
-  await page.goto(ARTIFACT);
+test('страница загружается без console error', async ({ page }) => {
+  const errors = [];
+  page.on('console', m => m.type() === 'error' && errors.push(m.text()));
+  page.on('pageerror', e => errors.push(e.message));
+  await page.goto(FILE);
+  await page.waitForLoadState('networkidle');
+  expect(errors, errors.join('\n')).toEqual([]);
 });
 
-test('Welcome → Main flow', async ({ page }) => {
-  await expect(page.locator('h1')).toContainText('Welcome');
-  await page.click('button:has-text("Начать")');
-  await expect(page.locator('.main')).toBeVisible();
-  await expect(page).toHaveURL(/main/);  // если используется ?screen=main
-});
-
-test('Form: fill and submit', async ({ page }) => {
+test('главный CTA ведёт на следующий экран', async ({ page }) => {
+  await page.goto(FILE);
   await page.click('text=Начать');
-  await page.fill('[name=email]', 'test@example.com');
-  await page.fill('[name=name]', 'YourFirstName');
-  await page.click('button:has-text("Отправить")');
-  await expect(page.locator('text=Готово')).toBeVisible();
+  await expect(page.locator('h1')).toContainText('Шаг 1');
 });
 
-test('Navigation: cycle through screens', async ({ page }) => {
-  const screens = ['welcome', 'features', 'pricing', 'final'];
-  for (const s of screens) {
-    await page.click(`[data-nav="${s}"]`);
-    await expect(page.locator(`[data-screen="${s}"]`)).toBeVisible();
+test('форма входа принимает email и password', async ({ page }) => {
+  await page.goto(FILE);
+  await page.click('text=Войти');
+  await page.fill('input[type=email]', 'test@test.ru');
+  await page.fill('input[type=password]', 'password123');
+  await page.click('button[type=submit]');
+  await expect(page).toHaveURL(/dashboard/);
+});
+
+test('навигация по табам работает', async ({ page }) => {
+  await page.goto(FILE + '#dashboard');
+  for (const tab of ['Главная', 'Лента', 'Профиль']) {
+    await page.click(`role=tab[name=${tab}]`);
+    await expect(page.locator(`[role=tabpanel][aria-label=${tab}]`)).toBeVisible();
   }
+});
+
+test('тёмная тема переключается', async ({ page }) => {
+  await page.goto(FILE);
+  await page.click('#theme-toggle');
+  const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  expect(bg).toMatch(/rgb\(\s*(\d+)/);
+  // Просто проверяем, что фон стал тёмным:
+  const [r,g,b] = bg.match(/\d+/g).map(Number);
+  expect(r + g + b).toBeLessThan(150);
 });
 ```
 
 ```bash
-npx playwright test tests/smoke.spec.js
+npx playwright test smoketest.spec.js
 ```
 
-## Какие сценарии писать
+## Что покрывать
 
-| Тип прототипа | Smoke paths |
-|---|---|
-| Onboarding | welcome → setup → permissions → done (1 path) |
-| E-commerce | catalog → product → cart → checkout (1 path) |
-| Dashboard | login → main → widget-detail → back (1 path) |
-| Form-flow | step 1 → 2 → 3 → review → submit (1 path) |
-| Multi-screen | full nav cycle (1 path) |
+5–10 ключевых сценариев. **Не** покрывай каждый клик.
 
-3 теста max на прототип. Это smoke, не coverage.
+Хорошие кандидаты:
+- ✅ Прототип вообще открывается без ошибок.
+- ✅ Главный путь от первого экрана до целевого.
+- ✅ Самые ломкие переходы (после большого UI-рефакторинга).
+- ✅ Форма с валидацией.
+- ✅ Тёмная/светлая тема.
 
-## Что НЕ тестировать
+Плохие:
+- ❌ Каждый текст в каждом блоке (это уже unit-тест).
+- ❌ Анимации (хрупко, ломается на каждом изменении CSS).
+- ❌ Точные пиксельные значения (нет смысла).
 
-- ❌ Каждый button hover (бессмысленно)
-- ❌ CSS layout (это для visual regression)
-- ❌ A11y (это `a11y-audit`)
-- ❌ Performance (это `perf-audit`)
-- ❌ Сложные edge cases (это для unit/E2E реального продукта)
+## Снимки UI
 
-Smoke = 3 теста по 5 секунд каждый.
-
-## Selectors — best practices
-
-Используй data-attrs специально для тестов:
-```jsx
-<button data-testid="start-btn">Начать</button>
-```
+Опционально — снимки экранов для визуальной регрессии:
 
 ```js
-await page.click('[data-testid=start-btn]');
-```
-
-Альтернативы в порядке предпочтения:
-1. `data-testid` (best — стабильно)
-2. `role` + accessible name (`button[name="Начать"]`)
-3. `text=` (хрупко при i18n)
-4. CSS selectors (`.btn-primary`) — хрупко при рефакторинге
-5. XPath (последнее средство)
-
-## Multi-viewport
-
-```js
-test.describe.parallel('responsive', () => {
-  for (const vp of [{w:1440,h:900,name:'desktop'}, {w:375,h:812,name:'mobile'}]) {
-    test(`flow on ${vp.name}`, async ({ page }) => {
-      await page.setViewportSize({ width: vp.w, height: vp.h });
-      await page.goto(ARTIFACT);
-      // ... тест
-    });
-  }
+test('скриншот главной страницы', async ({ page }) => {
+  await page.goto(FILE);
+  await expect(page).toHaveScreenshot('home.png', { maxDiffPixels: 100 });
 });
 ```
 
-## Скриншот failures
+При первом запуске Playwright создаст baseline. При следующих — сравнит. Чувствительность настраивается через `maxDiffPixels` / `threshold`.
 
-```js
-test.use({
-  screenshot: 'only-on-failure',  // авто-скриншот при failure
-  trace: 'retain-on-failure',     // полная trace для debug
-});
-```
+## Когда запускать
 
-При failure — у тебя есть `test-results/<name>/test-failed-1.png` для визуального ревью.
+- Перед сдачей пользователю — обязательно.
+- После каждого крупного рефакторинга.
+- В CI, если репо приватный (для прототипа CI обычно избыточен).
 
-## CI integration
+## Когда НЕ нужно
 
-```yaml
-# .github/workflows/smoke.yml
-- run: npx playwright install chromium
-- run: npx playwright test tests/smoke.spec.js --reporter=html
-- uses: actions/upload-artifact@v3
-  if: always()
-  with:
-    name: playwright-report
-    path: playwright-report/
-```
+- Прототип на 1 день.
+- Один экран без интерактива.
+- Дек слайдов.
+- Анимация-видео.
 
-## Output: PASS / FAIL
+## Поддержка
 
-```
-Running 3 tests using 1 worker
+Тесты — тоже код. Если не обновляешь их вместе с прототипом, они становятся ложными срабатываниями. Лучше **меньше** актуальных, чем больше устаревших.
 
-  ✓ Welcome → Main flow (2.3s)
-  ✓ Form: fill and submit (3.1s)
-  ✓ Navigation: cycle through screens (1.8s)
+## Legacy reference
 
-  3 passed (7.2s)
-```
-
-При failure:
-```
-  ✘ Form: fill and submit (4.2s)
-    Error: Timeout 30000ms exceeded.
-    waiting for locator('text=Готово')
-
-  See trace: test-results/form-flow-trace.zip
-```
-
-Юзеру: «Smoke ОК, 3/3 пройдены» или «Сломан flow X — экран Y не появляется после клика на Z. Скриншот в `test-results/`.»
-
-## Когда НЕ запускать
-
-- Прототип статичный (slides, лендинг без forms) → verifier достаточно
-- Один экран без переходов → нет flow для тестирования
-- На early итерации → структура ещё меняется, тесты постоянно ломаются
-
-## Антипаттерны
-
-- 30+ smoke tests → не smoke, а E2E suite
-- Тестировать UI specifics (bg color = X) → это хрупко, для visual regression
-- Не использовать data-testid → тест ломается при любом рефакторе текста
-- Игнорировать timeouts → тесты flaky, все теряют доверие
-- Запускать smoke на staging без отдельного artifact → совмещение concerns
-- Не сохранять report на CI → не понятно что упало
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-proto-smoketest.md`. Секции там: Инсталляция, Структура, Какие сценарии писать, Что НЕ тестировать, Selectors — best practices, Multi-viewport, Скриншот failures, CI integration, Output: PASS / FAIL, Когда НЕ запускать, Антипаттерны.

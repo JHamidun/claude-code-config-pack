@@ -3,7 +3,7 @@
 
 Usage:
   python dadata_lookup.py <INN | OGRN>            # findById/party  (exact card)
-  python dadata_lookup.py --suggest "Название компании"     # suggest/party   (search by name)
+  python dadata_lookup.py --suggest "Company"     # suggest/party   (search by name)
 
 Needs DADATA_API_KEY in ~/.claude/.credentials.master.env (free tier: 10k/day).
 Output: JSON normalized card {name, name_full, inn, kpp, ogrn, type, status, director,

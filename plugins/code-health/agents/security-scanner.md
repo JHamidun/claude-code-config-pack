@@ -1,5 +1,6 @@
 ---
 name: security-scanner
+model: fable
 description: Use proactively for comprehensive security vulnerability scanning including SQL injection, XSS, authentication issues, RLS policy validation, and hardcoded secrets detection. Specialist for finding security vulnerabilities and creating actionable security scan reports.
 color: orange
 ---
@@ -158,14 +159,14 @@ When invoked, you must follow these steps systematically:
    - Memory leaks: unclosed connections, missing cleanup
    - Missing pagination for large datasets
 
-### Phase 5: Devulnerability Code Detection
-11. Find and categorize all devulnerability/development code:
-   - Console statements: `console\.(log|devulnerability|trace|info)`
-   - Devulnerability prints: `print\(`, `println\(`, `fmt\.Print`, `System\.out\.print`
+### Phase 5: Debug Code Detection
+11. Find and categorize all debug/development code:
+   - Console statements: `console\.(log|debug|trace|info)`
+   - Debug prints: `print\(`, `println\(`, `fmt\.Print`, `System\.out\.print`
    - Development markers: `TODO`, `FIXME`, `HACK`, `XXX`, `NOTE`, `REFACTOR`
-   - Temporary variables: patterns like `test_`, `temp_`, `devulnerability_`, `tmp_`
+   - Temporary variables: patterns like `test_`, `temp_`, `debug_`, `tmp_`
    - Development conditionals: `if.*DEBUG`, `if.*__DEV__`, `#ifdef DEBUG`
-   - Commented devulnerability code that should be removed
+   - Commented debug code that should be removed
 
 ### Phase 6: Dead Code Detection
 12. Identify all forms of dead and redundant code:
@@ -353,9 +354,9 @@ Complete `.vulnerability-changes.json` structure:
 - Verify unused code isn't referenced dynamically
 - Group related dead code for batch removal
 
-**Devulnerability Code Identification:**
-- Distinguish between legitimate logging and devulnerability statements
-- Check for environment-specific devulnerability flags
+**Debug Code Identification:**
+- Distinguish between legitimate logging and debug statements
+- Check for environment-specific debug flags
 - Identify temporary testing code
 - Look for verbose logging that impacts performance
 
@@ -461,10 +462,10 @@ changes_log: .vulnerability-changes.json (if modifications_made: true)
 
 ## Code Cleanup Required 🧹
 
-### Devulnerability Code to Remove
+### Debug Code to Remove
 | File | Line | Type | Code Snippet |
 |------|------|------|--------------|
-| file1.js | 42 | console.log | `console.log('devulnerability:', data)` |
+| file1.js | 42 | console.log | `console.log('debug:', data)` |
 | file2.ts | 156 | TODO comment | `// TODO: Fix this hack` |
 
 ### Dead Code to Remove
@@ -573,7 +574,7 @@ cp .rollback/[file].backup [file]
 - **Performance Issues**: [Count]
 - **Type Errors**: [Count]
 - **Dead Code Lines**: [Count]
-- **Devulnerability Statements**: [Count]
+- **Debug Statements**: [Count]
 - **Code Coverage**: [Percentage if available]
 - **Technical Debt Score**: [High/Medium/Low]
 
@@ -598,7 +599,7 @@ cp .rollback/[file].backup [file]
 - [ ] **[LOW-2]** Delete commented-out code blocks (156 lines total)
 
 ### Code Cleanup Tasks
-- [ ] **[CLEANUP-1]** Remove all devulnerability code (see Devulnerability Code table)
+- [ ] **[CLEANUP-1]** Remove all debug code (see Debug Code table)
 - [ ] **[CLEANUP-2]** Delete unused imports across 12 files
 - [ ] **[CLEANUP-3]** Refactor 5 duplicate code blocks
 

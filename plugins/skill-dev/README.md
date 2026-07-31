@@ -8,21 +8,16 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `agent-tool-design` | Best practices for designing tools for AI agents (from Anthropic Engineering) |
-| `claude-api` | Claude API Skill |
-| `claude-cli-runner` | Claude CLI Runner |
+| `claude-api` | Anthropic Claude API (ANTHROPIC_API_KEY) из Python: text generation, vision, tool use, streaming. |
+| `claude-cli-runner` | Запуск моделей Claude из Python БЕЗ API-ключа — через claude CLI binary с авторизацией подписки Claude Code. |
 | `content-policy` | What NOT to reproduce — protected UI of big companies, unverified brands. The legal and ethical boundary. |
-| `context-engineering` | Context Engineering Kit |
-| `mcp-builder` | Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. |
-| `mcp-usage` | MCP Servers Usage Skill |
-| `prompt-engineering` | Prompt engineering techniques, patterns, and best practices for LLMs |
-| `senior-prompt-engineer` | World-class prompt engineering skill for LLM optimization, prompt patterns, structured outputs, and AI product development. |
+| `context-engineering` | Паттерны оптимизации контекста LLM: progressive disclosure, semantic compression, structured references, summary-first / layered / delta /… |
+| `llm-evals` | Evaluate LLMs and agents — golden sets, two-tier grading (programmatic metrics + LLM judge), model sweeps, keep/rollback verdicts. |
+| `mcp-builder` | Guide for building high-quality MCP (Model Context Protocol) servers in Python (FastMCP) or Node/TypeScript (MCP SDK). |
+| `prompt-engineering` | Промпт-инжиниринг: системные промпты, few-shot, chain-of-thought, structured outputs, декомпозиция, оценка и итерация промптов. |
 | `sharing-skills` | Use when you've developed a broadly useful skill and want to contribute it upstream via pull request |
-| `skill-creator` | Guide for creating effective skills following Anthropic's official best practices and Manus methodology. |
-| `template-skill` | Replace with description of the skill and when Claude should use it. |
+| `skill-creator` | Create new skills, modify and improve existing skills, and measure skill performance. |
 | `tool-search-protocol` | Don't refuse an MCP/connector capability outright — search via tool_search first; the tool may exist but be hidden. |
-| `using-superpowers` | Use when starting any task - establishes mandatory workflows for finding and using skills before proceeding |
-| `writing-skills` | Use when creating new skills - applies TDD principles to process documentation to ensure skills prevent actual agent failures |
 
 ### Agents
 
@@ -40,7 +35,7 @@ Enable it with `/plugin` — the skills then activate automatically when relevan
 
 ## Credits
 
-using-superpowers, writing-skills, and sharing-skills are adapted from **Superpowers** by Jesse Vincent / Prime Radiant — https://github.com/obra/superpowers.
+sharing-skills is adapted from **Superpowers** by Jesse Vincent / Prime Radiant — https://github.com/obra/superpowers.
 
 ## Related plugins
 

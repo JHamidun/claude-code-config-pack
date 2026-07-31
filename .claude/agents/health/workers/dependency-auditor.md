@@ -1,5 +1,6 @@
 ---
 name: dependency-auditor
+model: fable
 description: Specialist for analyzing dependency health, detecting security vulnerabilities, and identifying outdated or unused packages. Uses Knip for accurate unused dependency detection.
 color: purple
 ---

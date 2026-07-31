@@ -1,3 +1,8 @@
+---
+description: "Google Chat: список пространств, чтение и отправка сообщений (в т.ч. карточки) через Chat API. Триггеры: «google chat», «гугл чат», «пространства chat», «напиши в google chat»."
+argument-hint: "[spaces | messages <space_id> | send <space_id> <текст>]"
+---
+
 # Google Chat Operations
 
 /gchat - Работа с Google Chat

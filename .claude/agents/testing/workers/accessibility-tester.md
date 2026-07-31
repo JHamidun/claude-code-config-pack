@@ -1,7 +1,7 @@
 ---
 name: accessibility-tester
 description: Use proactively for comprehensive web accessibility testing (WCAG 2.1 AA/AAA compliance, screen reader validation, keyboard navigation, ARIA labels, color contrast). Generates detailed accessibility audit reports with actionable remediation steps.
-model: sonnet
+model: fable
 color: purple
 ---
 

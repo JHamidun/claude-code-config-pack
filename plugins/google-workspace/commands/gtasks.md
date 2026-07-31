@@ -1,3 +1,8 @@
+---
+description: "Google Tasks: списки задач, создание/завершение задач, дедлайны (Tasks API v1). Триггеры: «google tasks», «задачи google», «добавь задачу в google», «спиши задачу». Todoist-workflow → /gtd."
+argument-hint: "[lists | tasks <list_id> | create <список> <задача> | complete <list_id> <id>]"
+---
+
 # Google Tasks Operations
 
 /gtasks - Работа с Google Tasks
@@ -75,7 +80,7 @@ tasks.tasks().update(
 6. **Создать новый список:**
 ```python
 new_list = tasks.tasklists().insert(
-    body={'title': 'Проект YourCompanyGPT'}
+    body={'title': 'Проект YourProduct'}
 ).execute()
 print(f"Список: {new_list['id']}")
 ```

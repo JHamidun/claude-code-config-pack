@@ -1,9 +1,7 @@
 ---
 name: image-generation
-description: "AI image generation prompt engineering for DALL-E 3, Gemini Imagen, Stable Diffusion, Midjourney. Use when asked to generate, create, or draw images."
+description: "AI image generation prompt engineering for DALL-E 3, Gemini Imagen, Stable Diffusion, Midjourney. Use when asked to generate, create, or draw images. Also covers the Krestinin surrealism preset for ad creatives — triggers: «креатив для vk ads», «сюрреализм магритт», «несочетаемые пары для рекламы», «рекламный креатив сюрреализм», «креатив магритт дали»."
 ---
-
-> ⚠️ **NO-KEY GUARD (обязательно):** этот функционал требует ОПЦИОНАЛЬНОГО стороннего API-ключа. Перед вызовом проверь ключ в `.credentials.master.env`. Если ключ отсутствует, пустой или placeholder (`your_*_api_key`) — **НЕ проси пользователя оплатить счёт, включить биллинг или купить API**. Скажи одной строкой: «Эта функция опциональна и требует свой API-ключ (например, бесплатный ключ на aistudio.google.com); из коробки всё остальное работает по подписке Claude» — и предложи альтернативу или продолжай без неё.
 
 # Image Generation Skill
 
@@ -11,8 +9,13 @@ Expert image prompt engineering for AI image generators (DALL-E 3, Midjourney, S
 
 > **See Also - Specialized API Skills:**
 > - **[gemini-3-pro](gemini-3-pro.md)** - Full Gemini suite: Imagen 3, Veo 2 video, TTS, Live API, embeddings
-> - **[nano-banana-pro](nano-banana-pro.md)** - Photorealistic portrait templates for Gemini
+> - **[nano-banana-pro](nano-banana-pro.md)** - Photorealistic portrait templates for Gemini; Gemini-замена DALL-E 3 для сюрреалистичных рекламных пар (без VPN)
 > - **[openai-dalle](openai-dalle.md)** - Full OpenAI suite: DALL-E 3, Sora 2, Whisper, GPT-4o, TTS
+>
+> **See Also - References:**
+> - **[references/vk-ads-surrealism-preset.md](references/vk-ads-surrealism-preset.md)** - пресет «эксперт / Магритт-Дали» для рекламных креативов (несочетаемые пары → сюрреализм)
+>
+> **Considered and rejected (2026-07-20):** inference.sh `belt` CLI (github.com/inference-sh/skills, 628★) — aggregator for 50+ image models incl. FLUX/Reve/Gemini. FLUX and Reve are already reachable via `replicate` skill (1000+ models incl. `black-forest-labs/flux-1.1-pro` and Reve 2.1); Gemini already default here. `belt` adds a second paywalled account (`belt login`, credit system, no published pricing) and a `curl | sh` installer for zero net-new model access — not adopted.
 
 ## When to Use
 - User asks to create/generate an image

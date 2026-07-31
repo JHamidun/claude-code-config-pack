@@ -638,3 +638,30 @@ LIMIT 100"
 - **Migrations**: Alembic, Prisma, Django
 - **Monitoring**: pg_stat_statements, MongoDB Profiler
 - **Schema visualization**: dbdiagram.io, DrawSQL
+
+## ER-диаграммы из схемы (liam)
+
+`@liam-hq/cli` — интерактивные ER-диаграммы (React Flow, HTML) из Prisma/PostgreSQL/drizzle-схем. Работает через `npx`, ставить ничего не нужно. Проверено 2026-07-19 на ClientProjectA (61 модель).
+
+**Prisma (одиночный файл):**
+```bash
+npx -y @liam-hq/cli@latest erd build --input schema.prisma --format prisma --output-dir liam-erd
+```
+
+**Postgres по URL (Academy и любые live-БД):**
+```bash
+npx -y @liam-hq/cli@latest erd build --input "postgresql://user:pass@host:5432/db" --format postgres --output-dir liam-erd
+```
+Форматы: `prisma | postgres | drizzle | schemarb | tbls | liam`. Для Academy (drizzle/psql) — либо `--format drizzle` на schema-файлы, либо `pg_dump --schema-only > dump.sql` и `--format postgres`.
+
+**Вывод:** `--output-dir` (дефолт `dist/`) — index.html + schema.json + assets. Открывать ТОЛЬКО через HTTP (file:// не работает):
+```bash
+npx http-server -c-1 liam-erd/
+```
+
+**Гочи (Windows / Prisma 7 multi-file — ClientProjectA):**
+- Абсолютный Windows-путь с глобом (`C:/...*.prisma`) → `ERROR: fetch failed`. Запускай из директории схемы с относительным путём.
+- Bundled Prisma 6.8.2 не понимает multi-file schema и generator `provider = "prisma-client"` (Prisma 7): конкатенируй файлы в один temp `merged.prisma`, замени generator на `prisma-client-js` и добавь `url = env("DATABASE_URL")` в datasource — затем build проходит.
+- ClientProjectA-схема: `${WORKSPACE}/flame/packages/flame-tools/prisma/schema/{core,crm,pms}.prisma` (НЕ `flame/prisma/`).
+
+**Когда полезно:** ревью схемы перед миграцией (Академия LMS/CRM, ClientProjectB, ClientProjectC, ClientProjectA), онбординг в чужую БД, проверка связей после новых моделей, скриншот диаграммы в доку/КП.

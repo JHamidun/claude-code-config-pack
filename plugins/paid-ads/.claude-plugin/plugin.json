@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "paid-ads",
+  "displayName": "Paid Advertising",
+  "version": "0.1.0",
+  "description": "Meta, Google, VK, Yandex Direct and Telegram Ads playbooks, performance creative production, benchmark diagnostics.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "ads",
+    "ppc",
+    "performance",
+    "media-buying"
+  ]
+}

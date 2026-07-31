@@ -1,3 +1,8 @@
+---
+description: "Google Cloud Storage: бакеты, список объектов, upload/download файлов (REST + googleapiclient). Триггеры: «GCS», «gcloud storage», «бакет google», «залей в cloud storage»."
+argument-hint: "[buckets | list <bucket> | upload <bucket> <file> | download <bucket> <object>]"
+---
+
 # Google Cloud Storage Operations
 
 /gcloud-storage - Работа с Google Cloud Storage

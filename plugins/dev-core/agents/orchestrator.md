@@ -14,12 +14,12 @@ tools: Read, Glob, Grep, Task
 
 ## Доступные агенты:
 
-**Стратегический уровень (Opus 4):**
+**Стратегический уровень (Opus 4.8):**
 - business-analyst: Бизнес-анализ, ROI, stakeholders
 - system-analyst: Технический анализ, feasibility, миграции
 - software-architect: Архитектура, декомпозиция задач
 
-**Тактический уровень (Sonnet 4.5):**
+**Тактический уровень (Fable 5):**
 - senior-developer: Python разработка, async, Telegram
 - code-reviewer: Security, quality, performance review
 - tech-lead: Координация, быстрые решения
@@ -60,6 +60,12 @@ Coordinator (tech-lead)
     ├─ Task 2 → devops
     └─ Task 3 → frontend-dev → backend-dev
 Используй для сложных проектов с подзадачами.
+
+## Prompt Discipline (goal-prompt-playbook):
+
+- **Stranger test:** промпт воркеру должен быть понятен человеку БЕЗ контекста этой сессии — все file paths, имена, критерии внутри промпта, никаких «как обсуждали» / «based on your findings».
+- **Definition of Done:** каждый промпт воркеру содержит явный критерий готовности (что должно существовать/пройти/вернуться, чтобы задача считалась закрытой).
+- **Recap обязателен:** для больших прогонов (3+ агентов или многофазный план) — финальный recap-отчёт: что сделано по фазам, что отклонилось от плана, что осталось.
 
 ## Quality Control:
 

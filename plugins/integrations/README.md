@@ -8,15 +8,19 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
+| `agent-api-server` | OpenAI-compatible HTTP server on top of the local Claude CLI — expose /v1/chat/completions to n8n, SDKs, IDEs, curl. |
 | `aws-skills` | AWS development with CDK, Lambda, serverless patterns, infrastructure |
 | `claude-server-auth` | Use when authenticating Claude CLI on a headless server - generates subscription tokens via tmux + local Playwright OAuth flow |
 | `deepl-pro` | DeepL professional translation - text, documents, glossaries. |
-| `n8n` | n8n workflow automation - API integration, nodes, triggers, expressions, MCP. |
-| `pinecone` | Pinecone Vector Database Skill |
-| `senior-devops` | Comprehensive DevOps skill for CI/CD, infrastructure automation, containerization, and cloud platforms (AWS, GCP, Azure). |
+| `home-assistant` | Home Assistant CLI over REST + WebSocket — entity states, service calls, on/off/toggle, state history, live events. |
+| `maps-places` | Places, addresses and geocoding across 11 providers (Google Places, Yandex, 2GIS, HERE, Mapbox, Foursquare, OSM and more). |
+| `n8n` | n8n workflow automation — API integration, nodes, triggers, expressions, MCP, 400+ integrations. |
+| `pinecone` | Pinecone vector DB (PINECONE_API_KEY): serverless-индексы, semantic search, RAG; текущие индексы company-tm-bot, company-plus-bot и др. |
 | `server-health` | Server health checks via SSH - docker, systemctl, disk, memory, logs. |
 | `telegram-bot-toolkit` | Comprehensive toolkit for Telegram bot development, testing, debugging, and deployment. |
 | `uptime-kuma-ops` | Manage Uptime Kuma monitors via API - list, add, update, delete, check status. |
+| `webhook-receiver` | Receive webhooks (GitHub, Stripe, GitLab, JIRA, forms) on a local CLI server with HMAC signature validation and a JSONL log. |
+| `yandex-forms` | Create Yandex Forms (surveys, questionnaires) programmatically instead of clicking through every question by hand. |
 | `zoom` | Zoom meetings management — create, list, update, delete meetings and manage recordings via Server-to-Server OAuth API |
 
 ### Agents
@@ -44,7 +48,7 @@ Enable it with `/plugin` — the skills then activate automatically when relevan
 
 ## Related plugins
 
-`google-workspace` · `session-tools`
+`google-workspace` · `session-tools` · `social-posting`
 
 ---
 

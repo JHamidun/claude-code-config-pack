@@ -76,7 +76,7 @@
     {
       "name": "social-posting",
       "source": "./plugins/social-posting",
-      "description": "Publish to X, Threads, Bluesky, Instagram, TikTok; multi-platform post drafting."
+      "description": "Publish to Telegram channels via bot, message over WhatsApp, send SMS (Twilio), work with any IMAP/SMTP mailbox."
     },
     {
       "name": "content-writing",
@@ -127,6 +127,26 @@
       "name": "marketing-tools",
       "source": "./plugins/marketing-tools",
       "description": "Campaign planning, competitive analysis, performance analytics (ROAS/CPL)."
+    },
+    {
+      "name": "marketing-ru",
+      "source": "./plugins/marketing-ru",
+      "description": "Offers, pricing, positioning, launches, retention, referrals, growth loops, JTBD, PR outreach, marketing team building."
+    },
+    {
+      "name": "cro-funnels",
+      "source": "./plugins/cro-funnels",
+      "description": "Conversion optimization for landing pages, signup, onboarding, paywalls, popups and forms; funnel design, A/B testing, full-funnel analytics."
+    },
+    {
+      "name": "paid-ads",
+      "source": "./plugins/paid-ads",
+      "description": "Meta, Google, VK, Yandex Direct and Telegram Ads playbooks, performance creative production, benchmark diagnostics."
+    },
+    {
+      "name": "seo-geo",
+      "source": "./plugins/seo-geo",
+      "description": "SEO content pipeline, programmatic AI-SEO page generation, schema.org markup, GEO/AEO visibility in ChatGPT, Perplexity and AI Overviews."
     },
     {
       "name": "research-tools",

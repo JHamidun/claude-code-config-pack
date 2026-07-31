@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Perplexity deep B2B dossier over a priority queue of companies.
+"""Perplexity deep B2B dossier over a priority queue of companies. Port of the proven script.
 
 Usage:  python research_companies.py aggregated.json list.json [--out-dir research] [--workers 3] [--top-cold 500]
 
@@ -19,7 +19,7 @@ PROMPT_TEMPLATE = '''Подготовь сжатое досье для B2B-пр�
 2. **Свежие новости** (последние 6 месяцев): сделки, M&A, смена топ-менеджмента, цифровая трансформация.
 3. **Сигналы для EdTech / корп. библиотеки / AI-платформы**: инициативы по обучению, AI-внедрениям, HR-tech.
 4. **Триггеры** (за 3-6 мес., дают повод написать): рост штата, новый CIO, IPO, новая стратегия.
-5. **Пейн-поинты** под ваши продукты: например, корп. AI-ассистент, b2b-библиотека/книги, EdTech (замените на свой набор).
+5. **Пейн-поинты** под продукты: YourProduct (корп. AI-ассистент), Company Книги/Библиотека (b2b), EdTech.
 
 Кратко (300-400 слов), со ссылками. Если данных нет — "нет в открытых источниках".'''
 

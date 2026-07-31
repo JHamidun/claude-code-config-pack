@@ -1,7 +1,7 @@
 ---
 name: senior-developer
 description: "Implements features with clean, production-ready code across Python, TypeScript, and full-stack projects"
-model: opus
+model: fable
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 

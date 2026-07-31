@@ -1,3 +1,8 @@
+---
+description: "Google Search Console: сайты, топ поисковых запросов/страниц (клики, CTR, позиции), sitemaps. Триггеры: «search console», «GSC», «поисковые запросы google», «позиции в google». Яндекс.Вебмастер → skill yandex."
+argument-hint: "[sites | analytics <site_url> | sitemaps <site_url>]"
+---
+
 # Google Search Console Operations
 
 /gsearch-console - Работа с Google Search Console
