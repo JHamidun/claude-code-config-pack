@@ -1,3 +1,8 @@
+---
+description: "Индексация всех сессий Claude Code в ~/.claude/chats.db (SQLite FTS5): инкрементально или --force полный ре-индекс, затем stats. Триггеры: «проиндексируй чаты», «обнови индекс чатов», «memory ingest», «index chats»."
+argument-hint: "[--force]"
+---
+
 # Ingest Chat History
 
 **Arguments:** $ARGUMENTS (optional: --force)
@@ -11,19 +16,19 @@ Index all Claude Code chat sessions into SQLite FTS5 database for search.
 1. **Incremental index (fast, skips already indexed):**
 
 ```bash
-python ${WORKSPACE}/tools/search_chats.py index
+python ~/.claude/tools/search_chats.py index
 ```
 
 2. **Force full re-index:**
 
 ```bash
-python ${WORKSPACE}/tools/search_chats.py index --force
+python ~/.claude/tools/search_chats.py index --force
 ```
 
 3. **Check stats after:**
 
 ```bash
-python ${WORKSPACE}/tools/search_chats.py stats
+python ~/.claude/tools/search_chats.py stats
 ```
 
 ## Info

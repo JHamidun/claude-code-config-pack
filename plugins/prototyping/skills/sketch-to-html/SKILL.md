@@ -1,161 +1,64 @@
 ---
 name: sketch-to-html
-description: Грубый рукотворный скетч / whiteboard photo → HTML каркас. Идентифицирует layout regions, превращает в HTML divs/sections с placeholder-контентом для дальнейшей детализации в interactive-prototype или slides.
-when_to_use: Юзер прислал фото маркерной доски / whiteboard / paper sketch / Excalidraw screenshot и хочет «превратить это в HTML каркас». Не для финального дизайна — только начальный wireframe-каркас.
+description: Скетч / фото маркерной доски / напканная заметка → HTML каркас. Вариант document-import, специально для рукописных штук.
+when_to_use: Пользователь приложил фото скетча, рисунок на салфетке, экспорт из Excalidraw/tldraw.
 ---
 
-# Sketch → HTML
+# Sketch to HTML
 
-Скетч — это структурный сигнал, не визуальный. Цель: понять иерархию и блоки, не воспроизвести каракули.
+Не пытайся «распознавать» руками. У тебя есть способность видеть картинку — используй её прямо.
 
-## Workflow
+## Алгоритм
+
+1. **Открой картинку.** Просто через `view_image` (или эквивалент в Claude Code — Read с путём к картинке).
+2. **Опиши вслух, что видишь.** Не сразу строй HTML, сначала проговори:
+   - Это один экран или флоу?
+   - Сколько секций / прямоугольников / зон?
+   - Есть ли подписи и стрелки между ними?
+   - Что ты считаешь заголовком, что — текстом, что — кнопкой?
+3. **Покажи описание пользователю.** «Вижу 3 экрана. На первом форма входа, на втором лента карточек, на третьем настройки. Между ними стрелки 1→2→3. Правильно понял?»
+4. **Дождись подтверждения.** Не строй HTML, пока пользователь не согласился с описанием.
+5. **Перейди в `wireframe`** — собери черновик в low-fi.
+6. После утверждения — переходи в hi-fi через `interactive-prototype` или `slides`.
+
+## Чего не делать
+
+- ❌ Не угадывай детали, которых не видно. «Сделай красиво» — это сигнал спросить.
+- ❌ Не игнорируй стрелки и подписи. Они часто несут важную инфу о флоу.
+- ❌ Не теряй пропорции. Если на скетче sidebar занимает 1/4 ширины — на твоём wireframe тоже.
+
+## Если скетч сделан в excalidraw / tldraw / .napkin
+
+- `.napkin` — рисовалка с превью рядом. Если есть `scraps/.{name}.thumbnail.png` — открой превью.
+- Excalidraw export — `.excalidraw.json` или `.png`. JSON парси, PNG смотри глазами.
+- tldraw — `.tldr` это JSON. Можно вытащить shapes, но проще смотреть PNG-экспорт.
+
+## Полезные пометки в описании
+
+Когда описываешь скетч, размечай так:
 
 ```
-1. Load image (photo / screenshot / Excalidraw)
-2. Identify regions (header / hero / 3 columns / footer)
-3. Generate HTML с подписанными блоками
-4. → wireframe / interactive-prototype для следующего шага
+Экран 1 — Login
+  ┌────────────────┐
+  │ [LOGO]         │
+  │                │
+  │ Email   [____] │
+  │ Pass    [____] │
+  │                │
+  │   [Sign in →]  │
+  │   forgot pwd?  │
+  └────────────────┘
+       ↓ on submit
+Экран 2 — Feed
+  ...
 ```
 
-## Identification (визуально)
+Эту разметку отправь пользователю как часть описания. Так ему легче подтвердить или поправить.
 
-Claude Code умеет читать изображения через `Read` tool. Для скетча — описание, не парсинг:
+## После HTML
 
-```
-[Юзер скидывает фото]
-```
+Сохрани оригинал скетча рядом с артефактом (`assets/sketch-source.png`), сошлись на него в комментарии в HTML — пригодится при будущих правках.
 
-В response Claude:
-1. Описывает что видит: «Hero сверху на 60% ширины, справа карточка с 3 пунктами, ниже — 3 равные секции по 33%, footer с лого»
-2. Спрашивает уточнения если нужно: «У тебя в верхнем правом углу что-то закрашено — это иконка или CTA?»
-3. Генерирует HTML
+## Legacy reference
 
-## Output: wireframe-style HTML
-
-```html
-<!-- Re-creating user's sketch as structured HTML -->
-<!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><title>Sketch interpretation</title>
-<style>
-  body { font-family: system-ui; padding: 24px; max-width: 1200px; margin: auto; }
-  .block { background: #fff; border: 1px dashed #999; border-radius: 4px;
-           padding: 16px; margin-bottom: 12px; }
-  .block-label { color: #666; font-size: 11px; text-transform: uppercase;
-                 letter-spacing: 0.05em; margin-bottom: 6px; }
-  .row { display: grid; gap: 12px; }
-  .row.cols-2 { grid-template-columns: 2fr 1fr; }
-  .row.cols-3 { grid-template-columns: repeat(3, 1fr); }
-</style></head>
-<body>
-
-<div class="block">
-  <div class="block-label">Hero (top, ширина ~60%)</div>
-  <h1>[Заголовок 2-3 строки — что юзер написал в скетче]</h1>
-  <p>[Подзаголовок если был]</p>
-</div>
-
-<div class="row cols-2">
-  <div class="block">
-    <div class="block-label">Main content (left)</div>
-    [Содержимое центрального блока — описать что было в скетче]
-  </div>
-  <div class="block">
-    <div class="block-label">Sidebar card (right, ~30%)</div>
-    <p>[3 пункта/опции из скетча]</p>
-  </div>
-</div>
-
-<div class="row cols-3">
-  <div class="block">
-    <div class="block-label">Feature 1</div>
-    [Что юзер написал в первом блоке]
-  </div>
-  <div class="block">
-    <div class="block-label">Feature 2</div>
-    [Второй блок]
-  </div>
-  <div class="block">
-    <div class="block-label">Feature 3</div>
-    [Третий блок]
-  </div>
-</div>
-
-<div class="block">
-  <div class="block-label">Footer</div>
-  [Что было внизу скетча]
-</div>
-
-</body></html>
-```
-
-## Excalidraw / draw.io / Whimsical
-
-Если скетч из этих tools — есть structured export:
-
-### Excalidraw
-- Save → `.excalidraw` (JSON)
-- В JSON: elements with positions, text, types
-- Можно парсить и mapping coords → HTML grid
-
-```js
-const sketch = JSON.parse(fs.readFileSync('mockup.excalidraw'));
-const elements = sketch.elements;
-// elements[i] = { type, x, y, width, height, text, ... }
-// Группируешь по visual proximity → rows / columns
-```
-
-### draw.io
-- Save → `.drawio` (XML)
-- Mapping shapes → semantic blocks
-
-## Photo recognition (whiteboard)
-
-Это harder — нужно vision. Через Claude Code:
-- `Read` tool принимает image
-- Ты описываешь что видишь
-- Спрашиваешь у юзера про неоднозначности
-
-Если фото плохого качества — попроси юзера переснять или добавить подписи к блокам.
-
-## Что НЕ переносить
-
-- ❌ Точные пропорции рисованных коробок (палец дрожал)
-- ❌ Цвета маркера (юзер использовал то что было)
-- ❌ Стрелки между блоками — если важно, exposed как «sequence A → B»
-- ❌ Художественные элементы (улыбки, человечки) — не нужны в каркасе
-
-## Что переносить
-
-- ✅ Структура (1, 2, 3 колонки)
-- ✅ Иерархия (что больше = более важное)
-- ✅ Текст-надписи (содержательные подписи)
-- ✅ Sequence / порядок (если whiteboard это flow)
-- ✅ Группировку (что рядом = одна секция)
-
-## Уточняющие вопросы
-
-После interpretation спрашивай:
-```
-«Я вижу 4 блока:
-  1. Hero сверху во всю ширину
-  2. Левая колонка с тремя bullet'ами
-  3. Правая колонка с большой иконкой
-  4. Footer с тремя кнопками
-
-Угадал? Или что-то не так понял?»
-```
-
-## Stack
-
-- `wireframe` — следующий шаг (детализировать структуру)
-- `interactive-prototype` — далее (добавить интерактив)
-- `placeholders` — для блоков-заглушек
-
-## Антипаттерны
-
-- Воспроизводить скетч буквально (с дрожащими линиями) → дешёвый «hand-drawn» эффект
-- Игнорировать подписи юзера и придумывать свой контент
-- Делать финальный hi-fi сразу из скетча → теряешь шаг wireframe
-- Пытаться парсить фото алгоритмически без vision модели → 99% случаев garbage
-- Не задавать уточняющих вопросов → строишь не то что юзер имел в виду
-- Передавать sketch напрямую в slides без структурирования → теряется смысл
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-sketch-to-html.md`. Секции там: Workflow, Identification (визуально), Output: wireframe-style HTML, Excalidraw / draw.io / Whimsical, Photo recognition (whiteboard), Что НЕ переносить, Что переносить, Уточняющие вопросы, Stack, Антипаттерны.

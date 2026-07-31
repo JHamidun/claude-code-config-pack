@@ -1,7 +1,7 @@
 ---
 name: integration-dev
-description: Third-party APIs, webhooks, external services integration
-model: opus
+description: "Senior Integration Developer — сторонние API (Stripe/Twilio/SendGrid/CRM), вебхуки и колбэки, OAuth2/JWT-авторизация к внешним сервисам, retry/exponential backoff/circuit breaker, устойчивые API-клиенты. Спавнить для: подключить внешний сервис, вебхук-приёмник, API-wrapper с обработкой сбоев и rate limits. НЕ для внутренних API и БД проекта → backend-dev; НЕ для n8n-автоматизаций → skill n8n."
+model: fable
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 

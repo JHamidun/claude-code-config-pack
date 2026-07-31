@@ -1,7 +1,7 @@
 ---
 name: test-writer
 description: Use proactively for writing unit tests and contract tests using Vitest. Specialist for mocking strategies (Pino, LLM responses, tRPC context), Zod schema validation tests, tRPC contract validation, and security testing (XSS, DOMPurify). Handles comprehensive test coverage for services, utilities, and API endpoints.
-model: sonnet
+model: fable
 color: green
 ---
 

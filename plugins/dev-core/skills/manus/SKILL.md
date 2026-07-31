@@ -1,375 +1,119 @@
 ---
 name: manus
-description: Manus AI autonomous agent platform - task automation, web browsing, code execution
+description: Manus autonomous AI agent platform via its REST API v2 (api.manus.ai). Delegate a long-running, self-planning task (web browsing, research, code execution, file/artifact generation) to a Manus cloud agent, then poll for the result. Use when the user says «запусти задачу в Manus», «отправь в Manus», «manus api», «пусть Manus сделает research/автоматизацию», or wants an autonomous agent to run a multi-step job unattended. NOT for slides «в стиле Manus» (→ manus-slides) and NOT for local browser automation (→ dev-browser / playwright-automation).
 ---
 
-# Manus AI Skill
+# Manus AI (API v2)
 
-## Overview
+Manus (manus.im) is a cloud autonomous-agent platform. You hand it a natural-language
+task; a Manus agent plans and runs it asynchronously (browser, code sandbox, files,
+connectors) and returns messages/artifacts. This skill drives it through the official
+REST API v2 via `scripts/manus_helper.py`.
 
-Manus - платформа автономных AI агентов. Выполняет сложные задачи: веб-браузинг, написание кода, исследования, автоматизация.
+## When to use
 
-## API Configuration
+- A self-planning, multi-step job that runs unattended for minutes: deep web research,
+  scraping + structuring, "go to X, download report, summarize", generate a document.
+- You want the work done in Manus's own cloud sandbox, not in this session.
 
-```python
-import requests
-import os
+**When NOT to use:**
 
-MANUS_API_KEY = os.getenv('MANUS_API_KEY')
-BASE_URL = "https://api.manus.ai/v1"
+- Slides/decks "in the style of Manus" → skill `manus-slides`.
+- Simple/local browser clicks or scraping you control step-by-step → `dev-browser`,
+  `playwright-automation`, `apify-scraping`.
+- Quick web answer with citations → `deep-research` (Perplexity).
 
-headers = {
-    "API_KEY": MANUS_API_KEY,
-    "accept": "application/json",
-    "content-type": "application/json"
+## Verified facts (checked against open.manus.im/docs + live calls, 2026-07-22)
+
+- Base URL: `https://api.manus.ai`
+- Auth header: `x-manus-api-key: <MANUS_API_KEY>` (OAuth2 Bearer also supported).
+  Key is in `~/.claude/.credentials.master.env` as `MANUS_API_KEY`.
+- **v2 is current; v1 (`/v1/tasks`, header `API_KEY`) is deprecated** — do not use it.
+- Create is `POST /v2/task.create`; the task runs **async**. You poll for progress.
+- `agent_profile` values: `manus-1.6` (default), `manus-1.6-lite` (fast/cheap),
+  `manus-1.6-max` (best quality).
+- Lifecycle `agent_status`: `running` → `stopped` (success) | `error` (failed) |
+  `waiting` (needs your input). Field lives at `messages[].status_update.agent_status`.
+- Final answer text is at `messages[].assistant_message.content` (newest first when
+  `order=desc`). Structured output at `structured_output_result` if a schema was passed.
+
+Endpoints (see `references/api-v2.md` for the full map): `task.create` (POST),
+`task.listMessages` (GET, query params), `task.detail` (GET), `task.sendMessage` (POST),
+`task.stop` (POST), `task.list`, `task.delete`, `file.upload`.
+
+> Honest note: only the endpoints exercised by `manus_helper.py` (create / listMessages /
+> status / sendMessage / stop) have been run live from here. `file.upload`, connectors and
+> skills are documented by Manus but **not yet tested in this skill** — treat as reference.
+
+## Procedure
+
+Prefer the helper over hand-rolled `requests` — it handles the async poll loop and the
+nested `status_update` / `assistant_message` field parsing correctly.
+
+```bash
+# one-shot: create + poll until done, prints JSON with .answer
+python ~/.claude/skills/manus/scripts/manus_helper.py run \
+  "Research the top 5 Russian EdTech AI products in 2026; output a comparison table" \
+  --profile manus-1.6 --timeout 1800 --poll 8
+
+# fire-and-forget (returns task_id + task_url immediately)
+python ~/.claude/skills/manus/scripts/manus_helper.py create "…prompt…" --profile manus-1.6-lite
+
+# poll a task you started earlier
+python ~/.claude/skills/manus/scripts/manus_helper.py status   <task_id>
+python ~/.claude/skills/manus/scripts/manus_helper.py messages <task_id> --limit 20
+
+# answer a task that went agent_status=waiting, or add a follow-up
+python ~/.claude/skills/manus/scripts/manus_helper.py reply <task_id> "yes, proceed"
+
+# stop a runaway task
+python ~/.claude/skills/manus/scripts/manus_helper.py stop <task_id>
+```
+
+The key must be in the environment. In bash:
+`set -a; source ~/.claude/.credentials.master.env; set +a` before the call.
+
+## Output
+
+`run` prints JSON to stdout:
+
+```json
+{
+  "task_id": "REumuUf3XoZBGMgUZF7yad",
+  "task_url": "https://manus.im/app/REumuUf3XoZBGMgUZF7yad",
+  "agent_status": "stopped",
+  "answer": "…the agent's final message text…",
+  "messages": { "messages": [ … full event log … ] }
 }
 ```
 
-## When to Use
+Exit codes: `0` stopped/waiting, `2` error, `3` timeout. Progress (`task_id`,
+`agent_status`) is streamed to **stderr** so stdout stays parseable.
 
-- Автономное выполнение сложных задач
-- Web research с навигацией
-- Автоматизация рутинных операций
-- Выполнение кода в sandbox
-- Работа с файлами и документами
+## Example
 
-## Core Capabilities
-
-| Capability | Description |
-|------------|-------------|
-| **Web Browsing** | Навигация, клики, формы |
-| **Code Execution** | Python, JS в sandbox |
-| **File Operations** | Чтение, запись, конвертация |
-| **Research** | Глубокий поиск + анализ |
-| **Data Extraction** | Scraping + структурирование |
-| **Task Planning** | Декомпозиция сложных задач |
-
-## API Endpoints
-
-### Create Task
-
-```python
-def create_task(prompt: str, tools: list = None):
-    """Create autonomous task"""
-    payload = {
-        "prompt": prompt,
-        "tools": tools or ["browser", "code", "files"],
-        "settings": {
-            "max_steps": 50,
-            "timeout_minutes": 30,
-            "sandbox": True
-        }
-    }
-
-    response = requests.post(
-        f"{BASE_URL}/tasks",
-        headers=headers,
-        json=payload
-    )
-    return response.json()
-
-# Response:
-# {
-#   "task_id": "task_abc123",
-#   "status": "running",
-#   "created_at": "2024-01-15T10:30:00Z"
-# }
+```bash
+$ set -a; source ~/.claude/.credentials.master.env; set +a
+$ python ~/.claude/skills/manus/scripts/manus_helper.py run \
+    "Reply with exactly the word PONG and nothing else." --profile manus-1.6-lite
+# stderr: task_id=… / agent_status=running / agent_status=stopped
+# stdout: {"agent_status":"stopped","answer":"PONG", …}
 ```
 
-### Get Task Status
+## Checklist
 
-```python
-def get_task_status(task_id: str):
-    """Check task progress"""
-    response = requests.get(
-        f"{BASE_URL}/tasks/{task_id}",
-        headers=headers
-    )
-    return response.json()
-
-# Response:
-# {
-#   "task_id": "task_abc123",
-#   "status": "completed",  # running, completed, failed, paused
-#   "progress": 100,
-#   "steps_completed": 15,
-#   "result": {...},
-#   "artifacts": [...]
-# }
-```
-
-### Get Task Steps
-
-```python
-def get_task_steps(task_id: str):
-    """Get detailed step-by-step execution"""
-    response = requests.get(
-        f"{BASE_URL}/tasks/{task_id}/steps",
-        headers=headers
-    )
-    return response.json()
-
-# Response:
-# {
-#   "steps": [
-#     {"step": 1, "action": "browse", "url": "https://...", "result": "..."},
-#     {"step": 2, "action": "extract", "data": {...}},
-#     {"step": 3, "action": "code", "language": "python", "output": "..."}
-#   ]
-# }
-```
-
-### Download Artifacts
-
-```python
-def download_artifact(task_id: str, artifact_id: str):
-    """Download generated files"""
-    response = requests.get(
-        f"{BASE_URL}/tasks/{task_id}/artifacts/{artifact_id}",
-        headers=headers
-    )
-    return response.content
-```
-
-## Tool Configurations
-
-### Browser Tool
-
-```python
-browser_config = {
-    "tool": "browser",
-    "settings": {
-        "headless": True,
-        "screenshots": True,      # Capture screenshots
-        "viewport": {"width": 1920, "height": 1080},
-        "wait_for_network": True,
-        "allowed_domains": None,   # None = all allowed
-        "blocked_domains": ["ads.example.com"]
-    }
-}
-```
-
-### Code Execution Tool
-
-```python
-code_config = {
-    "tool": "code",
-    "settings": {
-        "languages": ["python", "javascript", "bash"],
-        "timeout_seconds": 60,
-        "memory_limit_mb": 512,
-        "packages": ["pandas", "requests", "beautifulsoup4"],
-        "sandbox": True
-    }
-}
-```
-
-### File Tool
-
-```python
-file_config = {
-    "tool": "files",
-    "settings": {
-        "allowed_operations": ["read", "write", "convert"],
-        "max_file_size_mb": 100,
-        "allowed_formats": ["pdf", "docx", "xlsx", "csv", "json"]
-    }
-}
-```
-
-## Complete Workflow
-
-```python
-import time
-
-def run_autonomous_task(prompt: str, wait: bool = True):
-    """Execute task and wait for completion"""
-
-    # 1. Create task
-    result = create_task(prompt)
-    task_id = result['task_id']
-    print(f"Task started: {task_id}")
-
-    if not wait:
-        return task_id
-
-    # 2. Poll for completion
-    while True:
-        status = get_task_status(task_id)
-        print(f"Progress: {status['progress']}% - {status['status']}")
-
-        if status['status'] == 'completed':
-            return {
-                "task_id": task_id,
-                "result": status['result'],
-                "artifacts": status.get('artifacts', [])
-            }
-        elif status['status'] == 'failed':
-            raise Exception(f"Task failed: {status.get('error')}")
-
-        time.sleep(5)
-
-# Usage
-result = run_autonomous_task(
-    "Research the top 10 AI startups in 2024, "
-    "create a comparison table with funding, products, and team size"
-)
-print(result)
-```
-
-## Use Case Examples
-
-### Web Research
-
-```python
-# Deep research with sources
-result = run_autonomous_task("""
-Research: "Best practices for microservices architecture in 2024"
-Requirements:
-1. Find at least 5 authoritative sources
-2. Extract key recommendations
-3. Create a summary document
-4. Include source URLs
-""")
-```
-
-### Data Extraction
-
-```python
-# Scrape and structure data
-result = run_autonomous_task("""
-Extract product data from https://example-store.com/products:
-- Product name
-- Price
-- Rating
-- Number of reviews
-
-Output as CSV file.
-""")
-
-# Download artifact
-csv_data = download_artifact(
-    result['task_id'],
-    result['artifacts'][0]['id']
-)
-```
-
-### Code Generation & Execution
-
-```python
-# Generate and run code
-result = run_autonomous_task("""
-Task: Analyze the sentiment of customer reviews
-
-1. Read reviews from the attached CSV
-2. Use a sentiment analysis library
-3. Calculate average sentiment by product category
-4. Create a visualization chart
-5. Save results as PNG and JSON
-""")
-```
-
-### Workflow Automation
-
-```python
-# Multi-step automation
-result = run_autonomous_task("""
-Daily report automation:
-1. Go to analytics.example.com
-2. Download yesterday's sales report
-3. Extract key metrics (revenue, orders, top products)
-4. Format as executive summary
-5. Save as PDF
-""")
-```
-
-## Advanced Features
-
-### Conditional Logic
-
-```python
-task_with_conditions = {
-    "prompt": "Check competitor prices",
-    "conditions": [
-        {
-            "if": "price_difference > 10%",
-            "then": "alert_slack",
-            "params": {"channel": "#pricing"}
-        }
-    ]
-}
-```
-
-### Scheduled Tasks
-
-```python
-def schedule_task(prompt: str, cron: str):
-    """Schedule recurring task"""
-    payload = {
-        "prompt": prompt,
-        "schedule": {
-            "cron": cron,  # "0 9 * * 1" = every Monday 9am
-            "timezone": "UTC"
-        }
-    }
-    return requests.post(
-        f"{BASE_URL}/tasks/scheduled",
-        headers=headers,
-        json=payload
-    ).json()
-```
-
-### Human-in-the-loop
-
-```python
-task_with_approval = {
-    "prompt": "Draft and send email to client",
-    "require_approval": True,
-    "approval_steps": ["before_send"],
-    "notification_webhook": "https://your-app.com/webhooks/manus"
-}
-```
-
-## Integration with Other Agents
-
-```python
-# Manus для research → другие агенты для реализации
-
-# 1. Manus: исследование и анализ
-research = run_autonomous_task(
-    "Research best authentication libraries for Python FastAPI"
-)
-
-# 2. Kimi: code review плана
-# Task(subagent_type="kimi-code-reviewer", prompt=research['result'])
-
-# 3. Backend-dev: реализация
-# Task(subagent_type="backend-dev", prompt="Implement auth based on research")
-```
-
-## Comparison with Other Tools
-
-| Feature | Manus | Browser MCP | n8n |
-|---------|-------|-------------|-----|
-| Autonomous | ✅ | ❌ | ❌ |
-| Code execution | ✅ | ❌ | Limited |
-| Web browsing | ✅ | ✅ | Via nodes |
-| Planning | ✅ | ❌ | Manual |
-| Best for | Complex autonomous | Simple scraping | Workflows |
-
-## Pricing
-
-| Plan | Tasks/month | Features |
-|------|-------------|----------|
-| Free | 10 | Basic tools |
-| Pro | 100 | All tools + priority |
-| Team | 500 | Collaboration + API |
-| Enterprise | Unlimited | Custom + SLA |
+- [ ] `MANUS_API_KEY` exported before calling the helper.
+- [ ] Chose profile: `manus-1.6-lite` for cheap/fast, `manus-1.6` default, `manus-1.6-max` for hard jobs.
+- [ ] Long jobs: set `--timeout` generously (default 1800s) — Manus runs can take many minutes.
+- [ ] If result is `agent_status=waiting`, use `reply` to unblock; if `error`, read `messages` for `error_message`.
+- [ ] Autonomy ≠ correctness — verify the returned artifact/answer before shipping.
 
 ## Tips
 
-1. **Чёткие инструкции** - детальный prompt = лучший результат
-2. **Разбивай сложное** - несколько простых задач лучше одной сложной
-3. **Проверяй результат** - автономность ≠ безошибочность
-4. **Используй sandbox** - для безопасного выполнения кода
-5. **Комбинируй с n8n** - Manus для сложного, n8n для рутинного
+1. Detailed prompt = better run. Spell out inputs, steps, and the exact output format.
+2. Break very large jobs into a few smaller tasks rather than one mega-prompt.
+3. Pass `--locale ru` (via `create`/`run` code path) to force Russian output.
+4. For structured extraction, call `create_task(..., structured_schema=<JSON Schema>)`
+   in Python and read `structured_output_result`.
+5. Manus API billing is metered per task/usage on the Manus account — prefer `-lite`
+   for drafts and cheap iterations.

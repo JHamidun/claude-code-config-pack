@@ -1,7 +1,7 @@
 ---
 name: meta-agent-v3
 description: Creates Claude Code agents (workers, orchestrators, simple agents) following project architecture. Use proactively when user asks to create a new agent. Concentrated version with essential patterns only.
-model: sonnet
+model: fable
 color: cyan
 ---
 
@@ -407,7 +407,7 @@ allowed-tools: Read, Grep, Bash  # Optional - restrict tools
 ---
 name: {agent-name}
 description: Use proactively for {task}. {When to invoke}. {Capabilities}.
-model: sonnet  # Always sonnet (workers & orchestrators)
+model: fable  # Canon: ALL text-agents run on Fable 5 (see rules/models.md)
 color: {blue|cyan|green|purple|orange}  # Domain-based
 ---
 ```
@@ -421,16 +421,55 @@ color: {blue|cyan|green|purple|orange}  # Domain-based
 - Specify capabilities without ambiguity
 - Avoid vague terms ("handles various tasks")
 
-**Model Selection:**
-- Workers: `sonnet` (implementation needs balance)
-- Orchestrators: `sonnet` (coordination doesn't need opus)
-- Simple agents: `sonnet` (default)
+**Model Selection (canon — rules/models.md):**
+- ALL text-agents: `fable` (Fable 5, ≤5 concurrent; on Fable rate-limit the session lead resumes with opus)
+- Session orchestrator only: `opus` (never for spawned workers)
+
+---
+
+## Decomposition Checklist (run BEFORE writing the agent)
+
+Applies when creating a new agent AND when a request is really "our agent grew too big". Never write a 300-line system prompt with 12 tools — decompose first.
+
+**Route every unit of behaviour to exactly one home:**
+
+| Признак | Куда | Правило |
+|---|---|---|
+| «Всегда делай X перед Y», политика, пороги, шаблоны, структура отчёта | Skill | грузится по требованию, не висит в промпте |
+| Инструмент отдаёт >2k токенов / его зовут в цикле по сущностям | Code-exec (скрипт над файлом) | считать, а не дампить в контекст |
+| Одна детерминированная функция, малый ответ, побочный эффект | Tool | лестницу вверх не поднимаем |
+| Нужен СВОЙ контекст (полная история / длинный документ) + своя цель, наружу отдаёт мало | Sub-agent | тяжёлый контекст живёт у него |
+| «Суб-агент», который сортирует список или заполняет шаблон | НЕ sub-agent | скилл + пара строк кода |
+| Не про работу этого агента | Delete | скоуп — тоже решение |
+
+**Обязательные требования к результату декомпозиции:**
+
+- [ ] Системный промпт ≤ ~30 строк: кто агент, где данные, куда писать, чем заканчивать ответ. Политики — в скиллах
+- [ ] Ни одна политика не живёт одновременно в промпте И в скилле
+- [ ] Стык с суб-агентом типизирован: строгий JSON (`{value, confidence, method, flags}`), парсится строго, битый JSON = ошибка, а не догадка
+- [ ] Даунстрим читает поля контракта (низкий `confidence` → эскалация, `flags` не выбрасываются). Нет фолбэка — считаем сами и ЗАНИЖАЕМ confidence
+- [ ] Делегирование = решение рантайма: список вызываемых агентов + условия развилки в скилле. Не «инструмент внутри дёргает суб-агента»
+- [ ] Суб-агенту передаются идентификаторы/ссылки, а не сырые строки данных
+- [ ] Большие данные: смонтированы в песочницу, в промпте явно «grep/python, целиком не читать». Массовая операция (>~5 сущностей) — один скрипт, а не N вызовов
+- [ ] Побочные эффекты пишутся append-only JSONL (аудит + вход для грейдера)
+
+**Эвал на каждый шаг (skill `llm-evals`):**
+
+- [ ] Есть baseline-прогон ДО правок, сохранён в файл
+- [ ] Одно решение за цикл → прогон только затронутых задач → следующее решение
+- [ ] Грейдеры машинные там, где возможно: ground truth считается из исходных данных, а не из ответа модели (`exact/set match`, `numeric_tolerance`, `action_taken` по sink-файлу, включая «чего агент НЕ сделал»)
+- [ ] Есть бюджеты ходов/токенов/времени: верный, но дорогой ответ = отдельный статус «медленно», не PASS
+- [ ] `llm_judge` только там, где машинного критерия нет, и всегда с рубрикой
+- [ ] Зафиксирован референс-диапазон: без него разброс LLM принимается за улучшение
+
+Цикл: `observe → diagnose → decide → verify`. Диагноз ставится по реальному транскрипту (считай вызовы инструментов по именам), а не по ощущениям.
 
 ---
 
 ## Validation Checklist
 
 Before writing agent:
+- [ ] Decomposition Checklist пройден (промпт ≤~30 строк, политики в скиллах, стыки типизированы, baseline эвала есть)
 - [ ] YAML frontmatter complete (name, description, model, color)
 - [ ] Description is action-oriented and clear
 - [ ] Workers: Has all 5 phases (Plan → Work → Validate → Report → Return)

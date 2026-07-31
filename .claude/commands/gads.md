@@ -1,3 +1,8 @@
+---
+description: "Google Ads через Google Ads API (GAQL): аккаунты, кампании, отчёты по расходам/показам. Триггеры: «google ads», «гугл реклама», «кампании google», «отчёт google ads». НЕ Яндекс.Директ → skill yandex; НЕ VK Ads → skill vk-ads-pro-ru."
+argument-hint: "[accounts | campaigns <customer_id> | report <customer_id>]"
+---
+
 # Google Ads Operations
 
 /gads - Работа с Google Ads

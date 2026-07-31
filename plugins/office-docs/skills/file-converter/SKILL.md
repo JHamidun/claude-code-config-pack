@@ -1,6 +1,6 @@
 ---
 name: file-converter
-description: "File Converter MCP Server Skill"
+description: "Конвертация файлов локально, без API-ключей: (1) формат→формат через MCP file-converter — Word↔PDF, изображения, Excel→CSV; (2) ЧТО УГОДНО→Markdown для LLM через markitdown (PDF/Office/HTML/EPub/ZIP, картинки с OCR+EXIF, аудио с транскрипцией, YouTube-URL). Триггеры: «конвертируй файл», «convert file», «word в pdf», «pdf в word», «переведи в markdown», «вытащи текст из pdf/docx/xlsx», «транскрипт с youtube», «файл для модели». НЕ: pixel-perfect PDF-вёрстка→skill pdf; Q&A по папке документов→research-docs; сложные сканы→ocr-restore."
 ---
 
 # File Converter MCP Server Skill
@@ -108,14 +108,43 @@ pip install mcp docx2pdf pdf2docx pillow pandas pdfkit markdown
 | Image conversion | `file-converter` |
 | Excel → CSV | `file-converter` |
 | HTML/MD → PDF | `file-converter` |
-| PDF → JSON/Text (OCR) | `markitdown` MCP |
+| **ЧТО УГОДНО → Markdown для LLM** | **markitdown** (см. ниже) |
+
+## markitdown — «всё → Markdown» для LLM (установлен локально)
+
+**Установлен и проверен: markitdown 0.1.5 со всеми экстрами** (pdf/docx/xlsx/pptx/youtube/audio). MIT, работает offline, файлы не уходят в облако. Это НЕ MCP-сервер (его у markitdown нет) — CLI + Python API.
+
+**Когда:** нужно скормить модели содержимое файла/страницы/видео — PDF, Word, Excel, PowerPoint, HTML, CSV/JSON/XML, EPub, ZIP (рекурсивно), картинки (OCR + EXIF), аудио (транскрипция), **YouTube-URL (транскрипт)**. Оптимизирован под чтение LLM, не под человеческую вёрстку.
+
+```bash
+# CLI
+markitdown doc.pdf > doc.md              # или: markitdown doc.pdf -o doc.md
+cat report.docx | markitdown             # stdin
+markitdown "https://youtu.be/VIDEO_ID"   # YouTube → транскрипт
+```
+
+```python
+# Python API (когда нужен контроль или пакетная обработка)
+from markitdown import MarkItDown
+md = MarkItDown()                        # локально, без сети
+print(md.convert("table.xlsx").text_content)
+
+# Описания картинок через LLM (опционально):
+# MarkItDown(llm_client=<openai client>, llm_model="gpt-...")  → alt-текст для картинок в PPTX/изображениях
+```
+
+**Гочи:**
+- Выход — под LLM, а не «красивый документ»: сложная вёрстка/колонки могут упроститься. Нужен pixel-fidelity → `file-converter` / `pdf`.
+- Untrusted-файлы: предпочитай `convert_local()` вместо общего `convert()` (не ходит в сеть за ресурсами).
+- Скан-PDF без текстового слоя → OCR-качество ограничено; для сложных сканов бери `ocr-restore` / `research-docs` (PageIndex).
+- Не путать со сравнением ниже: `file-converter` — про **формат→формат** (Word↔PDF, image→image), markitdown — про **что угодно→текст для модели**.
 
 ## Tips
 
 1. **Локальная обработка** - файлы не уходят в облако
 2. **Без лимитов** - конвертируй сколько нужно
 3. **Быстро** - нет сетевых задержек
-4. **Комбинируй** с `markitdown` для извлечения текста из PDF
+4. **Комбинируй**: `markitdown` (см. секцию выше) вытаскивает текст/структуру для модели, `file-converter` — меняет формат файла
 
 ## Source
 

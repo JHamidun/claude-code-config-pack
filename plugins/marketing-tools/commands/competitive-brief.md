@@ -5,7 +5,7 @@ argument-hint: "<competitor or feature area>"
 
 # Competitive Brief
 
-> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+> If you see unfamiliar placeholders or need to check which tools are connected, see the MCP registry: `~/.claude/config/mcp-servers.md`.
 
 Create a competitive analysis brief for one or more competitors or a feature area.
 
@@ -37,13 +37,13 @@ Ask the user:
 - Job postings (signal of strategic direction)
 - Social media and community discussions
 
-If **~~knowledge base** is connected:
+If **knowledge base** is connected:
 
 - Search for existing competitive analysis documents
 - Find win/loss reports or sales battle cards
 - Pull prior competitive research
 
-If **~~chat** is connected:
+If **chat** is connected:
 
 - Search for competitive mentions in sales or product channels
 - Find recent deal feedback involving competitors
@@ -198,7 +198,7 @@ After completing the brief, persist key findings:
 
 ```bash
 # Save to vector memory for future reference
-python ${WORKSPACE}/tools/vector_memory.py learn "[competitor]: [key finding]" "project"
+python ~/.claude/tools/vector_memory.py learn "[competitor]: [key finding]" "project"
 ```
 
 Save these data points specifically:

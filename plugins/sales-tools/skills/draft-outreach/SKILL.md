@@ -1,11 +1,18 @@
 ---
 name: draft-outreach
-description: Research a prospect then draft personalized outreach. Uses web research by default, supercharged with enrichment and CRM. Trigger with "draft outreach to [person/company]", "write cold email to [prospect]", "reach out to [name]".
+description: 'Research a prospect, then draft personalized B2B outreach (email + LinkedIn + Telegram). RU cold-outreach движок (цепочки касаний, персонализация) для продажи AI-воркшопов/консалтинга/когорт корп-ЛПР. Triggers: "draft outreach", "cold email", «холодное письмо», «цепочка касаний», «письмо ЛПР/HR-директору». NOT: newsletters→html-email; соцпосты→linkedin-post-user/tg-post.'
+metadata:
+  version: 2.1.0
+  updated: 2026-05-29
+  ported_from: coreyhaines31/marketingskills (cold-email)
+  reuses: yourname-marketing-context, crm, headhunter, linkedin, gmail, outlook, lead-research, zoom
 ---
 
 # Draft Outreach
 
 Research first, then draft. This skill never sends generic outreach - it always researches the prospect first to personalize the message. Works standalone with web search, supercharged when you connect your tools.
+
+> **RU B2B mode:** For Russian-market cold outreach (продажа AI-воркшопов + консалтинга + B2B-когорт academy корп-ЛПР), jump to **«RU B2B Cold Outreach»** below. It ports the cold-email frameworks/sequences/personalization to the RU market (русский язык, корп-ЛПР, каналы email + LinkedIn + Telegram). Before drafting, read product context: `yourname-marketing-context` → `references/business.md` + `references/offerings.md` + `references/funnel-another-db.md`.
 
 ## Connectors (Optional)
 
@@ -100,7 +107,7 @@ Research first, then draft. This skill never sends generic outreach - it always 
 
 ## Email Draft Status
 
-[Draft created - check ~~email]
+[Draft created - check email]
 [Email not connected - copy email above]
 [No email found - use LinkedIn approach]
 
@@ -436,5 +443,76 @@ Best,
 ---
 
 ## Email Draft Status
-Draft created - check ~~email
+Draft created - check email
 ```
+
+---
+
+# RU B2B Cold Outreach (NEW — русский рынок, Your Name)
+
+> Порт `cold-email` под российский B2B. Цель — холодные касания к корп-ЛПР за **AI-воркшоп / AI-консалтинг / B2B-когорту ExampleProduct**. Кому: HR-директора и руководители L&D, гендиры/владельцы, руководители отделов. Главный CTA — **бесплатная диагностика AI-зрелости команды / бесплатная консультация** (бронь Zoom). Принцип тот же: **сначала research, потом draft**. Голос — равный коллега-эксперт (руководитель ИИ-направления, экс-крупный банк N+ специалистов), не вендор; по-русски, без канцелярита и хайпа.
+
+## Перед написанием
+
+1. Прочитай контекст продукта: `yourname-marketing-context` → `references/business.md` (персоны, боли, дифференциаторы) + `references/offerings.md` (воркшоп/консалтинг/academy B2B, CTA = бесплатная консультация) + `references/funnel-another-db.md` (CRM `yourname-sales-postgres`, handoff_to_user, дыры воронки).
+2. Собери сигналы по компании/ЛПР — делегируй скиллу `lead-research` (RU-источники: Контур.Фокус, Rusprofile, СПАРК, HH, сайт). Не выдумывай факты.
+3. Определи: кому пишешь (роль из персон), что хочешь (цель касания → консультация/воркшоп), value под его роль, пруф (руководитель ИИ-направления / ClientCorp3 N+ / academy N+ материалов / корп-кейс), сигнал «почему сейчас».
+
+Хватает сильного сигнала + ясного value — пиши. Не блокируйся на отсутствии полей, отметь что усилило бы письмо.
+
+## Принципы (RU)
+
+- **Пиши как равный эксперт, не как продавец.** Прочитай вслух. Звучит как реклама — переписывай. На «вы», но по-человечески. YourFirstName — практик (руководитель ИИ-направления, экс-крупный банк N+ специалистов), а не инфоцыган.
+- **Каждое предложение зарабатывает место.** Холодное письмо безжалостно короткое. 50–90 слов оптимум для русского.
+- **Персонализация связана с проблемой.** Убрал первую строку — письмо рассыпалось? Тогда персонализация работает. Иначе это просто «attention hack».
+- **Веди их миром, а не своим.** «Вы/ваш» доминирует над «мы/наш». Не открывай тем, кто ты и что делает твоя компания.
+- **Один запрос, низкое трение.** CTA на бесплатную консультацию/диагностику AI-зрелости («Имеет смысл 20 минут разобрать, где AI даст команде быстрый результат?») бьёт прямой питч воркшопа. Один CTA на письмо.
+
+## Каналы (RU multi-touch)
+
+| Канал | Когда | Чем шлём | Нюанс |
+|---|---|---|---|
+| **Email** | есть рабочий email ЛПР/корп-домен | `gmail` или `outlook` (черновик) | основной для B2B; маркировка рекламы если применимо (см. ниже) |
+| **LinkedIn** | есть профиль, нет email | `linkedin` (connection request <300 симв + value-first follow-up) | работает по топам/иннов-директорам; внутренние правила LinkedIn, не 38-ФЗ |
+| **Telegram** | ЛПР активен в проф-ТГ, тёплый контекст | вручную / `tg-post` для контента | уместен после касания на конференции/в чате; не холодный спам |
+
+Channel-mix под топов: **email → LinkedIn → (опц.) Telegram**, чередуя углы. Деталь по углам и каденсу — `references/sequences-ru.md`.
+
+## Что делегировать (НЕ дублировать)
+
+| Нужно | Скилл |
+|---|---|
+| Сигналы/фирмографика по компании и ЛПР | `lead-research` (RU-источники) |
+| Отправка email / черновик | `gmail`, `outlook` |
+| LinkedIn касания | `linkedin` |
+| Бронь созвона / диагностики | `zoom` (бесплатная консультация) |
+| Контакты/история сделки, запись касания | `crm` + academy CRM `yourname-sales-postgres` |
+| Контент для ТГ | `tg-post` |
+
+После касания — **зафиксируй активность в CRM**: контакт, канал, дата, реакция. Записывай в `crm` (`crm.activity.add`) и/или в academy-CRM `yourname-sales-postgres` (стадии new→interested→qualified→zoom_scheduled). Горячий enterprise эскалируется через `handoff_to_user`. Это вход в воронку (см. `revops-ru`).
+
+## References (RU)
+
+| Файл | Что внутри |
+|---|---|
+| `references/frameworks-ru.md` | копирайт-фреймворки (PAS/BAB/QVC/AIDA + Mouse Trap/Vanilla Ice Cream) с RU-примерами под воркшоп/консалтинг |
+| `references/subject-lines-ru.md` | тема письма по-русски: коротко, «внутренне», без продажности; данные + примеры |
+| `references/sequences-ru.md` | мульти-тач каденс (5 касаний), ротация углов, breakup-письмо, фразы-убийцы — RU |
+| `references/personalization-ru.md` | 4 уровня персонализации + стек RU-сигналов (откуда брать: Контур/HH/новости/ТГ) |
+
+## Комплаенс (холодные касания, РФ)
+
+- **152-ФЗ «О персональных данных».** Контакт ЛПР — публичный рабочий канал (корп-email, профиль). Личные email/телефоны — повышенный риск, не использовать без основания. Храни источник + дату (через `lead-research`/`crm`).
+- **38-ФЗ «О рекламе».** Холодное B2B-письмо «приглашаю на бесплатную диагностику» — деловая переписка, не реклама. Но если письмо = рекламная рассылка (оффер/акция массово, например цены на когорту) → нужна маркировка/согласие + механизм отписки. Один email конкретному ЛПР с деловым предложением обычно вне рекламного контура — но при массовости консультируйся.
+- **LinkedIn / Telegram** регулируются правилами площадок, не 38-ФЗ.
+
+## Чеклист качества (RU)
+
+- [ ] Звучит как человек? (прочитай вслух)
+- [ ] Ответил бы сам на такое?
+- [ ] «Вы/ваш» доминирует над «мы/наш»?
+- [ ] Персонализация связана с болью корп-команды (сотрудники не используют AI / нет практического результата / зоопарк инструментов)?
+- [ ] Один ясный CTA с низким трением (бесплатная консультация/диагностика)?
+- [ ] Нет канцелярита, хайпа («революционный»), AI-следов («надеюсь, письмо застало вас»)?
+- [ ] Факты (соцпруф: руководитель ИИ-направления / ClientCorp3 N+ / academy N+ / корп-кейсы) сверены с `business.md`, не выдуманы?
+- [ ] Касание записано в CRM (`crm` / `yourname-sales-postgres`)?

@@ -1,126 +1,137 @@
 ---
 name: mobile-overlays
-description: Mobile UI слои — клавиатура (iOS/Android), bottom sheet, action sheet, тосты, нотификации. Поверх interactive-prototype добавляет реалистичные overlay-элементы.
-when_to_use: В прототипе есть формы, выборы, дейтствия — нужны те UI-overlay'и которые юзер видит на телефоне. После interactive-prototype, обычно вместе с device-frames.
+description: Дополнительные мобильные паттерны поверх device-frames — клавиатура, bottom sheet, тосты, контекстные меню.
+when_to_use: Прототип в iOS/Android рамке, нужен реалистичный overlay (клавиатура при вводе, всплывающий sheet, тост-уведомление).
 ---
 
 # Mobile overlays
 
-Готовые JSX-компоненты для типовых mobile UI-overlay'ев. Не пытайся сам рисовать клавиатуру — используй pre-built.
+Добавки к `device-frames`. Каждый — самодостаточный snippet HTML+CSS+JS.
 
-## Состав
+## iOS keyboard
 
-| Компонент | Что | Когда использовать |
-|---|---|---|
-| `<IOSKeyboard>` / `<AndroidKeyboard>` | клавиатура снизу | в прототипе есть `<input>` и пользователь вводит |
-| `<BottomSheet>` | модалка снизу | мобильный select, фильтры, share |
-| `<ActionSheet>` | список действий | удалить / поделиться / отчёт — iOS-стиль |
-| `<Toast>` | плашка-уведомление | feedback после действия (saved, error) |
-| `<Notification>` | system-style notification | push-нотификация в углу |
-| `<Modal>` | full-screen модалка | overlay с подтверждением действия |
-| `<StatusBar>` | время + батарея + сигнал | реалистичный mobile chrome |
+`templates/ios-keyboard.html` — пиксель-точная QWERTY-клавиатура iOS. Слайдится снизу, нажатия добавляют буквы в `input`.
 
-## iOS Keyboard (упрощённая)
-
-```jsx
-function IOSKeyboard({ visible, onKey, onSubmit, mode = 'text' }) {
-  if (!visible) return null;
-  const rows = mode === 'text' ? [
-    'qwertyuiop', 'asdfghjkl', '⇧zxcvbnm⌫'
-  ] : [
-    '1234567890', '-/:;()$&@"', '.,?!\'⌫'
-  ];
-  return (
-    <div style={{
-      position: 'fixed', bottom: 0, left: 0, right: 0,
-      background: '#D1D3D9', padding: '8px 4px 28px',
-      fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-      borderTop: '1px solid rgba(0,0,0,0.1)',
-    }}>
-      {rows.map((row, i) => (
-        <div key={i} style={{ display: 'flex', justifyContent: 'center', gap: 4, padding: '4px 4px' }}>
-          {[...row].map((c, j) => (
-            <button key={j} onClick={() => onKey(c)} style={{
-              width: 32, height: 42, fontSize: 24, background: '#fff',
-              border: 'none', borderRadius: 5, boxShadow: '0 1px 0 rgba(0,0,0,0.3)',
-            }}>{c}</button>
-          ))}
-        </div>
-      ))}
-      <div style={{ display: 'flex', gap: 4, padding: '4px 4px' }}>
-        <button style={{ flex: 1, height: 42, background: '#A6ABB6', borderRadius: 5 }}>123</button>
-        <button style={{ flex: 4, height: 42, background: '#fff', borderRadius: 5 }}>пробел</button>
-        <button onClick={onSubmit} style={{ flex: 1, height: 42, background: '#007AFF', color: '#fff', borderRadius: 5 }}>↵</button>
-      </div>
-    </div>
-  );
-}
-window.IOSKeyboard = IOSKeyboard;
+Использование:
+```html
+<input id="ios-input" type="text">
+<div id="ios-keyboard" class="ios-keyboard"></div>
 ```
+
+Высота клавиатуры — 291px (стандартная для iPhone). Учти: контент над ней должен скроллиться, не сжиматься.
 
 ## Bottom sheet
 
-```jsx
-function BottomSheet({ open, onClose, children, height = 400 }) {
-  return (
-    <>
-      <div style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
-        opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none',
-        transition: 'opacity .25s',
-      }} onClick={onClose} />
-      <div style={{
-        position: 'fixed', left: 0, right: 0, bottom: 0,
-        background: '#fff', borderRadius: '16px 16px 0 0',
-        height, padding: 20, paddingTop: 12,
-        transform: open ? 'translateY(0)' : `translateY(${height}px)`,
-        transition: 'transform .3s cubic-bezier(.2,.7,.3,1)',
-      }}>
-        <div style={{ width: 40, height: 4, background: '#ddd', borderRadius: 2, margin: '0 auto 16px' }} />
-        {children}
-      </div>
-    </>
-  );
+```html
+<div class="bs-backdrop" data-open="true"></div>
+<div class="bs-sheet" data-open="true">
+  <div class="bs-grabber"></div>
+  <h3>Sheet title</h3>
+  <p>Content</p>
+</div>
+```
+
+```css
+.bs-sheet {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: #fff; border-radius: 16px 16px 0 0;
+  padding: 24px; padding-bottom: 50px;
+  transform: translateY(100%);
+  transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1);
+  box-shadow: 0 -10px 40px rgba(0,0,0,.15);
 }
-window.BottomSheet = BottomSheet;
+.bs-sheet[data-open="true"] { transform: translateY(0); }
+.bs-grabber {
+  width: 36px; height: 5px; background: #d4d4d4;
+  border-radius: 3px; margin: -8px auto 16px;
+}
+.bs-backdrop {
+  position: absolute; inset: 0; background: rgba(0,0,0,.4);
+  opacity: 0; pointer-events: none;
+  transition: opacity 300ms;
+}
+.bs-backdrop[data-open="true"] { opacity: 1; pointer-events: auto; }
 ```
 
 ## Toast
 
-```jsx
-function Toast({ message, kind = 'info', onClose }) {
-  if (!message) return null;
-  const colors = {
-    info:    { bg: '#1F2937', fg: '#fff' },
-    success: { bg: '#16A34A', fg: '#fff' },
-    error:   { bg: '#DC2626', fg: '#fff' },
-  };
-  setTimeout(onClose, 3000);
-  return (
-    <div style={{
-      position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
-      background: colors[kind].bg, color: colors[kind].fg,
-      padding: '12px 20px', borderRadius: 8, fontSize: 14, fontWeight: 500,
-      boxShadow: '0 8px 24px rgba(0,0,0,0.2)', zIndex: 1000,
-    }}>{message}</div>
-  );
-}
-window.Toast = Toast;
+```html
+<div class="toast" data-show="true">
+  <span class="toast-text">Файл сохранён</span>
+</div>
 ```
 
-## Стек
+```css
+.toast {
+  position: absolute; top: 64px; left: 50%; transform: translate(-50%, -20px);
+  background: rgba(0,0,0,.85); color: #fff;
+  padding: 12px 16px; border-radius: 999px;
+  font-size: 14px; font-weight: 500;
+  opacity: 0; transition: all 200ms ease-out;
+  z-index: 100; backdrop-filter: blur(10px);
+}
+.toast[data-show="true"] {
+  transform: translate(-50%, 0); opacity: 1;
+}
+```
 
-Mobile-overlays почти всегда вместе с:
-- `device-frames` — рамка телефона снаружи
-- `interactive-prototype` — экран внутри
-- `microinteractions` — анимации появления (slide-up, fade-in)
+JS-хелпер:
+```js
+function showToast(text, ms = 2000) {
+  const el = document.querySelector('.toast');
+  el.querySelector('.toast-text').textContent = text;
+  el.dataset.show = 'true';
+  setTimeout(() => el.dataset.show = 'false', ms);
+}
+```
 
-## Антипаттерны
+## Action sheet (iOS)
 
-- Своя реализация iOS-клавиатуры с нуля → 200 строк впустую, всё уже есть
-- Bottom sheet без backdrop → юзер не понимает что нужно закрыть
-- Toast без auto-dismiss → застревает на экране
-- ActionSheet с 8+ опциями → не помещается на mobile
-- Modal full-screen без чёткого CTA «закрыть» → юзер в ловушке
-- Использовать `position: absolute` вместо `fixed` для overlay → ломается при скролле
-- Z-index без системы (`z-index: 9999999`) → конфликты, всё ломается. Используй каскад: backdrop=900, sheet=1000, toast=1100
+```html
+<div class="action-sheet" data-open="true">
+  <div class="as-card">
+    <button>Поделиться</button>
+    <button>Скопировать ссылку</button>
+    <button class="destructive">Удалить</button>
+  </div>
+  <button class="as-cancel">Отмена</button>
+</div>
+```
+
+```css
+.action-sheet {
+  position: absolute; left: 12px; right: 12px; bottom: 12px;
+  display: grid; gap: 8px;
+  transform: translateY(100%); transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1);
+  z-index: 50;
+}
+.action-sheet[data-open="true"] { transform: translateY(0); }
+.action-sheet button {
+  background: rgba(255,255,255,.9); backdrop-filter: blur(20px);
+  border: 0; border-radius: 14px; padding: 18px;
+  font-size: 17px; color: #007AFF;
+}
+.action-sheet button.destructive { color: #FF3B30; }
+.as-card { display: grid; }
+.as-card button + button { border-top: 0.5px solid rgba(0,0,0,.1); border-radius: 0; }
+.as-card button:first-child { border-radius: 14px 14px 0 0; }
+.as-card button:last-child  { border-radius: 0 0 14px 14px; }
+.as-cancel { font-weight: 600; }
+```
+
+## Когда использовать
+
+- Клавиатура — только когда показываешь экран ввода (форма, чат, поиск). На прочих скрывай.
+- Bottom sheet — для второстепенных действий, фильтров, share-меню.
+- Toast — только для подтверждения действия. Не для ошибок (для них inline-сообщения).
+- Action sheet — iOS-специфика, не используй на Android (там dialog или bottom sheet с button-list).
+
+## Что НЕ делать
+
+- ❌ Imitating клавиатуру через одну картинку. Делай настоящую сетку клавиш — реалистичнее и редактируемо.
+- ❌ Двигать клавиатуру через top/bottom вместо transform — лагает.
+- ❌ Тосты в центре экрана — это alert-паттерн, не toast.
+
+## Legacy reference
+
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-mobile-overlays.md`. Секции там: Состав, iOS Keyboard (упрощённая), Bottom sheet, Toast, Стек, Антипаттерны.

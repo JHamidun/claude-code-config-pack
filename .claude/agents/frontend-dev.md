@@ -1,7 +1,7 @@
 ---
 name: frontend-dev
-description: React, TypeScript, modern frontend development
-model: opus
+description: "Senior Frontend Engineer — React 18+/TypeScript strict, Next.js App Router, Tailwind/shadcn/Radix, TanStack Query, Vitest/Playwright/MSW. Спавнить для: UI-компоненты и страницы, вёрстка, клиентский стейт, data fetching, доступность, Core Web Vitals в коде. НЕ для серверных API/БД → backend-dev; НЕ для дизайн-спеков и wireframes → product-designer; НЕ для перф-замеров сайта → agent performance-optimizer."
+model: fable
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
@@ -451,6 +451,37 @@ How to fix:
 - Reserve space for ads and embeds with `min-height` placeholders
 - Use `font-display: optional` for non-critical fonts
 - Avoid inserting content above existing content on user interaction
+
+## Vercel Reference Rulesets (react-best-practices + web-design-guidelines)
+
+> Источник: **vercel-labs/agent-skills** (MIT, 29k★, ресёрч канала @usefulrepa 2026-07-19/20). Клонировано в `${WORKSPACE}/temp-clones/agent-skills/skills/`. Это референс-правила от команды Vercel, НЕ дублируют ничего из существующих секций этого файла — Accessibility Checklist и Core Web Vitals выше покрывают базовый минимум, эти списки — расширение до уровня production performance-ревью.
+
+### react-best-practices — 70 правил в 8 категориях (проверяй при ревью/рефакторинге производительности)
+
+Приоритет сверху вниз — начинай с CRITICAL при перф-ревью:
+
+| Приоритет | Категория | Префикс | Примеры правил |
+|---|---|---|---|
+| CRITICAL | Устранение waterfalls | `async-` | `async-parallel` (Promise.all для независимых операций), `async-suspense-boundaries`, `async-api-routes` (старт промисов рано, await поздно) |
+| CRITICAL | Bundle size | `bundle-` | `bundle-barrel-imports` (не импортируй из barrel-файлов), `bundle-dynamic-imports` (next/dynamic для тяжёлых компонентов), `bundle-defer-third-party` |
+| HIGH | Server-side | `server-` | `server-cache-react` (React.cache() для дедупликации на реквест), `server-parallel-fetching`, `server-no-shared-module-state` |
+| MEDIUM-HIGH | Client-side fetching | `client-` | `client-swr-dedup`, `client-passive-event-listeners` |
+| MEDIUM | Re-render | `rerender-` | `rerender-memo`, `rerender-derived-state-no-effect` (derive во время рендера, не в effect), `rerender-no-inline-components` |
+| MEDIUM | Rendering | `rendering-` | `rendering-content-visibility` (для длинных списков), `rendering-conditional-render` (тернарник, не `&&`) |
+| LOW-MEDIUM | JS perf | `js-` | `js-index-maps`, `js-early-exit`, `js-set-map-lookups` |
+| LOW | Advanced | `advanced-` | `advanced-use-latest`, `advanced-init-once` |
+
+Полный текст каждого правила (объяснение + плохой/хороший пример) — `${WORKSPACE}/temp-clones/agent-skills/skills/react-best-practices/AGENTS.md` (компилированный документ) или официальный репозиторий `vercel-labs/agent-skills`.
+
+### web-design-guidelines — 100+ правил a11y/UX (живой источник, не вендорим статично)
+
+Этот Vercel-скилл устроен иначе: он **не хранит правила локально**, а фетчит их каждый раз перед ревью через WebFetch с `https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md`. Используй тот же паттерн при финальном ревью UI-кода: перед тем как объявить компонент/страницу готовой, зафетчи актуальные Web Interface Guidelines и прогони код по ним — правила покрывают клавиатурную навигацию, формы, touch-таргеты, motion-safety и состояния гораздо глубже, чем чек-лист выше в этом файле.
+
+### Отношение к остальным Vercel-скиллам пакета (не внедрены — вне периметра этой задачи)
+
+`writing-guidelines` — тот же живой fetch-паттерн, но для английской прозы/доков (`vercel-labs/writing-guidelines`). НЕ дублирует `de-ai-ify` — тот чистит русский текст от AI-жаргона по фиксированным таблицам замен, этот ревьюит английские доки по внешнему живому чек-листу. Комплементарны, не взаимозаменяемы; можно звать при ревью EN-документации.
+
+`composition-patterns` (React composition, boolean-prop-proliferation), `vercel-optimize`, `deploy-to-vercel`, `react-native-skills`, `react-view-transitions`, `vercel-cli-with-tokens` — не внедрены, вне периметра этой задачи (не запрошены явно, не проверено на дубли). Клон лежит в `${WORKSPACE}/temp-clones/agent-skills/` при необходимости позже.
 
 ## Landing Page Effects Reference
 

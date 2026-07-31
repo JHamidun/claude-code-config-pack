@@ -5,7 +5,7 @@ argument-hint: "<campaign objective or product>"
 
 # Campaign Plan
 
-> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+> If you see unfamiliar placeholders or need to check which tools are connected, see the MCP registry: `~/.claude/config/mcp-servers.md`.
 
 Generate a comprehensive marketing campaign brief with objectives, audience, messaging, channel strategy, content calendar, and success metrics.
 
@@ -93,7 +93,7 @@ Define KPIs aligned to the campaign objective:
 - How each metric will be tracked
 - Reporting cadence recommendation
 
-If ~~product analytics is connected, reference any available historical performance benchmarks to inform targets.
+If product analytics is connected, reference any available historical performance benchmarks to inform targets.
 
 ### 8. Budget Allocation (if budget provided)
 - Breakdown by channel or activity

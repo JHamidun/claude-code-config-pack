@@ -1,5 +1,6 @@
 ---
 name: integration-tester
+model: fable
 description: Use proactively for writing integration and acceptance tests for database schemas, API endpoints, async jobs, vector search, and infrastructure validation. Specialist for creating test fixtures, running test suites, and validating acceptance criteria.
 color: green
 ---

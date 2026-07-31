@@ -182,3 +182,108 @@ Maintain a list of preferred terms and their incorrect alternatives:
 - How to refer to competitors (by name or generically)
 - Terms competitors have coined that you should avoid (to prevent reinforcing their positioning)
 - Your preferred differentiation language
+
+## Auto-derived voice profile (extraction helper)
+
+Когда есть **3–5 готовых постов автора** и нужно научить генератор контента (или LLM-агент) звучать «как он», вместо ручного описания voice guide извлеки структурные паттерны автоматически. Полученный JSON подаётся в rewrite-prompt как `VOICE_PROFILE` — модель пытается соблюсти числа, эмпирически работает заметно лучше, чем `«match the voice from these 3 examples»` без явных статистик.
+
+### Что извлекать
+
+| Метрика | Зачем нужна |
+|---------|-------------|
+| `avg_sentence_words` | Длина предложений — даёт ритм. Короткие 6–8 слов → бойко. Длинные 18–25 → reflective. |
+| `avg_paragraph_words` | Размер «абзаца-мысли». LLM по дефолту пишет 60–80 слов на абзац, автор часто 30–40 или 100+. |
+| `emoji_density` | Эмодзи на слово. Большинство тех-авторов 0.005–0.02, инфлюэнсеры 0.05+. Нулевая плотность тоже сигнал. |
+| `common_emojis` | Top-8 эмодзи. Если автор часто использует 🦞, добавь его в prompt. |
+| `signature_words` | Слова длиннее 5 букв, встретившиеся ≥ 2 раза в сэмплах. Идиолект автора. |
+| `questions_ratio` | Доля сэмплов с `?`. Высокая (>0.6) → диалоговый стиль, низкая → утвердительный. |
+| `lists_ratio` | Доля сэмплов с маркированными/нумерованными списками. Если 0 — не давать LLM писать списками. |
+| `cta_style_hint` | Эвристика по последней строке каждого сэмпла: question / direct-call / soft-or-none. |
+
+### Реализация
+
+```python
+import re
+from collections import Counter
+
+EMOJI_RE = re.compile(
+    r"[\U0001F300-\U0001FAFF\U0001F1E0-\U0001F1FF☀-➿⌀-⏿]"
+)
+SENT_RE = re.compile(r"[.!?…]+[ \n]")
+
+
+def analyze(samples: list[str]) -> dict:
+    if not samples:
+        return {}
+    total = "\n\n".join(samples)
+    emojis = EMOJI_RE.findall(total)
+    sent_lens = [len(s.split()) for s in SENT_RE.split(total) if s.strip()]
+    para_lens = [len(p.split()) for p in total.split("\n\n") if p.strip()]
+
+    word_counts = Counter(re.findall(r"\w{5,}", total.lower()))
+    signature_words = [w for w, c in word_counts.most_common(20) if c >= 2]
+
+    has_questions = sum(1 for s in samples if "?" in s)
+    has_lists = sum(1 for s in samples if re.search(r"^\s*[-•*\d]\.?\s", s, re.M))
+
+    return {
+        "samples_count": len(samples),
+        "avg_sentence_words": round(sum(sent_lens) / max(len(sent_lens), 1), 1),
+        "avg_paragraph_words": round(sum(para_lens) / max(len(para_lens), 1), 1),
+        "emoji_density": round(len(emojis) / max(len(total.split()), 1), 3),
+        "common_emojis": [e for e, _ in Counter(emojis).most_common(8)],
+        "signature_words": signature_words,
+        "questions_ratio": round(has_questions / len(samples), 2),
+        "lists_ratio": round(has_lists / len(samples), 2),
+        "cta_style_hint": _infer_cta(samples),
+    }
+
+
+def _infer_cta(samples: list[str]) -> str:
+    last_lines = [s.strip().split("\n")[-1] for s in samples if s.strip()]
+    if not last_lines:
+        return "none"
+    q = sum(1 for l in last_lines if l.endswith("?"))
+    imp = sum(1 for l in last_lines
+              if re.search(r"(пиши|напиши|попробуй|try|comment|share|tell)", l, re.I))
+    if q > len(last_lines) / 2:
+        return "question-to-audience"
+    if imp > 0:
+        return "direct-call"
+    return "soft-or-none"
+```
+
+### Применение в rewrite prompt
+
+```python
+voice_profile = analyze(user_samples)
+samples_block = "\n\n---\n".join(user_samples[:5])
+
+system = f"""You are a content editor.
+
+USER VOICE STATISTICS (try to match within ±15%):
+{json.dumps(voice_profile, ensure_ascii=False, indent=2)}
+
+USER VOICE SAMPLES (full posts):
+{samples_block}
+
+Now rewrite the following draft in the user's voice. Match sentence length,
+paragraph rhythm, emoji density, and CTA style from the statistics above.
+"""
+```
+
+LLM соблюдает метрики **точнее**, чем когда даёшь только сэмплы — эмпирика с малых моделей (замер был на gpt-4o-mini/gemini-2.0-flash-эре; актуальные малые модели — haiku-4-5 через claude-cli-runner или `gemini-3.1-flash-lite`, канон `config/models.md`).
+
+### Когда обновлять профиль
+
+- При каждом `save_voice_samples(user_id, new_samples)` — пересчитать
+- После каждого опубликованного поста — если он зашёл (виральный охват), добавить в samples; если упал — не добавлять
+- Хранить максимум 10 последних сэмплов, иначе устаревший стиль доминирует
+
+### Что НЕ извлекать алгоритмически
+
+- **Tone of voice** в смысле «дружелюбный / профессиональный» — LLM сам считывает по сэмплам, числами не задать
+- **Forbidden phrases** — добавлять руками в отдельный list, эвристика тут вредна
+- **Topics of expertise** — отдельный pass с TF-IDF/embeddings, не часть voice profile
+
+Voice profile — про **форму**, не про **смысл**. Smysl всё равно подаёт исходный draft, который ты переписываешь.

@@ -46,8 +46,8 @@ Use the frontend-dev subagent to implement frontend for $ARGUMENTS
 Use the integration-dev subagent to integrate external APIs for $ARGUMENTS
 
 # Phase 3: Quality (sequential)
-Use the kimi-code-reviewer subagent to review code quality and security
-Use the qa-automation subagent to create test suite
+Use the code-reviewer subagent to review code quality and security
+Use the qa-specialist subagent to create test suite
 Use the security-engineer subagent to review security implications
 
 # Phase 4: Deployment
@@ -63,7 +63,7 @@ Use the devops-engineer subagent to set up CI/CD and deploy to staging
 
 ```python
 # 1. Research (проактивно!)
-/ai-search "best practices для [feature]"
+/deep-research "best practices для [feature]"
 
 # 2. Planning через Plan субагента
 Task(
@@ -82,8 +82,8 @@ Task(
 
 ### Phase 3: Quality
 ```bash
-# Code review через Kimi
-/kimi-review src/feature/
+# Code review
+/code-review src/feature/
 
 # Frontend testing
 /test-frontend http://localhost:3000 e2e
@@ -122,7 +122,7 @@ Task(
       "type": "sequential",
       "steps": [
         {
-          "step": "/ai-search best practices",
+          "step": "/deep-research best practices",
           "estimated_time": "5 min"
         },
         {
@@ -150,7 +150,7 @@ Task(
       "type": "sequential",
       "steps": [
         {
-          "step": "/kimi-review src/features/X/",
+          "step": "/code-review src/features/X/",
           "estimated_time": "15 min"
         },
         {
@@ -220,8 +220,8 @@ Task(
 
 #### 1. Final Code Review
 ```bash
-# Comprehensive review через Kimi K2
-/kimi-review src/features/X/
+# Comprehensive review
+/code-review src/features/X/
 
 # Проверяет:
 # - Code quality и style
@@ -242,8 +242,8 @@ Context7: "OWASP security guidelines for [technology]"
 
 #### 3. Fix Issues
 ```bash
-# Auto-fix через Kimi
-/kimi-fix src/features/X/file.py
+# Auto-fix через агента
+Use the bug-fixer subagent to fix issues from the review in src/features/X/
 
 # Или manual fixes
 - Address review comments

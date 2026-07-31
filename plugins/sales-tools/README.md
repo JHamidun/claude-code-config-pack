@@ -12,10 +12,14 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `call-prep` | Prepare for a sales call with account context, attendee research, and suggested agenda. |
 | `competitive-intelligence` | Research your competitors and build an interactive battlecard. |
 | `create-an-asset` | Generate tailored sales assets (landing pages, decks, one-pagers, workflow demos) from your deal context. |
-| `daily-briefing` | Start your day with a prioritized sales briefing. |
-| `draft-outreach` | Research a prospect then draft personalized outreach. |
+| `daily-briefing` | Prioritized daily sales briefing — meetings, deals, priorities; richer when calendar, CRM, and email are connected. |
+| `draft-outreach` | Research a prospect, then draft personalized B2B outreach (email + LinkedIn + Telegram). |
 | `lead-enrichment` | Enrich and qualify B2B leads — match a company list against your CRM, pull firmographics, find decision-makers, score and export. |
-| `lead-research` | Identify and qualify high-quality leads, prospect research, ICP matching |
+| `lead-research` | Build and qualify a fresh B2B lead list from an ICP (RU market): discovery → decision-maker mapping → signal → scoring (Hot/Warm/Cold/Skip) → handoff. |
+| `revops-ru` | RevOps across two motions — B2C self-serve (free→trial→paid) and B2B sales-led: data model, handoffs, pipeline hygiene. |
+| `sales-enablement-ru` | Sales collateral for B2B — decks, one-pagers, objection handling and proof material for workshops and consulting. |
+| `sales-manager-audit` | Audit sales reps and pipeline health in CRM — funnel conversion, loss reasons, rep comparison, coaching signals. |
+| `sales-team-ru` | Build and run a sales team — hiring, scripts, quotas, control, plus AI-driven call review for B2C and B2B. |
 | `tender-search-ru` | Find Russian procurement tenders (goszakupki) and shortlist contracts matching a product or company profile. |
 
 ### Commands
@@ -40,7 +44,7 @@ Adapted from Anthropic's **knowledge-work-plugins** (sales) — https://github.c
 
 ## Related plugins
 
-`product-mgmt` · `marketing-tools` · `research-tools`
+`product-mgmt` · `marketing-tools` · `research-tools` · `marketing-ru` · `cro-funnels` · `paid-ads` · `seo-geo`
 
 ---
 

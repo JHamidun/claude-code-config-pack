@@ -1,7 +1,7 @@
 ---
 name: reuse-hunter
 description: Use proactively for comprehensive code duplication detection, identifying duplicated types, interfaces, Zod schemas, constants, and utility functions that should be consolidated using Single Source of Truth pattern. Specialist for finding reusable code opportunities and generating prioritized consolidation tasks.
-model: sonnet
+model: fable
 color: cyan
 ---
 

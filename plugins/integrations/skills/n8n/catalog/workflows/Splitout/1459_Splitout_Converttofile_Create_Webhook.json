@@ -1,0 +1,265 @@
+{
+  "id": "FyoPGDh8r3pxcGxo",
+  "meta": {
+    "instanceId": "workflow-815fdce8",
+    "versionId": "1.0.0",
+    "createdAt": "2025-09-29T07:07:54.010204",
+    "updatedAt": "2025-09-29T07:07:54.010221",
+    "owner": "n8n-user",
+    "license": "MIT",
+    "category": "automation",
+    "status": "active",
+    "priority": "high",
+    "environment": "production"
+  },
+  "name": "New OpenAI Image Generation",
+  "tags": [
+    "automation",
+    "n8n",
+    "production-ready",
+    "excellent",
+    "optimized"
+  ],
+  "nodes": [
+    {
+      "id": "6b5f9234-351f-4f6b-a0ab-f0d30897f60a",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        320,
+        400
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "toBinary",
+        "sourceProperty": "b64_json"
+      },
+      "typeVersion": 1.1,
+      "notes": "This convertToFile node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "9c60f827-bf37-486b-9026-0cbe97fd83b6",
+      "name": "OpenAI - Generate Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -120,
+        400
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n  \"model\": \"{{ $json.openai_image_model }}\",\n  \"prompt\": \"{{ $json.image_prompt }}\",\n  \"n\": {{ $json.number_of_images }},\n  \"size\": \"{{ $json.size_of_image }}\",\n  \"quality\": \"{{ $json.quality_of_image }}\"\n}",
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "KzjXYSuzUOCnnvzB",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 4.2,
+      "notes": "This httpRequest node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "2dd04b96-5faf-48ec-a7b0-66a31866388d",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -560,
+        400
+      ],
+      "parameters": {},
+      "typeVersion": 1,
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "629799c0-d2ff-4c5a-95d8-54d5afd3ac66",
+      "name": "Set Variables",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -340,
+        400
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2a5d52c2-5af1-4796-acba-4e1807fc7d7b",
+              "name": "image_prompt",
+              "type": "string",
+              "value": "a 4-frame cartoon strip telling a joke about AI"
+            },
+            {
+              "id": "c41a8091-d952-4f5a-ae24-3b0691bbce57",
+              "name": "number_of_images",
+              "type": "number",
+              "value": 2
+            },
+            {
+              "id": "00feec5a-19c8-43af-bf93-e0729d1391f8",
+              "name": "quality_of_image",
+              "type": "string",
+              "value": "high"
+            },
+            {
+              "id": "1b359a11-c05a-49c8-aa27-402b145fcbc1",
+              "name": "size_of_image",
+              "type": "string",
+              "value": "1024x1024"
+            },
+            {
+              "id": "6cf4ba85-d11a-48bb-9eaf-4084c9538d87",
+              "name": "openai_image_model",
+              "type": "string",
+              "value": "=gpt-image-1"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4,
+      "notes": "This set node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "5f4e4bbe-7331-42dc-86a3-5d9de658ea07",
+      "name": "Separate Image Outputs",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        100,
+        400
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "data"
+      },
+      "typeVersion": 1,
+      "notes": "This splitOut node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "0c0310a4-f354-4810-a967-ea002be09cc4",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -600,
+        580
+      ],
+      "parameters": {
+        "width": 1140,
+        "height": 220,
+        "content": "## [CLICK HERE to Watch Video]({{ $env.WEBHOOK_URL }}\n\nOpenAI just dropped API access for their new image generation — and it changes everything. In this quick walkthrough, I show you exactly how to integrate it with n8n using an HTTP request node. Learn how to send prompts, convert base64 to binary, and automate image handling. This is a big one. Don’t miss it.\n\n🔗 Official API Overview: {{ $env.API_BASE_URL }}\n🔗 API Reference – Create Image: {{ $env.API_BASE_URL }}\n\n### *New:  Make.com scenario here: {{ $env.WEBHOOK_URL }}\n"
+      },
+      "typeVersion": 1,
+      "notes": "This stickyNote node performs automated tasks as part of the workflow."
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": null,
+    "timezone": "UTC",
+    "executionTimeout": 3600,
+    "maxExecutions": 1000,
+    "retryOnFail": true,
+    "retryCount": 3,
+    "retryDelay": 1000
+  },
+  "versionId": "c7fef832-b7ba-4cb1-ad36-7a82f81a7f90",
+  "connections": {
+    "9c60f827-bf37-486b-9026-0cbe97fd83b6": {
+      "main": [
+        [
+          {
+            "node": "error-handler-9c60f827-bf37-486b-9026-0cbe97fd83b6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-9c60f827-bf37-486b-9026-0cbe97fd83b6-166c51a5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-9c60f827-bf37-486b-9026-0cbe97fd83b6-115a2b6f",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-9c60f827-bf37-486b-9026-0cbe97fd83b6-e944f3a6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-9c60f827-bf37-486b-9026-0cbe97fd83b6-1b739c2b",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-9c60f827-bf37-486b-9026-0cbe97fd83b6-1ac3c5be",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-9c60f827-bf37-486b-9026-0cbe97fd83b6-6d90e2ce",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-9c60f827-bf37-486b-9026-0cbe97fd83b6-62fb9ee1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler-9c60f827-bf37-486b-9026-0cbe97fd83b6-ef5c936f",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "6b5f9234-351f-4f6b-a0ab-f0d30897f60a": {
+      "main": [
+        [
+          {
+            "node": "error-handler-6b5f9234-351f-4f6b-a0ab-f0d30897f60a-2863c578",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "description": "Automated workflow: New OpenAI Image Generation. This workflow integrates 7 different services: convertToFile, stickyNote, httpRequest, splitOut, set. It contains 9 nodes and follows best practices for error handling and security.",
+  "notes": "Excellent quality workflow: New OpenAI Image Generation. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+}

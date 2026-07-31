@@ -5,7 +5,7 @@ argument-hint: "<call notes or transcript>"
 
 # /call-summary
 
-> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+> If you see unfamiliar placeholders or need to check which tools are connected, see the MCP registry: `~/.claude/config/mcp-servers.md`.
 
 Process call notes or a transcript to extract action items, draft follow-up communications, and update records.
 
@@ -154,7 +154,7 @@ Here's what we discussed:
 - Update next steps field
 
 **Email connected:**
-- I'll offer to create a draft in ~~email
+- I'll offer to create a draft in email
 - Or send directly if you approve
 
 ---

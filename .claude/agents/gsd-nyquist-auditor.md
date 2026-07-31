@@ -1,5 +1,6 @@
 ---
 name: gsd-nyquist-auditor
+model: fable
 description: Fills Nyquist validation gaps by generating tests and verifying coverage for phase requirements
 tools:
   - Read

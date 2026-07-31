@@ -9,15 +9,17 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | Skill | What it does |
 |-------|--------------|
 | `brand-voice` | Apply and enforce brand voice, style guide, and messaging pillars across content. |
-| `content-creation` | Draft marketing content across channels — blog posts, social media, email newsletters, landing pages, press releases, and case studies. |
+| `content-creation` | Draft generic marketing content across channels — blog posts, social media, email newsletters, landing pages, press releases, case studies… |
 | `content-engine` | Create platform-native content systems for X, LinkedIn, TikTok, YouTube, newsletters, and repurposed multi-platform campaigns. |
-| `content-research` | Content research, source verification, citations, fact-checking |
-| `de-ai-ify` | Removes AI jargon and cliches from text, making it sound human. |
-| `tapestry` | Tapestry — Knowledge Weaving |
-| `telegram-post` | Post to Telegram channels and groups with markdown formatting, media support, and message options via your social MCP |
+| `content-research` | Исследование под контент — поиск и верификация источников, CRAAP-оценка, цитирование, fact-checking. |
+| `de-ai-ify` | КАНОН анти-AI-tells для РУССКИХ текстов (все площадки — ТГ, Habr, VC, РБК, сайты, письма). |
+| `doc-coauthoring` | Guide users through a structured workflow for co-authoring documentation. |
+| `ru-text` | Use when writing, editing, or reviewing Russian-language text, or when user |
+| `tapestry` | Tapestry — knowledge weaving: связывает документы (YouTube-транскрипты, статьи, PDF, код) в интерлинкованный граф знаний + implementation plans. |
 
 ### Agents
 
+- `book-fact-checker`
 - `proofreader-ortho`
 - `proofreader-punctuation`
 - `proofreader-typography`

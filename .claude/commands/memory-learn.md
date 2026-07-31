@@ -1,3 +1,8 @@
+---
+description: "Сохранить знание в долгосрочную память (search_chats.py learn; категории technical/tools/workflow/preference/project). Без аргументов — анализ текущей сессии и предложение что сохранить. Триггеры: «memory learn», «сохрани в базу знаний», «запиши знание». Полный 4-уровневый пайплайн запоминания → skill save-knowledge-base."
+argument-hint: "[категория]: <что запомнить>"
+---
+
 # Save to Memory
 
 **Arguments:** $ARGUMENTS (what to remember)
@@ -28,7 +33,7 @@ Save new knowledge to long-term memory (SQLite FTS5).
 
 2. **Save:**
 ```bash
-python ${WORKSPACE}/tools/search_chats.py learn "$CONTENT" "$CATEGORY"
+python ~/.claude/tools/search_chats.py learn "$CONTENT" "$CATEGORY"
 ```
 
 3. **Confirm:**

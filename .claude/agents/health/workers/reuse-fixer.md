@@ -1,7 +1,7 @@
 ---
 name: reuse-fixer
 description: Use proactively to consolidate duplicated code from reuse-hunter reports. Specialist for processing reuse-hunting-report.md files and implementing Single Source of Truth pattern with re-exports by priority level with validation and progress tracking.
-model: sonnet
+model: fable
 color: cyan
 ---
 

@@ -1,133 +1,130 @@
 ---
 name: slides
-description: Презентация в HTML. 1920×1080 канва, навигация стрелками, переход через ?slide=N в URL. Каждый слайд — section с фиксированными размерами. Поверх можно стекать deck-themes (5 готовых тем) и animations.
-when_to_use: Юзер просит «сделай дек», «слайды», «презентация», «pitch deck», «keynote». Перед чем угодно про слайды (deck-themes, export-pdf, export-pptx) — этот скилл первый.
+description: HTML-презентации с навигацией, скейлингом под любой экран, спикер-нотами и печатью в PDF.
+when_to_use: Пользователь просит сделать слайды, презентацию, дек, питч, лендинг-как-дек.
 ---
 
 # Slides
 
-HTML-презентация: один файл, навигация со стрелок, фиксированный canvas 1920×1080.
+HTML-презентация на основе веб-компонента `<deck-stage>`. Один HTML-файл = одна презентация.
 
-## Каркас
+## Принципы
+
+- Канвас фиксированного размера (по умолчанию 1920×1080), отмасштабированный под viewport через `transform: scale()`. Чёрные полосы по краям, если соотношения не совпадают.
+- Каждый слайд — `<section>` внутри `<deck-stage>`.
+- Навигация: ←/→, Space, клик по краям, цифры на клавиатуре.
+- Печать в PDF: одна страница = один слайд (через `@page` + `@media print`).
+
+## Как делать дек
+
+1. Скопируй `templates/deck-stage.js` рядом с HTML-файлом.
+2. Возьми `templates/deck-template.html` как стартовый каркас.
+3. Сформулируй дизайн-систему ВСЛУХ перед слайдами:
+   - Шрифтовая пара (заголовок + основной).
+   - Базовая палитра: фон, текст, 0–2 акцента.
+   - Сетка: колонки, базовый отступ.
+   - Ритм слайдов: где full-bleed, где разделители-секции, где данные.
+4. Каждый слайд — `<section>` со своим layout. Не используй один шаблон на всё.
+5. На текстовых слайдах не больше ~30 слов. Остальное — в спикер-ноты.
+
+## Размеры
+
+| Формат | Размеры | Когда |
+|---|---|---|
+| 16:9 FullHD | 1920×1080 | Дефолт. Конференции, ревью. |
+| 16:9 lite | 1280×720 | Если важна скорость рендера. |
+| Square | 1080×1080 | Соцсети, карусели. |
+| Vertical | 1080×1920 | Сторис, мобильные плееры. |
+
+Указывается атрибутами на `<deck-stage>`:
 
 ```html
-<!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><title><Title></title>
-<link rel="stylesheet" href="styles/tokens.css">
-<style>
-  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
-  .deck { width: 100vw; height: 100vh; position: relative; }
-  .slide {
-    position: absolute; inset: 0;
-    width: 1920px; height: 1080px;
-    transform-origin: 0 0; opacity: 0; pointer-events: none;
-    transition: opacity .25s ease;
-    background: var(--bg, #fff); color: var(--ink, #111);
-    font-family: var(--font-body, "Inter", system-ui, sans-serif);
-    padding: 96px;
-  }
-  .slide.active { opacity: 1; pointer-events: auto; }
-  .slide .num { position: absolute; bottom: 32px; right: 48px; font: 600 14px/1 monospace; opacity: 0.4; }
-</style></head>
-<body>
-  <div class="deck" id="deck">
-    <section class="slide" data-i="1">
-      <h1 style="font:700 96px/1 var(--font-head, 'Inter Tight'); letter-spacing:-0.04em">
-        Заголовок<br/>дека
-      </h1>
-      <p style="font-size:32px;color:#666;margin-top:24px;max-width:1200px">
-        Подзаголовок: одна строка про сабж.
-      </p>
-      <div class="num">01</div>
-    </section>
-
-    <section class="slide" data-i="2">
-      <!-- следующий слайд -->
-      <div class="num">02</div>
-    </section>
-  </div>
-
-  <script>
-    (function(){
-      const deck = document.getElementById('deck');
-      const slides = [...deck.querySelectorAll('.slide')];
-      const total = slides.length;
-      function fit() {
-        // Вписать 1920×1080 канву в текущий viewport
-        const sx = window.innerWidth / 1920, sy = window.innerHeight / 1080;
-        const s = Math.min(sx, sy);
-        const left = (window.innerWidth - 1920 * s) / 2;
-        const top = (window.innerHeight - 1080 * s) / 2;
-        slides.forEach(el => el.style.transform = `translate(${left}px, ${top}px) scale(${s})`);
-      }
-      let i = +new URL(location).searchParams.get('slide') || 1;
-      function go(n) {
-        i = Math.max(1, Math.min(total, n));
-        slides.forEach(el => el.classList.toggle('active', +el.dataset.i === i));
-        history.replaceState({}, '', `?slide=${i}`);
-      }
-      window.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight' || e.key === ' ') go(i + 1);
-        else if (e.key === 'ArrowLeft') go(i - 1);
-        else if (e.key === 'Home') go(1);
-        else if (e.key === 'End') go(total);
-      });
-      window.addEventListener('resize', fit);
-      fit(); go(i);
-    })();
-  </script>
-</body></html>
+<deck-stage width="1920" height="1080">
+  <section>...</section>
+  <section>...</section>
+</deck-stage>
 ```
 
-## Правила слайдов
+## Спикер-ноты
 
-| Что | Минимум | Дефолт | Максимум |
-|---|---|---|---|
-| Текст body | 24px | 32px | 48px |
-| Заголовок | 48px | 80-96px | 144px |
-| Бок-отступы | 64px | 96px | 128px |
-| Слов в заголовке | 1 | 3-7 | 12 |
-| Bullet-points в списке | — | 3-5 | 7 |
+Если нужны — добавь в `<head>`:
 
-**1920×1080 — canvas-base.** Текст менее 24px не читается с дальних рядов.
-
-## Структура дека (типовая)
-
-```
-01. Cover               — заголовок + подзаголовок + автор + дата
-02. The problem         — что болит, в одной фразе + 1 цифра
-03. Why now             — почему сейчас, не раньше / позже
-04. Our solution        — суть, 1-3 ключевых слова
-05. Demo / how it works — скриншот / схема / гифка
-06. Traction / proof    — цифры / клиенты / отзыв
-07. Market              — TAM/SAM/SOM или просто размер
-08. Team                — фото + 1 строка про каждого
-09. Ask / next steps    — деньги / партнёрство / что просим
-10. Thank you           — контакты + CTA
+```html
+<script type="application/json" id="speaker-notes">
+[
+  "Заметки к слайду 1",
+  "Заметки к слайду 2"
+]
+</script>
 ```
 
-Не обязательно 10 слайдов. Pitch — 8-12. Презентация на конф — 15-25. Workshop — 30+.
+Полные разговорные тексты, не тезисы. Это сценарий выступления.
 
-## Стек со связанными скиллами
+## Типографические правила
 
-- `deck-themes` — 5 готовых CSS-тем (minimal/editorial/dark/data/brutalist) поверх каркаса
-- `placeholders` — стандартные плейсхолдеры для иллюстраций
-- `animations` — таймлайн-движок для motion внутри слайда
-- `export-pdf` — Playwright headless → PDF
-- `export-pptx` — screenshots → PPTX
-- `pptx-editable-extractor` — нативные текст-боксы → редактируемый PPTX
-- `verifier` — открыть в headless, проверить консоль
+- Минимальный размер на 1920×1080: **24px**, и то редко. Заголовки от 80px.
+- Не больше 2 шрифтов в деке.
+- Контраст текста к фону — минимум 4.5:1.
+- Не центрируй длинные абзацы. Центрируй короткие — заголовки и манифесты.
 
-## URL-навигация
+## Композиция слайдов
 
-`?slide=N` в URL → линкуешься на конкретный слайд. Полезно для шеринга.
+Полезные архетипы (комбинируй):
 
-## Антипаттерны
+- **Statement** — одна большая фраза, всё остальное минимум.
+- **Title + supporting** — заголовок сверху, 1–3 пункта или картинка.
+- **Two-column** — слева тезис, справа доказательство (картинка / данные).
+- **Section divider** — контрастный фон, номер секции и название. Использовать для ритма каждые 4–6 слайдов.
+- **Full-bleed image** — фото на весь экран, текст в углу с полупрозрачной плашкой.
+- **Data slide** — один график крупно, один вывод текстом.
+- **Quote** — большая цитата, мелкая атрибуция.
 
-- Текст 16px на слайде → не читается на проекторе
-- Wall of text (>50 слов на слайде) → никто не читает
-- 6+ цветов на слайде → визуальный шум
-- Эмодзи 🚀💡✨ как декорация → AI-tell, корпоративная клишированность
-- Картинки уровня stock-фото без обработки → выглядит как шаблон
-- Заголовок «Welcome» / «Thank you» в стандартном шрифте → 3-сек слайд впустую
-- Нумерация слайдов как «Slide 5» вместо «05 / 12» → не помогает понять прогресс
+Не повторяй один и тот же шаблон 10 раз подряд.
+
+## Изображения
+
+Если нет реальных — рисуй плейсхолдер:
+
+```html
+<div class="placeholder">
+  <span>product shot · 1200×800</span>
+</div>
+```
+
+```css
+.placeholder {
+  background: repeating-linear-gradient(
+    45deg, #1a1a1a, #1a1a1a 8px, #222 8px, #222 16px
+  );
+  display: grid; place-items: center;
+  font-family: ui-monospace, monospace;
+  color: #888; font-size: 14px;
+}
+```
+
+## Метки для контекста
+
+Поставь `data-screen-label` на каждом `<section>`, тогда при инспекции элементов видно, где какой слайд:
+
+```html
+<section data-screen-label="01 Title">...</section>
+<section data-screen-label="02 Problem">...</section>
+```
+
+Нумерация с 1, как у пользователя в интерфейсе.
+
+## Экспорты
+
+Когда готово — пользователь может попросить:
+- PDF → подключи скилл `export-pdf`.
+- PNG-кадры → `export-png`.
+- PPTX → `export-pptx`.
+- Один HTML-файл → `standalone-html`.
+
+## Проверка
+
+Открой результат: `open deck.html` (mac) или `xdg-open deck.html` (linux). Если есть скилл `verifier` — позови его проверить консоль и снять скриншоты.
+
+## Legacy reference
+
+Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-slides.md`. Секции там: Каркас, Правила слайдов, Структура дека (типовая), Стек со связанными скиллами, URL-навигация, Антипаттерны.

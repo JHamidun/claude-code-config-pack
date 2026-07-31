@@ -7,8 +7,8 @@ Resolve a company from INN / OGRN / name / domain → legal card (директо
 Free tier 10k req/day. Key in `DADATA_API_KEY`. Use `scripts/dadata_lookup.py`.
 
 ```bash
-python scripts/dadata_lookup.py 7707083893          # findById/party — exact card by INN/OGRN
-python scripts/dadata_lookup.py --suggest "Название компании"  # suggest/party — search by name (≤10)
+python scripts/dadata_lookup.py 7700000000          # findById/party — exact card by INN/OGRN
+python scripts/dadata_lookup.py --suggest "Company"  # suggest/party — search by name (≤10)
 ```
 
 Returns: name/name_full, inn, kpp, ogrn, type (LEGAL/INDIVIDUAL), status, director (+post), okved, address, employee_count, income/expense (Росстат), founded, branch_count. Docs: dadata.ru/api/find-party, dadata.ru/api/suggest/party.
@@ -18,8 +18,8 @@ Returns: name/name_full, inn, kpp, ogrn, type (LEGAL/INDIVIDUAL), status, direct
 `egrul.nalog.ru` unofficial web API (flow mirrors `roma8ok/egrul`): POST `/` `query=<q>` → token `t` → GET `/search-result/<t>` → rows. Use `scripts/egrul_lookup.py`.
 
 ```bash
-python scripts/egrul_lookup.py 7707083893            # by INN
-python scripts/egrul_lookup.py "Название компании"   # by name
+python scripts/egrul_lookup.py 7700000000            # by INN
+python scripts/egrul_lookup.py "ПАО крупный банк"        # by name
 ```
 
 Returns: name, inn, ogrn, kpp, address, **director**, status, reg_date, kind (ul/fl=ИП). The single most authoritative source for the current director (ЕГРЮЛ first-source). Rate-limit gently (≤1 req/2s); captcha appears under load → back off or switch to DaData.
@@ -30,7 +30,7 @@ Returns: name, inn, ogrn, kpp, address, **director**, status, reg_date, kind (ul
 
 - **Rusprofile** (rusprofile.ru) — free: реквизиты, ОКВЭД, руководитель, финансы (Росстат), связанные лица. Fast manual check.
 - **Checko** (checko.ru) — free card: ИНН/ОГРН, выручка, налоги, госконтракты, арбитраж, аффилированность, **связанные лица и их др. компании**. Has a paid API; without a key, fetch the public card via WebFetch and extract.
-- **The checko.ru + nalog.ru combo:** checko.ru gives the rich company picture (finances, links, risks); `egrul.nalog.ru` gives the authoritative legal extract (director, status, founders). Use checko for breadth, ЕГРЮЛ to verify the legal facts. Это про **компанию**, не про человека.
+- **The combo Pavel mentioned (checko.ru + nalog.ru):** checko.ru gives the rich company picture (finances, links, risks); `egrul.nalog.ru` gives the authoritative legal extract (director, status, founders). Use checko for breadth, ЕГРЮЛ to verify the legal facts. Это про **компанию**, не про человека.
 
 ## 4. Domain → company
 

@@ -1,6 +1,6 @@
-# Social Posting
+# Messaging & Posting
 
-> Publish to X, Threads, Bluesky, Instagram, TikTok; multi-platform post drafting.
+> Publish to Telegram channels via bot, message over WhatsApp, send SMS (Twilio), work with any IMAP/SMTP mailbox.
 
 Part of the **[hamidun marketplace](../../README.md)**.
 
@@ -8,12 +8,10 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `bluesky-post` | Post to Bluesky with rich text facets, images, videos, and alt text support via your social MCP |
-| `instagram-post` | Post to Instagram with images, carousels, Reels, and Stories via your social MCP (Business account required) |
-| `social-post` | Post to YouTube, Facebook Pages, and Mastodon via your social MCP - unified skill for video and fediverse platforms |
-| `threads-post` | Create and schedule Threads posts with auto-threading, image carousels, and reply control via your social MCP |
-| `tiktok-post` | Upload videos to TikTok with privacy controls and interaction settings via your social MCP |
-| `x-post` | Post to X (Twitter) with auto-threading, images, and videos via your social MCP |
+| `email-imap` | Generic IMAP/SMTP CLI for any mailbox — read, search, send, and download attachments with no external dependencies. |
+| `sms-twilio` | Send SMS through the Twilio REST API — single and bulk sends with dry-run guards, delivery status, history, balance. |
+| `tg-bot-publish` | Publish and manage in Telegram through a bot (Bot API) — channel posts, rich layout, broadcasts, inline buttons. |
+| `whatsapp-client` | CLI for a personal WhatsApp account over a local Baileys bridge — read chats and history, search, send text and media, groups. |
 
 ## Install
 
@@ -26,7 +24,7 @@ Enable it with `/plugin` — the skills then activate automatically when relevan
 
 ## Related plugins
 
-`linkedin-suite` · `social-intel` · `content-writing` · `marketing-tools`
+`linkedin-suite` · `social-intel` · `content-writing` · `marketing-tools` · `google-workspace` · `integrations` · `session-tools`
 
 ---
 

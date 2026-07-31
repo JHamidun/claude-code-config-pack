@@ -1,7 +1,7 @@
 ---
 name: qa-specialist
 description: Comprehensive QA specialist - test strategy, automation, CI/CD, performance testing. Combines qa-engineer and qa-automation capabilities.
-model: opus
+model: fable
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 

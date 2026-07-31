@@ -1,1275 +1,851 @@
 ---
 name: heygen
-description: "HeyGen AI avatar video — Video Agent (prompt-to-video), precise avatar control (v2 API), AI video gen (VEO/Kling/Sora via Workflow Gateway), Starfish TTS, faceswap, video translate, Remotion integration"
+description: HeyGen API — AI avatar video, v3 primary (54 endpoints). Avatar V/IV/III engines, Cinematic Avatar, HyperFrames (HTML→video), photo/digital-twin/prompt avatars, Image-to-Video, 175+ lang translation with lip-sync, TTS, Voice Clone, Video Agent (prompt-to-video), Brand Kits, webhooks, asset uploads. Use for «heygen», «аватар видео», «видео с аватаром». Verified against OpenAPI spec 2026-06-05.
 ---
 
-# HeyGen Skill (v2.0)
+# HeyGen API Skill
 
-## When to Use
+## Overview
 
-- Создание видео с AI аватаром (говорящая голова)
-- Prompt-to-video генерация через Video Agent API
-- Презентации с аватаром + слайды/фон
-- Маркетинговые и обучающие ролики
-- Персонализированные видео-сообщения
-- Локализация/перевод видео на другие языки
-- AI-генерация видео без аватара (VEO, Kling, Sora, Runway, Seedance)
-- Text-to-Speech через Starfish TTS (standalone аудио)
-- Faceswap — замена лица в видео
-- Transparent WebM для композитинга в Remotion
-- Multi-scene pipeline: параллельная генерация сцен + локальная сборка
-- Image-to-video генерация из референсного изображения
+HeyGen = AI avatar video platform. **v3 is the primary API** (`developers.heygen.com`, `api.heygen.com`). v1/v2 endpoints (`docs.heygen.com`) stay operational **until October 31, 2026** but get no new features. Studio API + Template API remain v1/v2-only (no v3 equivalent yet).
 
-## API Configuration
+**Rendering engines:**
+- **Avatar V** — cross-reference-driven animation, most natural motion + lip-sync. v3 only, opt-in `engine: {"type":"avatar_v"}`. **Same price as Avatar IV since 2026-05-12.**
+- **Avatar IV** (default on v3) — natural motion, `motion_prompt` + `expressiveness` (photo avatars only).
+- **Avatar III** — legacy v1/v2 only, no new integrations.
 
+**Two prompt-driven video products (new, 2026):**
+- **Cinematic Avatar** (`type:"cinematic_avatar"` on `POST /v3/videos`) — Seedance pipeline, prompt + 1–3 avatar looks + reference assets, no script/voice. Flat $7/video, 4–15 s.
+- **HyperFrames** (`POST /v3/hyperframes/renders`) — render an HTML composition (.zip project, Remotion-style) into video with data variables.
+
+**Base URL:** `https://api.heygen.com` (no version suffix; paths carry `/v3`, `/v2`, `/v1`)
+**Server (OpenAPI):** `https://api.heygen.com` (Production)
+
+**Docs:**
+- v3 (current): https://developers.heygen.com — full source dump `${HOME}/_heygen_v3_docs.md`
+- **OpenAPI spec (authoritative): `${HOME}/_heygen_openapi.json`** (54 paths, 145 schemas, 3.1.0) ← verified source for this skill
+- llms.txt: https://developers.heygen.com/llms.txt
+- Changelog: https://developers.heygen.com/changelog
+- v1/v2 legacy dump: `${HOME}/_heygen_docs.md`
+
+## Auth
+
+```
+Header: x-api-key: <your-key>          # apiKey auth (case-insensitive header name)
+   OR   Authorization: Bearer <token>  # OAuth2 bearer
+```
+
+API key → billed against **API wallet**. OAuth bearer → billed against **web plan**. Same key works v1/v2/v3. Get a key at https://app.heygen.com/settings (API tab).
+
+Test:
+```bash
+curl -s "https://api.heygen.com/v3/users/me" -H "x-api-key: $HEYGEN_API_KEY"
+# {"data":{"billing_type":"wallet","email":"...","wallet":{"currency":"usd","remaining_balance":0.0,...}}}
+```
+
+### Keys (rotated 2026-06-05) — account `your-heygen-account@example.com`
+
+In `.credentials.master.env`:
+- `HEYGEN_API_KEY` — alias for DEV key
+- `HEYGEN_API_KEY_DEV` = `sk_V2_...` — "ключ для разработки" (full API, direct video creation)
+- `HEYGEN_API_KEY_AGENT` = `sk_V2_...` — "ключ для агентов" (Video Agent / agentic skills)
+
+Both return identical `/v3/users/me` and `/v3/avatars` — same account, **shared wallet**, no permission difference observed. Use DEV for direct creation, AGENT for Video Agent / agentic flows (semantic split only).
+
+> ⚠️ **Wallet = $0.00 as of recent.** Pay-as-you-go top-up required before any billable job via the PUBLIC API. Check before generating: `GET /v3/users/me` → `wallet.remaining_balance`.
+
+## TWO billing surfaces — pick the right one
+
+| Surface | Base | Auth | Billed against | Use |
+|---|---|---|---|---|
+| **Public API** (this doc) | `api.heygen.com` | `x-api-key` | **API wallet = $0** | needs top-up; full documented v3 |
+| **Web session** (internal) | `api2.heygen.com` | `x-guest-session-token` (cookie) | **Team Unlimited subscription** ✅ | 0 extra cost, billed to the paid web plan |
+
+The account **`your-heygen-account@example.com` has an active paid HeyGen Team Unlimited plan** (`tier:team`, `is_trial:false`) (usage visible in account). That value lives on the **web subscription**, NOT the empty API wallet. To generate without paying, drive the **internal web API** like the Suno/Runway skills.
+
+→ **Full web-session reverse-engineering + headless client: `references/web-session.md`** + `scripts/heygen_web_client.py`.
+Creds in `.credentials.master.env`: `HEYGEN_WEB_TOKEN` / `HEYGEN_WEB_RAW_TOKEN` / `HEYGEN_WEB_SPACE_ID` (captured 2026-06-05).
+
+```bash
+cd ~/.claude/skills/heygen/scripts
+python heygen_web_client.py whoami        # confirm real account (email set, not guest)
+python heygen_web_client.py quota         # tier/entitlements/usage
+python heygen_web_client.py avatars       # your avatar groups (incl. YourFirstName)
+# GENERATE (all billed to Team plan, $0 wallet untouched):
+python heygen_web_client.py agent "Сделай 15-сек видео-интро про YourProduct"     # Video Agent
+python heygen_web_client.py translate "https://my.mp4" "Russian (Russia),Spanish (Spain)" --precision
+python heygen_web_client.py seedance "Man in neon city talks to camera" <look_id> --res 1080p --dur 10  # Cinematic
+python heygen_web_client.py avatar-iv ./photo.jpg "Привет!" <voice_id>          # Photo-to-Video (Avatar IV)
+python heygen_web_client.py image "product ad scene" --refs s3://...            # image / product placement
+python heygen_web_client.py seedance-list   # poll your jobs; or: status <item_id>
+python heygen_web_client.py call /v1/payment/subscription   # generic internal call
+```
+
+**Status:** auth + ALL read endpoints + ALL major WRITE/generate flows reverse-engineered & **verified live** (created real Team-plan jobs + downloaded a valid mp4, 2026-06-05):
+| Feature | Internal endpoint | CLI |
+|---|---|---|
+| AI Studio (talking-head, multi-scene) | `text_draft.create`→`text_draft.save`→`text_draft.generate` | `studio "<script>" <avatar_id> <voice_id>` |
+| Video Agent (prompt→video) | `POST /v1/video_agent/sessions` + `/v2/video_agent/interactive_chat` | `agent "<prompt>"` |
+| Translate | `POST /v3/video_translate.create` | `translate <url> "<lang names>"` |
+| Cinematic (Seedance 2) | `POST /v1/seedance2/submit` | `seedance "<prompt>" <look_id>` |
+| Photo-to-Video (Avatar IV) | `get_upload_photo_url`→PUT→`POST /v1/avatar/video_generate/submit` | `avatar-iv <photo> "<text>" <voice_id>` |
+| Product Placement / Image | `POST /v3/image/generate` | `image "<prompt>"` |
+| AI Video Generator / B-Roll (text→video, no avatar) | `POST /v1/file.ai_generate_element` (provider seedance_2) | `ai-video "<prompt>"` |
+| Upscale to 4K | `file.upload`→`POST /v1/apps/upscale-video` | `upscale <video>` |
+| Face Swap | `POST /v1/face_swap_v2.video.submit` | `face-swap <video_url> <face_url>` |
+| Speech Cleanup (filler removal) | `POST /v1/apps/filler-removal/preview/create` | — (`speech_cleanup_preview`) |
+| Auto Clips | `instant-highlights` (upload + format/caption) | `apps instant-highlights ...` |
+| PPT/PDF → Video | `POST /v1/ent_ppt_pdf_conversion/convert` → AI Studio draft | `ppt <file>` |
+| Batch Mode (scripts×avatars) | `POST /v1/avatar/batch_mode/submit` | `batch_mode(...)` method |
+| File upload (any) | `file.url` → PUT(SSE) → `file.upload` (3-step) | auto in methods |
+| Status / download | `GET /v1/project/items/status` · `/v1/apps/<slug>/{id}/status` · `.check?workflow_id=` | `status <id>` · `download <id> <out> --wait` |
+
+⚠️ **Each app has its OWN API namespace** (frontend slug ≠ API route — Face Swap = `/v1/face_swap_v2.*`, Speech Cleanup = `filler-removal`, B-Roll = `/v1/file.ai_generate_element`, Batch = `/v1/avatar/batch_mode/submit`, PPT = `/v1/ent_ppt_pdf_conversion/convert`). Guessing 404s — capture from a live submit. Upload is a 3-step `file.url`→PUT(`x-amz-server-side-encryption:AES256`)→`file.upload`, NOT multipart. Full payloads (AI Studio scene graph + every app body) in **`references/web-session.md`**. Only **Lipsync** (use public `/v3/lipsyncs`) and **LiveAvatar** (realtime WS) remain — niche.
+
+## Complete v3 endpoint map (54 paths, OpenAPI-verified)
+
+### Videos
+| Method | Path | Purpose |
+|---|---|---|
+| POST | `/v3/videos` | Create video (discriminated union: `avatar`/`image`/`cinematic_avatar`) |
+| GET | `/v3/videos` | List (filter `folder_id`, `title` min 1 char) |
+| GET | `/v3/videos/{video_id}` | Status + URLs |
+| DELETE | `/v3/videos/{video_id}` | Delete |
+
+### Cinematic / HyperFrames (prompt-driven)
+| Method | Path | Purpose |
+|---|---|---|
+| POST | `/v3/videos` (`type:"cinematic_avatar"`) | Seedance prompt+refs video |
+| POST | `/v3/hyperframes/renders` | Render HTML composition .zip → video |
+| GET | `/v3/hyperframes/renders` | List renders |
+| GET | `/v3/hyperframes/renders/{render_id}` | Render status |
+| DELETE | `/v3/hyperframes/renders/{render_id}` | Delete render |
+
+### Avatars
+| Method | Path | Purpose |
+|---|---|---|
+| POST | `/v3/avatars` | Create avatar (`digital_twin`/`photo`/`prompt`) |
+| GET | `/v3/avatars` | List groups (characters) |
+| GET | `/v3/avatars/{group_id}` | One group |
+| DELETE | `/v3/avatars/{group_id}` | Delete group |
+| POST | `/v3/avatars/{group_id}/consent` | Consent flow (returns URL → open in browser) |
+| GET | `/v3/avatars/looks` | List looks (outfits/styles) |
+| GET | `/v3/avatars/looks/{look_id}` | One look (`supported_api_engines`) |
+| PATCH | `/v3/avatars/looks/{look_id}` | Rename (photo/digital twin only) |
+| DELETE | `/v3/avatars/looks/{look_id}` | Delete look |
+
+### Voices
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/v3/voices` | List (filter `type`,`engine`,`language`,`gender`) |
+| POST | `/v3/voices` | **Design voice** from NL prompt (returns ≤3 matches) |
+| GET | `/v3/voices/{voice_id}` | Details + clone status |
+| POST | `/v3/voices/clone` | Clone from reference audio |
+| POST | `/v3/voices/speech` | TTS (Starfish engine voices only) |
+
+### Lipsync
+| Method | Path | Purpose |
+|---|---|---|
+| POST | `/v3/lipsyncs` | Replace audio + re-animate lips |
+| GET | `/v3/lipsyncs` | List |
+| GET | `/v3/lipsyncs/{lipsync_id}` | Status |
+| PATCH | `/v3/lipsyncs/{lipsync_id}` | Rename |
+| DELETE | `/v3/lipsyncs/{lipsync_id}` | Delete |
+
+### Video Translation
+| Method | Path | Purpose |
+|---|---|---|
+| POST | `/v3/video-translations` | Translate (175+ langs, lip-sync) |
+| GET | `/v3/video-translations` | List |
+| GET | `/v3/video-translations/{video_translation_id}` | Status |
+| PATCH | `/v3/video-translations/{video_translation_id}` | Rename |
+| DELETE | `/v3/video-translations/{video_translation_id}` | Delete |
+| GET | `/v3/video-translations/languages` | Supported target language names |
+| POST | `/v3/video-translations/proofreads` | Start proofread (editable SRT) |
+| GET | `/v3/video-translations/proofreads/{proofread_id}` | Proofread status |
+| GET/PUT | `/v3/video-translations/proofreads/{proofread_id}/srt` | Download / upload edited SRT |
+| POST | `/v3/video-translations/proofreads/{proofread_id}/generate` | Final render w/ approved SRT |
+
+### Video Agent (prompt-to-video)
+| Method | Path | Purpose |
+|---|---|---|
+| POST | `/v3/video-agents` | Create session (`generate` one-shot / `chat` multi-turn) |
+| GET | `/v3/video-agents` | List sessions |
+| GET | `/v3/video-agents/styles` | Curated visual styles |
+| GET | `/v3/video-agents/{session_id}` | Session status (incl. `thinking` state) |
+| POST | `/v3/video-agents/{session_id}` | Send message (answer question / request edit) |
+| POST | `/v3/video-agents/{session_id}/stop` | Halt run, keep partials |
+| GET | `/v3/video-agents/{session_id}/videos` | Videos from session |
+| GET | `/v3/video-agents/{session_id}/resources/{resource_id}` | One resource |
+
+### Assets
+| Method | Path | Purpose |
+|---|---|---|
+| POST | `/v3/assets` | Multipart upload (image/video/audio/PDF, ≤32 MB) → `asset_id` |
+| POST | `/v3/assets/direct-uploads` | Init presigned S3 upload (big files) |
+| POST | `/v3/assets/{asset_id}/complete` | Finalize direct upload |
+| GET | `/v3/assets/{asset_id}` | Asset metadata + public URL |
+| DELETE | `/v3/assets/{asset_id}` | Delete |
+
+### Audio / Brand
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/v3/audio/sounds?query=...` | **Search background music** (`query` REQUIRED) |
+| GET | `/v3/brand-kits` | List Brand Kits (`brand_kit_id` → Video Agent) |
+| GET | `/v3/brand-glossaries` | List Brand Glossaries (`brand_glossary_id` → translation custom terms) |
+
+### Webhooks
+| Method | Path | Purpose |
+|---|---|---|
+| POST | `/v3/webhooks/endpoints` | Create (returns `signing_secret` ONCE) |
+| GET | `/v3/webhooks/endpoints` | List |
+| PATCH | `/v3/webhooks/endpoints/{endpoint_id}` | Update URL / events |
+| DELETE | `/v3/webhooks/endpoints/{endpoint_id}` | Delete |
+| POST | `/v3/webhooks/endpoints/{endpoint_id}/rotate-secret` | New signing secret |
+| GET | `/v3/webhooks/event-types` | Available event types |
+| GET | `/v3/webhooks/events` | Delivery history (filter type/entity) |
+
+### Account
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/v3/users/me` | Profile + `wallet`/`subscription` + `billing_type` |
+
+### Legacy (v1/v2 — sunset 2026-10-31)
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/v1/audio/text_to_speech` | Legacy TTS (Starfish) |
+| GET | `/v1/audio/voices` | Legacy voice list |
+| GET | `/v1/user/me` | Legacy account |
+| POST | `/v1/video_agent/generate` | Legacy Video Agent |
+| GET | `/v1/workflows` | **Workflow API** list |
+| POST | `/v1/workflows/executions` | Run a workflow |
+| GET | `/v1/workflows/executions/{execution_id}` | Execution status |
+| POST | `/v1/workflows/graph-executions` | Run graph workflow |
+| POST | `/v2/video_translate` | Legacy translate (`brand_glossary_id`, `stock_voice_config`) |
+| GET | `/v2/video_translate/caption` | Legacy caption |
+| GET | `/v2/video_translate/target_languages` | Legacy lang list |
+| POST/GET | `/v2/videos` | Legacy create/list (Studio API multi-scene lives here) |
+| GET/DELETE | `/v2/videos/{video_id}` | Legacy status/delete |
+
+## POST /v3/videos — three variants (discriminator `type`)
+
+### Variant A — `avatar` (registered look)
+
+```jsonc
+{
+  "type": "avatar",                          // REQUIRED discriminator
+  "avatar_id": "<look_id>",                  // REQUIRED. video avatar or photo-avatar look ID
+  "script": "...",                           // OR audio_url OR audio_asset_id (mutually exclusive)
+  "voice_id": "<voice_id>",                  // required with script, UNLESS avatar has default voice
+  "audio_url": "https://...",                // public audio to lip-sync
+  "audio_asset_id": "...",                   // uploaded audio asset
+  "voice_settings": {                        // optional voice tuning
+    "speed": 1.0,                            // 0.5–1.5
+    "pitch": 0,                              // -50..+50 semitones
+    "volume": 1.0,                           // 0.0 silent .. 1.0 full
+    "locale": "en-US",
+    "engine_settings": { /* engine_type-discriminated */ }
+  },
+  "title": "Dashboard label",
+  "resolution": "4k | 1080p | 720p",
+  "aspect_ratio": "16:9 | 9:16 | 4:5 | 5:4 | 1:1 | auto",   // default 16:9
+  "fit": "cover | contain",                  // how subject fits canvas
+  "background": { "type": "color|image", "value": "#FFFFFF", "url": "...", "asset_id": "..." },
+  "remove_background": false,                 // requires matting-trained video avatar
+  "output_format": "mp4 | webm",             // webm = alpha/transparent BG
+  "caption": { "style": "..." },             // burned-in caption; sidecar SRT always returned via subtitle_url
+  "watermark": {                             // premium/Enterprise (WatermarkInput)
+    "url": "https://...", "asset_id": "...",
+    "scale": 1.0,                            // 0–2
+    "opacity": 1.0,                          // 0–1
+    "placement": "top_left|top_right|bottom_left|bottom_right",
+    "offset_x": 0.0, "offset_y": 0.0
+  },
+  "motion_prompt": "...",                     // Avatar IV + photo avatars only
+  "expressiveness": "high|medium|low",        // Avatar IV + photo avatars only (default low)
+  "engine": { "type": "avatar_v" },           // opt-in Avatar V (object, NOT string). Default = IV
+  "callback_url": "https://...",
+  "callback_id": "echoed-back-in-webhook"
+}
+```
+
+### Variant B — `image` (arbitrary image, no registered avatar)
+
+```jsonc
+{
+  "type": "image",
+  "image": { "type": "url", "url": "https://..." },     // OR {type:"asset_id",asset_id} OR {type:"base64",base64}
+  "script": "...", "voice_id": "...",
+  "motion_prompt": "...", "expressiveness": "high",     // supported here
+  // engine.type=avatar_v NOT supported for image
+}
+```
+
+### Variant C — `cinematic_avatar` (Seedance, prompt + references) — NEW 2026-06
+
+No script/voice — motion + speech driven entirely by prompt + reference content.
+
+```jsonc
+{
+  "type": "cinematic_avatar",                 // REQUIRED discriminator
+  "prompt": "A founder in a sunlit studio...",// REQUIRED, 1–10000 chars
+  "avatar_id": ["<look_id1>", "<look_id2>"],  // REQUIRED, ARRAY of 1–3 look IDs (visual refs)
+  "references": [                             // optional asset refs (images/videos/audio)
+    { "type": "url", "url": "https://..." },
+    { "type": "asset_id", "asset_id": "..." },
+    { "type": "base64", "base64": "..." }
+  ],                                          // combined limit: ≤3 videos + ≤9 images across avatars+refs
+  "aspect_ratio": "16:9 | 9:16 | 1:1",        // default 16:9 (cinematic supports only these 3)
+  "resolution": "720p | 1080p",               // default 720p
+  "auto_duration": false,                     // true → model picks length, omit duration
+  "duration": 10,                             // 4–15 s, default 10
+  "enhance_prompt": false,                    // server-side prompt enhancement
+  "title": "..."
+}
+```
+**Pricing:** flat **$7.00 per video** (4–15 s). Backed by Seedance.
+
+**Response (all variants):** `{"data": {"video_id": "...", "status": "waiting", "output_format": "mp4"}}`
+
+**Status:** `waiting → pending → processing → completed | failed`. Completed → `video_url`, `thumbnail_url`, `duration`, `subtitle_url`. **URLs expire — download or re-poll.**
+
+## POST /v3/hyperframes/renders — HTML composition → video (NEW)
+
+Renders a programmatic HTML/CSS/JS composition (Remotion-style) into video.
+
+```jsonc
+{
+  "project": { "type": "url|asset_id|base64", "url": "https://.../composition.zip" }, // REQUIRED .zip
+  "composition": "compositions/intro.html",   // entry HTML relative to project root (default index.html)
+  "variables": { "title": "Hello", "color": "#0af" }, // overrides data-composition-variables
+  "fps": 30,                                   // default 30
+  "quality": "<preset>",                       // higher = slower
+  "format": "<container/codec>",
+  "resolution": "1080p | 4k",                  // default 1080p; 4k billed 1.5x
+  "aspect_ratio": "16:9 | 9:16 | 1:1",         // default 16:9
+  "title": "...",
+  "callback_id": "...", "callback_url": "https://..."
+}
+```
+Poll `GET /v3/hyperframes/renders/{render_id}`.
+
+## Avatar types & Avatar V eligibility
+
+| Type | Description | Avatar V eligible |
+|---|---|---|
+| `studio_avatar` | HeyGen public library | ✓ if look's `supported_api_engines` has `avatar_v` |
+| `digital_twin` | Trained from real video footage | ✓ if eligible |
+| `photo_avatar` | From a single photo | ✓ if eligible |
+| `image` | Arbitrary image (no registered avatar) | ✗ requires a registered look |
+| `prompt` | AI-generated from text | ✓ if eligible |
+
+Check: `GET /v3/avatars/looks/{look_id}` → `data.supported_api_engines` (array). Avatar V eligibility is per **look**, not per group. `motion_prompt` + `expressiveness` are **rejected** when `engine.type=avatar_v`.
+
+## POST /v3/avatars — create avatar (discriminator `type`)
+
+```jsonc
+// digital_twin (from video footage)
+{ "type": "digital_twin", "name": "YourFirstName", "file": {"type":"url","url":"https://...mp4"}, "avatar_group_id": "<optional>" }
+// photo (from a photo)
+{ "type": "photo", "name": "...", "file": {"type":"url","url":"https://...jpg"}, "avatar_group_id": "<optional>" }
+// prompt (AI-generated)
+{ "type": "prompt", "name": "...", "prompt": "a 30yo founder, navy blazer", "reference_images": [{"type":"url","url":"..."}], "avatar_group_id": "<optional>" }
+```
+Custom avatars require consent: `POST /v3/avatars/{group_id}/consent` (optional `consent_text` for audit) → returned URL must be opened in a browser by the person. Training is async → `instant_avatar.*` / `photo_avatar_train.*` webhooks.
+
+## Voices
+
+```bash
+GET  /v3/voices?engine=starfish&language=en&type=clone&gender=female&limit=20
+GET  /v3/voices/{voice_id}                 # details + clone workflow status
+POST /v3/voices                            # DESIGN voice (NL prompt → ≤3 matches)
+POST /v3/voices/clone                      # clone from audio
+POST /v3/voices/speech                     # TTS (Starfish voices only)
+```
+**Engines:** `starfish` (HeyGen native, only one that supports TTS), `elevenlabs`, `fish`.
+
+### Design voice — `POST /v3/voices`
+```jsonc
+{ "prompt": "warm, confident female narrator, slight British accent",   // REQUIRED
+  "gender": "female", "locale": "en-US", "seed": 0 }   // seed=0 = top matches; bump for new batch
+```
+
+### Clone voice — `POST /v3/voices/clone`
+```jsonc
+{ "audio": {"type":"url","url":"https://...mp3"},   // REQUIRED (url|asset_id|base64)
+  "voice_name": "YourFirstName RU",                          // REQUIRED (NOT "name")
+  "language": "ru",                                  // optional hint, auto-detected
+  "remove_background_noise": true }
+```
+Returns a poll-able clone job; clone `voice_id` usable anywhere. Quota exceeded → `resource_limit_reached` (400).
+
+### TTS — `POST /v3/voices/speech` (Starfish only)
+```jsonc
+{ "text": "...",                  // REQUIRED 1–5000 chars (field is "text", NOT "input")
+  "voice_id": "<starfish voice>", // REQUIRED, must support starfish engine
+  "input_type": "text | ssml",    // default text
+  "speed": 1.0,                   // 0.5–2.0
+  "language": "ru", "locale": "ru-RU" }  // optional; locale infers language
+```
+Returns audio URL + duration. **$0.000667/sec** — effectively free for hooks/intros.
+
+## Lipsync — `POST /v3/lipsyncs` (dub existing video)
+
+```jsonc
+{ "video": {"type":"url","url":"https://...mp4"},     // REQUIRED (url|asset_id)
+  "audio": {"type":"url","url":"https://...mp3"},     // REQUIRED (url|asset_id)
+  "mode": "speed | precision",                         // speed=fast; precision=avatar inference (better)
+  "title": "...",
+  "enable_caption": true,
+  "keep_the_same_format": true,                        // preserve source resolution/bitrate
+  "enable_dynamic_duration": false,
+  "disable_music_track": false,
+  "enable_speech_enhancement": false,
+  "enable_watermark": false,
+  "start_time": 0, "end_time": 30,                     // partial lipsync (sec)
+  "fps_mode": "vfr | cfr | passthrough",
+  "folder_id": "...",
+  "callback_url": "...", "callback_id": "..." }
+```
+Poll `GET /v3/lipsyncs/{id}` → `status`, `video_url`, `caption_url`, `failure_reason`.
+
+## Video Translation — `POST /v3/video-translations` ⚠️ schema corrected
+
+```jsonc
+{ "video": {"type":"url","url":"https://...mp4"},     // REQUIRED (url|asset_id) — NOT "video_url"
+  "output_languages": ["Spanish (Spain)", "German", "Portuguese (Brazil)"],  // REQUIRED — language NAMES, not codes!
+  "title": "...",
+  "mode": "speed | precision",                         // precision uses avatar inference (better lip-sync)
+  "audio": {"type":"url","url":"..."},                 // custom dubbing audio
+  "input_language": "en",                              // source (auto-detected if omitted)
+  "translate_audio_only": false,                       // keep original video, swap audio
+  "speaker_num": 2,                                    // improves speaker separation
+  "enable_caption": true,
+  "keep_the_same_format": false,
+  "enable_dynamic_duration": false,
+  "disable_music_track": false,
+  "enable_speech_enhancement": false,
+  "enable_watermark": false,
+  "start_time": 0, "end_time": 60,                     // partial translation (sec)
+  "brand_glossary_id": "...",                          // custom term translations (brand_voice_id = legacy alias)
+  "stock_voice_config": { "use_stock_voice": true, "engine": "starfish", "voice_id": "..." },  // Stock TTS instead of voice clone
+  "srt": {"type":"url","url":"..."}, "srt_role": "input | output",  // custom subtitle file
+  "fps_mode": "vfr | cfr | passthrough",
+  "folder_id": "...",
+  "callback_url": "...", "callback_id": "..." }
+```
+Get supported names: `GET /v3/video-translations/languages`. Poll `GET /v3/video-translations/{id}` → `status`, `caption_url`, `video_url`.
+
+### Proofread workflow (edit SRT before final render)
+1. `POST /v3/video-translations/proofreads` → `proofread_id`
+2. Poll `GET /v3/video-translations/proofreads/{id}`
+3. `GET /v3/video-translations/proofreads/{id}/srt` → download editable SRT (presigned)
+4. Edit locally → `PUT /v3/video-translations/proofreads/{id}/srt` (upload edited)
+5. `POST /v3/video-translations/proofreads/{id}/generate` → final render
+   (`brand_glossary_id` accepted here too)
+
+## Video Agent — `POST /v3/video-agents` (prompt-to-video)
+
+```jsonc
+{ "prompt": "Make a 30s ad for our product launch...",  // REQUIRED 1–10000 chars
+  "mode": "generate | chat",                             // generate = one-shot; chat = multi-turn
+  "avatar_id": "<optional>", "voice_id": "<optional>",
+  "style_id": "<from GET /v3/video-agents/styles>",
+  "brand_kit_id": "<from GET /v3/brand-kits>",
+  "orientation": "landscape | portrait",                 // auto-detected if omitted
+  "files": [ /* ≤20 attachments: image/video/audio/PDF */ ],
+  "incognito_mode": false,                               // disable memory injection/extraction
+  "callback_url": "...", "callback_id": "..." }
+```
+Returns `session_id`. Poll `GET /v3/video-agents/{session_id}` (status incl. `thinking`). Iterate: `POST /v3/video-agents/{session_id}` (answer questions / request edits). Stop: `POST /v3/video-agents/{session_id}/stop`. Outputs: `GET /v3/video-agents/{session_id}/videos`.
+
+## Assets
+
+**Small (≤32 MB) — direct multipart:**
+```bash
+POST /v3/assets   # multipart/form-data, file=<binary> → {data:{asset_id}}
+```
+
+**Large — presigned direct upload (3 steps):**
+```jsonc
+// 1. init
+POST /v3/assets/direct-uploads
+{ "filename": "clip.mp4", "content_type": "video/mp4", "size_bytes": 73400320, "checksum_sha256": "<hex optional>" }
+// → returns asset_id + presigned upload URL
+// 2. PUT bytes to the presigned URL
+// 3. finalize
+POST /v3/assets/{asset_id}/complete
+```
+`GET /v3/assets/{asset_id}` → metadata + public URL. `DELETE /v3/assets/{asset_id}`.
+
+Unified asset reference union (every v3 endpoint accepting media):
+```jsonc
+{"type":"url","url":"https://..."} | {"type":"asset_id","asset_id":"..."} | {"type":"base64","base64":"..."}
+```
+
+## Webhooks — managed CRUD + signing
+
+```bash
+POST   /v3/webhooks/endpoints                       # create → signing_secret ONCE
+GET    /v3/webhooks/endpoints
+PATCH  /v3/webhooks/endpoints/{id}                  # change url/events
+DELETE /v3/webhooks/endpoints/{id}
+POST   /v3/webhooks/endpoints/{id}/rotate-secret
+GET    /v3/webhooks/event-types
+GET    /v3/webhooks/events                          # delivery history
+```
+```jsonc
+POST /v3/webhooks/endpoints
+{ "url": "https://yoursite.com/heygen-webhook",
+  "events": ["avatar_video.success","avatar_video.fail","video_translate.success"] }
+// → {"data":{"endpoint_id":"we_...","signing_secret":"whsec_..."}}  // STORE secret now (shown once)
+```
+Verify payloads via HMAC-SHA256 of raw body using `signing_secret`.
+
+**`avatar_video.success` payload:**
+```jsonc
+{ "event_type":"avatar_video.success",
+  "event_data":{ "video_id":"...","url":"<video_url>","gif_download_url":"...",
+    "video_page_url":"...","video_share_page_url":"...","folder_id":"...","callback_id":"..." } }
+```
+**Event types (20+):** `avatar_video.success/fail`, `avatar_video_gif.success/fail`, `video_agent.success/fail`, `video_translate.success/fail`, `personalized_video`, `instant_avatar.success/fail`, `photo_avatar_generation.success/fail`, `photo_avatar_train.success/fail`, `photo_avatar_add_motion.success/fail`, `proofread_creation.success/fail`, `live_avatar.success/fail`. (Authoritative list via `GET /v3/webhooks/event-types`.)
+
+## Pricing (USD per second, 2026 self-serve)
+
+### Avatar IV & V (same rates since 2026-05-12)
+| Avatar Type | 720p/1080p | 4K |
+|---|---|---|
+| Photo Avatar | $0.05/s | $0.0667/s |
+| **Digital Twin** | **$0.0667/s** | $0.0833/s |
+| Studio Avatar | $0.0667/s | $0.0833/s |
+
+**YourFirstName = digital_twin → $2.00 per 30-s short (1080p), $162 per 81 shorts.** Avatar V no longer costs more than IV.
+
+### Other
+| Feature | Rate |
+|---|---|
+| Video Agent (prompt-to-video) | $0.0333/s (~half of Digital Twin direct) |
+| **Cinematic Avatar** | **$7.00 flat per video** (4–15 s) |
+| HyperFrames 4K | resolution 4k billed **1.5×** vs 1080p |
+| Lipsync — speed / precision | $0.0333 / $0.0667 per s |
+| Translation — audio-only / lipsync speed / precision | $0.0167 / $0.0333 / $0.0667 per s |
+| TTS Starfish | $0.000667/s |
+| Avatar creation (digital twin / photo) | $1.00 per call |
+| Avatar III legacy (existing v1/v2 only) | $0.0167/s (720p/1080p), $0.02/s (4K) |
+
+## Usage limits
+| Resource | Limit |
+|---|---|
+| Concurrent video jobs | 10 (Pay-As-You-Go) → 429 + `Retry-After` |
+| Script text | 5000 chars |
+| Cinematic prompt / Video Agent prompt | 10,000 chars |
+| Cinematic refs | ≤3 videos + ≤9 images (avatars+refs combined); 1–3 avatar looks |
+| Cinematic duration | 4–15 s |
+| Audio input | 600 s (10 min) |
+| Multipart asset upload | 32 MB (use direct-uploads for larger) |
+| Video input (lipsync/translate) | 100 MB, <2K, MP4/WebM |
+| Image input | 50 MB, <2K, JPG/PNG |
+| Audio input file | 50 MB, WAV/MP3 |
+| Video Agent attachments | ≤20 (image/video/audio/PDF) |
+| Output (avatar videos) | 25 fps, 128–4096 px/axis, ≤50 scenes, ≤30 min |
+| Aspect ratio (avatar/image) | 16:9, 9:16, 4:5, 5:4, 1:1, auto (default 16:9) |
+| Aspect ratio (cinematic/hyperframes) | 16:9, 9:16, 1:1 |
+| TTS | 1–5000 chars, speed 0.5–2.0× |
+
+## Idempotency-Key (all POST mutations)
+Header `Idempotency-Key: <1–255 chars [A-Za-z0-9_:.-]>` (UUID = safe default).
+- Same key within 24h → replays original response.
+- Same key while original in flight → 409 `request_in_progress`.
+- Scope: per-endpoint + per-resource.
+
+## Error codes (v3 standard format)
+```jsonc
+{ "error": { "code": "...", "message": "...", "param": "field", "doc_url": "https://developers.heygen.com/docs/error-codes#..." } }
+```
+Codes: `invalid_parameter`, `authentication_failed`, `unauthorized`, `rate_limit_exceeded`, `resource_limit_reached`, `request_in_progress`, `not_found`, `internal_error`, `download_failed` (URL fetch failed), `gateway_timeout` (external fetch timed out), `ai_vendor_access_restricted` (workspace AI policy), `unlimited_mode_disabled`, `voice_unavailable` (clone failed/expired), `ephemeral_upload_disabled`, `avatar_group_not_found`, `webhook_not_found`.
+
+| HTTP | Meaning |
+|---|---|
+| 200 | OK |
+| 400 | invalid_parameter / validation / download_failed |
+| 401 | unauthorized |
+| 404 | not_found / avatar_group_not_found / webhook_not_found |
+| 409 | request_in_progress (idempotency in flight) / webhook registration conflict |
+| 429 | rate_limit_exceeded (+ Retry-After) |
+| 500 | internal_error |
+
+Pagination: cursor-based (`has_more`, `next_token`/`next_cursor`) → `?cursor=...&limit=20`.
+
+## Idiomatic Python client (v3)
+
+```python
+import os, time, requests
+from pathlib import Path
+
+KEY = os.environ['HEYGEN_API_KEY']
+BASE = 'https://api.heygen.com'
+H = {'x-api-key': KEY, 'Content-Type': 'application/json'}
+ASSET = lambda url=None, asset_id=None: ({'type':'url','url':url} if url else {'type':'asset_id','asset_id':asset_id})
+
+
+def wallet_balance() -> float:
+    r = requests.get(f'{BASE}/v3/users/me', headers={'x-api-key': KEY}, timeout=30); r.raise_for_status()
+    return r.json()['data'].get('wallet', {}).get('remaining_balance', 0.0)
+
+
+def create_video_avatar(*, avatar_id, script=None, audio_asset_id=None, voice_id=None,
+                        aspect_ratio='9:16', resolution='1080p', use_avatar_v=False,
+                        motion_prompt=None, expressiveness=None,
+                        callback_id=None, callback_url=None, idempotency_key=None) -> str:
+    body = {'type': 'avatar', 'avatar_id': avatar_id,
+            'aspect_ratio': aspect_ratio, 'resolution': resolution}
+    if script: body['script'] = script
+    if audio_asset_id: body['audio_asset_id'] = audio_asset_id
+    if voice_id: body['voice_id'] = voice_id
+    if use_avatar_v: body['engine'] = {'type': 'avatar_v'}
+    if motion_prompt: body['motion_prompt'] = motion_prompt
+    if expressiveness: body['expressiveness'] = expressiveness
+    if callback_id: body['callback_id'] = callback_id
+    if callback_url: body['callback_url'] = callback_url
+    headers = dict(H)
+    if idempotency_key: headers['Idempotency-Key'] = idempotency_key
+    r = requests.post(f'{BASE}/v3/videos', headers=headers, json=body, timeout=30)
+    r.raise_for_status(); return r.json()['data']['video_id']
+
+
+def create_video_cinematic(*, prompt, avatar_ids, references=None, aspect_ratio='9:16',
+                           resolution='1080p', duration=10, auto_duration=False,
+                           enhance_prompt=False, title=None) -> str:
+    """Seedance prompt+refs. avatar_ids = list of 1–3 look IDs. Flat $7/video."""
+    body = {'type': 'cinematic_avatar', 'prompt': prompt, 'avatar_id': avatar_ids,
+            'aspect_ratio': aspect_ratio, 'resolution': resolution, 'enhance_prompt': enhance_prompt}
+    if references: body['references'] = references          # [{'type':'url','url':...}, ...]
+    if auto_duration: body['auto_duration'] = True
+    else: body['duration'] = duration
+    if title: body['title'] = title
+    r = requests.post(f'{BASE}/v3/videos', headers=H, json=body, timeout=30)
+    r.raise_for_status(); return r.json()['data']['video_id']
+
+
+def get_video(video_id: str) -> dict:
+    r = requests.get(f'{BASE}/v3/videos/{video_id}', headers={'x-api-key': KEY}, timeout=30)
+    r.raise_for_status(); return r.json()['data']
+
+
+def wait_for_video(video_id: str, max_min=15, poll_s=15) -> dict:
+    deadline = time.time() + max_min * 60
+    while time.time() < deadline:
+        d = get_video(video_id); st = d.get('status')
+        if st == 'completed': return d
+        if st == 'failed': raise RuntimeError(f'{video_id} failed: {d.get("failure_reason")}')
+        time.sleep(poll_s)
+    raise TimeoutError(f'{video_id} not done in {max_min} min')
+
+
+def avatar_v_eligible(look_id: str) -> bool:
+    r = requests.get(f'{BASE}/v3/avatars/looks/{look_id}', headers={'x-api-key': KEY}, timeout=30)
+    r.raise_for_status()
+    return 'avatar_v' in r.json()['data'].get('supported_api_engines', [])
+
+
+def upload_asset(path: Path) -> str:
+    with open(path, 'rb') as f:
+        r = requests.post(f'{BASE}/v3/assets', headers={'x-api-key': KEY}, files={'file': f}, timeout=120)
+    r.raise_for_status(); return r.json()['data']['asset_id']
+
+
+def lipsync(*, video_url, audio_url, mode='precision') -> str:
+    r = requests.post(f'{BASE}/v3/lipsyncs', headers=H, json={
+        'video': ASSET(url=video_url), 'audio': ASSET(url=audio_url), 'mode': mode}, timeout=30)
+    r.raise_for_status(); return r.json()['data']['lipsync_id']
+
+
+def translate(*, video_url, output_languages, mode='precision', title='Translation') -> list:
+    """output_languages = language NAMES (e.g. ['Spanish (Spain)','German'])."""
+    r = requests.post(f'{BASE}/v3/video-translations', headers=H, json={
+        'video': ASSET(url=video_url), 'output_languages': output_languages,
+        'mode': mode, 'title': title, 'fps_mode': 'passthrough'}, timeout=30)
+    r.raise_for_status(); return r.json()['data']
+
+
+def tts_starfish(*, voice_id, text, speed=1.0, input_type='text') -> dict:
+    r = requests.post(f'{BASE}/v3/voices/speech', headers=H, json={
+        'voice_id': voice_id, 'text': text, 'input_type': input_type, 'speed': speed}, timeout=60)
+    r.raise_for_status(); return r.json()['data']
+
+
+def clone_voice(*, audio_url, voice_name, language=None) -> dict:
+    body = {'audio': ASSET(url=audio_url), 'voice_name': voice_name}
+    if language: body['language'] = language
+    r = requests.post(f'{BASE}/v3/voices/clone', headers=H, json=body, timeout=60)
+    r.raise_for_status(); return r.json()['data']
+
+
+def video_agent(*, prompt, mode='generate', style_id=None, brand_kit_id=None, callback_url=None) -> str:
+    body = {'prompt': prompt, 'mode': mode}
+    if style_id: body['style_id'] = style_id
+    if brand_kit_id: body['brand_kit_id'] = brand_kit_id
+    if callback_url: body['callback_url'] = callback_url
+    r = requests.post(f'{BASE}/v3/video-agents', headers=H, json=body, timeout=30)
+    r.raise_for_status(); return r.json()['data']['session_id']
+
+
+def register_webhook(url: str, events: list) -> dict:
+    r = requests.post(f'{BASE}/v3/webhooks/endpoints', headers=H, json={'url': url, 'events': events}, timeout=30)
+    r.raise_for_status(); return r.json()['data']   # {endpoint_id, signing_secret} — store secret now
+```
+
+## Recipes
+
+### YourFirstName short — highest quality (Avatar V if eligible)
+```python
+look_id = '<yourfirstname look_id>'   # verify it's a v3 look via GET /v3/avatars/looks
+vid = create_video_avatar(avatar_id=look_id, script='Hook... reveal... loop close.',
+    voice_id = 'YOUR_HEYGEN_VOICE_ID', aspect_ratio='9:16', resolution='1080p',
+    use_avatar_v=avatar_v_eligible(look_id), callback_id='shorts-user-001')
+d = wait_for_video(vid)   # d['video_url'] → SubMagic
+```
+
+### Cinematic Avatar — prompt + YourFirstName reference (Seedance)
+```python
+vid = create_video_cinematic(
+    prompt='YourFirstName in a sunlit studio, warm cinematic grade, slow push-in, talking to camera about AI.',
+    avatar_ids=['<yourfirstname look_id>'], references=[{'type':'url','url':'https://.../user-ref.jpg'}],
+    aspect_ratio='9:16', resolution='1080p', duration=12)
+d = wait_for_video(vid)
+```
+
+### ElevenLabs clone → HeyGen lip-sync
+```python
+# Option A: pre-recorded audio into /v3/videos
+asset_id = upload_asset(elevenlabs_tts(text='...', voice_id=os.environ['ELEVENLABS_VOICE_ID_YOURNAME']))
+create_video_avatar(avatar_id = 'YOUR_HEYGEN_AVATAR_ID', audio_asset_id=asset_id, aspect_ratio='9:16')
+# Option B: dub an existing video
+lipsync(video_url='https://...user.mp4', audio_url='https://...eleven.mp3', mode='precision')
+```
+
+### Translate webinar to 5 languages
+```python
+ids = translate(video_url='https://...webinar.mp4',
+    output_languages=['English','Spanish (Spain)','French','German','Portuguese (Brazil)'],
+    mode='precision', title='YourFirstName webinar')
+# poll GET /v3/video-translations/{id} per returned translation
+```
+
+### HyperFrames — branded intro from HTML
 ```python
 import requests
-import os
-
-HEYGEN_API_KEY = os.getenv('HEYGEN_API_KEY')
-BASE_URL = "https://api.heygen.com"
-
-headers = {
-    "X-Api-Key": HEYGEN_API_KEY,
-    "Content-Type": "application/json"
-}
+r = requests.post(f'{BASE}/v3/hyperframes/renders', headers=H, json={
+    'project': {'type':'url','url':'https://.../intro-comp.zip'},
+    'composition': 'compositions/intro.html',
+    'variables': {'title': 'Your Channel Name', 'accent': '#ff6a00'},
+    'resolution': '1080p', 'aspect_ratio': '9:16', 'fps': 30}, timeout=30)
+render_id = r.json()['data']['render_id']
 ```
 
-## Аватары User
+## Gotchas (verified 2026-06-05)
 
-| Название | Avatar ID |
-|----------|-----------|
-| User_Горизонталь_Сидячий | `YOUR_HEYGEN_AVATAR_ID_1` |
-| User_Вертикаль_Сидячий | `YOUR_HEYGEN_AVATAR_ID_2` |
+- **Auth header `x-api-key`** (case-insensitive). NOT Bearer (unless OAuth). NOT `X-Api-Key` required-case.
+- **Wallet $0.00** — top up before billable jobs; check `GET /v3/users/me`.
+- **`POST /v3/videos` is a 3-way union** on `type`: `avatar` / `image` / `cinematic_avatar`.
+- **Cinematic `avatar_id` is an ARRAY** of 1–3 look IDs; no script/voice; flat $7.
+- **Translation: `output_languages` = language NAMES not codes** (`'Spanish (Spain)'`), field is `video` not `video_url`. Get names from `GET /v3/video-translations/languages`.
+- **Lipsync uses `video`+`audio` asset unions**, not `video_url`/`audio_url` top-level.
+- **TTS field is `text`** (not `input`). **Voice clone fields are `audio`+`voice_name`** (not `audio_url`+`name`). **Voice design is `POST /v3/voices`** with `prompt`.
+- **Avatar V opt-in:** `engine: {"type":"avatar_v"}` (object). `motion_prompt`/`expressiveness` rejected with it. Eligibility per **look**. `image` type can't use Avatar V.
+- **Avatar V = same price as IV** (since 2026-05-12).
+- **aspect_ratio default 16:9** — for Shorts always pass `"9:16"`. Cinematic/HyperFrames support only 16:9/9:16/1:1.
+- **`voice_settings.speed` is 0.5–1.5** (TTS endpoint speed is 0.5–2.0).
+- **Webhook `signing_secret` shown once**; `PATCH` to change url/events, `rotate-secret` for new secret.
+- **`fps_mode` strict enum:** `vfr|cfr|passthrough`.
+- **Large assets:** use `direct-uploads` (init → PUT → complete), not 32 MB multipart.
+- **Send Video Agent message = `POST /v3/video-agents/{session_id}`** (the session itself), not `/messages`.
+- **Output URLs expire** — download or re-poll.
+- **Studio API (multi-scene) + Template API** remain v2-only.
+- **`callback_id`** echoed verbatim in webhook `event_data.callback_id`.
 
-## Голоса User's (HeyGen)
-
-| Название | Voice ID |
-|----------|----------|
-| User_pro voice | `YOUR_HEYGEN_VOICE_ID_1` |
-| User_Нейтральный_123 | `YOUR_HEYGEN_VOICE_ID_2` |
-| User_Сидячий - Voice 1 | `YOUR_HEYGEN_VOICE_ID_3` |
-| User_Сидячий - Voice 2 | `YOUR_HEYGEN_VOICE_ID_4` |
-| User_Сидячий - Voice 3 | `YOUR_HEYGEN_VOICE_ID_5` |
-
----
-
-## Decision Tree: Which API to Use
-
-| User Intent | API | Endpoint |
-|------------|-----|----------|
-| "Сделай видео про X" (описание идеи) | **Video Agent** | `POST /v1/video_agent/generate` |
-| Конкретный аватар + точный скрипт + фоны | **v2 API** | `POST /v2/video/generate` |
-| Multi-scene с разными фонами/позициями | **v2 API** (по сценам) | `POST /v2/video/generate` |
-| Transparent WebM для композитинга | **v1 WebM** | `POST /v1/video.webm` |
-| AI-генерация b-roll без аватара (VEO/Kling/Sora) | **Workflow Gateway** | `POST /v1/workflows/executions` |
-| Замена лица в видео | **Faceswap** | `POST /v1/workflows/executions` |
-| Standalone TTS (аудио без видео) | **Starfish TTS** | `POST /v1/audio/text_to_speech` |
-| Перевод видео на другой язык | **Video Translate** | `POST /v2/video_translate` |
-
----
-
-## 1. Video Agent API (Prompt-to-Video)
-
-AI сам выбирает аватар, пишет скрипт, настраивает визуал, озвучку и каptions. Достаточно описать что нужно.
-
-### Endpoint
-
+## YourFirstName setup reference
+your-server `/root/video-production/config/settings.yaml` (legacy v2):
+```yaml
+avatar_id: YOUR_HEYGEN_AVATAR_ID    # verify this is a valid v3 look_id
+voice_id: YOUR_HEYGEN_VOICE_ID_1
+dimension: {width: 720, height: 1280}          # → aspect_ratio "9:16" in v3
 ```
-POST https://api.heygen.com/v1/video_agent/generate
-```
+**Action item:** confirm `avatar_id` resolves to a v3 `look_id` via `GET /v3/avatars/looks?group_id=<group>`; check `supported_api_engines` for `avatar_v`.
 
-### Parameters
+## MCP server (no API key)
+HeyGen Remote MCP — Claude Web/Code, Cursor, Gemini CLI, OpenAI, Manus, Superhuman. OAuth, no local server. https://developers.heygen.com/mcp/overview. Tools: `create_video_from_avatar`, `create_video_from_image`, `list_videos`, `get_video`, `delete_video`, `create_digital_twin`, `create_photo_avatar`, `create_prompt_avatar`, `create_avatar_consent`, `list_avatar_looks`, `get_avatar_look`, `update_avatar_look`, `create_lipsync`, `create_video_translation`, `design_voice`.
 
-| Field | Type | Req | Description |
-|-------|------|:---:|-------------|
-| `prompt` | string | Y | Текстовый промпт с описанием видео |
-| `config` | object | | Конфигурация (см. ниже) |
-| `config.duration_sec` | integer | | Длительность 5-300 секунд |
-| `config.avatar_id` | string | | Конкретный аватар (иначе AI выберет) |
-| `config.orientation` | string | | `"landscape"` или `"portrait"` |
-| `files` | array | | Референсные файлы `[{asset_id: "..."}]` |
-| `callback_id` | string | | ID для вебхуков (требует `callback_url`) |
-| `callback_url` | string | | URL для уведомления о завершении |
-
-### Prompt Optimizer
-
-**Ключевой инсайт: Video Agent — это HTML-рендерер.** Описывай B-roll как motion graphics с глаголами действия ("SLAMS in", "COUNTS UP"), а не координатами ("upper-left, 48pt").
-
-#### Структура промпта (FORMAT-TONE-AVATAR-STYLE-TEXT-SCENES-MUSIC-NARRATION)
-
-```
-FORMAT:    Тип видео, длительность, энергия
-TONE:      Эмоциональный регистр, референсы
-AVATAR:    Детальное описание (одежда + окружение + мониторы + свет), 60-100 слов
-STYLE:     Именованная эстетика + цвета + типографика + правила движения + переходы
-CRITICAL ON-SCREEN TEXT:  Точные строки для отображения на экране
-SCENE-BY-SCENE:  Разбивка по сценам с VO и многослойными визуалами
-MUSIC:     Жанр, референсные артисты, арка энергии
-NARRATION STYLE:  Как произносить: быстро/медленно, где паузы
+## CLI (heygen v0.0.4)
+```bash
+heygen video create --avatar-id <id> --script "..." --voice-id <id> --wait --timeout 600
+heygen video translate --video-url <url> --target-languages "Spanish (Spain),German" --mode precision --wait
+heygen lipsync create --video-url <url> --audio-url <url> --mode precision --wait
+heygen voice design "warm confident narrator"
+heygen voice clone --audio-url <url> --name "My Voice"
+heygen webhook create --url <url> --events avatar_video.success,avatar_video.fail
+heygen avatar looks --avatar-type digital_twin
+heygen --request-schema POST /v3/videos        # inspect schema w/o API key
 ```
 
-#### Типы сцен
+## LiveAvatar — Realtime Video Avatar (separate service)
 
-| Type | Format | When to Use |
-|------|--------|-------------|
-| **A-ROLL** | Аватар говорит в камеру | Интро, ключевые мысли, CTA |
-| **FULL SCREEN B-ROLL** | Без аватара — motion graphics | Data visualization, плотный контент |
-| **A-ROLL + OVERLAY** | Split frame: аватар + контент | Данные + человеческая связь |
+**Full reference: `references/liveavatar.md`** (SDK source, OpenAPI spec, WebSocket protocol, Telegram integration architecture).
 
-**Правила:** Никогда 3+ одинаковых типа подряд. Минимум 2 чистых B-roll сцены. VOICEOVER на КАЖДОЙ сцене (включая B-roll).
+**Base URL:** `https://api.liveavatar.com` (NOT `api.heygen.com`)
+**Auth:** `X-API-KEY` header, key in `.credentials.master.env` → `HEYGEN_LIVE_AVATAR_API_KEY`
+**SDK:** `@heygen/liveavatar-web-sdk` (npm), built on **LiveKit** (WebRTC rooms)
+**OpenAPI:** `https://docs.liveavatar.com/openapi.json` (24 endpoints)
+**SDK source:** `github.com/heygen-com/liveavatar-web-sdk` → `packages/js-sdk/src/`
 
-#### Visual Layer System (5 слоёв для B-roll)
+| Mode | Cost | HeyGen does | You provide |
+|------|------|-------------|-------------|
+| **FULL** | 2 credits/min | STT + LLM + TTS + avatar | Configure via API |
+| **LITE** | 1 credit/min | Avatar render only | STT + LLM + TTS pipeline |
 
-| Layer | Purpose | Examples |
-|-------|---------|---------|
-| **L1** | Background | Текстура, grid, градиент |
-| **L2** | Hero content | Главный заголовок/число |
-| **L3** | Supporting data | Карточки, статистики, буллеты |
-| **L4** | Information bar | Тикеры, лейблы, цитаты |
-| **L5** | Effects | Частицы, глитчи, анимация сетки |
+**LITE mode** is key for custom integrations (Telegram calls, custom voice agents):
+- You get a LiveKit room with avatar video+audio tracks
+- You get a WebSocket for sending PCM 24kHz audio → avatar lip-syncs
+- Commands: `agent.speak` (chunked base64 PCM), `agent.interrupt`, `agent.start/stop_listening`
 
-Каждый B-roll: 4+ слоёв. Каждый элемент ДВИГАЕТСЯ.
-
-#### Motion Vocabulary
-
-**High Energy:** SLAMS, CRASHES, PUNCHES, STAMPS, SHATTERS
-**Medium Energy:** CASCADE, SLIDES, DROPS, FILLS, DRAWS
-**Low Energy:** types on, fades in, FLOATS, morphs, COUNTS UP
-
-#### Timing Guidelines
-
-| Content Type | Duration |
-|--------------|----------|
-| Hook/Intro (A-roll) | 6-10 sec |
-| Data-heavy B-roll | 10-15 sec (NEVER <=5s) |
-| A-roll + Overlay | 8-12 sec |
-| CTA / Close (A-roll) | 6-8 sec |
-
-**Pace:** ~150 words/min. Social clip: 30-45s (5-7 scenes) | Briefing: 60-75s (7-9 scenes) | Deep dive: 90-120s (10-13 scenes).
-
-#### 20 Visual Styles (краткий справочник)
-
-| # | Style | Mood | Best For |
-|---|-------|------|----------|
-| 1 | Soft Signal (Sagmeister) | Intimate, warm | Personal stories |
-| 2 | Warm Grain (Eksell) | Organic, friendly | Sustainability |
-| 3 | Quiet Drama (Ray) | Humanist | Profiles |
-| 4 | Heritage Reel (Cassandre) | Nostalgic | History |
-| 5 | Silk Route (Abedini) | Flowing | Global affairs |
-| 6 | **Swiss Pulse** (Muller-Brockmann) | Clinical, precise | **Data-heavy** |
-| 7 | Geometric Bold (Tanaka) | Minimal, elegant | Lifestyle |
-| 8 | Velvet Standard (Vignelli) | Premium | Luxury, investors |
-| 9 | **Digital Grid** (Crouwel) | Systematic | **Tech, infra** |
-| 10 | Contact Sheet (Brodovitch) | Editorial | Journalism |
-| 11 | Folk Frequency (Terrazas) | Cultural | Festivals |
-| 12 | Earth Pulse (Ghariokwu) | Grounded | Community |
-| 13 | Dream State (Tomaszewski) | Surreal | Philosophy |
-| 14 | Play Mode (Ahn Sang-soo) | Playful | Entertainment |
-| 15 | Carnival Surge (Lins) | Euphoric | Milestones |
-| 16 | Shadow Cut (Hillmann) | Dark | Investigations |
-| 17 | **Deconstructed** (Brody) | Industrial, raw | **Tech news** |
-| 18 | Maximalist Type (Scher) | Loud, kinetic | Launches |
-| 19 | Data Drift (Anadol) | Futuristic | AI/tech |
-| 20 | Red Wire (Tartakover) | Urgent | Breaking news |
-
-**Пример стиля в промпте:**
-```
-STYLE — DECONSTRUCTED (Brody): Dark grey #1a1a1a, rust orange #D4501E.
-Type at angles, overlapping. Gritty textures, scan-line glitch.
-Smash cuts with flash frames.
-```
-
-#### What Doesn't Work
-
-- **Layout language** — координаты вызывают чёрные кадры: "`UPPER-LEFT: headline in 48pt`"
-- **Named artists without specs** — "`Ikko Tanaka style`" = ничего. Переводи в конкретные правила
-- **B-roll <= 5 seconds** — слишком коротко, чёрные экраны. Минимум 10s
-- **Content as list** — всегда синтезируй в story, не буллеты
-
-#### Style Performance (из 40+ видео)
-
-| Rank | Style | Strength |
-|------|-------|----------|
-| 1 | Deconstructed (Brody) | Most reliable across all topics |
-| 2 | Swiss Pulse (Muller-Brockmann) | Best for data-heavy |
-| 3 | Digital Grid (Crouwel) | Strong for tech |
-| 4 | Geometric Bold (Tanaka) | Elegant and versatile |
-| 5 | Maximalist Type (Scher) | High energy, use sparingly |
-
-### Example: Video Agent Python
-
+**Quick check credits:**
 ```python
-def generate_with_video_agent(
-    prompt: str,
-    duration_sec: int | None = None,
-    avatar_id: str | None = None,
-    orientation: str | None = None
-) -> str:
-    """Generate video via Video Agent. Returns video_id."""
-    request_body = {"prompt": prompt}
-
-    config = {}
-    if duration_sec:
-        config["duration_sec"] = duration_sec
-    if avatar_id:
-        config["avatar_id"] = avatar_id
-    if orientation:
-        config["orientation"] = orientation
-
-    if config:
-        request_body["config"] = config
-
-    response = requests.post(
-        f"{BASE_URL}/v1/video_agent/generate",
-        headers=headers,
-        json=request_body
-    )
-
-    data = response.json()
-    if data.get("error"):
-        raise Exception(f"Video Agent failed: {data['error']}")
-
-    return data["data"]["video_id"]
+import os, requests
+r = requests.get('https://api.liveavatar.com/v1/users/credits',
+                 headers={'X-API-KEY': os.environ['HEYGEN_LIVE_AVATAR_API_KEY']})
+print(r.json())
 ```
 
----
-
-## 2. Avatar Video (v2 API — Precise Control)
-
-Полный контроль: конкретный аватар, точный скрипт, фон, стиль, позиция, мультисцены.
-
-### Create Video (POST /v2/video/generate)
-
-#### Top-Level Fields
-
-| Field | Type | Req | Description |
-|-------|------|:---:|-------------|
-| `video_inputs` | array | Y | Массив сцен (1-50 элементов) |
-| `dimension` | object | | `{width, height}` |
-| `title` | string | | Название видео |
-| `test` | boolean | | Тест-режим (водяной знак, без кредитов) |
-| `caption` | boolean | | Включить авто-субтитры |
-| `callback_id` | string | | ID для вебхуков |
-| `callback_url` | string | | URL для уведомления |
-| `folder_id` | string | | ID папки хранения |
-
-#### video_inputs[].character Fields
-
-| Field | Type | Req | Description |
-|-------|------|:---:|-------------|
-| `type` | string | Y | `"avatar"` или `"talking_photo"` |
-| `avatar_id` | string | Y* | ID аватара (*required для type="avatar") |
-| `talking_photo_id` | string | Y* | ID фото (*required для type="talking_photo") |
-| `avatar_style` | string | | `"normal"`, `"closeUp"`, `"circle"`, `"voice_only"` |
-| `scale` | number | | Масштаб аватара |
-| `offset` | object | | Позиция `{x, y}` |
-
-#### video_inputs[].voice Fields
-
-| Field | Type | Req | Description |
-|-------|------|:---:|-------------|
-| `type` | string | Y | `"text"`, `"audio"`, `"silence"` |
-| `voice_id` | string | Y* | ID голоса (*для type="text") |
-| `input_text` | string | Y* | Скрипт (*для type="text") |
-| `audio_url` | string | Y* | URL аудио (*для type="audio") |
-| `duration` | number | Y* | Длительность в сек (*для type="silence") |
-| `speed` | number | | Скорость речи 0.5-2.0 (default 1.0) |
-| `pitch` | number | | Тон голоса -20 до 20 (default 0) |
-
-#### video_inputs[].background Fields
-
-| Field | Type | Req | Description |
-|-------|------|:---:|-------------|
-| `type` | string | | `"color"`, `"image"`, `"video"` |
-| `value` | string | | Hex-цвет (для type="color") |
-| `url` | string | | URL картинки/видео |
-| `fit` | string | | `"cover"` или `"contain"` |
-
-#### Dimensions
-
-```python
-dimensions = {
-    "landscape": {"width": 1920, "height": 1080},  # 16:9
-    "portrait": {"width": 1080, "height": 1920},   # 9:16 (TikTok, Reels)
-    "square": {"width": 1080, "height": 1080},     # 1:1 (Instagram)
-}
-```
-
-#### Python Example
-
-```python
-def create_video(avatar_id: str, voice_id: str, script: str,
-                 background: dict | None = None,
-                 dimension: dict | None = None,
-                 test: bool = False) -> str:
-    """Generate video with avatar. Returns video_id."""
-    payload = {
-        "video_inputs": [{
-            "character": {
-                "type": "avatar",
-                "avatar_id": avatar_id,
-                "avatar_style": "normal"
-            },
-            "voice": {
-                "type": "text",
-                "input_text": script,
-                "voice_id": voice_id
-            },
-            "background": background or {"type": "color", "value": "#FFFFFF"}
-        }],
-        "dimension": dimension or {"width": 1920, "height": 1080},
-        "test": test,
-    }
-
-    response = requests.post(
-        f"{BASE_URL}/v2/video/generate",
-        headers=headers,
-        json=payload
-    )
-    data = response.json()
-    if data.get("error"):
-        raise Exception(data["error"])
-    return data["data"]["video_id"]
-```
-
-### Video Status Polling
-
-```python
-import time
-
-def wait_for_video(video_id: str, poll_interval: int = 10, timeout: int = 1200) -> str:
-    """Poll until video is ready. Returns video_url."""
-    start = time.time()
-    while time.time() - start < timeout:
-        resp = requests.get(
-            f"{BASE_URL}/v2/videos/{video_id}",
-            headers={"X-Api-Key": HEYGEN_API_KEY}
-        )
-        data = resp.json()["data"]
-        status = data["status"]
-        print(f"  [{video_id[:8]}] status={status}")
-
-        if status == "completed":
-            return data["video_url"]
-        elif status == "failed":
-            raise RuntimeError(f"Video {video_id} failed: {data.get('failure_message')}")
-
-        time.sleep(poll_interval)
-
-    raise TimeoutError(f"Video {video_id} timed out after {timeout}s")
-```
-
-### Break Tags in Scripts
-
-Паузы в скрипте через SSML `<break>` теги:
-
-```python
-script = "Welcome to our demo. <break time=\"1s\"/> Let me show you the features."
-# Multiple pauses
-script = "First point. <break time=\"1.5s\"/> Second point. <break time=\"1s\"/> Third."
-```
-
-**Правила:** `<break time="Xs"/>` где X — секунды. Обязательно пробелы до и после тега.
-
-### Captions (built-in)
-
-```python
-# Simple
-payload = {
-    "video_inputs": [...],
-    "caption": True,  # auto-captions с дефолтным стилем
-}
-
-# Styled
-payload = {
-    "video_inputs": [...],
-    "caption": {
-        "enabled": True,
-        "style": {
-            "font_family": "Arial",
-            "font_size": 32,
-            "font_color": "#FFFFFF",
-            "background_color": "rgba(0, 0, 0, 0.7)",
-            "position": "bottom",  # "top" or "bottom"
-        }
-    },
-}
-```
-
-**Social media:** для TikTok/Reels — position="top" (нижняя часть занята UI), font_size=42.
-
-### Text Overlays (через v2 API scene background)
-
-Для текста поверх аватара — используй фоновое изображение с текстом или Remotion-композитинг.
-
-### Transparent WebM (POST /v1/video.webm)
-
-Для прозрачного фона (alpha channel) — overlay аватара на другом контенте.
-
-**Когда нужен WebM:**
-- Аватар поверх screen recording (Loom-style)
-- Аватар floating над видео-контентом
-- True alpha compositing
-
-**НЕ нужен WebM для:**
-- Аватар с overlays/текстом поверх (используй MP4)
-- Picture-in-picture с solid background
-- Стандартные presenter видео
-
-#### WebM Request Fields
-
-| Field | Type | Req | Description |
-|-------|------|:---:|-------------|
-| `avatar_pose_id` | string | Y | ID позы аватара |
-| `avatar_style` | string | Y | `"normal"` или `"closeUp"` only (НЕ circle) |
-| `input_text` | string | Y* | Скрипт (*или input_audio) |
-| `voice_id` | string | Y* | ID голоса (*с input_text) |
-| `input_audio` | string | Y* | URL аудио (*или input_text) |
-| `dimension` | object | | `{width, height}` (default 1280x720) |
-
-```python
-def create_transparent_video(avatar_pose_id: str, voice_id: str, script: str) -> str:
-    """Generate transparent WebM video. Returns video_id."""
-    payload = {
-        "avatar_pose_id": avatar_pose_id,
-        "avatar_style": "normal",
-        "input_text": script,
-        "voice_id": voice_id,
-        "dimension": {"width": 1920, "height": 1080}
-    }
-    resp = requests.post(f"{BASE_URL}/v1/video.webm", headers=headers, json=payload)
-    return resp.json()["data"]["video_id"]
-```
-
-### Avatar Styles
-
-| Style | Description | WebM Support |
-|-------|-------------|:---:|
-| `normal` | Full body, standard framing | Y |
-| `closeUp` | Close-up, more expressive | Y |
-| `circle` | Circular frame (talking head) | N |
-| `voice_only` | Audio only, no video | N/A |
-
-### Avatar Details & Default Voice
-
-```python
-def get_avatar_details(avatar_id: str) -> dict:
-    """Get avatar details including default_voice_id."""
-    resp = requests.get(
-        f"{BASE_URL}/v2/avatar/{avatar_id}/details",
-        headers={"X-Api-Key": HEYGEN_API_KEY}
-    )
-    return resp.json()["data"]
-
-# Usage: avatar's pre-matched voice
-details = get_avatar_details("josh_lite3_20230714")
-voice_id = details["default_voice_id"]  # guaranteed gender match + natural lip sync
-```
-
-### Templates
-
-HeyGen поддерживает шаблоны для повторяемого создания видео с разными параметрами.
-
-### Script Length Limits
-
-| Tier | Max Characters |
-|------|----------------|
-| Free | ~500 |
-| Creator | ~1,500 |
-| Team | ~3,000 |
-| Enterprise | ~5,000+ |
-
----
-
-## 3. Workflow Gateway (AI Video Generation — 13 Providers)
-
-Генерация AI-видео из текстового промпта БЕЗ аватара. B-roll, product shots, cinematic clips.
-
-### Endpoint
-
-```
-POST https://api.heygen.com/v1/workflows/executions
-```
-
-### All 13 Providers
-
-| Provider | Value | Description |
-|----------|-------|-------------|
-| **VEO 3.1** | `"veo_3_1"` | Google VEO 3.1 (default, highest quality) |
-| VEO 3.1 Fast | `"veo_3_1_fast"` | Faster VEO 3.1 variant |
-| VEO 3 | `"veo3"` | Google VEO 3 |
-| VEO 3 Fast | `"veo3_fast"` | Faster VEO 3 variant |
-| VEO 2 | `"veo2"` | Google VEO 2 |
-| Kling Pro | `"kling_pro"` | Kling Pro model |
-| Kling V2 | `"kling_v2"` | Kling V2 model |
-| Sora V2 | `"sora_v2"` | OpenAI Sora V2 |
-| Sora V2 Pro | `"sora_v2_pro"` | OpenAI Sora V2 Pro |
-| Runway Gen-4 | `"runway_gen4"` | Runway Gen-4 |
-| Seedance Lite | `"seedance_lite"` | Seedance Lite |
-| Seedance Pro | `"seedance_pro"` | Seedance Pro |
-| LTX Distilled | `"ltx_distilled"` | LTX Distilled (fastest) |
-
-### Request Fields
-
-| Field | Type | Req | Description |
-|-------|------|:---:|-------------|
-| `workflow_type` | string | Y | `"GenerateVideoNode"` |
-| `input.prompt` | string | Y | Описание видео |
-| `input.provider` | string | | Провайдер (default: `"veo_3_1"`) |
-| `input.aspect_ratio` | string | | `"16:9"`, `"9:16"`, `"1:1"` |
-| `input.reference_image_url` | string | | URL референсного изображения (image-to-video) |
-| `input.tail_image_url` | string | | URL изображения для последнего кадра |
-| `input.config` | object | | Provider-specific overrides |
-
-### Image-to-Video
-
-```python
-def generate_ai_video(
-    prompt: str,
-    provider: str = "veo_3_1",
-    aspect_ratio: str = "16:9",
-    reference_image_url: str | None = None,
-) -> str:
-    """Generate AI video via Workflow Gateway. Returns execution_id."""
-    payload = {
-        "workflow_type": "GenerateVideoNode",
-        "input": {
-            "prompt": prompt,
-            "provider": provider,
-            "aspect_ratio": aspect_ratio,
-        },
-    }
-    if reference_image_url:
-        payload["input"]["reference_image_url"] = reference_image_url
-
-    resp = requests.post(
-        f"{BASE_URL}/v1/workflows/executions",
-        headers=headers,
-        json=payload,
-    )
-    return resp.json()["data"]["execution_id"]
-```
-
-### Status Polling
-
-```python
-def wait_for_workflow(execution_id: str, poll_interval: int = 10, timeout: int = 600) -> dict:
-    """Poll workflow execution until done. Returns output dict."""
-    start = time.time()
-    while time.time() - start < timeout:
-        resp = requests.get(
-            f"{BASE_URL}/v1/workflows/executions/{execution_id}",
-            headers={"X-Api-Key": HEYGEN_API_KEY}
-        )
-        data = resp.json()["data"]
-        status = data["status"]
-
-        if status == "completed":
-            return data["output"]
-        elif status == "failed":
-            raise RuntimeError(f"Workflow {execution_id} failed: {data.get('error')}")
-        elif status == "not_found":
-            raise RuntimeError(f"Workflow {execution_id} not found")
-
-        time.sleep(poll_interval)
-
-    raise TimeoutError(f"Workflow {execution_id} timed out after {timeout}s")
-```
-
-### Completed Response Format
-
-```json
-{
-  "data": {
-    "execution_id": "node-gw-v1d2e3o4",
-    "status": "completed",
-    "output": {
-      "video": {
-        "video_url": "https://resource.heygen.ai/generated/video.mp4",
-        "video_id": "abc123"
-      },
-      "asset_id": "asset-xyz789"
-    }
-  }
-}
-```
-
----
-
-## 4. Faceswap
-
-Замена лица из source image в target video через GPU AI.
-
-### Endpoint
-
-```
-POST https://api.heygen.com/v1/workflows/executions
-```
-
-### Request Fields
-
-| Field | Type | Req | Description |
-|-------|------|:---:|-------------|
-| `workflow_type` | string | Y | `"FaceswapNode"` |
-| `input.source_image_url` | string | Y | URL фото с лицом для замены |
-| `input.target_video_url` | string | Y | URL видео для применения замены |
-
-### Python
-
-```python
-def faceswap(source_image_url: str, target_video_url: str) -> str:
-    """Swap face from source image into target video. Returns execution_id."""
-    payload = {
-        "workflow_type": "FaceswapNode",
-        "input": {
-            "source_image_url": source_image_url,
-            "target_video_url": target_video_url,
-        },
-    }
-    resp = requests.post(
-        f"{BASE_URL}/v1/workflows/executions",
-        headers=headers,
-        json=payload,
-    )
-    return resp.json()["data"]["execution_id"]
-```
-
-### Chain Pattern: AvatarInferenceNode -> FaceswapNode
-
-```python
-# Step 1: Generate avatar video
-avatar_exec = requests.post(
-    f"{BASE_URL}/v1/workflows/executions",
-    headers=headers,
-    json={
-        "workflow_type": "AvatarInferenceNode",
-        "input": {
-            "avatar": {"avatar_id": "Angela-inblackskirt-20220820"},
-            "audio_list": [{"audio_url": "https://example.com/speech.mp3"}],
-        },
-    },
-).json()["data"]["execution_id"]
-
-# Step 2: Wait for avatar video
-output = wait_for_workflow(avatar_exec)
-avatar_video_url = output["video"]["video_url"]
-
-# Step 3: Swap in custom face
-faceswap_exec = faceswap(
-    source_image_url="https://example.com/custom-face.jpg",
-    target_video_url=avatar_video_url,
-)
-faceswap_output = wait_for_workflow(faceswap_exec)
-final_url = faceswap_output["video_url"]
-```
-
-**Tips:** Clear front-facing photo, single face, high resolution. Processing: 1-3 min.
-
----
-
-## 5. Starfish TTS (Text-to-Speech)
-
-Standalone аудио-генерация. Отдельный API от видео-голосов.
-
-### List Voices (GET /v1/audio/voices)
-
-> **NB:** Это `GET /v1/audio/voices` — отдельный от `GET /v2/voices` (видео-голоса). Не все видео-голоса поддерживают Starfish TTS.
-
-```python
-def list_tts_voices() -> list:
-    """List voices compatible with Starfish TTS."""
-    resp = requests.get(
-        f"{BASE_URL}/v1/audio/voices",
-        headers={"X-Api-Key": HEYGEN_API_KEY}
-    )
-    data = resp.json()
-    if data.get("error"):
-        raise Exception(data["error"])
-    return data["data"]["voices"]
-```
-
-**Response voice fields:** `voice_id`, `name`, `language`, `gender`, `preview_audio_url`, `support_pause`, `support_locale`, `type`.
-
-### Generate Speech (POST /v1/audio/text_to_speech)
-
-| Field | Type | Req | Description |
-|-------|------|:---:|-------------|
-| `text` | string | Y | Текст для озвучки |
-| `voice_id` | string | Y | ID голоса из `/v1/audio/voices` |
-| `speed` | number | | Скорость 0.5-1.5 (default 1.0) |
-| `pitch` | integer | | Тон -50 до 50 (default 0) |
-| `locale` | string | | Акцент для multilingual голосов (e.g. `"pt-BR"`) |
-| `elevenlabs_settings` | object | | Расширенные настройки для ElevenLabs голосов |
-
-#### ElevenLabs Settings (optional)
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `model` | string | `"eleven_v3"`, `"eleven_turbo_v2_5"`, etc. |
-| `similarity_boost` | number | Voice similarity 0.0-1.0 |
-| `stability` | number | Output consistency 0.0-1.0 |
-| `style` | number | Style intensity 0.0-1.0 |
-
-```python
-def text_to_speech(
-    text: str,
-    voice_id: str,
-    speed: float = 1.0,
-    pitch: int = 0,
-    locale: str | None = None,
-) -> dict:
-    """Generate speech audio. Returns {audio_url, duration, word_timestamps}."""
-    payload = {"text": text, "voice_id": voice_id, "speed": speed, "pitch": pitch}
-    if locale:
-        payload["locale"] = locale
-
-    resp = requests.post(
-        f"{BASE_URL}/v1/audio/text_to_speech",
-        headers=headers,
-        json=payload,
-    )
-    data = resp.json()
-    if data.get("error"):
-        raise Exception(data["error"])
-    return data["data"]
-```
-
-### word_timestamps in Response
-
-Ответ содержит таймстампы каждого слова — идеально для синхронизации субтитров или timed text overlays.
-
-```json
-{
-  "data": {
-    "audio_url": "https://resource2.heygen.ai/text_to_speech/.../id=365d46bb.wav",
-    "duration": 5.526,
-    "request_id": "p38QJ52hfgNlsYKZZmd9",
-    "word_timestamps": [
-      { "word": "<start>", "start": 0.0, "end": 0.0 },
-      { "word": "Hey", "start": 0.079, "end": 0.219 },
-      { "word": "there,", "start": 0.239, "end": 0.459 },
-      { "word": "welcome", "start": 0.479, "end": 0.739 },
-      { "word": "to", "start": 0.759, "end": 0.859 },
-      { "word": "our", "start": 0.879, "end": 0.979 },
-      { "word": "demo.", "start": 0.999, "end": 1.279 },
-      { "word": "<end>", "start": 5.526, "end": 5.526 }
-    ]
-  }
-}
-```
-
-### SSML Break Tags
-
-Те же правила что и в видео: `<break time="1.5s"/>` с пробелами до и после.
-
----
-
-## 6. Video Translate
-
-Перевод и дублирование видео с lip-sync.
-
-### Submit (POST /v2/video_translate)
-
-| Field | Type | Req | Description |
-|-------|------|:---:|-------------|
-| `video_url` | string | Y* | URL видео (*или `video_id`) |
-| `video_id` | string | Y* | HeyGen video ID (*или `video_url`) |
-| `output_language` | string | Y | Целевой язык (e.g. `"es-ES"`) |
-| `title` | string | | Название |
-| `translate_audio_only` | boolean | | Только аудио, без lip-sync (быстрее) |
-| `speaker_num` | number | | Количество спикеров |
-| `callback_id` | string | | ID для вебхуков |
-| `callback_url` | string | | URL уведомления |
-
-### Supported Languages (12)
-
-| Language | Code |
-|----------|------|
-| English (US) | `en-US` |
-| Spanish (Spain) | `es-ES` |
-| Spanish (Mexico) | `es-MX` |
-| French | `fr-FR` |
-| German | `de-DE` |
-| Italian | `it-IT` |
-| Portuguese (Brazil) | `pt-BR` |
-| Japanese | `ja-JP` |
-| Korean | `ko-KR` |
-| Chinese (Mandarin) | `zh-CN` |
-| Hindi | `hi-IN` |
-| Arabic | `ar-SA` |
-
-### v4 Advanced (vocabulary, brand_voice_id, instruction, etc.)
-
-```python
-# Advanced translation with custom vocabulary and multiple languages
-advanced_config = {
-    "input_video_id": "original_video_id",
-    "output_languages": ["es-ES", "fr-FR", "de-DE"],
-    "name": "Multi-language translations",
-    "vocabulary": ["YourCompanyGPT", "SuperWidget", "Pro Max"],  # preserve as-is
-    "brand_voice_id": "brand_voice_id",
-    "instruction": "Keep technical terms in English",
-    "speaker_num": 2,
-    "enable_speech_enhancement": True,
-    "disable_music_track": False,
-    "srt_key": "path/to/custom.srt",
-    "srt_role": "input",  # "input" or "output"
-    "translate_audio_only": False,
-    "enable_video_stretching": True,
-}
-```
-
-### Status Polling
-
-```python
-def wait_for_translation(translate_id: str, poll_interval: int = 30, timeout: int = 1800) -> str:
-    """Poll translation status. Returns translated video_url. Timeout 30 min."""
-    start = time.time()
-    while time.time() - start < timeout:
-        resp = requests.get(
-            f"{BASE_URL}/v2/video_translate/{translate_id}",
-            headers={"X-Api-Key": HEYGEN_API_KEY}
-        )
-        data = resp.json()["data"]
-        status = data["status"]
-
-        if status == "completed":
-            return data["video_url"]
-        elif status == "failed":
-            raise RuntimeError(f"Translation failed: {data.get('message')}")
-
-        print(f"  Translation status: {status}...")
-        time.sleep(poll_interval)
-
-    raise TimeoutError(f"Translation {translate_id} timed out")
-```
-
----
-
-## 7. Photo Avatars
-
-### Generate AI Photo
-
-HeyGen поддерживает создание AI-фотографий для talking photo аватаров.
-
-### Create Avatar from Photo (Talking Photo)
-
-```python
-# В video_inputs используй talking_photo вместо avatar:
-scene = {
-    "character": {
-        "type": "talking_photo",
-        "talking_photo_id": "your_talking_photo_id"
-    },
-    "voice": {
-        "type": "text",
-        "input_text": "Hello from a photo avatar!",
-        "voice_id": "voice_id_here"
-    }
-}
-```
-
-### Avatar IV (latest)
-
-Новейшая версия аватаров HeyGen. Проверяй поле `tags: ["AVATAR_IV"]` в ответе avatar details.
-
----
-
-## 8. Assets & Upload
-
-### Upload (POST upload.heygen.com/v1/asset)
-
-```python
-def upload_asset(file_path: str) -> str:
-    """Upload file to HeyGen. Returns asset URL."""
-    import mimetypes
-    mime_type = mimetypes.guess_type(file_path)[0] or "application/octet-stream"
-
-    with open(file_path, "rb") as f:
-        resp = requests.post(
-            "https://upload.heygen.com/v1/asset",
-            headers={"X-Api-Key": HEYGEN_API_KEY},
-            files={"file": (os.path.basename(file_path), f, mime_type)}
-        )
-    data = resp.json()
-    if data.get("error"):
-        raise Exception(data["error"])
-    return data["data"]["url"]
-```
-
----
-
-## 9. Webhooks
-
-### Register (POST /v1/webhook/endpoint.add)
-
-```python
-def register_webhook(url: str, events: list[str] | None = None) -> dict:
-    """Register webhook for video completion events."""
-    payload = {"url": url}
-    if events:
-        payload["events"] = events
-
-    resp = requests.post(
-        f"{BASE_URL}/v1/webhook/endpoint.add",
-        headers=headers,
-        json=payload,
-    )
-    return resp.json()
-```
-
-Альтернатива polling — получай уведомления по HTTP когда видео готово.
-
----
-
-## 10. Remotion Integration
-
-### Choosing Format
-
-| Composition | Recommended | Why |
-|-------------|-------------|-----|
-| Avatar + overlays поверх | **MP4** + background | Overlays идут сверху, transparency не нужна |
-| Loom-style (avatar over screen recording) | **WebM** + `closeUp` | Нужна прозрачность, circle mask в CSS |
-| Avatar floating над видео | **WebM** (transparent) | Нужно видеть контент за аватаром |
-| Full-screen avatar | **MP4** + background | Стандартный подход |
-
-### Key Rules
-
-- **Всегда `OffthreadVideo`** вместо `Video` — frame-accurate rendering, без jitter
-- WebM с `transparent` prop для альфа-канала
-- Match dimensions: HeyGen output = Remotion composition
-- HeyGen default 25 fps — учитывай при настройке Remotion fps
-- Генерация 10-15+ мин — work in parallel, используй placeholder
-
-### Remotion Composition Example
-
-```tsx
-import { OffthreadVideo, AbsoluteFill, Sequence } from "remotion";
-
-export const AvatarWithOverlays: React.FC<{
-  avatarVideoUrl: string;
-}> = ({ avatarVideoUrl }) => {
-  return (
-    <AbsoluteFill>
-      {/* Layer 1: Avatar video */}
-      <OffthreadVideo
-        src={avatarVideoUrl}
-        style={{ width: "100%", height: "100%", objectFit: "contain" }}
-      />
-
-      {/* Layer 2: Animated title after 1s */}
-      <Sequence from={30}>
-        <div style={{
-          position: "absolute", top: 50, left: 50,
-          color: "white", fontSize: 48, fontWeight: "bold",
-        }}>
-          Welcome!
-        </div>
-      </Sequence>
-    </AbsoluteFill>
-  );
-};
-```
-
-### Loom-Style: Circle Avatar Over Screen Recording
-
-```tsx
-export const LoomStyle: React.FC<{
-  screenRecordingUrl: string;
-  avatarWebmUrl: string; // via /v1/video.webm, avatar_style: "closeUp"
-}> = ({ screenRecordingUrl, avatarWebmUrl }) => (
-  <AbsoluteFill>
-    <OffthreadVideo src={screenRecordingUrl} style={{ width: "100%", height: "100%" }} />
-    <OffthreadVideo
-      src={avatarWebmUrl}
-      transparent
-      style={{
-        position: "absolute", bottom: 40, left: 40,
-        width: 180, height: 180,
-        borderRadius: "50%", overflow: "hidden", objectFit: "cover",
-      }}
-    />
-  </AbsoluteFill>
-);
-```
-
----
-
-## Multi-Scene Pipeline
-
-Когда нужно длинное видео с разными фонами — генерируй каждую сцену отдельно в HeyGen, потом собирай локально через video_editor.py.
-
-**Почему отдельные клипы:**
-- Полный контроль per-scene: разные фоны, позиции, длительности
-- Можно микшировать HeyGen-клипы с AI b-roll (VEO/Sora)
-- Локальная сборка бесплатна — не тратишь кредиты на ре-рендеры
-
-### Step 1: Generate N scene clips in parallel
-
-```python
-import os
-import time
-import requests
-
-HEYGEN_API_KEY = os.getenv("HEYGEN_API_KEY")
-BASE_URL = "https://api.heygen.com/v2"
-headers = {"X-Api-Key": HEYGEN_API_KEY, "Content-Type": "application/json"}
-
-
-def generate_scene(scene: dict, avatar_id: str, voice_id: str) -> str:
-    """Submit one scene to HeyGen. Returns video_id."""
-    payload = {
-        "video_inputs": [{
-            "character": {
-                "type": "avatar",
-                "avatar_id": avatar_id,
-                "avatar_style": scene.get("avatar_style", "normal"),
-                "scale": scene.get("scale", 0.4),
-                "position": scene.get("position", {"x": 0.5, "y": 0.85}),
-            },
-            "voice": {
-                "type": "text",
-                "input_text": scene["script"],
-                "voice_id": voice_id,
-                "speed": scene.get("speed", 1.0),
-            },
-            "background": scene["background"],
-        }],
-        "dimension": {"width": scene.get("width", 1920), "height": scene.get("height", 1080)},
-    }
-    resp = requests.post(f"{BASE_URL}/video/generate", headers=headers, json=payload)
-    resp.raise_for_status()
-    return resp.json()["data"]["video_id"]
-
-
-def wait_and_download(video_id: str, output_path: str, poll_interval: int = 10) -> str:
-    """Poll until HeyGen job is done, then download to output_path."""
-    while True:
-        status_resp = requests.get(f"{BASE_URL}/video/{video_id}", headers=headers)
-        data = status_resp.json()["data"]
-        state = data["status"]
-
-        if state == "completed":
-            video_url = data["video_url"]
-            content = requests.get(video_url).content
-            with open(output_path, "wb") as f:
-                f.write(content)
-            print(f"Downloaded: {output_path}")
-            return output_path
-        elif state == "failed":
-            raise RuntimeError(f"HeyGen job {video_id} failed: {data.get('error')}")
-
-        print(f"  [{video_id[:8]}] status={state}, waiting {poll_interval}s...")
-        time.sleep(poll_interval)
-
-
-def generate_multi_scene(scenes: list, avatar_id: str, voice_id: str,
-                         output_dir: str = ".") -> list:
-    """
-    Generate all scenes in parallel (submit all, then poll all).
-    Returns list of downloaded clip paths in scene order.
-    """
-    os.makedirs(output_dir, exist_ok=True)
-
-    # Submit all scenes at once
-    jobs = []
-    for i, scene in enumerate(scenes):
-        video_id = generate_scene(scene, avatar_id, voice_id)
-        jobs.append({"index": i, "video_id": video_id,
-                     "output": os.path.join(output_dir, f"scene_{i+1:02d}.mp4")})
-        print(f"Submitted scene {i+1}/{len(scenes)}: {video_id}")
-
-    # Poll all until done
-    clips = [None] * len(jobs)
-    pending = list(jobs)
-    while pending:
-        still_pending = []
-        for job in pending:
-            try:
-                path = wait_and_download(job["video_id"], job["output"], poll_interval=0)
-                clips[job["index"]] = path
-            except RuntimeError:
-                still_pending.append(job)
-        if still_pending:
-            pending = still_pending
-            time.sleep(10)
-        else:
-            break
-
-    return clips
-```
-
-### Step 2: Assemble with video_editor.py
-
-```python
-import subprocess
-
-
-def assemble_scenes(clip_paths: list, output_path: str,
-                    transition: str = "fade", transition_duration: float = 0.3) -> str:
-    """Concat HeyGen clips locally using video_editor.py (FFmpeg)."""
-    cmd = [
-        "python",
-        os.path.expanduser("~/.claude/skills/video-editor/video_editor.py"),
-        "concat",
-        *clip_paths,
-        "--transition", transition,
-        "--transition-duration", str(transition_duration),
-        "-o", output_path,
-    ]
-    subprocess.run(cmd, check=True)
-    return output_path
-```
-
-### Step 3: Full orchestration example
-
-```python
-# Define scenes
-scenes = [
-    {
-        "script": "Привет! Сегодня я расскажу вам о новом продукте.",
-        "background": {"type": "color", "value": "#0f0f1a"},
-        "avatar_style": "normal",
-    },
-    {
-        "script": "Ключевые преимущества: скорость, простота, результат.",
-        "background": {"type": "image", "url": "https://example.com/slide2.png"},
-        "avatar_style": "circle",
-        "position": {"x": 0.8, "y": 0.8},
-    },
-    {
-        "script": "Попробуйте бесплатно по ссылке в описании.",
-        "background": {"type": "color", "value": "#1a0f0f"},
-    },
-]
-
-AVATAR_ID = "YOUR_HEYGEN_AVATAR_ID_1"  # User_Горизонталь_Сидячий
-VOICE_ID = "YOUR_HEYGEN_VOICE_ID_1"    # User_pro voice
-
-# 1. Generate all scenes in parallel
-clips = generate_multi_scene(scenes, AVATAR_ID, VOICE_ID, output_dir="./heygen_clips")
-
-# 2. Assemble into one video
-final = assemble_scenes(clips, "final_video.mp4", transition="fade")
-
-# 3. Optional: add captions via SubtitleService
-# add_submagic_captions(final, "final_with_subs.mp4", style="hormozi")
-
-print(f"Done: {final}")
-```
-
-### Decision: single multi-slide vs separate scenes
-
-| Approach | When to use |
-|---------------------------------|----------------------------------------------------------------------------------|
-| Single `video_inputs` array | Simple presentation, same layout per slide, no b-roll |
-| Separate clips + local assembly | Different layouts per scene, mixing with AI video, re-render individual scenes |
-
----
-
-## Integration with Other Skills
-
-| Step | Tool | What it does |
-|------|------|-------------|
-| 1 | Claude / GPT | Генерация скрипта |
-| 2 | Gamma / Manus Slides | Генерация слайдов / презентаций |
-| 3 | **HeyGen** (Video Agent или v2 API) | Avatar видео |
-| 4 | **HeyGen** (Workflow Gateway) | AI b-roll (VEO/Kling/Sora) |
-| 5 | video_editor.py | Склейка, переходы, overlay |
-| 6 | **HeyGen** (Starfish TTS) | Standalone озвучка |
-| 7 | SubtitleService | Каptions / субтитры |
-| 8 | **HeyGen** (Video Translate) | Локализация |
-| 9 | **HeyGen** (Faceswap) | Замена лица |
-| 10 | Remotion | Программный композитинг |
-| 11 | ElevenLabs | Альтернативная озвучка |
-| 12 | Deepgram | Транскрипция |
-
-```python
-# Полный pipeline пример:
-# 1. Generate script with Claude
-script = generate_script_with_claude(topic)
-
-# 2. Generate slides with Gamma
-slides = create_presentation_with_gamma(script)
-
-# 3. Create avatar video with HeyGen
-video = generate_avatar_video(script)
-
-# 4. Add AI b-roll via Workflow Gateway
-broll = generate_ai_video("cinematic product shot", provider="veo_3_1")
-
-# 5. Assemble with video_editor.py
-final = assemble_scenes([video, broll], "final.mp4")
-
-# 6. Add captions with SubtitleService
-final_video = add_captions_with_submagic(final)
-
-# 7. Translate to Spanish
-spanish = translate_video({"video_url": final_video, "output_language": "es-ES"})
-```
-
----
-
-## Complete API Endpoint Map
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/v1/video_agent/generate` | Video Agent (prompt-to-video) |
-| `POST` | `/v2/video/generate` | Avatar video (precise control) |
-| `POST` | `/v1/video.webm` | Transparent WebM video |
-| `GET` | `/v2/videos/{video_id}` | Video status & download URL |
-| `GET` | `/v2/videos` | List account videos |
-| `DELETE` | `/v2/videos/{video_id}` | Delete video |
-| `GET` | `/v2/avatars` | List avatars |
-| `GET` | `/v2/avatar/{avatar_id}/details` | Avatar details + default voice |
-| `GET` | `/v2/avatar_group.list` | List avatar groups |
-| `GET` | `/v2/avatar_group/{id}/avatars` | Avatars in group |
-| `GET` | `/v2/voices` | List video voices |
-| `GET` | `/v1/audio/voices` | List Starfish TTS voices |
-| `POST` | `/v1/audio/text_to_speech` | Starfish TTS generation |
-| `POST` | `/v1/workflows/executions` | Workflow Gateway (video gen, faceswap) |
-| `GET` | `/v1/workflows/executions/{id}` | Workflow status |
-| `POST` | `/v2/video_translate` | Submit video translation |
-| `GET` | `/v2/video_translate/{id}` | Translation status |
-| `POST` | `upload.heygen.com/v1/asset` | Upload asset (image/video/audio) |
-| `POST` | `/v1/webhook/endpoint.add` | Register webhook |
-| `POST` | `/v2/voice/clone` | Clone voice from audio |
-
----
-
-## Pricing & Credits
-
-| Plan | Credits/month | Best For |
-|------|---------------|----------|
-| Free | 1 credit | Testing |
-| Creator | 15 credits | Individuals |
-| Business | 60 credits | Teams |
-| Enterprise | Unlimited | Large orgs |
-
-**Tips:** `test: true` в payload = watermarked video, 0 credits. Используй для разработки.
-
----
-
-## Tips
-
-1. **Короткие предложения** — лучшая синхронизация губ
-2. **Паузы** — `<break time="1s"/>` для естественных пауз (пробелы до и после!)
-3. **Тест голоса** — проверь произношение терминов перед продакшном
-4. **Фон 16:9** — для презентаций используй landscape
-5. **Portrait 9:16** — для TikTok/Reels
-6. **Default voice** — используй `default_voice_id` аватара для наилучшего lip-sync
-7. **Timeout 20 min** — генерация занимает 10-15+ мин, не ставь маленький timeout
-8. **test: true** — тестируй без траты кредитов (водяной знак)
-9. **Prompt Optimizer** — разница между средним и профессиональным результатом = качество промпта
-10. **B-roll >= 10s** — короче 5 секунд = чёрные кадры
-11. **Motion verbs** — SLAMS, CASCADE, COUNTS UP вместо координат
-12. **Layer system** — 4+ слоёв на каждый B-roll, каждый элемент двигается
-13. **Scene rotation** — чередуй A-roll / B-roll / Overlay, никогда 3+ одинаковых
-14. **VOICEOVER everywhere** — каждая сцена включая B-roll должна иметь озвучку
-15. **Word timestamps** — используй `word_timestamps` из TTS для субтитров
-16. **Parallel generation** — submit все сцены сразу, poll все параллельно
-17. **WebM only for transparency** — для обычных видео используй MP4
-18. **OffthreadVideo** — в Remotion всегда `OffthreadVideo`, не `Video`
-19. **URL expiration** — HeyGen URLs живут ~24 часа, скачивай для повторного использования
-20. **Deconstructed style** — самый надёжный визуальный стиль для Video Agent
+## Local references
+- **OpenAPI spec (authoritative): `${HOME}/_heygen_openapi.json`** (54 paths, 145 schemas)
+- v3 docs dump: `${HOME}/_heygen_v3_docs.md`
+- v1/v2 legacy dump: `${HOME}/_heygen_docs.md`
+- Skill backups: `SKILL.md.bak.v3-pre-20260605` (this update), `SKILL.md.bak.v2`
+- Creds: `~/.claude/.credentials.master.env` → `HEYGEN_API_KEY` / `_DEV` / `_AGENT`
+- your-server pipeline (legacy v2): `ssh your-server` → `/root/video-production/services/heygen.py`
+- Changelog: https://developers.heygen.com/changelog · OpenAPI online: https://developers.heygen.com/openapi/external-api.json
+
+## Use cases → endpoints
+| Goal | Endpoint(s) |
+|---|---|
+| Highest-quality talking head | check look eligibility → `POST /v3/videos` + `engine:{"type":"avatar_v"}` |
+| Default avatar video | `POST /v3/videos` type=avatar (omit engine) |
+| Cinematic prompt video (Seedance) | `POST /v3/videos` type=cinematic_avatar |
+| Animate arbitrary image | `POST /v3/videos` type=image |
+| Render HTML motion graphics | `POST /v3/hyperframes/renders` |
+| Lip-sync ElevenLabs audio | upload asset → `POST /v3/videos` audio_asset_id |
+| Dub existing video | `POST /v3/lipsyncs` (precision) |
+| Multilingual webinar | `POST /v3/video-translations` (output_languages names) |
+| Edit subtitles before render | proofreads → srt PUT → generate |
+| Prompt-to-video AI | `POST /v3/video-agents` |
+| Voice from description | `POST /v3/voices` (design) |
+| Clone a voice | `POST /v3/voices/clone` |
+| TTS only | `POST /v3/voices/speech` (Starfish) |
+| Background music | `GET /v3/audio/sounds` |
+| Brand-consistent video | `POST /v3/video-agents` + brand_kit_id |
+| Custom term translation | brand_glossary_id (`GET /v3/brand-glossaries`) |
+| Large file upload | `/v3/assets/direct-uploads` → complete |
+| Transparent BG video | output_format=webm + remove_background=true |
+| Safe POST retries | Idempotency-Key header |
+| Async tracking | callback_url + callback_id OR managed webhook |
+| Multi-scene / templates | v2 Studio API / Template API only |

@@ -8,11 +8,11 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `deepseek` | DeepSeek API Skill |
-| `gemini-3-pro` | Gemini API Skill (Full Suite) |
-| `kimi` | Kimi K2 API Skill |
+| `deepseek` | DeepSeek API (DEEPSEEK_API_KEY, deepseek-chat, OpenAI-совместимый эндпоинт) — кодогенерация, рефакторинг, reasoning, 128K контекст. |
+| `gemini-3-pro` | Google AI Suite через API (GOOGLE_API_KEY): Gemini text (2M контекст), embeddings, TTS/STT (Live API), code execution, Google Search grounding… |
+| `kimi` | Kimi K2 (Moonshot AI, KIMI_API_KEY, kimi-k2-thinking) — глубокий reasoning, код-анализ, алгоритмы. |
 | `multi-model-gateway` | Orchestrate tasks across Claude, GPT, and Gemini via AI Gateway. |
-| `perplexity` | Perplexity AI API Skill |
+| `perplexity` | Perplexity — веб-поиск и research с реалтайм-информацией и источниками. |
 
 ### Agents
 
@@ -22,9 +22,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 ### Commands
 
-- `/kimi-fix`
 - `/kimi-reasoning`
-- `/kimi-review`
 
 ## Install
 

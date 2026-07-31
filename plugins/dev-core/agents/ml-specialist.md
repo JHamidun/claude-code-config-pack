@@ -1,7 +1,7 @@
 ---
 name: ml-specialist
 description: Machine Learning and AI specialist - model training, data pipelines, MLOps
-model: sonnet
+model: fable
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 

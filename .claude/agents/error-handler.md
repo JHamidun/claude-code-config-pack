@@ -1,7 +1,7 @@
 ---
 name: error-handler
 description: Analyzes errors, stack traces, and exceptions - finds root causes and suggests fixes
-model: sonnet
+model: fable
 tools: Read, Glob, Grep, Bash, WebSearch
 ---
 

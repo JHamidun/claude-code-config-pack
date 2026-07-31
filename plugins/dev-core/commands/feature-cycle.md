@@ -15,23 +15,23 @@ argument-hint: [описание фичи]
 ## Phase 2: Planning (Sequential)
 После завершения Phase 1:
 - @system-analyst читает результаты Phase 1 → Technical feasibility analysis
-- @architect читает результаты → Architecture design, tech stack выбор
+- @software-architect читает результаты → Architecture design, tech stack выбор
 
 ## Phase 3: Implementation (Parallel)
 Все работают параллельно в изолированных файлах:
 - @frontend-dev: UI components, state management
 - @backend-dev: API endpoints, database schema
 - @integration-dev: Third-party services integration
-- @qa-automation: Test suites (unit, integration, E2E)
+- @qa-specialist: Test suites (unit, integration, E2E)
 
 ## Phase 4: Quality Assurance (Sequential)
 Последовательная проверка всех результатов Phase 3:
-- @qa-engineer: Manual testing, exploratory testing
+- @qa-specialist: Manual testing, exploratory testing
 - @security-engineer: Security review, vulnerability scanning
 - Финальный code review
 
 ## Phase 5: Deployment
-- @devops: CI/CD pipeline, deployment, monitoring setup
+- @devops-engineer: CI/CD pipeline, deployment, monitoring setup
 
 ## Структура документации
 Каждый agent сохраняет output в:

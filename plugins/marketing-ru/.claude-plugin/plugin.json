@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "marketing-ru",
+  "displayName": "Marketing Strategy",
+  "version": "0.1.0",
+  "description": "Offers, pricing, positioning, launches, retention, referrals, growth loops, JTBD, PR outreach, marketing team building.",
+  "author": {
+    "name": "Zhemal Khamidun",
+    "url": "https://github.com/JHamidun"
+  },
+  "repository": "https://github.com/JHamidun/claude-code-config-pack",
+  "license": "MIT",
+  "keywords": [
+    "marketing",
+    "growth",
+    "strategy",
+    "pricing"
+  ]
+}

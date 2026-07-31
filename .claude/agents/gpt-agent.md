@@ -1,7 +1,7 @@
 ---
 name: gpt-agent
 description: "GPT-5.4/o4 tasks via AI Gateway — alternative perspective, advanced reasoning, OpenAI ecosystem"
-model: sonnet
+model: fable
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 

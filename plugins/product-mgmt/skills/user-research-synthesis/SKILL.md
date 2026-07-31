@@ -1,6 +1,6 @@
 ---
 name: user-research-synthesis
-description: Synthesize qualitative and quantitative user research into structured insights and opportunity areas. Use when analyzing interview notes, survey responses, support tickets, or behavioral data to identify themes, build personas, or prioritize opportunities.
+description: "Синтез качественных и количественных исследований в инсайты: интервью, опросы, тикеты → темы, персоны, opportunity areas. Плюс логистика CustDev: поиск респондентов, коридорные интервью, карта эмпатии, валидация спросом через рекламу (CPQL по сегментам), 20 вопросов фаундерам. Triggers: CustDev, customer development, поиск респондентов, карта эмпатии, empathy map, discovery-интервью."
 ---
 
 # User Research Synthesis Skill
@@ -194,3 +194,21 @@ Score opportunities on a simple matrix:
 - Show the math: "Based on support ticket volume, approximately 2,000 users per month encounter this issue. Interview data suggests 60% of them consider it a significant blocker."
 - Use ranges rather than false precision: "This affects 1,500-2,500 users monthly" not "This affects 2,137 users monthly"
 - Compare opportunities against each other to create a relative ranking, not just absolute scores
+
+## CustDev Logistics (экспертная методология)
+
+The methodology above covers how to *synthesize* research that already exists. The references below cover how to *run* customer development in the first place — sourcing respondents, conducting interviews, and validating demand with real money. Material is from an expert CustDev methodology («Выбор рынка»). References are written in Russian.
+
+### References
+
+- **`references/custdev-instructor2.md`** — full CustDev workflow: finding respondents (Respondent.io for EU/US, Conv.ru for Russia, Reddit, competitors' Facebook groups), hallway / коридорные interviews, the Empathy Map (Says / Thinks / Does / Feels = Говорит / Думает / Делает / Чувствует), demand validation by running ads to multiple landing pages, and comparing CPQL/CPL across segments to pick the priority segment. Load this when the user wants to conduct customer development, not just analyze existing notes.
+- **`references/founder-interview-checklist.md`** — 20 questions to ask founders of *similar business models* as a discovery-interview / B2B competitive-intelligence checklist (market, unit economics, risks, channels, trust, team, local specifics). Load this for founder/advisor discovery interviews before launch.
+
+### How this connects to the synthesis methodology
+
+The references feed *into* the methods above. Empathy maps and interview transcripts get coded with **Thematic Analysis** and **Affinity Mapping**; demand-validation data (CPQL by segment) is the **quantitative** half of the **Qual–Quant Feedback Loop**; the «Говорит vs Делает» tension in the empathy map is exactly the **behaviors vs stated preferences** principle from "Interview Note Analysis".
+
+### Related skills (do not duplicate)
+
+- **`market-selection-ru`** — choosing the market / country and sizing TAM **before** any research. It also covers the same CustDev appliances (20 founder questions, empathy map, respondent search) from a pre-launch *decision* angle. Go there for "which market" — this skill is for actually running and synthesizing the interviews.
+- **`ajtbd-instructor-ru`** — depth of the interview itself: Timeline Interview, Switch Interview, Forces of Progress, Job Story Format. Use it to design what to ask *inside* a CustDev interview when you need to understand the job and the switch, not just surface needs.

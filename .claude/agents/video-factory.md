@@ -1,7 +1,7 @@
 ---
 name: video-factory
 description: "Full video production pipeline: trends → script → avatar → b-roll → audio → subtitles → YouTube. One prompt to published video."
-model: opus
+model: fable
 tools: Read, Write, Edit, Bash, Glob, Grep, Task
 ---
 
@@ -80,7 +80,7 @@ Read skill `~/.claude/skills/trend-engine/SKILL.md` and execute:
 ### Phase 2: SCRIPT & STORYBOARD
 
 Read skills:
-- `~/.claude/skills/youtube-shorts-creator/SKILL.md` (hook formulas, format constraints)
+- `~/.claude/skills/viral-shorts-playbook/SKILL.md` (hook formulas, abrupt ending, format constraints)
 - `~/.claude/skills/trend-engine/SKILL.md` (transcript analysis prompts)
 
 #### 2.1 Anti-hallucination Gate
@@ -94,7 +94,7 @@ Never include unverified claims in the script.
 
 #### 2.2 Generate Script
 
-Use the hook-value-abrupt formula from youtube-shorts-creator:
+Use the hook-value-abrupt formula from viral-shorts-playbook:
 
 - **HOOK** (1-2s): shocking fact / question / contradiction / name drop / threat
   - Examples: "OpenAI только что убил целую индустрию", "Этот ИИ заменит 90% программистов"
@@ -156,8 +156,8 @@ Use HeyGen v2 API for avatar scenes:
 HEYGEN_API_KEY from ~/.claude/.credentials.master.env
 
 # Avatar IDs
-# 16:9 (horizontal): User_Горизонталь_Сидячий = YOUR_HEYGEN_AVATAR_ID_1
-# 9:16 (vertical):   User_Вертикаль_Сидячий   = YOUR_HEYGEN_AVATAR_ID_2
+# 16:9 (horizontal): User_Горизонталь_Сидячий = YOUR_HEYGEN_AVATAR_ID
+# 9:16 (vertical):   User_Вертикаль_Сидячий   = YOUR_HEYGEN_AVATAR_ID
 
 # Voice ID: User_pro = YOUR_HEYGEN_VOICE_ID_1
 ```
@@ -360,7 +360,7 @@ python ~/.claude/skills/nano-banana-pro/scripts/generate.py \
 
 ### Phase 6: PUBLISH
 
-Read skill: `~/.claude/skills/youtube-publisher/SKILL.md`
+Read skill: `~/.claude/skills/youtube-channel/SKILL.md` (section «1. Upload»)
 
 #### 6.1 Auth Check
 
@@ -371,7 +371,7 @@ test -f ~/.claude/.youtube-oauth-token.json && echo "TOKEN_EXISTS" || echo "NO_T
 
 If no token, guide user through setup:
 ```bash
-python ~/.claude/skills/youtube-publisher/scripts/yt_oauth_setup.py
+python ~/.claude/skills/youtube-channel/scripts/upload/yt_oauth_setup.py
 ```
 
 Wait for user to complete OAuth flow in browser before proceeding.
@@ -379,7 +379,7 @@ Wait for user to complete OAuth flow in browser before proceeding.
 #### 6.2 Upload as Private
 
 ```bash
-python ~/.claude/skills/youtube-publisher/scripts/yt_upload.py upload \
+python ~/.claude/skills/youtube-channel/scripts/upload/yt_upload.py upload \
   final_video.mp4 \
   --title "GENERATED_TITLE" \
   --description "GENERATED_DESCRIPTION" \
@@ -408,10 +408,20 @@ Make it Public? (yes/no)
 
 #### 6.4 Privacy Update
 
-If user approves:
+If user approves (note: yt_upload.py has only `upload` and `status` subcommands — no `update-privacy`; use the API directly with the same token):
 ```bash
-python ~/.claude/skills/youtube-publisher/scripts/yt_upload.py update-privacy \
-  --video-id "XXXXX" --privacy public
+python -c "
+from pathlib import Path
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+creds = Credentials.from_authorized_user_file(str(Path.home()/'.claude'/'.youtube-oauth-token.json'))
+yt = build('youtube', 'v3', credentials=creds)
+vid = 'XXXXX'
+status = yt.videos().list(part='status', id=vid).execute()['items'][0]['status']
+status['privacyStatus'] = 'public'
+yt.videos().update(part='status', body={'id': vid, 'status': status}).execute()
+print('now public:', vid)
+"
 ```
 
 If user declines: leave as Private, print reminder.
@@ -434,7 +444,7 @@ If user declines: leave as Private, print reminder.
 
 | User says | Style | Notes |
 |-----------|-------|-------|
-| "с аватаром", "с YourFirstNameом", "talking head" | Avatar | All scenes via HeyGen |
+| "с аватаром", "с YourFirstName в кадре", "talking head" | Avatar | All scenes via HeyGen |
 | "без аватара", "AI video only", "чисто нейросеть" | AI-only | All scenes via Veo 3.1 |
 | Default (nothing specified) for YourChannel | Mixed | Avatar intro/outro + AI b-roll middle |
 | "микс", "mixed" | Mixed | Explicit mixed mode |

@@ -8,11 +8,10 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `campaign-planning` | Plan marketing campaigns with objectives, audience segmentation, channel strategy, content calendars, and success metrics. |
-| `competitive-analysis` | Competitor research, market analysis, ad intelligence, positioning |
-| `competitive-analysis-mktg` | Research competitors and compare positioning, messaging, content strategy, and market presence. |
-| `performance-analytics` | Analyze marketing performance with key metrics, trend analysis, and optimization recommendations. |
-| `seo-machine-ru` | Russian-market SEO/GEO/AEO pipeline — semantic core, article clusters, and optimization for Yandex and AI answers. |
+| `campaign-planning` | Plan marketing campaigns: objectives, audience segmentation, channel strategy, content calendars, KPIs, budget allocation, product launch. |
+| `competitive-analysis` | Competitor research, market analysis, ad intelligence, positioning. |
+| `competitive-analysis-mktg` | Research competitors: positioning, messaging, content strategy, battlecards, content gaps, comparison/alternative pages (vs-pages) for SEO+sales… |
+| `performance-analytics` | Analyze marketing performance — метрики каналов (email, social, paid, SEO), отчёты, tracking plan / события / цели. |
 
 ### Commands
 
@@ -23,7 +22,6 @@ Part of the **[hamidun marketplace](../../README.md)**.
 - `/draft-content`
 - `/email-sequence`
 - `/performance-report`
-- `/seo-audit`
 
 ## Install
 
@@ -40,7 +38,7 @@ Adapted from Anthropic's **knowledge-work-plugins** (marketing) — https://gith
 
 ## Related plugins
 
-`linkedin-suite` · `social-intel` · `social-posting` · `content-writing` · `product-mgmt` · `sales-tools` · `research-tools`
+`linkedin-suite` · `social-intel` · `social-posting` · `content-writing` · `product-mgmt` · `sales-tools` · `research-tools` · `marketing-ru` · `cro-funnels` · `paid-ads` · `seo-geo`
 
 ---
 

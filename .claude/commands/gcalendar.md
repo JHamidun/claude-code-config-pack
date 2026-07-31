@@ -1,3 +1,8 @@
+---
+description: "Google Calendar: события на сегодня/неделю, создание событий, свободные слоты (Calendar API v3, OAuth). Триггеры: «календарь», «события на сегодня», «создай событие в календаре», «свободные слоты», «что у меня по расписанию»."
+argument-hint: "[today | week | list <дней> | create <событие> | free]"
+---
+
 # Google Calendar Operations
 
 /gcalendar - Работа с Google Календарём

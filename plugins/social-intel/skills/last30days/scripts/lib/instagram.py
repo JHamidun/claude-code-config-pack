@@ -3,21 +3,19 @@
 Uses ScraperVendor REST API to search Instagram Reels by keyword, extract
 engagement metrics (views, likes, comments), and fetch video transcripts.
 
-Requires SCRAPER_API_KEY in config. 100 free credits, then PAYG.
+Requires SCRAPER_API_KEY in config. 100 free API calls, then PAYG.
 API docs: https://your-scraper.example/docs
 """
 
+import os
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Set
 
-try:
-    import requests as _requests
-except ImportError:
-    _requests = None
-
-from . import http
+from . import dates, http, log
+from .query import infer_query_intent
+from .relevance import token_overlap_relevance as _compute_relevance
 
 SCRAPER_BASE = "https://api.your-scraper.example"
 
@@ -31,37 +29,108 @@ DEPTH_CONFIG = {
 # Max words to keep from each caption
 CAPTION_MAX_WORDS = 500
 
-from .relevance import token_overlap_relevance as _compute_relevance
+# Default transcript fetch timeout (seconds). SC's
+# /v2/instagram/media/transcript regularly takes >15s on real workloads,
+# so the default is generous; override via LAST30DAYS_TRANSCRIPT_TIMEOUT.
+DEFAULT_TRANSCRIPT_TIMEOUT = 30
+
+
+def _resolve_transcript_timeout(
+    timeout: Optional[float] = None,
+    config: Optional[Dict[str, Any]] = None,
+) -> float:
+    """Resolve the IG transcript-fetch timeout.
+
+    Priority (highest wins):
+      1. Explicit ``timeout`` kwarg
+      2. ``LAST30DAYS_TRANSCRIPT_TIMEOUT`` in os.environ
+      3. ``LAST30DAYS_TRANSCRIPT_TIMEOUT`` in caller-supplied config dict
+      4. ``DEFAULT_TRANSCRIPT_TIMEOUT`` (30s)
+
+    Mirrors the ``os.environ.get(X) or config.get(X)`` pattern used for
+    LAST30DAYS_STORE in last30days.py so the env var works whether it's
+    shell-exported or set in ~/.config/last30days/.env.
+    """
+    if timeout is not None:
+        try:
+            return float(timeout)
+        except (TypeError, ValueError):
+            pass
+    raw = os.environ.get("LAST30DAYS_TRANSCRIPT_TIMEOUT")
+    if not raw and config:
+        raw = config.get("LAST30DAYS_TRANSCRIPT_TIMEOUT")
+    if raw:
+        try:
+            return float(raw)
+        except (TypeError, ValueError):
+            pass
+    return float(DEFAULT_TRANSCRIPT_TIMEOUT)
 
 
 def _extract_core_subject(topic: str) -> str:
     """Extract core subject from verbose query for Instagram search."""
-    from .query import extract_core_subject
-    _INSTAGRAM_NOISE = frozenset({
-        'best', 'top', 'good', 'great', 'awesome', 'killer',
-        'latest', 'new', 'news', 'update', 'updates',
-        'trending', 'hottest', 'popular', 'viral',
-        'practices', 'features',
-        'recommendations', 'advice',
-        'prompt', 'prompts', 'prompting',
-        'methods', 'strategies', 'approaches',
-    })
-    return extract_core_subject(topic, noise=_INSTAGRAM_NOISE)
+    from .query import VIRAL_NOISE, extract_core_subject
+    return extract_core_subject(topic, noise=VIRAL_NOISE)
+
+
+def _to_hashtag_form(query: str) -> str:
+    """Collapse a multi-word query to hashtag form (no spaces, lowercase).
+
+    SC's /v2/instagram/reels/search wraps Google Search and is documented
+    to be flaky on multi-token queries. Single-token queries map to a
+    hashtag page lookup which is the stable path. Used as a 500-retry
+    fallback before the request bubbles up as a silent failure.
+    """
+    return ''.join(query.split()).lower()
+
+
+def expand_instagram_queries(topic: str, depth: str) -> List[str]:
+    """Generate multiple Instagram search queries from a topic.
+
+    Mirrors reddit.py's expand_reddit_queries() pattern:
+    1. Extract core subject (strip noise words)
+    2. Include original topic if different from core
+    3. Add intent-specific OR-joined content-type variants
+    4. Cap by depth: 1 for quick, 2 for default, 3 for deep
+
+    Returns 1-3 query strings depending on depth.
+    """
+    core = _extract_core_subject(topic)
+    queries = [core]
+
+    # Include cleaned original topic as variant if different from core
+    original_clean = topic.strip().rstrip('?!.')
+    if core.lower() != original_clean.lower() and len(original_clean.split()) <= 8:
+        queries.append(original_clean)
+
+    qtype = infer_query_intent(topic)
+
+    # Intent-specific Instagram content-type variants
+    if qtype == "breaking_news":
+        queries.append(f"{core} reaction OR edit")
+    elif qtype == "opinion":
+        queries.append(f"{core} reaction OR edit")
+    elif qtype == "product":
+        queries.append(f"{core} review OR haul")
+    elif qtype == "comparison":
+        queries.append(f"{core} vs OR compared")
+    elif qtype == "how_to":
+        queries.append(f"{core} tutorial OR hack")
+    else:
+        queries.append(f"{core} reaction OR edit")
+
+    # Deep depth: add viral content variant
+    if depth == "deep":
+        queries.append(f"{core} viral OR trending OR reel")
+
+    # Cap by depth budget
+    caps = {"quick": 1, "default": 2, "deep": 3}
+    cap = caps.get(depth, 2)
+    return queries[:cap]
 
 
 def _log(msg: str):
-    """Log to stderr (only in interactive terminals; spinner handles non-TTY)."""
-    if sys.stderr.isatty():
-        sys.stderr.write(f"[Instagram] {msg}\n")
-        sys.stderr.flush()
-
-
-def _sc_headers(token: str) -> Dict[str, str]:
-    """Build ScraperVendor request headers."""
-    return {
-        "x-api-key": token,
-        "Content-Type": "application/json",
-    }
+    log.source_log("Instagram", msg, tty_only=False)
 
 
 def _parse_date(item: Dict[str, Any]) -> Optional[str]:
@@ -88,9 +157,8 @@ def _parse_date(item: Dict[str, Any]) -> Optional[str]:
 
     # Fall back to unix timestamp
     try:
-        dt = datetime.fromtimestamp(int(ts), tz=timezone.utc)
-        return dt.strftime("%Y-%m-%d")
-    except (ValueError, TypeError, OSError):
+        return dates.timestamp_to_date(int(ts))
+    except (ValueError, TypeError):
         pass
 
     return None
@@ -101,6 +169,109 @@ def _extract_hashtags(caption_text: str) -> List[str]:
     if not caption_text:
         return []
     return re.findall(r'#(\w+)', caption_text)
+
+
+def _parse_items(raw_items: List[Dict[str, Any]], core_topic: str) -> List[Dict[str, Any]]:
+    """Parse raw Instagram items into normalized dicts."""
+    items = []
+    for raw in raw_items:
+        if not isinstance(raw, dict):
+            continue
+
+        # Extract reel ID and shortcode
+        reel_pk = str(raw.get("id", raw.get("pk", "")))
+        shortcode = raw.get("shortcode", raw.get("code", ""))
+
+        # Caption text -- can be a string or dict depending on endpoint
+        caption_obj = raw.get("caption", "")
+        if isinstance(caption_obj, dict):
+            text = caption_obj.get("text", "")
+        elif isinstance(caption_obj, str):
+            text = caption_obj
+        else:
+            text = raw.get("desc", raw.get("text", ""))
+
+        # Engagement metrics
+        play_count = raw.get("video_play_count") or raw.get("video_view_count") or raw.get("play_count") or 0
+        like_count = raw.get("like_count") or 0
+        comment_count = raw.get("comment_count") or 0
+
+        # Author info -- 'owner' in reels/search, 'user' in user/reels
+        owner_raw = raw.get("owner") or raw.get("user")
+        if isinstance(owner_raw, dict):
+            author_name = owner_raw.get("username", "")
+        elif isinstance(owner_raw, str):
+            author_name = owner_raw
+        else:
+            author_name = ""
+
+        # Duration
+        duration = raw.get("video_duration")
+
+        # Date
+        date_str = _parse_date(raw)
+
+        # Hashtags from caption text
+        hashtags = _extract_hashtags(text)
+
+        # Compute relevance with hashtag boost
+        relevance = _compute_relevance(core_topic, text, hashtags)
+
+        # Build URL -- prefer API-provided url, fallback to shortcode
+        url = raw.get("url", "")
+        if not url and shortcode:
+            url = f"https://www.instagram.com/reel/{shortcode}"
+
+        items.append({
+            "video_id": reel_pk,
+            "text": text,
+            "url": url,
+            "author_name": author_name,
+            "date": date_str,
+            "engagement": {
+                "views": play_count,
+                "likes": like_count,
+                "comments": comment_count,
+            },
+            "hashtags": hashtags,
+            "duration": duration,
+            "relevance": relevance,
+            "why_relevant": f"Instagram: {text[:60]}" if text else f"Instagram: {core_topic}",
+            "caption_snippet": "",  # populated by fetch_captions
+        })
+    return items
+
+
+def _user_reels(
+    handle: str,
+    token: str,
+) -> List[Dict[str, Any]]:
+    """Fetch an Instagram user's recent reels via ScraperVendor.
+
+    Args:
+        handle: Instagram username (without @)
+        token: Scraping API key
+
+    Returns:
+        List of raw Instagram reel dicts.
+    """
+    _log(f"User reels: @{handle}")
+    reels_url = f"{SCRAPER_BASE}/v1/instagram/user/reels"
+    try:
+        data = http.get(
+            reels_url,
+            params={"handle": handle},
+            headers=http.scraper-vendor_headers(token),
+            timeout=30,
+            retries=2,
+        )
+    except Exception as e:
+        _log(f"User reels error for @{handle}: {e}")
+        return []
+
+    raw_items = data.get("items") or data.get("reels") or data.get("data") or []
+    _log(f"  -> {len(raw_items)} reels from @{handle}")
+    return raw_items
 
 
 def search_instagram(
@@ -130,31 +301,37 @@ def search_instagram(
 
     _log(f"Searching Instagram for '{core_topic}' (depth={depth}, count={config['results_per_page']})")
 
-    if not _requests:
-        _log("requests library not installed, falling back to urllib")
-        try:
-            from urllib.parse import urlencode
-            params = urlencode({"query": core_topic})
-            url = f"{SCRAPER_BASE}/v2/instagram/reels/search?{params}"
-            headers = _sc_headers(token)
-            headers["User-Agent"] = http.USER_AGENT
-            data = http.get(url, headers=headers, timeout=30, retries=2)
-        except Exception as e:
-            _log(f"ScraperVendor error (urllib): {e}")
-            return {"items": [], "error": f"{type(e).__name__}: {e}"}
-    else:
-        try:
-            resp = _requests.get(
-                f"{SCRAPER_BASE}/v2/instagram/reels/search",
-                params={"query": core_topic},
-                headers=_sc_headers(token),
-                timeout=30,
-            )
-            resp.raise_for_status()
-            data = resp.json()
-        except Exception as e:
+    try:
+        data = http.get(
+            f"{SCRAPER_BASE}/v2/instagram/reels/search",
+            params={"query": core_topic},
+            headers=http.scraper-vendor_headers(token),
+            timeout=30,
+            retries=2,
+        )
+    except http.HTTPError as e:
+        # SC's v2 reels search wraps Google Search and 500s frequently on
+        # multi-token queries. Single tokens hit the stable hashtag-page
+        # path. Retry once with hashtag form before bubbling up.
+        if getattr(e, "status_code", None) == 500 and ' ' in core_topic:
+            _log(f"IG search 500 on '{core_topic}', retrying with hashtag form")
+            try:
+                data = http.get(
+                    f"{SCRAPER_BASE}/v2/instagram/reels/search",
+                    params={"query": _to_hashtag_form(core_topic)},
+                    headers=http.scraper-vendor_headers(token),
+                    timeout=30,
+                    retries=2,
+                )
+            except Exception as retry_e:
+                _log(f"IG search retry failed: {retry_e}")
+                return {"items": [], "error": f"{type(retry_e).__name__}: {retry_e}"}
+        else:
             _log(f"ScraperVendor error: {e}")
             return {"items": [], "error": f"{type(e).__name__}: {e}"}
+    except Exception as e:
+        _log(f"ScraperVendor error: {e}")
+        return {"items": [], "error": f"{type(e).__name__}: {e}"}
 
     # Items are in the 'reels' array (ScraperVendor v2 response)
     raw_items = data.get("reels") or data.get("items") or data.get("data") or []
@@ -163,67 +340,7 @@ def search_instagram(
     raw_items = raw_items[:config["results_per_page"]]
 
     # Parse items
-    items = []
-    for raw in raw_items:
-        if not isinstance(raw, dict):
-            continue
-
-        # Extract reel ID and shortcode
-        reel_pk = str(raw.get("id", raw.get("pk", "")))
-        shortcode = raw.get("shortcode", raw.get("code", ""))
-
-        # Caption text — can be a string or dict depending on endpoint
-        caption_obj = raw.get("caption", "")
-        if isinstance(caption_obj, dict):
-            text = caption_obj.get("text", "")
-        elif isinstance(caption_obj, str):
-            text = caption_obj
-        else:
-            text = raw.get("desc", raw.get("text", ""))
-
-        # Engagement metrics
-        play_count = raw.get("video_play_count") or raw.get("video_view_count") or raw.get("play_count") or 0
-        like_count = raw.get("like_count") or 0
-        comment_count = raw.get("comment_count") or 0
-
-        # Author info — 'owner' in reels/search, 'user' in user/reels
-        owner = raw.get("owner") or raw.get("user") or {}
-        author_name = owner.get("username", "")
-
-        # Duration
-        duration = raw.get("video_duration")
-
-        # Date
-        date_str = _parse_date(raw)
-
-        # Hashtags from caption text
-        hashtags = _extract_hashtags(text)
-
-        # Compute relevance with hashtag boost
-        relevance = _compute_relevance(core_topic, text, hashtags)
-
-        # Build URL — prefer API-provided url, fallback to shortcode
-        url = raw.get("url", "")
-        if not url and shortcode:
-            url = f"https://www.instagram.com/reel/{shortcode}"
-
-        items.append({
-            "video_id": reel_pk,
-            "text": text,
-            "url": url,
-            "author_name": author_name,
-            "date": date_str,
-            "engagement": {
-                "views": play_count,
-                "likes": like_count,
-                "comments": comment_count,
-            },
-            "hashtags": hashtags,
-            "duration": duration,
-            "relevance": relevance,
-            "why_relevant": f"Instagram: {text[:60]}" if text else f"Instagram: {core_topic}",
-            "caption_snippet": "",  # populated by fetch_captions
-        })
+    items = _parse_items(raw_items, core_topic)
 
     # Hard date filter
     in_range = [i for i in items if i["date"] and from_date <= i["date"] <= to_date]
@@ -246,6 +363,8 @@ def fetch_captions(
     video_items: List[Dict[str, Any]],
     token: str,
     depth: str = "default",
+    timeout: Optional[float] = None,
+    config: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, str]:
     """Fetch transcripts for top N Instagram reels via ScraperVendor.
 
@@ -257,14 +376,21 @@ def fetch_captions(
         video_items: Items from search_instagram()
         token: Scraping API key
         depth: Depth level for caption limit
+        timeout: Optional per-request transcript timeout in seconds. When
+            None, resolves from LAST30DAYS_TRANSCRIPT_TIMEOUT (env or
+            config), defaulting to DEFAULT_TRANSCRIPT_TIMEOUT (30s).
+        config: Optional config dict (from env.get_config()) used as a
+            fallback source for LAST30DAYS_TRANSCRIPT_TIMEOUT when the
+            value is not exported in os.environ.
 
     Returns:
         Dict mapping video_id -> caption text (truncated to 500 words)
     """
-    config = DEPTH_CONFIG.get(depth, DEPTH_CONFIG["default"])
-    max_captions = config["max_captions"]
+    depth_cfg = DEPTH_CONFIG.get(depth, DEPTH_CONFIG["default"])
+    max_captions = depth_cfg["max_captions"]
+    transcript_timeout = _resolve_transcript_timeout(timeout, config)
 
-    if not video_items or not token or not _requests:
+    if not video_items or not token:
         return {}
 
     top_items = video_items[:max_captions]
@@ -289,26 +415,28 @@ def fetch_captions(
         if not url:
             continue
         try:
-            resp = _requests.get(
-                f"{SCRAPER_BASE}/v2/instagram/media/transcript",
-                params={"url": url},
-                headers=_sc_headers(token),
-                timeout=15,
-            )
-            if resp.status_code == 200:
-                data = resp.json()
-                transcripts = data.get("transcripts") or []
-                if transcripts and isinstance(transcripts, list):
-                    # Combine all transcript segments
-                    transcript_text = " ".join(
-                        t.get("text", "") for t in transcripts
-                        if isinstance(t, dict) and t.get("text")
-                    )
-                    if transcript_text:
-                        words = transcript_text.split()
-                        if len(words) > CAPTION_MAX_WORDS:
-                            transcript_text = ' '.join(words[:CAPTION_MAX_WORDS]) + '...'
-                        captions[vid] = transcript_text
+            # Isolate transcript fetch errors from the pipeline-level
+            # capture_failures() context so an individual reel's 400 doesn't
+            # poison the entire source outcome (#829).
+            with http.capture_failures() as _tf:
+                data = http.get(
+                    f"{SCRAPER_BASE}/v2/instagram/media/transcript",
+                    params={"url": url},
+                    headers=http.scraper-vendor_headers(token),
+                    timeout=transcript_timeout,
+                    retries=1,
+                )
+            transcripts = data.get("transcripts") or []
+            if transcripts and isinstance(transcripts, list):
+                transcript_text = " ".join(
+                    t.get("text", "") for t in transcripts
+                    if isinstance(t, dict) and t.get("text")
+                )
+                if transcript_text:
+                    words = transcript_text.split()
+                    if len(words) > CAPTION_MAX_WORDS:
+                        transcript_text = ' '.join(words[:CAPTION_MAX_WORDS]) + '...'
+                    captions[vid] = transcript_text
         except Exception as e:
             _log(f"Transcript fetch failed for {vid}: {e}")
 
@@ -323,25 +451,57 @@ def search_and_enrich(
     to_date: str,
     depth: str = "default",
     token: str = None,
+    ig_creators: List[str] | None = None,
 ) -> Dict[str, Any]:
     """Full Instagram search: find reels, then fetch captions for top results.
 
+    Uses expand_instagram_queries() to generate multiple search queries,
+    runs ScraperVendor for each, and merges/deduplicates results by video ID.
+
     Args:
-        topic: Search topic
+        topic: Search topic (raw topic, not planner's narrowed query)
         from_date: Start date (YYYY-MM-DD)
         to_date: End date (YYYY-MM-DD)
         depth: 'quick', 'default', or 'deep'
         token: Scraping API key
+        ig_creators: Optional list of Instagram creator handles to fetch reels from
 
     Returns:
         Dict with 'items' list. Each item has a 'caption_snippet' field.
     """
-    # Step 1: Search
-    search_result = search_instagram(topic, from_date, to_date, depth, token)
-    items = search_result.get("items", [])
+    core_topic = _extract_core_subject(topic)
+    seen_ids: Set[str] = set()
+    items: List[Dict[str, Any]] = []
+    last_error = None
+
+    # Step 0: Creator reels (high-signal, runs first)
+    if ig_creators and token:
+        for creator in ig_creators:
+            raw_items = _user_reels(creator, token)
+            parsed = _parse_items(raw_items, core_topic)
+            for item in parsed:
+                vid = item.get("video_id", "")
+                if vid and vid not in seen_ids:
+                    seen_ids.add(vid)
+                    items.append(item)
+
+    # Step 1: Multi-query keyword search — run ScraperVendor for each expanded query
+    queries = expand_instagram_queries(topic, depth)
+    for q in queries:
+        search_result = search_instagram(q, from_date, to_date, depth, token)
+        if search_result.get("error"):
+            last_error = search_result["error"]
+        for item in search_result.get("items", []):
+            vid = item.get("video_id", "")
+            if vid and vid not in seen_ids:
+                seen_ids.add(vid)
+                items.append(item)
+
+    # Sort merged results by views descending
+    items.sort(key=lambda x: x.get("engagement", {}).get("views") or 0, reverse=True)
 
     if not items:
-        return search_result
+        return {"items": [], "error": last_error}
 
     # Step 2: Fetch captions for top N
     captions = fetch_captions(items, token, depth)
@@ -353,7 +513,7 @@ def search_and_enrich(
         if caption:
             item["caption_snippet"] = caption
 
-    return {"items": items, "error": search_result.get("error")}
+    return {"items": items, "error": last_error}
 
 
 def parse_instagram_response(response: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -363,3 +523,114 @@ def parse_instagram_response(response: Dict[str, Any]) -> List[Dict[str, Any]]:
         List of item dicts ready for normalization.
     """
     return response.get("items", [])
+
+
+# ---------------------------------------------------------------------------
+# Comments (ScraperVendor, opt-in via INCLUDE_SOURCES=instagram_comments)
+# ---------------------------------------------------------------------------
+
+
+def _ig_total_engagement(item: Dict[str, Any]) -> int:
+    """Sum an Instagram item's engagement for picking which posts to enrich."""
+    eng = item.get("engagement", {}) or {}
+    return (eng.get("views") or 0) + (eng.get("likes") or 0) + (eng.get("comments") or 0)
+
+
+def enrich_with_comments(
+    items: List[Dict[str, Any]],
+    token: str,
+    max_posts: int = 3,
+    max_comments: int = 5,
+) -> List[Dict[str, Any]]:
+    """Enrich top Instagram posts with comment data from ScraperVendor.
+
+    Mirrors ``tiktok.enrich_with_comments`` / ``youtube_yt.enrich_with_comments``:
+    for the top N posts by engagement, fetch comments and attach them as a
+    ``top_comments`` field (highest-liked first). Failures never crash the run.
+    """
+    if not items or not token or max_posts <= 0:
+        return items
+
+    ranked = sorted(items, key=_ig_total_engagement, reverse=True)
+    top_items = ranked[:max_posts]
+    _log(f"Enriching comments for {len(top_items)} Instagram posts")
+
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    def _enrich_one(item: dict) -> bool:
+        post_url = item.get("url", "")
+        if not post_url:
+            return False
+        try:
+            comments = _fetch_post_comments(post_url, token, max_comments)
+            if comments:
+                item["top_comments"] = comments
+                return True
+        except Exception as exc:
+            _log(f"Comment enrichment failed for {post_url}: {exc}")
+        return False
+
+    enriched_count = 0
+    with ThreadPoolExecutor(max_workers=min(4, len(top_items))) as executor:
+        futures = {http.submit_with_context(executor, _enrich_one, item): item for item in top_items}
+        for future in as_completed(futures):
+            if future.result():
+                enriched_count += 1
+
+    _log(f"Enriched {enriched_count}/{len(top_items)} posts with comments")
+    return items
+
+
+def _fetch_post_comments(
+    post_url: str,
+    token: str,
+    max_comments: int = 5,
+) -> List[Dict[str, Any]]:
+    """Fetch comments for a single Instagram post/reel via ScraperVendor.
+
+    SC endpoint: GET /v2/instagram/post/comments?url=<post_or_reel_url>
+    Response shape: { comments: [{text, comment_like_count, child_comment_count,
+    created_at, user{username, ...}}], cursor }
+
+    Returns:
+        List of comment dicts with author, text, comment_like_count (likes), date,
+        highest-liked first. Empty list on any error — never crashes the pipeline.
+    """
+    try:
+        data = http.get(
+            f"{SCRAPER_BASE}/v2/instagram/post/comments",
+            params={"url": post_url},
+            headers=http.scraper-vendor_headers(token),
+            timeout=30,
+            retries=2,
+        )
+    except Exception as exc:
+        _log(f"Comment fetch error for {post_url}: {exc}")
+        return []
+
+    raw_comments = data.get("comments") or data.get("data") or []
+    # Sort by like count desc so normalize sees the highest-signal first.
+    raw_comments = sorted(
+        raw_comments,
+        key=lambda c: c.get("comment_like_count", 0) or 0,
+        reverse=True,
+    )
+    out: List[Dict[str, Any]] = []
+    for c in raw_comments[:max_comments]:
+        if not isinstance(c, dict):
+            continue
+        text = c.get("text") or ""
+        if not text:
+            continue
+        user = c.get("user") if isinstance(c.get("user"), dict) else {}
+        author = user.get("username") or ""
+        created_at = c.get("created_at") or ""
+        # created_at is ISO 8601 (e.g. "2026-07-04T14:27:58.000Z"); take the date.
+        date_str = created_at[:10] if isinstance(created_at, str) and len(created_at) >= 10 else ""
+        out.append({
+            "author": author,
+            "text": text[:400],
+            "comment_like_count": c.get("comment_like_count", 0) or 0,
+            "date": date_str,
+        })
+    return out

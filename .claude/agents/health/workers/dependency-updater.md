@@ -1,5 +1,6 @@
 ---
 name: dependency-updater
+model: fable
 description: Use for safe dependency updates, security fixes, and cleanup. Handles one dependency at a time with validation and rollback.
 color: purple
 ---

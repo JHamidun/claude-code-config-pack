@@ -17,7 +17,7 @@ Extract: commits count, files changed, main areas of work.
 
 ### 2. Vector Memory (last 7 days)
 ```bash
-python ${WORKSPACE}/tools/vector_memory.py search "session" --limit 20
+python ~/.claude/tools/vector_memory.py search "session" --limit 20
 ```
 Extract: key decisions, errors fixed, tools discovered.
 
@@ -68,6 +68,6 @@ powershell -c "Get-ChildItem $env:USERPROFILE\.claude\projects\ -Recurse -Filter
 3. Generate the report in the format above
 4. Save key insights to vector memory:
 ```bash
-python ${WORKSPACE}/tools/vector_memory.py learn "Weekly synthesis [date]: [key insight]" "meta"
+python ~/.claude/tools/vector_memory.py learn "Weekly synthesis [date]: [key insight]" "meta"
 ```
 5. Output the report to the user

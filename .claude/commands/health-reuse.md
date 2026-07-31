@@ -4,13 +4,13 @@ description: Code duplication detection and consolidation workflow (inline orche
 
 # Code Reuse Health Check
 
-Execute the `reuse-health-inline` skill for inline orchestration.
+Execute the `health-inline` skill (mode: reuse) for inline orchestration.
 
 **You ARE the orchestrator.** Do not spawn a separate orchestrator agent.
 
 ## Quick Start
 
-1. Read `.claude/skills/reuse-health-inline/SKILL.md`
+1. Read `.claude/skills/health-inline/SKILL.md` (mode table) + `.claude/skills/health-inline/references/modes/reuse.md` (full workflow)
 2. Follow the workflow phases directly
 3. Use Task tool only for workers (reuse-hunter, reuse-fixer)
 4. Run quality gates inline via Bash
@@ -27,4 +27,4 @@ Pre-flight → Detect → [Consolidate by Priority] → Verify → Report
 
 ---
 
-Now read and execute the skill: `.claude/skills/reuse-health-inline/SKILL.md`
+Now read and execute the workflow: `.claude/skills/health-inline/references/modes/reuse.md`

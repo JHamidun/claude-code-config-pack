@@ -40,7 +40,7 @@
         "AFFINE_PASSWORD": "${AFFINE_PASSWORD}",
         "AFFINE_LOGIN_AT_START": "sync"
       },
-      "description": "AFFiNE workspace — YourCompanyGPT documentation",
+      "description": "AFFiNE workspace — YourProduct documentation",
       "disabled": true
     },
     "memory": {
@@ -113,34 +113,6 @@
       ],
       "description": "Browser automation - screenshots, navigation, interaction"
     },
-    "sqlite": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-sqlite",
-        "${HOME}\\.claude\\bot_data.db"
-      ],
-      "description": "SQLite database access for Your Bot"
-    },
-    "fetch": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-fetch"
-      ],
-      "description": "Fetch web content and convert to markdown"
-    },
-    "time": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-time"
-      ],
-      "description": "Time-based automation - scheduling and reminders"
-    },
     "playwright": {
       "type": "stdio",
       "command": "npx",
@@ -149,15 +121,6 @@
         "@playwright/mcp@latest"
       ],
       "description": "Playwright browser automation"
-    },
-    "microsoft-office": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@jenstangen1/pptx-xlsx-mcp"
-      ],
-      "description": "Microsoft Office - PowerPoint, Excel, Word automation"
     },
     "postgres": {
       "type": "stdio",

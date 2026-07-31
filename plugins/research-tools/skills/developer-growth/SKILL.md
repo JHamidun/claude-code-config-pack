@@ -1,388 +1,143 @@
 ---
 name: developer-growth
-description: Analyze coding patterns and track developer skill progression
+description: Оценка и развитие навыков разработчика — self-assessment матрица, анализ git-вклада, персональный план развития (PDP), карьерная лестница IC. Триггеры: «оцени мои навыки», «skills assessment», «план развития», «PDP», «подготовь performance review», «проанализируй мой git-вклад», «карьерный рост разработчика», «готов ли я к senior», «менторинг джуна». НЕ для: поиска работы и откликов на вакансии (→ career-ops), код-ревью конкретного PR (→ agent code-reviewer), оценки кандидатов при найме (→ headhunter).
 ---
 
-# Developer Growth Analysis Skill
+# Developer Growth — оценка навыков и план развития
 
-## Overview
+## Когда использовать
 
-Анализ паттернов кодирования, отслеживание роста навыков, персональное развитие.
+- Разработчик хочет самооценку: «где я сейчас, где пробелы»
+- Подготовка к performance review / грейд-комитету («докажи фактами из git»)
+- Составление персонального плана развития (PDP) на квартал
+- Ментор готовит план роста для подопечного
+- Вопрос «что мне нужно, чтобы стать senior/staff» → gap-анализ по карьерной лестнице
+- Ретро по собственной продуктивности: анализ commit-паттернов за период
 
-## When to Use
+## Роутинг: тип запроса → workflow
 
-- Самооценка навыков
-- Планирование развития
-- Code review insights
-- Performance review prep
-- Mentoring developers
+| Запрос звучит как | Workflow | Входы |
+|---|---|---|
+| «оцени навыки», «где пробелы», «skills matrix» | **A. Self-assessment** | Роль, стек, целевая роль; ответы на вопросы матрицы |
+| «проанализируй мой вклад», «что говорит мой git» | **B. Git-анализ** | Путь к репо(ям), имя/email автора, период |
+| «план развития», «PDP на квартал» | **C. PDP** | Результат A (и B, если есть репо), целевая роль, часы/нед |
+| «готов ли я к senior», «чего не хватает до L4» | **D. Career-ladder gap** | Текущий грейд, целевой грейд, примеры работы |
+| «performance review», «подготовь самооценку для ревью» | **B + D** → саммари | Git-репо + грейд-требования компании (или дефолтная лестница) |
 
-## Skills Assessment Framework
+Запрос комбинированный («оцени и составь план») → A → B (если есть код) → C.
 
-### Technical Skills Matrix
+## Процедура
+
+### Workflow A: Self-assessment (матрица навыков)
+
+1. **Собери входы**: текущая роль, годы опыта, основной стек, целевая роль/грейд. Если не даны — задай 3-4 вопроса одним сообщением, не растягивай интервью.
+2. **Построй матрицу под стек** (не копируй дефолтный список): 4 блока — Languages / Frameworks / Infrastructure / Practices, только релевантные пользователю технологии + 1-2 из целевой роли. Шкала 1-5 (см. `references/templates.md`).
+3. **Проставь оценки**: попроси пользователя оценить себя, либо — если дан доступ к его коду/git — предложи свою оценку с обоснованием («в коммитах нет тестов → TDD ≤ 2»).
+4. **Посчитай gap** (Target − Current) и отсортируй: топ-3 разрыва = кандидаты в цели PDP.
+5. **Проверь по чек-листу** (внизу) и отдай артефакт «Матрица навыков + топ-3 gap».
+
+### Workflow B: Git-анализ вклада
+
+1. **Собери входы**: путь к репо (или несколько), автор (`git log --author`), период (`--since`). Уточни цель анализа — performance review или самопознание (влияет на тон выводов).
+2. **Прогони анализ** скриптами из `references/git-analytics.md`: распределение коммитов по типам (feat/fix/refactor/test/docs), по времени, complexity-тренд (radon для Python), паттерны ревью если доступны PR-данные.
+3. **Интерпретируй, а не пересказывай цифры**: 70% fix и 0% test → сигнал «пожарный режим, нет профилактики»; коммиты только в один модуль → узкая зона владения. Каждому паттерну — вывод для роста.
+4. **Собери артефакт** «Git-профиль разработчика» (таблица метрик + 3-5 инсайтов + рекомендации). LOC ≠ продуктивность — не строй выводы на объёме строк.
+
+### Workflow C: Персональный план развития (PDP)
+
+1. **Возьми на вход** топ-3 gap из Workflow A (если A не делали — сначала выполни его быстро) + ограничение по времени (часов/неделю) + горизонт (обычно квартал).
+2. **На каждый gap сформулируй SMART-цель**: текущее состояние → целевое состояние → измеримый критерий («провёл 5 код-ревью с фидбеком», не «стал лучше в ревью»).
+3. **Подбери действия трёх типов** на каждую цель: практика в рабочих задачах (главное), учебный ресурс (курс/книга — публичные, конкретные), «learning in public» (доклад/статья/OSS).
+4. **Разложи по неделям**: milestones на неделях 4/8/12, чекпоинты (еженедельная саморефлексия, ежемесячный прогресс-обзор).
+5. **Стресс-тест реалистичности**: суммарная нагрузка ≤ заявленных часов/неделю; если больше — режь цели до 2, не ужимай сроки.
+6. **Отдай артефакт PDP** по шаблону из «Выход».
+
+### Workflow D: Career-ladder gap-анализ
+
+1. **Определи лестницу**: если у компании пользователя есть своя — попроси её; иначе используй дефолтную IC-лестницу L1-L5 из `references/templates.md`.
+2. **Пройди по критериям целевого грейда**: для каждого пункта — статус ✅ (есть подтверждение примером) / 🟡 (частично) / ❌ (нет). Требуй конкретный пример работы на каждый ✅, без примера — максимум 🟡.
+3. **Сведи в таблицу готовности** с % закрытых критериев и списком ❌/🟡 как приоритетами.
+4. **Дальше по желанию** → Workflow C для закрытия пробелов.
+
+## Выход
+
+Основной артефакт зависит от workflow. Скелет PDP (Workflow C, самый частый финальный артефакт):
 
 ```markdown
-## Technical Skills Assessment
+# План развития: [Имя]
+**Период:** [Q_ 20__] · **Роль:** [текущая] → **Цель:** [целевая] · **Бюджет времени:** [X ч/нед]
 
-Rate each skill 1-5:
-1 = Beginner (learning)
-2 = Junior (can do with guidance)
-3 = Mid (independent work)
-4 = Senior (can teach others)
-5 = Expert (industry leader)
+## Топ-3 gap (из матрицы навыков)
+| # | Навык | Сейчас | Цель | Почему важно для целевой роли |
+|---|-------|--------|------|-------------------------------|
+| 1 | [System Design] | 2 | 4 | [решения на уровне сервиса ждут от senior] |
 
-### Languages
+## Цели (SMART)
+### Цель 1: [System Design 2→4]
+- Текущее: [проектирует в рамках задачи, не сервиса]
+- Целевое: [ведёт дизайн фичи end-to-end с design doc]
+- Действия: ① [взять дизайн следующей фичи + design doc] ② [книга/курс: конкретное название] ③ [разбор одного публичного system design в блог/команде]
+- Критерий успеха: [2 принятых design doc за квартал]
+
+## План по неделям
+| Недели | Фокус | Milestone |
+|--------|-------|-----------|
+| 1-4 | [цель 1: теория + первый design doc] | [ ] design doc №1 на ревью |
+| 5-8 | [цель 2 + продолжение 1] | [ ] ... |
+| 9-12 | [цель 3 + закрепление] | [ ] ... |
+
+## Чекпоинты
+- Еженедельно: саморефлексия (что узнал / где застрял)
+- Ежемесячно: обзор прогресса, корректировка
+```
+
+Артефакты остальных workflow: **A** — таблица «Skill | Current | Target | Gap» по 4 блокам + топ-3 gap; **B** — «Git-профиль» (метрики + инсайты + рекомендации); **D** — таблица готовности к грейду (критерий | статус | пример). Полные шаблоны — `references/templates.md`.
+
+## Пример
+
+**Вход:** «Я мидл-питонист, 3 года, хочу к senior. Оцени и дай план, есть ~4 часа в неделю. Репо не покажу.»
+
+**Ход:** Workflow A (без B — репо нет) → C.
+
+**Артефакт (сокращённо):**
+
+```markdown
+## Матрица (фрагмент)
 | Skill | Current | Target | Gap |
 |-------|---------|--------|-----|
-| Python | [X] | [Y] | [Y-X] |
-| JavaScript | [X] | [Y] | [Y-X] |
-| TypeScript | [X] | [Y] | [Y-X] |
-| Go | [X] | [Y] | [Y-X] |
-| SQL | [X] | [Y] | [Y-X] |
+| Python | 3 | 4 | 1 |
+| System Design | 2 | 4 | 2 ← топ-gap
+| Code Review | 2 | 4 | 2 ← топ-gap
+| Тесты/TDD | 2 | 3 | 1 ← топ-gap
+| Docker/CI | 3 | 3 | 0 |
 
-### Frameworks
-| Skill | Current | Target | Gap |
-|-------|---------|--------|-----|
-| React | [X] | [Y] | [Y-X] |
-| Node.js | [X] | [Y] | [Y-X] |
-| FastAPI | [X] | [Y] | [Y-X] |
-| Django | [X] | [Y] | [Y-X] |
-
-### Infrastructure
-| Skill | Current | Target | Gap |
-|-------|---------|--------|-----|
-| Docker | [X] | [Y] | [Y-X] |
-| Kubernetes | [X] | [Y] | [Y-X] |
-| AWS | [X] | [Y] | [Y-X] |
-| CI/CD | [X] | [Y] | [Y-X] |
-
-### Practices
-| Skill | Current | Target | Gap |
-|-------|---------|--------|-----|
-| TDD | [X] | [Y] | [Y-X] |
-| Code Review | [X] | [Y] | [Y-X] |
-| System Design | [X] | [Y] | [Y-X] |
-| Documentation | [X] | [Y] | [Y-X] |
+# План развития: [Разработчик] · Q_ · Mid → Senior · 4 ч/нед
+### Цель 1: System Design 2→4
+- Действия: дизайн следующей фичи с design doc; «Designing Data-Intensive Applications» гл. 1-4; разбор дизайна в команде
+- Критерий: 2 принятых design doc
+### Цель 2: Code Review 2→4
+- Действия: брать ≥2 PR коллег/нед на ревью; чек-лист ревью команды выучить и дополнить
+- Критерий: 20 содержательных ревью за квартал, фидбек от тимлида
+### Цель 3: TDD 2→3
+- Критерий: новые фичи квартала покрыты тестами до мержа
+| 1-4 | DDIA гл.1-2 + первый design doc | [ ] doc №1 |
+| 5-8 | ревью-практика + doc №2 | [ ] 10 ревью |
+| 9-12 | закрепление, самооценка заново | [ ] матрица v2 |
 ```
 
-## Git Analytics
+«Done» = пользователь получил заполненную матрицу + PDP, влезающий в его 4 ч/нед, с измеримыми критериями.
 
-### Contribution Patterns
+## Чек-лист (перед выдачей)
 
-```python
-import subprocess
-from collections import defaultdict
-from datetime import datetime
+- [ ] Матрица построена под реальный стек пользователя, а не дефолтный список технологий
+- [ ] Каждая оценка ≥4 или спорная — с обоснованием/примером, не «на глаз»
+- [ ] Целей в PDP ≤3, каждая SMART (измеримый критерий, не «стать лучше»)
+- [ ] Суммарная нагрузка плана влезает в заявленные часы/неделю
+- [ ] Git-выводы — про паттерны и рост, не про LOC; нет выводов из объёма строк
+- [ ] В gap-анализе грейда каждый ✅ подтверждён конкретным примером работы
+- [ ] Ресурсы в плане — конкретные публичные книги/курсы, не «почитай про X»
 
-def analyze_git_contributions(repo_path: str, author: str = None) -> dict:
-    """Analyze git contribution patterns"""
+## References
 
-    # Get commit stats
-    cmd = "git log --pretty=format:'%H|%an|%ae|%ad|%s' --date=short"
-    if author:
-        cmd += f" --author='{author}'"
-
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd=repo_path)
-
-    commits = []
-    for line in result.stdout.strip().split('\n'):
-        if line:
-            parts = line.split('|')
-            commits.append({
-                'hash': parts[0],
-                'author': parts[1],
-                'email': parts[2],
-                'date': parts[3],
-                'message': parts[4]
-            })
-
-    # Analyze patterns
-    by_weekday = defaultdict(int)
-    by_month = defaultdict(int)
-    by_type = defaultdict(int)
-
-    for commit in commits:
-        date = datetime.strptime(commit['date'], '%Y-%m-%d')
-        by_weekday[date.strftime('%A')] += 1
-        by_month[date.strftime('%Y-%m')] += 1
-
-        # Categorize by conventional commit
-        msg = commit['message'].lower()
-        if msg.startswith('feat'):
-            by_type['features'] += 1
-        elif msg.startswith('fix'):
-            by_type['fixes'] += 1
-        elif msg.startswith('refactor'):
-            by_type['refactors'] += 1
-        elif msg.startswith('test'):
-            by_type['tests'] += 1
-        elif msg.startswith('docs'):
-            by_type['docs'] += 1
-        else:
-            by_type['other'] += 1
-
-    return {
-        'total_commits': len(commits),
-        'by_weekday': dict(by_weekday),
-        'by_month': dict(by_month),
-        'by_type': dict(by_type),
-        'commits': commits[:50]  # Last 50
-    }
-```
-
-### Code Complexity Trends
-
-```python
-import subprocess
-import json
-
-def analyze_complexity_trends(repo_path: str) -> dict:
-    """Track code complexity over time"""
-
-    # Using radon for Python
-    result = subprocess.run(
-        "radon cc . -a -j",
-        shell=True,
-        capture_output=True,
-        text=True,
-        cwd=repo_path
-    )
-
-    complexity = json.loads(result.stdout)
-
-    summary = {
-        'A': 0,  # Low complexity
-        'B': 0,  # Low
-        'C': 0,  # Moderate
-        'D': 0,  # High
-        'E': 0,  # Very high
-        'F': 0   # Extreme
-    }
-
-    for file_data in complexity.values():
-        for func in file_data:
-            rank = func.get('rank', 'A')
-            summary[rank] += 1
-
-    return summary
-```
-
-## Growth Metrics
-
-### Productivity Metrics
-
-```markdown
-## Developer Productivity Dashboard
-
-### Code Output (Monthly)
-| Metric | Value | Trend |
-|--------|-------|-------|
-| Commits | [X] | [↑/↓/→] |
-| Lines Changed | [X] | [↑/↓/→] |
-| PRs Merged | [X] | [↑/↓/→] |
-| PRs Reviewed | [X] | [↑/↓/→] |
-
-### Quality Metrics
-| Metric | Value | Target |
-|--------|-------|--------|
-| Bug Rate | [X per 1K LOC] | <[Y] |
-| PR Approval Time | [X hours] | <[Y] |
-| Test Coverage | [X]% | >[Y]% |
-| Doc Coverage | [X]% | >[Y]% |
-
-### Learning & Growth
-| Activity | Count |
-|----------|-------|
-| New technologies used | [X] |
-| Technical articles read | [X] |
-| Courses completed | [X] |
-| Talks/presentations given | [X] |
-```
-
-## Code Review Analysis
-
-```python
-def analyze_code_reviews(pr_data: list) -> dict:
-    """Analyze code review patterns"""
-
-    review_stats = {
-        'reviews_given': 0,
-        'reviews_received': 0,
-        'avg_review_time_hours': 0,
-        'comments_given': 0,
-        'comments_received': 0,
-        'approval_rate': 0,
-        'common_feedback': []
-    }
-
-    # Analyze patterns
-    feedback_categories = defaultdict(int)
-
-    for pr in pr_data:
-        # Count reviews
-        review_stats['reviews_given'] += len(pr.get('reviews_given', []))
-        review_stats['reviews_received'] += len(pr.get('reviews_received', []))
-
-        # Categorize feedback
-        for comment in pr.get('comments', []):
-            text = comment['body'].lower()
-            if 'style' in text or 'format' in text:
-                feedback_categories['style'] += 1
-            elif 'test' in text:
-                feedback_categories['testing'] += 1
-            elif 'performance' in text:
-                feedback_categories['performance'] += 1
-            elif 'security' in text:
-                feedback_categories['security'] += 1
-            else:
-                feedback_categories['logic'] += 1
-
-    review_stats['common_feedback'] = sorted(
-        feedback_categories.items(),
-        key=lambda x: x[1],
-        reverse=True
-    )[:5]
-
-    return review_stats
-```
-
-## Personal Development Plan
-
-```markdown
-# Personal Development Plan: [Name]
-
-**Period:** [Q1 2024]
-**Role:** [Current Role]
-**Target Role:** [Desired Role]
-
-## Goals
-
-### Technical Goals
-1. **[Goal 1]**
-   - Current state: [Description]
-   - Target state: [Description]
-   - Actions: [List of actions]
-   - Success criteria: [Measurable outcome]
-   - Resources: [Courses, books, projects]
-
-2. **[Goal 2]**
-   ...
-
-### Soft Skills Goals
-1. **[Goal 1]**
-   ...
-
-## Learning Plan
-
-### Q1 Focus Areas
-| Area | Resource | Time/Week | Deadline |
-|------|----------|-----------|----------|
-| [Skill 1] | [Course/Book] | [X hours] | [Date] |
-| [Skill 2] | [Resource] | [X hours] | [Date] |
-
-### Projects
-| Project | Skills Developed | Status |
-|---------|-----------------|--------|
-| [Project 1] | [Skills] | [Status] |
-| [Project 2] | [Skills] | [Status] |
-
-## Milestones
-
-- [ ] **Week 4:** [Milestone 1]
-- [ ] **Week 8:** [Milestone 2]
-- [ ] **Week 12:** [Milestone 3]
-
-## Check-in Schedule
-- Weekly: Self-reflection
-- Bi-weekly: Mentor 1:1
-- Monthly: Progress review
-- Quarterly: Goal adjustment
-
-## Resources
-- Mentor: [Name]
-- Buddy: [Name]
-- Learning budget: $[Amount]
-```
-
-## Career Ladder
-
-### IC Track
-
-```markdown
-## Individual Contributor Levels
-
-### Junior Engineer (L1)
-**Scope:** Task-level
-**Skills:**
-- [ ] Writes clean, functional code
-- [ ] Follows team standards
-- [ ] Completes assigned tasks
-- [ ] Asks for help when stuck
-
-### Mid Engineer (L2)
-**Scope:** Feature-level
-**Skills:**
-- [ ] Designs and implements features
-- [ ] Writes tests
-- [ ] Reviews code
-- [ ] Mentors juniors
-
-### Senior Engineer (L3)
-**Scope:** Project-level
-**Skills:**
-- [ ] Leads technical projects
-- [ ] Makes architectural decisions
-- [ ] Influences team practices
-- [ ] Debugs complex issues
-
-### Staff Engineer (L4)
-**Scope:** Org-level
-**Skills:**
-- [ ] Sets technical direction
-- [ ] Solves cross-team problems
-- [ ] Drives major initiatives
-- [ ] Mentors seniors
-
-### Principal Engineer (L5)
-**Scope:** Company-level
-**Skills:**
-- [ ] Industry-recognized expertise
-- [ ] Shapes company tech strategy
-- [ ] External thought leadership
-```
-
-## 1:1 Template
-
-```markdown
-# 1:1 Meeting: [Date]
-
-## Since Last Time
-- **Accomplished:** [List]
-- **Learned:** [List]
-- **Struggled with:** [List]
-
-## Discussion Topics
-1. [Topic 1]
-2. [Topic 2]
-
-## Feedback
-- **What's going well:**
-- **Areas for improvement:**
-- **Support needed:**
-
-## Action Items
-- [ ] [Action] - Due: [Date]
-
-## Notes
-[Meeting notes]
-```
-
-## Tips
-
-1. **Measure consistently** - track the same metrics over time
-2. **Quality > quantity** - LOC isn't productivity
-3. **Seek feedback** - ask for specific feedback
-4. **Reflect weekly** - what did you learn?
-5. **Set SMART goals** - specific, measurable
-6. **Learn in public** - blog, speak, contribute
-7. **Find mentors** - accelerate growth
+- `references/templates.md` — полные шаблоны: матрица навыков, productivity dashboard, полный PDP, IC-лестница L1-L5, шаблон 1:1
+- `references/git-analytics.md` — Python-скрипты: анализ коммитов, complexity-тренды (radon), паттерны код-ревью

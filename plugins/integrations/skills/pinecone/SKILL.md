@@ -1,6 +1,6 @@
 ---
 name: pinecone
-description: "Pinecone Vector Database Skill"
+description: "Pinecone vector DB (PINECONE_API_KEY): serverless-индексы, semantic search, RAG; текущие индексы company-tm-bot, company-plus-bot и др. Триггеры: pinecone, «vector database», «векторная база», «семантический поиск», embeddings, RAG."
 ---
 
 # Pinecone Vector Database Skill
@@ -17,13 +17,14 @@ Expert skill for using Pinecone - the leading vector database for AI application
 PINECONE_API_KEY=os.getenv('PINECONE_API_KEY')
 ```
 
-## Примеры индексов
+## Существующие индексы
 
 | Индекс | Описание |
 |--------|----------|
-| `support-bot` | Векторы саппорт-бота |
-| `docs-search` | Поиск по документации |
+| `company-tm-bot` | Company TM бот |
+| `company-plus-bot` | Company Plus бот |
 | `agent-dev` | Разработка агентов |
+| `chatbot-data` | Данные чатбота |
 | `test-index` | Тестовый |
 
 **Параметры:** Dimension 3072 (OpenAI text-embedding-3-large), Metric cosine, Serverless AWS us-east-1
@@ -67,13 +68,14 @@ pc = Pinecone(api_key=os.getenv('PINECONE_API_KEY'))
 ### Create Serverless Index
 
 ```python
-def create_index(name: str, dimension: int = 1536, metric: str = "cosine"):
+def create_index(name: str, dimension: int = 3072, metric: str = "cosine"):
     """
     Create a new serverless index.
 
     Args:
         name: Index name
-        dimension: Vector dimension (1536 for OpenAI, 768 for many others)
+        dimension: Vector dimension (3072 — канон живых индексов, text-embedding-3-large;
+                   1536 для text-embedding-3-small, 768 for many others)
         metric: "cosine", "euclidean", or "dotproduct"
     """
     from pinecone import ServerlessSpec
@@ -90,8 +92,8 @@ def create_index(name: str, dimension: int = 1536, metric: str = "cosine"):
 
     return pc.Index(name)
 
-# Usage
-index = create_index("my-knowledge-base", dimension=1536)
+# Usage (3072 = канон живых индексов проекта)
+index = create_index("my-knowledge-base", dimension=3072)
 ```
 
 ### Create Index with Integrated Embeddings

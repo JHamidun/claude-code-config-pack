@@ -1,7 +1,7 @@
 ---
 name: devops-engineer
 description: "Handles deployment, CI/CD, infrastructure, monitoring, and incident response"
-model: opus
+model: fable
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
@@ -64,7 +64,7 @@ When invoked, follow these phases systematically:
 2. **Map requirements and constraints**:
    - Expected traffic and load patterns
    - Uptime requirements (SLA targets)
-   - Budget constraints (your VPS: limited vCPU/RAM/SSD)
+   - Budget constraints (your-server: 6 vCPU, 16GB RAM, 300GB SSD)
    - Compliance or regulatory requirements
 3. **Identify risks**:
    - Single points of failure

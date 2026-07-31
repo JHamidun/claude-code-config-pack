@@ -1,6 +1,6 @@
 # Commands
 
-> Custom slash commands for Claude Code. Usage: `/command-name`. 75+ commands total.
+> Custom slash commands for Claude Code. Usage: `/command-name`. ~100 root commands + `/gsd:*` family (57, в `gsd/`). Точные счётчики — `scripts/config_lint.py`, не этот каталог.
 
 ## Development
 
@@ -24,12 +24,9 @@
 
 | Command | Description |
 |---------|-------------|
-| `/kimi-review` | Deep code review with Kimi K2 |
-| `/kimi-fix` | Auto-fix code based on Kimi review |
 | `/kimi-reasoning` | Deep analysis with Kimi K2 |
 | `/manus` | Manus AI complex task automation |
 | `/deep-research` | Perplexity-powered research |
-| `/ai-search` | Deep search with Perplexity |
 | `/ultra-think` | Multi-dimensional deep analysis |
 
 ## Telegram
@@ -48,7 +45,7 @@
 | `/daily` | Daily standup summary |
 | `/standup-report` | Standup report for period |
 | `/roadmap` | Product roadmap generation |
-| `/prd` | Product Requirements Document |
+| `/write-spec` | Feature specification (PRD) |
 | `/specs` | Technical specifications |
 | `/userflow` | User flow and wireframes |
 | `/estimate` | Complexity and time estimation |
@@ -56,7 +53,6 @@
 | `/bug-triage` | Bug prioritization |
 | `/meeting` | Structure meeting notes |
 | `/gtd` | GTD task management from Todoist |
-| `/research` | Topic research via Brave/Notion |
 
 ## Deploy
 
@@ -66,19 +62,23 @@
 | `/quick-deploy` | Quick deploy with lint/test |
 | `/parallel-dev` | Parallel dev via git worktrees |
 
-## Context and Memory
+## Context, Memory, Search
 
 | Command | Description |
 |---------|-------------|
-| `/session-save` | Save session context to memory |
-| `/session-restore` | Restore context from memory |
 | `/context-optimize` | Optimize context window |
-| `/memory-search` | Search memory |
+| `/search-chats` | Full-text search across Claude Code chats (canon) |
+| `/kb` | Local knowledge base: tl;dv/Spark/Gmail/Outlook/TG/Calendar |
+| `/memory-search` | Search chats + knowledge base |
 | `/memory-learn` | Save knowledge to memory |
-| `/memory-extract` | Extract knowledge from memory |
-| `/memory-ingest` | Ingest chat history |
+| `/memory-extract` | Extract knowledge by topics (legacy) |
+| `/memory-ingest` | Index chat history into chats.db |
 | `/memory-stats` | Memory statistics |
 | `/self-learn` | Auto-learn from errors |
+| `/rename-sessions` | Bulk informative session titles |
+| `/weekly-synthesis` | Weekly synthesis report |
+| `/plan-my-day` | Optimized daily plan |
+| `/prompt-log` | Session statistics (tokens, tools) |
 
 ## Analysis
 
@@ -100,17 +100,12 @@
 | `/health-deps` | Dependency audit and update |
 | `/health-cleanup` | Dead code detection and cleanup |
 | `/health-reuse` | Code duplication consolidation |
-| `/health-metrics` | Codebase health metrics |
 
 ## Models
 
-| Command | Description |
-|---------|-------------|
-| `/use-opus` | Switch to Opus model |
-| `/use-sonnet` | Switch to Sonnet model |
-| `/use-haiku` | Switch to Haiku model |
+Переключение моделей — встроенная команда `/model opus|sonnet|haiku` (кастомные /use-* удалены).
 
-## Google Workspace
+## Google Workspace / Cloud
 
 | Command | Description |
 |---------|-------------|
@@ -118,7 +113,35 @@
 | `/gdocs` | Google Docs operations |
 | `/gsheets` | Google Sheets operations |
 | `/gcalendar` | Google Calendar operations |
-| `/gmail` | Gmail operations |
+| `/gmail` | Gmail (личная почта) |
+| `/gcontacts` | Google Contacts (People API) |
+| `/gtasks` | Google Tasks |
+| `/gmeet` | Google Meet meetings and recordings |
+| `/gchat` | Google Chat spaces and messages |
+| `/gads` | Google Ads (GAQL) |
+| `/ganalytics` | Google Analytics 4 |
+| `/gsearch-console` | Google Search Console |
+| `/gtranslate` | Google Cloud Translation |
+| `/gcloud-storage` | Google Cloud Storage buckets |
+
+## Knowledge-Work (PM / Sales / Marketing, connector-based)
+
+| Command | Description |
+|---------|-------------|
+| `/write-spec`, `/roadmap-update`, `/metrics-review`, `/stakeholder-update`, `/synthesize-research`, `/competitive-brief`, `/sprint-planning-pm` | PM family |
+| `/call-summary`, `/forecast`, `/pipeline-review` | Sales family |
+| `/campaign-plan`, `/draft-content`, `/email-sequence`, `/seo-audit`, `/brand-review`, `/performance-report`, `/competitive-brief-mktg` | Marketing family |
+
+## Media / Comms
+
+| Command | Description |
+|---------|-------------|
+| `/transcribe` | Deepgram audio/video transcription |
+| `/translate` | DeepL Pro translation |
+| `/slides` | Presentation via Manus Slides pipeline |
+| `/video-factory` | Full video production pipeline |
+| `/youtube-upload` | Upload video to YouTube |
+| `/domain-dns-ops` | Cloudflare DNS management |
 
 ## Other
 
@@ -126,3 +149,5 @@
 |---------|-------------|
 | `/beads-init` | Initialize Beads issue tracking |
 | `/test-frontend` | Frontend testing with Playwright |
+| `/kimi-reasoning` | (см. AI) Kimi K2 reasoning |
+| `/gsd:*` | Get Shit Done workflow family (57 commands, `gsd/`) |

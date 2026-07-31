@@ -1,7 +1,7 @@
 ---
 name: prompt-engineer
-description: "Optimizes prompts for LLMs — improves clarity, reduces tokens, increases accuracy, designs system prompts"
-model: sonnet
+description: "Делегируемая оптимизация промптов ВОРКЕРОМ: анализ, реструктуризация, токен-компрессия и до/после-оценка промптов и системных промптов для Claude/GPT/Gemini. Спавнить когда промпт-работа — отдельная единица: файлы промптов, system prompts агентов/ботов, батч-оптимизация. Методология в ТЕКУЩЕМ контексте без спавна → skill prompt-engineering."
+model: fable
 tools: Read, Write, Edit, Glob, Grep
 ---
 

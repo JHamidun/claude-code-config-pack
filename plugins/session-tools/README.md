@@ -10,8 +10,11 @@ Part of the **[hamidun marketplace](../../README.md)**.
 |-------|--------------|
 | `away-summary` | Generate a brief "while you were away" recap of the current session. |
 | `btw` | Ask a quick side question without interrupting the main conversation flow. |
-| `dream` | Memory consolidation — reflective pass over memory files. |
+| `dream` | Memory consolidation — reflective pass over memory files + Second Brain sleeptime. |
+| `memory-agent` | Router across a layered memory system — picks the right layer (files, graph, vectors, chat history) for the question asked. |
+| `save-knowledge-base` | Persist an instruction or reference into long-term memory across four layers so future sessions retrieve it by trigger. |
 | `self-reflect` | Self-improvement analysis - review recent errors, find patterns, generate improvements for rules/skills. |
+| `session-mentor` | Local analysis of your Claude Code session history into an HTML report — themes, tool usage, friction points, unused features. |
 | `year-review` | Analyze session history and generate insights about work patterns, productivity, and tool usage over a time period. |
 
 ### Agents
@@ -32,12 +35,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 - `/rename-sessions`
 - `/search-chats`
 - `/self-learn`
-- `/session-restore`
-- `/session-save`
 - `/ultra-think`
-- `/use-haiku`
-- `/use-opus`
-- `/use-sonnet`
 - `/weekly-synthesis`
 
 ## Install
@@ -51,7 +49,7 @@ Enable it with `/plugin` — the skills then activate automatically when relevan
 
 ## Related plugins
 
-`google-workspace` · `integrations`
+`google-workspace` · `integrations` · `social-posting`
 
 ---
 

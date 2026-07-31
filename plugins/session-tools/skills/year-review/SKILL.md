@@ -16,7 +16,7 @@ Analyze session history to generate insights about work patterns.
 
 ## Data Sources
 
-1. **Chat search DB**: `python ${WORKSPACE}/tools/search_chats.py` — SQLite FTS5 index of all sessions
+1. **Chat search DB**: `python ~/.claude/tools/search_chats.py` — SQLite FTS5 index of all sessions
 2. **Session files**: `~/.claude/projects/*/` — JSONL transcript files
 3. **Memory files**: `~/.claude/projects/*/memory/` — accumulated knowledge
 4. **Git history**: `git log` in relevant repos

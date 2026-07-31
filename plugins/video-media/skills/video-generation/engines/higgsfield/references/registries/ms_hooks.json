@@ -1,0 +1,114 @@
+{
+  "cursor": null,
+  "has_more": false,
+  "items": [
+    {
+      "id": "3d45fb46-254f-4c83-9685-8e3d28945a67",
+      "type": "stunt",
+      "name": "Product Hit",
+      "prompt": "Object flies into frame, hits subject. Brief reaction → pivot to product.",
+      "job_id": null,
+      "job_status": null,
+      "is_pinned": false,
+      "thumbnail_url": "https://cdn.higgsfield.ai/marketing_studio_setup/672b7bc8-fd7e-48ef-954f-f194b83eb1ba.webp",
+      "video_url": "https://cdn.higgsfield.ai/marketing_studio_setup/0376d63f-7fcb-4622-bdd0-4dc700d44cc6.mp4",
+      "source": "preset"
+    },
+    {
+      "id": "75b6d501-be0e-4416-a7ed-52f04f180574",
+      "type": "subtle",
+      "name": "Spicy",
+      "prompt": "The shot starts with an extreme close-up of a collarbone, slowly tilts up to reveal a flawless makeup look, then pulls back into selfie framing before a silent pause leads into the product pitch.",
+      "job_id": null,
+      "job_status": null,
+      "is_pinned": false,
+      "thumbnail_url": "https://cdn.higgsfield.ai/marketing_studio_setup/f7d72731-0188-4897-ab2b-642465dbe028.webp",
+      "video_url": "https://cdn.higgsfield.ai/marketing_studio_setup/310818fe-e1af-4e3c-a8c2-3d4a3579365f.mp4",
+      "source": "preset"
+    },
+    {
+      "id": "26cac2dd-99cb-4818-a678-509b0dab2c32",
+      "type": "subtle",
+      "name": "Interview",
+      "prompt": "Interviewer asks a second stranger a question based entirely on the first stranger's random answer; confusion builds until the second person naturally notices the product (Erewhon-style aspirational item) and pivots into a casual review.",
+      "job_id": null,
+      "job_status": null,
+      "is_pinned": false,
+      "thumbnail_url": "https://cdn.higgsfield.ai/marketing_studio_setup/08a663fb-690b-4f57-8b3a-2bf8ab1f4480.webp",
+      "video_url": "https://cdn.higgsfield.ai/marketing_studio_setup/913b0ed2-bbbb-4626-a491-e9335d250eaf.mp4",
+      "source": "preset"
+    },
+    {
+      "id": "d50eb41c-fcfa-4f4d-93aa-473cdc6bc3b2",
+      "type": "stunt",
+      "name": "Random Object Mic",
+      "prompt": "During a casual vlog, a random absurd object falls into the person's hand from above, and they immediately use it as a microphone to continue a completely serious product review.",
+      "job_id": null,
+      "job_status": null,
+      "is_pinned": false,
+      "thumbnail_url": "https://cdn.higgsfield.ai/marketing_studio_setup/e30feee4-f9b5-4e9e-8967-d9d6ff34acd4.webp",
+      "video_url": "https://cdn.higgsfield.ai/marketing_studio_setup/381965b9-5d4b-4e6a-a9a1-be94a6cbb66d.mp4",
+      "source": "preset"
+    },
+    {
+      "id": "8101cd3e-3cc9-4607-a171-3582daa2f6ee",
+      "type": "subtle",
+      "name": "Product Crash",
+      "prompt": "The product itself falls from above and destroyed, creating chaos; harsh sharpness leads to a perfectly clean and restored scene where a person calmly begins reviewing the product.",
+      "job_id": null,
+      "job_status": null,
+      "is_pinned": false,
+      "thumbnail_url": "https://cdn.higgsfield.ai/marketing_studio_setup/7f0ec32b-3a26-45fc-8e5c-9d2fea8fde87.webp",
+      "video_url": "https://cdn.higgsfield.ai/marketing_studio_setup/e106fdf3-b64d-4d85-867c-47fe5b9dc381.mp4",
+      "source": "preset"
+    },
+    {
+      "id": "31976cc7-e597-4be2-9753-4a80153b0cc7",
+      "type": "stunt",
+      "name": "Blizzard",
+      "prompt": "A cozy indoor scene is suddenly hit by a violent, impossible blizzard; chaos fills the room but the product remains intact and functioning, and once the storm stops, the product is still working.",
+      "job_id": null,
+      "job_status": null,
+      "is_pinned": false,
+      "thumbnail_url": "https://cdn.higgsfield.ai/marketing_studio_setup/677036e5-bd7f-4258-8429-5a98a93569c4.webp",
+      "video_url": "https://cdn.higgsfield.ai/marketing_studio_setup/b46b6584-a4c7-4228-8b51-927e1aebcfed.mp4",
+      "source": "preset"
+    },
+    {
+      "id": "2db84ed8-7082-4981-9c9c-9d61b3c28668",
+      "type": "subtle",
+      "name": "Camera Bump",
+      "prompt": "The camera operator accidentally bumps into a person, hitting their forehead; they react briefly, recover, and naturally reveal the dress (or product on it) while transitioning into a casual explanation.",
+      "job_id": null,
+      "job_status": null,
+      "is_pinned": false,
+      "thumbnail_url": "https://cdn.higgsfield.ai/marketing_studio_setup/88b9bcda-4ac3-4170-bbc4-4f827c8193b7.webp",
+      "video_url": "https://cdn.higgsfield.ai/marketing_studio_setup/868ca5a9-cf6f-460a-959b-76706deee95b.mp4",
+      "source": "preset"
+    },
+    {
+      "id": "5443eff1-d940-4ad3-9413-957bb048a6b0",
+      "type": "stunt",
+      "name": "Product Dodge",
+      "prompt": "Suddenly, a product flies into a person's face; he quickly bends down to avoid a collision, and in the next frame he stands up straight and already holds the product in his hands and begins to review as if nothing had happened.",
+      "job_id": null,
+      "job_status": null,
+      "is_pinned": false,
+      "thumbnail_url": "https://cdn.higgsfield.ai/marketing_studio_setup/af91a3e3-6667-404d-ab20-ba653178661b.webp",
+      "video_url": "https://cdn.higgsfield.ai/marketing_studio_setup/81a3aed0-6db5-4c8f-9f56-8aab62e81b22.mp4",
+      "source": "preset"
+    },
+    {
+      "id": "ec9fdf99-314d-480d-a656-10d9861341e7",
+      "type": "subtle",
+      "name": "Epic Fail",
+      "prompt": "A person performs an unsuccessful backflip, lands unsuccessfully, falls, and immediately, without pause, takes out the product and begins an unflappable review.",
+      "job_id": null,
+      "job_status": null,
+      "is_pinned": false,
+      "thumbnail_url": "https://cdn.higgsfield.ai/marketing_studio_setup/e0df1fee-1988-456e-87af-56aa4cf2866a.webp",
+      "video_url": "https://cdn.higgsfield.ai/marketing_studio_setup/6b1698c1-5f82-4854-8a32-de3807618082.mp4",
+      "source": "preset"
+    }
+  ]
+}

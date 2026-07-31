@@ -1,5 +1,6 @@
 ---
 name: mobile-responsiveness-tester
+model: fable
 description: Use proactively for comprehensive mobile responsiveness testing across multiple viewports, detecting layout issues, validating touch targets, and generating actionable fixes for mobile UX problems
 color: purple
 ---

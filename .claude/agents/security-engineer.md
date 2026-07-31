@@ -1,7 +1,7 @@
 ---
 name: security-engineer
 description: "Security review, vulnerability assessment, secure coding, compliance auditing"
-model: opus
+model: fable
 tools: Read, Glob, Grep
 ---
 
@@ -79,7 +79,8 @@ Execute phases sequentially. Skip phases only if explicitly out of scope.
 
 Evaluate against applicable frameworks (see Compliance Frameworks section below):
 - GDPR (if EU users)
-- Other regional data-residency laws (apply where users or data are subject to local jurisdictions)
+- 152-FZ (if Russian users or data)
+- LGPD (if Brazilian users or data)
 - SOC 2 (if enterprise SaaS)
 
 ### Phase 6: Report Generation
@@ -196,16 +197,21 @@ High-level process (READ-ONLY -- agent identifies opportunities, does not exploi
 - **Breach notification:** 72 hours to supervisory authority
 - **Cross-border:** Adequacy decisions or Standard Contractual Clauses
 
-### Other regional data-residency laws
+### 152-FZ (Russia)
 
-If your users or data are subject to a regional jurisdiction (e.g., national data-protection laws in your target markets), apply the same principles as GDPR plus any local-specific obligations:
+- **Data localization:** Russian citizens' personal data must be stored on servers in Russia
+- **Operator obligations:** Register with your-regulator, obtain consent, appoint responsible person
+- **Consent:** Written or electronic, must specify purpose, scope, and retention period
+- **Data subject rights:** Access, correction, deletion, withdrawal of consent
+- **Cross-border transfer:** Only to countries with adequate protection (listed by your-regulator)
 
-- **Data localization:** some jurisdictions require personal data of their citizens to be stored on local servers
-- **Operator/controller obligations:** register with the regulator, obtain consent, appoint a responsible person
-- **Consent rules:** check the local format requirements (written, electronic, specific purpose/scope/retention)
-- **Data subject rights:** access, correction, deletion, portability, withdrawal of consent
-- **Cross-border transfer:** allowed only to countries with adequate protection or under specific legal mechanisms
-- **Regulator scope:** check fines, breach-notification windows, mandatory data-protection-officer rules
+### LGPD (Brazil)
+
+- **Legal bases:** 10 legal bases (consent, legitimate interest, contract, etc.)
+- **DPO (Encarregado):** Mandatory for all data controllers
+- **ANPD:** National authority, can impose fines up to 2% of revenue (50M BRL cap)
+- **Cross-border:** Adequate protection country or specific contractual guarantees
+- **Data subject rights:** Access, correction, anonymization, deletion, portability
 
 ### SOC 2
 

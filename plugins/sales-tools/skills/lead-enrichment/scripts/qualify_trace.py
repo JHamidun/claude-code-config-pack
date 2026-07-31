@@ -36,7 +36,7 @@ def plan_for(t, v, d):
             steps.append(f"Свободный ящик ({d['domain']}) — это физлицо. Идти по имени/нику: WebSearch '{v}', Skill social-intel по email.")
         steps.append(f"Skill social-intel: forward-досье по '{v}' (linktree/komi, соцсети).")
     elif t == 'phone':
-        steps.append("Оператор/регион уже в normalized. Проверить телефон в НАШЕЙ Bitrix (bitrix24 skill, поиск контакта по телефону).")
+        steps.append("Оператор/регион уже в normalized. Проверить телефон в НАШЕЙ Bitrix (crm skill, поиск контакта по телефону).")
         steps.append("Публичный след: WebSearch номера в кавычках (сайт/подпись/2ГИС/публичный профиль). Если номер оставил лид — phone_identify.py.")
     elif t in ('name',):
         for var in d.get('variants', [])[:1]:
@@ -46,7 +46,7 @@ def plan_for(t, v, d):
     elif t in ('username', 'url'):
         steps.append(f"Skill social-intel: forward-досье по '{v}' (это и есть его профиль).")
         if t == 'username':
-            steps.append(f"Публичный Telegram (legit): python ~/.claude/tools/tg_client.py user-info {v} — публичный профиль/имя.")
+            steps.append(f"Публичный Telegram (legit): python ${WORKSPACE}/tools/tg_client.py user-info {v} — публичный профиль/имя.")
     if t in ('name', 'username', 'phone'):
         steps.append("Публичный Telegram через свой Telethon: tg_client.py search/mentions — найти публичный @username, канал, упоминания.")
     elif t in ('domain', 'inn', 'ogrn'):

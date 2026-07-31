@@ -1,6 +1,6 @@
 ---
 name: kimi
-description: "Kimi K2 API Skill"
+description: "Kimi K2 (Moonshot AI, KIMI_API_KEY, kimi-k2-thinking) — глубокий reasoning, код-анализ, алгоритмы. Триггеры: kimi, «Kimi K2», moonshot, «спроси кими», «глубокое ревью через kimi»."
 ---
 
 # Kimi K2 API Skill
@@ -14,9 +14,9 @@ Expert skill for Kimi K2 (Moonshot AI) - specialized in deep reasoning and code 
 ```bash
 # API ключи: ~/.claude/.credentials.master.env
 # Переменная: KIMI_API_KEY
-KIMI_API_KEY=os.getenv('KIMI_API_KEY')
-KIMI_BASE_URL=https://api.moonshot.ai/v1
-KIMI_MODEL=kimi-k2-thinking
+export KIMI_API_KEY="$(grep -m1 '^KIMI_API_KEY=' ~/.claude/.credentials.master.env | cut -d= -f2-)"
+export KIMI_BASE_URL=https://api.moonshot.ai/v1
+export KIMI_MODEL=kimi-k2-thinking
 ```
 
 ## When to Use Kimi K2

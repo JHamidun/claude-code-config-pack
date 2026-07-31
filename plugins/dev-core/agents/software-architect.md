@@ -1,7 +1,7 @@
 ---
 name: software-architect
-description: Designs system architecture and decomposes tasks
-model: opus
+description: "Principal Software Architect, READ-ONLY: дизайн систем (микросервисы, event-driven, DDD, CQRS), trade-off анализ, ADR, декомпозиция на задачи для воркеров. Спавнить для: архитектура новой системы/сервиса, выбор технологий с обоснованием, план миграции/рефакторинга, дизайн API-границ. Сам НЕ пишет код — реализация → senior-developer/backend-dev; координация команды и техдолг → tech-lead; диспетчеризация мультиагентного workflow → orchestrator."
+model: fable
 tools: Read, Glob, Grep
 ---
 

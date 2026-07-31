@@ -4,28 +4,7 @@
 
 ## Decision Tree: How Many Agents?
 
-```
-Task received
-|
-+-- Single file, <50 lines change?
-|   +-- Level 0: Do it yourself (no agents)
-|       Examples: typo fix, add import, rename variable, update config
-|
-+-- 2-5 files, single feature?
-|   +-- Level 1: One specialized agent
-|       Examples: add API endpoint, implement component, fix bug
-|       Pattern: Agent(subagent_type="senior-developer", prompt="...")
-|
-+-- 5+ files, multiple concerns?
-|   +-- Level 2: Orchestrator + workers
-|       Examples: new feature with frontend+backend+tests
-|       Pattern: orchestrator dispatches to frontend-dev, backend-dev, test-writer
-|
-+-- Project-wide, multi-system?
-    +-- Level 3: Full workflow (plan -> agents -> QA)
-        Examples: new microservice, major refactoring, security audit
-        Pattern: Plan mode -> parallel agents -> code-reviewer -> qa-specialist
-```
+Level 0-3 decision tree (single file vs orchestrator vs full workflow) → `rules/delegation.md`.
 
 ## Parallel Agent Patterns
 
@@ -93,14 +72,15 @@ Best for: experimental changes, risky refactors, parallel feature branches.
 
 ## Model Selection for Subagents
 
-| Task complexity | Model | Rationale |
-|-----------------|-------|-----------|
-| Simple edits, search | haiku | Fast, cheap, sufficient |
-| Standard features, reviews | sonnet | Good balance of speed and quality |
-| Architecture, complex bugs | opus | Maximum reasoning quality |
+**Канон: движок ВСЕХ text-воркеров = Fable 5** (`model: "fable"`), ≤5 одновременно (комфорт 3-4).
 
-Default to **sonnet** for subagents. Escalate to opus only when the task
-requires deep reasoning or cross-system analysis.
+| Роль | Модель | Когда |
+|------|--------|-------|
+| Text-воркер (default) | fable | ВСЕГДА — любой субагент, который читает/пишет код или текст |
+| Массовые простые прогоны | haiku | ТОЛЬКО 10+ параллельных тривиальных задач (классификация, поиск) |
+| Оркестратор / подхват | opus | Основная сессия; подхват после лимита Fable (resume + смена model) |
+
+Сложность задачи регулируй **глубиной промпта и контекстом** (opus-level / standard / light — это уровни промпта), а НЕ сменой движка. Decision tree уровней → `rules/model-selection.md`.
 
 ## When NOT to Scale
 

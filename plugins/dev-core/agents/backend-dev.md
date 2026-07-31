@@ -1,7 +1,7 @@
 ---
 name: backend-dev
-description: Python, Node.js, APIs, databases, backend systems
-model: opus
+description: "Senior Backend Engineer — Python (FastAPI/Django/SQLAlchemy/Celery), Node.js (Express/NestJS/Prisma), PostgreSQL/Redis/MongoDB, очереди, JWT/OAuth2, миграции. Спавнить для: API-эндпоинты, серверная бизнес-логика, схема БД и миграции, интеграция очередей/кэша, backend-фиксы. НЕ для UI/React → frontend-dev; НЕ для CI/CD и инфраструктуры → devops-engineer; НЕ для сторонних API-интеграций → integration-dev."
+model: fable
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 

@@ -1,3 +1,8 @@
+---
+description: "Сборка оптимального контекста под тип задачи (bug fix / feature / review / refactoring / testing) по принципам Context Engineering: релевантные источники, few-shot, компрессия токенов. Триггеры: «оптимизируй контекст», «собери контекст под задачу», «context engineering». Методология целиком → skill context-engineering."
+argument-hint: "[тип задачи] \"<описание>\""
+---
+
 Оптимизируй контекст для текущей задачи используя Context Engineering принципы.
 
 ## Что делает эта команда:

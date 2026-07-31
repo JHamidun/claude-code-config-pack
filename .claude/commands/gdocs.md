@@ -1,3 +1,8 @@
+---
+description: "Google Docs: чтение документа, краткое содержание, поиск документов, вставка текста (Docs API + Drive API). Триггеры: «google docs», «гугл документ», «прочитай документ», «саммари документа»."
+argument-hint: "[read <doc_id> | summary <doc_id> | search <запрос>]"
+---
+
 # Google Docs Operations
 
 /gdocs - Работа с Google Docs

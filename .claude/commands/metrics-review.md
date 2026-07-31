@@ -5,7 +5,7 @@ argument-hint: "<time period or metric focus>"
 
 # Metrics Review
 
-> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+> If you see unfamiliar placeholders or need to check which tools are connected, see the MCP registry: `~/.claude/config/mcp-servers.md`.
 
 Review and analyze product metrics, identify trends, and surface actionable insights.
 
@@ -19,7 +19,7 @@ Review and analyze product metrics, identify trends, and surface actionable insi
 
 ### 1. Gather Metrics Data
 
-If **~~product analytics** is connected:
+If **product analytics** is connected:
 - Pull key product metrics for the relevant time period
 - Get comparison data (previous period, same period last year, targets)
 - Pull segment breakdowns if available

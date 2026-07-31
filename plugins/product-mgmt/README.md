@@ -10,9 +10,9 @@ Part of the **[hamidun marketplace](../../README.md)**.
 |-------|--------------|
 | `feature-spec` | Write structured product requirements documents (PRDs) with problem statements, user stories, requirements, and success metrics. |
 | `metrics-tracking` | Define, track, and analyze product metrics with frameworks for goal setting and dashboard design. |
-| `roadmap-management` | Plan and prioritize product roadmaps using frameworks like RICE, MoSCoW, and ICE. |
+| `roadmap-management` | Построение и приоритизация продуктового роадмапа — пошаговая процедура от входов до готового документа. |
 | `stakeholder-comms` | Draft stakeholder updates tailored to audience — executives, engineering, customers, or cross-functional partners. |
-| `user-research-synthesis` | Synthesize qualitative and quantitative user research into structured insights and opportunity areas. |
+| `user-research-synthesis` | Синтез качественных и количественных исследований в инсайты: интервью, опросы, тикеты → темы, персоны, opportunity areas. |
 
 ### Agents
 

@@ -10,13 +10,13 @@ import re
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict, List, Optional
-from urllib.parse import quote_plus, urlencode
+from urllib.parse import quote, quote_plus, urlencode
 
-from . import http
-from .query_type import detect_query_type
+from . import http, log
 from .relevance import LOW_SIGNAL_QUERY_TOKENS, token_overlap_relevance
 
 GAMMA_SEARCH_URL = "https://gamma-api.polymarket.com/public-search"
+GAMMA_EVENTS_URL = "https://gamma-api.polymarket.com/events"
 
 # Pages to fetch per query (API returns 5 events per page, limit param is a no-op)
 DEPTH_CONFIG = {
@@ -34,10 +34,7 @@ RESULT_CAP = {
 
 
 def _log(msg: str):
-    """Log to stderr (only in TTY mode to avoid cluttering Claude Code output)."""
-    if sys.stderr.isatty():
-        sys.stderr.write(f"[PM] {msg}\n")
-        sys.stderr.flush()
+    log.source_log("PM", msg, tty_only=False)
 
 
 def _extract_core_subject(topic: str) -> str:
@@ -75,7 +72,7 @@ def _expand_queries(topic: str) -> List[str]:
     words = core.split()
     if len(words) >= 2:
         for word in words:
-            if len(word) > 1 and word.lower() not in LOW_SIGNAL_QUERY_TOKENS:
+            if len(word) > 1 and word.lower() not in LOW_SIGNAL_QUERY_TOKENS and word.lower() not in _NOISE_WORDS:
                 queries.append(word)
 
     # Add the full topic if different from core
@@ -94,6 +91,179 @@ def _expand_queries(topic: str) -> List[str]:
 
 
 _GENERIC_TAGS = frozenset({"sports", "politics", "crypto", "science", "culture", "pop culture"})
+
+# Words that are too generic to serve as the sole topic-match signal.
+# If ALL core words from the topic are in this set, we skip filtering (can't meaningfully filter).
+# But if some words are informative and some are generic, we require at least one informative word.
+_NOISE_WORDS = frozenset({
+    # Articles, prepositions, conjunctions
+    "the", "a", "an", "in", "on", "at", "of", "for", "and", "or", "to", "is", "are",
+    "was", "were", "will", "be", "by", "with", "from", "as", "it", "its", "not", "no",
+    "but", "if", "so", "do", "has", "had", "have", "this", "that", "what", "who",
+    # Directional / geographic terms that cause false matches
+    "west", "east", "north", "south", "central", "southern", "northern", "eastern", "western",
+    # Common sports / category terms
+    "champion", "championship", "league", "division", "conference", "cup", "series",
+    "team", "game", "match", "season", "win", "winner", "finals",
+    # Common geographic / place nouns that cause false matches
+    # "club" -> Athletic Club, Racing Club; "island" -> Epstein's Island, Rhode Island
+    "club", "island", "city", "park", "hill", "lake", "bay", "beach", "valley",
+    "river", "mountain", "county", "state", "village", "town", "point", "creek",
+    "springs", "heights", "ridge", "bridge", "harbor", "port", "station", "center",
+    "square", "field", "forest", "garden", "tower", "school", "church", "camp",
+    "ranch", "crossing", "shore", "rock", "summit", "falls", "grove", "haven",
+    # Generic tech terms that match too broadly on Polymarket
+    # "cli" -> any CLI tool market; "mcp" -> protocol markets; "ai" -> every AI market
+    "cli", "mcp", "protocol", "tool", "app", "code", "model", "ai", "api",
+    "software", "plugin", "skill", "agent", "bot", "search", "research",
+    # Generic prediction market terms
+    "market", "odds", "prediction", "forecast", "chance", "probability",
+    # Comparison-query conjunctions — should not count as informative filter tokens
+    # when the topic is "X vs Y vs Z"
+    "vs", "versus",
+})
+
+
+def _passes_topic_filter(topic: str, event_title: str) -> bool:
+    """Check if event title contains enough informative words from the topic.
+
+    Prevents noise like "Meek Mill" matching "Mill.com food recycler" by requiring
+    proportional word overlap. For topics with 3+ informative words, at least 2 must
+    match. For shorter topics, 1 match suffices (existing behavior).
+
+    Returns True if the event should be kept, False if it should be filtered out.
+    """
+    core = _extract_core_subject(topic).lower()
+    core_words = [w for w in re.sub(r"[^\w\s]", " ", core).split() if len(w) > 1]
+
+    if not core_words:
+        return True  # No words to check against
+
+    # Split into informative vs generic
+    informative = [w for w in core_words if w not in _NOISE_WORDS]
+
+    # If ALL words are generic, we can't meaningfully filter — keep everything
+    if not informative:
+        return True
+
+    # Normalize the title for matching
+    title_lower = " ".join(re.sub(r"[^\w\s]", " ", event_title.lower()).split())
+    title_words = set(title_lower.split())
+
+    # Count how many informative words appear in the title
+    match_count = 0
+    for word in informative:
+        # Check as whole word in the title word set
+        if word in title_words:
+            match_count += 1
+            continue
+        # Also check as substring for compound words (e.g., "kanye" in "kanyewest")
+        if len(word) >= 4 and word in title_lower:
+            match_count += 1
+
+    # For topics with 3+ informative words, require at least 2 matches.
+    # This prevents single-word false positives like "mill" in "Meek Mill"
+    # when the topic is "Mill.com food recycler" (3 informative words).
+    min_matches = 2 if len(informative) >= 3 else 1
+
+    return match_count >= min_matches
+
+
+def _passes_any_informative_word(topic: str, event_title: str) -> bool:
+    """Looser variant of _passes_topic_filter that keeps an item if ANY
+    informative word from the topic appears in the title.
+
+    Designed for post-merge validation of comparison topics (e.g., "OpenClaw vs
+    Hermes vs Paperclip"), where a market mentioning just one of the entities
+    is still on-topic. The stricter _passes_topic_filter (min_matches=2 for
+    3+ informative words) is correct for single-entity topics like "Mill.com
+    food recycler" but drops legitimate single-entity comparison results.
+    """
+    core = _extract_core_subject(topic).lower()
+    core_words = [w for w in re.sub(r"[^\w\s]", " ", core).split() if len(w) > 1]
+    if not core_words:
+        return True
+    informative = [w for w in core_words if w not in _NOISE_WORDS]
+    if not informative:
+        return True
+
+    title_lower = " ".join(re.sub(r"[^\w\s]", " ", event_title.lower()).split())
+    title_words = set(title_lower.split())
+
+    for word in informative:
+        if word in title_words:
+            return True
+        if len(word) >= 4 and word in title_lower:
+            return True
+    return False
+
+
+def filter_items_against_topic(topic: str, items: List[Any]) -> List[Any]:
+    """Drop items whose title shares no informative word with the original topic.
+
+    Called post-merge from pipeline.py so per-entity subquery results for
+    comparison topics get re-validated against the ORIGINAL full topic before
+    landing in the footer. Prevents noise like WTI crude oil or Elon tweet
+    markets from surviving a loose "Hermes" single-entity subquery match.
+
+    Uses the looser _passes_any_informative_word rule (ANY entity name match
+    is sufficient) so a market mentioning just one of several compared entities
+    still counts as on-topic.
+
+    Accepts a list of either raw dicts (with 'title') or SourceItem-like objects
+    (with .title attribute). Returns the filtered list in the same order.
+    """
+    if not topic:
+        return items
+
+    filtered = []
+    for item in items:
+        title = getattr(item, "title", None)
+        if title is None and isinstance(item, dict):
+            title = item.get("title", "")
+        title = title or ""
+
+        if _passes_any_informative_word(topic, title):
+            filtered.append(item)
+
+    dropped = len(items) - len(filtered)
+    if dropped:
+        _log(f"Post-merge topic filter dropped {dropped} Polymarket items against full topic '{topic}'")
+
+    return filtered
+
+
+def filter_items_against_keywords(items: List[Any], keywords: List[str]) -> List[Any]:
+    """Keep only items whose title contains at least one keyword (case-insensitive).
+
+    Intended for disambiguating ambiguous single-token topics like 'Warriors'
+    via --polymarket-keywords (e.g., 'nba,gsw,golden-state') to filter out
+    Glasgow Warriors rugby, Honor of Kings Rogue Warriors markets that share
+    the 'Warriors' token but are not the target entity.
+    """
+    if not keywords:
+        return items
+    normalized_keywords = [kw.strip().lower() for kw in keywords if kw and kw.strip()]
+    if not normalized_keywords:
+        return items
+
+    filtered = []
+    for item in items:
+        title = getattr(item, "title", None)
+        if title is None and isinstance(item, dict):
+            title = item.get("title", "")
+        title = (title or "").lower()
+        if any(kw in title for kw in normalized_keywords):
+            filtered.append(item)
+
+    dropped = len(items) - len(filtered)
+    if dropped:
+        _log(
+            f"Keyword filter dropped {dropped} Polymarket items; "
+            f"kept {len(filtered)} matching {normalized_keywords}"
+        )
+
+    return filtered
 
 
 def _extract_domain_queries(topic: str, events: List[Dict]) -> List[str]:
@@ -130,6 +300,21 @@ def _extract_domain_queries(topic: str, events: List[Dict]) -> List[str]:
     return domain_queries
 
 
+def _infer_query_intent(topic: str) -> str:
+    """Narrower local classifier for Polymarket search tuning only.
+
+    Deliberately does NOT delegate to ``query.infer_query_intent``:
+    Polymarket only needs the prediction/non-prediction split, and the
+    broader classifier would route queries to ``how_to``, ``opinion``,
+    ``product``, etc. without any matching expansion branch downstream.
+    Keep this narrow until polymarket grows additional intents.
+    """
+    text = topic.lower().strip()
+    if re.search(r"\b(predict|prediction|odds|forecast|chance|probability|will .* win)\b", text):
+        return "prediction"
+    return "breaking_news"
+
+
 def _search_single_query(query: str, page: int = 1) -> Dict[str, Any]:
     """Run a single search query against Gamma API."""
     params = {
@@ -159,7 +344,7 @@ def _run_queries_parallel(
         futures = {}
         for i, q in enumerate(queries, start=start_idx):
             for p in range(1, pages + 1):
-                future = executor.submit(_search_single_query, q, p)
+                future = http.submit_with_context(executor, _search_single_query, q, p)
                 futures[future] = i
 
         for future in as_completed(futures):
@@ -309,8 +494,9 @@ def _shorten_question(question: str) -> str:
     m = re.match(r"^Will\s+(.+?)\s+", q, re.IGNORECASE)
     if m and len(m.group(1).split()) <= 4:
         return m.group(1).strip()
-    # Fallback: truncate
-    return question[:40] if len(question) > 40 else question
+    # Fallback: truncate, dropping a leading article so the name doesn't read "an"/"the"
+    text = q[:40] if len(q) > 40 else q
+    return re.sub(r"^(?:a|an|the)\s+", "", text, flags=re.I)
 
 
 def _compute_text_similarity(topic: str, title: str, outcomes: List[str] = None) -> float:
@@ -328,7 +514,7 @@ def _compute_text_similarity(topic: str, title: str, outcomes: List[str] = None)
     if core in title_lower:
         return 1.0
 
-    query_type = detect_query_type(topic)
+    query_type = _infer_query_intent(topic)
     title_score = token_overlap_relevance(core, title)
     best_score = title_score
 
@@ -377,7 +563,13 @@ def _safe_float(val, default=0.0) -> float:
         return default
 
 
-def parse_polymarket_response(response: Dict[str, Any], topic: str = "") -> List[Dict[str, Any]]:
+def parse_polymarket_response(
+    response: Dict[str, Any],
+    topic: str = "",
+    *,
+    include_all_outcomes: bool = False,
+    include_closed: bool = False,
+) -> List[Dict[str, Any]]:
     """Parse Gamma API response into normalized item dicts.
 
     Each event becomes one item showing its title and top markets.
@@ -392,15 +584,23 @@ def parse_polymarket_response(response: Dict[str, Any], topic: str = "") -> List
     events = response.get("events", [])
     items = []
 
+    filtered_count = 0
     for i, event in enumerate(events):
         event_id = event.get("id", "")
         title = event.get("title", "")
         slug = event.get("slug", "")
 
         # Filter: skip closed/resolved events
-        if event.get("closed", False):
-            continue
-        if not event.get("active", True):
+        if not include_closed:
+            if event.get("closed", False):
+                continue
+            if not event.get("active", True):
+                continue
+
+        # Filter: skip events that don't match the topic's core subject
+        # This prevents "NFC West" from matching a "Kanye West" search
+        if topic and not _passes_topic_filter(topic, title):
+            filtered_count += 1
             continue
 
         # Get markets for this event
@@ -411,16 +611,17 @@ def parse_polymarket_response(response: Dict[str, Any], topic: str = "") -> List
         # Filter to active, open markets with liquidity (excludes resolved markets)
         active_markets = []
         for m in markets:
-            if m.get("closed", False):
-                continue
-            if not m.get("active", True):
-                continue
+            if not include_closed:
+                if m.get("closed", False):
+                    continue
+                if not m.get("active", True):
+                    continue
             # Must have liquidity (resolved markets have 0 or None)
             try:
                 liq = float(m.get("liquidity", 0) or 0)
             except (ValueError, TypeError):
                 liq = 0
-            if liq > 0:
+            if include_closed or liq > 0:
                 active_markets.append(m)
 
         if not active_markets:
@@ -551,8 +752,9 @@ def parse_polymarket_response(response: Dict[str, Any], topic: str = "") -> List
             if reordered:
                 outcome_prices = reordered + rest
 
-        # Top 3 outcomes for multi-outcome markets
-        top_outcomes = outcome_prices[:3]
+        # Normal display payloads stay compact. Verification requests the
+        # complete snapshot so topic-promoted outcomes remain re-checkable.
+        top_outcomes = outcome_prices if include_all_outcomes else outcome_prices[:3]
         remaining = len(outcome_prices) - 3
         if remaining < 0:
             remaining = 0
@@ -574,7 +776,162 @@ def parse_polymarket_response(response: Dict[str, Any], topic: str = "") -> List
             "why_relevant": f"Prediction market: {title[:60]}",
         })
 
+    if filtered_count:
+        _log(f"Filtered {filtered_count} noise events (topic: '{topic}')")
+
     # Sort by relevance (quality-signal ranked) and apply cap
     items.sort(key=lambda x: x["relevance"], reverse=True)
+
+    # Drop ALL results if nothing is genuinely on-topic.
+    # If the best item's relevance is below the threshold, the Gamma API
+    # returned only tangential matches (e.g., "Anthropic best AI model"
+    # for a "CLI vs MCP" query). Better to show 0 than noise.
+    _MIN_RELEVANCE = 0.15
+    if items and items[0]["relevance"] < _MIN_RELEVANCE:
+        _log(f"All {len(items)} Polymarket results below relevance threshold "
+             f"({items[0]['relevance']:.2f} < {_MIN_RELEVANCE}), dropping all")
+        return []
+
+    # Per-item floor: drop individual noise items even if the best item passed
+    _ITEM_MIN_RELEVANCE = 0.10
+    before_count = len(items)
+    items = [i for i in items if i["relevance"] >= _ITEM_MIN_RELEVANCE]
+    dropped = before_count - len(items)
+    if dropped:
+        _log(f"Dropped {dropped} Polymarket items below per-item relevance floor ({_ITEM_MIN_RELEVANCE})")
+
     cap = response.get("_cap", len(items))
     return items[:cap]
+
+
+def refetch_datum(item: Any, datum_key: str) -> dict[str, Any]:
+    """Re-fetch one event datum through the replay-aware HTTP wrapper."""
+    event_id = str(getattr(item, "metadata", {}).get("event_id") or "").strip()
+    slug_match = re.search(r"/event/([^/?#]+)", str(getattr(item, "url", "")))
+    cached_item_id = str(getattr(item, "item_id", "") or "").strip()
+    # On the slug fallback, a slug can be re-used by a re-created event. When
+    # the cached item still carries the original Gamma event id (numeric; the
+    # synthetic PM<N> parse fallback carries no identity), the response id
+    # must match it too, or the verdict would come from another market.
+    expected_id = (
+        cached_item_id
+        if not event_id and re.fullmatch(r"\d+", cached_item_id)
+        else ""
+    )
+    if event_id:
+        payload = http.request(
+            "GET", f"{GAMMA_EVENTS_URL}/{quote(event_id)}", timeout=10, retries=2,
+        )
+    elif slug_match:
+        if not expected_id:
+            # No event id anywhere: slug equality alone cannot verify event
+            # identity, so fail closed (unsupported) instead of re-deriving a
+            # verdict from whatever event currently owns the slug.
+            raise ValueError(
+                "Polymarket item carries no event id; slug equality alone "
+                "cannot verify event identity"
+            )
+        requested_slug = slug_match.group(1)
+        payload = http.request(
+            "GET", GAMMA_EVENTS_URL, params={"slug": requested_slug},
+            timeout=10, retries=2,
+        )
+    else:
+        raise ValueError("Polymarket item has no event id or slug")
+
+    requested_slug = slug_match.group(1) if slug_match else None
+
+    def _matches_identity(entry: dict) -> bool:
+        if str(entry.get("slug") or "").strip() != requested_slug:
+            return False
+        if expected_id and str(entry.get("id") or "").strip() != expected_id:
+            return False
+        return True
+
+    def _pick_event(events: list) -> Any:
+        candidates = [entry for entry in events if isinstance(entry, dict)]
+        if requested_slug is None:
+            return candidates[0] if candidates else None
+        # Verify identity: Gamma slug queries can return multiple or loosely
+        # matched events, and verifying a claim against another market's
+        # prices would fabricate current/stale verdicts.
+        for entry in candidates:
+            if _matches_identity(entry):
+                return entry
+        return None
+
+    if isinstance(payload, list):
+        event = _pick_event(payload)
+    elif isinstance(payload, dict) and isinstance(payload.get("events"), list):
+        event = _pick_event(payload.get("events") or [])
+    else:
+        event = payload
+        if (
+            requested_slug is not None
+            and isinstance(event, dict)
+            and (
+                str(event.get("slug") or "").strip() not in ("", requested_slug)
+                or (
+                    expected_id
+                    and str(event.get("id") or "").strip() not in ("", expected_id)
+                )
+            )
+        ):
+            event = None
+    if not isinstance(event, dict):
+        raise KeyError("Polymarket event was not found")
+    # Mixed events: an active event can carry resolved child markets whose
+    # high volume would win the parse and swap the outcome labels. Only fall
+    # back to closed markets when nothing is active (fully resolved event -
+    # the stale-odds transition verification exists to catch).
+    markets = event.get("markets") or []
+    has_active = any(
+        isinstance(m, dict) and m.get("active", True) and not m.get("closed", False)
+        for m in markets
+    )
+    parsed = parse_polymarket_response(
+        {"events": [event]},
+        include_all_outcomes=True,
+        include_closed=not has_active,
+    )
+    if not parsed:
+        raise KeyError("Polymarket event is closed, unavailable, or malformed")
+    refreshed = parsed[0]
+    values: dict[str, Any] = {}
+    outcome_pairs = refreshed.get("outcome_prices") or []
+    outcome_totals: dict[str, int] = {}
+    for name, _price in outcome_pairs:
+        normalized = str(name).casefold()
+        outcome_totals[normalized] = outcome_totals.get(normalized, 0) + 1
+    outcome_counts: dict[str, int] = {}
+    for name, price in outcome_pairs:
+        normalized = str(name).casefold()
+        occurrence = outcome_counts.get(normalized, 0)
+        outcome_counts[normalized] = occurrence + 1
+        key = f"{name}\x1f{occurrence}" if outcome_totals[normalized] > 1 else str(name)
+        values[key] = price
+    if refreshed.get("end_date") is not None:
+        values["end_date"] = refreshed["end_date"]
+
+    if datum_key == "end_date":
+        value = values.get("end_date")
+    else:
+        if "\x1f" in datum_key:
+            outcome_name, raw_occurrence = datum_key.rsplit("\x1f", 1)
+            occurrence = int(raw_occurrence)
+        else:
+            outcome_name, occurrence = datum_key, 0
+        matches = [
+            price
+            for name, price in refreshed.get("outcome_prices") or []
+            if str(name).casefold() == outcome_name.casefold()
+        ]
+        value = matches[occurrence] if occurrence < len(matches) else None
+    if value is None:
+        raise KeyError(f"Polymarket datum {datum_key!r} was not found")
+    return {
+        "value": value,
+        "values": values,
+        "url": str(getattr(item, "url", "")),
+        "timestamp": event.get("updatedAt"),
+    }

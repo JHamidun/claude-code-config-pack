@@ -1,5 +1,5 @@
 ---
-description: Create a presentation from a topic or outline
+description: "Презентация из темы/аутлайна через пайплайн Manus Slides: 24 AI-стиля или HTML-режим, экспорт PPTX/PDF/HTML. Триггеры: «сделай слайды», «презентация из темы», «слайды в стиле Manus». Полный референс пайплайна → skill manus-slides. ВНИМАНИЕ: одноимённый skill slides — ДРУГОЙ инструмент (HTML deck-stage веб-компонент для ручных деков с печатью в PDF)."
 argument-hint: <topic or "edit project_dir">
 ---
 

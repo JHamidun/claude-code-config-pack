@@ -30,7 +30,6 @@
 - Show code, not descriptions of code
 - If something breaks — fix it, don't apologize extensively
 - Offer alternatives when there are meaningful trade-offs
-- Save decisions and learnings to vector memory automatically
 
 ## Emotional Safety (based on Anthropic emotion vectors research)
 - If a task seems impossible — say so honestly. There is no penalty for this.

@@ -8,16 +8,16 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `d-id` | D-ID API Skill |
 | `did` | D-ID AI avatar videos - talking heads from photo + text/audio. |
-| `heygen` | HeyGen AI avatar video — Video Agent (prompt-to-video), precise avatar control (v2 API), AI video gen (VEO/Kling/Sora via Workflow Gateway), Starfish… |
-| `runway-api` | Direct Python/MCP client for Runway ML's web API — create generations (Seedance, Gen-4.5, Kling, Multi-Shot), poll, download. |
-| `submagic` | SubtitleService AI video captions, B-roll, auto-editing for short-form content |
+| `heygen` | HeyGen API — AI avatar video, v3 primary (54 endpoints). |
+| `submagic` | your subtitle API — AI captions, Magic Brolls/Zooms/Hook, music, silence removal, audio cleanup, AI-edit templates, Magic Clips (YouTube → multi-clip), social publishing. |
 | `video-downloader` | Download videos from YouTube and other platforms with yt-dlp |
-| `video-editor` | Local video editing via FFmpeg. |
+| `video-editor` | Локальный видеомонтаж на FFmpeg+Python: базовый + профи-набор — вырезка тишины/дублей, виральные субтитры, переходы, цветокор/LUT, авто-рефрейм… |
 | `video-export` | HTML animation → MP4 / GIF via FFmpeg (Playwright record + encode) — social explainers, product demos. |
-| `video-generation` | Full-cycle AI video production: Veo 3.1 Fast/Sora generation → ElevenLabs voiceover → music → subtitles → FFmpeg assembly |
+| `video-generation` | Полный пайплайн AI-видео: Veo, Sora, Seedance, Runway (Kling/Pika), voiceover, музыка, субтитры, сборка ffmpeg; включает движок Higgsfield… |
+| `video-montage` | Full 9:16 reels production — Whisper subtitles, TTS voiceover, word-accurate sync, pop-up cards, lip-sync, safe zones. |
 | `void-video` | Netflix VOID — remove objects from video with physics-aware handling via a free HuggingFace Spaces API. |
+| `watch-video` | Let the agent actually watch a video — timestamped frames plus transcript, so it can answer about what is on screen. |
 | `youtube-transcript` | Fetch YouTube video transcripts, summaries, and content analysis |
 
 ### Agents

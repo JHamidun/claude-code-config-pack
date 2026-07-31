@@ -1,3 +1,7 @@
+---
+description: "Массовое переименование сессий Claude Code: извлечение контекста из JSONL и генерация информативных заголовков параллельными субагентами. Триггеры: «переименуй сессии», «заголовки сессий», «rename sessions»."
+---
+
 # Rename Sessions Command
 
 **Массовое переименование сессий Claude Code с информативными заголовками**
@@ -139,7 +143,7 @@ for i, batch in enumerate(batches):
 Примеры:
 - "Разработка Telegram Mini App для YourProject"
 - "Настройка интеграции Todoist и Google Calendar"
-- "Презентация Acme Corp AI Overview"
+- "Презентация AcmeCorp AI Overview"
 
 Верни JSON:
 {{"session-id": "Title", ...}}

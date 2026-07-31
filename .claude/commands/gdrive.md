@@ -1,3 +1,8 @@
+---
+description: "Google Drive: список последних файлов, поиск по имени, чтение и метаданные файла (Drive API v3). Триггеры: «google drive», «гугл диск», «найди файл на диске», «файлы drive». НЕ Яндекс.Диск → skill yandex."
+argument-hint: "[list <N> | search <запрос> | read <file_id> | info <file_id>]"
+---
+
 # Google Drive Operations
 
 /gdrive - Работа с Google Drive

@@ -12,11 +12,14 @@
 8. НЕ используй устаревшие модели — сверяй с config/models.md
 9. НЕ используй старый SDK `google.generativeai` — используй `from google import genai`
 10. НЕ запускай деструктивные команды без подтверждения
-11. НЕ проси пользователя ОПЛАТИТЬ сторонний API (Gemini/OpenAI/и т.п.), включить биллинг или купить подписку. Сторонние API — опциональны. Нет ключа в `.credentials.master.env` (или там placeholder `your_*_api_key`) → фича недоступна: скажи об этом одной строкой, предложи альтернативу и продолжай. Из коробки всё работает по подписке Claude.
-12. НЕ используй НЕ ТУ модель для генерации изображений (сама генерация — ОПЦИОНАЛЬНАЯ фича, только при настроенном GOOGLE_API_KEY; без ключа — см. п.11) — ТОЛЬКО `gemini-3.1-flash-image-preview` (default) или `gemini-3-pro-image-preview` (pro)
+11. НЕ используй НЕ ТУ модель для генерации изображений — ТОЛЬКО:
+    - `gemini-3.1-flash-image-preview` / `gemini-3.1-flash-image` (Nano Banana 2, default)
+    - `gemini-3.1-flash-lite-image` (Nano Banana 2 **Lite** — дешевле/быстрее ×2, качество держит; дефолт для новостных обложек ваших контент-проектов)
+    - `gemini-3-pro-image-preview` / `nano-banana-pro-preview` (Nano Banana Pro — для флагманского качества)
     - НЕ `gemini-2.0-flash-exp-image-generation`
     - НЕ `gemini-2.0-flash-exp`
     - НЕ `gemini-2.0-flash`
+    - НЕ `gemini-2.5-flash-image` (Nano Banana 1 — устарела, есть NB2)
     - КЛЮЧ: `GOOGLE_API_KEY` (не GEMINI_API_KEY — конфликт SDK)
     - Убирай `os.environ.pop('GEMINI_API_KEY', None)` перед вызовом
     - SDK: `from google import genai` + `types.GenerateContentConfig(response_modalities=['IMAGE', 'TEXT'])`

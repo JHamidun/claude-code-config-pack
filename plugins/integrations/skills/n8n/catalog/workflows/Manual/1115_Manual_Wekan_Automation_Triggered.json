@@ -1,0 +1,169 @@
+{
+  "name": "Manualtrigger Workflow",
+  "nodes": [
+    {
+      "name": "On clicking 'execute'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        450,
+        450
+      ],
+      "parameters": {},
+      "typeVersion": 1,
+      "id": "228b7813-3598-4900-853c-49454ae9608f",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow."
+    },
+    {
+      "name": "Wekan",
+      "type": "n8n-nodes-base.wekan",
+      "position": [
+        650,
+        450
+      ],
+      "parameters": {
+        "owner": "c4nzTEvSwGPBxKTCc",
+        "title": "Documentation",
+        "resource": "board",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "wekanApi": "wekan-trial"
+      },
+      "typeVersion": 1,
+      "id": "236d2645-5379-4d44-9800-892ffe24228c",
+      "notes": "This wekan node performs automated tasks as part of the workflow."
+    },
+    {
+      "name": "Wekan1",
+      "type": "n8n-nodes-base.wekan",
+      "position": [
+        850,
+        450
+      ],
+      "parameters": {
+        "title": "To Do",
+        "boardId": "={{$node[\"Wekan\"].json[\"_id\"]}}",
+        "resource": "list"
+      },
+      "credentials": {
+        "wekanApi": "wekan-trial"
+      },
+      "typeVersion": 1,
+      "id": "90418dda-2d12-4ce6-ae46-696caf51f74a",
+      "notes": "This wekan node performs automated tasks as part of the workflow."
+    },
+    {
+      "name": "Wekan2",
+      "type": "n8n-nodes-base.wekan",
+      "position": [
+        1050,
+        450
+      ],
+      "parameters": {
+        "title": "Done",
+        "boardId": "={{$node[\"Wekan\"].json[\"_id\"]}}",
+        "resource": "list"
+      },
+      "credentials": {
+        "wekanApi": "wekan-trial"
+      },
+      "typeVersion": 1,
+      "id": "a671c5f1-7411-457d-9582-22422acddf10",
+      "notes": "This wekan node performs automated tasks as part of the workflow."
+    },
+    {
+      "name": "Wekan3",
+      "type": "n8n-nodes-base.wekan",
+      "position": [
+        1250,
+        450
+      ],
+      "parameters": {
+        "title": "Document Wekan node",
+        "listId": "={{$node[\"Wekan1\"].json[\"_id\"]}}",
+        "boardId": "={{$node[\"Wekan\"].json[\"_id\"]}}",
+        "authorId": "c4nzTEvSwGPBxKTCc",
+        "swimlaneId": "LDTcBp9fvmjSsSB69",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "wekanApi": "wekan-trial"
+      },
+      "typeVersion": 1,
+      "id": "7e3dd190-c5b8-46f4-95d2-46d2d22ae145",
+      "notes": "This wekan node performs automated tasks as part of the workflow."
+    },
+    {
+      "name": "Wekan4",
+      "type": "n8n-nodes-base.wekan",
+      "position": [
+        1450,
+        450
+      ],
+      "parameters": {
+        "cardId": "={{$node[\"Wekan3\"].json[\"_id\"]}}",
+        "listId": "={{$node[\"Wekan1\"].json[\"_id\"]}}",
+        "boardId": "={{$node[\"Wekan\"].json[\"_id\"]}}",
+        "operation": "update",
+        "updateFields": {
+          "listId": "={{$node[\"Wekan2\"].json[\"_id\"]}}"
+        }
+      },
+      "credentials": {
+        "wekanApi": "wekan-trial"
+      },
+      "typeVersion": 1,
+      "id": "65f7565c-c20c-41ae-ba5c-e8456f8422bb",
+      "notes": "This wekan node performs automated tasks as part of the workflow."
+    },
+    {
+      "id": "error-c7ea9079",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": null,
+    "timezone": "UTC",
+    "executionTimeout": 3600,
+    "maxExecutions": 1000,
+    "retryOnFail": true,
+    "retryCount": 3,
+    "retryDelay": 1000
+  },
+  "connections": {},
+  "description": "Automated workflow: Manualtrigger Workflow. This workflow processes data and performs automated tasks.",
+  "meta": {
+    "instanceId": "workflow-cecb0696",
+    "versionId": "1.0.0",
+    "createdAt": "2025-09-29T07:07:49.692040",
+    "updatedAt": "2025-09-29T07:07:49.692051",
+    "owner": "n8n-user",
+    "license": "MIT",
+    "category": "automation",
+    "status": "active",
+    "priority": "high",
+    "environment": "production"
+  },
+  "tags": [
+    "automation",
+    "n8n",
+    "production-ready",
+    "excellent",
+    "optimized"
+  ],
+  "notes": "Excellent quality workflow: Manualtrigger Workflow. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+}

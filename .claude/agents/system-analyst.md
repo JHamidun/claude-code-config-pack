@@ -1,7 +1,7 @@
 ---
 name: system-analyst
 description: "Analyzes technical feasibility, maps dependencies, designs data flows, plans integration and migration strategies"
-model: opus
+model: fable
 tools: Read, Glob, Grep
 ---
 

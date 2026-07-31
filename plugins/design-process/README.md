@@ -14,6 +14,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `critique-mode` | Critique a finished design instead of making one — concrete, checklist-driven, no 'looks good'. |
 | `design-guide` | A guide to good-design principles — hierarchy, rhythm, density, copy, restraint. A taste memo, not a process. |
 | `design-orchestrator` | The entry skill — activates on any 'make a design / prototype / slides / landing' task and routes to the right design skills. |
+| `design-taste` | Quantitative taste control for landings and redesigns — three 1-10 scales (variance, motion, density) plus an AI-tells scanner. |
 | `frontend-design` | Five ready aesthetic presets for projects with no design system — a fast starting style. |
 | `license-check` | Check licenses of fonts, images, icons, and npm packages in an artifact (avoid GPL fonts or Getty images). |
 | `open-design` | Open-source alternative to Claude Design — a local design tool with many skills, design systems, and AI-agent support. |

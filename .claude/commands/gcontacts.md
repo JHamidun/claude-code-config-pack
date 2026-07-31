@@ -1,3 +1,8 @@
+---
+description: "Google Контакты (People API): список, поиск, детали, создание контактов. Триггеры: «контакты google», «найди контакт», «телефон из контактов», «создай контакт»."
+argument-hint: "[list <N> | search <запрос> | get <resourceName> | create <имя> <email>]"
+---
+
 # Google Contacts Operations
 
 /gcontacts - Работа с Google Контактами

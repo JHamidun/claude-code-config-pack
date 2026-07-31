@@ -1,7 +1,7 @@
 ---
 name: kimi-algorithm-specialist
 description: "Expert in algorithms, data structures, and computational optimization — deep reasoning via Kimi K2 for math and algorithmic problems"
-model: sonnet
+model: fable
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 

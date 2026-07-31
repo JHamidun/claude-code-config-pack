@@ -8,7 +8,6 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `artifacts-builder` | Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). |
 | `canvas-design` | Create beautiful visual art in .png and .pdf documents using design philosophy. |
 | `claude-in-html` | Call an LLM from inside an artifact (summaries, generation, classification) — prototypes with 'magic'. |
 | `component-playground` | Storybook-like page with every variant of every component, plus prop controls. |
@@ -19,6 +18,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `real-data` | Wire a prototype to real data — JSON / CSV / API / GraphQL — replacing hardcoded mocks with a live source. |
 | `sketch-to-html` | Rough hand sketch / whiteboard photo → HTML skeleton — identifies layout regions into divs and sections. |
 | `storybook-bridge` | Export the component playground to Storybook 7+ (CSF3) so a team's existing Storybook can pick it up. |
+| `web-artifacts-builder` | Build elaborate multi-component HTML artifacts with React, Tailwind and shadcn/ui — state, routing, and complex layouts. |
 | `wireframe` | Rough screen/page structure variants before visuals — blocks and flow, not beauty; 2-4 options. |
 
 ## Install

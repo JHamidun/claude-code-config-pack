@@ -1,7 +1,7 @@
 ---
 name: business-analyst
 description: Performs end-to-end business analysis including stakeholder mapping, market sizing, requirements engineering, ROI modeling, and feature prioritization. Produces structured deliverables grounded in real data.
-model: opus
+model: fable
 tools: Read, Glob, Grep, WebSearch, WebFetch
 ---
 

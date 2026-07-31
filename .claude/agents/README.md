@@ -1,6 +1,6 @@
 # Agents
 
-> Specialized AI agents for delegation via orchestrator pattern.
+> Specialized AI agents for delegation via orchestrator pattern. Точные счётчики — `scripts/config_lint.py`. Text-агенты — model: fable (канон rules/models.md).
 
 ## Core
 
@@ -78,6 +78,29 @@
 | `proofreader-ortho` | Stage 1: Russian spelling |
 | `proofreader-punctuation` | Stage 2: Russian punctuation |
 | `proofreader-typography` | Stage 3: Typographic corrections |
+
+## Article Pipeline (8 stages, YourFirstName voice)
+
+| Agent | Description |
+|-------|-------------|
+| `book-fact-checker` | Book chapters fact-check («a non-fiction book», UNKNOWN vs VERIFIED) |
+
+## External Models
+
+| Agent | Description |
+|-------|-------------|
+| `gpt-agent` | GPT-5.4/o4 via AI Gateway — alternative perspective |
+| `gemini-agent` | Gemini 3.1/3.0 via AI Gateway — long context, multimodal |
+
+## Pipelines
+
+| Agent | Description |
+|-------|-------------|
+| `video-factory` | Trends → script → avatar → b-roll → audio → subtitles → YouTube |
+
+## GSD (`gsd-*`, spawned by /gsd:* commands)
+
+18 workers: planner, executor, verifier, debugger, roadmapper, phase/project/advisor researchers, research-synthesizer, plan/integration/ui checkers, ui-researcher/auditor, codebase-mapper, assumptions-analyzer, nyquist-auditor, user-profiler. Спавнятся оркестраторами `/gsd:*` — напрямую не вызывать.
 
 ## Meta (`meta/workers/`)
 
