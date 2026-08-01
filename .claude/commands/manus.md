@@ -58,7 +58,7 @@ argument-hint: "\"<задача>\" [speed|quality|balanced]"
 
 ```python
 import sys
-sys.path.append('${WORKSPACE}/tools')
+sys.path.append('~/.claude/tools')
 from manus_helper import ManusClient
 
 client = ManusClient()

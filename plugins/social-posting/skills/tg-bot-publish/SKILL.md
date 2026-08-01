@@ -1,6 +1,6 @@
 ---
 name: tg-bot-publish
-description: Публикация и управление в Telegram ЧЕРЕЗ БОТА (Bot API), CLI tg_bot.py: посты в канал, rich-вёрстка (таблицы/картинки), рассылка подписчикам, inline-кнопки, админка канала, монетизация Stars, вебхуки. Триггеры: «опубликуй через бота», «пост в канал от бота», «rich-пост с таблицей», «tg_bot.py». НЕ: текст поста→tg-post; разработка бота→telegram-bot-toolkit; user-аккаунт/парсинг→tg_client.py.
+description: "Публикация и управление в Telegram ЧЕРЕЗ БОТА (Bot API), CLI tg_bot.py: посты в канал, rich-вёрстка (таблицы/картинки), рассылка подписчикам, inline-кнопки, админка, Stars, вебхуки. НЕ: текст поста→tg-post; разработка→telegram-bot-toolkit; user-аккаунт→tg_client.py."
 keywords: telegram bot api, tg_bot.py, sendRichMessage, пост в канал от бота, бот админ канала, кнопка к посту, rich пост таблица, рассылка подписчикам, sendMessage, inline keyboard, broadcast, paid media stars, инвайт ссылка, вебхук, getFile, опрос от бота
 ---
 
@@ -25,7 +25,7 @@ keywords: telegram bot api, tg_bot.py, sendRichMessage, пост в канал �
 
 `--token` принимает сам токен (`123:ABC…`) ИЛИ имя бота из `~/.claude/.credentials.master.env`
 (`BOT_TOKEN_*`, `TELEGRAM_BOT_TOKEN_*`, `*_TELEGRAM_BOT_TOKEN`).
-Живые на 2026-06: **ACADEMY, COMPANY_SALES, DEMO3, LEADGEN**. Отозваны (401): DEMO5, FINANCE.
+Живые на 2026-06: **ACADEMY, COMPANY_SALES, DEMO3, YOUR_LEADGEN_BOT**. Отозваны (401): DEMO5, FINANCE.
 
 Глобальный `--dry-run` печатает payload и НЕ отправляет — всегда проверяй им перед боевой отправкой.
 
@@ -98,8 +98,8 @@ python tg_bot.py --token COMPANY_SALES --dry-run broadcast --to-file subs.txt \
 
 ## Справочники (progressive disclosure)
 
-- **`${WORKSPACE}/tools/TG_BOT_CAPABILITIES.md`** — разведка возможностей: что доступно one-shot vs нужен живой бот, форматирование, кнопки, рассылка, rich, новинки 2025-2026 по версиям, полный список 62 команд.
-- **`${WORKSPACE}/tools/TG_BOT_API_REFERENCE.md`** — детальный справочник всех 173 методов Bot API (назначение, версия, все параметры, что возвращает, грабли). Сюда смотреть когда нужен точный параметр метода или метод вне CLI.
+- **`~/.claude/tools/TG_BOT_API_REFERENCE.md`** — разведка возможностей: что доступно one-shot vs нужен живой бот, форматирование, кнопки, рассылка, rich, новинки 2025-2026 по версиям, полный список 62 команд.
+- **`~/.claude/tools/TG_BOT_API_REFERENCE.md`** — детальный справочник всех 173 методов Bot API (назначение, версия, все параметры, что возвращает, грабли). Сюда смотреть когда нужен точный параметр метода или метод вне CLI.
 
 ## Границы (что НЕ через этот навык)
 

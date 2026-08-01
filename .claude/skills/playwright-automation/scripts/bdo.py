@@ -5,13 +5,15 @@ Stateless: подключается к запущенному daemon по пор
 (браузер остаётся жить). Параллелится — у каждой сессии свой --port.
 
 Команды:
-  goto <url>                     — перейти
+  goto <url>                     — перейти (+ авто-проверка на антибот-заслон)
   click <selector>               — клик (text=.. | css | role=.. | "Текст кнопки")
   fill <selector> <value>        — заполнить поле
   type <selector> <text>         — печатать по символу (триггерит JS)
   press <key>                    — нажать клавишу (Enter, Escape, ...)
   snap                           — список кликабельных элементов (что можно нажать)
-  text [selector]                — innerText страницы/элемента
+  aria [offset]                  — aria-снапшот окном 80K + хвост 5K (пагинация не теряется)
+  blocked                        — проверить страницу на антибот-заслон (exit 3 если забанен)
+  text [selector]                — innerText страницы/элемента (окном + хвост)
   shot [file]                    — скриншот (default: live_shot.png в CWD)
   eval <js>                      — выполнить JS, вернуть результат
   scroll <px>                    — прокрутить (px, можно отрицательное)
@@ -20,13 +22,57 @@ Stateless: подключается к запущенному daemon по пор
   newtab <url>                   — новая вкладка
   wait <selector|ms>             — ждать селектор или мс
   upload <selector> <file>       — загрузить файл в input
+  health                         — состояние daemon (200 ok/sleeping, 503 crashed/stopped), exit 0/1
   quit                           — закрыть браузер (daemon завершится)
 
 Все команды: python bdo.py --port 9456 <cmd> [args]
+Окно снапшота: --offset N --max-chars N --tail-chars N (дефолт 0 / 80000 / 5000).
+Заслон антибота: goto/blocked дают exit 3 и явную причину; --allow-blocked = только warning.
 """
-import argparse, sys, json, pathlib
+import argparse, sys, json, pathlib, time
 sys.stdout.reconfigure(encoding="utf-8")
 from playwright.sync_api import sync_playwright
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from pw_guard import window_snapshot, is_blocked  # noqa: E402
+
+STATE = pathlib.Path(__file__).resolve().parent.parent / "state"
+WAKE_WAIT_SEC = 25  # daemon поднимает уснувший браузер за один цикл (~5 с)
+
+
+def touch_activity(port):
+    """Отметить активность — daemon по ней держит браузер живым / будит уснувший."""
+    try:
+        STATE.mkdir(exist_ok=True)
+        (STATE / f"activity-{port}").write_text(str(time.time()), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def read_state(port):
+    try:
+        return json.loads((STATE / f"session-{port}.json").read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def connect(p, port):
+    """Подключиться к daemon; если браузер спит по idle-таймауту — подождать пробуждения."""
+    deadline = time.time() + WAKE_WAIT_SEC
+    last_err = ""
+    while True:
+        try:
+            return p.chromium.connect_over_cdp(f"http://127.0.0.1:{port}")
+        except Exception as e:
+            last_err = str(e)[:80]
+            st = read_state(port)
+            if st.get("status") in ("sleeping",) and time.time() < deadline:
+                time.sleep(2)
+                continue
+            st_txt = f" [daemon status={st.get('status')} reason={st.get('reason')}]" if st else ""
+            print(f"ERR: не подключиться к браузеру на порту {port}. Запущен ли daemon?{st_txt} ({last_err})")
+            sys.exit(1)
+
 
 def active_page(browser):
     # последняя страница последнего контекста = активная вкладка
@@ -35,6 +81,7 @@ def active_page(browser):
         raise RuntimeError("нет контекстов в браузере")
     pages = ctxs[0].pages
     return pages[-1] if pages else ctxs[0].new_page()
+
 
 SNAP_JS = """() => {
   const out = [];
@@ -58,26 +105,50 @@ SNAP_JS = """() => {
   return out;
 }"""
 
+
+def report_block(pg, allow):
+    """Явная ошибка вместо пустого результата (silent failure)."""
+    blocked, reason = is_blocked(pg)
+    if blocked:
+        print(f"{'WARN' if allow else 'ERR'} blocked: {reason}")
+        if not allow:
+            sys.exit(3)
+    return blocked
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=9456)
+    ap.add_argument("--offset", type=int, default=0)
+    ap.add_argument("--max-chars", type=int, default=80000)
+    ap.add_argument("--tail-chars", type=int, default=5000)
+    ap.add_argument("--allow-blocked", action="store_true", help="антибот-заслон = warning, не ошибка")
     ap.add_argument("cmd")
     ap.add_argument("rest", nargs="*")
     a = ap.parse_args()
     r = a.rest
 
-    with sync_playwright() as p:
-        try:
-            browser = p.chromium.connect_over_cdp(f"http://127.0.0.1:{a.port}")
-        except Exception as e:
-            print(f"ERR: не подключиться к браузеру на порту {a.port}. Запущен ли daemon? ({str(e)[:80]})")
+    if a.cmd == "health":
+        st = read_state(a.port)
+        if not st:
+            print(json.dumps({"code": 503, "status": "unknown", "reason": "no state file", "port": a.port}, ensure_ascii=False))
             sys.exit(1)
+        code = 200 if st.get("status") in ("ok", "sleeping") else 503
+        st["code"] = code
+        print(json.dumps(st, ensure_ascii=False))
+        sys.exit(0 if code == 200 else 1)
+
+    touch_activity(a.port)
+
+    with sync_playwright() as p:
+        browser = connect(p, a.port)
         pg = active_page(browser)
 
         try:
             if a.cmd == "goto":
                 pg.goto(r[0], wait_until="domcontentloaded", timeout=30000)
                 print(f"OK goto {pg.url}")
+                report_block(pg, a.allow_blocked)
             elif a.cmd == "click":
                 pg.click(r[0], timeout=15000)
                 print(f"OK click {r[0]} -> {pg.url}")
@@ -93,11 +164,23 @@ def main():
             elif a.cmd == "snap":
                 els = pg.evaluate(SNAP_JS)
                 print(json.dumps(els, ensure_ascii=False, indent=1))
+            elif a.cmd == "aria":
+                off = int(r[0]) if r and r[0].lstrip("-").isdigit() else a.offset
+                w = window_snapshot(pg, offset=off, max_chars=a.max_chars, tail_chars=a.tail_chars)
+                print(f"[aria] total={w['total']} chars, window={w['offset']}..{w['offset'] + w['window_chars']}"
+                      f"{', next_offset=' + str(w['next_offset']) if w['truncated'] else ' (полный)'}")
+                print(w["text"])
+            elif a.cmd == "blocked":
+                blocked, reason = is_blocked(pg)
+                print(json.dumps({"url": pg.url, "blocked": blocked, "reason": reason}, ensure_ascii=False))
+                if blocked and not a.allow_blocked:
+                    sys.exit(3)
             elif a.cmd == "text":
-                if r:
-                    print(pg.locator(r[0]).inner_text()[:4000])
-                else:
-                    print(pg.evaluate("() => document.body.innerText")[:4000])
+                raw = pg.locator(r[0]).inner_text() if r else pg.evaluate("() => document.body.innerText")
+                w = window_snapshot(raw, offset=a.offset,
+                                    max_chars=a.max_chars if a.max_chars != 80000 else 4000,
+                                    tail_chars=a.tail_chars if a.tail_chars != 5000 else 500)
+                print(w["text"])
             elif a.cmd == "shot":
                 fp = r[0] if r else "live_shot.png"
                 pg.screenshot(path=fp, full_page=("--full" in r))
@@ -117,6 +200,7 @@ def main():
                 np = browser.contexts[0].new_page()
                 np.goto(r[0], wait_until="domcontentloaded", timeout=30000)
                 print(f"OK newtab {np.url}")
+                report_block(np, a.allow_blocked)
             elif a.cmd == "wait":
                 arg = r[0]
                 if arg.isdigit():
@@ -128,14 +212,18 @@ def main():
                 pg.set_input_files(r[0], r[1])
                 print(f"OK upload {r[1]} -> {r[0]}")
             elif a.cmd == "quit":
+                (STATE / f"STOP_{a.port}").write_text("bdo quit", encoding="utf-8")
                 browser.contexts[0].close()
-                print("OK quit (браузер закрыт)")
+                print("OK quit (браузер закрыт, daemon завершится: reason=stop_file)")
             else:
                 print(f"ERR неизвестная команда: {a.cmd}")
                 sys.exit(2)
+        except SystemExit:
+            raise
         except Exception as e:
             print(f"ERR {a.cmd}: {str(e)[:200]}")
             sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

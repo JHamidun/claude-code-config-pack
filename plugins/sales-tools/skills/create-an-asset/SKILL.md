@@ -485,7 +485,7 @@ margin performance...'"
     --accent-glow: rgba(var(--brand-primary-rgb), 0.3);
 
     /* === Status === */
-    --success: #YOUR_BRAND_COLOR;
+    --success: #12b886;
     --warning: #f59e0b;
     --error: #ef4444;
 }

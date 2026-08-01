@@ -1,6 +1,6 @@
 ---
 name: social-intel
-description: "Cross-platform social media intelligence — build a complete dossier on any person, brand, or company across LinkedIn, Instagram, TikTok, X/Twitter, Facebook, Threads, Bluesky, YouTube, Snapchat, Pinterest via Scraping API. Use when user says: досье, кто этот человек, найди соцсети, social profile, обогати контакт, due diligence, KYC check, research person, find socials."
+description: "Cross-platform social media intelligence — build a complete dossier on any person, brand or company across LinkedIn, Instagram, TikTok, X, Facebook, Threads, Bluesky, YouTube, Snapchat, Pinterest via Scraping API. Triggers: KYC check, research person, find socials."
 allowed-tools: Bash, Read, Write, WebSearch
 ---
 

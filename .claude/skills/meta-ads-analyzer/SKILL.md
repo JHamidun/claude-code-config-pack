@@ -1,6 +1,6 @@
 ---
 name: meta-ads-analyzer
-description: "Analysis and DIAGNOSIS of existing Meta Ads (Facebook/Instagram) campaigns — what broke, why it's expensive: Breakdown Effect (Marginal vs Average CPA), Learning Phase. Triggers: «диагностика Meta кампании», «почему дорого в Meta», «не выходит из обучения», analyzing Meta/FB/IG ad data. NOT for launching/scaling campaigns (meta-ads-launch-ru) or competitor creatives (ad-spy)."
+description: "Диагностика существующих кампаний Meta Ads (Facebook/Instagram) — что сломалось и почему дорого: Breakdown Effect (Marginal vs Average CPA), Learning Phase. Триггеры: «почему дорого в Meta», «не выходит из обучения». НЕ: запуск→meta-ads-launch-ru."
 ---
 
 # Meta Ads Analysis & Diagnosis

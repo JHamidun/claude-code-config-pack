@@ -30,11 +30,11 @@ KEY = open(CRED, encoding="utf-8").read().split("OPENAI_API_KEY=")[1].split("\n"
 MODEL = "gpt-image-2-2026-04-21"
 DEFAULT = "photoreal-3d"
 
-PALETTE = {"cream": "#YOUR_CREAM", "navy": "#YOUR_INK", "blue": "#YOUR_PRIMARY", "cyan": "#YOUR_ACCENT", "terra": "#CC7357"}
+PALETTE = {"cream": "#F1F3F5", "navy": "#0B1021", "blue": "#3B5BDB", "cyan": "#4DABF7", "terra": "#CC7357"}
 
 # brand invariant for CUTOUT object styles (subject on plain bg → rembg)
-_CUT = (" Strict brand palette: warm cream (#YOUR_CREAM), deep navy (#YOUR_INK), electric blue (#YOUR_PRIMARY), "
-        "bright cyan (#YOUR_ACCENT), terracotta (#CC7357). ONE clear central subject, balanced, generous space. "
+_CUT = (" Strict brand palette: warm cream (#F1F3F5), deep navy (#0B1021), electric blue (#3B5BDB), "
+        "bright cyan (#4DABF7), terracotta (#CC7357). ONE clear central subject, balanced, generous space. "
         "NO text, NO words, NO logos, NO watermarks, NO UI chrome. PLAIN seamless near-white background, "
         "subject fully inside frame with margin, for easy cutout.\nSubject:\n")
 # brand invariant for FULL-CARD-BACKGROUND styles (no cut — used full-bleed)
@@ -50,7 +50,7 @@ TEMPLATES = {
     "isometric":     "Isometric 3D illustration, 30-degree angle, clean geometric shapes, soft ambient occlusion, "
                      "technical but playful, no photorealism." + _CUT,
     "marker":        "Hand-drawn marker / sketch illustration — confident slightly-imperfect lines, like a smart "
-                     "whiteboard diagram. Icons, arrows and small diagrams drawn with indigo-blue (#YOUR_PRIMARY) and "
+                     "whiteboard diagram. Icons, arrows and small diagrams drawn with indigo-blue (#3B5BDB) and "
                      "copper-orange (#CC7357) markers on clean white. Playful but precise, blueprint-of-an-idea feel." + _CUT,
     "chromatic":     "Playful tech-explainer 3D render — glossy colorful floating object with soft reflections and "
                      "subtle prism/sparkle accents, educational and engaging, light airy feel." + _CUT,

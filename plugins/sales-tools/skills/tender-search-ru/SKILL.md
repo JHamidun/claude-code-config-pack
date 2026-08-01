@@ -1,6 +1,6 @@
 ---
 name: tender-search-ru
-description: "Search Russian procurement tenders (госзакупки/закупки/тендеры) via Playwright and shortlist contracts for a product/company. Use for: найди тендеры, подходящие контракты, zakupki.gov.ru, rostender. Covers geo-block workaround (zakupki blocks non-RU IPs → rostender), relevance filtering, keyword+OKPD2 sets. NOT for non-RU procurement or writing the bid/КП (draft-outreach/kp-deck-factory)."
+description: "Search Russian procurement tenders via Playwright and shortlist contracts for a product/company: geo-block workaround (zakupki blocks non-RU IPs → rostender), relevance filtering, keyword + OKPD2 sets. NOT for non-RU procurement or writing the bid/КП."
 metadata:
   version: 1.0.0
   updated: 2026-06-18

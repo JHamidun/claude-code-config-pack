@@ -1,6 +1,6 @@
 ---
 name: image-generation
-description: "AI image generation prompt engineering for DALL-E 3, Gemini Imagen, Stable Diffusion, Midjourney. Use when asked to generate, create, or draw images. Also covers the Krestinin surrealism preset for ad creatives — triggers: «креатив для vk ads», «сюрреализм магритт», «несочетаемые пары для рекламы», «рекламный креатив сюрреализм», «креатив магритт дали»."
+description: "AI image generation prompt engineering — DALL-E 3, Gemini Imagen, Stable Diffusion, Midjourney. Плюс сюрреализм-пресет эксперта для рекламных креативов: «креатив для vk ads», «сюрреализм магритт», «несочетаемые пары для рекламы», «креатив магритт дали»."
 ---
 
 # Image Generation Skill

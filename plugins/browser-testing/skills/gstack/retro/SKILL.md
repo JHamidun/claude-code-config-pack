@@ -396,7 +396,7 @@ Use the Write tool to save the JSON file with this schema:
     "Garry Tan": { "commits": 32, "insertions": 2400, "deletions": 300, "test_ratio": 0.41, "top_area": "browse/" },
     "Alice": { "commits": 12, "insertions": 800, "deletions": 150, "test_ratio": 0.35, "top_area": "app/services/" }
   },
-  "version_range": ["YOUR_PUBLIC_IP", "YOUR_PUBLIC_IP"],
+  "version_range": ["1.0.0.0", "9.9.9.9"],
   "streak_days": 47,
   "tweetable": "Week of Mar 1: 47 commits (3 contributors), 3.2k LOC, 38% tests, 12 PRs, peak: 10pm",
   "greptile": {

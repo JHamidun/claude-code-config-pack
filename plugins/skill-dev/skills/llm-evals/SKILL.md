@@ -1,6 +1,6 @@
 ---
 name: llm-evals
-description: Эвалюация LLM/агентов — построить golden-set, двухуровневый грейдинг (программные метрики + LLM-судья), быстрый пробник vs полный прогон, отчёт вариант×метрика и вердикт keep/rollback; отдельный режим — свип по моделям и параметрам инференса (thinking/effort) ради quality-per-dollar. Триггеры "сделай эвал", "как измерить агента", "мой промпт стал лучше?", "это улучшение или шум", "golden set", "LLM-as-judge", "судья-LLM", "аудит эвала", "какую модель выбрать под задачу", "свип по моделям", "extended thinking / effort сравнение", "регресс агента", "grader", "pass rate", "почему агент хуже стал". НЕ для — фактчек текста и проверка ссылок/цитат (check-skill-solo), адверсарная проверка чужих находок и код-ревью (verifier), кросс-модельное второе мнение по одному вопросу (multi-model-gateway), RAG-специфичные метрики recall/faithfulness (verifier/references/rag-eval-opik.md).
+description: "Эвалюация LLM/агентов: golden-set, двухуровневый грейдинг (программные метрики + LLM-судья), пробник vs полный прогон, отчёт вариант×метрика, вердикт keep/rollback, свип моделей и effort/thinking ради quality-per-dollar. Триггеры: «судья-LLM», «grader», «сравнение effort». НЕ: фактчек→check-skill-solo; адверсарное ревью и код-ревью→verifier; второе мнение→multi-model-gateway; RAG-метрики→rag-eval-opik.md."
 ---
 
 # LLM Evals — измерять, а не верить

@@ -59,7 +59,7 @@ Production-tested workflow для Claude Design (`claude.ai/design`) — бра�
 Контекст: ExampleProduct — your example AI platform.
 Audience: senior-engineers (your demographic).
 Задача: страница /dashboard/billing — личный биллинг юзера.
-Бренд: основной #YOUR_PRIMARY, ink #YOUR_INK, акцент cyan #YOUR_ACCENT, cream #YOUR_CREAM.
+Бренд: основной #3B5BDB, ink #0B1021, акцент cyan #4DABF7, cream #F1F3F5.
 Шрифты: Inter Tight (heading), Manrope (body), JetBrains Mono (numbers).
 Состав:
   - Hero с текущим тарифом (Plus $X.XX/mo) и датой следующего списания
@@ -190,9 +190,9 @@ URL Claude Design мокапа стабильный (`claude.ai/design/<id>`). �
 Размер ровно 1200×675 px.
 
 ПАЛИТРА БРЕНДА (your-domain.com):
-• #YOUR_INK — глубокая navy (основной фон)
-• #YOUR_PRIMARY — насыщенный синий (primary accent)
-• #YOUR_ACCENT — cyan (secondary accent / подчёркивания)
+• #0b1021 — глубокая navy (основной фон)
+• #3B5BDB — насыщенный синий (primary accent)
+• #4DABF7 — cyan (secondary accent / подчёркивания)
 • #FFFFFF — белый (текст)
 • #9CA3AF — средний серый (второстепенный текст)
 
@@ -258,7 +258,7 @@ Output — один HTML canvas `ExampleProduct Landing.html`
 **Промпт-1 (design-system foundation):**
 ```
 Создай design system для ExampleProduct.
-Brand: #YOUR_PRIMARY / #YOUR_INK / #YOUR_ACCENT / #YOUR_CREAM.
+Brand: #3B5BDB / #0B1021 / #4DABF7 / #F1F3F5.
 Шрифты: Inter Tight (display), Manrope (body), JetBrains Mono (numbers).
 Output: один styles.css файл с tokens (colors / spacing / radii / shadows /
 type scale / fonts) + components.jsx с базовыми атомами
@@ -425,7 +425,7 @@ Update сюда — это коллективная память между се
 
 - В прототипе кнопка `border-radius: 14px`, в проекте все кнопки `--r-md: 12px` → берём `12px`, не `14px`
 - В прототипе `font-family: 'Manrope'`, в проекте уже есть `--h-font-body: Inter` → ставим в `globals.css` ОДИН раз и заменяем на единый
-- В прототипе цвет `#YOUR_PRIMARY`, в проекте `--h-primary: #YOUR_PRIMARY` → используем токен, не хардкод
+- В прототипе цвет `#3B5BDB`, в проекте `--h-primary: #3B5BDB` → используем токен, не хардкод
 - В прототипе компонент Card по своему, в проекте есть `<ACard>` → расширяем `ACard` props, не делаем новый
 
 Если расхождение **визуально критичное** — спросить юзера, не молчать.
@@ -435,7 +435,7 @@ Update сюда — это коллективная память между се
 Это шпаргалка, чтобы юзер получал лучший output из Claude Design:
 
 ### 1. Начинать с дизайн-системы
-Первый промпт: «Создай design tokens (цвета, шрифты, spacing, radii) для edtech-платформы про AI, аудитория your target users, тон премиум, бренд your-domain.com (#YOUR_PRIMARY / #YOUR_INK)». Получаешь `styles.css` фундамент. Потом — экраны на этих tokens.
+Первый промпт: «Создай design tokens (цвета, шрифты, spacing, radii) для edtech-платформы про AI, аудитория your target users, тон премиум, бренд your-domain.com (#3B5BDB / #0B1021)». Получаешь `styles.css` фундамент. Потом — экраны на этих tokens.
 
 ### 2. Просить варианты
 Не «сделай dashboard», а «сделай 3 варианта dashboard: (а) карточный grid, (б) список с metrics в шапке, (в) split с sidebar metrics + main feed». Дешевле, дальше выбираешь.

@@ -1,6 +1,6 @@
 ---
 name: context-engineering
-description: "Паттерны оптимизации контекста LLM: progressive disclosure, semantic compression, structured references, summary-first / layered / delta / contract-based context, token-оптимизация длинных сессий. Триггеры: «context engineering», «контекст инжиниринг», «сжать контекст», «оптимизируй токены», «не влезает в контекст»."
+description: "Паттерны оптимизации контекста LLM: progressive disclosure, semantic compression, structured references, summary-first / layered / delta / contract-based, токен-оптимизация длинных сессий. Триггеры: «сжать контекст», «не влезает в контекст»."
 ---
 
 # Context Engineering Kit

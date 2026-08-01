@@ -24,6 +24,16 @@
  * (base64 -d | sh, eval $(base64|curl), bash <(curl), sh -c "$(curl)");
  * powershell -EncodedCommand decoded (UTF-16LE + UTF-8) and re-scanned;
  * wipefs -a; vssadmin/wmic shadowcopy delete.
+ *
+ * 2026-07-31 infra-destruction gap-fill: the guard knew nothing about tearing down
+ * running production infrastructure (your-server: 44 prod containers + pm2 + systemd).
+ * Added to the SAME P[] list (so the ssh / interpreter / -EncodedCommand branches
+ * re-scan payloads automatically): docker rm -f, docker rm/stop/kill $(docker ps ...),
+ * docker compose down (+ -v/--volumes = data loss), docker volume rm, docker * prune,
+ * pm2 delete/kill, systemctl stop/disable, service ... stop, kubectl delete.
+ * Deliberately NOT sql/txt-gated: a text-display prefix must not open
+ * `echo restarting && docker compose down -v`. Read-only ops (docker ps/logs,
+ * docker compose up -d, pm2 list, systemctl status) never match.
  */
 'use strict';
 const fs = require('fs');
@@ -60,6 +70,13 @@ try {
   const TERM = '(?:\\/|\\/\\*|\\*)?\\1(?:\\s|$|;|&|\\|)';
   // Windows path tail for del/robocopy targets: optional \ or /, optional *, closing backref quote, boundary.
   const WINEND = '[\\\\/]?\\*?\\1(?:\\s|$|;|&|\\|)';
+
+  // docker prefix + optional GLOBAL flags before the subcommand (`docker -H tcp://h:2375 rm -f x`,
+  // `docker --context prod compose down`). Each optional token must start with a dash, so the
+  // subcommand word itself can never be swallowed by the group.
+  const DKRFLAGS = '(?:(?:-[a-zA-Z]|--[a-z][\\w-]*)(?:[=\\s]+[^\\s;&|]+)?\\s+)*';
+  const DKR  = '\\bdocker(?:\\.exe)?\\s+' + DKRFLAGS;          // `docker <sub>`
+  const DKRC = '\\bdocker(?:\\.exe)?[\\s-]+' + DKRFLAGS;       // `docker compose` AND `docker-compose`
 
   const P = [
     // Tier 1: root / home / drive roots (subpaths ALLOWED)
@@ -106,6 +123,30 @@ try {
     { id: 'chmod-root', re: /\bchmod\s+(-[a-z]*\s+)*-[a-z]*r[a-z]*\s+[^\n]*\s(\/(\s|$)|~(\/(\s|$)|\s|$)|\$\{?home\}?(\s|$))/i, why: 'chmod -R на корень/home' },
     // download|execute (remote code exec)
     { id: 'curl-pipe-exec', re: /\b(curl|wget|iwr|invoke-webrequest)\b[^\n]*(\||;|&&)\s*(sh|bash|zsh|iex\b|invoke-expression\b|python3?\b|node\b|perl\b)\b/i, why: 'скачать-и-исполнить (curl|sh)' },
+    // === 2026-07-31 infra-destruction (снос работающего прода) ===
+    // NO sql/txt gate on purpose: TEXTDISP matches only the START of the line, so a txt-flag
+    // would open `echo restarting && docker compose down -v`. Cost: `grep "docker rm -f" x.md`
+    // is blocked too — same trade-off as the existing rm-root/dd rules.
+    { id: 'docker-rm-force', re: new RegExp(DKR + 'rm\\b(?=[^\\n;&|]*\\s(?:-[a-zA-Z]*f[a-zA-Z]*|--force)\\b)', 'i'),
+      why: 'docker rm -f/--force — принудительное удаление контейнера' },
+    { id: 'docker-mass-wipe', re: /\bdocker\b[^\n]*\s(?:rm|stop|kill)\b[^\n]*(?:\$\(|`)\s*docker\s+ps\b/i,
+      why: 'docker rm/stop/kill $(docker ps ...) — массовый снос ВСЕХ контейнеров' },
+    { id: 'compose-down-volumes', re: new RegExp(DKRC + 'compose\\b[^\\n;&|]*\\sdown\\b[^\\n;&|]*\\s(?:-[a-zA-Z]*v[a-zA-Z]*|--volumes)\\b', 'i'),
+      why: 'docker compose down -v/--volumes — удаление томов = ПОТЕРЯ ДАННЫХ' },
+    { id: 'compose-down', re: new RegExp(DKRC + 'compose\\b[^\\n;&|]*\\sdown(?=\\s|$|[;&|])', 'i'),
+      why: 'docker compose down — остановка и удаление стека контейнеров' },
+    { id: 'docker-volume-rm', re: new RegExp(DKR + 'volume\\s+(?:rm|remove)\\b', 'i'),
+      why: 'docker volume rm — удаление тома с данными' },
+    { id: 'docker-prune', re: new RegExp(DKR + '(?:system|volume|image|container|network|builder)\\s+prune\\b', 'i'),
+      why: 'docker prune — массовое удаление контейнеров/томов/образов' },
+    { id: 'pm2-delete', re: /\bpm2(?:\.exe)?\s+(?:(?:-[a-zA-Z]|--[a-z][\w-]*)(?:[=\s]+[^\s;&|]+)?\s+)*(?:delete|del|kill)\b/i,
+      why: 'pm2 delete/kill — снятие процесса с продакшена' },
+    { id: 'systemctl-stop', re: /\bsystemctl\b(?:\s+--?[\w][\w=.:@-]*)*\s+(?:stop|disable)\b/i,
+      why: 'systemctl stop/disable — остановка/отключение системного сервиса' },
+    { id: 'service-stop', re: /\bservice\s+[\w.@-]+\s+stop\b/i,
+      why: 'service ... stop — остановка системного сервиса' },
+    { id: 'kubectl-delete', re: /\bkubectl\b[^\n;&|]*\sdelete(?=\s|$)/i,
+      why: 'kubectl delete — удаление ресурсов кластера' },
     // === dcg-port 2026-07-19 (8 patterns + 3 scan branches below) ===
     // Interpreter fs-nuke sinks: match the RAW cmd (heredoc bodies and -c payloads are
     // substrings of it). Root/home/sysdir targets only — rmtree('./build'|'/tmp/x') PASS.

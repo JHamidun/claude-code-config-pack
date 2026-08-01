@@ -1,0 +1,12 @@
+{
+ "port": 9475,
+ "updated": 1785509808.3723464,
+ "pid": 96420,
+ "status": "sleeping",
+ "reason": "idle_timeout",
+ "profile": "guard-test",
+ "browser_up": false,
+ "last_activity": 1785509749.2441614,
+ "rss_mb": 60.9,
+ "restarts": 1
+}

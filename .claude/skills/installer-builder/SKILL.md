@@ -1,6 +1,6 @@
 ---
 name: installer-builder
-description: "One-click installers (Windows .exe + macOS .dmg) on Electron: выбор компонентов, fully-offline bundling, GitHub Actions macOS build (без Mac). Triggers: «сделай инсталлятор», «установщик в один клик», «офлайн-инсталлятор», «exe + dmg», «вшить ПО в один установщик», «накатить софт на чистую машину», «offline installer», «electron installer». NOT: npm packages, MSI-only (WiX), App Store."
+description: "One-click инсталляторы (Windows .exe + macOS .dmg) на Electron: выбор компонентов, fully-offline bundling, сборка macOS через GitHub Actions без Mac. Триггеры: «вшить ПО в один установщик», «накатить софт на чистую машину». NOT: npm, MSI-only (WiX), App Store."
 metadata:
   version: 1.0.0
   updated: 2026-06-23

@@ -50,7 +50,7 @@ Route tasks to the best AI model (or multiple models) through AI Gateway v2.
 
 ```bash
 # Local gateway (start once):
-cd ${WORKSPACE}/projects/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port YOUR_PORT &
+cd ${WORKSPACE}/projects/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200 &
 
 # Call any model:
 curl -s http://localhost:GATEWAY_PORT/v1/messages \

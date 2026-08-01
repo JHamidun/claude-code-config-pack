@@ -1,6 +1,6 @@
 ---
 name: email-imap
-description: Generic IMAP/SMTP email CLI для ПРОИЗВОЛЬНОГО почтового ящика — Яндекс.Почта, корпоративные сервера, Mail.ru, Gmail по app-password, любой хостинг с IMAP/SMTP. Чтение, поиск, отправка, ответы, вложения, несколько профилей ящиков. Триггеры: «почта по IMAP», «яндекс почта письма», «корпоративный ящик», «подключи произвольный ящик», «письмо через SMTP», «imap search», «скачай вложения из письма». НЕ для: личной Gmail через OAuth → skill/команда `gmail`; рабочей почты на Exchange → `outlook`; Яндекс-сервисов кроме почты (Диск/Метрика/Директ) → skill `yandex`.
+description: "Generic IMAP/SMTP CLI для ПРОИЗВОЛЬНОГО ящика — Яндекс.Почта, корпоративные серверы, Mail.ru, Gmail по app-password: чтение, поиск, отправка, ответы, вложения, несколько профилей ящиков. НЕ: личная Gmail по OAuth→gmail; рабочая почта на Exchange→outlook; Яндекс-сервисы кроме почты (Диск/Метрика/Директ)→yandex."
 ---
 
 # Email IMAP/SMTP CLI
@@ -24,7 +24,7 @@ CLI-коннектор к любому почтовому ящику по ста
 
 ## Установка / настройка
 
-CLI: `${WORKSPACE}/tools/email_client.py` (Python 3.13, stdlib — ставить ничего не нужно).
+CLI: `~/.claude/tools/email_client.py` (Python 3.13, stdlib — ставить ничего не нужно).
 
 Профили — в `~/.claude/.credentials.master.env` через префикс `MAIL_<PROFILE>_*`. Владелец заполняет значения сам (НЕ хардкодить в код):
 
@@ -47,7 +47,7 @@ MAIL_YANDEX_PASSWORD=
 
 Типовые хосты: Яндекс `imap.yandex.ru`/`smtp.yandex.ru` (993/465, нужен **пароль приложения** + включить IMAP в настройках почты); Gmail `imap.gmail.com`/`smtp.gmail.com` (993/465, только app-password при 2FA); Mail.ru `imap.mail.ru`/`smtp.mail.ru` (993/465).
 
-Проверка конфигурации: `python ${WORKSPACE}/tools/email_client.py profiles`
+Проверка конфигурации: `python ~/.claude/tools/email_client.py profiles`
 
 ## Команды
 
@@ -72,20 +72,20 @@ UID — из вывода `list`/`search` (число в `[...]`). UID вали�
 
 ```bash
 # непрочитанные в Яндекс-ящике
-python ${WORKSPACE}/tools/email_client.py list --profile YANDEX --unseen
+python ~/.claude/tools/email_client.py list --profile YANDEX --unseen
 
 # поиск счетов за июль
-python ${WORKSPACE}/tools/email_client.py search "счёт" --since 2026-07-01 --json
+python ~/.claude/tools/email_client.py search "счёт" --since 2026-07-01 --json
 
 # прочитать письмо и скачать вложения
-python ${WORKSPACE}/tools/email_client.py read 4321
-python ${WORKSPACE}/tools/email_client.py download-attachments 4321 --out C:/temp/invoices
+python ~/.claude/tools/email_client.py read 4321
+python ~/.claude/tools/email_client.py download-attachments 4321 --out C:/temp/invoices
 
 # отправить с вложением
-python ${WORKSPACE}/tools/email_client.py send client@firm.ru "Отчёт" "Во вложении." --attach report.pdf
+python ~/.claude/tools/email_client.py send client@firm.ru "Отчёт" "Во вложении." --attach report.pdf
 
 # ответить в тред
-python ${WORKSPACE}/tools/email_client.py reply 4321 "Принято, спасибо."
+python ~/.claude/tools/email_client.py reply 4321 "Принято, спасибо."
 ```
 
 ## Гочи

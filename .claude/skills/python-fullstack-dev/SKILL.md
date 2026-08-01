@@ -868,7 +868,7 @@ USER appuser
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "YOUR_PUBLIC_IP", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 ### docker-compose.yml
@@ -888,7 +888,7 @@ services:
       - redis
     volumes:
       - ./:/app
-    command: uvicorn app.main:app --host YOUR_PUBLIC_IP --reload
+    command: uvicorn app.main:app --host 0.0.0.0 --reload
 
   db:
     image: postgres:15

@@ -208,7 +208,7 @@ if __name__ == "__main__":
     import asyncio
 
     asyncio.run(setup_webhook())
-    uvicorn.run(app_fastapi, host="YOUR_PUBLIC_IP", port=8080)
+    uvicorn.run(app_fastapi, host="0.0.0.0", port=8080)
 ```
 
 #### Nginx Configuration

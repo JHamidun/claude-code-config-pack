@@ -1,6 +1,6 @@
 ---
 name: linkedin-profile-optimizer
-description: 'Audit and rewrite a LinkedIn profile end-to-end — headline, About section, Featured, banner, photo, Experience metrics, Skills pinning, custom URL, recommendations. Triggers: "review my LinkedIn profile", "rewrite my headline", "fix my About section", "optimize banner", "profile audit", "LinkedIn bio", "Featured section", "profile conversion", "profile keywords".'
+description: "Audit and rewrite a LinkedIn profile end-to-end — headline, About, Featured, banner, photo, Experience metrics, Skills pinning, custom URL, recommendations. Triggers: \"rewrite my headline\", \"fix my About section\", \"profile audit\", \"profile keywords\"."
 ---
 
 # LinkedIn Profile Optimizer

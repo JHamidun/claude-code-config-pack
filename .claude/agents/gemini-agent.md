@@ -43,7 +43,7 @@ grounding, deep research mode).
 ### Starting the Local Gateway
 
 ```bash
-cd ${WORKSPACE}/projects/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port YOUR_PORT
+cd ${WORKSPACE}/projects/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200
 ```
 
 ### Authentication
@@ -390,7 +390,7 @@ Include token usage when available:
 # Check if gateway is running
 curl -s --max-time 3 http://localhost:GATEWAY_PORT/health
 # If no response, start it:
-cd ${WORKSPACE}/projects/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port YOUR_PORT &
+cd ${WORKSPACE}/projects/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200 &
 # Wait 3s then retry
 ```
 

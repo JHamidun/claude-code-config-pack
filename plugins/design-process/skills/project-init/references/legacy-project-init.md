@@ -1,4 +1,4 @@
-<!-- LEGACY: полное тело скилла 'project-init' из старого дерева ${WORKSPACE}/tools/claude-code-skills (@2026-04-30).
+<!-- LEGACY: полное тело скилла 'project-init' из старого дерева ~/.claude/tools/claude-code-skills (@2026-04-30).
      Сохранено при консолидации деревьев design-пака 2026-07-18 (lossless-merge, канон deep-read-before-merge).
      Актуальный канон — ../SKILL.md; здесь — расширенный материал прежней версии (таблицы, рецепты, антипаттерны). -->
 
@@ -61,10 +61,10 @@ when_to_use: Юзер начинает новый дизайн-проект и �
   "preset": "warm",
   "tokens_source": "figma:YOUR_FIGMA_FILE_ID",
   "brand": {
-    "primary": "#YOUR_PRIMARY",
-    "deep": "#YOUR_INK",
-    "cyan": "#YOUR_ACCENT",
-    "cream": "#YOUR_CREAM"
+    "primary": "#3B5BDB",
+    "deep": "#0B1021",
+    "cyan": "#4DABF7",
+    "cream": "#F1F3F5"
   },
   "fonts": {
     "head": "Inter Tight",

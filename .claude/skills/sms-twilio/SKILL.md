@@ -1,13 +1,13 @@
 ---
 name: sms-twilio
-description: Отправка SMS через Twilio REST API — одиночные и массовые (bulk с dry-run/джиттером), статус доставки, история сообщений, баланс, номера аккаунта. CLI: python ${WORKSPACE}/tools/sms_client.py. Триггеры: «отправь SMS», «смс», «sms», «twilio», «рассылка по телефонам», «статус доставки смс», «баланс twilio». НЕ для: сообщений в Telegram → tg_client.py/tg-bot-publish; WhatsApp; email-рассылок → gmail/outlook; звонков/телефонии.
+description: "Отправка SMS через Twilio REST API — одиночные и массовые (bulk с dry-run/джиттером), статус доставки, история сообщений, баланс, номера аккаунта. CLI: python ~/.claude/tools/sms_client.py. НЕ: Telegram→tg_client.py/tg-bot-publish; WhatsApp→whatsapp-client; email-рассылки→gmail/outlook; звонки/телефония."
 ---
 
 # SMS via Twilio
 
 CLI-коннектор к Twilio REST API (`https://api.twilio.com/2010-04-01`). Без twilio-SDK — `requests` (стоит) или stdlib urllib fallback. Подключился → сделал → напечатал → вышел.
 
-**Файл:** `${WORKSPACE}/tools/sms_client.py`
+**Файл:** `~/.claude/tools/sms_client.py`
 
 ## Когда использовать
 
@@ -44,15 +44,15 @@ CLI-коннектор к Twilio REST API (`https://api.twilio.com/2010-04-01`).
 
 ```bash
 # одно SMS (from = TWILIO_PHONE_NUMBER)
-python ${WORKSPACE}/tools/sms_client.py send +55 XX XXXXX-XXXX "Тест"
+python ~/.claude/tools/sms_client.py send +55 XX XXXXX-XXXX "Тест"
 
 # рассылка: сначала dry-run (дефолт), потом реальная
-python ${WORKSPACE}/tools/sms_client.py bulk numbers.txt "Текст всем"
-python ${WORKSPACE}/tools/sms_client.py bulk numbers.txt "Текст всем" --confirm --rate 3
+python ~/.claude/tools/sms_client.py bulk numbers.txt "Текст всем"
+python ~/.claude/tools/sms_client.py bulk numbers.txt "Текст всем" --confirm --rate 3
 
 # статус и история
-python ${WORKSPACE}/tools/sms_client.py status SMxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-python ${WORKSPACE}/tools/sms_client.py list --limit 10 --json
+python ~/.claude/tools/sms_client.py status SMxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+python ~/.claude/tools/sms_client.py list --limit 10 --json
 ```
 
 ## Стоимость и согласие получателей
@@ -64,7 +64,7 @@ python ${WORKSPACE}/tools/sms_client.py list --limit 10 --json
 
 ## Гочи
 
-- Номера ТОЛЬКО в E.164 (`+<код страны><номер>`, напр. `+15551234567`) — без плюса Twilio вернёт 21211.
+- Номера ТОЛЬКО в E.164 (`+5581...`) — без плюса Twilio вернёт 21211.
 - `bulk` без `--confirm` = всегда dry-run; это фича, не баг. Cap 50 получателей — поднимать `--limit` осознанно.
 - Error 21608 = trial + неверифицированный получатель; 21606 = From-номер не SMS-capable.
 - `status` сразу после `send` часто показывает `queued`/`sent` — `delivered` приходит через секунды-минуты, перепроверить позже.

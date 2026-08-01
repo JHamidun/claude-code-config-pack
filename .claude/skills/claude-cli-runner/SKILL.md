@@ -1,6 +1,6 @@
 ---
 name: claude-cli-runner
-description: "Запуск моделей Claude из Python БЕЗ API-ключа — через claude CLI binary с авторизацией подписки Claude Code. Модуль ~/.claude/tools/claude_cli.py (claude, claude_async, claude_json, claude_stream, validate_response). Триггеры: «claude CLI», «без API ключа», «claude binary», «run Claude from Python», «call Claude without API key», «клод из скрипта»."
+description: "Запуск моделей Claude из Python БЕЗ API-ключа — через claude CLI binary с авторизацией подписки Claude Code. Модуль ~/.claude/tools/claude_cli.py (claude, claude_async, claude_json, claude_stream). Триггеры: «клод из скрипта», run Claude from Python."
 ---
 
 # Claude CLI Runner
@@ -22,7 +22,7 @@ Use this skill when the user needs to run Claude models from Python code WITHOUT
 
 ```python
 import sys
-sys.path.insert(0, "${WORKSPACE}/tools")
+sys.path.insert(0, "~/.claude/tools")
 from claude_cli import claude, claude_async, claude_json, claude_stream, validate_response
 
 # Simple call

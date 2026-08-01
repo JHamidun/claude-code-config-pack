@@ -37,8 +37,8 @@ when_to_use: Юзер просит «как app», «можно установи
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "theme_color": "#YOUR_PRIMARY",
-  "background_color": "#YOUR_INK",
+  "theme_color": "#3B5BDB",
+  "background_color": "#0B1021",
   "lang": "ru",
 
   "icons": [
@@ -62,7 +62,7 @@ when_to_use: Юзер просит «как app», «можно установи
 В HTML:
 ```html
 <link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#YOUR_PRIMARY">
+<meta name="theme-color" content="#3B5BDB">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MyApp">
@@ -167,7 +167,7 @@ iOS не поддерживает `beforeinstallprompt` — там install че�
 Из одного 1024×10N PNG:
 ```bash
 npx pwa-asset-generator source-icon-1024.png ./icons \
-  --background "#YOUR_INK" \
+  --background "#0B1021" \
   --opaque false \
   --padding "0" \
   --manifest manifest.webmanifest \

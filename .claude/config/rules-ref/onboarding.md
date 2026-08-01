@@ -120,7 +120,7 @@ Run these to confirm everything works end-to-end:
 | Slow startup (>5s) | Disable unused MCP servers — each one adds cold-start latency |
 | Hook errors / crashes | See `rules/hooks.md` — only blocking hooks and beep are active by design |
 | Context7 not resolving | Ensure `context7` plugin is enabled in `settings.json` |
-| Telegram tools fail | Run `python ${WORKSPACE}/tools/tg_client.py` once to authenticate Telethon session |
+| Telegram tools fail | Run `python ~/.claude/tools/tg_client.py` once to authenticate Telethon session |
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: competitive-intelligence
-description: Research your competitors and build an interactive battlecard. Outputs an HTML artifact with clickable competitor cards and a comparison matrix. Trigger with "competitive intel", "research competitors", "how do we compare to [competitor]", "battlecard for [competitor]", or "what's new with [competitor]".
+description: "Research your competitors and build an interactive battlecard — HTML artifact with clickable competitor cards and a comparison matrix. Trigger with \"competitive intel\", \"battlecard for [competitor]\", \"how do we compare to [competitor]\"."
 ---
 
 # Competitive Intelligence
@@ -180,7 +180,7 @@ Each competitor gets a clickable card that expands to show:
     --accent-hover: #2563eb;
 
     /* Status indicators */
-    --you-win: #YOUR_BRAND_COLOR;
+    --you-win: #12b886;
     --they-win: #ef4444;
     --tie: #f59e0b;
 }

@@ -1,4 +1,4 @@
-<!-- LEGACY: полное тело скилла 'github-import' из старого дерева ${WORKSPACE}/tools/claude-code-skills (@2026-04-30).
+<!-- LEGACY: полное тело скилла 'github-import' из старого дерева ~/.claude/tools/claude-code-skills (@2026-04-30).
      Сохранено при консолидации деревьев design-пака 2026-07-18 (lossless-merge, канон deep-read-before-merge).
      Актуальный канон — ../SKILL.md; здесь — расширенный материал прежней версии (таблицы, рецепты, антипаттерны). -->
 
@@ -90,10 +90,10 @@ Tailwind? styled-components? CSS Modules? Это влияет на то как �
 - shadcn/ui компоненты
 
 ## Tokens (use these names)
-- `--h-primary: #YOUR_PRIMARY`
-- `--h-deep: #YOUR_INK`
-- `--h-cyan: #YOUR_ACCENT`
-- `--h-cream: #YOUR_CREAM`
+- `--h-primary: #3B5BDB`
+- `--h-deep: #0B1021`
+- `--h-cyan: #4DABF7`
+- `--h-cream: #F1F3F5`
 - (см. apps/web/src/app/globals.css)
 
 ## Components (use these instead of building new)

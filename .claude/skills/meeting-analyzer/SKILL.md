@@ -1,6 +1,6 @@
 ---
 name: meeting-analyzer
-description: "Превращает транскрипт встречи в структурный отчёт: решения, action items (владелец + дедлайн), риски/блокеры, открытые вопросы, next steps. Вход — готовый транскрипт (текст) или ссылка на источник (tl;dv / Plaud / Spark / kb), либо аудио для транскрипции через Deepgram. Триггеры: «проанализируй встречу», «meeting notes», «саммари звонка», «разбери транскрипт», «action items из встречи», «протокол совещания», «meeting analyzer»."
+description: "Транскрипт встречи → структурный отчёт: решения, action items (владелец + дедлайн), риски/блокеры, открытые вопросы, next steps. Вход — текст транскрипта, ссылка на источник (tl;dv / Plaud / Spark / kb) или аудио для транскрипции через Deepgram. Триггеры: «саммари звонка», «разбери транскрипт», «action items из встречи», «протокол совещания»."
 ---
 
 # Meeting Analyzer
@@ -30,7 +30,7 @@ description: "Превращает транскрипт встречи в стр
 | **tl;dv** запись | Локальный экспорт `${HOME}/tldv-export/transcripts/` (655 встреч) или API | skill `tldv` |
 | **Plaud** запись | Транскрипт/саммари по записи через Workspace Token | skill `plaud` |
 | **Spark** звонок (AI) | Локальные SQLite (мета + контент) | `/spark-transcripts` |
-| **Поиск по всем встречам** | FTS5+BM25 по tldv/spark/gmail/outlook/telegram | `python ${WORKSPACE}/tools/kb.py search "<q>"` |
+| **Поиск по всем встречам** | FTS5+BM25 по tldv/spark/gmail/outlook/telegram | `python ~/.claude/tools/kb.py search "<q>"` |
 | **Аудио/видео файл** | Транскрипция с диаризацией | skill `deepgram` (см. ниже) |
 | **Просто текст** | Пользователь вставил транскрипт | — |
 

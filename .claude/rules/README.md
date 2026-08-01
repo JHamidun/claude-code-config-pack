@@ -14,7 +14,7 @@
 | `dont-do` | Forbidden actions and common mistakes |
 | `model-selection` | Which model for which task (decision tree) |
 | `models` | Указатель: актуальные алиасы Max → канон config/models.md |
-| `permissions` | Permission modes, sandbox, security boundaries |
+| `permissions` | Security boundaries; актуальный режим — только из settings.json / `/context` |
 | `personality` | Communication style and priorities |
 | `quality-gates` | Mandatory checks after code changes |
 | `routing` | Auto-routing: task type to tool/agent |

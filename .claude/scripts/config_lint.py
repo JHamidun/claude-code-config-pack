@@ -15,8 +15,23 @@ WHAT IT DOES
   3. HYGIENE FLAGS: skills with empty frontmatter description, zombies
      (desc < 60 chars), oversized descriptions (> 400 chars), broken skill
      dirs (no SKILL.md), skills not referenced in routing.md.
-  4. ARGS:
-       (no args)              -> full report
+  4. OFF-BOOK WEIGHT (added 2026-07-31): everything the 4-component TILE
+     misses but that still lands in the startup prompt —
+       - MEMORY.md (auto-memory, injected whole)
+       - command descriptions (commands/**/*.md frontmatter)
+       - plugin skills + plugin commands (enabled plugins only)
+       - MCP tool schemas (measured live via stdio handshake, cached)
+     MCP is reported in TWO scenarios, because Claude Code >= ~2.1.x defers
+     MCP tool schemas behind the ToolSearch tool by default
+     (env ENABLE_TOOL_SEARCH: unset/"auto" => deferred; "100" => standard):
+       deferred  -> only the tool NAME list is in the prompt
+       raw       -> the full JSON schema of every tool is in the prompt
+  5. ARGS:
+       (no args)              -> full report (MCP from cache if present)
+       --probe-mcp            -> spawn every enabled MCP server (stdio),
+                                 do initialize+tools/list, cache the schemas,
+                                 then print the full report. SLOW (~2-4 min:
+                                 npx servers resolve the registry on start).
        --check-select "фраза" -> which skills / routing rows roughly match
 
 Baseline reference (report 30, o200k_base):
@@ -28,7 +43,10 @@ import io
 import json
 import os
 import re
+import subprocess
 import sys
+import threading
+import time
 
 # ---- Force UTF-8 stdout for Cyrillic on Windows ----
 try:
@@ -48,6 +66,16 @@ COMMANDS_DIR = os.path.join(CLAUDE_HOME, "commands")
 RULES_DIR = os.path.join(CLAUDE_HOME, "rules")
 SETTINGS_JSON = os.path.join(CLAUDE_HOME, "settings.json")
 ROUTING_MD = os.path.join(RULES_DIR, "routing.md")
+
+# --- off-book components -----------------------------------------------------
+MEMORY_MD = os.path.join(CLAUDE_HOME, "projects", "C--Users-youruser",
+                         "memory", "MEMORY.md")
+PLUGINS_DIR = os.path.join(CLAUDE_HOME, "plugins")
+INSTALLED_PLUGINS = os.path.join(PLUGINS_DIR, "installed_plugins.json")
+GLOBAL_CONFIG = os.path.join(os.path.expanduser("~"), ".claude.json")
+MCP_CACHE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                         ".mcp_schema_cache.json")
+MCP_PROBE_TIMEOUT = 120  # seconds per server (npx cold start is ~30-40s)
 
 # Report-30 hard-measure baseline (o200k_base) for delta reporting.
 REF = {
@@ -247,6 +275,269 @@ def collect_plugins():
 
 
 # ---------------------------------------------------------------------------
+# OFF-BOOK collectors: commands with descriptions, plugin skills/commands
+# ---------------------------------------------------------------------------
+def collect_command_entries():
+    """Return list of {name,desc} for commands/**/*.md (README excluded).
+
+    Name mirrors how the slash-command shows up: gsd/next.md -> 'gsd:next'.
+    """
+    out = []
+    if not os.path.isdir(COMMANDS_DIR):
+        return out
+    for root, _dirs, files in os.walk(COMMANDS_DIR):
+        for fn in sorted(files):
+            if not fn.endswith(".md") or fn.lower() == "readme.md":
+                continue
+            p = os.path.join(root, fn)
+            rel = os.path.relpath(p, COMMANDS_DIR).replace(os.sep, "/")
+            name = rel[:-3].replace("/", ":")
+            fm = parse_frontmatter(read_text(p))
+            out.append({"name": name, "desc": fm["description"] or ""})
+    return out
+
+
+def enabled_plugin_roots():
+    """Return list of (plugin_key, installPath) for ENABLED plugins only."""
+    try:
+        st = json.loads(read_text(SETTINGS_JSON) or "{}")
+    except Exception:
+        return []
+    enabled = {k for k, v in (st.get("enabledPlugins") or {}).items()
+               if v is True}
+    try:
+        inst = json.loads(read_text(INSTALLED_PLUGINS) or "{}").get(
+            "plugins", {})
+    except Exception:
+        return []
+    roots = []
+    for key in sorted(enabled):
+        for rec in inst.get(key, []):
+            p = rec.get("installPath")
+            if p and os.path.isdir(p):
+                roots.append((key, p))
+    return roots
+
+
+def collect_plugin_entries(roots):
+    """Return (plugin_skills, plugin_commands) as [{name,desc}]."""
+    pskills, pcmds = [], []
+    for key, root in roots:
+        short = key.split("@")[0]
+        sdir = os.path.join(root, "skills")
+        if os.path.isdir(sdir):
+            for d in sorted(os.listdir(sdir)):
+                sk = os.path.join(sdir, d, "SKILL.md")
+                if os.path.isfile(sk):
+                    fm = parse_frontmatter(read_text(sk))
+                    pskills.append({"name": "%s:%s" % (short, d),
+                                    "desc": fm["description"] or ""})
+        cdir = os.path.join(root, "commands")
+        if os.path.isdir(cdir):
+            for rt, _d, fs in os.walk(cdir):
+                for fn in sorted(fs):
+                    if not fn.endswith(".md"):
+                        continue
+                    fm = parse_frontmatter(read_text(os.path.join(rt, fn)))
+                    pcmds.append({"name": "%s:%s" % (short,
+                                                     os.path.splitext(fn)[0]),
+                                  "desc": fm["description"] or ""})
+    return pskills, pcmds
+
+
+# ---------------------------------------------------------------------------
+# MCP: config discovery + live stdio handshake (initialize -> tools/list)
+# ---------------------------------------------------------------------------
+def collect_mcp_configs():
+    """Return {server_name: {'cfg':..., 'origin':..., 'prefix':...}}.
+
+    Sources: settings.json mcpServers (user scope), ~/.claude.json
+    mcpServers (global), .mcp.json of every ENABLED plugin.
+    Servers with "disabled": true are skipped.
+    """
+    out = {}
+
+    def add(name, cfg, origin, prefix):
+        if isinstance(cfg, dict) and cfg.get("disabled"):
+            return
+        out[name] = {"cfg": cfg, "origin": origin, "prefix": prefix}
+
+    try:
+        st = json.loads(read_text(SETTINGS_JSON) or "{}")
+    except Exception:
+        st = {}
+    for name, cfg in (st.get("mcpServers") or {}).items():
+        add(name, cfg, "settings.json", name)
+
+    try:
+        gc = json.loads(read_text(GLOBAL_CONFIG) or "{}")
+    except Exception:
+        gc = {}
+    for name, cfg in (gc.get("mcpServers") or {}).items():
+        add(name, cfg, "~/.claude.json", name)
+
+    for key, root in enabled_plugin_roots():
+        short = key.split("@")[0]
+        p = os.path.join(root, ".mcp.json")
+        blob = {}
+        if os.path.isfile(p):
+            try:
+                blob = json.loads(read_text(p) or "{}")
+            except Exception:
+                blob = {}
+            blob = blob.get("mcpServers", blob)
+        pj = os.path.join(root, ".claude-plugin", "plugin.json")
+        if not blob and os.path.isfile(pj):
+            try:
+                blob = (json.loads(read_text(pj) or "{}")
+                        .get("mcpServers") or {})
+            except Exception:
+                blob = {}
+        for name, cfg in (blob or {}).items():
+            if not isinstance(cfg, dict):
+                continue
+            cfg = dict(cfg)
+            cfg["_plugin_root"] = root
+            add("plugin:%s:%s" % (short, name), cfg, "plugin/" + short,
+                "plugin_%s_%s" % (short, name))
+    return out
+
+
+def _mcp_handshake(cmd, env, timeout):
+    """Spawn a stdio MCP server, return (tools_list, error_str)."""
+    try:
+        p = subprocess.Popen(
+            cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, env=env, bufsize=0,
+            shell=(os.name == "nt"
+                   and os.path.splitext(cmd[0])[1].lower() not in
+                   (".exe", ".cmd", ".bat")),
+        )
+    except Exception as e:
+        return None, "spawn failed: %s" % e
+
+    threading.Thread(
+        target=lambda: [None for _ in iter(p.stderr.readline, b"")],
+        daemon=True).start()
+
+    def send(obj):
+        p.stdin.write((json.dumps(obj) + "\n").encode("utf-8"))
+        p.stdin.flush()
+
+    def read_msg(budget):
+        box = {}
+
+        def rd():
+            while True:
+                line = p.stdout.readline()
+                if not line:
+                    box["r"] = None
+                    return
+                s = line.decode("utf-8", "replace").strip()
+                if s.lower().startswith("content-length:"):
+                    n = int(s.split(":")[1].strip())
+                    p.stdout.readline()
+                    box["r"] = json.loads(p.stdout.read(n).decode("utf-8"))
+                    return
+                if s.startswith("{"):
+                    try:
+                        box["r"] = json.loads(s)
+                        return
+                    except Exception:
+                        continue
+        t = threading.Thread(target=rd, daemon=True)
+        t.start()
+        t.join(budget)
+        return box.get("r")
+
+    t0 = time.time()
+    try:
+        send({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {
+            "protocolVersion": "2025-06-18", "capabilities": {},
+            "clientInfo": {"name": "config-lint", "version": "1.0"}}})
+        init = None
+        for _ in range(6):
+            m = read_msg(max(1, timeout - (time.time() - t0)))
+            if m is None:
+                break
+            if m.get("id") == 1:
+                init = m
+                break
+        if init is None:
+            return None, "no initialize response (%.0fs)" % (time.time() - t0)
+        if "error" in init:
+            return None, "initialize error: %s" % str(init["error"])[:120]
+        send({"jsonrpc": "2.0", "method": "notifications/initialized"})
+        send({"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}})
+        res = None
+        for _ in range(8):
+            m = read_msg(max(1, timeout - (time.time() - t0)))
+            if m is None:
+                break
+            if m.get("id") == 2:
+                res = m
+                break
+        if res is None or "result" not in res:
+            return None, "no tools/list result (%.0fs)" % (time.time() - t0)
+        return res["result"].get("tools", []), None
+    except Exception as e:
+        return None, "handshake error: %s" % e
+    finally:
+        try:
+            p.kill()
+        except Exception:
+            pass
+
+
+def probe_mcp(configs):
+    """Probe every stdio server; return {name: {'tools':[...]} | {'error':..}}."""
+    out = {}
+    for name in sorted(configs):
+        rec = configs[name]
+        cfg = rec["cfg"]
+        kind = cfg.get("type", "stdio")
+        if kind != "stdio" or not cfg.get("command"):
+            if cfg.get("url"):
+                out[name] = {"error": "remote %s server (%s) — needs OAuth/"
+                                      "token, not measurable headlessly"
+                                      % (kind, cfg.get("url"))}
+            else:
+                out[name] = {"error": "no stdio command in config"}
+            continue
+        args = []
+        for a in cfg.get("args", []):
+            args.append(str(a).replace("${CLAUDE_PLUGIN_ROOT}",
+                                       cfg.get("_plugin_root", "")))
+        env = dict(os.environ)
+        env["PYTHONIOENCODING"] = "utf-8"
+        for k, v in (cfg.get("env") or {}).items():
+            if isinstance(v, str) and not re.search(r"\$\{\w+\}", v):
+                env[k] = v
+        sys.stderr.write("  probing %-34s ... " % name)
+        sys.stderr.flush()
+        tools, err = _mcp_handshake([cfg["command"]] + args, env,
+                                    MCP_PROBE_TIMEOUT)
+        if err:
+            sys.stderr.write("FAIL (%s)\n" % err)
+            out[name] = {"error": err}
+        else:
+            sys.stderr.write("%d tools\n" % len(tools))
+            out[name] = {"tools": tools}
+    return out
+
+
+def mcp_tokens(enc, name, prefix, tools):
+    """(raw_schema_tokens, deferred_name_tokens) for one server's tools."""
+    api = [{"name": "mcp__%s__%s" % (prefix, t.get("name", "")),
+            "description": t.get("description", ""),
+            "input_schema": t.get("inputSchema") or t.get("input_schema")
+            or {}} for t in tools]
+    raw = enc(json.dumps(api, ensure_ascii=False, separators=(",", ":")))
+    names = enc("\n".join(x["name"] for x in api))
+    return raw, names
+
+
+# ---------------------------------------------------------------------------
 # CLAUDE.md declared numbers
 # ---------------------------------------------------------------------------
 def parse_claude_md_declared():
@@ -440,6 +731,87 @@ def print_tile(enc, skills, agents, rules):
     print("   many >400ch), so the listing legitimately grew. %d SKILL.md counted"
           % len(skills))
     print("   (real dirs + resolved junctions; matches audit's ~389 entries).)")
+    return auto
+
+
+def print_full_picture(enc, lint_total, mcp_cache):
+    """Section 2b: everything the 4-component TILE does not count."""
+    print()
+    print("=" * 74)
+    print("2b. OFF-BOOK WEIGHT — what the TILE above does NOT count")
+    print("=" * 74)
+
+    mem_tok = enc(read_text(MEMORY_MD))
+    cmds = collect_command_entries()
+    cmd_tok = enc(build_agent_registry(cmds))          # same "- name: desc"
+    roots = enabled_plugin_roots()
+    pskills, pcmds = collect_plugin_entries(roots)
+    psk_tok = enc(build_agent_registry(pskills))
+    pcm_tok = enc(build_agent_registry(pcmds))
+
+    configs = collect_mcp_configs()
+    raw_total = 0
+    def_total = 0
+    rows = []
+    failed = []
+    for name in sorted(configs):
+        rec = mcp_cache.get(name)
+        if not rec or "tools" not in rec:
+            reason = (rec or {}).get("error", "not probed — run --probe-mcp")
+            failed.append((name, reason))
+            continue
+        raw, nm = mcp_tokens(enc, name, configs[name]["prefix"], rec["tools"])
+        rows.append((name, len(rec["tools"]), raw, nm))
+        raw_total += raw
+        def_total += nm
+    rows.sort(key=lambda x: -x[2])
+
+    print("%-34s %7s %10s %10s" % ("MCP server (enabled)", "tools",
+                                   "raw sch.", "names only"))
+    print("-" * 66)
+    for name, n, raw, nm in rows:
+        print("%-34s %7d %10d %10d" % (name[:34], n, raw, nm))
+    print("-" * 66)
+    print("%-34s %7s %10d %10d" % ("MCP TOTAL (measured)", "", raw_total,
+                                   def_total))
+    if failed:
+        print("  not measured (%d):" % len(failed))
+        for name, why in failed:
+            print("    %-30s %s" % (name[:30], why[:70]))
+
+    ts_env = os.environ.get("ENABLE_TOOL_SEARCH")
+    deferred = ts_env is None or ts_env == "auto" or ts_env.startswith("auto:")
+    print()
+    print("  ENABLE_TOOL_SEARCH=%s -> MCP schemas are %s"
+          % (ts_env if ts_env else "(unset, default)",
+             "DEFERRED behind ToolSearch (names only in prompt)" if deferred
+             else "sent RAW in the prompt"))
+
+    mcp_eff = def_total if deferred else raw_total
+    comps = [
+        ("counted by TILE (rules+CLAUDE.md+skills+agents)", lint_total),
+        ("MEMORY.md (auto-memory)", mem_tok),
+        ("commands listing (%d)" % len(cmds), cmd_tok),
+        ("plugin skills listing (%d)" % len(pskills), psk_tok),
+        ("plugin commands listing (%d)" % len(pcmds), pcm_tok),
+        ("MCP tool schemas (%s)" % ("deferred names" if deferred else "raw"),
+         mcp_eff),
+    ]
+    total = sum(c[1] for c in comps)
+    print()
+    print("%-48s %8s %7s" % ("component", "tokens", "% total"))
+    print("-" * 66)
+    for name, tok in comps:
+        print("%-48s %8d %6.1f%%" % (name, tok, 100.0 * tok / max(1, total)))
+    print("-" * 66)
+    print("%-48s %8d" % ("REAL AUTO-LOAD TOTAL", total))
+    print("  off-book share: %d tok (%.1f%% of the real total)"
+          % (total - lint_total,
+             100.0 * (total - lint_total) / max(1, total)))
+    if deferred:
+        print("  if tool search were OFF (ENABLE_TOOL_SEARCH=100): %d tok"
+              % (total - def_total + raw_total))
+    return total
 
 
 def print_hygiene(skills):
@@ -555,12 +927,37 @@ def main():
         cmd_check_select(phrase, skills)
         return
 
+    mcp_cache = {}
+    if "--probe-mcp" in args:
+        sys.stderr.write("probing MCP servers (stdio handshake, slow)...\n")
+        mcp_cache = probe_mcp(collect_mcp_configs())
+        try:
+            with io.open(MCP_CACHE, "w", encoding="utf-8") as f:
+                f.write(json.dumps({"ts": int(time.time()),
+                                    "servers": mcp_cache}, ensure_ascii=False))
+        except Exception as e:
+            sys.stderr.write("cache write failed: %s\n" % e)
+    else:
+        try:
+            mcp_cache = json.loads(read_text(MCP_CACHE) or "{}").get(
+                "servers", {})
+        except Exception:
+            mcp_cache = {}
+
     print("config_lint.py  |  token mode: %s" % mode)
     print("CLAUDE_HOME: %s" % CLAUDE_HOME)
+    if mcp_cache and "--probe-mcp" not in args:
+        try:
+            ts = json.loads(read_text(MCP_CACHE) or "{}").get("ts", 0)
+            print("MCP schema cache: %s (re-probe with --probe-mcp)"
+                  % time.strftime("%Y-%m-%d %H:%M", time.localtime(ts)))
+        except Exception:
+            pass
     print()
     print_counters(enc, skills, broken, agents, cmd_root, cmd_gsd, cmd_tot,
                    rules, plug)
-    print_tile(enc, skills, agents, rules)
+    lint_total = print_tile(enc, skills, agents, rules)
+    print_full_picture(enc, lint_total, mcp_cache)
     print_hygiene(skills)
     print()
     print("Done. (read-only; no config file was modified)")

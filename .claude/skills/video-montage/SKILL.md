@@ -1,6 +1,6 @@
 ---
 name: video-montage
-description: "Полный продакшн вертикальных reels 9:16 с нуля: Whisper-субтитры, TTS ElevenLabs, word-accurate sync, pop-up словарные карточки, lip-sync, safe zones, анти-fingerprint репостов. Триггеры: «собери рилс», «рилс с нуля», «вертикалка с озвучкой», «текст-рилс», «словарные карточки», «lip sync клип», «уникализируй видео», «залей репост». НЕ: монтаж готового футажа→video-editor; AI-ген→video-generation."
+description: "Полный продакшн вертикальных reels 9:16 с нуля: Whisper-субтитры, TTS ElevenLabs, word-accurate sync, pop-up словарные карточки, lip-sync, safe zones, анти-fingerprint репостов. НЕ: монтаж готового футажа→video-editor; AI-генерация→video-generation."
 ---
 
 # Video Montage — Full Production Pipeline

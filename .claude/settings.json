@@ -3,7 +3,9 @@
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "MCP_TIMEOUT": "120000",
-    "MCP_TOOL_TIMEOUT": "180000"
+    "MCP_TOOL_TIMEOUT": "180000",
+    "ENABLE_TOOL_SEARCH": "auto",
+    "SUPERPOWERS_DISABLE_TELEMETRY": "1"
   },
   "permissions": {
     "allow": [
@@ -160,7 +162,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${HOME}/.claude/hooks/gsd-check-update.js\""
+            "command": "node \"${HOME}/.claude/hooks/gsd-check-update.js\"",
+            "async": true
           }
         ]
       },
@@ -182,7 +185,8 @@
           {
             "type": "command",
             "command": "powershell -c \"if (-not (Test-Path '/tmp/claude-no-beep')) { [console]::beep(800,200); [console]::beep(1000,200) }\"",
-            "timeout": 3
+            "timeout": 3,
+            "async": true
           }
         ]
       },
@@ -497,7 +501,7 @@
     "playwright-live1": {
       "command": "npx",
       "args": [
-        "@playwright/mcp@latest",
+        "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live1"
       ]
@@ -505,7 +509,7 @@
     "playwright-live2": {
       "command": "npx",
       "args": [
-        "@playwright/mcp@latest",
+        "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live2"
       ]
@@ -513,7 +517,7 @@
     "playwright-live3": {
       "command": "npx",
       "args": [
-        "@playwright/mcp@latest",
+        "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live3"
       ]
@@ -521,7 +525,7 @@
     "playwright-live4": {
       "command": "npx",
       "args": [
-        "@playwright/mcp@latest",
+        "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live4"
       ]
@@ -529,7 +533,7 @@
     "playwright-live5": {
       "command": "npx",
       "args": [
-        "@playwright/mcp@latest",
+        "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live5"
       ]
@@ -537,7 +541,7 @@
     "playwright-live6": {
       "command": "npx",
       "args": [
-        "@playwright/mcp@latest",
+        "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live6"
       ]
@@ -545,7 +549,7 @@
     "playwright-live7": {
       "command": "npx",
       "args": [
-        "@playwright/mcp@latest",
+        "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live7"
       ]
@@ -553,7 +557,7 @@
     "playwright-live8": {
       "command": "npx",
       "args": [
-        "@playwright/mcp@latest",
+        "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live8"
       ]
@@ -561,7 +565,7 @@
     "playwright-live9": {
       "command": "npx",
       "args": [
-        "@playwright/mcp@latest",
+        "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live9"
       ]
@@ -569,7 +573,7 @@
     "playwright-live10": {
       "command": "npx",
       "args": [
-        "@playwright/mcp@latest",
+        "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live10"
       ]
@@ -589,6 +593,10 @@
         "@pageindex/mcp"
       ],
       "disabled": true
+    },
+    "miro": {
+      "type": "http",
+      "url": "https://mcp.miro.com/"
     }
   }
 }

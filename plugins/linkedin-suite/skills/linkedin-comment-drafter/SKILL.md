@@ -1,6 +1,6 @@
 ---
 name: linkedin-comment-drafter
-description: "LinkedIn comments, replies, thread follow-ups по URL поста. COMMENT: 1-3 варианта в голосе юзера + reaction, approval → post via SocialPublisher. REPLY HANDLER: ответ на коммент по URL (parent URN). THREAD ENGAGEMENT: трекинг ответов автора, follow-up, DM. Триггеры: linkedin comment, коммент на linkedin, ответ на коммент, thread engagement. NOT YourFirstName-voice RU replies без автопостинга → comment-replies."
+description: "LinkedIn comments, replies, thread follow-ups по URL поста: 1-3 варианта в голосе юзера + reaction, approval → постинг через SocialPublisher; ответ по parent URN; трекинг ответов автора, follow-up, DM. NOT: RU-ответы в голосе пользователя без автопостинга→comment-replies."
 ---
 
 # LinkedIn Comment Drafter

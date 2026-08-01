@@ -11,8 +11,8 @@ the WebSearch queries, then WebFetch any public profile URLs found. See referenc
 import sys, io, json, argparse
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
-TG = 'python ${WORKSPACE}/tools/tg_client.py'
-MAX = 'python ${WORKSPACE}/tools/max_client.py'
+TG = 'python ~/.claude/tools/tg_client.py'
+MAX = 'python ~/.claude/tools/max_client.py'
 
 def build(name, handle, phone, company, city):
     prog, search = [], []

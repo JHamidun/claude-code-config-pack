@@ -1,6 +1,6 @@
 ---
 name: de-ai-ify
-description: "КАНОН анти-AI-tells для РУССКИХ текстов (все площадки — ТГ, Habr, VC, РБК, сайты, письма). Removes AI jargon and cliches from text, making it sound human. Use when user says «убери ИИ стиль», «де-аифай», «humanize text», «звучит как ИИ», «почисти от клише». EN/LinkedIn-специфика (tier-система forensic/strict/aesthetic, детекторы, emoji-паттерны) → skill linkedin-humanizer."
+description: "КАНОН анти-AI-tells для РУССКИХ текстов (ТГ, Habr, VC, РБК, сайты, письма) — убирает ИИ-жаргон и клише. Триггеры: «звучит как ИИ», «почисти от клише», humanize text. EN/LinkedIn-специфика (tier-система, детекторы, emoji) → skill linkedin-humanizer."
 ---
 
 # De-AI-ify: Remove AI Jargon

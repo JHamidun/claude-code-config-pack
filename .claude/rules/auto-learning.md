@@ -58,7 +58,7 @@
 ## Дополнительно: Vector Memory (ручной вызов)
 
 ```bash
-python ${WORKSPACE}/tools/search_chats.py learn "knowledge" "category"
+python ~/.claude/tools/search_chats.py learn "knowledge" "category"
 ```
 
 Категории: technical, tools, project

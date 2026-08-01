@@ -1,0 +1,12 @@
+{
+ "port": 9471,
+ "updated": 1785509212.319637,
+ "pid": 106784,
+ "status": "stopped",
+ "reason": "session_idle",
+ "profile": "guard-test",
+ "browser_up": false,
+ "last_activity": 1785509040.8380752,
+ "rss_mb": 0,
+ "restarts": 0
+}

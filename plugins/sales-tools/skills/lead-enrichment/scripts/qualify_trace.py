@@ -46,7 +46,7 @@ def plan_for(t, v, d):
     elif t in ('username', 'url'):
         steps.append(f"Skill social-intel: forward-досье по '{v}' (это и есть его профиль).")
         if t == 'username':
-            steps.append(f"Публичный Telegram (legit): python ${WORKSPACE}/tools/tg_client.py user-info {v} — публичный профиль/имя.")
+            steps.append(f"Публичный Telegram (legit): python ~/.claude/tools/tg_client.py user-info {v} — публичный профиль/имя.")
     if t in ('name', 'username', 'phone'):
         steps.append("Публичный Telegram через свой Telethon: tg_client.py search/mentions — найти публичный @username, канал, упоминания.")
     elif t in ('domain', 'inn', 'ogrn'):

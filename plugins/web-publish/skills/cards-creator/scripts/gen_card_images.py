@@ -33,8 +33,8 @@ KEY = open(os.path.expanduser('~/.claude/.credentials.master.env'), encoding='ut
 MODEL = 'gpt-image-2-2026-04-21'
 
 STYLE = (" Editorial vector illustration in a modern tech-magazine style. "
-         "Strictly limited palette: warm cream background (#YOUR_CREAM), deep navy (#YOUR_INK), "
-         "electric blue (#YOUR_PRIMARY) and bright cyan (#YOUR_ACCENT) accents, small touches of "
+         "Strictly limited palette: warm cream background (#F1F3F5), deep navy (#0B1021), "
+         "electric blue (#3B5BDB) and bright cyan (#4DABF7) accents, small touches of "
          "terracotta (#CC7357). Clean flat shapes, subtle grain, confident geometry, generous "
          "negative space. NO text, NO words, NO logos, NO watermarks. Centered, balanced composition.")
 

@@ -1,6 +1,6 @@
 ---
 name: osint-recon
-description: CLI-разведка по ОТКРЫТЫМ источникам для проверки ИНФРАСТРУКТУРЫ и КОНТРАГЕНТОВ — IP-геолокация и ASN, DNS-записи, RDAP-whois (регистратор, даты, статусы), BGP-префиксы и upstream'ы, субдомены из Certificate Transparency, открытые порты и CVE хоста (Shodan InternetDB, бесплатно), аудит HTTP security-заголовков, санкционный/PEP-скрининг (OpenSanctions + OFAC SDN), поиск уязвимостей в NVD, и сводный `recon` по домену одной командой. CLI - `python ${WORKSPACE}/tools/osint_client.py <cmd>`. Триггеры - «пробей домен», «чей это IP», «кому принадлежит IP», «проверь домен перед сделкой», «найди субдомены», «что торчит наружу у хоста», «открытые порты», «security-заголовки», «проверь SSL/CT логи», «RDAP», «whois домена», «ASN», «BGP префиксы», «есть ли CVE», «санкции по компании», «OFAC», «проверь контрагента по санкционным спискам», «OSINT», «recon домена», «due diligence инфраструктуры». НЕ для - слежки за частными лицами; живых карт самолётов/судов/спутников и ситуационной осведомлённости в реальном времени (`shadowbroker-map` — здесь принципиально нет поллеров); обогащения лидов и ЕГРЮЛ (`lead-enrichment`); досье по соцсетям (`social-intel`); KYC контрагентов РФ (`fns-check`); аудита СВОЕГО кода и инфры (`security-audit`, `threat-hunting`); активного сканирования/эксплуатации (это не сканер — только публичные API).
+description: "CLI-разведка публичной инфраструктуры домена/IP: DNS, RDAP-whois, ASN/BGP, субдомены из Certificate Transparency, порты и CVE (Shodan InternetDB), HTTP security-заголовки, санкции OpenSanctions/OFAC. Триггеры: «recon», «OSINT», «due diligence инфраструктуры». НЕ: люди→social-intel; ЕГРЮЛ→lead-enrichment; борта/суда/спутники→shadowbroker-map; свой код→security-audit."
 metadata:
   version: 1.0.1
   updated: 2026-07-30
@@ -8,7 +8,7 @@ metadata:
 
 # OSINT Recon (публичные источники, request-driven)
 
-`python ${WORKSPACE}/tools/osint_client.py <команда> [аргументы] [--json]`
+`python ~/.claude/tools/osint_client.py <команда> [аргументы] [--json]`
 
 **Философия: никаких демонов, поллеров и докера.** Спросил → сходил в публичный API → напечатал.
 Всё, что требует постоянного опроса (живые карты самолётов/судов/спутников), **не входит в скилл принципиально** — см. «Чего здесь нет».
@@ -45,29 +45,29 @@ metadata:
 
 ```bash
 # Сводка по домену — начинай отсюда
-python ${WORKSPACE}/tools/osint_client.py recon example.com
+python ~/.claude/tools/osint_client.py recon example.com
 
 # Чей IP и где стоит
-python ${WORKSPACE}/tools/osint_client.py ip YOUR_PUBLIC_IP
+python ~/.claude/tools/osint_client.py ip YOUR_PUBLIC_IP
 
 # Что торчит наружу у хоста + известные CVE
-python ${WORKSPACE}/tools/osint_client.py ports YOUR_PUBLIC_IP
+python ~/.claude/tools/osint_client.py ports YOUR_PUBLIC_IP
 
 # Живые субдомены (карта поверхности атаки)
-python ${WORKSPACE}/tools/osint_client.py subdomains github.com --limit 100
+python ~/.claude/tools/osint_client.py subdomains github.com --limit 100
 
 # Гигиена заголовков с оценкой A-F
-python ${WORKSPACE}/tools/osint_client.py headers https://example.com
+python ~/.claude/tools/osint_client.py headers https://example.com
 
 # Санкционный скрининг контрагента
-python ${WORKSPACE}/tools/osint_client.py sanctions "Название Компании"
+python ~/.claude/tools/osint_client.py sanctions "Название Компании"
 
 # Свежие CVE по продукту / конкретный CVE
-python ${WORKSPACE}/tools/osint_client.py cve "openssl" --limit 5
-python ${WORKSPACE}/tools/osint_client.py cve CVE-2024-3094
+python ~/.claude/tools/osint_client.py cve "openssl" --limit 5
+python ~/.claude/tools/osint_client.py cve CVE-2024-3094
 
 # Машинный вывод для дальнейшей обработки
-python ${WORKSPACE}/tools/osint_client.py recon example.com --json
+python ~/.claude/tools/osint_client.py recon example.com --json
 ```
 
 ## Опциональные ключи
