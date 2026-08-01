@@ -1,6 +1,6 @@
 ---
 name: video-generation
-description: "Полный пайплайн AI-видео: Veo, Sora, Seedance, Runway (Kling/Pika), voiceover, музыка, субтитры, сборка ffmpeg; включает движок Higgsfield (cinematic, motion design, UGC, Virality Predictor). Триггеры: «сгенерь видео», «оживи картинку», «image-to-video», «буктрейлер», «Veo», «Sora», «Seedance», «Runway», «shorts», «higgsfield», «оцени виральность видео». НЕ монтаж готового футажа→video-editor."
+description: "Полный пайплайн AI-видео: Veo, Sora, Seedance, Runway (Kling/Pika), voiceover, музыка, субтитры, сборка ffmpeg; включает движок Higgsfield (cinematic, motion design, UGC, Virality Predictor). Триггер: «оцени виральность видео». НЕ монтаж футажа→video-editor."
 type: actionable
 ---
 
@@ -319,7 +319,7 @@ c.download(url, 'out_ch1.mp4')
 
 ```python
 # avatar_id=YOUR_HEYGEN_AVATAR_ID
-# voice_id=6c4a430699084c8e85be39f032d84c3e
+# voice_id=YOUR_HEYGEN_VOICE_ID
 # engine=avatar_v, 9:16, 1080p, $0.0667/sec
 # Готовая обвязка в `shorts-pipeline-user` skill
 ```

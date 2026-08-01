@@ -1264,7 +1264,7 @@ def center_crop(input_file, output_file):
 def yolo_crop(input_file, output_file):
     """Requires: pip install ultralytics opencv-python + Autocrop-vertical clone"""
     import os
-    repo = '${WORKSPACE}/tools/Autocrop-vertical'  # adjust path
+    repo = '~/.claude/tools/Autocrop-vertical'  # adjust path
     subprocess.run([
         'python', f'{repo}/main.py',
         '-i', input_file, '-o', output_file,

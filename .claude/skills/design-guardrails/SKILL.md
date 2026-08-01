@@ -1,6 +1,6 @@
 ---
 name: design-guardrails
-description: "Финальная верификация дизайн-артефакта: Design Read → Quality Gate → Visual Diff → Drift Rejection. Используй для «pixel-perfect», «сверь с референсом», «повтори сайт в коде», «редизайн без поломки» рабочего React/HTML, либо как финальный QA-гейт (PASS/FAIL) перед сдачей дизайн-артефакта. Соседи: design-taste (вкус+AI-tells ДО), frontend-design/design-orchestrator (генерация с нуля)."
+description: "Финальная верификация дизайн-артефакта: Design Read → Quality Gate → Visual Diff → Drift Rejection. Для «повтори сайт в коде», «редизайн без поломки» или как QA-гейт PASS/FAIL перед сдачей. Соседи: design-taste (ДО), design-orchestrator (генерация)."
 when_to_use: |
   1) Пользователь дал скриншот/URL/дизайн-референс и просит воспроизвести в коде максимально точно.
   2) Пользователь дал существующий функциональный React/HTML/CSS-код (Bootstrap-дефолты, ад-хок Tailwind) и просит

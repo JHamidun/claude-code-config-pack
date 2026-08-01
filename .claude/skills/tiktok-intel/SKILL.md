@@ -1,6 +1,6 @@
 ---
 name: tiktok-intel
-description: "TikTok & Instagram deep intelligence — trending content, influencer research, audience demographics, TikTok Shop products, popular songs/hashtags, Instagram Reels & Stories. Uses a 3rd-party scraping API. Trigger: тикток тренды, инфлюенсеры, TikTok Shop, популярные рилсы, тикток аналитика, инстаграм рилсы, trending TikTok, influencer search, TikTok analytics, Instagram highlights."
+description: "TikTok & Instagram deep intelligence via Scraping API — trending content, influencer research, audience demographics, TikTok Shop products, popular songs/hashtags, Reels & Stories. Триггеры: инстаграм рилсы, influencer search, Instagram highlights."
 allowed-tools: Bash, Read, Write, WebSearch
 ---
 

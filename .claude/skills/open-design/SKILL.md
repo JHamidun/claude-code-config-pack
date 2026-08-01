@@ -7,7 +7,7 @@ description: Open-source альтернатива Claude Design — локаль
 
 **GitHub:** https://github.com/nexu-io/open-design  
 **Лицензия:** Apache-2.0 | **Звёзды:** 7.6k | **Статус:** активно, коммиты ежедневно  
-**Локальный путь:** `${WORKSPACE}/tools/open-design/`
+**Локальный путь:** `~/.claude/tools/open-design/`
 
 ## Когда использовать
 
@@ -32,10 +32,10 @@ description: Open-source альтернатива Claude Design — локаль
 
 ```bash
 # 1. Клонировать
-git clone https://github.com/nexu-io/open-design.git ${WORKSPACE}/tools/open-design
+git clone https://github.com/nexu-io/open-design.git ~/.claude/tools/open-design
 
 # 2. Установить зависимости (ignore-scripts чтобы не падал Electron на Windows)
-cd ${WORKSPACE}/tools/open-design
+cd ~/.claude/tools/open-design
 pnpm install --ignore-scripts
 
 # 3. Собрать зависимости
@@ -44,7 +44,7 @@ pnpm --filter @open-design/tools-dev... build
 # 4. Скомпилировать better-sqlite3 (нативный аддон, нужен Visual Studio Build Tools)
 cd node_modules/.pnpm/better-sqlite3@*/node_modules/better-sqlite3
 npx node-gyp rebuild
-cd ${WORKSPACE}/tools/open-design
+cd ~/.claude/tools/open-design
 
 # 5. Запуск (2 терминала)
 # Терминал 1 — daemon:
@@ -60,8 +60,8 @@ cd apps/web && pnpm dev
 
 ```bash
 # Запуск (из двух терминалов параллельно)
-cd ${WORKSPACE}/tools/open-design && node apps/daemon/dist/cli.js --no-open
-cd ${WORKSPACE}/tools/open-design/apps/web && pnpm dev
+cd ~/.claude/tools/open-design && node apps/daemon/dist/cli.js --no-open
+cd ~/.claude/tools/open-design/apps/web && pnpm dev
 
 # Остановка
 Ctrl+C в обоих терминалах

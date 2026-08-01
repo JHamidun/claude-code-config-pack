@@ -1,6 +1,6 @@
 ---
 name: check-skill-solo
-description: Use when the user says "/check-skill-solo", "проверь", "перепроверь", "check this", "verify", "fact-check", or wants to verify any fact, claim, number, statement, citation, or AI-generated output for hallucinations. Triggers on requests to verify data accuracy, cross-check sources, or validate research findings.
+description: "Verify any fact, claim, number, statement, citation or AI-generated output for hallucinations — cross-check sources, validate research findings. Triggers: \"/check-skill-solo\", «проверь», «перепроверь», \"verify\", \"fact-check\"."
 ---
 
 # Check — Multi-LLM Anti-Hallucination Verification (portable)

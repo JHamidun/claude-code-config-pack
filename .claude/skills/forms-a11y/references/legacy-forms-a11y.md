@@ -1,4 +1,4 @@
-<!-- LEGACY: полное тело скилла 'forms-a11y' из старого дерева ${WORKSPACE}/tools/claude-code-skills (@2026-04-30).
+<!-- LEGACY: полное тело скилла 'forms-a11y' из старого дерева ~/.claude/tools/claude-code-skills (@2026-04-30).
      Сохранено при консолидации деревьев design-пака 2026-07-18 (lossless-merge, канон deep-read-before-merge).
      Актуальный канон — ../SKILL.md; здесь — расширенный материал прежней версии (таблицы, рецепты, антипаттерны). -->
 

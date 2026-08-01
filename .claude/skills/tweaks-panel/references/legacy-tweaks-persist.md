@@ -1,4 +1,4 @@
-<!-- LEGACY: полное тело скилла 'tweaks-persist' из старого дерева ${WORKSPACE}/tools/claude-code-skills (@2026-04-30).
+<!-- LEGACY: полное тело скилла 'tweaks-persist' из старого дерева ~/.claude/tools/claude-code-skills (@2026-04-30).
      Сохранено при консолидации деревьев design-пака 2026-07-18 (lossless-merge, канон deep-read-before-merge).
      Актуальный канон — ../SKILL.md; здесь — расширенный материал прежней версии (таблицы, рецепты, антипаттерны). -->
 
@@ -113,7 +113,7 @@ node scripts/save-tokens-server.js
 current.json:
 ```json
 {
-  "primary": "#YOUR_PRIMARY",
+  "primary": "#3B5BDB",
   "radius": 12,
   "fontScale": 105,
   "density": "cozy",

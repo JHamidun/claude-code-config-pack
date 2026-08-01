@@ -1,4 +1,4 @@
-<!-- LEGACY: полное тело скилла 'frontend-design' из старого дерева ${WORKSPACE}/tools/claude-code-skills (@2026-04-30).
+<!-- LEGACY: полное тело скилла 'frontend-design' из старого дерева ~/.claude/tools/claude-code-skills (@2026-04-30).
      Сохранено при консолидации деревьев design-пака 2026-07-18 (lossless-merge, канон deep-read-before-merge).
      Актуальный канон — ../SKILL.md; здесь — расширенный материал прежней версии (таблицы, рецепты, антипаттерны). -->
 
@@ -37,7 +37,7 @@ Premium-восприятие: глубокий navy, единственный я
 
 ### 4. Warm minimalism
 Cream + ink + один акцент. Spacious, читабельный, дружелюбный.
-- **Палитра:** `#YOUR_CREAM` cream фон, `#1B1B1F` ink, `#3a83f6` либо `#YOUR_PRIMARY` primary
+- **Палитра:** `#F1F3F5` cream фон, `#1B1B1F` ink, `#3a83f6` либо `#3B5BDB` primary
 - **Шрифт:** Manrope / Inter (body), Inter Tight (heading)
 - **Ритм:** spacing kratно 4 (4/8/12/16/24/32/48/64/96), радиусы 8-12, тени почти нет
 - **Когда:** edtech, healthcare, mainstream b2c, продукты для России

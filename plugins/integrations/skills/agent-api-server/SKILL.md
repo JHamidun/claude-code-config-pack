@@ -1,11 +1,11 @@
 ---
 name: agent-api-server
-description: OpenAI-совместимый HTTP-сервер поверх ЛОКАЛЬНОГО claude CLI (по подписке Max, без API-ключа) — отдаёт Claude как /v1/chat/completions для n8n, OpenAI-SDK, IDE, curl, Open WebUI. Триггеры «подними OpenAI-эндпоинт», «claude как openai api», «подключи n8n к клоду по подписке», «base_url для OpenAI-клиента локально», «openai-compatible локально», «сервер поверх claude cli», «SSE стрим от клода», «X-Session-Id продолжить диалог». НЕ для: походов НАРУЖУ к OpenAI/Perplexity/Runway → skill local-gateway (127.0.0.1:GATEWAY_PORT); НЕ для разовых вызовов из Python → skill claude-cli-runner / ${WORKSPACE}/tools/claude_cli.py; НЕ для боевых Hermes-ботов с тулзами и памятью → skill agent-builder tooling.
+description: "OpenAI-совместимый HTTP-сервер поверх ЛОКАЛЬНОГО claude CLI (подписка Max, без API-ключа) — отдаёт Claude как /v1/chat/completions для n8n, OpenAI-SDK, IDE, curl, Open WebUI; SSE-стрим, X-Session-Id. НЕ: наружу к OpenAI/Perplexity/Runway→local-gateway; разовый вызов из Python→claude-cli-runner; боевые Hermes-боты→agent-builder tooling."
 ---
 
 # agent-api-server — Claude по подписке как OpenAI API
 
-`${WORKSPACE}/tools/agent_api_server.py` — stdlib-only HTTP-сервер, который принимает
+`~/.claude/tools/agent_api_server.py` — stdlib-only HTTP-сервер, который принимает
 запросы в формате OpenAI и обслуживает их локальным `claude -p`. Оплата идёт через
 подписку Claude Code (OAuth), `ANTHROPIC_API_KEY` не используется и **намеренно
 вырезается** из окружения дочернего процесса.
@@ -36,10 +36,10 @@ claude --version                       # 2.1.207 проверено
 npm install -g @anthropic-ai/claude-code   # если CLI нет
 
 # 2. Проверка
-python ${WORKSPACE}/tools/agent_api_server.py test --model haiku
+python ~/.claude/tools/agent_api_server.py test --model haiku
 
 # 3. Запуск
-python ${WORKSPACE}/tools/agent_api_server.py serve --port 8199
+python ~/.claude/tools/agent_api_server.py serve --port 8199
 ```
 
 ### Env-переменные (значения заполняет владелец; читаются из `~/.claude/.credentials.master.env`)
@@ -118,7 +118,7 @@ for chunk in c.chat.completions.create(model="haiku", stream=True,
   (если токен не задан — любая непустая строка, поле в n8n обязательное).
 - Model: вписать вручную `sonnet` / `haiku` / `fable` / `opus`.
 - ⚠️ n8n в Docker: `127.0.0.1` внутри контейнера — это сам контейнер. Нужен
-  `http://host.docker.internal:8199/v1`, а сервер поднимать с `--host YOUR_PUBLIC_IP` + `AGENT_API_TOKEN`
+  `http://host.docker.internal:8199/v1`, а сервер поднимать с `--host 0.0.0.0` + `AGENT_API_TOKEN`
   (**требует проверки на конкретной инсталляции n8n владельца — не тестировалось**).
 - n8n Cloud (your-name.app.n8n.cloud) до `127.0.0.1` не дотянется в принципе — нужен туннель.
 
@@ -163,7 +163,7 @@ for chunk in c.chat.completions.create(model="haiku", stream=True,
 ## Чек-лист
 
 - [ ] `claude --version` отвечает (иначе `npm install -g @anthropic-ai/claude-code`)
-- [ ] `python ${WORKSPACE}/tools/agent_api_server.py test --model haiku` → ALL CHECKS PASSED
+- [ ] `python ~/.claude/tools/agent_api_server.py test --model haiku` → ALL CHECKS PASSED
 - [ ] Порт свободен (`serve` печатает понятную ошибку и выходит с кодом 2, если занят)
 - [ ] Если наружу/в Docker — задан `AGENT_API_TOKEN` и хост не loopback
 - [ ] Клиент шлёт `model` из `/v1/models` (`sonnet`/`haiku`/`fable`/`opus`), а не `gpt-4o`

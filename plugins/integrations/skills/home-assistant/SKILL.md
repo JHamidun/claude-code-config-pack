@@ -1,12 +1,12 @@
 ---
 name: home-assistant
-description: "Home Assistant CLI — управление умным домом через REST + WebSocket API: состояния сущностей, вызов сервисов (свет/климат/медиа), on/off/toggle, история состояний, live-поток событий, конфиг, areas/devices. Триггеры: «home assistant», «HA», «hass», «включи/выключи свет через HA», «состояние датчика», «entity_id», «вызови сервис HA», «события умного дома», «history сенсора». НЕ для: Яндекс умный дом / Алиса / устройства из Яндекс-экосистемы → skill yandex (секция IoT); генерация ботов для HA → agent-builder tooling."
+description: "Home Assistant CLI — умный дом через REST + WebSocket API: состояния сущностей, вызов сервисов (свет/климат/медиа), on/off/toggle, история состояний, live-поток событий, конфиг, areas/devices. НЕ: Яндекс умный дом / Алиса / Яндекс-экосистема→skill yandex (секция IoT); генерация ботов для HA→agent-builder tooling."
 ---
 
 # Home Assistant CLI
 
 Коннектор к Home Assistant: подключился → сделал → напечатал → вышел.
-CLI: `python ${WORKSPACE}/tools/ha_client.py <command>`.
+CLI: `python ~/.claude/tools/ha_client.py <command>`.
 
 ## Когда использовать
 
@@ -56,26 +56,26 @@ CLI: `python ${WORKSPACE}/tools/ha_client.py <command>`.
 
 ```bash
 # Проверка связи
-python ${WORKSPACE}/tools/ha_client.py ping
+python ~/.claude/tools/ha_client.py ping
 
 # Весь свет в доме
-python ${WORKSPACE}/tools/ha_client.py states --domain light
+python ~/.claude/tools/ha_client.py states --domain light
 
 # Включить свет на кухне на 50% яркости
-python ${WORKSPACE}/tools/ha_client.py call light turn_on --entity light.kitchen --data '{"brightness_pct": 50}'
+python ~/.claude/tools/ha_client.py call light turn_on --entity light.kitchen --data '{"brightness_pct": 50}'
 
 # Просто вкл/выкл/переключить
-python ${WORKSPACE}/tools/ha_client.py on switch.heater
-python ${WORKSPACE}/tools/ha_client.py toggle light.bedroom
+python ~/.claude/tools/ha_client.py on switch.heater
+python ~/.claude/tools/ha_client.py toggle light.bedroom
 
 # Температура за 12 часов
-python ${WORKSPACE}/tools/ha_client.py history sensor.living_room_temperature --hours 12
+python ~/.claude/tools/ha_client.py history sensor.living_room_temperature --hours 12
 
 # Следить за изменениями состояний (20 событий и выход)
-python ${WORKSPACE}/tools/ha_client.py events --type state_changed --limit 20
+python ~/.claude/tools/ha_client.py events --type state_changed --limit 20
 
 # JSON для скриптов
-python ${WORKSPACE}/tools/ha_client.py states --domain sensor --json
+python ~/.claude/tools/ha_client.py states --domain sensor --json
 ```
 
 ## Гочи

@@ -1,6 +1,6 @@
 ---
 name: xlsx
-description: "Comprehensive spreadsheet creation, editing, and analysis with formulas, formatting, data analysis, and visualization. Use for spreadsheets (.xlsx, .xlsm, .csv, .tsv): create with formulas, read/analyze data, modify while preserving formulas, visualize, recalculate. Триггеры (RU): Excel, эксель, xlsx, таблица Excel, отчёт Excel, дашборд Excel, openpyxl, pandas Excel, мульти-лист, формулы Excel."
+description: "Spreadsheet creation, editing and analysis (.xlsx, .xlsm, .csv, .tsv): formulas, formatting, data analysis, visualization, modify while preserving formulas, recalculate. Триггеры (RU): эксель, отчёт Excel, дашборд Excel, openpyxl, pandas Excel, мульти-лист."
 license: Proprietary. LICENSE.txt has complete terms
 type: actionable
 ---

@@ -83,7 +83,7 @@ The build writes `git rev-parse HEAD` to `browse/dist/.version`. On each CLI inv
 
 ### Localhost only
 
-The HTTP server binds to `localhost`, not `YOUR_PUBLIC_IP`. It's not reachable from the network.
+The HTTP server binds to `localhost`, not `0.0.0.0`. It's not reachable from the network.
 
 ### Bearer token auth
 

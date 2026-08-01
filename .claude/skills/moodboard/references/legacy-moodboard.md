@@ -1,4 +1,4 @@
-<!-- LEGACY: полное тело скилла 'moodboard' из старого дерева ${WORKSPACE}/tools/claude-code-skills (@2026-04-30).
+<!-- LEGACY: полное тело скилла 'moodboard' из старого дерева ~/.claude/tools/claude-code-skills (@2026-04-30).
      Сохранено при консолидации деревьев design-пака 2026-07-18 (lossless-merge, канон deep-read-before-merge).
      Актуальный канон — ../SKILL.md; здесь — расширенный материал прежней версии (таблицы, рецепты, антипаттерны). -->
 
@@ -56,9 +56,9 @@ when_to_use: Юзер собирает визуал для нового прое
     <h2 style="margin:0;font-size:18px">Извлечённая палитра</h2>
     <div class="mb-swatches">
       <div class="mb-swatch" style="background:#0A0E27">#0A0E27</div>
-      <div class="mb-swatch" style="background:#YOUR_PRIMARY">#YOUR_PRIMARY</div>
-      <div class="mb-swatch" style="background:#YOUR_ACCENT">#YOUR_ACCENT</div>
-      <div class="mb-swatch" style="background:#YOUR_CREAM;color:#111;text-shadow:none">#YOUR_CREAM</div>
+      <div class="mb-swatch" style="background:#3B5BDB">#3B5BDB</div>
+      <div class="mb-swatch" style="background:#4DABF7">#4DABF7</div>
+      <div class="mb-swatch" style="background:#F1F3F5;color:#111;text-shadow:none">#F1F3F5</div>
       <div class="mb-swatch" style="background:#FFFFFF;color:#111;text-shadow:none;border:1px solid #ddd">#FFFFFF</div>
       <!-- … 8 swatches … -->
     </div>

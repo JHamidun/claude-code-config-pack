@@ -16,54 +16,54 @@ Search the local knowledge base (meetings, emails, chats) using SQLite FTS5 with
 ### Search all sources
 
 ```bash
-python ${WORKSPACE}/tools/kb.py search "$ARGUMENTS"
+python ~/.claude/tools/kb.py search "$ARGUMENTS"
 ```
 
 ### Search specific source
 
 ```bash
-python ${WORKSPACE}/tools/kb.py search "$ARGUMENTS" --source tldv
+python ~/.claude/tools/kb.py search "$ARGUMENTS" --source tldv
 ```
 
 ### Search with date filter
 
 ```bash
-python ${WORKSPACE}/tools/kb.py search "$ARGUMENTS" --after 2025-01-01
+python ~/.claude/tools/kb.py search "$ARGUMENTS" --after 2025-01-01
 ```
 
 ### Search by speaker
 
 ```bash
-python ${WORKSPACE}/tools/kb.py search "$ARGUMENTS" --speaker "Name"
+python ~/.claude/tools/kb.py search "$ARGUMENTS" --speaker "Name"
 ```
 
 ### Show stats
 
 ```bash
-python ${WORKSPACE}/tools/kb.py stats
+python ~/.claude/tools/kb.py stats
 ```
 
 ### Show sources
 
 ```bash
-python ${WORKSPACE}/tools/kb.py sources
+python ~/.claude/tools/kb.py sources
 ```
 
 ### Ingest new data
 
 ```bash
-python ${WORKSPACE}/tools/kb.py ingest tldv                # tl;dv transcripts
-python ${WORKSPACE}/tools/kb.py ingest spark                # Spark Mail transcripts
-python ${WORKSPACE}/tools/kb.py ingest telegram <file.json> # Telegram export
-python ${WORKSPACE}/tools/kb.py ingest gmail [days]         # Gmail emails (default: 90)
-python ${WORKSPACE}/tools/kb.py ingest gcalendar [days]     # Google Calendar (default: 365)
-python ${WORKSPACE}/tools/kb.py ingest outlook [days]       # Outlook/Exchange (default: 90)
+python ~/.claude/tools/kb.py ingest tldv                # tl;dv transcripts
+python ~/.claude/tools/kb.py ingest spark                # Spark Mail transcripts
+python ~/.claude/tools/kb.py ingest telegram <file.json> # Telegram export
+python ~/.claude/tools/kb.py ingest gmail [days]         # Gmail emails (default: 90)
+python ~/.claude/tools/kb.py ingest gcalendar [days]     # Google Calendar (default: 365)
+python ~/.claude/tools/kb.py ingest outlook [days]       # Outlook/Exchange (default: 90)
 ```
 
 ### Show full document
 
 ```bash
-python ${WORKSPACE}/tools/kb.py doc <id>
+python ~/.claude/tools/kb.py doc <id>
 ```
 
 ## Search tips

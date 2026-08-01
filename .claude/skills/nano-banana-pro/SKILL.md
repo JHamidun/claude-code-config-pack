@@ -1,6 +1,6 @@
 ---
 name: nano-banana-pro
-description: "Nano Banana Pro / Gemini Image Ultra - Prompt Engineering Guide. Also covers VK Ads surrealist ad creatives via Gemini as a DALL-E 3 replacement (no VPN). Triggers: «vk креатив на gemini», «магритт через nano banana», «рекламный креатив без VPN», «несочетаемые пары через gemini»."
+description: "Nano Banana Pro / Gemini Image Ultra — prompt engineering. Плюс сюрреалистичные креативы для VK Ads через Gemini как замена DALL-E 3 без VPN. Триггеры: «магритт через nano banana», «рекламный креатив без VPN»."
 ---
 
 # Nano Banana Pro / Gemini Image Ultra - Prompt Engineering Guide

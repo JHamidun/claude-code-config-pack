@@ -1,6 +1,6 @@
 ---
 name: maps-places
-description: "Поиск мест, ресторанов, организаций, адресов, EV-зарядок, Airbnb-листингов и геокодинг через 11 провайдеров (Google Places, Yandex Geosearch, 2GIS, HERE, Mapbox, Foursquare, OpenCage, OSM, Open Charge Map, SerpAPI, Apify/Airbnb). Триггеры: «найди ресторан/кафе рядом», «координаты адреса», «места на карте», «поиск на яндекс/гугл/2гис картах», «EV зарядки», «Airbnb», «часы работы/телефоны/рейтинги»."
+description: "Поиск мест, ресторанов, организаций, адресов, EV-зарядок, Airbnb и геокодинг через 11 провайдеров (Google Places, Yandex Geosearch, 2GIS, HERE, Mapbox, Foursquare, OpenCage, OSM, Open Charge Map, SerpAPI, Apify). Плюс часы работы, телефоны, рейтинги."
 ---
 
 # Maps & Places
@@ -57,34 +57,34 @@ description: "Поиск мест, ресторанов, организаций,
 
 ```bash
 # Отдельные провайдеры
-python ${WORKSPACE}/tools/places_search.py google "ресторан грузинская" --lat 55.7558 --lon 37.6173
-python ${WORKSPACE}/tools/places_search.py yandex "суши" --lat 55.7558 --lon 37.6173
-python ${WORKSPACE}/tools/places_search.py 2gis "кофейня" --lat 55.7558 --lon 37.6173
-python ${WORKSPACE}/tools/places_search.py here "georgian restaurant" --lat 55.7558 --lon 37.6173
-python ${WORKSPACE}/tools/places_search.py mapbox "café" --lat 48.8566 --lon 2.3522
-python ${WORKSPACE}/tools/places_search.py foursquare "pizza" --lat 40.7128 --lon -74.0060
-python ${WORKSPACE}/tools/places_search.py opencage "Sample Beach, Brazil"
-python ${WORKSPACE}/tools/places_search.py nominatim "Тверская 13"
-python ${WORKSPACE}/tools/places_search.py overpass "cafe" --lat 55.7558 --lon 37.6173 --radius 1000 --limit 50
-python ${WORKSPACE}/tools/places_search.py ocm "ev" --lat -8.305 --lon -34.948 --radius 50000
-python ${WORKSPACE}/tools/places_search.py serpapi "pizza" --lat 40.71 --lon -74.00
+python ~/.claude/tools/places_search.py google "ресторан грузинская" --lat 55.7558 --lon 37.6173
+python ~/.claude/tools/places_search.py yandex "суши" --lat 55.7558 --lon 37.6173
+python ~/.claude/tools/places_search.py 2gis "кофейня" --lat 55.7558 --lon 37.6173
+python ~/.claude/tools/places_search.py here "georgian restaurant" --lat 55.7558 --lon 37.6173
+python ~/.claude/tools/places_search.py mapbox "café" --lat 48.8566 --lon 2.3522
+python ~/.claude/tools/places_search.py foursquare "pizza" --lat 40.7128 --lon -74.0060
+python ~/.claude/tools/places_search.py opencage "Sample Beach, Brazil"
+python ~/.claude/tools/places_search.py nominatim "Тверская 13"
+python ~/.claude/tools/places_search.py overpass "cafe" --lat 55.7558 --lon 37.6173 --radius 1000 --limit 50
+python ~/.claude/tools/places_search.py ocm "ev" --lat -8.305 --lon -34.948 --radius 50000
+python ~/.claude/tools/places_search.py serpapi "pizza" --lat 40.71 --lon -74.00
 
 # Airbnb
-python ${WORKSPACE}/tools/places_search.py airbnb "Sample District, Brazil" --check-in 2026-07-01 --check-out 2026-07-08 --guests 2
+python ~/.claude/tools/places_search.py airbnb "Sample District, Brazil" --check-in 2026-07-01 --check-out 2026-07-08 --guests 2
 
 # Гибридные merge-режимы
-python ${WORKSPACE}/tools/places_search.py both "ресторан" --lat 55.7558 --lon 37.6173   # Yandex + Google
-python ${WORKSPACE}/tools/places_search.py all  "кафе"     --lat 55.7558 --lon 37.6173   # +2GIS
-python ${WORKSPACE}/tools/places_search.py all+ "ресторан" --lat 55.7558 --lon 37.6173   # +HERE + Foursquare + Mapbox (6 источников)
+python ~/.claude/tools/places_search.py both "ресторан" --lat 55.7558 --lon 37.6173   # Yandex + Google
+python ~/.claude/tools/places_search.py all  "кафе"     --lat 55.7558 --lon 37.6173   # +2GIS
+python ~/.claude/tools/places_search.py all+ "ресторан" --lat 55.7558 --lon 37.6173   # +HERE + Foursquare + Mapbox (6 источников)
 
 # JSON-выгрузка
-python ${WORKSPACE}/tools/places_search.py all+ "пиццерия" --lat 55.75 --lon 37.62 --json > out.json
+python ~/.claude/tools/places_search.py all+ "пиццерия" --lat 55.75 --lon 37.62 --json > out.json
 
 # Геокодинг (forward — все 6 провайдеров параллельно)
-python ${WORKSPACE}/tools/places_search.py geocode "Мясницкая 13, Москва"
+python ~/.claude/tools/places_search.py geocode "Мясницкая 13, Москва"
 
 # Reverse геокодинг (все 6 параллельно)
-python ${WORKSPACE}/tools/places_search.py reverse_geocode --lat 55.7558 --lon 37.6173
+python ~/.claude/tools/places_search.py reverse_geocode --lat 55.7558 --lon 37.6173
 ```
 
 ## Reference docs
@@ -125,7 +125,7 @@ python ${WORKSPACE}/tools/places_search.py reverse_geocode --lat 55.7558 --lon 3
 ## Связано
 
 - `~/.claude/projects/C--Users-youruser/memory/maps-api-setup-2026-05-28.md` — история ключей
-- `${WORKSPACE}/tools/places_search.py` — основной CLI (shim к скиллу)
+- `~/.claude/tools/places_search.py` — основной CLI (shim к скиллу)
 - Skill `yandex` — Метрика/Директ/Диск (не карты)
 - Skill `apify-scraping` — для Airbnb actor
 - Skill `serpapi` — SERP scraping (включая google_maps)

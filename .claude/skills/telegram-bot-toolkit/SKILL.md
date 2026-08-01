@@ -1,6 +1,6 @@
 ---
 name: telegram-bot-toolkit
-description: Comprehensive toolkit for Telegram bot development, testing, debugging, and deployment. Specializes in python-telegram-bot, Telethon, scene management patterns, middleware configuration, and production deployment strategies. Also covers when NOT to use a bot as a TG Ads funnel — triggers «бот как коллектор базы», «антипаттерн бот-воронки», «бот из TG Ads», «воронка через бот».
+description: "Telegram bot development, testing, debugging and deployment — python-telegram-bot, Telethon, scene management patterns, middleware, production deploy. Also when NOT to use a bot as a TG Ads funnel: «антипаттерн бот-воронки», «бот как коллектор базы»."
 keywords: telegram, bot, python-telegram-bot, telethon, scenes, middleware, webhooks, deployment, debugging, бот как коллектор, антипаттерн бот-воронки, бот из TG Ads, воронка через бот
 ---
 
@@ -276,7 +276,7 @@ await app.bot.set_webhook(
 )
 
 # Run FastAPI
-uvicorn.run(fastapi_app, host="YOUR_PUBLIC_IP", port=8080)
+uvicorn.run(fastapi_app, host="0.0.0.0", port=8080)
 ```
 
 #### Environment Configuration

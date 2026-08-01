@@ -1,4 +1,4 @@
-<!-- LEGACY: полное тело скилла 'html-email' из старого дерева ${WORKSPACE}/tools/claude-code-skills (@2026-04-30).
+<!-- LEGACY: полное тело скилла 'html-email' из старого дерева ~/.claude/tools/claude-code-skills (@2026-04-30).
      Сохранено при консолидации деревьев design-пака 2026-07-18 (lossless-merge, канон deep-read-before-merge).
      Актуальный канон — ../SKILL.md; здесь — расширенный материал прежней версии (таблицы, рецепты, антипаттерны). -->
 
@@ -94,7 +94,7 @@ Email — это HTML 1999-го года. Outlook рендерит через Wo
           <!-- CTA -->
           <tr><td style="padding:0 32px 48px;text-align:center;">
             <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
-              <tr><td style="background:#YOUR_PRIMARY;border-radius:6px;">
+              <tr><td style="background:#3B5BDB;border-radius:6px;">
                 <a href="https://your-domain.com/cta" target="_blank"
                    style="display:inline-block;padding:14px 32px;color:#fff;text-decoration:none;font-weight:bold;font-size:16px;">
                   Главное действие →
@@ -134,7 +134,7 @@ Email — это HTML 1999-го года. Outlook рендерит через Wo
 ```html
 <table role="presentation" cellpadding="0" cellspacing="0">
   <tr>
-    <td style="border-radius:6px;background:#YOUR_PRIMARY;">
+    <td style="border-radius:6px;background:#3B5BDB;">
       <a href="..." style="display:inline-block;padding:14px 32px;color:#fff;text-decoration:none;">
         Click me
       </a>

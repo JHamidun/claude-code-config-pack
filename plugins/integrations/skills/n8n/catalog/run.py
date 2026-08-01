@@ -120,7 +120,7 @@ def main():
 Examples:
   python run.py                    # Start with default settings
   python run.py --port 3000        # Start on port 3000
-  python run.py --host YOUR_PUBLIC_IP     # Accept external connections
+  python run.py --host 0.0.0.0     # Accept external connections
   python run.py --reindex          # Force database reindexing
   python run.py --dev              # Development mode with auto-reload
         """,

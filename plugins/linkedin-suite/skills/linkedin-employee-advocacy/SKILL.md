@@ -1,6 +1,6 @@
 ---
 name: linkedin-employee-advocacy
-description: 'Plan, launch, and operate a LinkedIn employee advocacy program for a marketing team: 14-day launch playbook, authentic-voice posting at scale, brand governance, posting cadence benchmarks, ROI measurement. Triggers: "employee advocacy", "team posting program", "scale LinkedIn across marketing team", "brand amplification", "advocacy ROI", "get the team posting", "employee-generated content".'
+description: "Plan, launch and operate a LinkedIn employee advocacy program for a marketing team: 14-day launch playbook, authentic-voice posting at scale, brand governance, cadence benchmarks, ROI. Triggers: \"get the team posting\", \"employee-generated content\"."
 ---
 
 # LinkedIn Employee Advocacy

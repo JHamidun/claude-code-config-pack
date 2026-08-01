@@ -77,7 +77,7 @@ services:
     ports:
       - "8188:8188"
     environment:
-      - CLI_ARGS=--listen YOUR_PUBLIC_IP --port 8188
+      - CLI_ARGS=--listen 0.0.0.0 --port 8188
     volumes:
       # Model storage (checkpoints, loras, etc.)
       - ./shared/comfyui/models:/comfyui/models
@@ -114,7 +114,7 @@ services:
   #   ports:
   #     - "8188:8188"
   #   environment:
-  #     - CLI_ARGS=--listen YOUR_PUBLIC_IP --port 8188 --cpu
+  #     - CLI_ARGS=--listen 0.0.0.0 --port 8188 --cpu
   #   volumes:
   #     - ./shared/comfyui/models:/comfyui/models
   #     - ./shared/comfyui/output:/comfyui/output

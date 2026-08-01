@@ -1,4 +1,4 @@
-<!-- LEGACY: полное тело скилла 'tweaks-panel' из старого дерева ${WORKSPACE}/tools/claude-code-skills (@2026-04-30).
+<!-- LEGACY: полное тело скилла 'tweaks-panel' из старого дерева ~/.claude/tools/claude-code-skills (@2026-04-30).
      Сохранено при консолидации деревьев design-пака 2026-07-18 (lossless-merge, канон deep-read-before-merge).
      Актуальный канон — ../SKILL.md; здесь — расширенный материал прежней версии (таблицы, рецепты, антипаттерны). -->
 
@@ -51,7 +51,7 @@ function TweaksPanel({ tweaks, onChange }) {
           {t.type === 'toggle' && (
             <button onClick={() => onChange(t.key, !t.value)} style={{
               width: 48, height: 26, borderRadius: 13, border: 'none',
-              background: t.value ? '#YOUR_BRAND_COLOR' : '#d1d5db', position: 'relative', cursor: 'pointer',
+              background: t.value ? '#12b886' : '#d1d5db', position: 'relative', cursor: 'pointer',
             }}>
               <div style={{
                 position: 'absolute', top: 2, left: t.value ? 24 : 2,
@@ -79,7 +79,7 @@ window.TweaksPanel = TweaksPanel;
 ```jsx
 function App() {
   const [tw, setTw] = useState({
-    primary: '#YOUR_PRIMARY',
+    primary: '#3B5BDB',
     fontScale: 100,
     radius: 12,
     darkMode: false,

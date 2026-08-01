@@ -1,6 +1,6 @@
 ---
 name: privacy-filter
-description: "Local on-device PII detection and redaction (OpenAI `opf` model). De-identify text BEFORE sending to any cloud LLM (152-ФЗ/GDPR), strip PII from logs/datasets/tickets, detect PII spans. Reversible redaction + Russian fine-tuning. Triggers: «обезличь текст», «деперсонализация», «убери персональные данные», «privacy filter», «opf», «redact PII». NOT for image redaction or as a compliance guarantee."
+description: "Local on-device PII detection and redaction (OpenAI `opf` model): de-identify text BEFORE sending to any cloud LLM (152-ФЗ/GDPR), strip PII from logs, datasets and tickets, reversible redaction + Russian fine-tuning. NOT for image redaction or as a compliance guarantee."
 metadata:
   version: 1.0.0
   updated: 2026-05-31

@@ -13,7 +13,7 @@
 | Brain статистика | "brain stats", "статистика мозга" | MCP `brain_stats` |
 | Brain dream | "dream brain", "консолидация памяти", "сон мозга" | Skill `dream` (updated) |
 |-----------|----------|------------|
-| Open Design | "open design", "open-design", "открой дизайн тул", "nexu-io", "72 дизайн-системы", "дизайн системой Stripe/Linear/Vercel", "local design tool", "guizang-ppt", "запусти дизайн приложение" | Skill `open-design`, CLI: `cd ${WORKSPACE}/tools/open-design && pnpm tools-dev run web` |
+| Open Design | "open design", "open-design", "открой дизайн тул", "nexu-io", "72 дизайн-системы", "дизайн системой Stripe/Linear/Vercel", "local design tool", "guizang-ppt", "запусти дизайн приложение" | Skill `open-design`, CLI: `cd ~/.claude/tools/open-design && pnpm tools-dev run web` |
 | Музыка/аудио | "сгенерируй музыку", "сделай трек", "music generation", "ace-step", "напиши песню", "soundtrack", "jingle", "background music", "сгенерируй аудио" | Skill `ace-step`, CLI: `cd ~/your-ace-step && uv run python ~/.claude/skills/ace-step/scripts/generate.py` |
 | Тендеры/закупки | "тендеры", "госзакупки", "закупки", "найди контракты", "подходящие контракты", "zakupki", "rostender", "тендерные закупки", "ОКПД2" | Skill `tender-search-ru` (Playwright + rostender; обход гео-блока zakupki) |
 | Реставрация фото | "реставрируй фото", "улучши старую фотку", "восстанови фото", "photo restoration", "шакальная фотка", "улучши качество фото" | Skill `nano-banana-pro` (раздел Photo Restoration) |
@@ -64,32 +64,32 @@
 | Cloud Translation | "переведи через google", "gtranslate" | Command `gtranslate` |
 | Cloud Storage | "GCS", "бакеты", "gcloud storage" | Command `gcloud-storage` |
 | Telegram бот (разработка) | "бот", "telegram бот", "напиши бота", "handlers", "scenes", "deploy бота" | Skill `telegram-bot-toolkit` |
-| Публикация через бота (Bot API) | "опубликуй через бота", "пост в канал от бота", "бот-админ канала", "кнопка к посту в канале", "rich-пост с таблицей", "таблица/заголовок в тг-посте", "рассылка подписчикам бота", "отправь подписчику в личку", "опрос от бота", "платный пост Stars", "инвайт-ссылка бот", "почему updates молчит", "вебхук бота", "tg_bot.py" | Skill `tg-bot-publish`, CLI: `python ${WORKSPACE}/tools/tg_bot.py` (+ TG_BOT_CAPABILITIES.md, TG_BOT_API_REFERENCE.md) |
-| MAX переписка | "чат в максе", "max chat", "прочитай макс" | `python ${WORKSPACE}/tools/max_client.py read-chat <target>` |
-| MAX каналы | "канал в максе", "max channel", "посты макс" | `python ${WORKSPACE}/tools/max_client.py parse-channel <@username>` |
-| MAX поиск каналов | "найди канал макс", "public search max" | `python ${WORKSPACE}/tools/max_client.py public-search <query>` |
-| MAX глобальный поиск | "поиск в максе", "max search" | `python ${WORKSPACE}/tools/max_client.py global-search <query>` |
-| MAX участники | "участники макс", "members max" | `python ${WORKSPACE}/tools/max_client.py parse-members <@username>` |
-| MAX статистика | "статистика макс канала" | `python ${WORKSPACE}/tools/max_client.py channel-stats <@username>` |
-| MAX отправить | "напиши в макс", "отправь в max" | `python ${WORKSPACE}/tools/max_client.py send <chat_id> "text"` |
-| MAX файл | "отправь файл в макс" | `python ${WORKSPACE}/tools/max_client.py send-file <chat_id> <file>` |
-| MAX юзер инфо | "кто это в максе", "max user info" | `python ${WORKSPACE}/tools/max_client.py user-info <user_id>` |
-| MAX онлайн | "онлайн ли в максе", "max online" | `python ${WORKSPACE}/tools/max_client.py online-status <user_id>` |
-| MAX поиск телефон | "найди в максе по телефону" | `python ${WORKSPACE}/tools/max_client.py search-phone <phone>` |
-| MAX вступить | "вступи в канал макс" | `python ${WORKSPACE}/tools/max_client.py join <@username>` |
-| MAX экспорт | "экспортируй чат макс" | `python ${WORKSPACE}/tools/max_client.py export-chat <chat_id>` |
-| MAX папки | "папки макс" | `python ${WORKSPACE}/tools/max_client.py folders` |
-| MAX устройства | "устройства макс", "сессии max" | `python ${WORKSPACE}/tools/max_client.py active-sessions` |
-| MAX слушать | "слушай макс", "listen max" | `python ${WORKSPACE}/tools/max_client.py listen [--ai]` |
-| MAX рассылка | "рассылка макс", "broadcast max" | `python ${WORKSPACE}/tools/max_client.py broadcast "text" --targets` |
-| MAX упоминания | "упоминания макс", "mentions max" | `python ${WORKSPACE}/tools/max_client.py mentions` |
-| MAX медиа | "медиа из макс чата", "фото макс" | `python ${WORKSPACE}/tools/max_client.py chat-media <chat_id>` |
-| MAX профиль | "обнови био макс", "max bio" | `python ${WORKSPACE}/tools/max_client.py set-bio/set-name/set-photo` |
-| MAX группа | "создай группу макс" | `python ${WORKSPACE}/tools/max_client.py create-group "name" <user_ids>` |
-| MAX канал создать | "создай канал макс" | `python ${WORKSPACE}/tools/max_client.py create-channel "name"` |
-| MAX архив | "архивируй макс чат" | `python ${WORKSPACE}/tools/max_client.py archive/unarchive <chat_id>` |
-| MAX мьют | "замьють макс" | `python ${WORKSPACE}/tools/max_client.py mute/unmute <chat_id>` |
-| MAX блок | "заблокируй в максе" | `python ${WORKSPACE}/tools/max_client.py block/unblock <user_id>` |
+| Публикация через бота (Bot API) | "опубликуй через бота", "пост в канал от бота", "бот-админ канала", "кнопка к посту в канале", "rich-пост с таблицей", "таблица/заголовок в тг-посте", "рассылка подписчикам бота", "отправь подписчику в личку", "опрос от бота", "платный пост Stars", "инвайт-ссылка бот", "почему updates молчит", "вебхук бота", "tg_bot.py" | Skill `tg-bot-publish`, CLI: `python ~/.claude/tools/tg_bot.py` (+ TG_BOT_API_REFERENCE.md, TG_BOT_API_REFERENCE.md) |
+| MAX переписка | "чат в максе", "max chat", "прочитай макс" | `python ~/.claude/tools/max_client.py read-chat <target>` |
+| MAX каналы | "канал в максе", "max channel", "посты макс" | `python ~/.claude/tools/max_client.py parse-channel <@username>` |
+| MAX поиск каналов | "найди канал макс", "public search max" | `python ~/.claude/tools/max_client.py public-search <query>` |
+| MAX глобальный поиск | "поиск в максе", "max search" | `python ~/.claude/tools/max_client.py global-search <query>` |
+| MAX участники | "участники макс", "members max" | `python ~/.claude/tools/max_client.py parse-members <@username>` |
+| MAX статистика | "статистика макс канала" | `python ~/.claude/tools/max_client.py channel-stats <@username>` |
+| MAX отправить | "напиши в макс", "отправь в max" | `python ~/.claude/tools/max_client.py send <chat_id> "text"` |
+| MAX файл | "отправь файл в макс" | `python ~/.claude/tools/max_client.py send-file <chat_id> <file>` |
+| MAX юзер инфо | "кто это в максе", "max user info" | `python ~/.claude/tools/max_client.py user-info <user_id>` |
+| MAX онлайн | "онлайн ли в максе", "max online" | `python ~/.claude/tools/max_client.py online-status <user_id>` |
+| MAX поиск телефон | "найди в максе по телефону" | `python ~/.claude/tools/max_client.py search-phone <phone>` |
+| MAX вступить | "вступи в канал макс" | `python ~/.claude/tools/max_client.py join <@username>` |
+| MAX экспорт | "экспортируй чат макс" | `python ~/.claude/tools/max_client.py export-chat <chat_id>` |
+| MAX папки | "папки макс" | `python ~/.claude/tools/max_client.py folders` |
+| MAX устройства | "устройства макс", "сессии max" | `python ~/.claude/tools/max_client.py active-sessions` |
+| MAX слушать | "слушай макс", "listen max" | `python ~/.claude/tools/max_client.py listen [--ai]` |
+| MAX рассылка | "рассылка макс", "broadcast max" | `python ~/.claude/tools/max_client.py broadcast "text" --targets` |
+| MAX упоминания | "упоминания макс", "mentions max" | `python ~/.claude/tools/max_client.py mentions` |
+| MAX медиа | "медиа из макс чата", "фото макс" | `python ~/.claude/tools/max_client.py chat-media <chat_id>` |
+| MAX профиль | "обнови био макс", "max bio" | `python ~/.claude/tools/max_client.py set-bio/set-name/set-photo` |
+| MAX группа | "создай группу макс" | `python ~/.claude/tools/max_client.py create-group "name" <user_ids>` |
+| MAX канал создать | "создай канал макс" | `python ~/.claude/tools/max_client.py create-channel "name"` |
+| MAX архив | "архивируй макс чат" | `python ~/.claude/tools/max_client.py archive/unarchive <chat_id>` |
+| MAX мьют | "замьють макс" | `python ~/.claude/tools/max_client.py mute/unmute <chat_id>` |
+| MAX блок | "заблокируй в максе" | `python ~/.claude/tools/max_client.py block/unblock <user_id>` |
 | N8N | "автоматизация", "workflow" | Skill `n8n` |
 | CEO Council | "совет директоров", "ceo council", "стратегическое решение", "параллельные эксперты", "мнения экспертов" | Skill `ceo-council` |
 | Investor Materials | "питч-дек", "investor", "one-pager", "финмодель", "инвестор", "фандрейзинг", "pitch deck" | Skill `investor-materials` |
@@ -250,7 +250,7 @@
 | AI ревью PR | "greptile", "AI review PR" | Plugin `greptile` |
 | Tapestry (документы) | "tapestry", "weave", "свяжи документы", "interlink docs" | Skill `tapestry` (интерлинкинг внешних документов, YouTube, PDF) |
 | EPUB | "epub", "ebook", "электронная книга", "kindle" | Skill `epub-tools` |
-| Claude CLI | "claude CLI", "без API ключа", "without API key", "claude binary" | Skill `claude-cli-runner`, модуль `${WORKSPACE}/tools/claude_cli.py` |
+| Claude CLI | "claude CLI", "без API ключа", "without API key", "claude binary" | Skill `claude-cli-runner`, модуль `~/.claude/tools/claude_cli.py` |
 | Claude серверная авторизация | "авторизуй на сервере", "setup-token", "токен подписки", "server auth" | Skill `claude-server-auth` |
 | Акции/Финансы | "stock", "акции", "курс", "биржа", "yfinance" | Skill `stock-analysis`, CLI: `python ~/.claude/skills/stock-analysis/scripts/stock_analysis.py` |
 | Трафик сайта | "similarweb", "трафик сайта", "посещаемость", "web analytics" | Skill `similarweb-analytics` |

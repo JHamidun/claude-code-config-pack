@@ -17,17 +17,17 @@ argument-hint: "[extract-knowledge | dedupe | scan]"
 
 1. **Извлечь знания по топикам:**
 ```bash
-python ${WORKSPACE}/tools/chat_ingester_v2.py extract-knowledge
+python ~/.claude/tools/chat_ingester_v2.py extract-knowledge
 ```
 
 2. **Удалить дубликаты:**
 ```bash
-python ${WORKSPACE}/tools/chat_ingester_v2.py dedupe
+python ~/.claude/tools/chat_ingester_v2.py dedupe
 ```
 
 3. **Показать статистику:**
 ```bash
-python ${WORKSPACE}/tools/chat_ingester_v2.py scan
+python ~/.claude/tools/chat_ingester_v2.py scan
 ```
 
 ## Что извлекается

@@ -1,6 +1,6 @@
 ---
 name: webhook-receiver
-description: Приём вебхуков (GitHub, Stripe, GitLab, JIRA, HTML-формы) локальным CLI-сервером с HMAC-валидацией подписей, JSONL-логом и запуском команды на payload. CLI: python ${WORKSPACE}/tools/webhook_server.py. Триггеры: «вебхук», «webhook», «прими вебхук», «поймай событие GitHub/Stripe», «подпиши webhook», «проверь подпись вебхука», «webhook receiver», «лови POST от формы», «endpoint для колбэка». НЕ для: постоянных agent-ботов на вебхуках → agent-builder tooling (Hermes webhook-адаптер); отправки исходящих запросов/уведомлений → tg-bot-publish/n8n; туннели наружу настраиваются отдельно (cloudflared/ngrok, см. Гочи).
+description: "Приём вебхуков (GitHub, Stripe, GitLab, JIRA, HTML-формы) локальным CLI-сервером: HMAC-валидация подписей, JSONL-лог, запуск команды на payload. CLI: python ~/.claude/tools/webhook_server.py serve. НЕ: постоянные боты на вебхуках→agent-builder tooling (Hermes webhook-адаптер); исходящие уведомления→tg-bot-publish/n8n; туннели наружу — cloudflared/ngrok отдельно."
 ---
 
 # Webhook Receiver
@@ -20,7 +20,7 @@ description: Приём вебхуков (GitHub, Stripe, GitLab, JIRA, HTML-ф�
 
 Зависимости: только stdlib (aiohttp НЕ нужен). Файлы:
 
-- Инструмент: `${WORKSPACE}/tools/webhook_server.py`
+- Инструмент: `~/.claude/tools/webhook_server.py`
 - Конфиг маршрутов: `~/.claude/data/webhooks/routes.json` (создать: `routes --init`)
 - Лог событий: `~/.claude/data/webhooks/YYYY-MM-DD.jsonl`
 
@@ -61,20 +61,20 @@ description: Приём вебхуков (GitHub, Stripe, GitLab, JIRA, HTML-ф�
 
 ```bash
 # Первый запуск: создать конфиг, заполнить секреты, поднять сервер
-python ${WORKSPACE}/tools/webhook_server.py routes --init
-python ${WORKSPACE}/tools/webhook_server.py serve --port 8787
+python ~/.claude/tools/webhook_server.py routes --init
+python ~/.claude/tools/webhook_server.py serve --port 8787
 
 # Smoke-тест из второго терминала (подпись считается автоматически)
-python ${WORKSPACE}/tools/webhook_server.py test github
+python ~/.claude/tools/webhook_server.py test github
 
 # Что прилетело за сегодня
-python ${WORKSPACE}/tools/webhook_server.py tail -n 30 --route stripe
+python ~/.claude/tools/webhook_server.py tail -n 30 --route stripe
 
 # Посчитать GitHub-подпись для файла (отладка интеграции)
-python ${WORKSPACE}/tools/webhook_server.py verify github --payload event.json --secret-env WEBHOOK_GITHUB_SECRET
+python ~/.claude/tools/webhook_server.py verify github --payload event.json --secret-env WEBHOOK_GITHUB_SECRET
 
 # Проверить присланную кем-то подпись
-python ${WORKSPACE}/tools/webhook_server.py verify stripe --payload body.json --secret-env WEBHOOK_STRIPE_SECRET --signature "t=...,v1=..."
+python ~/.claude/tools/webhook_server.py verify stripe --payload body.json --secret-env WEBHOOK_STRIPE_SECRET --signature "t=...,v1=..."
 ```
 
 Action-команда получает: payload на **stdin** (сырые байты тела), env `WEBHOOK_ROUTE` и `WEBHOOK_EVENT`; выполняется в фоне (ответ провайдеру уходит сразу), rc/stdout/stderr пишутся отдельной строкой `kind=action_result` в тот же JSONL.

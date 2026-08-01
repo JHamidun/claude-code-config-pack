@@ -52,7 +52,7 @@ argument-hint: "\"<исследовательский вопрос>\""
 
 ```python
 import sys
-sys.path.append('${WORKSPACE}/tools')
+sys.path.append('~/.claude/tools')
 from perplexity_helper import PerplexityClient
 
 client = PerplexityClient()

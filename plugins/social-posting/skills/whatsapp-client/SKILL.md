@@ -1,6 +1,6 @@
 ---
 name: whatsapp-client
-description: CLI к ЛИЧНОМУ WhatsApp через локальный Baileys-мост (Node) — чтение чатов и истории, поиск, отправка текста/медиа, редактирование, контакты, группы, профили, скачивание медиа, экспорт чата, аккуратная рассылка с анти-бан гардами. Всё локально на Windows, сессия рядом с мостом. CLI - `python ${WORKSPACE}/tools/wa_client.py <cmd>`. Триггеры - «whatsapp», «вотсап», «ватсап», «напиши в whatsapp», «прочитай переписку в whatsapp», «непрочитанные в вотсапе», «найди в whatsapp», «отправь файл в whatsapp», «экспортируй чат whatsapp», «группы whatsapp», «QR whatsapp», «привяжи whatsapp». НЕ для - Telegram (`tg_client.py`/`tg-bot-publish`), MAX (`max-messenger`), SMS (`sms-twilio`), WhatsApp Business Cloud API (официальный, здесь его нет), автономных ботов на WhatsApp (agent-builder tooling → Hermes-адаптер), массового спама (запрещено ToS Meta).
+description: "CLI к ЛИЧНОМУ WhatsApp через локальный Baileys-мост (Node): чтение чатов и истории, поиск, отправка текста/медиа, группы, контакты, профили, экспорт чата, рассылка с анти-бан гардами. CLI: python ~/.claude/tools/wa_client.py <cmd>. НЕ: Telegram→tg_client.py/tg-bot-publish; MAX→max-messenger; SMS→sms-twilio; WhatsApp Business Cloud API здесь нет; спам запрещён ToS Meta."
 ---
 
 # WhatsApp Client (личный номер, локально)
@@ -9,8 +9,8 @@ description: CLI к ЛИЧНОМУ WhatsApp через локальный Bailey
 (подключился → сделал → напечатал → вышел).
 
 ```
-${WORKSPACE}/tools/wa_client.py        # CLI (Python 3.13, только stdlib)
-${WORKSPACE}/tools/wa-bridge/          # Node-мост (ESM, express + Baileys 7.0.0-rc.9)
+~/.claude/tools/wa_client.py        # CLI (Python 3.13, только stdlib)
+~/.claude/tools/wa-bridge/          # Node-мост (ESM, express + Baileys 7.0.0-rc.9)
   bridge.js                           # HTTP на 127.0.0.1:<порт>, loopback-only
   .session/                           # креды Baileys (в .gitignore!) — НЕ коммитить
   store/store.json                    # локальный индекс чатов/контактов/сообщений
@@ -31,12 +31,12 @@ ${WORKSPACE}/tools/wa-bridge/          # Node-мост (ESM, express + Baileys 7
 
 1. Node 18+ (проверено на 22.15) и Python 3.13 — уже есть.
 2. Зависимости моста ставятся автоматически при первом `bridge-start`
-   (или вручную: `cd ${WORKSPACE}/tools/wa-bridge && npm install`).
+   (или вручную: `cd ~/.claude/tools/wa-bridge && npm install`).
 3. Поднять мост и привязать телефон:
 
 ```bash
-python ${WORKSPACE}/tools/wa_client.py bridge-start
-python ${WORKSPACE}/tools/wa_client.py login      # покажет ASCII-QR, ждёт сканирования
+python ~/.claude/tools/wa_client.py bridge-start
+python ~/.claude/tools/wa_client.py login      # покажет ASCII-QR, ждёт сканирования
 ```
 
 **Процедура QR-логина (делает владелец, телефон обязателен):**
@@ -52,7 +52,7 @@ WhatsApp на телефоне → **Настройки → Связанные �
 
 | Переменная | Назначение |
 |---|---|
-| `WA_BRIDGE_DIR` | каталог моста (деф. `${WORKSPACE}/tools/wa-bridge`) |
+| `WA_BRIDGE_DIR` | каталог моста (деф. `~/.claude/tools/wa-bridge`) |
 | `WA_BRIDGE_PORT` | порт моста (деф. `3000`) |
 | `WA_SESSION_DIR` | каталог сессии Baileys (деф. `<bridge>/.session`) |
 | `WA_MODE` | `bot` (деф. для CLI, без Hermes-префикса) или `self-chat` |
@@ -109,31 +109,31 @@ WhatsApp на телефоне → **Настройки → Связанные �
 
 ```bash
 # Старт и проверка
-python ${WORKSPACE}/tools/wa_client.py bridge-start
-python ${WORKSPACE}/tools/wa_client.py status
+python ~/.claude/tools/wa_client.py bridge-start
+python ~/.claude/tools/wa_client.py status
 
 # Что накопилось
-python ${WORKSPACE}/tools/wa_client.py unread
-python ${WORKSPACE}/tools/wa_client.py read-chat "+55 XX XXXXX-XXXX" --limit 30
+python ~/.claude/tools/wa_client.py unread
+python ~/.claude/tools/wa_client.py read-chat "+55 XX XXXXX-XXXX" --limit 30
 
 # Написать и приложить файл
-python ${WORKSPACE}/tools/wa_client.py send "+55 XX XXXXX-XXXX" "Готово, скинул отчёт"
-python ${WORKSPACE}/tools/wa_client.py send-media "+55 XX XXXXX-XXXX" "${WORKSPACE}/report.pdf" --caption "Отчёт за июль"
+python ~/.claude/tools/wa_client.py send "+55 XX XXXXX-XXXX" "Готово, скинул отчёт"
+python ~/.claude/tools/wa_client.py send-media "+55 XX XXXXX-XXXX" "${WORKSPACE}/report.pdf" --caption "Отчёт за июль"
 
 # Длинный текст из файла
-python ${WORKSPACE}/tools/wa_client.py send "+55 XX XXXXX-XXXX" "@${WORKSPACE}/msg.txt"
+python ~/.claude/tools/wa_client.py send "+55 XX XXXXX-XXXX" "@${WORKSPACE}/msg.txt"
 
 # Поиск и экспорт
-python ${WORKSPACE}/tools/wa_client.py search "договор" --limit 20
-python ${WORKSPACE}/tools/wa_client.py export-chat "120363011111111111@g.us" --out ${WORKSPACE}/chat.txt
+python ~/.claude/tools/wa_client.py search "договор" --limit 20
+python ~/.claude/tools/wa_client.py export-chat "120363011111111111@g.us" --out ${WORKSPACE}/chat.txt
 
 # Машинный вывод для скриптов
-python ${WORKSPACE}/tools/wa_client.py --json chats --limit 10
+python ~/.claude/tools/wa_client.py --json chats --limit 10
 
 # Рассылка: сначала ВСЕГДА dry-run
-python ${WORKSPACE}/tools/wa_client.py broadcast ${WORKSPACE}/list.txt "Привет, {name}! ..."
+python ~/.claude/tools/wa_client.py broadcast ${WORKSPACE}/list.txt "Привет, {name}! ..."
 # и только потом, осознанно:
-python ${WORKSPACE}/tools/wa_client.py broadcast ${WORKSPACE}/list.txt "Привет, {name}! ..." --confirm --max 20
+python ~/.claude/tools/wa_client.py broadcast ${WORKSPACE}/list.txt "Привет, {name}! ..." --confirm --max 20
 ```
 
 Формат файла для `broadcast` (плейсхолдеры `{name}`, `{jid}`, `{number}`):

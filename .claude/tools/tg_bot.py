@@ -38,7 +38,7 @@ tg_bot.py — полный инструмент Telegram Bot API: ВСЁ, что
 
 Глобальный флаг --dry-run печатает метод+payload и НИЧЕГО не отправляет (для проверки).
 
-Примеры — внизу файла (EXAMPLES) и в TG_BOT_CAPABILITIES.md.
+Примеры — внизу файла (EXAMPLES) и в TG_BOT_API_REFERENCE.md.
 """
 import argparse
 import json

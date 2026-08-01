@@ -79,7 +79,7 @@ pip install -r requirements.txt
 python run.py --dev
 
 # Production mode
-python run.py --host YOUR_PUBLIC_IP --port 8000
+python run.py --host 0.0.0.0 --port 8000
 ```
 
 #### Production with Gunicorn
@@ -88,7 +88,7 @@ python run.py --host YOUR_PUBLIC_IP --port 8000
 pip install gunicorn
 
 # Start with gunicorn
-gunicorn -w 4 -k uvicorn.workers.UvicornWorker -b YOUR_PUBLIC_IP:8000 api_server:app
+gunicorn -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 api_server:app
 ```
 
 ### 4. Kubernetes Deployment

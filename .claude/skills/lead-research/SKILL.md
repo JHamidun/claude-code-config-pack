@@ -1,6 +1,6 @@
 ---
 name: lead-research
-description: "Build and qualify a fresh B2B lead list from an ICP (RU market): discovery → decision-maker mapping → signal → scoring (Hot/Warm/Cold/Skip) → handoff. For selling AI-workshops / consulting / B2B academy cohorts. Delegates firmographics to lead-enrichment (ЕГРЮЛ/Checko/DaData), decision-makers to headhunter/linkedin/social-intel, budget signals to tender-search-ru. Triggers: 'lead research', 'prospect research', 'ICP', «поиск компаний», «список лидов», «найди клиентов», «квалифицируй лиды». NOT: enrich an existing list/fragment→lead-enrichment; outreach copy→draft-outreach; CRM ops→crm/revops-ru; social dossier on a known handle→social-intel."
+description: "Build and qualify a fresh B2B lead list from an ICP (RU market): discovery → decision-maker mapping → signals → scoring (Hot/Warm/Cold/Skip) → handoff, for selling AI-workshops / consulting / B2B cohorts. Triggers: 'lead research', 'prospect research', 'ICP', «список лидов». NOT: enrich an existing list→lead-enrichment; outreach copy→draft-outreach; CRM ops→crm/revops-ru; dossier on a known handle→social-intel."
 allowed-tools: Bash, Read, Write, WebSearch, WebFetch, Skill
 metadata:
   version: 3.0.0

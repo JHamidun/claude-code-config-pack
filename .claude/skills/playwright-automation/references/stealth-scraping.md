@@ -1,8 +1,8 @@
-# Stealth-скрапинг: patchright + curl_cffi
+# Stealth-скрапинг: curl_cffi + patchright + Camoufox
 
-> Два стелс-инструмента для обхода анти-ботов. Установлены и проверены 2026-07-19
-> (Python 3.13, Windows). Общий референс для skills: `playwright-automation`,
-> `tender-search-ru`, `headhunter`, `ad-spy`.
+> Три стелс-инструмента для обхода анти-ботов. curl_cffi и patchright установлены и
+> проверены 2026-07-19 (Python 3.13, Windows), Camoufox — опция под установку.
+> Общий референс для skills: `playwright-automation`, `tender-search-ru`, `headhunter`, `ad-spy`.
 
 ## TL;DR — какой инструмент когда
 
@@ -11,11 +11,20 @@
 | Дёрнуть JSON-API / голый HTML, который банит `requests` | **curl_cffi** (`impersonate="chrome"`) | Нет браузера → быстро и легко; подделывает TLS/JA3-отпечаток под Chrome. WAF видит «настоящий Chrome». |
 | Страница требует исполнения JS / клики / логин, и стоит анти-бот | **patchright** | Полный браузер, но скрывает `navigator.webdriver`, CDP-утечки (`Runtime.enable`), чинит `window.chrome`. |
 | Cloudflare Turnstile / Datadome / Kasada / Akamai challenge | **patchright** (браузер) или **curl_cffi** (если challenge только TLS/JA3-based) | Пробуй сначала curl_cffi (дёшево), не пробило — patchright. |
+| **Chromium уже спалён на этой цели** / нужна гео-привязка к прокси / цель ловит именно Chromium | **Camoufox** (Firefox) | Другой движок + подмена на уровне C++ **до** того, как значение увидит JS. Детекторы, заточенные под CDP-артефакты Chromium, на нём не срабатывают. |
 | Обычный сайт без защиты | стоковый `playwright` / `requests` | Стелс не нужен, лишний оверхед. |
 
 **Принцип:** начинай с самого лёгкого (curl_cffi без браузера) → эскалируй к patchright
 (браузер) только когда нужен реальный рендеринг JS или защита ловит именно браузерную
-автоматизацию.
+автоматизацию → Camoufox как **третья нога**, когда Chromium как класс уже не проходит.
+
+**Слои подмены — почему это не дубли, а разные уровни:**
+
+| Инструмент | Что подделывает | На каком слое |
+| ---------- | --------------- | ------------- |
+| curl_cffi | TLS/JA3-отпечаток | сетевой, браузера нет вообще |
+| patchright | `navigator.webdriver`, CDP-утечки, `window.chrome` | CDP/JS-рантайм Chromium — **после** того, как значение выдал движок |
+| Camoufox | `navigator.*`, WebGL vendor/renderer, AudioContext, геометрия экрана, WebRTC-IP, шрифты | **C++ движка Firefox — до JS**; отпечаток генерит BrowserForge по реальным распределениям устройств |
 
 ---
 
@@ -140,6 +149,48 @@ with sync_playwright() as p:
   содержит `HeadlessChrome` (некоторые чеки это ловят, но core-antidetect всё равно проходит).
 - Не универсальный обход капчи. Скрывает автоматизацию, но интерактивную капчу (reCAPTCHA v2
   клик) всё равно решает человек/сервис.
+
+---
+
+## Camoufox — третья нога (Firefox, подмена в C++)
+
+**Не установлен.** Ставится одной командой, когда Chromium как класс уже не проходит.
+
+```bash
+# ОБЯЗАТЕЛЬНО отдельный venv: тянет playwright<1.61 и конфликтует с текущим окружением
+python -m venv ~/.venvs/camoufox && ~/.venvs/camoufox/Scripts/pip install -U "camoufox[geoip]"
+~/.venvs/camoufox/Scripts/camoufox fetch     # качает Firefox-форк, ~470 МБ (Windows x86_64)
+```
+
+```python
+from camoufox.sync_api import Camoufox
+
+# os/humanize/geoip — весь стелс задаётся тут, руками ничего не патчим
+with Camoufox(os="windows", humanize=True, geoip=True,
+              proxy={"server": "http://user:pass@host:port"}) as browser:
+    page = browser.new_page()
+    page.goto("https://example.com")
+```
+
+**Что даёт сверх patchright:**
+
+- **Другой движок.** Детекторы, заточенные под CDP-артефакты Chromium (`Runtime.enable`, следы `Page.*`), на Firefox просто не срабатывают — там другая поверхность.
+- **`geoip=True`** — автосогласование locale, timezone и координат с IP прокси. Руками это муторно и легко забыть, а рассинхрон «немецкий IP + московская таймзона» палит сразу.
+- **`humanize=True`** — человекоподобное движение курсора на уровне движка.
+
+**Честная цена (знать до установки):**
+
+| Что | Сколько |
+| --- | ------- |
+| Диск | ~470 МБ (Windows), ~630 МБ (Linux); распакованным в 2-3 раза больше |
+| Окружение | обязательно отдельный venv (`playwright<1.61`) |
+| Лицензия браузера | **MPL-2.0** — файловый copyleft. Личное использование и скиллы не задевает; выстрелит только если вшивать браузер в дистрибутив клиенту (`installer-builder`) — тогда тащи текст MPL и ссылку на исходники |
+| Питон-обёртка | MIT |
+
+> **Почему не REST-обёртка `camofox-browser`** (8210★): её собственный стелс-вклад — 11 строк
+> вызова этого же движка. При этом в `postinstall` намеренно замаскирован `spawn`
+> («to avoid triggering static code scanners»), а телеметрия включена по умолчанию и шлёт
+> целевой URL на сторонний Worker. Идеи из неё забраны в `scripts/pw_guard.py`, сам пакет — нет.
 
 ---
 

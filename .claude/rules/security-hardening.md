@@ -19,20 +19,14 @@
 - PreToolUse hooks can BLOCK dangerous commands (configured in settings.json)
 - Never run `eval()` or `exec()` on LLM-generated strings without validation
 
-## Current Blocking Hooks
+## Blocking Hooks
 
-| Pattern | What It Blocks |
-|---------|---------------|
-| `Bash(rm -rf)` | Recursive deletion |
-| `Bash(DROP DATABASE)` | Database destruction |
-| `Bash(DROP TABLE)` | Table destruction |
-
-Add new hooks in `~/.claude/settings.json` under `hooks.PreToolUse` as needed.
+Какие гарды реально стоят — смотри `~/.claude/settings.json` → `hooks.PreToolUse` (и код в `~/.claude/hooks/`); в сессии — `/doctor`. Не пересказывай их по памяти: устаревший список уже приводил к «найденной» несуществующей дыре. Принципы и стоимость хуков → `config/rules-ref/hooks.md`.
 
 ## Permission Boundaries
 
 - Security agents (security-engineer, security-scanner) have READ-ONLY tools
-- Write operations require explicit user approval (first time per session)
+- Актуальный режим и списки — `settings.json` → `permissions` (defaultMode, allow/deny/ask) и `/context`
 - MCP servers should use least-privilege API tokens
 - Scope OAuth grants to minimum required permissions
 - Revoke unused MCP server tokens promptly

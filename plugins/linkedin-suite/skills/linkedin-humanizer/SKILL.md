@@ -1,6 +1,6 @@
 ---
 name: linkedin-humanizer
-description: "Anti-AI-tells suite for LinkedIn (EN), 5 modes: humanize/scrub (tiers forensic/strict/aesthetic), rules explainer, emoji detector, detector tester (GPTZero, Originality.ai, ZeroGPT, Copyleaks), pre-publish post audit vs 2026 algorithm. Триггеры: humanize linkedin, scrub AI tells, AI detector, эмодзи детектор, audit my linkedin draft. НЕ: русские тексты на любых площадках → skill de-ai-ify."
+description: "Anti-AI-tells suite for LinkedIn (EN), 5 modes: humanize/scrub (forensic/strict/aesthetic), rules explainer, emoji detector, detector tester (GPTZero, Originality.ai, ZeroGPT, Copyleaks), pre-publish audit vs 2026 algorithm. НЕ: русские тексты→de-ai-ify."
 ---
 
 # LinkedIn Humanizer V2

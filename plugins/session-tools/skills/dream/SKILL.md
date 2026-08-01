@@ -1,6 +1,6 @@
 ---
 name: dream
-description: Memory consolidation — reflective pass over memory files + Second Brain sleeptime. Carries the full v2 regulation referenced from rules/auto-learning.md — frontmatter v2 schema, rethink/supersede (bi-temporal), decay −0.02/week, prune pending>30d, promote project→global, TOP-INSTINCTS top-K rebuild. Use when memory is cluttered, stale, or after many sessions without cleanup.
+description: "Memory consolidation — рефлексивный проход по памяти + Second Brain sleeptime. Несёт полный регламент v2 из rules/auto-learning.md: frontmatter v2, rethink/supersede (bi-temporal), decay −0.02/нед, prune pending>30д, promote project→global, TOP-INSTINCTS."
 triggers:
   - "dream"
   - "консолидируй память"

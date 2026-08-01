@@ -68,7 +68,7 @@ def brand_composite(photo, out):
     LANCZOS = getattr(Image, 'Resampling', Image).LANCZOS
     yy, xx = np.mgrid[0:1024, 0:1024]
     d = np.clip(np.sqrt((xx - 512) ** 2 + (yy - 360) ** 2) / 760, 0, 1)[..., None]
-    c1, c2 = np.array([45, 47, 232]), np.array([1, 3, 52])  # #YOUR_PRIMARY -> #YOUR_INK
+    c1, c2 = np.array([45, 47, 232]), np.array([1, 3, 52])  # #3B5BDB -> #0B1021
     bg = Image.fromarray((c1 * (1 - d) + c2 * d).astype('uint8'))
     im = Image.open(photo).convert('RGB'); w, h = im.size; s = min(w, h)
     face = im.crop(((w - s) // 2, (h - s) // 2 - int(s * 0.05), (w - s) // 2 + s,
