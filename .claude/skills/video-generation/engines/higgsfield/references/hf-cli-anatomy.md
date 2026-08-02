@@ -1,6 +1,6 @@
 # hf.exe — полная анатомия (разобрано на запчасти, 2026-06-07)
 
-`${HOME}/.claude/skills/higgsfield/bin/hf.exe` — **8.66 МБ, Go-бинарь** (Cobra CLI), статически слинкован,
+`~/.claude/skills/video-generation/engines/higgsfield/bin/hf.exe` — **8.66 МБ, Go-бинарь** (Cobra CLI), статически слинкован,
 репо `github.com/higgsfield-ai/cli`, v0.1.40. Алиасы: `higgsfield` / `higgs` / `hf`. NPM-shim (`higgsfield.cmd`)
 пустой — вся логика в бинаре. **Per-model param-схемы НЕ в бинаре — приходят с сервера** (`hf model get`).
 

@@ -99,9 +99,9 @@ If the user says "analyze this video", "score this ad", "evaluate the hook", or 
    **Video analysis:**
    - Rate a finished video's hook, virality potential, attention, retention, or distraction risk → Virality Predictor (`brain_activity`). This is a video analysis model that returns a text score/report, not a generated media asset.
 
-   For the actual `--model` ID to pass to `higgsfield generate create`, run `higgsfield model list --json | jq` to map display names to IDs. See `references/model-catalog.md` for the full table.
+   For the actual `--model` ID to pass to `higgsfield generate create`, run `higgsfield model list --json | jq` to map display names to IDs. See `model-catalog.md` for the full table.
 
-2. **Pass media inputs straight to flags.** Media flags accept a local file path **or** a UUID. CLI auto-uploads paths and auto-detects job vs upload for UUIDs. No need to pre-upload. Each model declares accepted roles (`image`, `start_image`, `end_image`, `video`, `audio`) — see `references/media-inputs.md`.
+2. **Pass media inputs straight to flags.** Media flags accept a local file path **or** a UUID. CLI auto-uploads paths and auto-detects job vs upload for UUIDs. No need to pre-upload. Each model declares accepted roles (`image`, `start_image`, `end_image`, `video`, `audio`) — see `media-inputs.md`.
 3. **Validate quickly.** If unsure of params, run `higgsfield model get <jst> --json` once and pass only what's needed. Validate the preferred model before falling back to an older one. Use schema defaults otherwise. The server returns `adjustments` for non-fatal coercions (e.g. `aspect_ratio=99:99` → closest match) and a structured error for invalid declared-param values.
 4. **Submit and wait in one shot.** `higgsfield generate create <jst> [--prompt "..."] [media flags] [param flags] --wait`. Blocks until terminal status and prints the result on stdout. Tunables: `--wait-timeout 20m` (default 10m), `--wait-interval 5s` (default 3s). Virality Predictor does not need a prompt; pass `--video`.
 5. **Deliver.** For generated media, send the URL plus a one-line summary (model, duration if video). For Virality Predictor, deliver the scores, business interpretation, and the Open report link. Do not surface `.glb`, `.bin`, or region-table internals in normal chat output.
@@ -118,7 +118,7 @@ To inspect or rerun later, `higgsfield generate list --json` and `higgsfield gen
 | `--video <path-or-id>` | reference or analyzed video | `seedance_2_0`, `brain_activity` |
 | `--audio <path-or-id>` | reference audio (lipsync, soundtrack match) | `seedance_2_0` (use this, NOT `--generate-audio`) |
 
-Each flag accepts either a local file path (auto-uploaded) or a UUID (upload id from `higgsfield upload create`, or a previous job id). Each model declares its own role set via `MEDIA_ROLES`. See `references/media-inputs.md` for the full table.
+Each flag accepts either a local file path (auto-uploaded) or a UUID (upload id from `higgsfield upload create`, or a previous job id). Each model declares its own role set via `MEDIA_ROLES`. See `media-inputs.md` for the full table.
 
 ## Common params
 
@@ -149,8 +149,8 @@ Branded image/video gen: avatars + products + optional setup hooks/settings + ad
 - **Webproduct** — App Store / web page version. Auto-routes when fetching App Store URLs.
 - **Hook** — reusable opening angle / ad hook. Browse with `higgsfield marketing-studio hooks list`. Hook text is prepended to the user's prompt; it does not replace `--prompt`.
 - **Setting** — reusable environment / scene context. Browse with `higgsfield marketing-studio settings list`.
-- **Ad reference** — reusable inspiration video that can be bound to an avatar and/or product. Created from an uploaded video (`--video-input <upload_id>`) or a previous generation job (`--job <job_id>`). Browse with `higgsfield marketing-studio ad-references list`. See `references/marketing-ad-references.md`.
-- **Brand kit** — captures a brand's identity (name, logo, hero images, colours, fonts, tone) for reuse across image generations. Created by handing in a website URL (`higgsfield marketing-studio brand-kits fetch --url https://… --wait`). See `references/marketing-brand-kits.md`.
+- **Ad reference** — reusable inspiration video that can be bound to an avatar and/or product. Created from an uploaded video (`--video-input <upload_id>`) or a previous generation job (`--job <job_id>`). Browse with `higgsfield marketing-studio ad-references list`. See `marketing-ad-references.md`.
+- **Brand kit** — captures a brand's identity (name, logo, hero images, colours, fonts, tone) for reuse across image generations. Created by handing in a website URL (`higgsfield marketing-studio brand-kits fetch --url https://… --wait`). See `marketing-brand-kits.md`.
 - **Ad format** — presets that drives the visual structure of a generated image (`headline`, `bullet-points`, etc.). Read-only, browse with `higgsfield marketing-studio ad-formats list`. Required input for `dtc-ads generate`.
 
 ### Discovery commands
@@ -192,7 +192,7 @@ higgsfield marketing-studio ad-formats list --json
    - Hook: `higgsfield marketing-studio hooks list --json`
    - Setting: `higgsfield marketing-studio settings list --json`
    Pass selected IDs as `--hook_id <hook_id>` and `--setting_id <setting_id>` for `marketing_studio_video` only. Do not copy the hook's prompt into `--prompt` unless the user explicitly wants to reinforce the same wording.
-4. **Pick mode if needed.** Default is `ugc`; `--mode` is not required just because `--hook_id` is present. Other current slugs: `ugc_how_to`, `ugc_unboxing`, `product_showcase`, `product_review`, `tv_spot`, `wild_card`, `ugc_virtual_try_on`, `virtual_try_on`. **Hook/setting are valid only for `ugc`, `ugc_how_to`, `ugc_unboxing`, `product_review`, `ugc_virtual_try_on`** — do not pass `--hook_id` / `--setting_id` with the other modes. See `references/marketing-modes.md`.
+4. **Pick mode if needed.** Default is `ugc`; `--mode` is not required just because `--hook_id` is present. Other current slugs: `ugc_how_to`, `ugc_unboxing`, `product_showcase`, `product_review`, `tv_spot`, `wild_card`, `ugc_virtual_try_on`, `virtual_try_on`. **Hook/setting are valid only for `ugc`, `ugc_how_to`, `ugc_unboxing`, `product_review`, `ugc_virtual_try_on`** — do not pass `--hook_id` / `--setting_id` with the other modes. See `marketing-modes.md`.
 5. **Generate (one-shot).**
    ```bash
    PRODUCT_IDS_JSON=$(mktemp)
@@ -278,20 +278,20 @@ Open report: <report_url>
 - `Unknown params: foo` → schema doesn't accept that flag; check `higgsfield model get <jst>`. If this happens for `hook_id` or `setting_id`, the selected model/job_set_type does not support Marketing Studio setup items.
 - `Session expired` → `higgsfield auth login`.
 
-See `references/troubleshooting.md` for more.
+See `troubleshooting.md` for more.
 
 ## Reference docs
 
 Load on demand:
 
-- `references/model-catalog.md` — picking the right model for the task
-- `references/prompt-engineering.md` — writing prompts that work
-- `references/media-inputs.md` — image/video/audio reference flows and Virality Predictor video analysis
-- `references/troubleshooting.md` — common errors and fixes
-- `references/marketing-avatars.md` — preset vs custom avatars
-- `references/marketing-products.md` — URL fetch vs manual product create
-- `references/marketing-setup-items.md` — hooks/settings discovery and usage
-- `references/marketing-ad-references.md` — ad reference videos (create/list/get)
-- `references/marketing-brand-kits.md` — brand kits (fetch from URL, list, get)
-- `references/marketing-dtc-ads.md` — DTC Ads Engine (`dtc-ads generate`)
-- `references/marketing-modes.md` — every Marketing Studio mode
+- `model-catalog.md` — picking the right model for the task
+- `prompt-engineering.md` — writing prompts that work
+- `media-inputs.md` — image/video/audio reference flows and Virality Predictor video analysis
+- `troubleshooting.md` — common errors and fixes
+- `marketing-avatars.md` — preset vs custom avatars
+- `marketing-products.md` — URL fetch vs manual product create
+- `marketing-setup-items.md` — hooks/settings discovery and usage
+- `marketing-ad-references.md` — ad reference videos (create/list/get)
+- `marketing-brand-kits.md` — brand kits (fetch from URL, list, get)
+- `marketing-dtc-ads.md` — DTC Ads Engine (`dtc-ads generate`)
+- `marketing-modes.md` — every Marketing Studio mode

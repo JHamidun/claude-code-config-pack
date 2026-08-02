@@ -6,8 +6,8 @@ Mark a shipped version (v1.0, v1.1, v2.0) as complete. Creates historical record
 
 <required_reading>
 
-1. templates/milestone.md
-2. templates/milestone-archive.md
+1. $HOME/.claude/get-shit-done/templates/milestone.md
+2. $HOME/.claude/get-shit-done/templates/milestone-archive.md
 3. `.planning/ROADMAP.md`
 4. `.planning/REQUIREMENTS.md`
 5. `.planning/PROJECT.md`
@@ -29,7 +29,7 @@ When a milestone completes:
 
 **Context Efficiency:** Archives keep ROADMAP.md constant-size and REQUIREMENTS.md milestone-scoped.
 
-**ROADMAP archive** uses `templates/milestone-archive.md` — includes milestone header (status, phases, date), full phase details, milestone summary (decisions, issues, tech debt).
+**ROADMAP archive** uses `$HOME/.claude/get-shit-done/templates/milestone-archive.md` — includes milestone header (status, phases, date), full phase details, milestone summary (decisions, issues, tech debt).
 
 **REQUIREMENTS archive** contains all requirements marked complete with outcomes, traceability table with final status, notes on changed requirements.
 

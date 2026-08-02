@@ -47,7 +47,7 @@ argument-hint: "\"<задача>\" [speed|quality|balanced]"
 
 Когда пользователь просит выполнить задачу через Manus:
 
-1. **Используй Python helper** `tools/manus_helper.py`
+1. **Используй Python helper** `skills/manus/scripts/manus_helper.py`
 2. **API ключ уже настроен** через переменную окружения `MANUS_API_KEY`
 3. **Выбери режим выполнения:**
    - `speed` - быстрое выполнение (по умолчанию)
@@ -168,13 +168,13 @@ task = client.create_task(
 export MANUS_API_KEY="sk-..."
 
 # Создать задачу
-python tools/manus_helper.py create "Задача для Manus" --mode quality
+python skills/manus/scripts/manus_helper.py create "Задача для Manus" --mode quality
 
 # Проверить статус
-python tools/manus_helper.py get <task-id>
+python skills/manus/scripts/manus_helper.py get <task-id>
 
 # Список задач
-python tools/manus_helper.py list --status completed
+python skills/manus/scripts/manus_helper.py list --status completed
 ```
 
 ---
@@ -242,7 +242,7 @@ Manus имеет встроенные connectors:
 ## 📚 Документация
 
 - **API Reference:** https://open.manus.ai/docs
-- **Helper код:** `tools/manus_helper.py`
+- **Helper код:** `skills/manus/scripts/manus_helper.py`
 - **Полный гайд:** `MANUS_INTEGRATION_GUIDE.md`
 
 ---

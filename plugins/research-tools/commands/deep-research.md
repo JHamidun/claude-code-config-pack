@@ -253,19 +253,19 @@ print(result['content'])
 
 ```bash
 # Basic research
-python tools/perplexity_helper.py research "What are AI agents?"
+python ~/.claude/tools/perplexity_helper.py research "What are AI agents?"
 
 # Market research
-python tools/perplexity_helper.py market "AI automation tools"
+python ~/.claude/tools/perplexity_helper.py market "AI automation tools"
 
 # Fact check
-python tools/perplexity_helper.py fact-check "Claude 4 has 1M context"
+python ~/.claude/tools/perplexity_helper.py fact-check "Claude 4 has 1M context"
 
 # Tech analysis
-python tools/perplexity_helper.py tech "FastAPI" --depth comprehensive
+python ~/.claude/tools/perplexity_helper.py tech "FastAPI" --depth comprehensive
 
 # Compare sources
-python tools/perplexity_helper.py compare "MCP protocol" --sources "anthropic.com" "github.com"
+python ~/.claude/tools/perplexity_helper.py compare "MCP protocol" --sources "anthropic.com" "github.com"
 ```
 
 ---
@@ -418,7 +418,7 @@ trends = client.research(
 ## 📚 Документация
 
 - **Perplexity API:** https://docs.perplexity.ai/
-- **Helper код:** `tools/perplexity_helper.py`
+- **Helper код:** `~/.claude/tools/perplexity_helper.py`
 - **API Reference:** https://docs.perplexity.ai/reference
 
 ---

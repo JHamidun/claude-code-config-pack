@@ -63,7 +63,7 @@ def is_lost(stage_id: str) -> bool:
 
 ### 1. Несколько юрлиц на один ИНН
 
-Один ИНН может соответствовать нескольким `company_id` в Bitrix (старые карточки, дубликаты, разные подразделения). Решение: **агрегировать всё по ИНН**, не по `company_id`. См. `aggregate_inn()` в `scripts/02_match_bitrix.py`.
+Один ИНН может соответствовать нескольким `company_id` в Bitrix (старые карточки, дубликаты, разные подразделения). Решение: **агрегировать всё по ИНН**, не по `company_id`. См. `aggregate_inn()` в `scripts/list_pipeline/02_match_bitrix.py`.
 
 В Excel столбцы `Bitrix компания` и `Bitrix ID` показывают все titles/IDs через `/` и `,`.
 

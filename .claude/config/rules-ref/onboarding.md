@@ -118,7 +118,7 @@ Run these to confirm everything works end-to-end:
 | "API key not found" | Verify `~/.claude/.credentials.master.env` has the key, loaded via `os.getenv()` |
 | "MCP server failed to start" | Check `mcp.json` — ensure env vars are set and `disabled` is `false` |
 | Slow startup (>5s) | Disable unused MCP servers — each one adds cold-start latency |
-| Hook errors / crashes | See `rules/hooks.md` — only blocking hooks and beep are active by design |
+| Hook errors / crashes | See `config/rules-ref/hooks.md` — only blocking hooks and beep are active by design |
 | Context7 not resolving | Ensure `context7` plugin is enabled in `settings.json` |
 | Telegram tools fail | Run `python ~/.claude/tools/tg_client.py` once to authenticate Telethon session |
 

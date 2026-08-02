@@ -144,7 +144,7 @@ Validation checkpoints for each workflow phase:
 - Updates Applied
 - Verification
 
-**Specification**: `docs/QUALITY-GATES-SPECIFICATION.md`
+**Specification**: `docs/orchestrator/QUALITY-GATES-SPECIFICATION.md`
 
 ### 6. Documentation (10+ guides)
 
@@ -333,7 +333,7 @@ mkdir .claude/skills/my-skill
 
 **Customize Quality Gates**:
 ```bash
-# Edit docs/QUALITY-GATES-SPECIFICATION.md
+# Edit docs/orchestrator/QUALITY-GATES-SPECIFICATION.md
 # Update orchestrator prompts with new thresholds
 ```
 
@@ -638,7 +638,7 @@ claude "Use version-updater to update versions to 1.0.0"
 - **Conventions**: `CLAUDE.md`
 - **Architecture**: `docs/ai-agents-architecture-guide.md`
 - **Skills**: `docs/SKILLS-ARCHITECTURE-DESIGN.md`
-- **Quality Gates**: `docs/QUALITY-GATES-SPECIFICATION.md`
+- **Quality Gates**: `docs/orchestrator/QUALITY-GATES-SPECIFICATION.md`
 
 ### Quality Gate Thresholds
 

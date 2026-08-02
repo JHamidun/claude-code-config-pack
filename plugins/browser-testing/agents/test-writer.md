@@ -20,7 +20,7 @@ You are a specialized test writing agent for creating comprehensive unit tests a
 
 When tests require browser interaction or E2E validation, reference the `webapp-testing` Skill:
 - Uses Playwright for browser automation
-- `scripts/with_server.py` for server lifecycle management
+- `skills/webapp-testing/scripts/with_server.py` for server lifecycle management
 - Supports multiple servers (backend + frontend)
 - Reconnaissance-then-action pattern for dynamic content
 

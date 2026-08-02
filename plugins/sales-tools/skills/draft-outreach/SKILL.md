@@ -12,7 +12,7 @@ metadata:
 
 Research first, then draft. This skill never sends generic outreach - it always researches the prospect first to personalize the message. Works standalone with web search, supercharged when you connect your tools.
 
-> **RU B2B mode:** For Russian-market cold outreach (продажа AI-воркшопов + консалтинга + B2B-когорт academy корп-ЛПР), jump to **«RU B2B Cold Outreach»** below. It ports the cold-email frameworks/sequences/personalization to the RU market (русский язык, корп-ЛПР, каналы email + LinkedIn + Telegram). Before drafting, read product context: `yourname-marketing-context` → `references/business.md` + `references/offerings.md` + `references/funnel-another-db.md`.
+> **RU B2B mode:** For Russian-market cold outreach (продажа AI-воркшопов + консалтинга + B2B-когорт academy корп-ЛПР), jump to **«RU B2B Cold Outreach»** below. It ports the cold-email frameworks/sequences/personalization to the RU market (русский язык, корп-ЛПР, каналы email + LinkedIn + Telegram). Before drafting, read product context: `yourname-marketing-context` → `skills/yourname-marketing-context/references/business.md` + `skills/yourname-marketing-context/references/offerings.md` + `skills/yourname-marketing-context/references/funnel-another-db.md`.
 
 ## Connectors (Optional)
 
@@ -454,7 +454,7 @@ Draft created - check email
 
 ## Перед написанием
 
-1. Прочитай контекст продукта: `yourname-marketing-context` → `references/business.md` (персоны, боли, дифференциаторы) + `references/offerings.md` (воркшоп/консалтинг/academy B2B, CTA = бесплатная консультация) + `references/funnel-another-db.md` (CRM `yourname-sales-postgres`, handoff_to_user, дыры воронки).
+1. Прочитай контекст продукта: `yourname-marketing-context` → `skills/yourname-marketing-context/references/business.md` (персоны, боли, дифференциаторы) + `skills/yourname-marketing-context/references/offerings.md` (воркшоп/консалтинг/academy B2B, CTA = бесплатная консультация) + `skills/yourname-marketing-context/references/funnel-another-db.md` (CRM `yourname-sales-postgres`, handoff_to_user, дыры воронки).
 2. Собери сигналы по компании/ЛПР — делегируй скиллу `lead-research` (RU-источники: Контур.Фокус, Rusprofile, СПАРК, HH, сайт). Не выдумывай факты.
 3. Определи: кому пишешь (роль из персон), что хочешь (цель касания → консультация/воркшоп), value под его роль, пруф (руководитель ИИ-направления / ClientCorp3 N+ / academy N+ материалов / корп-кейс), сигнал «почему сейчас».
 

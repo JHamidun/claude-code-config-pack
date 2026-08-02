@@ -13,7 +13,7 @@
 РЕСУРС-ГАРД (конвенция ваше локальное хранилище памяти):
   - ручной запуск, НЕ крон;
   - BELOW_NORMAL приоритет процесса (psutil, если стоит);
-  - лестница простоя: лишние вкладки -> 5 мин, браузер -> 5 мин (daemon засыпает, ~40 МБ),
+  - лестница простоя: лишние вкладки -> 5 мин, браузер -> 5 мин (daemon засыпает, замер: ~62 МБ вместо ~260 МБ с браузером),
     сессия -> 10 мин без активности (процесс выходит, reason=session_idle);
   - рестарт браузера при RSS > 1500 МБ (утечки в долгих сессиях);
   - стоп-файл `state/STOP_<port>` = чистое завершение;
@@ -95,6 +95,7 @@ def main():
     ap.add_argument("--url", default="about:blank", help="стартовый URL")
     ap.add_argument("--headless", action="store_true", help="без окна (RuTube палит — НЕ использовать для него)")
     ap.add_argument("--channel", default=None, help="channel браузера, напр. chrome (реальный Chrome вместо Chromium)")
+    ap.add_argument("--proxy", default=None, help="прокси для браузера, напр. socks5://127.0.0.1:1085 (гео-мост, канал агента не трогает)")
     ap.add_argument("--idle-timeout", type=int, default=BROWSER_IDLE_SEC, help="сек простоя до закрытия браузера (0 = никогда)")
     ap.add_argument("--session-timeout", type=int, default=SESSION_IDLE_SEC, help="сек простоя до выхода daemon (0 = никогда)")
     ap.add_argument("--tab-idle", type=int, default=TAB_IDLE_SEC, help="сек простоя до закрытия лишних вкладок (0 = никогда)")
@@ -109,6 +110,8 @@ def main():
                   viewport={"width": 1440, "height": 900})
     if a.channel:
         kwargs["channel"] = a.channel
+    if a.proxy:
+        kwargs["proxy"] = {"server": a.proxy}
 
     low = set_low_priority()
     stop_path(a.port).unlink(missing_ok=True)

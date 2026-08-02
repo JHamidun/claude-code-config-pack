@@ -12,9 +12,9 @@ metadata:
 
 Реализация структурированных данных schema.org на сайтах пользователя, чтобы поисковики (Яндекс, Google) лучше понимали контент и показывали расширенные сниппеты, а AI-поверхности (Яндекс.Нейро, Alice, (regional LLM B)) точнее цитировали. Порт `schema` из marketingskills: вокабуляр schema.org международный, адаптированы примеры под реальные сущности (YourFirstName, академия, воркшоп, news, блог) и заметка про Яндекс.
 
-**Перед началом прочитай контекст:** `yourname-marketing-context` — `references/business.md` (сущности: кто YourFirstName, что за продукты), `references/offerings.md` (URL и цены). Не выдумывай факты — `[TODO]` уточнять.
+**Перед началом прочитай контекст:** `yourname-marketing-context` — `skills/yourname-marketing-context/references/business.md` (сущности: кто YourFirstName, что за продукты), `skills/yourname-marketing-context/references/offerings.md` (URL и цены). Не выдумывай факты — `[TODO]` уточнять.
 
-**AEO/GEO связка:** JSON-LD — один из сильнейших сигналов для попадания в AI-ответы. После разметки сверяйся с `seo-machine-ru` → `references/aeo-geo.md` (цитируемость в Яндекс.Нейро/Alice/(regional LLM B)/ChatGPT/Perplexity).
+**AEO/GEO связка:** JSON-LD — один из сильнейших сигналов для попадания в AI-ответы. После разметки сверяйся с `seo-machine-ru` → `skills/seo-machine-ru/references/aeo-geo.md` (цитируемость в Яндекс.Нейро/Alice/(regional LLM B)/ChatGPT/Perplexity).
 
 ## Принципы
 
@@ -75,7 +75,7 @@ metadata:
 | Нужно | Скилл |
 |------|-------|
 | Контекст сущностей, URL, цены | `yourname-marketing-context` |
-| AEO/GEO (цитируемость в AI) | `seo-machine-ru` (`references/aeo-geo.md`) |
+| AEO/GEO (цитируемость в AI) | `seo-machine-ru` (`skills/seo-machine-ru/references/aeo-geo.md`) |
 | Валидация в Вебмастере | `yandex` |
 | Вставка JSON-LD на Tilda + публикация | `tilda` |
 | SEO-контент страницы целиком | `seo-machine-ru` |

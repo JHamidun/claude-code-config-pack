@@ -1,0 +1,13 @@
+{
+ "port": 9494,
+ "updated": 1785630802.9962547,
+ "pid": 48628,
+ "status": "ok",
+ "reason": "running",
+ "profile": "tbank2",
+ "browser_up": true,
+ "last_activity": 1785618016.0959501,
+ "idle_sec": 12787,
+ "rss_mb": 847.6,
+ "restarts": 0
+}

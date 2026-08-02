@@ -44,48 +44,38 @@ Everything else (rules, skills, plugins, agents, commands, hooks, MCP servers) w
 - 50+ agents (`~/.claude/agents/`)
 - 110+ slash commands (`~/.claude/commands/`)
 - 23 auto-loaded rules (`~/.claude/rules/`)
-- 29 plugins (all enabled — disabled entries are not shipped, see below)
+- 35 plugins (3 disabled by default — see `settings.json`)
 - 20+ MCP servers (most disabled by default — enable via `mcp.json` or `settings.json`)
 - 5 GSD hooks (`~/.claude/hooks/`)
 - 6 generic Python tools (`~/.claude/tools/`)
 
-## Permission model
+## Permission model — read this before installing
 
-**This pack ships `defaultMode: bypassPermissions`.** Claude runs commands without
-asking for confirmation each time. That is deliberate: with per-command prompts a
-freshly installed pack interrupts on nearly every step, and beginners read that as
-"it's broken" — the exact failure this pack exists to prevent.
+This config ships **`defaultMode: bypassPermissions`**. Claude runs commands without asking
+you to confirm each one. That is deliberate: the config is built for uninterrupted autonomous
+work, and confirming every step defeats it.
 
-The protection is not the prompt. It lives in three layers that stay active in
-bypass mode:
+Protection does not disappear, it moves:
 
-- **`permissions.deny`** — hard blocks that bypass does *not* override
-  (`rm -rf /`, `rm -rf ~`, `DROP DATABASE`, …).
-- **`hooks.PreToolUse` → `bash-guard.js`** — inspects every `Bash`/`PowerShell`
-  call before it runs; catches obfuscated forms too, e.g. `ssh host "rm -rf …"`
-  and base64-encoded PowerShell.
-- **`hooks.PreToolUse` → `security-guard.js`** — same idea for `Write`/`Edit`/`MultiEdit`.
+- **`hooks/bash-guard.js`** inspects every Bash and PowerShell call *before* it runs and exits
+  with code 2 on 43 destructive patterns — `rm -rf` of roots, `DROP DATABASE/TABLE`, `mkfs`,
+  `dd`, force-push to main, `docker rm -f`, `docker compose down -v`, `docker system prune`,
+  `pm2 delete`, `systemctl stop`, `kubectl delete`. It also unwraps `ssh host "…"`,
+  `bash -c "…"` and base64-encoded PowerShell, so hiding a command inside quotes does not help.
+- **`hooks/security-guard.js`** does the same for Write/Edit.
+- **`permissions.deny`** stays as the final backstop.
 
-**Want confirmations back?** One line in `~/.claude/settings.json`:
+If you would rather be asked, set `permissions.defaultMode` to `"default"` in
+`~/.claude/settings.json` and drop `skipDangerousModePermissionPrompt`. Nothing else depends
+on the bypass mode.
 
-```jsonc
-"permissions": { "defaultMode": "acceptEdits" }   // or "default" for maximum nagging
-```
-
-`permissions.allow` is still populated (~288 portable patterns), so those modes
-stay usable without re-approving everything. Patterns are machine-independent by
-design: no absolute paths from the author's machine, only `~/`-relative ones that
-expand to *your* home.
-
-## Other hardened defaults
+## Other defaults
 
 - `cleanupPeriodDays: 90` — sessions auto-archive
 - All MCP servers tied to personal credentials are `disabled: true`
 - All MCP servers with hardcoded local paths rewritten to portable `npx -y`
-- **Disabled plugins are not shipped at all.** A `false` entry still makes Claude
-  Code resolve its marketplace on every start — pure startup latency for something
-  that never runs. Marketplaces pointing at a build machine's local directory are
-  removed for the same reason: that path does not exist on your computer.
+- Plugins that were declared but disabled are stripped, so nothing is resolved at startup for
+  a marketplace you do not have
 
 ## Requirements
 

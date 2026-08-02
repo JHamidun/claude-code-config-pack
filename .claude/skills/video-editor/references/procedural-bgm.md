@@ -40,7 +40,7 @@ ffmpeg -f lavfi -i "anoisesrc=d=10:c=pink:a=0.3" -y noise.mp3
 
 ## Когда что
 - Нужна **быстрая бесплатная подложка** под короткий ролик / превью → procedural BGM (этот файл).
-- Нужен **настоящий трек/драматургия** (60s+, дуга, узнаваемая музыка) → `suno` (через браузер) или `elevenlabs` Music / Lyria 2 (см. video-generation `references/audio.md`).
+- Нужен **настоящий трек/драматургия** (60s+, дуга, узнаваемая музыка) → `suno` (через браузер) или `elevenlabs` Music / Lyria 2 (см. video-generation `skills/video-generation/references/audio.md`).
 
 Источник: реверс Higgsfield Supercomputer `montage` skill → `higgsfield/references/supercomputer-architecture.md` §7c.
 Их финальная сборка 9:16: blurred-bg overlay + drawtext-сабы + `amix weights=1.0 0.4` (видео+bgm) — у нас это уже есть лучше (ASS-караоке вместо drawtext), см. `montage-toolkit.md`.

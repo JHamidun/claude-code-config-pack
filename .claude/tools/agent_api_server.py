@@ -188,14 +188,53 @@ _STRIP_ENV_EXACT = (
 )
 
 
-def child_env(sanitize=True):
+# --- recursion guard ------------------------------------------------------
+# A CLI child can reach back into this server (it is a plain HTTP endpoint on
+# loopback), and that request spawns another CLI, which can call again: the
+# nesting only ends when RAM or the rate limit ends it.  The depth marker rides
+# into every child; at the limit we answer 508 instead of forking another tree.
+# NB: the marker must survive child_env() sanitising — it is deliberately named
+# outside _STRIP_ENV_PREFIXES / _STRIP_ENV_EXACT.
+DEPTH_ENV = "CLAUDE_CLI_DEPTH"
+MAX_DEPTH_ENV = "CLAUDE_CLI_MAX_DEPTH"
+DEFAULT_MAX_DEPTH = 1
+
+
+def _int_env(name, default):
+    try:
+        return max(0, int(os.environ.get(name, default)))
+    except (TypeError, ValueError):
+        return default
+
+
+def current_depth():
+    """Nesting depth of THIS process (0 = not spawned by a claude CLI wrapper)."""
+    return _int_env(DEPTH_ENV, 0)
+
+
+def check_recursion(allow_nested=False):
+    """Return the child's depth, or raise CLIError(508) at the limit."""
+    depth = current_depth()
+    limit = _int_env(MAX_DEPTH_ENV, DEFAULT_MAX_DEPTH)
+    if not allow_nested and depth >= limit:
+        raise CLIError(
+            f"recursion guard: refusing to spawn a nested claude CLI — this server "
+            f"is already running at depth {depth} (limit {limit}, {DEPTH_ENV}="
+            f"{os.environ.get(DEPTH_ENV)!r}). An agent calling its own API server "
+            f"recurses without bound. If intended, set {MAX_DEPTH_ENV}={depth + 1}.",
+            status=508,
+        )
+    return depth + 1
+
+
+def child_env(sanitize=True, allow_nested=False):
     """Environment for the spawned CLI: subscription auth, nothing hijacking it."""
     env = dict(os.environ)
-    if not sanitize:
-        return env
-    for key in list(env):
-        if key.startswith(_STRIP_ENV_PREFIXES) or key in _STRIP_ENV_EXACT:
-            env.pop(key, None)
+    if sanitize:
+        for key in list(env):
+            if key.startswith(_STRIP_ENV_PREFIXES) or key in _STRIP_ENV_EXACT:
+                env.pop(key, None)
+    env[DEPTH_ENV] = str(check_recursion(allow_nested))
     return env
 
 
@@ -204,7 +243,8 @@ def cli_version(cli_path):
         proc = subprocess.run(
             cli_argv(cli_path, ["--version"]),
             capture_output=True, text=True, timeout=30,
-            encoding="utf-8", errors="replace", env=child_env(),
+            # `--version` is not an agent spawn — exempt from the recursion guard.
+            encoding="utf-8", errors="replace", env=child_env(allow_nested=True),
         )
         return (proc.stdout or proc.stderr or "").strip().splitlines()[0] if (proc.stdout or proc.stderr) else ""
     except Exception as e:
@@ -840,6 +880,16 @@ def cmd_serve(args):
     if not cli:
         print(CLI_MISSING_HINT)
         return 2
+
+    if current_depth() >= _int_env(MAX_DEPTH_ENV, DEFAULT_MAX_DEPTH):
+        # Serving still starts (models/health stay useful), but every completion
+        # would recurse — say so now instead of at the first 508.
+        # flush=True: stdout is block-buffered when redirected to a log, and an
+        # unflushed warning sits in the buffer until exit — i.e. is never seen.
+        print(f"WARNING: started inside a claude CLI child ({DEPTH_ENV}="
+              f"{os.environ.get(DEPTH_ENV)!r}). Completion requests will be refused "
+              f"with 508 by the recursion guard. Set {MAX_DEPTH_ENV} higher if intended.",
+              flush=True)
 
     try:
         httpd = make_server(host, args.port, model=args.model, timeout=args.timeout,

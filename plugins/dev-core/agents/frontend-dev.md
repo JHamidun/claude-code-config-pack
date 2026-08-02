@@ -485,7 +485,7 @@ How to fix:
 
 ## Landing Page Effects Reference
 
-When building landing pages, use the reference effects library at `~/.claude/skills/landing-page-effects.md` — **45 effects** with full CSS and JS code.
+When building landing pages, use the reference effects library at `~/.claude/skills/landing-page-effects/SKILL.md` — **45 effects** with full CSS and JS code.
 
 Contains:
 

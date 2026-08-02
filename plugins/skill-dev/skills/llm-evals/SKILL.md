@@ -412,7 +412,7 @@ def run_cell(model, thinking, effort, examples, run_one, judge, price):
 ## Смежное
 
 `check-skill-solo` — фактчек текста и механическая проверка URL/цитат.
-`verifier` (+ `references/gan-adversarial-improve.md`) — адверсарная проверка находок, GAN-петля улучшения.
+`verifier` (+ `skills/verifier/references/gan-adversarial-improve.md`) — адверсарная проверка находок, GAN-петля улучшения.
 `verifier/references/rag-eval-opik.md` — метрики именно RAG (recall/precision/faithfulness/relevance).
 `multi-model-gateway` — второе мнение другой модели (в т.ч. как независимый судья).
 `skill-creator` — у него есть свой eval-прогон для триггеров скиллов; этот скилл — про эвал систем, а не описаний скиллов.

@@ -56,6 +56,37 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="repla
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 
+# ── Invisible-Unicode sanitizer ──────────────────────────────────────────────
+# Mail bodies, subjects and From-headers can carry zero-width / bidi / Unicode
+# Tag-block characters: invisible to a human, readable by an LLM. Strip them
+# from anything that will be printed into a model's context, and say so.
+sys.path.insert(0, str(Path.home() / ".claude" / "scripts"))
+try:
+    from text_sanitize import sanitize as _sanitize_unicode, format_report as _sanitize_fmt
+except Exception:  # sanitizer missing — never break mail reading over it
+    def _sanitize_unicode(text, *a, **kw):
+        return text, {"removed": 0, "by_class": {}, "by_codepoint": {}, "decoded_tags": ""}
+
+    def _sanitize_fmt(report, source=""):
+        return ""
+
+
+def clean_untrusted(text, source=""):
+    """Strip invisible Unicode from mail-derived text; warn on stderr if any found.
+
+    Applied to bodies and headers on the read/list/search paths only. Outbound
+    text (send/reply) and raw attachment bytes are left untouched.
+    """
+    if not isinstance(text, str) or not text:
+        return text
+    clean, report = _sanitize_unicode(text)
+    if report["removed"]:
+        msg = _sanitize_fmt(report, source or "message text")
+        if msg:
+            print(msg, file=sys.stderr)
+    return clean
+
+
 def load_env():
     env_path = Path.home() / ".claude" / ".credentials.master.env"
     if env_path.exists():
@@ -256,14 +287,16 @@ def decode_hdr(raw):
     try:
         parts = decode_header(raw)
     except Exception:
-        return str(raw)
+        return clean_untrusted(str(raw), "header")
     decoded = []
     for part, charset in parts:
         if isinstance(part, bytes):
             decoded.append(part.decode(charset or "utf-8", errors="replace"))
         else:
             decoded.append(part)
-    return "".join(decoded).strip()
+    # headers are untrusted too: a zero-width-padded From/Subject is a classic
+    # spoof, and attachment filenames come through here as well
+    return clean_untrusted("".join(decoded).strip(), "header")
 
 
 def strip_html(html):
@@ -542,6 +575,7 @@ def cmd_read(args, prof):
         imap.logout()
     text, html = extract_bodies(msg)
     body = text or (strip_html(html) if html else "")
+    body = clean_untrusted(body, f"UID {args.uid} body")
     atts = list_attachments(msg)
     out = {
         "uid": str(args.uid),

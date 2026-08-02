@@ -20,6 +20,6 @@
 
 ## Связь со скиллами
 
-- **`image-generation`** (`references/vk-ads-surrealism-preset.md`) — КАНОН метода.
+- **`image-generation`** (`skills/image-generation/references/vk-ads-surrealism-preset.md`) — КАНОН метода.
 - **`vk-ads-pro-ru`** — полный метод VK Ads (направления креативов, роли элементов объявления, A/B-тест).
 - **`ai-creative-factory-ru`** — структура креативной фабрики (идея → генерация → отбор → тест).

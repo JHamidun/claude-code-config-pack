@@ -1,0 +1,13 @@
+{
+ "port": 9490,
+ "updated": 1785630807.2676275,
+ "pid": 99888,
+ "status": "ok",
+ "reason": "running",
+ "profile": "tbankru",
+ "browser_up": true,
+ "last_activity": 1785617921.88234,
+ "idle_sec": 12885,
+ "rss_mb": 823.0,
+ "restarts": 0
+}

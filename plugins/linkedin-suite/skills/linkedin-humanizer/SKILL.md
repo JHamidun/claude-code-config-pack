@@ -201,7 +201,7 @@ For emoji-pattern detection (lightbulb, rocket, sparkles signature), see `refere
 
 - `SKILL.md` — this file
 - `references/scrub-rules.md` — full regex patterns by tier
-- `references/voice-fingerprint.md` — how to preserve user voice while scrubbing
+- `references/voice-fingerprint.md` (file not created yet) — how to preserve user voice while scrubbing
 - `references/tier-rationale.md` — long-form per-rule justification
 
 ## Related skills

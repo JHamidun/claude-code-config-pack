@@ -12,7 +12,7 @@ metadata:
 
 Полный конвейер производства SEO-контента под российский поиск и AI-выдачу. Портирован с `seomachine`, но все внешние интеграции заменены на твой стек: данные тянутся скиллом `yandex` (Метрика/Вебмастер/Wordstat), публикация — скиллом `tilda`. Аналитические модули переписаны под русский (морфология, читаемость, anti-AI на русском).
 
-**Перед любой задачей** прочитай контекст продукта: вызови `yourname-marketing-context` → `references/business.md` (или `personal-brand.md` для блога пользователя) и `references/ru-localization.md`.
+**Перед любой задачей** прочитай контекст продукта: вызови `yourname-marketing-context` → `skills/yourname-marketing-context/references/business.md` (или `personal-brand.md` для блога пользователя) и `skills/yourname-marketing-context/references/ru-localization.md`.
 
 ## Когда использовать
 
@@ -110,7 +110,7 @@ Bind только на `127.0.0.1` — не открывать наружу. П�
 
 Связанные скиллы (НЕ дублировать — границы):
 
-- **`yandex-direct-pro-ru`** → `references/semantics-wordstat.md` — те же операторы и маски, но **семантика для платной рекламы** (Директ): минус-слова, структура аккаунта, объявления Поиск/РСЯ, UTM.
+- **`yandex-direct-pro-ru`** → `skills/yandex-direct-pro-ru/references/semantics-wordstat.md` — те же операторы и маски, но **семантика для платной рекламы** (Директ): минус-слова, структура аккаунта, объявления Поиск/РСЯ, UTM.
 - **`ai-seo-agent-pipeline`** — программатическая массовая генерация сотен страниц по собранному ядру (n8n + Perplexity, метод эксперт). Это ядро питает его конвейер.
 - **`geo-aeo-ru`** — видимость и измерение цитируемости бренда в LLM-ответах ((regional LLM B)/(regional LLM A)/ChatGPT/Perplexity); информационные запросы из ядра идут в AEO (см. `references/aeo-geo.md`).
 

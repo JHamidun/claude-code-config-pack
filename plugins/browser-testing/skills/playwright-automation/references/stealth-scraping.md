@@ -152,6 +152,63 @@ with sync_playwright() as p:
 
 ---
 
+## `scripts/pw_guard.py` — детектор блокировки и skip-лист (вызывается из `bdo.py`)
+
+Стелс уменьшает шанс бана, но не отменяет его. Забаненная страница — это **не ошибка**:
+приходит 200, `innerText` на 300 символов, парсер честно достаёт из них ноль результатов.
+Снаружи «забанили» неотличимо от «ничего не нашлось» — и это самый дорогой класс багов,
+потому что пайплайн идёт дальше с пустыми данными. Поэтому бан ловим явно.
+
+```python
+from pw_guard import is_blocked, assert_not_blocked, should_skip_frame, window_snapshot
+
+page.goto(url, wait_until="domcontentloaded")
+blocked, reason = is_blocked(page)      # ВСЕГДА после goto, ДО парсинга
+if blocked:
+    raise RuntimeError(f"blocked: {reason}")   # или assert_not_blocked(page)
+```
+
+**Три функции:**
+
+| Функция | Что делает | Почему так |
+| --- | --- | --- |
+| `is_blocked(page) -> (bool, reason)` | 19 паттернов по title + `innerText`: Cloudflare, Datadome, PerimeterX, Kasada, hCaptcha, 403/429, RU-заслоны («Доступ ограничен», SmartCaptcha) | Возвращает **имя** паттерна, а не просто False — по логу видно, кто именно забанил и чем лечить |
+| `should_skip_frame(url)` | Skip-лист антибот-iframe (recaptcha, px-captcha, datadome, arkose…) | Эти фреймы висят по таймауту и засоряют снапшот. Вызывается автоматически внутри `aria_snapshot()` |
+| `window_snapshot(...)` | Окно 80K + **обязательный хвост 5K** | Пагинация и футер-навигация живут в подвале; обрезав их, дальше идти нечем |
+
+Пустое тело (`innerText` < 40 символов) тоже считается блокировкой — это ровно тот
+silent failure, ради которого детектор и написан.
+
+**Где уже подключено (не дублируй):**
+
+- `bdo.py` → `report_block()` на `goto` и `newtab`; отдельная команда `blocked`;
+  `aria` и `text` идут через `window_snapshot`.
+- Заслон = **exit 3** и явная причина в stderr. `--allow-blocked` понижает до warning
+  (exit 0), когда бан ожидаем и обрабатывается вызывающим.
+
+**Живая проверка (2026-08-01, patchright, headless):**
+
+```text
+$ python pw_guard.py https://example.com
+blocked=False reason=
+raw_chars=232 -> window_chars=232 truncated=False
+
+$ python pw_guard.py "https://www.google.com/search?q=playwright+stealth"
+blocked=True reason=google_unusual_traffic: 'Our systems have detected unusual traffic'
+raw_chars=391
+
+$ python bdo.py --port 9611 goto "https://www.google.com/search?q=test+query"
+ERR blocked: google_unusual_traffic: ...     # exit 3
+```
+
+391 символа «выдачи» — это и есть тот самый пустой результат, который без детектора
+уехал бы дальше по пайплайну как «ничего не нашлось».
+
+> Идеи детектора и skip-листа взяты из `camofox-browser`, сам пакет — нет
+> (маскированный `spawn` в postinstall + телеметрия с целевым URL, см. врезку ниже).
+
+---
+
 ## Camoufox — третья нога (Firefox, подмена в C++)
 
 **Не установлен.** Ставится одной командой, когда Chromium как класс уже не проходит.

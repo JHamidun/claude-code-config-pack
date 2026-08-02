@@ -42,7 +42,7 @@ type: actionable
 | Marketing Studio / DTC (реклама с аватаром+товаром) | `hf marketing-studio {avatars,products,hooks} list` → `generate create marketing_studio_video` |
 | reframe (AI-outpaint видео в новый аспект) | `hf generate create reframe --aspect_ratio 16:9 --video <id>` |
 
-**(E) СОСЕДНИЕ СКИЛЛЫ (не дублировать):** talking-head с НАСТОЯЩИМ lip-sync → **`heygen`** (Avatar V/IV, 175 langs translate, lipsync — отдельный скилл, дополняет Soul); чистый монтаж → `video-editor`; **рилс из снятого видео блогера + AI-врезки ПОВЕРХ** (creator = основа, AI поверх, не full-AI) → `video-editor` `references/talking-head-broll-reel.md`; TTS без видео → `elevenlabs`; картинка → `nano-banana-pro`.
+**(E) СОСЕДНИЕ СКИЛЛЫ (не дублировать):** talking-head с НАСТОЯЩИМ lip-sync → **`heygen`** (Avatar V/IV, 175 langs translate, lipsync — отдельный скилл, дополняет Soul); чистый монтаж → `video-editor`; **рилс из снятого видео блогера + AI-врезки ПОВЕРХ** (creator = основа, AI поверх, не full-AI) → `video-editor` `skills/video-editor/references/talking-head-broll-reel.md`; TTS без видео → `elevenlabs`; картинка → `nano-banana-pro`.
 
 **Rejected (2026-07-20):** inference.sh `belt` CLI (github.com/inference-sh/skills, 628★) — aggregator for 40+ video models incl. Seedance/Wan/Veo. Seedance and Veo are already direct here ($0 marginal via Runway Unlimited / own GOOGLE_API_KEY); Wan is already reachable via `replicate` skill (`wan-video/wan-2.2-*`). Zero net-new model access, second paywalled account + `curl | sh` installer — not adopted.
 
@@ -741,7 +741,7 @@ ffmpeg -i master.mp4 -c:v libx264 -preset medium -crf 22 \
 | `suno` | Длинный оркестровый score / песня (headless Clerk API) | Phase 5 audio — 60s+ score или вокал |
 | `heygen` | Avatar V YourFirstName talking heads | Когда нужен говорящий аватар |
 | `submagic` | Платные EN-субтитры (с пиво-bug warning) | Phase 6 captions для EN-контента |
-| `shorts-pipeline-user` | Готовая обвязка Avatar V + SubMagic + RU trigger check (`scripts/trigger_word_check.py`) | Перед SubMagic на RU тексте — обязательно |
+| `shorts-pipeline-user` | Готовая обвязка Avatar V + SubMagic + RU trigger check (`skills/shorts-pipeline-user/scripts/trigger_word_check.py`) | Перед SubMagic на RU тексте — обязательно |
 | `video-editor` | Чистый монтаж готовых клипов на your-server:3124 | Если нужен external assembly service |
 | `void-video` | Удаление объектов из готового видео | Post-production cleanup |
 | `video-downloader` | yt-dlp скачать чужое видео | Источник для re-edit |
