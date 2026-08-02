@@ -1,5 +1,5 @@
 {
-  "cleanupPeriodDays": 90,
+  "cleanupPeriodDays": 99999,
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "MCP_TIMEOUT": "120000",
