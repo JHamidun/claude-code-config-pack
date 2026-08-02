@@ -406,7 +406,7 @@ flex flex-col sm:flex-row gap-3
 ## Mode A: Vanilla HTML Quick Start
 
 ### Библиотека эффектов
-**ОБЯЗАТЕЛЬНО** используй: `~/.claude/skills/landing-page-effects.md`
+**ОБЯЗАТЕЛЬНО** используй: `~/.claude/skills/landing-page-effects/SKILL.md`
 - 50+ готовых эффектов (CSS + JS)
 - 15 шрифтов, цветовая палитра
 - Трендовые эффекты 2025

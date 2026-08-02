@@ -57,9 +57,31 @@
 7. **Batch related questions** — one conversation per topic area
 8. **Summarize before compact** — ask Claude to list key findings first
 
+## Дисциплина чтения больших источников
+
+Книга/отчёт/лог целиком в контекст — самый дорогой способ узнать один факт. Skill-listing уже
+съедает ~39.7% авто-загрузки; чтение книги на каждую главу стоит миллионы входных токенов.
+Порядок: **сначала измерь, потом найди оффсет, потом читай срез.**
+
+```bash
+wc -w book.txt                      # 1. сколько там вообще (слова ≈ токены ×1.3)
+grep -n "^#\|^Глава\|^Chapter" f    # 2. оффсеты заголовков — карта, а не текст
+grep -c "конкретное утверждение" f  # 3. оно вообще есть? 0 → не читай, отвечай "нет в тексте"
+sed -n "1200,1450p" book.txt        # 4. один срез
+```
+
+Затем `Read(file_path, offset=1200, limit=250)` вместо голого `Read` — голый Read большого
+файла допустим, только когда действительно нужен весь файл.
+
+- Проверка утверждения (`grep -c` = 0) стоит ~50 токенов вместо ~200K на чтение книги.
+- Одна глава = один `sed`-срез; не тяни соседние «на всякий случай».
+- Для длинных структурированных PDF есть дерево-индекс (PageIndex) — см. skill `research-docs`.
+- Тот же порядок для логов: `grep -n ERROR` → `sed -n` вокруг найденной строки.
+
 ## Anti-Patterns
 
 - Pasting entire files into chat (use Read tool instead)
+- Голый `Read` книги/лога ради одного факта (см. «Дисциплина чтения больших источников»)
 - Keeping stale context from completed tasks
 - Running many sequential searches in main context (use Explore agent)
 - Not compacting before starting new work

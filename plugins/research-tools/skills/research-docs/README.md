@@ -2,8 +2,6 @@
 
 A Claude Code skill that parses your documents with [LiteParse](https://developers.llamaindex.ai/liteparse/), answers questions using the parsed text, and generates a self-contained HTML report with source citations — including bounding box highlights on the original page images.
 
-![Research Docs](assets/research-docs.png)
-
 ## Install
 
 ```bash

@@ -22,7 +22,9 @@ Stateless: подключается к запущенному daemon по пор
   newtab <url>                   — новая вкладка
   wait <selector|ms>             — ждать селектор или мс
   upload <selector> <file>       — загрузить файл в input
-  health                         — состояние daemon (200 ok/sleeping, 503 crashed/stopped), exit 0/1
+  health                         — состояние daemon; exit 0 = живой (ok/sleeping),
+                                   2 = штатно остановлен (intentional=true),
+                                   1 = упал / убит жёстко (status=dead при протухшем state)
   quit                           — закрыть браузер (daemon завершится)
 
 Все команды: python bdo.py --port 9456 <cmd> [args]
@@ -39,6 +41,13 @@ from pw_guard import window_snapshot, is_blocked  # noqa: E402
 STATE = pathlib.Path(__file__).resolve().parent.parent / "state"
 WAKE_WAIT_SEC = 25  # daemon поднимает уснувший браузер за один цикл (~5 с)
 
+# health: daemon пишет состояние каждые POLL_SEC=5 с. Если запись протухла —
+# процесс убит жёстко (kill -9, сон машины, BSOD) и не успел записать финальный
+# статус. Без этой проверки health вечно рапортует последний «ok» о мёртвом daemon.
+STATE_STALE_SEC = 30
+# Намеренная остановка (не инцидент) против падения (инцидент).
+INTENTIONAL_REASONS = ("stop_file", "session_idle", "keyboard_interrupt", "bdo quit")
+
 
 def touch_activity(port):
     """Отметить активность — daemon по ней держит браузер живым / будит уснувший."""
@@ -47,6 +56,17 @@ def touch_activity(port):
         (STATE / f"activity-{port}").write_text(str(time.time()), encoding="utf-8")
     except Exception:
         pass
+
+
+def pid_alive(pid):
+    """True/False/None (не смогли проверить — psutil не стоит)."""
+    if not pid:
+        return None
+    try:
+        import psutil
+        return psutil.pid_exists(int(pid))
+    except Exception:
+        return None
 
 
 def read_state(port):
@@ -131,12 +151,34 @@ def main():
     if a.cmd == "health":
         st = read_state(a.port)
         if not st:
-            print(json.dumps({"code": 503, "status": "unknown", "reason": "no state file", "port": a.port}, ensure_ascii=False))
+            print(json.dumps({"code": 503, "status": "unknown", "reason": "no state file",
+                              "intentional": False, "port": a.port}, ensure_ascii=False))
             sys.exit(1)
-        code = 200 if st.get("status") in ("ok", "sleeping") else 503
-        st["code"] = code
+
+        status = st.get("status")
+        reason = str(st.get("reason") or "")
+        stale = round(time.time() - float(st.get("updated") or 0), 1)
+        st["stale_sec"] = stale
+        st["pid_alive"] = pid_alive(st.get("pid"))
+
+        if status in ("ok", "sleeping"):
+            # Живым считаем только того, кто СЕЙЧАС пишет состояние.
+            if stale > STATE_STALE_SEC or st["pid_alive"] is False:
+                st.update(status="dead", code=503, intentional=False,
+                          reason=f"state stale {stale}s (was {status!r}/{reason!r}); "
+                                 f"daemon killed without clean shutdown")
+                print(json.dumps(st, ensure_ascii=False))
+                sys.exit(1)
+            st.update(code=200, intentional=False)
+            print(json.dumps(st, ensure_ascii=False))
+            sys.exit(0)
+
+        # Не работает. Различаем «мы сами остановили» и «упало».
+        intentional = status == "stopped" and any(x in reason for x in INTENTIONAL_REASONS)
+        st.update(code=503, intentional=intentional)
         print(json.dumps(st, ensure_ascii=False))
-        sys.exit(0 if code == 200 else 1)
+        # 0/non-zero контракт прежний; 2 отделяет штатный стоп от инцидента.
+        sys.exit(2 if intentional else 1)
 
     touch_activity(a.port)
 

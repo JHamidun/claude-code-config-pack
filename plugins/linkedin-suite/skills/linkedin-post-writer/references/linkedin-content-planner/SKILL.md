@@ -86,12 +86,12 @@ For each posting day:
 
 ## Example
 
-See `references/example-plan-week.md` for a filled-in 7-day plan.
+A filled-in 7-day plan would live in `references/example-plan-week.md` (file not created yet) — build the plan from the pillars framework below.
 
 ## Files
 
 - `SKILL.md` — this file
-- `references/example-plan-week.md` — worked example
+- `references/example-plan-week.md` (file not created yet) — worked example
 - `references/pillars-framework.md` — the 3-pillar discipline explained
 
 ## Related skills

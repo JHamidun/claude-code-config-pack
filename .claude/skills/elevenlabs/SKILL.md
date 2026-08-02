@@ -143,7 +143,7 @@ with open('bgm.mp3', 'wb') as f:
 - **CRITICAL — имя параметра длины = `music_length_ms`, НЕ `length_ms`.** `length_ms=...` → `TypeError: MusicClient.compose() got an unexpected keyword argument 'length_ms'` (проверено в проде, июнь 2026).
 - Инструментал — через `force_instrumental=True` (надёжнее, чем «no vocals» в тексте промпта).
 - `model_id='music_v1'`.
-- **~30 seconds на одну генерацию** (длиннее режь на сегменты с narrative handoff, см. video-generation `references/audio.md`).
+- **~30 seconds на одну генерацию** (длиннее режь на сегменты с narrative handoff, см. video-generation `skills/video-generation/references/audio.md`).
 - Output: MP3 stream. Generation time: 10-30 sec wall-clock.
 
 ### CRITICAL: Named-artist policy

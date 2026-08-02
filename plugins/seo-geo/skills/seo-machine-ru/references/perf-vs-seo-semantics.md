@@ -58,7 +58,7 @@ TOFU-аудиторию, перелинковывается на коммерч�
 
 - **Семантика для рекламы (Директ)** — детальный разбор операторов под платную рекламу, структура
   аккаунта, объявления для Поиска/РСЯ, UTM: скилл `yandex-direct-pro-ru` →
-  `references/semantics-wordstat.md`.
+  `skills/yandex-direct-pro-ru/references/semantics-wordstat.md`.
 - **Сбор масок и кластеризация (SEO)** — `keyword-mapping.md` (этот скилл).
 - **Операторы Wordstat** — `wordstat-operators.md` (этот скилл).
 - **Реальный съём частот** — `wordstat-real-recipe.md` (этот скилл).

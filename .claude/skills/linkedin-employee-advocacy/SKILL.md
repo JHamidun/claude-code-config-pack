@@ -115,8 +115,8 @@ Stand up a marketing-team LinkedIn advocacy program that scales without killing 
 ## Resources
 
 - `references/advocacy-principles.md` — the 4 operating principles with examples
-- `references/team-cadence-matrix.md` — realistic cadence by role + seniority
-- `references/governance-playbook.md` — what to review, what not to, SLA
+- `references/team-cadence-matrix.md` (file not created yet) — realistic cadence by role + seniority
+- `references/governance-playbook.md` (file not created yet) — what to review, what not to, SLA
 
 ## Related skills
 

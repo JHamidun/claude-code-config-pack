@@ -19,7 +19,7 @@
 | Реставрация фото | "реставрируй фото", "улучши старую фотку", "восстанови фото", "photo restoration", "шакальная фотка", "улучши качество фото" | Skill `nano-banana-pro` (раздел Photo Restoration) |
 | Видео аватар | "видео с аватаром", "аватар" | Skill `heygen` |
 | Видеомонтаж | "склей видео", "монтаж", "concat videos", "склейка", "видеоредактор", "наложи музыку на видео" | Skill `video-editor`, CLI: `python ~/.claude/skills/video-editor/video_editor.py` |
-| Pro монтаж (toolkit) | "профессиональный монтаж", "смонтируй ролик", "докрути монтаж", "как у блогеров", "крутой монтаж" | Skill `video-editor` → `references/montage-toolkit.md` (индекс скриптов + правила ремесла) |
+| Pro монтаж (toolkit) | "профессиональный монтаж", "смонтируй ролик", "докрути монтаж", "как у блогеров", "крутой монтаж" | Skill `video-editor` → `skills/video-editor/references/montage-toolkit.md` (индекс скриптов + правила ремесла) |
 | Вырезать паузы/тишину | "вырежи паузы", "убери тишину", "jump cut", "auto-editor", "убери эээ", "плотный монтаж" | `python ~/.claude/skills/video-editor/scripts/silence_cut.py in.mp4 out.mp4` |
 | Beat-sync нарезка | "под биты", "beat sync", "нарежь под музыку", "клип под трек", "ритмичный монтаж" | `python ~/.claude/skills/video-editor/scripts/beat_sync_edit.py music.mp3 c1.mp4 c2.mp4 -o out.mp4` |
 | Виральные субтитры | "виральные субтитры", "субтитры на видео", "капкат субтитры", "word highlight", "хормози субтитры", "караоке субтитры" | `python ~/.claude/skills/video-editor/scripts/karaoke_captions.py in.mp4 out.mp4 --lang ru --style hormozi` |
@@ -28,7 +28,7 @@
 | Авто-рефрейм 9:16 | "сделай вертикалку", "16:9 в 9:16", "auto reframe", "перекадрируй под reels/shorts", "вертикальное из горизонтального" | `python ~/.claude/skills/video-editor/scripts/reframe_9x16.py in.mp4 out.mp4 --method yolo` |
 | Speed ramps | "слоумо", "ускорь видео", "slow motion", "speed ramp", "замедли момент", "ускорь скучное" | `python ~/.claude/skills/video-editor/scripts/speed_ramp.py in.mp4 out.mp4 --ramp "0:3:0.25,3:12:1.0"` |
 | Sound design | "звуковые эффекты", "whoosh", "sfx", "freesound", "подложи звук под переход", "приглуши музыку под голос" | `python ~/.claude/skills/video-editor/scripts/sfx.py search whoosh` / `place` / `duck` |
-| Соц-UI оверлеи | "соц-UI оверлей", "instagram оверлей на видео", "telegram баблы", "фейк лента", "как в том рилсе", "kinetic UI", "motion graphics на видео" | Skill `video-generation` → `references/remotion-overlays.md` + `scripts/motion_graphics.py` |
+| Соц-UI оверлеи | "соц-UI оверлей", "instagram оверлей на видео", "telegram баблы", "фейк лента", "как в том рилсе", "kinetic UI", "motion graphics на видео" | Skill `video-generation` → `skills/video-generation/references/remotion-overlays.md` + `skills/video-generation/scripts/motion_graphics.py` |
 | VOID (удаление объектов) | "удали объект из видео", "remove object from video", "VOID", "video inpainting", "убери из видео", "video object removal" | Skill `void-video`, CLI: `python ~/.claude/skills/void-video/void_remove.py` |
 | Видео фабрика | "полный ролик", "video factory", "ролик под ключ", "сделай видео и выложи", "запиши и выложи" | Agent `video-factory` |
 | Озвучка | "озвучь", "голос", "TTS" | Skill `elevenlabs` |
@@ -64,7 +64,7 @@
 | Cloud Translation | "переведи через google", "gtranslate" | Command `gtranslate` |
 | Cloud Storage | "GCS", "бакеты", "gcloud storage" | Command `gcloud-storage` |
 | Telegram бот (разработка) | "бот", "telegram бот", "напиши бота", "handlers", "scenes", "deploy бота" | Skill `telegram-bot-toolkit` |
-| Публикация через бота (Bot API) | "опубликуй через бота", "пост в канал от бота", "бот-админ канала", "кнопка к посту в канале", "rich-пост с таблицей", "таблица/заголовок в тг-посте", "рассылка подписчикам бота", "отправь подписчику в личку", "опрос от бота", "платный пост Stars", "инвайт-ссылка бот", "почему updates молчит", "вебхук бота", "tg_bot.py" | Skill `tg-bot-publish`, CLI: `python ~/.claude/tools/tg_bot.py` (+ TG_BOT_API_REFERENCE.md, TG_BOT_API_REFERENCE.md) |
+| Публикация через бота (Bot API) | "опубликуй через бота", "пост в канал от бота", "бот-админ канала", "кнопка к посту в канале", "rich-пост с таблицей", "таблица/заголовок в тг-посте", "рассылка подписчикам бота", "отправь подписчику в личку", "опрос от бота", "платный пост Stars", "инвайт-ссылка бот", "почему updates молчит", "вебхук бота", "tg_bot.py" | Skill `tg-bot-publish`, CLI: `python ~/.claude/tools/tg_bot.py` (+ TG_BOT_CAPABILITIES.md, TG_BOT_API_REFERENCE.md) |
 | MAX переписка | "чат в максе", "max chat", "прочитай макс" | `python ~/.claude/tools/max_client.py read-chat <target>` |
 | MAX каналы | "канал в максе", "max channel", "посты макс" | `python ~/.claude/tools/max_client.py parse-channel <@username>` |
 | MAX поиск каналов | "найди канал макс", "public search max" | `python ~/.claude/tools/max_client.py public-search <query>` |

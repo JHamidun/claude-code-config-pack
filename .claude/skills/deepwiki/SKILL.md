@@ -12,6 +12,25 @@ Fetch and analyze documentation for any GitHub repository.
 - **DeepWiki**: Any GitHub repository documentation
 - **Context7** (separate skill): npm/pypi packages with published docs
 
+## Method 0 — llms.txt preflight (ВСЕГДА первым, до любого краулинга)
+
+Многие проекты уже отдают готовый срез доков для LLM. Спросить — секунда, краулить — минуты.
+
+```bash
+python ~/.claude/tools/llms_txt.py https://docs.example.com          # или сразу несколько доменов
+python ~/.claude/tools/llms_txt.py https://svelte.dev --full --save ./llms   # llms-full.txt целиком
+```
+
+- `[FOUND]` → бери этот текст как источник, дальше по Methods 1-3 идти не нужно.
+- `[NONE ]` → llms.txt нет, спокойно переходи к Method 1 (корректная деградация, не ошибка).
+
+Проверяется `/llms.txt` и `/llms-full.txt` рядом с путём и в корне домена.
+**Валидация по телу, а не по коду ответа:** SPA-сайты отдают 200 + HTML на любой
+несуществующий путь (проверено: `your-domain.com/llms.txt` → 200 `text/html`), поэтому
+скрипт режет HTML-заглушки и отдаёт `found=false` вместо вёрстки под видом доков.
+
+Из Python: `from llms_txt import discover, parse` (`sys.path` → `~/.claude/tools`).
+
 ## Methods
 
 ### Method 1: gitmcp.io (preferred)

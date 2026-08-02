@@ -15,7 +15,7 @@
 > **Самый надёжный обход (когда `C\:` всё равно даёт `No option name near`):** скопируй .cube в
 > рабочую папку и ссылайся ОТНОСИТЕЛЬНЫМ путём без двоеточия — `cp LUT build/lut.cube`, затем
 > `lut3d=build/lut.cube:interp=tetrahedral`. Двоеточия в пути нет → парсер не ломается ни в каком шелле.
-> (Так делает `scripts/talking-head/grade_preview.py`.)
+> (Так делает `skills/video-editor/scripts/talking-head/grade_preview.py`.)
 
 ## Применить LUT
 

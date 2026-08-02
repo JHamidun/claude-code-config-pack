@@ -79,5 +79,5 @@ higgsfield soul-id get <id>               # one by id
 
 ## Reference docs
 
-- `references/photo-guide.md` — what photos work best
-- `references/troubleshooting.md` — common training failures
+- `soul-id-photo-guide.md` — what photos work best
+- `troubleshooting.md` — common training failures

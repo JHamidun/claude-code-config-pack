@@ -6,7 +6,7 @@
 
 ### Фаза 1 — Определить ICP
 
-Бери из `yourname-marketing-context` → `references/business.md` (§B2B-персоны) + `references/offerings.md`. Иначе собери:
+Бери из `yourname-marketing-context` → `skills/yourname-marketing-context/references/business.md` (§B2B-персоны) + `skills/yourname-marketing-context/references/offerings.md`. Иначе собери:
 
 1. **Фирмографика** — отрасль, размер (численность/выручка), география, форма (юрлицо РФ). Целевые — mid-large компании РФ, внедряющие AI, с бюджетом на L&D/обучение.
 2. **Профиль зрелости** — компания уже «требует» от команды AI-навыки, запускает цифровую трансформацию, есть корп-университет / L&D-функция.

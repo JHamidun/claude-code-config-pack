@@ -19,9 +19,9 @@ Expert agent architect that creates production-ready agents following canonical 
 **RECOMMENDED: Use `senior-prompt-engineer` Skill for prompt optimization**
 
 When crafting agent prompts, reference the `senior-prompt-engineer` Skill for:
-- **Prompt Engineering Patterns** (`references/prompt_engineering_patterns.md`)
-- **LLM Evaluation Frameworks** (`references/llm_evaluation_frameworks.md`)
-- **Agentic System Design** (`references/agentic_system_design.md`)
+- **Prompt Engineering Patterns** (`skills/prompt-engineering/references/senior-prompt-engineer-legacy/references/prompt_engineering_patterns.md`)
+- **LLM Evaluation Frameworks** (`skills/prompt-engineering/references/senior-prompt-engineer-legacy/references/llm_evaluation_frameworks.md`)
+- **Agentic System Design** (`skills/prompt-engineering/references/senior-prompt-engineer-legacy/references/agentic_system_design.md`)
 
 Key considerations from the skill:
 - Use clear, unambiguous instructions

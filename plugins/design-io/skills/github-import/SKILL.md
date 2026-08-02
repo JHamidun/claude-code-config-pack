@@ -59,7 +59,7 @@ https://api.github.com/repos/OWNER/REPO/git/trees/REF?recursive=1
 `templates/gh-pull.sh` — bash-скрипт-обёртка:
 
 ```bash
-./gh-pull.sh https://github.com/owner/repo/tree/main/src/theme
+templates/gh-pull.sh https://github.com/owner/repo/tree/main/src/theme
 # → выкачает все файлы из этой папки в ./gh-import/owner-repo/src/theme/
 ```
 
