@@ -44,18 +44,48 @@ Everything else (rules, skills, plugins, agents, commands, hooks, MCP servers) w
 - 50+ agents (`~/.claude/agents/`)
 - 110+ slash commands (`~/.claude/commands/`)
 - 23 auto-loaded rules (`~/.claude/rules/`)
-- 35 plugins (3 disabled by default — see `settings.json`)
+- 29 plugins (all enabled — disabled entries are not shipped, see below)
 - 20+ MCP servers (most disabled by default — enable via `mcp.json` or `settings.json`)
 - 5 GSD hooks (`~/.claude/hooks/`)
 - 6 generic Python tools (`~/.claude/tools/`)
 
-## Hardened defaults
+## Permission model
 
-- `defaultMode: default` — Claude asks before running new bash patterns
-- `permissions.allow` — concrete patterns (no wildcard `Bash`)
+**This pack ships `defaultMode: bypassPermissions`.** Claude runs commands without
+asking for confirmation each time. That is deliberate: with per-command prompts a
+freshly installed pack interrupts on nearly every step, and beginners read that as
+"it's broken" — the exact failure this pack exists to prevent.
+
+The protection is not the prompt. It lives in three layers that stay active in
+bypass mode:
+
+- **`permissions.deny`** — hard blocks that bypass does *not* override
+  (`rm -rf /`, `rm -rf ~`, `DROP DATABASE`, …).
+- **`hooks.PreToolUse` → `bash-guard.js`** — inspects every `Bash`/`PowerShell`
+  call before it runs; catches obfuscated forms too, e.g. `ssh host "rm -rf …"`
+  and base64-encoded PowerShell.
+- **`hooks.PreToolUse` → `security-guard.js`** — same idea for `Write`/`Edit`/`MultiEdit`.
+
+**Want confirmations back?** One line in `~/.claude/settings.json`:
+
+```jsonc
+"permissions": { "defaultMode": "acceptEdits" }   // or "default" for maximum nagging
+```
+
+`permissions.allow` is still populated (~288 portable patterns), so those modes
+stay usable without re-approving everything. Patterns are machine-independent by
+design: no absolute paths from the author's machine, only `~/`-relative ones that
+expand to *your* home.
+
+## Other hardened defaults
+
 - `cleanupPeriodDays: 90` — sessions auto-archive
 - All MCP servers tied to personal credentials are `disabled: true`
 - All MCP servers with hardcoded local paths rewritten to portable `npx -y`
+- **Disabled plugins are not shipped at all.** A `false` entry still makes Claude
+  Code resolve its marketplace on every start — pure startup latency for something
+  that never runs. Marketplaces pointing at a build machine's local directory are
+  removed for the same reason: that path does not exist on your computer.
 
 ## Requirements
 
