@@ -136,7 +136,9 @@ This executes the full consolidation pipeline:
 python ${HOME}/.brain/brain_sleeptime.py insights
 ```
 
-This produces data-driven insights: hot entities, frequent memories, contact patterns, memory growth, pending vectorization.
+This produces data-driven insights: hot entities, frequent memories, contact patterns,
+memory growth. (No vector database here on purpose: local embeddings need a decent GPU,
+and this pack must work on any laptop. The graph gives you связи without one.)
 
 ### If CLI fails (e.g. missing deps), explain:
 
