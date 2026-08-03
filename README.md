@@ -71,9 +71,7 @@ on the bypass mode.
 
 ## Other defaults
 
-- `cleanupPeriodDays: 99999` — chat history is kept, not auto-deleted. Claude Code prunes
-  sessions older than this many days; the 90-day default silently ate three-month-old
-  work, which is exactly the history you want when you come back to an old project.
+- `cleanupPeriodDays: 90` — sessions auto-archive
 - All MCP servers tied to personal credentials are `disabled: true`
 - All MCP servers with hardcoded local paths rewritten to portable `npx -y`
 - Plugins that were declared but disabled are stripped, so nothing is resolved at startup for
