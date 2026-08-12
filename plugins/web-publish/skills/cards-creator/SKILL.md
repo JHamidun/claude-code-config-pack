@@ -235,7 +235,7 @@ python render.py series.html
 
 ⚠️ `tg_client.py` НЕ имеет `send-album`. Альбомы + богатую подпись (спойлер,
 раскрывающиеся цитаты, ссылки, фото+видео в одной группе, отложка) шлёт модуль
-**`~/.claude/skills/tg-post/scripts/tg_rich_post.py`** — см. секцию «ПЛАНИРОВАНИЕ И ПУБЛИКАЦИЯ»
+**`~/.claude/skills/tg-post/scripts/tg_rich_post.py (скилл `tg-post` в пак не входит — он завязан на личный канал автора; публикацию делай своим ботом через `~/.claude/tools/tg_bot.py`)`** — см. секцию «ПЛАНИРОВАНИЕ И ПУБЛИКАЦИЯ»
 в `tg-post/SKILL.md`. Коротко:
 
 ```python

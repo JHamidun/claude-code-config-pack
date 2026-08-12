@@ -218,7 +218,7 @@ On-slide text AND speaker notes must read like a human, not an info-business coa
 Replace each with a concrete, useful statement or cut it. Bottom-marker lines should teach or instruct, not motivate.
 
 ### Speaker-notes voice for YourFirstName's decks
-Write `notes.py` in the speaker's real spoken voice — keep a voice-profile file (e.g. `~/.claude/skills/tg-post/references/user-spoken-voice.md`) with concrete markers: metronome/filler openers for transitions, favourite connectives, peer-address forms, homely analogies, self-irony on glitches. Reference notes: `presentations/clientcorp-webinar2-practice/slides/notes.py`.
+Write `notes.py` in the speaker's real spoken voice — keep a voice-profile file (e.g. `~/.claude/skills/tg-post/references/user-spoken-voice.md (скилл `tg-post` в пак не входит — он завязан на личный канал автора; публикацию делай своим ботом через `~/.claude/tools/tg_bot.py`)`) with concrete markers: metronome/filler openers for transitions, favourite connectives, peer-address forms, homely analogies, self-irony on glitches. Reference notes: `presentations/clientcorp-webinar2-practice/slides/notes.py`.
 
 ### slide_manager.py (HTML Mode Core)
 

@@ -78,3 +78,9 @@ PyJWT>=2.8
 
 # Heavy ML/media extras (torch, whisper, rembg, opencv…) are NOT here on purpose:
 # see requirements-optional.txt.
+
+# Приезжают транзитивно с fastapi/python-pptx, но скиллы импортируют их напрямую —
+# при установке без этих «родителей» импорт падал бы на ровном месте.
+pydantic>=2.7            # skills/n8n (модели запросов)
+six>=1.16                # skills/pptx (совместимость внутри ooxml-обвязки)
+websockets>=12.0         # tools/ (клиенты с постоянным соединением)
