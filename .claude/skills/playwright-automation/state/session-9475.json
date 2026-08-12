@@ -1,12 +1,13 @@
 {
  "port": 9475,
- "updated": 1785509808.3723464,
- "pid": 96420,
- "status": "sleeping",
- "reason": "idle_timeout",
- "profile": "guard-test",
- "browser_up": false,
- "last_activity": 1785509749.2441614,
- "rss_mb": 60.9,
- "restarts": 1
+ "updated": 1785859052.3695693,
+ "pid": 124520,
+ "status": "ok",
+ "reason": "running",
+ "profile": "conf-probe",
+ "browser_up": true,
+ "last_activity": 1785858785.1607566,
+ "idle_sec": 267,
+ "rss_mb": 61.7,
+ "restarts": 0
 }

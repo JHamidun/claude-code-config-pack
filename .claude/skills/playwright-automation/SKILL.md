@@ -147,6 +147,38 @@ with sync_playwright() as p:
 
 Полный референс (оба инструмента, сниппеты из smoke, таблица симптомов): `references/stealth-scraping.md`.
 
+## Визуальный рекордер — `codegen` ⭐
+
+Кликаешь в браузере руками — на выходе готовый скрипт. Это то, ради чего обычно ставят
+no-code платформы вроде Maxun (5 контейнеров: postgres + minio + backend + frontend + browser),
+только здесь это одна команда и ноль постоянных сервисов.
+
+```bash
+# записать действия и сразу получить Python-скрипт
+npx playwright codegen --target python -o scraper.py https://example.com
+
+# под свой стек: python-async, javascript, playwright-test, java, csharp
+npx playwright codegen --target python-async -o scraper.py https://example.com
+
+# с авторизацией: сначала логинишься руками, состояние сохраняется
+npx playwright codegen --save-storage=auth.json https://site.com/login
+npx playwright codegen --load-storage=auth.json https://site.com/dashboard
+
+# записать на конкретном браузере / мобильном устройстве
+npx playwright codegen -b firefox --device "iPhone 15" https://example.com
+```
+
+**Как это ложится в остальной стек:**
+
+1. `codegen` — записал сценарий, получил черновик селекторов
+2. Переписал импорт на `patchright`, если цель под анти-ботом (см. раздел Stealth)
+3. Прогон через `bdo.py`-демон, если нужен живой браузер между вызовами
+4. `pw_guard.is_blocked(page)` после каждого `goto` — чтобы бан не выглядел как «ничего не нашлось»
+
+**Гоча:** codegen генерирует селекторы по видимому тексту и `data-testid`. На динамических классах
+(Tailwind, CSS-modules) они ломаются при первом же редизайне — после записи стоит заменить
+хрупкие селекторы на `get_by_role` / `get_by_text`.
+
 ## When to Use
 
 - E2E тестирование

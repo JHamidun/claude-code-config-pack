@@ -639,6 +639,16 @@ LIMIT 100"
 - **Monitoring**: pg_stat_statements, MongoDB Profiler
 - **Schema visualization**: dbdiagram.io, DrawSQL
 
+## Аналитический SQL (запросы к данным)
+
+Схемы/миграции/индексы — выше. Всё про **чтение данных** вынесено в
+`references/analytics-sql-playbook.md`: SQLite (FTS5 + BM25-ранжирование, оконные функции,
+json_extract, ATTACH нескольких баз, PRAGMA для скорости, таблица отличий от Postgres и три
+грабли — алиас ломает FTS5, `LIKE`/`lower()` не знают кириллицы, `SUM(CASE)` без ELSE даёт NULL),
+аналитический диалект PostgreSQL, агрегации MongoDB с картой соответствий SQL→pipeline,
+универсальные паттерны (CTE-шаги, когортное удержание, воронка, дедупликация, оконные функции)
+и разбор упавшего запроса. SQLite-раздел проверен запусками на `chats.db` и `graph.db`.
+
 ## ER-диаграммы из схемы (liam)
 
 `@liam-hq/cli` — интерактивные ER-диаграммы (React Flow, HTML) из Prisma/PostgreSQL/drizzle-схем. Работает через `npx`, ставить ничего не нужно. Проверено 2026-07-19 на ClientProjectA (61 модель).

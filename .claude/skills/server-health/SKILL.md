@@ -67,6 +67,17 @@ def health_check(host="your-server"):
     }
 ```
 
+## Before Changing Anything (checks are read-only, fixes are not)
+
+A health check often turns into a fix. Four lines before the first mutating command:
+
+- [ ] **Return point** — `cp <file> <file>.bak-$(date +%Y%m%dT%H%M%SZ)` for any config you touch; for a container, note its current `Status`/uptime so you can tell a regression from a cure
+- [ ] **Blast radius** — `docker ps` first: which other stacks share this network, volume or port? your-server runs 150+ containers
+- [ ] **Revert trigger** — decide in advance what makes you roll back ("service does not answer within 2 min")
+- [ ] **Verify the effect, not the command** — `Up 5 seconds` is not "it works"; hit the real endpoint / send a real message
+
+Full procedures with rollback and escalation (bot silent, Hermes restart, cron did not fire, disk full, fleet liveness) → skill `runbook`.
+
 ## Tips
 
 1. Use `--no-pager` for journalctl/systemctl

@@ -101,6 +101,15 @@ Workers can read and write here without permission prompts. Use for:
 
 Clean up after task completion.
 
+### Incremental Output (mandatory for long workers)
+
+Субагент отдаёт результат ПО ХОДУ работы, а не одним куском в конце: append в файл/отчёт
+после каждой завершённой единицы (файл, глава, кластер правок), Edit'ы применяются сразу.
+Финальный ответ агента = краткое summary, а не сам результат. Причина: сессия обрывается
+по лимиту/крэшу, и всё, что не на диске, теряется (прецедент: 345K токенов разведки).
+В промпт долгого воркера и в COMMON каждой Workflow-волны вставлять блок CRASH-SAFE PROTOCOL
+**дословно** из `${HOME}/.claude/workflows/CRASH-SAFE-PROTOCOL.md` (~200 токенов на агента).
+
 ## Anti-Patterns
 
 | Anti-pattern | Why it fails | Fix |

@@ -1,0 +1,12 @@
+{
+ "port": 9472,
+ "updated": 1785856497.7863603,
+ "pid": 118744,
+ "status": "stopped",
+ "reason": "session_idle",
+ "profile": "tilda-conf",
+ "browser_up": false,
+ "last_activity": 1785855892.1342704,
+ "rss_mb": 0,
+ "restarts": 1
+}

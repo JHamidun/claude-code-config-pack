@@ -1,0 +1,13 @@
+{
+ "port": 9476,
+ "updated": 1785859055.9792073,
+ "pid": 112884,
+ "status": "ok",
+ "reason": "running",
+ "profile": "conf-probe2",
+ "browser_up": true,
+ "last_activity": 1785858850.9011893,
+ "idle_sec": 204,
+ "rss_mb": 62.8,
+ "restarts": 0
+}

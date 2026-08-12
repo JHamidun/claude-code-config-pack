@@ -1,8 +1,12 @@
-# Stealth-скрапинг: curl_cffi + patchright + Camoufox
+# Stealth-скрапинг: curl_cffi + patchright + Fortress + Camoufox
 
-> Три стелс-инструмента для обхода анти-ботов. curl_cffi и patchright установлены и
-> проверены 2026-07-19 (Python 3.13, Windows), Camoufox — опция под установку.
+> Четыре независимых пути обхода анти-ботов, **все установлены и проверены запуском**
+> (Python 3.13, Windows): curl_cffi и patchright — 2026-07-19, Fortress и Camoufox — 2026-08-11.
 > Общий референс для skills: `playwright-automation`, `tender-search-ru`, `headhunter`, `ad-spy`.
+>
+> **Зачем четыре.** Разные движки дают разные отпечатки, поэтому их можно гонять
+> **параллельно с одного IP** — цель не свяжет сессии между собой. Один Chromium в десяти
+> копиях такого не даёт: отпечаток у всех одинаковый.
 
 ## TL;DR — какой инструмент когда
 
@@ -11,7 +15,8 @@
 | Дёрнуть JSON-API / голый HTML, который банит `requests` | **curl_cffi** (`impersonate="chrome"`) | Нет браузера → быстро и легко; подделывает TLS/JA3-отпечаток под Chrome. WAF видит «настоящий Chrome». |
 | Страница требует исполнения JS / клики / логин, и стоит анти-бот | **patchright** | Полный браузер, но скрывает `navigator.webdriver`, CDP-утечки (`Runtime.enable`), чинит `window.chrome`. |
 | Cloudflare Turnstile / Datadome / Kasada / Akamai challenge | **patchright** (браузер) или **curl_cffi** (если challenge только TLS/JA3-based) | Пробуй сначала curl_cffi (дёшево), не пробило — patchright. |
-| **Chromium уже спалён на этой цели** / нужна гео-привязка к прокси / цель ловит именно Chromium | **Camoufox** (Firefox) | Другой движок + подмена на уровне C++ **до** того, как значение увидит JS. Детекторы, заточенные под CDP-артефакты Chromium, на нём не срабатывают. |
+| **Chromium-детектор ловит patchright** (видит JS-патчи в геттерах) | **Fortress** (Chromium 151, C++) | Подмена в самом движке: `webdriver`-геттер отдаёт `[native code]`. Замер 7/7. Подключение по CDP, код не меняется |
+| **Chromium как класс уже спалён** / нужна гео-привязка к прокси | **Camoufox** (Firefox) | Другой движок + подмена на уровне C++ **до** того, как значение увидит JS. Детекторы, заточенные под CDP-артефакты Chromium, на нём не срабатывают. |
 | Обычный сайт без защиты | стоковый `playwright` / `requests` | Стелс не нужен, лишний оверхед. |
 
 **Принцип:** начинай с самого лёгкого (curl_cffi без браузера) → эскалируй к patchright
@@ -24,6 +29,7 @@
 | ---------- | --------------- | ------------- |
 | curl_cffi | TLS/JA3-отпечаток | сетевой, браузера нет вообще |
 | patchright | `navigator.webdriver`, CDP-утечки, `window.chrome` | CDP/JS-рантайм Chromium — **после** того, как значение выдал движок |
+| **Fortress** | `navigator.*`, WebGL, геттеры прототипов | **C++ движка Chromium (Blink/V8/BoringSSL) — до JS**; геттеры отдают `[native code]` |
 | Camoufox | `navigator.*`, WebGL vendor/renderer, AudioContext, геометрия экрана, WebRTC-IP, шрифты | **C++ движка Firefox — до JS**; отпечаток генерит BrowserForge по реальным распределениям устройств |
 
 ---
@@ -209,14 +215,77 @@ ERR blocked: google_unusual_traffic: ...     # exit 3
 
 ---
 
-## Camoufox — третья нога (Firefox, подмена в C++)
+## Fortress — Chromium с патчами в C++ ✅ УСТАНОВЛЕН
 
-**Не установлен.** Ставится одной командой, когда Chromium как класс уже не проходит.
+Форк Chromium 151: 34 патча в Blink, V8 и BoringSSL. Отличие от patchright принципиальное —
+там подмена живёт в CDP/JS-слое и её видно по геттерам, здесь значения меняются
+**в самом движке**, до того как их увидит JS.
+
+```text
+бинарь: ${WORKSPACE}/browsers/fortress/tilion-fortress/chrome.exe   (532 МБ, BSD-3)
+```
+
+Работает через CDP, код менять не нужно — подключается тем же patchright или playwright:
 
 ```bash
-# ОБЯЗАТЕЛЬНО отдельный venv: тянет playwright<1.61 и конфликтует с текущим окружением
-python -m venv ~/.venvs/camoufox && ~/.venvs/camoufox/Scripts/pip install -U "camoufox[geoip]"
-~/.venvs/camoufox/Scripts/camoufox fetch     # качает Firefox-форк, ~470 МБ (Windows x86_64)
+# 1) поднять браузер с открытым CDP-портом
+"${WORKSPACE}/browsers/fortress/tilion-fortress/chrome.exe" \
+  --headless=new --remote-debugging-port=9333 \
+  --user-data-dir=/tmp/fortress-prof --no-first-run --no-default-browser-check
+```
+
+```python
+# 2) подключиться к уже запущенному браузеру
+from patchright.sync_api import sync_playwright
+with sync_playwright() as p:
+    browser = p.chromium.connect_over_cdp("http://127.0.0.1:9333")
+    page = (browser.contexts[0] if browser.contexts else browser.new_context()).new_page()
+```
+
+**Замер на этой машине (2026-08, Chromium 151.0.7908.0), 7 из 7:**
+
+| Проверка | Результат |
+| -------- | --------- |
+| `navigator.webdriver` | `false` |
+| UA | без `HeadlessChrome` |
+| `window.chrome` | `object` |
+| plugins / mimeTypes | 5 / 2 (не пусто) |
+| `permissions.query` | `[native code]` |
+| геттер `webdriver` | `[native code]` — **JS-инъекции не видно** |
+| `cdc_` / `__driver` | отсутствуют |
+
+### Гочи Fortress
+
+1. **🚨 Локаль по умолчанию индонезийская.** Замер отдал `navigator.languages = ['id-ID','id','en']`.
+   Российский или бразильский IP плюс индонезийский язык — сам по себе сигнал. Перед работой
+   выставляй язык под задачу (`--lang=ru-RU` и заголовок `Accept-Language`), иначе маскировка
+   отпечатка спасает, а несоответствие локали и гео выдаёт.
+2. **Отпечаток «средний», а не твой.** Отдаёт 4 ядра, 8 ГБ, WebGL `AMD Radeon` — при том что
+   машина 16-ядерная с your GPU. Это by design, но помни: значения не совпадут с реальным железом,
+   если цель сверяет их с чем-то ещё.
+3. **Windows-сборки нет в свежем релизе.** В `v150` только Linux. Windows-архивы лежат
+   в `v149` (stable) и `v151` (latest) — если обновляешься, проверяй список ассетов.
+4. Ошибка `Sandbox cannot access executable` при первом запуске из непривычного пути — Chromium
+   ругается на песочницу, на работу через CDP не влияет.
+
+## Camoufox — Firefox с подменой в C++ ✅ УСТАНОВЛЕН
+
+Вторая независимая нога: другой движок (Gecko), поэтому детекторы, заточенные под Chromium,
+на нём не срабатывают в принципе.
+
+```text
+venv:   ${WORKSPACE}/browsers/camoufox-venv    (227 МБ + бинарь Firefox-форка в AppData)
+запуск: ${WORKSPACE}/browsers/camoufox-venv/Scripts/python.exe
+```
+
+**Замер на этой машине:** `Firefox/152.0` (Gecko), `webdriver = false`, `platform = Win32`,
+12 ядер, `languages = ['en-US','en']`.
+
+```bash
+# если понадобится переустановить
+python -m venv ${WORKSPACE}/browsers/camoufox-venv
+${WORKSPACE}/browsers/camoufox-venv/Scripts/pip install -U "camoufox[geoip]"
+${WORKSPACE}/browsers/camoufox-venv/Scripts/python.exe -m camoufox fetch
 ```
 
 ```python
