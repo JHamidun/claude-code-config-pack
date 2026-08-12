@@ -1,0 +1,41 @@
+# Heavy / niche dependencies — NOT installed by default.
+#
+# Everything here is multi-hundred-megabyte, GPU-flavoured or platform-picky, so
+# putting it in requirements.txt would make a first install crawl (and fail on
+# machines without a compiler). Install a line only when you actually reach for
+# the skill that needs it:
+#
+#     pip install --user -r requirements-optional.txt      # all of it
+#     pip install --user opencv-python                      # or just one
+#
+# Each entry names the skill that imports it, so you can pick by need.
+
+# --- video / audio understanding ------------------------------------------
+openai-whisper                # skills/video-editor, video-generation (assemble)
+whisperx                      # skills/video-editor (karaoke_captions, talking-head)
+librosa                       # skills/video-editor (beat_sync_edit)
+scenedetect                   # skills/video-editor (scene_detect)
+opencv-python                 # skills/video-editor (reframe_9x16), sticker-pack-generator
+
+# --- vision models ---------------------------------------------------------
+torch                         # sticker-pack-generator, privacy-filter
+ultralytics                   # skills/video-editor (reframe_9x16, subject tracking)
+rembg                         # cards-creator, sticker-pack-generator, web-assets-generator
+scipy                         # web-assets-generator (cut_avatars)
+
+# --- search / text ---------------------------------------------------------
+jieba                         # skills/last30days (CJK tokenisation)
+gradio-client                 # skills/ace-step (music generation over a Gradio space)
+patchright                    # skills/playwright-automation (stealth driver)
+
+# --- vector memory ---------------------------------------------------------
+qdrant-client                 # tools/vector_memory.py
+chromadb                      # tools/vector_memory.py (alternative backend)
+
+# Deliberately absent — no installable PyPI distribution, the owning skill
+# documents its own setup:
+#   madmom      skills/video-editor (beat_sync_edit)   — needs a source build
+#   sam2        skills/sticker-pack-generator          — install from git
+#   captacity   skills/video-editor (add_captions)     — install from git
+#   liteparse   skills/research-docs                   — vendor-provided
+#   opf         skills/privacy-filter                  — local on-device model

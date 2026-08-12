@@ -47,6 +47,17 @@ Stop and ask the user if:
 - The fix requires **architectural changes** (not just a build fix)
 - Build errors stem from **missing dependencies** (need `npm install`, `cargo add`, etc.)
 
+## Step 4b: Rollback Anchor (capture BEFORE the first edit)
+
+A build-fix run touches many files quickly. Capture a return point before the first Edit — not after the third failed attempt:
+
+- [ ] `git status --short` — is the tree already dirty? Someone else's uncommitted work will get mixed into yours
+- [ ] Dirty tree → `git stash push -u -m "pre-build-fix"` or commit a WIP snapshot. Clean tree → record `git rev-parse --short HEAD`
+- [ ] Not a git repo → copy the files you are about to touch: `cp <file> <file>.bak-build-fix`
+- [ ] State the revert trigger up front: "if total error count grows, or the same error survives 3 attempts, revert to the anchor and report"
+
+Revert path: `git checkout -- <specific files>` or `git stash pop`. Never `git checkout -- .` — it discards every uncommitted change in the tree, including work unrelated to this build (the bash-guard blocks that form for exactly this reason).
+
 ## Step 5: Summary
 
 Show results:

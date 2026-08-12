@@ -1,0 +1,33 @@
+#!/bin/sh
+# Local tripwire for the free-by-default promise.
+#
+# The pack's .claude/ tree gets re-synced wholesale from a personal config.
+# A sync overwrites whole files, so it silently deletes the NO-KEY policy that
+# lives inside them — that already happened twice (16 -> 10 -> 0 guard blocks,
+# 2026-07-21 .. 2026-07-31) and shipped to origin/main.
+#
+# Enable once per clone:
+#     git config core.hooksPath .githooks
+#
+# Bypass (only when you know what you are doing): git commit --no-verify
+
+if command -v python >/dev/null 2>&1; then PY=python
+elif command -v python3 >/dev/null 2>&1; then PY=python3
+else
+  echo "pre-commit: python not found — skipping free-by-default guard" >&2
+  exit 0
+fi
+
+if ! $PY guard_free_by_default.py --check; then
+  cat >&2 <<'MSG'
+
+COMMIT BLOCKED: the pack would ship demanding a paid third-party API key.
+
+  repair:  python guard_free_by_default.py --apply
+  then:    python _build_plugins.py     # propagate .claude/ -> plugins/
+  verify:  python guard_free_by_default.py --check
+
+MSG
+  exit 1
+fi
+exit 0

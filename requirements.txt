@@ -42,3 +42,39 @@ markdownify>=0.13
 deepgram-sdk>=3.5
 elevenlabs>=1.5
 replicate>=0.30
+
+# Office docs — XML hardening (skills/docx, skills/pptx: ooxml pack/unpack)
+defusedxml>=0.7
+
+# Imaging / frames (cards-creator, slack-gif-creator, sticker-pack-generator,
+# web-assets-generator, video-editor)
+numpy>=1.26
+imageio>=2.34
+imageio-ffmpeg>=0.5
+pdf2image>=1.17          # skills/pdf — needs the poppler binaries on PATH
+
+# MCP servers shipped in the pack (claude-design, mcp-builder, video-generation)
+mcp>=1.2
+
+# Local automation / diagnostics
+psutil>=5.9              # playwright-automation daemon, n8n catalog monitor
+dnspython>=2.6           # tools/osint_client.py
+qrcode>=7.4              # tools/wa_client.py (WhatsApp pairing)
+aiohttp>=3.9
+tiktoken>=0.7            # honest token counts in config_lint / memory_brief
+PyYAML>=6.0              # skill-creator frontmatter validation
+
+# Data / matching
+pandas>=2.2              # stock-analysis
+yfinance>=0.2            # stock-analysis
+rapidfuzz>=3.9           # lead-enrichment company matching
+phonenumbers>=8.13       # lead-enrichment phone lookup
+pymorphy2>=0.9           # seo-machine-ru (RU morphology)
+
+# Local API surface (skills/n8n catalog)
+fastapi>=0.110
+uvicorn>=0.29
+PyJWT>=2.8
+
+# Heavy ML/media extras (torch, whisper, rembg, opencv…) are NOT here on purpose:
+# see requirements-optional.txt.

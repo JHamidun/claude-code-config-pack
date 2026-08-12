@@ -1,5 +1,5 @@
 {
-  "cleanupPeriodDays": 99999,
+  "cleanupPeriodDays": 90,
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "MCP_TIMEOUT": "120000",
@@ -9,6 +9,9 @@
   },
   "permissions": {
     "allow": [
+      "Edit(/.claude/**)",
+      "Write(/.claude/**)",
+      "Read(/.claude/**)",
       "Bash(python *)",
       "Bash(python3 *)",
       "Bash(py *)",
@@ -72,22 +75,19 @@
       "Read(~/**)",
       "Write",
       "Write(*)",
-      "Write(~/.claude/**)",
       "Write(~/.claude.json)",
       "Write(~/**)",
-      "Write(.claude/**)",
       "Edit",
       "Edit(*)",
-      "Edit(~/.claude/**)",
       "Edit(~/.claude.json)",
       "Edit(~/**)",
-      "Edit(.claude/**)",
       "MultiEdit",
       "MultiEdit(*)",
       "NotebookEdit",
       "NotebookEdit(*)",
       "Glob",
       "Grep",
+      "Workflow",
       "Task",
       "Agent",
       "WebFetch",
@@ -115,26 +115,13 @@
       "mcp__context7__*",
       "mcp__firecrawl__*",
       "mcp__exa__*",
-      "Edit(/.claude/skills/figma-api/**)",
-      "Edit(/.claude/skills/tg-post/**)",
       "Bash(mkdir -p /c~/.claude/skills/kp-deck-factory/references)",
-      "Read(//c~/.claude/skills/**)",
-      "Edit(/.claude/skills/kp-deck-factory/**)",
       "Bash(cd \"~/.claude/projects/C--Users-youruser\" && rm -f _kp_extract.txt && echo cleaned)",
       "Bash(cat >> *)",
-      "Edit(/.claude/skills/suno/**)",
       "Bash(cp \"~//.claude//skills//heygen//SKILL.md\" \"~//.claude//skills//heygen//SKILL.md.bak.v3-pre-20260605\" *)",
-      "Edit(/.claude/skills/heygen/**)",
       "Bash(F=\"~/.claude/.credentials.master.env\" *)",
       "Bash(mkdir -p ~/.claude/skills/heygen/scripts ~/.claude/skills/heygen/references && echo \"dirs ready\")",
-      "Edit(/.claude/skills/video-generation/**)",
       "Bash(python -m http.server 8753 --bind 127.0.0.1)",
-      "Edit(/.claude/skills/manus-slides/**)",
-      "Edit(/.claude/skills/webinar-to-pdf/**)",
-      "Edit(/.claude/skills/plaud/**)",
-      "Edit(/.claude/skills/elevenlabs/**)",
-      "Edit(/.claude/skills/video-editor/**)",
-      "Edit(/.claude/skills/playwright-automation/**)",
       "mcp__playwright-live1__*",
       "mcp__playwright-live2__*",
       "mcp__playwright-live3__*",
@@ -154,7 +141,6 @@
       "Bash(cp ~/_higgsfield_re/models_all.json ~/.claude/skills/higgsfield/references/models_all.json)",
       "Bash(cp ~/_higgsfield_re/sc_skills_builtin.json ~/.claude/skills/higgsfield/references/builtin_skills.json)",
       "Bash(cp \"~/_higgsfield_re/SUPERCOMPUTER_RE.md\" \"~/.claude/skills/higgsfield/references/supercomputer-architecture.md\" && echo \"dossier synced to skill refs\")",
-      "Edit(/.claude/skills/higgsfield/**)",
       "Bash(cp ~/_higgsfield_re/REPO_DIGEST.md ~/.claude/skills/higgsfield/references/REPO_DIGEST.md)",
       "Bash(cat > *)",
       "Bash(mkdir -p ~/.claude/skills/higgsfield/references/official-repo)",
@@ -164,8 +150,6 @@
       "Bash(cp ~/_higgsfield_re/hf_skills_repo/higgsfield-soul-id/references/photo-guide.md ~/.claude/skills/higgsfield/references/official-repo/soul-id-photo-guide.md)",
       "Bash(ls \"~/.claude/skills/higgsfield-local/scripts\" 2>/dev/null || mkdir -p \"~/.claude/skills/higgsfield-local/scripts\" && echo \"dir ready\")",
       "Bash(mkdir -p \"~/.claude/skills/higgsfield-local/scripts\")",
-      "Edit(/.claude/skills/higgsfield-local/**)",
-      "Edit(/.claude/skills/tg-carousel-outreach/**)",
       "Bash(mkdir -p \"~/.claude/scratchpad/higgsfield-merge\" 2>/dev/null; echo \"dir ready\")",
       "Bash(mkdir -p \"~/.claude/skills/higgsfield/_merge\" 2>/dev/null && echo \"dir ready\")",
       "Bash(mkdir -p \"~/.claude/scratchpad/video-skill-merge\" && echo \"dir ready\")",
@@ -173,103 +157,45 @@
       "Bash(mkdir -p \"~/.claude/scratchpad/higgsfield-merge\" && echo created)",
       "Bash(mkdir -p \"~/.claude/scratchpad/higgsfield-merge\" && echo \"dir ready\")",
       "Bash(mkdir -p /c~/.claude/skills/lead-enrichment/scripts /c~/.claude/skills/lead-enrichment/references)",
-      "Edit(/.claude/skills/lead-enrichment/**)",
       "Bash(cd /c~/.claude/skills/lead-enrichment *)",
       "Bash(python ~/.claude/tools/search_chats.py \"[Client] Александр Андреевич Company\" 2>nul || echo \"search_chats unavailable\")",
-      "Edit(/.claude/skills/claude-design/**)",
       "Bash(cat)",
       "Bash(mkdir -p \"~/.claude/skills/ai-news-bot/_review\")",
       "Bash(cp \"C:/tmp/CODE-REVIEW-REPORT.md\" \"~/.claude/skills/ai-news-bot/_review/CODE-REVIEW-2026-06-11.md\")",
       "Read(//tmp/**)",
-      "Edit(/.claude/skills/ai-news-bot/**)",
       "Bash(netstat -ano)",
       "Bash(tasklist //FI \"PID eq 80844\")",
       "Bash([ -s \"$f\" ])",
       "Bash(sleep 2)",
-      "Edit(/.claude/skills/career-ops/**)",
       "Bash(mkdir -p ~/.claude/skills/headhunter/candidate/scripts ~/.claude/skills/headhunter/candidate/references ~/.claude/skills/headhunter/candidate/data ~/.claude/.hh-candidate-profile 2>/dev/null *)",
-      "Edit(/.claude/skills/headhunter/**)",
-      "Edit(/.claude/skills/web-assets-generator/**)",
-      "Edit(/.claude/skills/crm/**)",
-      "Edit(/.claude/skills/deepgram/**)",
-      "Edit(/.claude/skills/zoom/**)",
       "Bash(mkdir -p /c~/.claude/skills/your-product-admin/scripts /c~/.claude/skills/your-product-admin/references && echo \"skill dirs ready\")",
-      "Edit(/.claude/skills/your-product-admin/**)",
       "Bash(mkdir -p /c~/.claude/skills/your-product-admin/scripts/audit)",
       "Bash(cp /c~/_offer_audit_skill/scripts/export_offer_users.py /c~/_offer_audit_skill/scripts/transfer_users.py /c~/_offer_audit_skill/scripts/categorize_users.py /c~/_offer_audit_skill/scripts/verify_offer.py /c~/_offer_audit_skill/scripts/scrape_we_company.py /c~/.claude/skills/your-product-admin/scripts/audit/)",
       "Bash(PYTHONUTF8=1 python -)",
-      "Read(//c~/.claude/skills/your-product-admin/scripts/**)",
-      "Edit(/.claude/skills/comment-replies/**)",
       "Bash(rm -rf _gmail_login_profile)",
       "Bash(mkdir -p _gmail_login_shots)",
       "Bash(PYTHONUTF8=1 PYTHONUNBUFFERED=1 nohup python -u gmail_oauth_claude_company.py)",
       "Bash(mkdir -p \"~/.claude/skills/prospect-list-enrichment/references\" \"~/.claude/skills/prospect-list-enrichment/scripts\" && ls \"~/.claude/skills/prospect-list-enrichment/\")",
-      "Edit(/.claude/skills/perplexity/**)",
-      "Edit(/.claude/skills/prospect-list-enrichment/**)",
       "Bash(mkdir -p *)",
-      "Edit(/.claude/skills/vk-ads-pro-ru/**)",
       "Bash(cp /c~/.claude/scratchpad/patch_contact_handler.py ~/your-project/infra/academy-bot/patches/patch_contact_handler.py)",
       "Bash(cp /c~/.claude/scratchpad/add_remove_keyboard_tool.py ~/your-project/infra/academy-bot/patches/add_remove_keyboard_tool.py)",
       "Bash(mkdir -p \"~/.claude/skills/google-ads-pro-ru/references\" && echo \"created\")",
       "Bash(mkdir -p /c~/.claude/skills/meta-ads-launch-ru/references)",
-      "Edit(/.claude/skills/meta-ads-launch-ru/**)",
-      "Edit(/.claude/skills/google-ads-pro-ru/**)",
-      "Edit(/.claude/skills/capi-no-code-setup/**)",
-      "Edit(/.claude/skills/ai-seo-agent-pipeline/**)",
       "Bash(mkdir -p ~/.claude/skills/geo-aeo-ru/references && echo \"created\")",
       "Bash(mkdir -p ~/.claude/skills/ai-marketing-stack-ru/references && echo \"created\")",
       "Bash(mkdir -p ~/.claude/skills/full-funnel-analytics-ru/references && echo \"created\")",
-      "Edit(/.claude/skills/geo-aeo-ru/**)",
-      "Edit(/.claude/skills/full-funnel-analytics-ru/**)",
-      "Edit(/.claude/skills/ai-marketing-stack-ru/**)",
-      "Edit(/.claude/skills/performance-analytics/**)",
       "Bash(mkdir -p ~/.claude/skills/ajtbd-instructor-ru/references ~/.claude/skills/ajtbd-instructor-ru/prompts && echo \"dirs created\")",
       "Bash(mkdir -p \"~/.claude/skills/ai-creative-factory-ru/references\" && echo \"created\")",
-      "Edit(/.claude/skills/funnel-design-ru/**)",
-      "Edit(/.claude/skills/ai-creative-factory-ru/**)",
-      "Edit(/.claude/skills/ajtbd-instructor-ru/**)",
       "Bash(mkdir -p ~/.claude/skills/b2b-marketing-ru/references && echo \"created\")",
       "Bash(mkdir -p /c~/.claude/skills/sales-team-ru/references && echo \"created\")",
       "Bash(mkdir -p /c~/.claude/skills/tg-channel-buyout-ru/references && echo \"created\")",
-      "Edit(/.claude/skills/tg-channel-buyout-ru/**)",
-      "Edit(/.claude/skills/b2b-marketing-ru/**)",
-      "Edit(/.claude/skills/sales-team-ru/**)",
       "Bash(mkdir -p ~/.claude/skills/manychat-funnel-ru/references && echo \"created\")",
-      "Edit(/.claude/skills/marketing-team-builder-ru/**)",
-      "Edit(/.claude/skills/content-machine-instructor2-ru/**)",
-      "Edit(/.claude/skills/manychat-funnel-ru/**)",
       "Bash(mkdir -p ~/.claude/skills/media-planning-ru/references)",
-      "Edit(/.claude/skills/market-selection-ru/**)",
-      "Edit(/.claude/skills/ad-benchmarks-ru/**)",
-      "Edit(/.claude/skills/media-planning-ru/**)",
-      "Edit(/.claude/skills/marketing-masterminds-ru/**)",
-      "Edit(/.claude/skills/leak-scan/**)",
       "Bash(mkdir -p \"~/.claude/skills/ninja-marketing-orchestrator/references\" && echo \"created\")",
-      "Edit(/.claude/skills/ninja-marketing-orchestrator/**)",
-      "Edit(/.claude/skills/yandex/**)",
-      "Edit(/.claude/skills/revops-ru/**)",
-      "Edit(/.claude/skills/meta-ads-analyzer/**)",
-      "Edit(/.claude/skills/ad-spy/**)",
-      "Edit(/.claude/skills/ab-testing-ru/**)",
       "Bash(mkdir -p \"~/.claude/skills/user-research-synthesis/references\" && echo \"created\")",
       "Bash(mkdir -p \"~/.claude/skills/launch-strategy-ru/references/channels\" && echo \"created\")",
-      "Edit(/.claude/skills/seo-machine-ru/**)",
-      "Edit(/.claude/skills/user-research-synthesis/**)",
-      "Edit(/.claude/skills/launch-strategy-ru/**)",
-      "Edit(/.claude/skills/marketing-psychology-ru/**)",
       "Bash(mkdir -p \"~/.claude/skills/campaign-planning/references\" && echo \"created\")",
-      "Edit(/.claude/skills/campaign-planning/**)",
-      "Edit(/.claude/skills/n8n/**)",
-      "Edit(/.claude/skills/image-generation/**)",
-      "Edit(/.claude/skills/page-cro-ru/**)",
       "Bash(mkdir -p ~/.claude/skills/product-analytics/references && echo \"created\")",
-      "Edit(/.claude/skills/telegram-bot-toolkit/**)",
-      "Edit(/.claude/skills/nano-banana-pro/**)",
-      "Edit(/.claude/skills/product-analytics/**)",
-      "Edit(/.claude/skills/apify-scraping/**)",
-      "Edit(/.claude/skills/competitive-analysis/**)",
-      "Edit(/.claude/skills/installer-builder/**)",
-      "Edit(/.claude/skills/company-lawyer/**)",
       "Bash(cp \"~/.claude/skills/ai-news-bot/scripts/orchestrator/recheck-approved.js\" \"~/.claude/skills/ai-news-bot/scripts/orchestrator/recheck-approved.js.bak-indexnow-20260702\" && node --version)",
       "Bash(cp \"~/.claude/skills/ai-news-bot/scripts/orchestrator/translate-batch.js\" \"~/.claude/skills/ai-news-bot/scripts/orchestrator/translate-batch.js.bak-improve\" && grep -n -B2 -A3 \"stdout.on/('data'\" \"~/.claude/skills/ai-news-bot/scripts/orchestrator/translate-batch.js\")",
       "Bash(exit 0)",
@@ -288,7 +214,6 @@
       "Bash(rm -f \"~//.claude//skills//playwright-automation//profiles//zoom-mkt//SingletonLock\")",
       "Bash(rm -f \"~//.claude//skills//playwright-automation//profiles//zoom-mkt//SingletonCookie\")",
       "Bash(mkdir -p /c~/.claude/workflows-progress/news-review)",
-      "Read(//c~/.claude/workflows-progress/news-review/**)",
       "Bash(mkdir -p \"~/.claude/workflows-progress/news-review\" && cat \"~/.claude/workflows-progress/news-review/rev-portal.md\" 2>/dev/null || echo \"FILE_DOES_NOT_EXIST_YET\")",
       "Bash(python -c ' *)",
       "Bash(mkdir -p \"~/.claude/workflows-progress/news-w7\" && ls -la \"~/.claude/workflows-progress/news-w7/\")",
@@ -304,8 +229,6 @@
       "Bash(cp orig/seo.js orig/index.html orig/portal.js orig/weekly-digest.js test/)",
       "Bash(PYTHONIOENCODING=utf-8 python patch_links_web.py test/seo.js)",
       "Bash(PYTHONIOENCODING=utf-8 python patch_links_miniapp.py test/index.html)",
-      "Edit(/.claude/skills/garant-research/**)",
-      "Edit(/.claude/skills/apple-developer/**)",
       "mcp__codex__codex",
       "Bash(cp \"~//.claude//skills//ai-news-bot//scripts//orchestrator//db.js\" patch-test/orch/db.js)",
       "Bash(cp \"~//.claude//skills//ai-news-bot//scripts//orchestrator//run.js\" patch-test/orch/run.js)",
@@ -314,10 +237,8 @@
       "mcp__codex__codex-reply",
       "Bash(mkdir -p ~/.claude/scripts/region-law && echo \"dir ready: $\\(ls -d ~/.claude/scripts/region-law\\)\")",
       "Bash(mkdir -p ~/.claude/skills/region-law-research && echo ready)",
-      "Edit(/.claude/skills/region-law-research/**)",
       "Bash(echo mem *)",
       "Bash(mkdir -p /c~/.claude/scratchpad/academy-panel && echo ok)",
-      "Read(//c~/.claude/scratchpad/academy-panel/src/**)",
       "Bash(python -c \"import playwright; from playwright.sync_api import sync_playwright; print/('playwright ok'/)\" 2>&1; mkdir -p ~/.claude/scratchpad/academy-panel/frontend-shots)",
       "Bash(mkdir -p \"~/.claude/scratchpad/academy-funnel\")",
       "Bash(mkdir -p /c~/.claude/scratchpad/config-audit-2026-07-17)",
@@ -336,44 +257,14 @@
       "Bash(mkdir -p ~/.claude/scratchpad/nomad-research && ls ~/.claude/scratchpad/nomad-research 2>/dev/null; ls ~/.claude/scratchpad/ | head -30)",
       "Bash(mkdir -p ~/.claude/scratchpad/nomad-research && echo ok)",
       "Bash(mkdir -p ~/.claude/scratchpad/nomad-research && echo OK)",
-      "Edit(/.claude/skills/ru-text/**)",
-      "Edit(/.claude/skills/last30days/**)",
-      "Edit(/.claude/skills/doc-coauthoring/**)",
-      "Edit(/.claude/skills/web-artifacts-builder/**)",
-      "Edit(/.claude/skills/canvas-design/**)",
-      "Edit(/.claude/skills/skill-creator/**)",
       "Read(//c~/.brain/logs//**)",
       "Read(//c~/.brain/soul//**)",
       "Read(//c~/.brain/**)",
-      "Edit(/.claude/skills/dream/**)",
-      "Edit(/.claude/skills/socialpublisher-post/**)",
-      "Edit(/.claude/skills/_archived/**)",
-      "Edit(/.claude/skills/video-montage/**)",
-      "Edit(/.claude/skills/brain-briefing/**)",
       "Bash(mkdir -p scratchpad/pre-owner-package)",
       "Bash(cp skills/postiz/SKILL.md scratchpad/pre-owner-package/postiz-SKILL.md)",
       "Bash(cp skills/socialpublisher-post/SKILL.md scratchpad/pre-owner-package/socialpublisher-post-SKILL.md)",
       "Bash(cp skills/crosspost/SKILL.md scratchpad/pre-owner-package/crosspost-SKILL.md)",
-      "Edit(/.claude/skills/health-inline/**)",
-      "Edit(/.claude/skills/agent-builder tooling/**)",
       "Bash(mkdir -p \"~/.claude/skills/geo-aeo-ru/scripts\" && ls \"~/.claude/skills/geo-aeo-ru/\")",
-      "Edit(/.claude/skills/postiz/**)",
-      "Edit(/.claude/skills/marketing-loops-ru/**)",
-      "Edit(/.claude/skills/mcp-builder/**)",
-      "Edit(/.claude/skills/referrals-ru/**)",
-      "Read(//c~/.claude/skills/artifacts-builder/**)",
-      "Edit(/.claude/skills/offers-ru/**)",
-      "Edit(/.claude/skills/pr-outreach-ru/**)",
-      "Edit(/.claude/skills/thinking-frameworks/**)",
-      "Edit(/.claude/skills/de-ai-ify/**)",
-      "Edit(/.claude/skills/linkedin-humanizer/**)",
-      "Edit(/.claude/skills/multi-model-gateway/**)",
-      "Edit(/.claude/skills/youtube-channel/**)",
-      "Edit(/.claude/skills/claude-api/**)",
-      "Edit(/.claude/skills/claude-cli-runner/**)",
-      "Edit(/.claude/skills/design-orchestrator/**)",
-      "Edit(/.claude/skills/openai-dalle/**)",
-      "Edit(/.claude/skills/watch-video/**)",
       "Bash(mkdir -p \"~/.claude/scratchpad/config-audit-2026-07-17\")",
       "Bash(mkdir -p \"~/.claude/scratchpad/config-audit-2026-07-17\" *)",
       "Bash(mkdir -p /c~/.claude/skills/design-taste/references)",
@@ -435,16 +326,6 @@
             "timeout": 5
           }
         ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
       }
     ],
     "SessionStart": [
@@ -456,16 +337,6 @@
             "async": true
           }
         ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
       }
     ],
     "Stop": [
@@ -474,175 +345,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -c \"if (-not (Test-Path '/tmp/claude-no-beep')) { [console]::beep(800,200); [console]::beep(1000,200) }\"",
+            "command": "node \"${HOME}/.claude/hooks/stop-beep.js\"",
             "timeout": 3,
             "async": true
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PermissionRequest": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 120
-          }
-        ]
-      }
-    ],
-    "PostCompact": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PostToolUseFailure": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "StopFailure": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "SubagentStart": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "CwdChanged": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "FileChanged": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:VSCODE_PORT/hook",
-            "timeout": 5
           }
         ]
       }
@@ -663,7 +368,6 @@
     "context7@claude-plugins-official": true,
     "dev-browser@dev-browser-marketplace": true,
     "feature-dev@claude-plugins-official": true,
-    "figma@claude-plugins-official": true,
     "firecrawl@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "github@claude-plugins-official": true,
@@ -676,12 +380,32 @@
     "pr-review-toolkit@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
     "ralph-loop@claude-plugins-official": true,
-    "sentry@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
     "sourcegraph@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
     "telegram@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true
+    "typescript-lsp@claude-plugins-official": true,
+    "claude-security@claude-plugins-official": true,
+    "hookify@claude-plugins-official": true,
+    "receipts@claude-plugins-official": true,
+    "project-artifact@claude-plugins-official": true,
+    "pdf-viewer@knowledge-work-plugins": true,
+    "mcp-server-dev@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "knowledge-work-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/knowledge-work-plugins"
+      }
+    },
+    "dev-browser-marketplace": {
+      "source": {
+        "source": "git",
+        "repo": "sawyerhood/dev-browser",
+        "url": "https://github.com/sawyerhood/dev-browser.git"
+      }
+    }
   },
   "outputStyle": "Proactive",
   "language": "ru",
@@ -697,7 +421,8 @@
       ],
       "env": {
         "PYTHONIOENCODING": "utf-8"
-      }
+      },
+      "disabled": true
     },
     "graph-memory": {
       "command": "python",
@@ -781,7 +506,8 @@
         "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live2"
-      ]
+      ],
+      "disabled": true
     },
     "playwright-live3": {
       "command": "npx",
@@ -789,7 +515,8 @@
         "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live3"
-      ]
+      ],
+      "disabled": true
     },
     "playwright-live4": {
       "command": "npx",
@@ -797,7 +524,8 @@
         "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live4"
-      ]
+      ],
+      "disabled": true
     },
     "playwright-live5": {
       "command": "npx",
@@ -805,7 +533,8 @@
         "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live5"
-      ]
+      ],
+      "disabled": true
     },
     "playwright-live6": {
       "command": "npx",
@@ -813,7 +542,8 @@
         "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live6"
-      ]
+      ],
+      "disabled": true
     },
     "playwright-live7": {
       "command": "npx",
@@ -821,7 +551,8 @@
         "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live7"
-      ]
+      ],
+      "disabled": true
     },
     "playwright-live8": {
       "command": "npx",
@@ -829,7 +560,8 @@
         "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live8"
-      ]
+      ],
+      "disabled": true
     },
     "playwright-live9": {
       "command": "npx",
@@ -837,7 +569,8 @@
         "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live9"
-      ]
+      ],
+      "disabled": true
     },
     "playwright-live10": {
       "command": "npx",
@@ -845,7 +578,8 @@
         "@playwright/mcp@0.0.78",
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live10"
-      ]
+      ],
+      "disabled": true
     },
     "fns-check": {
       "command": "${HOME}\\.claude\\mcps\\mcp-fns-check\\.venv\\Scripts\\atomno-mcp-fns-check.exe",
@@ -865,7 +599,8 @@
     },
     "miro": {
       "type": "http",
-      "url": "https://mcp.miro.com/"
+      "url": "https://mcp.miro.com/",
+      "disabled": true
     }
   }
 }

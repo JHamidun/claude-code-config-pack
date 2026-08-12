@@ -1,0 +1,44 @@
+name: free-by-default guard
+
+# The pack must install and run with ZERO third-party API keys — everything
+# works on the user's Claude subscription. That promise lives in text files
+# inside .claude/, which is periodically re-synced wholesale from a personal
+# config; the sync overwrites files and has already silently deleted this
+# policy twice (16 -> 10 -> 0 files, 2026-07-21 .. 2026-07-31).
+#
+# This job is the tripwire: if a sync eats the guard again, the push fails
+# here instead of shipping to users.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: NO-KEY guard + free-by-default policy present
+        run: python guard_free_by_default.py --check
+
+      - name: Show what a repair would change (only on failure)
+        if: failure()
+        run: |
+          echo "::error::free-by-default policy eroded — run: python guard_free_by_default.py --apply"
+          python guard_free_by_default.py --dry-run || true
+
+      - name: No live API key ships in the credentials template
+        run: |
+          # placeholders must stay commented out: a non-empty placeholder makes
+          # every `if not os.getenv(...)` guard think the key is configured
+          if grep -nE '^[A-Za-z0-9_]*(KEY|TOKEN|SECRET|PASSWORD|HASH|SID)[A-Za-z0-9_]*=' .credentials.template.env; then
+            echo "::error::uncommented secret-ish var in .credentials.template.env"
+            exit 1
+          fi
+          echo "template OK"

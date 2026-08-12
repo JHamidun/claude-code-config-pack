@@ -1,0 +1,41 @@
+# Переводы строк фиксируем в репозитории, а не полагаемся на настройку машины.
+#
+# Зачем: в рабочей копии 40 shell-скриптов лежат с CRLF. Здесь это безобидно —
+# core.autocrlf=true нормализует их при коммите. Но настройка живёт на машине, а не
+# в проекте: у соавтора с autocrlf=false те же файлы уедут в репозиторий как есть,
+# и тогда `./install.sh` на Linux и macOS упадёт с "bad interpreter: No such file or
+# directory" — bash увидит имя интерпретатора с приклеенным возвратом каретки.
+# Правила ниже делают поведение одинаковым независимо от того, кто и чем коммитит.
+
+* text=auto eol=lf
+
+# Shell — строго LF. Ломается shebang, а не оформление.
+*.sh    text eol=lf
+*.bash  text eol=lf
+
+# PowerShell и батники — CRLF. Родной формат Windows; кроме того .ps1 здесь идут
+# с BOM (без него PowerShell 5.1, штатный в Windows, выводит кириллицу кракозябрами).
+*.ps1   text eol=crlf
+*.psm1  text eol=crlf
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# Бинарное — не трогать: нормализация переводов строк портит содержимое.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.pdf   binary
+*.zip   binary
+*.gz    binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.mp4   binary
+*.mp3   binary
+*.wav   binary
+*.db    binary
+*.sqlite binary

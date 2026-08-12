@@ -1,0 +1,12 @@
+{
+ "port": 9485,
+ "updated": 1786374778.4238079,
+ "pid": 164320,
+ "status": "stopped",
+ "reason": "session_idle",
+ "profile": "conf-v6",
+ "browser_up": false,
+ "last_activity": 1786374175.8427575,
+ "rss_mb": 0,
+ "restarts": 1
+}

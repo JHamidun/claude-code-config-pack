@@ -22,11 +22,12 @@
    ```bash
    cp ~/.claude/.credentials.master.env.example ~/.claude/.credentials.master.env
    ```
-2. Fill in your API keys (minimum set to get started):
-   - `GOOGLE_API_KEY` — Google Gemini (image gen, video, search)
+2. **No API keys are required.** Claude Code runs entirely on your Claude subscription —
+   text, code, reasoning, agents, skills all work with ZERO third-party keys. Leave the file as is.
+3. OPTIONAL paid features — uncomment and add a key only if you want them:
+   - `GOOGLE_API_KEY` — Google Gemini (image/video gen; free tier at aistudio.google.com)
    - `OPENAI_API_KEY` — GPT models, DALL-E
    - `ANTHROPIC_API_KEY` — only needed for standalone bots (Claude Code uses subscription auth)
-3. Add more keys as you enable features:
    - `ELEVENLABS_API_KEY` — text-to-speech
    - `DEEPGRAM_API_KEY` — transcription
    - `DEEPL_API_KEY` — translation
@@ -79,7 +80,7 @@ Run these to confirm everything works end-to-end:
 2. **Basic task**: ask `create a hello world Python script` — tests file writing
 3. **Skill**: try `/deep-research "Claude Code best practices"` — tests research pipeline
 4. **Agent delegation**: ask `review this code` on any file — triggers `code-reviewer` agent
-5. **Image generation**: ask `draw a sunset` — tests Gemini image gen via AI Gateway
+5. **Image generation** (OPTIONAL — only if you configured `GOOGLE_API_KEY`): ask `draw a sunset`
 6. **Memory**: ask `/memory-stats` — confirms vector memory is operational
 
 ---
