@@ -406,13 +406,13 @@ flex flex-col sm:flex-row gap-3
 ## Mode A: Vanilla HTML Quick Start
 
 ### Библиотека эффектов
-**ОБЯЗАТЕЛЬНО** используй: `~/.claude/skills/landing-page-effects/SKILL.md`
+**ОБЯЗАТЕЛЬНО** используй: `~/.claude/skills/landing-page-effects/SKILL.md (скилл `landing-page-effects` в пак не входит)`
 - 50+ готовых эффектов (CSS + JS)
 - 15 шрифтов, цветовая палитра
 - Трендовые эффекты 2025
 
 ### Эталонный лендинг
-`${HOME}\your-project-landing\index-yourname.html`
+`${HOME}\your-project-landing\index.html`
 
 ### Чеклист
 - [ ] Preloader + Custom cursor (опц.)
@@ -528,7 +528,7 @@ Output: ONLY the HTML document, starting with <!DOCTYPE html>.
 
 ### Как связаны Your Slide Service, Manus и Lovable
 
-| Аспект | Manus | Your Slide Service (наш) | Lovable |
+| Аспект | Manus | Your Slide Service (yours) | Lovable |
 |--------|-------|-----------------|---------|
 | Подход | System prompt → single HTML | Fork Manus паттернов | React app (полный проект) |
 | Стек | Claude + sandbox | Claude CLI carousel | React + Tailwind + shadcn |

@@ -23,7 +23,6 @@ from pathlib import Path
 
 CLAUDE = Path(os.environ.get("CLAUDE_HOME") or (Path.home() / ".claude"))
 SETTINGS = CLAUDE / "settings.json"
-DEV_BROWSER = CLAUDE / "skills" / "dev-browser"
 
 IS_WINDOWS = os.name == "nt"
 CHECK_ONLY = "--check" in sys.argv
@@ -133,29 +132,48 @@ def ensure_marketplaces() -> bool:
     return ok_all
 
 
-# --- 3. Зависимости dev-browser ----------------------------------------------------------
-def ensure_dev_browser() -> bool:
-    pkg = DEV_BROWSER / "package.json"
-    if not pkg.is_file():
-        say("·", "скилл dev-browser не установлен — пропускаю")
+# --- 3. Зависимости Node ------------------------------------------------------------------
+# Ставим лёгкие и часто нужные. Remotion-проекты (video-shotcraft, remotion-overlays)
+# тянут React и рендер-тулчейн на сотни мегабайт — их ставит сам скилл, когда до них
+# дойдёт дело, иначе первая установка растянется на десятки минут ради того, чем
+# большинство не пользуется.
+NODE_PROJECTS = [
+    (CLAUDE / "skills" / "dev-browser", "dev-browser", True),
+    (CLAUDE / "skills" / "gstack", "gstack", True),
+    (CLAUDE / "skills" / "video-shotcraft" / "template", "video-shotcraft", False),
+    (CLAUDE / "skills" / "video-generation" / "remotion-overlays", "remotion-overlays", False),
+]
+
+
+def ensure_node_project(path, label, install_by_default) -> bool:
+    if not (path / "package.json").is_file():
+        say("·", f"{label}: не установлен — пропускаю")
         return True
-    if (DEV_BROWSER / "node_modules").is_dir():
-        say("✓", "зависимости dev-browser на месте")
+    if (path / "node_modules").is_dir():
+        say("✓", f"{label}: зависимости на месте")
+        return True
+    if not install_by_default:
+        say("·", f"{label}: зависимости не ставлю (тяжёлый рендер-стек) — "
+                 f"поставит сам скилл, либо вручную: npm install --prefix \"{path}\"")
         return True
     if CHECK_ONLY:
-        say("✗", "нет node_modules у dev-browser (иначе он ставит их прямо во время работы)")
+        say("✗", f"{label}: нет node_modules (иначе ставятся прямо во время работы)")
         return False
     if not have("npm"):
-        say("✗", "нет npm — поставь Node.js, затем npm install в skills/dev-browser")
+        say("✗", f"{label}: нет npm — поставь Node.js, затем npm install --prefix \"{path}\"")
         return False
-    say("…", "ставлю зависимости dev-browser")
+    say("…", f"ставлю зависимости {label}")
     ok, out = run(["npm", "install", "--omit=dev", "--no-audit", "--no-fund",
-                   "--prefix", str(DEV_BROWSER)], timeout=600)
+                   "--prefix", str(path)], timeout=600)
     if ok:
-        say("✓", "зависимости dev-browser установлены")
+        say("✓", f"{label}: зависимости установлены")
     else:
-        say("✗", f"не установились: {out.splitlines()[-1] if out else 'без вывода'}")
+        say("✗", f"{label}: не установились — {out.splitlines()[-1] if out else 'без вывода'}")
     return ok
+
+
+def ensure_node() -> bool:
+    return all(ensure_node_project(p, label, default) for p, label, default in NODE_PROJECTS)
 
 
 def main() -> int:
@@ -163,7 +181,7 @@ def main() -> int:
         print(f"Каталога {CLAUDE} нет — пак не установлен.")
         return 1
     print("Проверяю рантайм:" if CHECK_ONLY else "Довожу рантайм:")
-    results = [ensure_playwright(), ensure_marketplaces(), ensure_dev_browser()]
+    results = [ensure_playwright(), ensure_marketplaces(), ensure_node()]
     print()
     if all(results):
         print("Рантайм готов.")
