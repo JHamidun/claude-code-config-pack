@@ -410,55 +410,17 @@
   "skipDangerousModePermissionPrompt": true,
   "preferredNotifChannel": "terminal_bell",
   "mcpServers": {
-    "second-brain": {
-      "command": "python",
-      "args": [
-        "${HOME}\\.brain\\brain_mcp.py"
-      ],
-      "env": {
-        "PYTHONIOENCODING": "utf-8"
-      },
-      "disabled": true
-    },
     "graph-memory": {
       "command": "python",
       "args": [
-        "${HOME}\\.claude\\graph-memory\\mcp_server.py"
+        "${HOME}/.claude/mcps/graph-memory/server.py"
       ],
       "env": {
-        "PYTHONIOENCODING": "utf-8"
+        "PYTHONIOENCODING": "utf-8",
+        "PYTHONUTF8": "1"
       },
-      "disabled": true
-    },
-    "notebooklm": {
-      "command": "python",
-      "args": [
-        "${HOME}\\.claude\\mcps\\notebooklm-mcp\\src\\server.py"
-      ],
-      "env": {
-        "PYTHONIOENCODING": "utf-8"
-      },
-      "disabled": true
-    },
-    "google-studio": {
-      "command": "python",
-      "args": [
-        "${HOME}\\.claude\\mcps\\google-studio-mcp\\src\\server.py"
-      ],
-      "env": {
-        "PYTHONIOENCODING": "utf-8"
-      },
-      "disabled": true
-    },
-    "plaud": {
-      "command": "python",
-      "args": [
-        "${HOME}\\.claude\\skills\\plaud\\scripts\\plaud_mcp.py"
-      ],
-      "env": {
-        "PYTHONIOENCODING": "utf-8"
-      },
-      "disabled": true
+      "disabled": true,
+      "description": "Граф твоей памяти: соседи, пути, хабы, разрывы. Строится из ~/.claude/projects/*/memory/*.md, база создаётся пустой."
     },
     "filesystem": {
       "args": [
@@ -467,17 +429,6 @@
         "."
       ],
       "command": "npx"
-    },
-    "postiz": {
-      "command": "node",
-      "args": [
-        "${HOME}\\postiz-mcp-repo\\build\\index.js"
-      ],
-      "env": {
-        "POSTIZ_API_KEY": "${POSTIZ_API_KEY}",
-        "POSTIZ_BASE_URL": "http://YOUR_SERVER_IP:4007/public/v1"
-      },
-      "disabled": true
     },
     "runway": {
       "type": "stdio",
@@ -575,14 +526,6 @@
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live10"
       ],
-      "disabled": true
-    },
-    "fns-check": {
-      "command": "${HOME}\\.claude\\mcps\\mcp-fns-check\\.venv\\Scripts\\atomno-mcp-fns-check.exe",
-      "env": {
-        "PYTHONIOENCODING": "utf-8",
-        "MCP_FNS_CACHE_DB": "${HOME}\\.claude\\mcps\\mcp-fns-check\\cache.sqlite"
-      },
       "disabled": true
     },
     "pageindex": {
