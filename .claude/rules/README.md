@@ -21,6 +21,7 @@
 | `scaling` | Decision tree: when 1 agent, when orchestrator |
 | `security` | API key handling, credential safety |
 | `security-hardening` | Sandbox, audit logging, commercial deployment |
+| `try-before-refusing` | Проверить инструментом, прежде чем сказать «не могу» |
 | `user-profile` | User identity, contacts, preferences |
 
 ## Перенесено в config/rules-ref/ (справочники, по требованию)
