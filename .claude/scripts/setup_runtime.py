@@ -21,6 +21,18 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Вывод — только UTF-8, и это не косметика. Скрипт печатает значки ✔ ✓ ✗ …, а на
+# русской Windows кодировка вывода по умолчанию cp1251, где таких символов нет.
+# Пока вывод идёт в консоль, Python пишет в неё через широкие символы и всё цело; но
+# установщик ЗАПУСКАЕТ этот скрипт с перенаправленным выводом — и там кодировка уже
+# локальная. Первый же значок валит процесс с UnicodeEncodeError, доводка рантайма
+# обрывается на первом шаге, а снаружи это выглядит как «плагины сами не поставились».
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:  # noqa: BLE001 — на экзотическом стриме просто оставляем как есть
+        pass
+
 CLAUDE = Path(os.environ.get("CLAUDE_HOME") or (Path.home() / ".claude"))
 SETTINGS = CLAUDE / "settings.json"
 
@@ -176,12 +188,61 @@ def ensure_node() -> bool:
     return all(ensure_node_project(p, label, default) for p, label, default in NODE_PROJECTS)
 
 
+# --- 4. Интерпретатор для MCP-серверов на Python ------------------------------------------
+# MCP-сервер объявлен как command: "python" — короткое имя, которого в PATH может не быть
+# вовсе. На Windows хуже: там это имя штатно ведёт в заглушку Microsoft Store, которая
+# вместо запуска открывает магазин и не возвращает управление (пак обходит её отдельно
+# в установщике Python — грабли известные). В обоих случаях снаружи это выглядит как
+# «MCP просто нет»: запись в настройках есть, инструментов ноль.
+#
+# Рабочий интерпретатор мы уже держим в руках — тот, которым запущен этот скрипт.
+# Прописываем его абсолютным путём. Идемпотентно: если путь уже проставлен, файл не
+# трогаем вовсе (лишняя перезапись настроек пользователя — тоже вред).
+BARE_PYTHON = {"python", "python3", "python.exe", "python3.exe", "py", "py.exe"}
+
+
+def ensure_python_mcp() -> bool:
+    if not SETTINGS.is_file():
+        say("~", "settings.json не найден — нечего настраивать")
+        return True
+    try:
+        data = json.loads(SETTINGS.read_text(encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001
+        say("✗", f"settings.json не читается ({e}) — интерпретатор MCP не проставлен")
+        return False
+
+    servers = data.get("mcpServers")
+    if not isinstance(servers, dict):
+        return True
+
+    targets = [name for name, cfg in servers.items()
+               if isinstance(cfg, dict) and str(cfg.get("command", "")).lower() in BARE_PYTHON]
+    if not targets:
+        return True
+
+    if CHECK_ONLY:
+        say("~", "MCP на Python объявлены коротким именем: " + ", ".join(targets))
+        return False
+
+    for name in targets:
+        servers[name]["command"] = sys.executable
+    try:
+        SETTINGS.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n",
+                            encoding="utf-8")
+    except Exception as e:  # noqa: BLE001
+        say("✗", f"не смог записать settings.json ({e})")
+        return False
+    say("✔", f"интерпретатор для MCP ({', '.join(targets)}): {sys.executable}")
+    return True
+
+
 def main() -> int:
     if not CLAUDE.is_dir():
         print(f"Каталога {CLAUDE} нет — пак не установлен.")
         return 1
     print("Проверяю рантайм:" if CHECK_ONLY else "Довожу рантайм:")
-    results = [ensure_playwright(), ensure_marketplaces(), ensure_node()]
+    results = [ensure_playwright(), ensure_marketplaces(), ensure_node(),
+               ensure_python_mcp()]
     print()
     if all(results):
         print("Рантайм готов.")

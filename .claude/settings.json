@@ -1,6 +1,8 @@
 {
   "cleanupPeriodDays": 90,
   "env": {
+    "PYTHONUTF8": "1",
+    "PYTHONIOENCODING": "utf-8",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "MCP_TIMEOUT": "120000",
     "MCP_TOOL_TIMEOUT": "180000",
