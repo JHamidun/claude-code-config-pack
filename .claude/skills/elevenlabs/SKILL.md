@@ -17,13 +17,19 @@ Expert skill for text-to-speech, voice cloning, sound effects, and audio AI usin
 ELEVENLABS_API_KEY=os.getenv('ELEVENLABS_API_KEY')
 ```
 
-## Голос пользователя (ElevenLabs)
+## Свой голос (клон)
 
-| Название | Voice ID | Категория |
-|----------|----------|-----------|
-| User_Нейтральный_123 | `YOUR_ELEVENLABS_VOICE_ID` | cloned |
+Идентификатор своего голоса держится в окружении, а не в тексте навыка: он привязан
+к конкретному аккаунту и в чужой установке всё равно не сработает.
 
-> **Локальная альтернатива (экономия кредитов):** для массовой/черновой RU-озвучки, длинных аудиокниг, dictation и офлайн — см. `references/local-voicebox-eval.md` (Voicebox / Chatterbox / Qwen3-TTS на your GPU, 0 кредитов). ElevenLabs остаётся каноном для флагманской озвучки пользователя, SFX и music.
+```bash
+ELEVENLABS_VOICE_ID_RU=<идентификатор своего клона>   # в ~/.claude/.credentials.master.env
+```
+
+Список доступных голосов аккаунта — `GET /v1/voices`; клонированные помечены
+категорией `cloned`. Как подготовить материал для клонирования — `scripts/voice_dataset.py`.
+
+> **Локальная альтернатива (экономия кредитов):** для массовой/черновой RU-озвучки, длинных аудиокниг, dictation и офлайн — см. `references/local-voicebox-eval.md` (Voicebox / Chatterbox / Qwen3-TTS на видеокарта с 16 ГБ памяти, 0 кредитов). ElevenLabs остаётся каноном для флагманской озвучки, звуковых эффектов и музыки.
 
 ## When to Use ElevenLabs
 
@@ -180,16 +186,16 @@ seg2 = client.music.compose(prompt='Continues from dark mystery, transitions int
 | Задача | Решение |
 |---|---|
 | Quick BGM под шортс | **ElevenLabs Music** — быстрее, не нужен service account |
-| Commercial-safe license для коммерческого ролика | **Lyria 2** (your-server AI, см. `video-generation/references/audio.md`) |
+| Commercial-safe license для коммерческого ролика | **Lyria 2** (Vertex AI, см. `video-generation/references/audio.md`) |
 | Кинематографический score для книжного трейлера | **Lyria 2** 2×30s + acrossfade |
 
 ## Production voice IDs
 
-### YourFirstName voice (clone) — точные production settings
+### Свой клонированный голос — рабочие настройки
 
 ```python
 audio = client.text_to_speech.convert(
-    voice_id = 'YOUR_HEYGEN_VOICE_ID',   # YourFirstName clone
+    voice_id=os.getenv('ELEVENLABS_VOICE_ID_RU'),   # свой голос — из окружения
     text='Сегодня разберём, как…',
     model_id='eleven_multilingual_v2',
     voice_settings={
@@ -205,7 +211,7 @@ audio = client.text_to_speech.convert(
 
 ### EN voices on RU — эмпирически лучше native RU
 
-Английские voice IDs через `eleven_multilingual_v2` на русском тексте дают тембр заметно лучше native RU voices. Подтверждено в production (YourFirstName shortform pattern).
+Английские voice IDs через `eleven_multilingual_v2` на русском тексте дают тембр заметно лучше native RU voices. Подтверждено на коротких вертикальных роликах.
 
 | Voice | voice_id | Use |
 |---|---|---|

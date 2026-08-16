@@ -22,9 +22,65 @@ CLI для видеомонтажа. Базовые операции — stdlib-
 | `scene_detect.py` | детекция сцен/шотов + split | scenedetect |
 | `sfx.py` | Freesound SFX + place + sidechain ducking | ffmpeg (+API key) |
 | `add_captions.py` | captacity-субтитры (требует moviepy<2, отд. venv) | captacity |
+| `transitions_pro.py` | 8 переходов, которых во встроенном наборе НЕТ | ffmpeg |
+| `music_map.py` | карта трека: темп, такты, секции, дропы → сетка склеек | librosa |
+| `font_catalog.py` | каталог шрифтов + подбор под роль в кадре | fontTools |
+| `fetch_fonts.py` | докачать свободные шрифты с кириллицей | fontTools |
 | `../video-generation/scripts/motion_graphics.py` | like-counter/progress/countdown/lower-third/pop | ffmpeg+PIL |
 
 > `karaoke_captions.py` авто-ужимает кегль на строку (`fit_size`) — длинные RU-слова больше НЕ вылезают за экран.
+
+### transitions_pro.py — то, чего ffmpeg не умеет сам
+
+`zoom-punch` (удар зумом, скорости совпадают на склейке) · `shake-cut` (толчок камеры с
+затуханием) · `light-leak` (смена прячется в пересвете) · `film-burn` (прожиг плёнки) ·
+`blur-dissolve` (подмена в мути) · `rgb-slide` (разъезд каналов) · `luma-wipe` (вытеснение
+по яркости) · `speed-ramp-cut` (разгон в склейку, торможение из неё).
+
+```bash
+python scripts/transitions_pro.py a.mp4 b.mp4 -o out.mp4 --effect zoom-punch --dur 0.2
+python scripts/transitions_pro.py --list
+```
+
+Пропорции: короткий удар 0,15–0,25 с читается как акцент, длинный 0,6–1,0 с — как смена
+главы. Между ними пусто: 0,4 с выглядит ошибкой темпа.
+
+**Грабля ffmpeg.** Часть параметров (`gblur sigma`, `rgbashift rh/bh`, `colorlevels`)
+выражения со временем НЕ принимает — падает на «Error applying option». Но в справке
+(`ffmpeg -h filter=gblur`) у них стоит флаг `T` = параметром можно управлять командами.
+Решение — расписание через `sendcmd`, **интервалы разделяются `;`**, запятая разделяет
+команды внутри одного интервала (с запятой всё склеивается и время уезжает в имя цели).
+
+### music_map.py — монтаж следует за музыкой, а не за метрономом
+
+`beat_sync_edit.py` режет по битам равномерно: на вступлении столько же склеек, сколько
+на кульминации. `music_map.py` разбирает трек на секции (вступление / нарастание / пик /
+дроп / брейк / финал) и назначает каждой свою плотность склеек и класс перехода.
+
+```bash
+python scripts/music_map.py track.mp3 -o map.json --plot map.png
+python scripts/music_map.py track.mp3 --cuts          # только моменты склеек
+```
+
+Сильную долю берём не счётом, а по силе онсетов (madmom под свежий Python не ставится).
+Референсный и рабочий трек разбираются одинаково — чужую структуру можно снять и
+приложить к своему материалу.
+
+### Шрифты: 464 начертания, 264 с кириллицей
+
+Название шрифта не говорит, есть ли в нём кириллица, — половина модных гротесков даёт
+пустые квадраты. `font_catalog.py` проверяет по таблице символов, вес берёт из метрик, а
+моноширинность — сравнением ширин глифов.
+
+```bash
+python scripts/font_catalog.py scan                    # пересобрать каталог
+python scripts/font_catalog.py stats
+python scripts/font_catalog.py pick caption --cyrillic # путь к файлу для ffmpeg
+python scripts/fetch_fonts.py                          # докачать 70 семейств OFL
+```
+
+Роли: `display` (слово на весь экран) · `caption` (субтитры) · `body` · `numeric`
+(моно, чтобы счётчик не дёргался) · `accent` (засечки для цитаты).
 
 ## Talking-head + AI b-roll reel (блогер = основа, AI поверх)
 

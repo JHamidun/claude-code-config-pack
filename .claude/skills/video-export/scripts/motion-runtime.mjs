@@ -228,36 +228,13 @@ export const ABSOLUTE_FILL_STYLE = {
   width: '100%', height: '100%', display: 'flex', flexDirection: 'column',
 };
 
-export const AbsoluteFill = (props = {}) => {
-  const R = (typeof window !== 'undefined' && window.React) || null;
-  const style = { ...ABSOLUTE_FILL_STYLE, ...(props.style || {}) };
-  if (!R) return { style };
-  return R.createElement('div', { ...props, style }, props.children);
-};
 
 /**
  * Картинка, о загрузке которой знает рендерер: пока она не готова, кадр не снимается.
  * Без этого первые кадры выходят пустыми — самая частая причина «первая секунда чёрная».
  */
-export const Img = (props = {}) => {
-  const R = (typeof window !== 'undefined' && window.React) || null;
-  const onLoad = (e) => {
-    if (typeof props.onLoad === 'function') props.onLoad(e);
-  };
-  if (!R) return { ...props, onLoad };
-  return R.createElement('img', { ...props, onLoad });
-};
 
 /** Отрезок таймлайна: сцена внутри видит своё время, начинающееся с нуля. */
-export const Sequence = (props = {}) => {
-  const R = (typeof window !== 'undefined' && window.React) || null;
-  const { from = 0, durationInFrames = Infinity, children } = props;
-  const frame = useCurrentFrame();
-  const inside = frame - from;
-  if (inside < 0 || inside >= durationInFrames) return null;
-  if (!R) return { visible: true, frame: inside };
-  return R.createElement('div', { style: ABSOLUTE_FILL_STYLE }, children);
-};
 
 export const random = (seed) => {
   // Детерминированный шум: рендер должен повторяться кадр в кадр, поэтому Math.random
@@ -273,5 +250,5 @@ export const random = (seed) => {
 export default {
   configure, setTime, useVideoConfig, useCurrentFrame, onTimeChange,
   Easing, interpolate, interpolateColors, spring,
-  AbsoluteFill, ABSOLUTE_FILL_STYLE, Img, Sequence, staticFile, random,
+  ABSOLUTE_FILL_STYLE, staticFile, random,
 };
