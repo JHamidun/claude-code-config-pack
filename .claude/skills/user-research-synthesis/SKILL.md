@@ -211,4 +211,4 @@ The references feed *into* the methods above. Empathy maps and interview transcr
 ### Related skills (do not duplicate)
 
 - **`market-selection-ru`** — choosing the market / country and sizing TAM **before** any research. It also covers the same CustDev appliances (20 founder questions, empathy map, respondent search) from a pre-launch *decision* angle. Go there for "which market" — this skill is for actually running and synthesizing the interviews.
-- **`ajtbd-instructor-ru`** — depth of the interview itself: Timeline Interview, Switch Interview, Forces of Progress, Job Story Format. Use it to design what to ask *inside* a CustDev interview when you need to understand the job and the switch, not just surface needs.
+- **`jtbd`** — depth of the interview itself: Timeline Interview, Switch Interview, Forces of Progress, Job Story Format. Use it to design what to ask *inside* a CustDev interview when you need to understand the job and the switch, not just surface needs.

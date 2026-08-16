@@ -53,7 +53,7 @@
 | Нужно | Куда |
 |------|------|
 | Полная методология выбора рынка, TAM, 20 вопросов фаундерам, decision tree «венчур vs lifestyle», карта эмпатии, поиск респондентов | `market-selection-ru` |
-| Сегментация по работам/JTBD под выбранный рынок | `ajtbd-instructor-ru` |
+| Сегментация по работам/JTBD под выбранный рынок | `jtbd` |
 | Синтез самих интервью (Thematic Analysis, логистика) | `user-research-synthesis` |
 | Конкуренты ВНУТРИ уже выбранного рынка, battlecards | `competitive-analysis` |
 | Контекст продукта, ICP, цены, воронка пользователя | `yourname-marketing-context` |

@@ -1,11 +1,11 @@
 ---
 name: funnel-design-ru
-description: "Проектирование маркетинговых воронок: дерево метрик CPM→CTR→CPL→CPA→LTV→CAC, 8 типов воронок (лид-магнит/tripwire/вебинар/бот/freemium), лиды A/B/C/D, SLA дозвона, ICE. Триггеры: «спроектируй воронку», «какую воронку выбрать», «дерево метрик», «трипваер», «перлидоз», «как улучшить CR1/CR2», «как снизить CPL/CPA». НЕ: MQL/SQL в CRM→revops-ru; CRO страницы→page-cro-ru; JTBD→ajtbd-instructor-ru."
+description: "Проектирование маркетинговых воронок: дерево метрик CPM→CTR→CPL→CPA→LTV→CAC, 8 типов воронок (лид-магнит/tripwire/вебинар/бот/freemium), лиды A/B/C/D, SLA дозвона, ICE. Триггеры: «спроектируй воронку», «какую воронку выбрать», «дерево метрик», «трипваер», «перлидоз», «как улучшить CR1/CR2», «как снизить CPL/CPA». НЕ: MQL/SQL в CRM→revops-ru; CRO страницы→page-cro-ru; JTBD→jtbd."
 metadata:
   version: 1.0.0
   updated: 2026-06-22
   source: best-practice методология проектирования маркетинговых воронок
-  reuses: revops-ru, campaign-planning, page-cro-ru, ab-testing-ru, ajtbd-instructor-ru, sales-team-ru
+  reuses: revops-ru, campaign-planning, page-cro-ru, ab-testing-ru, jtbd, sales-team-ru
 ---
 
 # Funnel Design (RU) — проектирование маркетинговых воронок
@@ -26,7 +26,7 @@ Playbook по **проектированию** маркетинговых вор
 - **Развести лидов** A/B/C/D и поставить SLA на прозвон, чтобы понять, маркетинг льёт мусор или продажи не дожимают.
 - **Приоритизировать гипотезы** улучшения воронки (ICE) и спланировать спринт: 3 гипотезы × 2-3 недели.
 
-**НЕ использовать для:** lifecycle-стадий MQL/SQL и хэндоффа маркетинг→продажи в CRM (`revops-ru`); generic-плана кампании Objective/Audience/Message (`campaign-planning`); глубокого CRO отдельной страницы (`page-cro-ru`, `signup-cro-ru`, `paywall-cro-ru`); JTBD-исследования «что нанимает клиент» ДО воронки (`ajtbd-instructor-ru`); настройки конкретного рекламного канала (`*-ads-pro-ru`).
+**НЕ использовать для:** lifecycle-стадий MQL/SQL и хэндоффа маркетинг→продажи в CRM (`revops-ru`); generic-плана кампании Objective/Audience/Message (`campaign-planning`); глубокого CRO отдельной страницы (`page-cro-ru`, `signup-cro-ru`, `paywall-cro-ru`); JTBD-исследования «что нанимает клиент» ДО воронки (`jtbd`); настройки конкретного рекламного канала (`*-ads-pro-ru`).
 
 ## Граница с revops-ru (важно!)
 
@@ -186,5 +186,5 @@ Playbook по **проектированию** маркетинговых вор
 - **`campaign-planning`** — generic-фреймворк планирования кампании (Objective/Audience/Message/Channel/Measure). Дерево метрик = обязательный артефакт планирования внутри него.
 - **`page-cro-ru`** / `signup-cro-ru` / `paywall-cro-ru` — глубокий CRO отдельной страницы/этапа. Здесь — только 8-пунктный экспресс-чек-лист лендинга в контексте воронки.
 - **`ab-testing-ru`** — глубокая механика ICE, статзначимость, программа экспериментов для гипотез воронки.
-- **`ajtbd-instructor-ru`** — JTBD-исследование «что нанимает клиент» / сегментация по работам ДО проектирования воронки. Дерево метрик начинается с попадания оффера в JOB.
+- **`jtbd`** — JTBD-исследование «что нанимает клиент» / сегментация по работам ДО проектирования воронки. Дерево метрик начинается с попадания оффера в JOB.
 - **`sales-team-ru`** — полный разбор 19 критериев качества звонка, скрипты, баттл-карты, контроль отдела продаж.

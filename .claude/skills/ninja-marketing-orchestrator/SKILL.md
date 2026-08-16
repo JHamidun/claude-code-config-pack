@@ -38,7 +38,7 @@ metadata:
 | Запрос | Скилл |
 |---|---|
 | «выбор рынка», «в какую страну выходить», «TAM», «венчур vs lifestyle», «валидация рынка» | `market-selection-ru` |
-| «JTBD», «AJTBD», «что нанимает клиент», «граф работ», «Forces of Progress», «Job Story», «сегментация по работам» | `ajtbd-instructor-ru` |
+| «JTBD», «AJTBD», «что нанимает клиент», «граф работ», «Forces of Progress», «Job Story», «сегментация по работам» | `jtbd` |
 | «спроектируй воронку», «какой тип воронки», «дерево метрик», «8 типов воронок», «tripwire», «категоризация лидов A/B/C/D», «почему не покупают на этапе», «как поднять CR1/CR2» | `funnel-design-ru` |
 
 ### Слой 2 — Performance / платная реклама
@@ -95,7 +95,7 @@ metadata:
 **Главный принцип: стратегия ДО исполнения.** Нельзя осмысленно настраивать канал, не зная JTBD клиента, типа воронки и того, какой канал вообще нужен.
 
 ```
-СТРАТЕГИЯ          market-selection-ru  →  ajtbd-instructor-ru  →  funnel-design-ru
+СТРАТЕГИЯ          market-selection-ru  →  jtbd  →  funnel-design-ru
 (что/кому/как)     (какой рынок)           (что нанимает)        (какая воронка)
                                                                         │
                                                                         ▼
@@ -135,10 +135,10 @@ metadata:
    `media-planning-ru` → конкретные ad-playbook'и (`yandex-direct-pro-ru` / `google-ads-pro-ru` / `meta-ads-launch-ru` / `vk-ads-pro-ru` / `telegram-ads-pro-ru`) → `ad-benchmarks-ru` (норматив) → `capi-no-code-setup` (трекинг) → `full-funnel-analytics-ru` (когорты, LTV).
 
 2. **Контент-маркетолог** (органика, видео, видимость)
-   `ajtbd-instructor-ru` (что цепляет) → `content-machine-instructor2-ru` (фабрика) → `ai-creative-factory-ru` (хук, структура) → `manychat-funnel-ru` (лиды из SMM) → `geo-aeo-ru` + `ai-seo-agent-pipeline` (поисковая и LLM-видимость).
+   `jtbd` (что цепляет) → `content-machine-instructor2-ru` (фабрика) → `ai-creative-factory-ru` (хук, структура) → `manychat-funnel-ru` (лиды из SMM) → `geo-aeo-ru` + `ai-seo-agent-pipeline` (поисковая и LLM-видимость).
 
 3. **B2B-маркетолог** (длинный цикл, ЛПР, аккаунты)
-   `market-selection-ru` → `ajtbd-instructor-ru` → `b2b-marketing-ru` (TOFU/MOFU/BOFU + outreach + контент) → `sales-team-ru` (передача в продажи) → `full-funnel-analytics-ru`.
+   `market-selection-ru` → `jtbd` → `b2b-marketing-ru` (TOFU/MOFU/BOFU + outreach + контент) → `sales-team-ru` (передача в продажи) → `full-funnel-analytics-ru`.
 
 4. **Рост-команда / CMO** (система целиком, не один навык)
    `market-selection-ru` → `funnel-design-ru` → `media-planning-ru` (channel mix) → `marketing-team-builder-ru` (кого нанять, 35 ролей) → `sales-team-ru` (отдел продаж) → `full-funnel-analytics-ru` (управление по цифрам). Поверх — `ai-marketing-stack-ru` и `marketing-masterminds-ru`.
@@ -151,7 +151,7 @@ metadata:
 
 1. **Контекст.** Собрать: ниша, гео, бюджет, цель, цикл сделки, B2C/B2B, оффер, ICP, цены (через `brand-voice` / `competitive-analysis` или опрос).
 2. **Рынок.** Новый рынок/страна/модель не подтверждены? → `market-selection-ru` (TAM, конкуренты, CustDev). Если рынок ясен — пропустить.
-3. **JTBD.** → `ajtbd-instructor-ru` — что клиент нанимает, какие силы прогресса, сегменты по работам. Это база для воронки, креативов и копирайта.
+3. **JTBD.** → `jtbd` — что клиент нанимает, какие силы прогресса, сегменты по работам. Это база для воронки, креативов и копирайта.
 4. **Воронка.** → `funnel-design-ru` — выбрать ТИП воронки (звонок / лид-магнит / tripwire / вебинар / бот / комьюнити / freemium) и собрать дерево метрик с целевыми значениями.
 5. **Канал.** → `media-planning-ru` — channel mix под нишу/бюджет/гео/цель + минимальные бюджеты. (B2B → `b2b-marketing-ru` вместо обычного channel-mix.)
 6. **Исполнение.** Открыть playbook(и) выбранного канала (см. Слой 2). Параллельно — креативы (`ai-creative-factory-ru`) и/или органика (`content-machine-instructor2-ru` + `manychat-funnel-ru`).
