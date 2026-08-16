@@ -172,6 +172,16 @@
       "name": "session-tools",
       "source": "./plugins/session-tools",
       "description": "Memory search/learn, chat history, daily planning, reviews, model switching, session save/restore."
+    },
+    {
+      "name": "video-media-subdir",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/JHamidun/claude-code-config-pack.git",
+        "path": "plugins/video-media"
+      },
+      "description": "Same content as video-media, fetched as a sparse git-subdir clone of this monorepo. Reference entry for the git-subdir source format - install either this or video-media, not both.",
+      "defaultEnabled": false
     }
   ]
 }
