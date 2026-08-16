@@ -2,6 +2,92 @@
 
 > Depersonalised Claude Code setup. Drop into `~/.claude/`, fill in API keys, run.
 
+## Три способа установки
+
+Один и тот же набор инструментов раздаётся тремя путями. Разница — в объёме и в том,
+трогается ли твой `~/.claude`.
+
+| Способ | Что получаешь | Когда выбирать |
+|---|---|---|
+| 1. Весь конфиг | плоский `~/.claude/`: скиллы, агенты, команды, правила, хуки, MCP | нужна вся рабочая среда целиком |
+| 2. Маркетплейс | 33 плагина, ставишь любые по имени | свой `~/.claude` уже есть, файлы в него докладывать не хочется |
+| 3. Один плагин | ровно один плагин, без остальных | нужен конкретный набор (например, video-media) и ничего больше |
+
+### 1. Весь конфиг целиком
+
+```powershell
+git clone https://github.com/JHamidun/claude-code-config-pack.git
+cd claude-code-config-pack
+./install.ps1 -DryRun     # показать план, ничего не менять
+./install.ps1
+```
+
+```bash
+git clone https://github.com/JHamidun/claude-code-config-pack.git
+cd claude-code-config-pack
+chmod +x install.sh uninstall.sh
+./install.sh --dry-run
+./install.sh
+```
+
+Кладёт файлы поверх твоего `~/.claude` (по умолчанию — только недостающие, существующее
+не трогается), перед этим снимает резервную копию, в конце доводит рантайм (браузер
+Playwright, маркетплейсы, node_modules). Всё разложенное записывается в манифест, поэтому
+`./uninstall.sh` / `.\uninstall.ps1` убирает ровно то, что положил установщик. Детали и
+гарантии — раздел [Install](#install) ниже.
+
+**Когда выбирать:** ставишь конфиг как рабочую среду — правила, роутинг, память, хуки,
+интеграции. Плагины из каталога поверх не нужны: те же скиллы уже лежат в `~/.claude/skills/`.
+
+### 2. Маркетплейс: все 33 плагина
+
+В Claude Code:
+
+```text
+/plugin marketplace add JHamidun/claude-code-config-pack
+/plugin install video-media@hamidun
+/plugin install design-system@hamidun
+```
+
+Из терминала то же самое: `claude plugin marketplace add …` / `claude plugin install …`.
+Список плагинов — `/plugin` или каталог в `.claude-plugin/marketplace.json`.
+
+**Когда выбирать:** у тебя уже настроенный `~/.claude`, и мержить в него чужие файлы не
+хочется. Плагины живут в собственном кэше, включаются по одному, обновляются
+`/plugin update`, удаляются `/plugin uninstall` — твой конфиг не затрагивается.
+
+### 3. Один плагин отдельно
+
+Через отдельный репозиторий — выкачивается только этот плагин:
+
+```text
+/plugin marketplace add JHamidun/claude-plugin-video-media
+/plugin install video-media@hamidun-video-media
+```
+
+Через git-subdir из монорепо — Claude Code делает sparse clone одного подкаталога, не
+выкачивая остальной репозиторий. В нашем каталоге есть рабочий образец такой записи
+(`video-media-subdir`); для собственного `marketplace.json` она выглядит так:
+
+```json
+{
+  "name": "video-media",
+  "source": {
+    "source": "git-subdir",
+    "url": "https://github.com/JHamidun/claude-code-config-pack.git",
+    "path": "plugins/video-media"
+  }
+}
+```
+
+**Когда выбирать:** нужен один набор инструментов, остальные 32 плагина не интересуют.
+Отдельный репозиторий — самый короткий путь для человека. git-subdir — для того, кто ведёт
+собственный `marketplace.json` и хочет тянуть плагин прямо из монорепо, пиня версию через
+`ref`/`sha`. Если каталог монорепо у тебя уже добавлен — ставь просто
+`video-media@hamidun`, git-subdir тут ничего не ускорит.
+
+---
+
 ## Install
 
 If you already use Claude Code, read this section before running anything. The installer is
