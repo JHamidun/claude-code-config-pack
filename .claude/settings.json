@@ -419,7 +419,7 @@
         "PYTHONIOENCODING": "utf-8",
         "PYTHONUTF8": "1"
       },
-      "disabled": true,
+      "disabled": false,
       "description": "Граф твоей памяти: соседи, пути, хабы, разрывы. Строится из ~/.claude/projects/*/memory/*.md, база создаётся пустой."
     },
     "filesystem": {
