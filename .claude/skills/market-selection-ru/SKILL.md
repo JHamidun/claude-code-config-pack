@@ -1,11 +1,11 @@
 ---
 name: market-selection-ru
-description: "Выбор рынка перед запуском: цепочка «бизнес-модель → страна → TAM → конкуренты → CustDev», 20 вопросов фаундерам, расчёт TAM, «венчур vs lifestyle», карта эмпатии. Триггеры: «выбор рынка», «TAM расчёт», «в какую страну выходить», «CustDev», «валидация рынка». НЕ: GTM-запуск→launch-strategy-ru; JTBD→ajtbd-instructor-ru; синтез интервью→user-research-synthesis; конкуренты→competitive-analysis."
+description: "Выбор рынка перед запуском: цепочка «бизнес-модель → страна → TAM → конкуренты → CustDev», 20 вопросов фаундерам, расчёт TAM, «венчур vs lifestyle», карта эмпатии. Триггеры: «выбор рынка», «TAM расчёт», «в какую страну выходить», «CustDev», «валидация рынка». НЕ: GTM-запуск→launch-strategy-ru; JTBD→jtbd; синтез интервью→user-research-synthesis; конкуренты→competitive-analysis."
 metadata:
   version: 1.0.0
   updated: 2026-06-22
   source: best-practice методология выбора рынка и CustDev перед запуском
-  reuses: ajtbd-instructor-ru, user-research-synthesis, competitive-analysis, account-research, funnel-design-ru, thinking-frameworks
+  reuses: jtbd, user-research-synthesis, competitive-analysis, account-research, funnel-design-ru, thinking-frameworks
 ---
 
 # Выбор рынка и CustDev — pre-launch методика
@@ -26,7 +26,7 @@ Playbook по выбору рынка и валидации спроса. Это
 - Решаете, строить **венчурный** бизнес (быстрый рост → продажа гигантам) или **lifestyle / cashflow**.
 - Применяете к своему продукту: SaaS (порог $10B, 3-5% за 7 лет), курс/академия, выход в новые регионы, due diligence по странам.
 
-**НЕ использовать для:** GTM-механики запуска и каналов (`launch-strategy-ru`); сегментации по работам и JTBD-аппарата (`ajtbd-instructor-ru`); логистики/транскрипции/Thematic Analysis самих интервью (`user-research-synthesis`); конкурентов ВНУТРИ уже выбранного рынка и battlecards (`competitive-analysis`); глубокого ресёрча одного аккаунта/компании (`account-research`); каталога фреймворков мышления для других задач (`thinking-frameworks`).
+**НЕ использовать для:** GTM-механики запуска и каналов (`launch-strategy-ru`); сегментации по работам и JTBD-аппарата (`jtbd`); логистики/транскрипции/Thematic Analysis самих интервью (`user-research-synthesis`); конкурентов ВНУТРИ уже выбранного рынка и battlecards (`competitive-analysis`); глубокого ресёрча одного аккаунта/компании (`account-research`); каталога фреймворков мышления для других задач (`thinking-frameworks`).
 
 ---
 
@@ -166,7 +166,7 @@ LIFESTYLE / cashflow  → стабильный денежный поток, не
 9. **CustDev** — найти респондентов, провести интервью, заполнить карту эмпатии, найти сегменты (→ `references/custdev.md`).
 10. **Тест спроса** — лендинги с разными заголовками, сравнить CPQL.
 11. **Подружиться с конкурентами** — консалтинг у их маркетологов через LinkedIn (→ `references/custdev.md`).
-12. **Передать дальше** — сегменты и работы → `ajtbd-instructor-ru`; синтез интервью → `user-research-synthesis`; GTM-запуск → `launch-strategy-ru`; воронка → `funnel-design-ru`.
+12. **Передать дальше** — сегменты и работы → `jtbd`; синтез интервью → `user-research-synthesis`; GTM-запуск → `launch-strategy-ru`; воронка → `funnel-design-ru`.
 
 ---
 
@@ -184,7 +184,7 @@ LIFESTYLE / cashflow  → стабильный денежный поток, не
 
 | Когда переключиться | Скилл |
 |---|---|
-| Сегментация по работам, JTBD, граф работ, Forces of Progress | `ajtbd-instructor-ru` |
+| Сегментация по работам, JTBD, граф работ, Forces of Progress | `jtbd` |
 | Логистика интервью, транскрипция, Thematic Analysis, синтез | `user-research-synthesis` |
 | Конкуренты ВНУТРИ уже выбранного рынка, battlecards | `competitive-analysis` |
 | Глубокий ресёрч одной компании-аккаунта | `account-research` |

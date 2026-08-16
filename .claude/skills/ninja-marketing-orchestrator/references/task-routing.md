@@ -10,7 +10,7 @@
 |---|---|---|
 | «в какую страну/рынок выходить», «выбор бизнес-модели», «оценка рынка», «размер рынка», «TAM», «венчур vs lifestyle», «venture-scale», «validation рынка», «20 вопросов фаундерам», «дружить с конкурентами», «Big Mac Index», «куда запускать продукт» | `market-selection-ru` | Делается ДО продукта/воронки. |
 | «CustDev», «поиск респондентов», «коридорные интервью», «карта эмпатии» | `market-selection-ru` | Логистика интервью. Синтез интервью — `user-research-synthesis`. |
-| «JTBD», «AJTBD», «эксперт», «что нанимает клиент», «почему покупают», «граф работ», «Forces of Progress», «push pull anxiety habit», «Job Story», «Switch/Timeline Interview», «Big hire little hire», «underserved jobs», «ODI», «сегментация по работам», «switching costs» | `ajtbd-instructor-ru` | Фундамент под воронку, креативы, копирайт. |
+| «JTBD», «AJTBD», «эксперт», «что нанимает клиент», «почему покупают», «граф работ», «Forces of Progress», «push pull anxiety habit», «Job Story», «Switch/Timeline Interview», «Big hire little hire», «underserved jobs», «ODI», «сегментация по работам», «switching costs» | `jtbd` | Фундамент под воронку, креативы, копирайт. |
 | «спроектируй воронку», «какую воронку выбрать», «какой тип воронки», «дерево метрик», «8 типов воронок», «tripwire/трипваер», «лид-магнит воронка», «вебинарная воронка», «freemium воронка», «категоризация лидов A/B/C/D», «как развести лидов», «SLA дозвона», «перлидоз», «как поднять CTR/CR1/CR2», «как снизить CPL/CPA», «почему не покупают на этапе», «починить воронку» | `funnel-design-ru` | Выбор ТИПА воронки + диагностика узла дерева метрик. |
 
 ## B. Performance / платная реклама (B02-B06)
