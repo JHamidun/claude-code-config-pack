@@ -13,7 +13,11 @@ IPs) is left in place (separate depersonalization concern, not for local config)
 """
 import re, os, sys, io
 
-BASE = r"${HOME}/.claude"
+# Путь был прописан машиной автора и при обезличивании стал литералом "${HOME}/.claude".
+# Python таких подстановок не делает, и инструмент, который ищет утёкшие секреты, читал
+# несуществующие файлы: «ничего не нашлось» выглядело как «всё чисто». Для чекера
+# безопасности это худший из возможных отказов, поэтому берём домашний каталог у системы.
+BASE = os.path.join(os.path.expanduser("~"), ".claude")
 ENV  = os.path.join(BASE, ".credentials.master.env")
 TARGETS = [
     os.path.join(BASE, "config/projects-registry.md"),

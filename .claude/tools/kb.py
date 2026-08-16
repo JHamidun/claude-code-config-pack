@@ -31,8 +31,17 @@ from pathlib import Path
 from typing import Optional
 
 # --- Config ---
-DB_PATH = Path("${WORKSPACE}/.claude/kb.db")
-TLDV_DIR = Path("${HOME}/tldv-export/transcripts")
+# Пути ниже были прописаны машиной автора и при обезличивании стали литералами
+# "${HOME}/…" и "${WORKSPACE}/…". Python таких подстановок не делает (на Windows
+# переменной HOME обычно нет вовсе), поэтому база заводилась в каталоге со скобками
+# в имени, а транскрипты «не находились» — молча, без единой ошибки. Резолвим сами.
+HOME = Path.home()
+WORKSPACE = Path(os.environ.get("WORKSPACE") or os.getcwd())
+CREDENTIALS_ENV = HOME / ".claude" / ".credentials.master.env"
+GOOGLE_TOKEN = HOME / ".claude" / "google_oauth_token.json"
+
+DB_PATH = WORKSPACE / ".claude" / "kb.db"
+TLDV_DIR = HOME / "tldv-export" / "transcripts"
 SPARK_MESSAGES_DB = Path(os.environ.get("LOCALAPPDATA", "")) / "Spark Desktop/core-data/databases/messages.sqlite"
 SPARK_CACHE_DB = Path(os.environ.get("LOCALAPPDATA", "")) / "Spark Desktop/core-data/databases/cache.sqlite"
 
@@ -621,7 +630,7 @@ def ingest_outlook(days=90, force=False):
         return
 
     from dotenv import load_dotenv
-    load_dotenv("${HOME}/.claude/.credentials.master.env")
+    load_dotenv(CREDENTIALS_ENV)
 
     password = os.getenv("EXCHANGE_PASSWORD")
     if not password:
@@ -807,7 +816,7 @@ def ingest_gmail(days=90, force=False):
 
     import base64
 
-    token_path = "${HOME}/.claude/google_oauth_token.json"
+    token_path = str(GOOGLE_TOKEN)
     if not os.path.exists(token_path):
         print(f"[ERROR] Google OAuth token not found: {token_path}")
         return
@@ -1007,7 +1016,7 @@ def ingest_gcalendar(days=365, force=False):
         print("[ERROR] google-api-python-client not installed.")
         return
 
-    token_path = "${HOME}/.claude/google_oauth_token.json"
+    token_path = str(GOOGLE_TOKEN)
     if not os.path.exists(token_path):
         print(f"[ERROR] Google OAuth token not found: {token_path}")
         return

@@ -24,7 +24,10 @@ from playwright.sync_api import sync_playwright  # noqa: E402
 BASE = Path(os.environ.get("REEL_DIR") or Path.cwd())
 DBG = BASE / "audio" / "suno_debug"
 DBG.mkdir(exist_ok=True)
-PROFILE = Path(r"${HOME}\.claude\skills\playwright-automation\profiles\suno_real")
+# Путь был прописан машиной автора и при обезличивании стал литералом "${HOME}\…":
+# Python его не разворачивает, и Playwright завёл бы профиль в каталоге со скобками
+# в имени — то есть каждый запуск начинался бы с чистого профиля и просил логин.
+PROFILE = Path.home() / ".claude" / "skills" / "playwright-automation" / "profiles" / "suno_real"
 
 DESC = ("Energetic upbeat modern promo background, punchy tight drums, deep sub-bass pulse, "
         "bright plucky synth hook, confident forward momentum, percussive groove, 124 BPM, "
