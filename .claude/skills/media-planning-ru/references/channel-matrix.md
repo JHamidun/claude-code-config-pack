@@ -80,7 +80,7 @@
 
 ## 5. Применение к проектам пользователя (контекст)
 
-- **YourProduct / Academy на РФ** → Яндекс.Директ + VK + Telegram Ads + посевы (Google/Meta отпадают).
+- **YourProduct / YourService на РФ** → Яндекс.Директ + VK + Telegram Ads + посевы (Google/Meta отпадают).
 - **Международные продукты** → Google Ads + Meta Ads.
 - **@yourchannel (личный канал)** → Telegram Ads (подписчики) + посевы у экспертов.
 
