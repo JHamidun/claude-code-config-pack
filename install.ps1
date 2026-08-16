@@ -1,4 +1,4 @@
-# Claude Code config pack installer (Windows / PowerShell)
+﻿# Claude Code config pack installer (Windows / PowerShell)
 #
 # === ГЛАВНЫЙ ИНВАРИАНТ: установщик НИКОГДА не стирает и не переносит ~/.claude ===
 # Твоё дерево ~/.claude остаётся на месте. Пак кладётся ПОВЕРХ копированием (merge).
@@ -703,8 +703,13 @@ if (-not $SkipDeps) {
 if (-not $SkipDeps) {
     $runtimeScript = Join-Path $DstClaude 'scripts\setup_runtime.py'
     if (Test-Path -LiteralPath $runtimeScript) {
-        $py2 = Get-Command python -ErrorAction SilentlyContinue
-        if (-not $py2) { $py2 = Get-Command python3 -ErrorAction SilentlyContinue }
+        # Заглушку Microsoft Store (WindowsApps\python.exe) брать нельзя: она не
+        # интерпретатор, а перехватчик — открывает магазин и не возвращает управление,
+        # то есть установка встала бы намертво без единого сообщения. На чистой Win11
+        # она лежит в PATH выше настоящего Python, поэтому проверяем ПУТЬ, а не имя.
+        $py2 = @(Get-Command python, python3 -ErrorAction SilentlyContinue |
+                 Where-Object { $_.Path -and $_.Path -notmatch '\\WindowsApps\\' }) |
+               Select-Object -First 1
         if ($py2) {
             Write-Host ""
             Write-Host "Довожу рантайм (браузер Playwright, маркетплейсы плагинов, node_modules)..."
