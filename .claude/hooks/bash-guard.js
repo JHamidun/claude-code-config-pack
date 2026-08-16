@@ -53,7 +53,11 @@ try {
   const cmd = (ti.command || ti.script || '');
   if (typeof cmd !== 'string' || !cmd.trim()) allow();
 
-  const HOMEwin = (process.env.USERPROFILE || '${HOME}');
+  // Запасной вариант раньше был литералом '${HOME}' — при обезличивании так заменили
+  // путь машины автора. Node таких подстановок не делает, и на системе без USERPROFILE
+  // (то есть везде кроме Windows) сторож сравнивал команды с каталогом по имени "${HOME}"
+  // и не узнавал ни одного домашнего пути — то есть молча переставал стеречь.
+  const HOMEwin = (process.env.USERPROFILE || require('os').homedir());
   const HOMEfwd = HOMEwin.replace(/\\/g, '/');
   const HOMEfwdEsc = HOMEfwd.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const HOMEbackEsc = HOMEwin.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
