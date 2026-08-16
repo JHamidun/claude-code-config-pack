@@ -22,6 +22,9 @@ cd claude-code-config-pack
 ./install.ps1
 ```
 
+Если Windows отказывается запускать скрипт («running scripts is disabled»):
+`powershell -ExecutionPolicy Bypass -File .\install.ps1`.
+
 ```bash
 git clone https://github.com/JHamidun/claude-code-config-pack.git
 cd claude-code-config-pack
@@ -259,7 +262,7 @@ the installer sets them up by running `~/.claude/scripts/setup_runtime.py` at th
 
 - the **Playwright browser binary** — `pip` installs the Python package, not the browser;
   42 skills depend on it (cards, PNG/PDF/PPTX export, decks, screenshot tests);
-- **plugin marketplaces** — 29 plugins are declared, but a fresh machine does not know where
+- **plugin marketplaces** — 33 plugins are declared, but a fresh machine does not know where
   to fetch them from (`claude plugin list` comes back empty);
 - **`node_modules`** for the `dev-browser` skill.
 
@@ -276,7 +279,7 @@ python ~/.claude/scripts/setup_runtime.py           # fix it (idempotent)
 - 50+ agents (`~/.claude/agents/`)
 - 110+ slash commands (`~/.claude/commands/`)
 - 23 auto-loaded rules (`~/.claude/rules/`)
-- 35 plugins (3 disabled by default — see `settings.json`)
+- 33 plugins (3 disabled by default — see `settings.json`)
 - 21 MCP servers, **2 enabled by default**: `filesystem` and `playwright-live1`.
   The other 19 are `disabled: true` on purpose — some need your own keys and accounts, some
   point at infrastructure only the author has, and `playwright-live2..10` are parallel browser
