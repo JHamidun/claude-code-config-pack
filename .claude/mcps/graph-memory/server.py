@@ -19,40 +19,30 @@ graph-memory/mcp_server.py — сервер к FalkorDB, оставшийся о
 Движок вызывается отдельным процессом намеренно: он самодостаточен и уже покрыт
 своими проверками, а импорт его как модуля потянул бы за собой глобальное состояние
 и превратил бы одну поломку в две.
+
+ПРО ВЕРСИЮ БИБЛИОТЕКИ. Первая редакция была написана на низкоуровневом API
+(`mcp.server.Server` + декораторы `@app.list_tools()`), который живёт в mcp 1.x.
+В mcp 2.0 — а именно это колесо едет в пакете офлайн — декораторов у Server больше
+нет, и сервер падал на импорте, не отдав ни одного инструмента. Причём проверка вида
+«импорты прошли» этого НЕ ловит: имена на месте, атрибутов нет. Поэтому здесь взят
+API, одинаковый в обеих версиях: `add_tool(fn, name=…, description=…)` и
+`run(transport="stdio")`. Различается только путь импорта класса.
 """
 from __future__ import annotations
 
-import asyncio
 import os
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
-from mcp.server import Server
-from mcp.server.stdio import stdio_server
-from mcp.types import TextContent, Tool
+try:                                            # mcp 2.x
+    from mcp.server import MCPServer as _ServerClass
+except ImportError:                             # mcp 1.x
+    from mcp.server.fastmcp import FastMCP as _ServerClass
 
 ENGINE = Path.home() / ".claude" / "scripts" / "memory_graph.py"
 TIMEOUT_SEC = 120
-
-# Команда -> (описание, обязательные аргументы). Ровно то, что умеет движок: список
-# держим здесь, чтобы расхождение «инструмент есть, команды нет» было видно сразу.
-COMMANDS = {
-    "build":     ("Пересобрать граф из заметок памяти (безопасно повторять).", []),
-    "stats":     ("Сколько узлов, рёбер, типов и битых ссылок.", []),
-    "neighbors": ("Соседи узла. Второй аргумент — глубина, по умолчанию 1.", ["name"]),
-    "path":      ("Кратчайший путь между двумя узлами.", ["from", "to"]),
-    "timeline":  ("Цепочка «что считали верным и когда» для узла.", ["name"]),
-    "hubs":      ("Самые связанные узлы. Аргумент — сколько показать.", []),
-    "orphans":   ("Узлы без единой связи.", []),
-    "search":    ("Узлы, в имени или заголовке которых есть подстрока.", ["query"]),
-    "cases":     ("Кейсы (прошлые сессии) по проекту или подстроке названия. Берутся из "
-                  "кейсбука — опционального слоя поверх заметок; на свежей установке его "
-                  "нет, и «0 кейсов» — нормальный ответ, а не поломка.", ["query"]),
-    "dangling":  ("Ссылки на заметки, которых ещё нет — кандидаты дописать.", []),
-    "gaps":      ("Разрывы: одинокие узлы, битые ссылки, залежавшиеся хабы.", []),
-}
 
 
 def engine_missing() -> str | None:
@@ -66,7 +56,7 @@ def engine_missing() -> str | None:
     return None
 
 
-def run_engine(argv: list[str]) -> str:
+def run_engine(*argv: str) -> str:
     problem = engine_missing()
     if problem:
         return problem
@@ -93,67 +83,94 @@ def run_engine(argv: list[str]) -> str:
     return out
 
 
-app = Server("graph-memory")
+def _number(value: str, what: str) -> str | None:
+    """Позиционное число для движка. Отсекаем здесь, а не там: движок на int('abc')
+    упал бы трейсбеком, а клиенту нужен ответ, который можно прочитать."""
+    v = (value or "").strip()
+    if not v:
+        return None
+    if not v.isdigit():
+        raise ValueError(f"{what} должно быть целым числом, получено: {value!r}")
+    return v
 
 
-@app.list_tools()
-async def list_tools() -> list[Tool]:
-    tools = []
-    for name, (desc, required) in COMMANDS.items():
-        props = {}
-        for arg in required:
-            props[arg] = {"type": "string", "description": f"Аргумент «{arg}»"}
-        if name in ("neighbors", "hubs"):
-            props["limit"] = {"type": "string",
-                              "description": "Число: для neighbors — глубина обхода, для hubs — размер топа"}
-        tools.append(Tool(
-            name=f"graph_{name}",
-            description=desc,
-            inputSchema={"type": "object", "properties": props, "required": required},
-        ))
-    return tools
+# --- команды движка ---------------------------------------------------------
+# По одной функции на команду: описание инструмента и схема аргументов строятся
+# из подписи и docstring, поэтому расхождение «инструмент есть, а команды нет»
+# становится невозможным — обе стороны берутся из одного места.
+
+def graph_build() -> str:
+    """Пересобрать граф из заметок памяти. Безопасно повторять."""
+    return run_engine("build")
 
 
-@app.call_tool()
-async def call_tool(name: str, arguments: dict) -> list[TextContent]:
-    cmd = name[len("graph_"):] if name.startswith("graph_") else name
-    if cmd not in COMMANDS:
-        return [TextContent(type="text", text=f"Неизвестная команда: {cmd}")]
+def graph_stats() -> str:
+    """Сколько узлов, рёбер, типов и битых ссылок."""
+    return run_engine("stats")
 
-    _, required = COMMANDS[cmd]
-    argv = [cmd]
-    for arg in required:
-        val = (arguments or {}).get(arg)
-        if not val:
-            return [TextContent(type="text", text=f"Не хватает аргумента «{arg}» для {cmd}.")]
-        argv.append(str(val))
-    # limit — это ПОЗИЦИОННЫЙ аргумент движка, и есть он не у всех команд: neighbors
-    # читает его как глубину, hubs — как размер топа. Остальным лишний позиционный
-    # аргумент ломает вызов (например, search принимает ровно один — был бы TypeError
-    # с трейсбеком вместо результата), поэтому для них limit не пробрасываем вовсе.
-    if cmd in ("neighbors", "hubs"):
-        limit = str((arguments or {}).get("limit") or "").strip()
-        if limit:
-            if not limit.isdigit():
-                # Отсекаем здесь, а не в движке: движок на int('abc') упал бы
-                # трейсбеком, а клиенту нужен ответ, который можно прочитать.
-                return [TextContent(type="text",
-                                    text=f"limit должен быть целым числом, получено: {limit!r}")]
-            argv.append(limit)
 
-    text = run_engine(argv)
-    # «-- 0 кейсов» на чистой машине — штатная ситуация (кейсбука может не быть),
-    # но голая цифра выглядит как поломка. Поясняем словами, чтобы не пугать.
-    if cmd == "cases" and text == "-- 0 кейсов":
+def graph_neighbors(name: str, depth: str = "") -> str:
+    """Соседи узла. depth — глубина обхода (число), по умолчанию 1."""
+    d = _number(depth, "depth")
+    return run_engine("neighbors", name, *( [d] if d else [] ))
+
+
+def graph_path(from_node: str, to_node: str) -> str:
+    """Кратчайший путь между двумя узлами."""
+    return run_engine("path", from_node, to_node)
+
+
+def graph_timeline(name: str) -> str:
+    """Цепочка «что считали верным и когда» для узла."""
+    return run_engine("timeline", name)
+
+
+def graph_hubs(top: str = "") -> str:
+    """Самые связанные узлы. top — сколько показать (число)."""
+    t = _number(top, "top")
+    return run_engine("hubs", *( [t] if t else [] ))
+
+
+def graph_orphans() -> str:
+    """Узлы без единой связи."""
+    return run_engine("orphans")
+
+
+def graph_search(query: str) -> str:
+    """Узлы, в имени или заголовке которых есть подстрока."""
+    return run_engine("search", query)
+
+
+def graph_cases(query: str) -> str:
+    """Кейсы (прошлые сессии) по проекту или подстроке названия."""
+    text = run_engine("cases", query)
+    # «-- 0 кейсов» на чистой машине — штатная ситуация: кейсбук это отдельный слой
+    # поверх заметок, и на свежей установке его нет. Голая цифра выглядит как
+    # поломка, поэтому поясняем словами.
+    if text.strip() == "-- 0 кейсов":
         text += ("\nКейсбук не собран или по запросу ничего не нашлось. "
                  "Граф заметок работает и без него — это не ошибка.")
-    return [TextContent(type="text", text=text)]
+    return text
 
 
-async def main() -> None:
-    async with stdio_server() as (read, write):
-        await app.run(read, write, app.create_initialization_options())
+def graph_dangling() -> str:
+    """Ссылки на заметки, которых ещё нет — кандидаты дописать."""
+    return run_engine("dangling")
+
+
+def graph_gaps() -> str:
+    """Разрывы: одинокие узлы, битые ссылки, залежавшиеся хабы."""
+    return run_engine("gaps")
+
+
+TOOLS = (graph_build, graph_stats, graph_neighbors, graph_path, graph_timeline,
+         graph_hubs, graph_orphans, graph_search, graph_cases, graph_dangling,
+         graph_gaps)
+
+app = _ServerClass("graph-memory")
+for _fn in TOOLS:
+    app.add_tool(_fn, name=_fn.__name__, description=(_fn.__doc__ or "").strip())
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    app.run(transport="stdio")
