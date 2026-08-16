@@ -1,13 +1,113 @@
 ---
 name: video-montage
-description: "Полный продакшн вертикальных reels 9:16 с нуля: Whisper-субтитры, TTS ElevenLabs, word-accurate sync, pop-up словарные карточки, lip-sync, safe zones, анти-fingerprint репостов. НЕ: монтаж готового футажа→video-editor; AI-генерация→video-generation."
+description: "Конвейер производства ролика ролями: «сделай ролик про X» → бриф, сценарий, музыка, раскадровка, кадры, монтаж, контроль — параллельно, без ручного выбора инструментов. Плюс полный продакшн вертикальных reels 9:16: Whisper-субтитры, TTS ElevenLabs, word-accurate sync, pop-up карточки, lip-sync, safe zones. Здесь же структура ролика на доказательной базе (не AIDA) и каталог 79 монтажных приёмов. НЕ: монтаж готового футажа→video-editor; AI-генерация отдельных сцен→video-generation."
 ---
 
 # Video Montage — Full Production Pipeline
 
-> **Windows-адаптация (стек пользователя):** `python` вместо `python3`; headless Chrome = `"C:/Program Files/Google/Chrome/Application/chrome.exe"` (те же флаги); временные файлы → scratchpad, не `/tmp`; ElevenLabs-ключ `ELEVENLABS_API_KEY` из `~/.claude/.credentials.master.env`, голос пользователя — см. skill `elevenlabs`; правило кодека то же: только `libx264 + yuv420p`. WhisperX уже стоит (см. `video-editor` karaoke_captions). Смежное: монтаж готового футажа → `video-editor`; AI-генерация сцен → `video-generation`; музыка → `ace-step`/`suno`; публикация → `postiz`/`tg-post`.
+> **Windows-адаптация (стек пользователя):** `python` вместо `python3`; headless Chrome = `"C:/Program Files/Google/Chrome/Application/chrome.exe"` (те же флаги); временные файлы → scratchpad, не `/tmp`; ElevenLabs-ключ `ELEVENLABS_API_KEY` из `~/.claude/.credentials.master.env`, свой голос — см. навык `elevenlabs`; правило кодека то же: только `libx264 + yuv420p`. WhisperX уже стоит (см. `video-editor` karaoke_captions). Смежное: монтаж готового футажа → `video-editor`; AI-генерация сцен → `video-generation`; музыка → `ace-step`/`suno`; публикация → `postiz`/`tg-post`.
 
 Everything you need to produce vertical reels (9:16, 1080x1920, 30fps) with Claude Code — from raw footage to published content.
+
+---
+
+## 0. Конвейер целиком: одна задача — весь ролик
+
+Когда просьба звучит как «сделай ролик про X», а не как отдельная операция монтажа, не
+выбирай инструменты вручную — запускай конвейер. Он сам разберёт задачу на роли и
+проведёт её от брифа до готового файла.
+
+```
+Workflow({
+  scriptPath: '~/.claude/skills/video-montage/workflows/video-factory.js',
+  args: { brief: 'как за день собрали лендинг вайбкодингом',
+          seconds: 35, platform: 'reels', goal: 'watch',
+          workdir: '~/Videos/video-factory/lending-35s' }
+})
+```
+
+Обрыв не страшен: `Workflow({scriptPath, resumeFromRunId})` продолжит с места, а готовые
+кадры помечены в конверте и второй раз не оплачиваются.
+
+**Роли и порядок** (полностью — `references/pipeline-architecture.md`):
+
+```
+бриф ─┬─ сценарий ─┐
+      └─ музыка ───┴─ раскадровка ─ кадры (волнами по 4) ─ монтаж ─ контроль
+```
+
+Сценарий и музыка идут одновременно; кадры независимы друг от друга и обрабатываются
+волнами — больше шести агентов разом упирается в ограничение сервера. Барьеры стоят
+только там, где они честно нужны: раскадровке нужны и структура, и сетка долей.
+
+**Единый документ между ролями** — `schemas/production.schema.json`. Каждая роль пишет
+свой раздел и не трогает чужие; это и делает параллельность возможной, и позволяет
+перезапускать этапы поодиночке.
+
+**Ремесленная часть** — в каталоге приёмов, 79 записей с источником и статусом
+доказательности у каждой:
+
+```bash
+python scripts/techniques.py stats
+python scripts/techniques.py find "не держится внимание"
+python scripts/techniques.py for-block крючок
+```
+
+**Структура ролика** строится не по AIDA: та описывает убеждение покупателя (печатная
+реклама, 1898) и оптимизирует намерение купить — величину, которую лента не измеряет.
+Площадки официально называют главным сигналом досмотр, поэтому план строится вокруг
+удержания:
+
+```bash
+python scripts/reel_structure.py --message "…" --seconds 35 --goal shares --music track.mp3
+python scripts/reel_structure.py --why      # откуда взято каждое число
+```
+
+### Приёмка: посмотреть и послушать готовый файл
+
+Последний шаг любого ролика — не «сборка прошла без ошибок», а собственный просмотр и
+прослушивание. Сборка молчит о том, что видно и слышно с первой секунды: у персонажа
+белый прямоугольник вместо фона, титры серые в момент появления, речь не совпадает с
+картинкой, последние семь секунд немые. Всё это даёт нулевой код возврата.
+
+```bash
+python scripts/review_cut.py reel.mp4 -o review/ --listen
+```
+
+Выдаёт контактный лист (весь ролик одной сеткой — открыть и посмотреть), замеры звука
+(громкость, пики, тишина) и разбор дорожки на слух. Три источника не заменяют друг
+друга: замеры не слышат кашу в речи, слух не видит призрака в кадре, глаз не измеряет
+перегруз. Возраст файла печатается первой строкой — если рендер упал, на диске лежит
+прошлая сборка, и приёмка бодро отчитается по ней.
+
+### Липсинк без сторонних платформ
+
+Пока рот на рисунке неподвижен, персонаж читается как мёртвая картинка — это первое,
+за что цепляется глаз. Рот открывается по громкости голоса; фонемы для рисованного
+персонажа не нужны, так делают в рисованной анимации с начала звукового кино.
+
+```bash
+python scripts/mouth_map.py ./poses -o mouth.json --draw check/   # где рот на каждой позе
+python scripts/voice_envelope.py voice.mp3 --fps 30 --duration 20 -o env.json
+python scripts/cutout.py ./poses -o ./poses_cut                   # убрать фон
+python scripts/cutout.py ./stickers -o ./stickers_cut --outline 14 # наклейка с каймой
+```
+
+Разметку рта обязательно смотреть глазами через `--draw`: модель отвечает уверенно и
+в тех случаях, когда промахнулась.
+
+### Озвучка, попадающая в титры
+
+Монолитная озвучка расходится с картинкой: диктор говорит со своей скоростью, титры
+идут со своей. Каждая фраза синтезируется отдельно и ставится в момент своего титра, а
+хронометраж подгоняется под реальную речь.
+
+```bash
+python scripts/voice_timed.py script.json -o voice.mp3 --duration 20 --retime script_fit.json
+```
+
+`--retime` возвращает сценарий, ужатый под то, как реально звучит речь: без него
+половина ролика — паузы, и на слух он затянут, хотя каждый кусок нормальный.
 
 ## Requirements
 
@@ -64,7 +164,7 @@ Common Whisper error patterns:
 | Numbers as words mixed up | "сторилл соус" → "сто рилсов" |
 | Spelling errors | "конкатинировать" → "конкатенировать" |
 | TTS responses missing | Quiet AI voice not transcribed → re-run with `large-v3` |
-| Word boundaries wrong | "вайп-код и шпродук" → "example-queryить продукт" |
+| Word boundaries wrong | "вайп-код и шпродук" → "вайб-кодить продукт" |
 
 **Protocol:** Save corrected SRT as `audio_corrected.srt` — this is the source of truth.
 
