@@ -51,7 +51,7 @@
     {
       "name": "video-media",
       "source": "./plugins/video-media",
-      "description": "Generation (Runway), avatars (HeyGen/D-ID), edit, download, export, subtitles, transcripts."
+      "description": "8-role production pipeline (brief to QC), generation (Runway), avatars (HeyGen/D-ID), edit, download, export, subtitles, transcripts."
     },
     {
       "name": "audio-voice",
