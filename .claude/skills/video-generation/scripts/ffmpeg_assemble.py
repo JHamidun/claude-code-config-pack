@@ -23,8 +23,8 @@ manifest.json schema:
           "enabled": true,
           "duration": 5,
           "lines": [
-              {"text": "ТехПред",         "size": 120, "color": "white",   "y_offset": -220},
-              {"text": "[университет] × Сколково", "size": 60,  "color": "white",   "y_offset": -30},
+              {"text": "Название курса",  "size": 120, "color": "white",   "y_offset": -220},
+              {"text": "Организатор × Партнёр",    "size": 60,  "color": "white",   "y_offset": -30},
               {"text": "Поступление 2026", "size": 40, "color": "#BBBBBB", "y_offset": 90}
           ]
       }
