@@ -58,8 +58,17 @@ except Exception:
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-CLAUDE_HOME = r"${HOME}\.claude"
-CLAUDE_MD = r"${HOME}\CLAUDE.md"
+# Оба пути были прописаны машиной автора, и при обезличивании превратились в литерал
+# "${HOME}\..." — Python его не разворачивает (на Windows переменной HOME обычно нет
+# вовсе). Инструмент, который CLAUDE.md называет источником правды по счётчикам,
+# показывал из-за этого ровно нули: каталогов с таким именем не существует, а
+# os.walk по несуществующему пути молча возвращает пустоту, без единой ошибки.
+# Берём домашний каталог у самой системы; CLAUDE_CONFIG_DIR (штатная переменная
+# Claude Code) позволяет посчитать чужую раскладку — например, сам пакет до установки.
+HOME_DIR = os.path.expanduser("~")
+CLAUDE_HOME = os.environ.get("CLAUDE_CONFIG_DIR") or os.path.join(HOME_DIR, ".claude")
+CLAUDE_MD = os.path.join(os.path.dirname(CLAUDE_HOME.rstrip("\\/")) or HOME_DIR,
+                         "CLAUDE.md")
 SKILLS_DIR = os.path.join(CLAUDE_HOME, "skills")
 AGENTS_DIR = os.path.join(CLAUDE_HOME, "agents")
 COMMANDS_DIR = os.path.join(CLAUDE_HOME, "commands")

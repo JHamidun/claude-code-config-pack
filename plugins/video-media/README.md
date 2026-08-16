@@ -1,6 +1,6 @@
 # Video Production
 
-> Generation (Runway), avatars (HeyGen/D-ID), edit, download, export, subtitles, transcripts.
+> 8-role production pipeline (brief to QC), generation (Runway), avatars (HeyGen/D-ID), edit, download, export, subtitles, transcripts.
 
 Part of the **[hamidun marketplace](../../README.md)**.
 
@@ -23,6 +23,14 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 ### Agents
 
+- `vf-brief`
+- `vf-editor`
+- `vf-operator`
+- `vf-prompter`
+- `vf-qc`
+- `vf-screenwriter`
+- `vf-sound`
+- `vf-storyboard`
 - `video-factory`
 
 ### Commands

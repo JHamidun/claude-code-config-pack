@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "production.schema.json",
+  "title": "Производственный конверт ролика",
+  "description": "Единый документ, который ходит между всеми ролями конвейера. Каждая роль дописывает свой раздел и не трогает чужие — так этапы можно гонять параллельно и перезапускать поодиночке. Разделы намеренно плоские: агенту проще дописать один блок, чем править вложенное дерево.",
+  "type": "object",
+  "required": ["brief", "route"],
+  "properties": {
+
+    "brief": {
+      "description": "Заполняет роль «бриф». Всё остальное строится отсюда, поэтому раздел обязателен и меняется только по прямому указанию заказчика.",
+      "type": "object",
+      "required": ["message", "platform", "seconds", "goal"],
+      "properties": {
+        "message": {"type": "string", "description": "О чём ролик — одной фразой, как сказал бы человек"},
+        "audience": {"type": "string"},
+        "platform": {"enum": ["reels", "shorts", "tiktok", "vk", "rutube", "landing", "presentation"]},
+        "seconds": {"type": "number", "minimum": 3, "maximum": 600},
+        "goal": {"enum": ["watch", "shares", "profile", "learn", "sell"],
+                 "description": "watch=досмотр, shares=пересылки, profile=подписка, learn=обучение, sell=перформанс (единственный случай, где уместна схема убеждения)"},
+        "tone": {"type": "string"},
+        "language": {"type": "string", "default": "ru"},
+        "brand": {"type": "object", "description": "Палитра, шрифты, логотип — если есть фирменный стиль",
+                  "properties": {
+                    "colors": {"type": "array", "items": {"type": "string"}},
+                    "font_display": {"type": "string"},
+                    "font_caption": {"type": "string"},
+                    "logo": {"type": "string"}
+                  }},
+        "constraints": {"type": "array", "items": {"type": "string"},
+                        "description": "Чего делать нельзя: запрет на лица, на музыку с текстом, на конкретные слова"}
+      }
+    },
+
+    "route": {
+      "description": "Каким путём собирается ролик. Определяет, какие роли вообще включаются в работу.",
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "enum": ["footage", "generated", "avatar", "motion", "slides", "hybrid"],
+          "description": "footage=есть свой материал; generated=кадры генерируются моделью; avatar=говорящая голова; motion=анимация из разметки; slides=презентация в видео; hybrid=несколько источников"
+        },
+        "sources": {"type": "array", "items": {"type": "string"},
+                    "description": "Пути к исходникам для footage/hybrid"},
+        "engines": {
+          "type": "object",
+          "description": "Чем именно исполнять. Пусто — выбирает роль-оператор.",
+          "properties": {
+            "video": {"enum": ["veo", "veo-fast", "veo-lite", "sora", "sora-pro"]},
+            "image": {"enum": ["pro", "flash"]},
+            "voice": {"enum": ["elevenlabs", "none"]},
+            "avatar": {"enum": ["heygen", "did", "none"]},
+            "music": {"enum": ["ace-step", "library", "reference", "procedural", "none"]}
+          }
+        }
+      }
+    },
+
+    "structure": {
+      "description": "Заполняет роль «сценарист» через reel_structure.py. Блоки и точки событий — договор о темпе, на который опираются раскадровка и монтаж.",
+      "type": "object",
+      "properties": {
+        "hook_type": {"type": "string", "description": "Идентификатор крючка из каталога техник"},
+        "loop": {"type": "boolean"},
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["block", "start", "end"],
+            "properties": {
+              "block": {"enum": ["крючок", "перехват", "тело", "выдача", "петля"]},
+              "start": {"type": "number"}, "end": {"type": "number"},
+              "task": {"type": "string"}
+            }
+          }
+        },
+        "event_times": {"type": "array", "items": {"type": "number"},
+                        "description": "Секунды, в которых обязано что-то произойти"}
+      }
+    },
+
+    "script": {
+      "description": "Заполняет роль «сценарист». Реплики привязаны ко времени, потому что озвучка задаёт настоящий хронометраж — план подгоняется под неё, а не наоборот.",
+      "type": "object",
+      "properties": {
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["text"],
+            "properties": {
+              "id": {"type": "string"},
+              "text": {"type": "string"},
+              "start": {"type": "number"},
+              "duration": {"type": "number"},
+              "block": {"type": "string"},
+              "on_screen": {"type": "string", "description": "Что в этот момент видно — короткая заметка для раскадровки"},
+              "emphasis": {"type": "array", "items": {"type": "string"},
+                           "description": "Слова, которые выделяются титром или ударом монтажа"}
+            }
+          }
+        },
+        "wpm": {"type": "number", "default": 155,
+                "description": "Темп речи; для русского берётся ниже английского эталона"}
+      }
+    },
+
+    "shots": {
+      "description": "Заполняет роль «раскадровщик», дополняет «промптер», исполняет «оператор». Один элемент — один кадр; они независимы, поэтому генерируются параллельно.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "role", "seconds"],
+        "properties": {
+          "id": {"type": "string"},
+          "role": {
+            "enum": ["establish_context", "introduce_subject", "build_tension",
+                     "deliver_payload", "transition", "emotional_beat",
+                     "evidence", "comparison", "resolution", "call_to_action"],
+            "description": "Роль кадра в рассказе. Она задаёт умолчания крупности, движения и света — см. build_visual_prompt.py"
+          },
+          "block": {"type": "string", "description": "К какому блоку структуры относится"},
+          "seconds": {"type": "number"},
+          "subject": {"type": "string", "description": "Что в кадре, своими словами"},
+          "size": {"enum": ["extreme_wide", "wide", "medium_wide", "medium", "medium_close",
+                            "close_up", "extreme_close_up", "over_shoulder", "insert", "establishing"]},
+          "move": {"type": "string", "description": "Ход камеры; для статичной картинки не заполняется"},
+          "light": {"type": "string"},
+          "dof": {"enum": ["shallow", "medium", "deep"]},
+          "texture": {"type": "string"},
+          "text_on_screen": {"type": "string", "description": "Точная надпись, если она нужна в кадре"},
+          "prompt": {"type": "string", "description": "Собранный пятислойный промпт"},
+          "negative": {"type": "string"},
+          "first_frame": {"type": "string", "description": "Путь к опорному кадру — держит единство персонажа"},
+          "engine": {"type": "string"},
+          "source_file": {"type": "string", "description": "Для маршрута footage — кусок своего материала"},
+          "in_point": {"type": "number"}, "out_point": {"type": "number"},
+          "output": {"type": "string", "description": "Путь к готовому файлу кадра"},
+          "status": {"enum": ["planned", "prompted", "generating", "ready", "rejected", "failed"]},
+          "attempts": {"type": "integer", "default": 0},
+          "reject_reason": {"type": "string"}
+        }
+      }
+    },
+
+    "audio": {
+      "description": "Заполняет роль «звук». Карта музыки нужна монтажу раньше, чем готовы кадры, поэтому раздел считается параллельно раскадровке.",
+      "type": "object",
+      "properties": {
+        "voice_file": {"type": "string"},
+        "voice_id": {"type": "string"},
+        "voice_timings": {"type": "array", "items": {"type": "object"},
+                          "description": "Реальные тайминги слов после озвучки — по ним пересчитывается план"},
+        "music_file": {"type": "string"},
+        "music_map": {"type": "string", "description": "Путь к карте трека: темп, такты, секции, дропы"},
+        "cut_grid": {"type": "array", "items": {"type": "number"},
+                     "description": "Моменты склеек, притянутые к долям"},
+        "sfx": {"type": "array", "items": {"type": "object"}},
+        "ducking": {"type": "boolean", "default": true,
+                    "description": "Приглушать музыку под голосом"}
+      }
+    },
+
+    "edit": {
+      "description": "Заполняет роль «монтажёр». Переходы держатся в бюджете: два-три вида на ролик, иначе разнообразие читается как неумение.",
+      "type": "object",
+      "properties": {
+        "transitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "at": {"type": "number"},
+              "effect": {"type": "string"},
+              "duration": {"type": "number"},
+              "reason": {"type": "string", "description": "Почему именно этот — привязка к приёму из каталога"}
+            }
+          }
+        },
+        "transition_budget": {"type": "array", "items": {"type": "string"},
+                              "description": "Разрешённые виды переходов: не больше трёх"},
+        "grade": {"type": "string", "description": "Цветокор или LUT"},
+        "captions": {
+          "type": "object",
+          "properties": {
+            "style": {"enum": ["karaoke", "line", "none"]},
+            "font_file": {"type": "string"},
+            "size_pct": {"type": "number", "description": "Кегль в процентах высоты кадра"},
+            "safe_zone": {"type": "object"}
+          }
+        },
+        "output": {"type": "string"}
+      }
+    },
+
+    "qa": {
+      "description": "Заполняет роль «контроль». Оценки НЕ усредняются: провал по одному измерению не должен маскироваться хорошими остальными — это найденный дефект чужих оценщиков.",
+      "type": "object",
+      "properties": {
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "verdict"],
+            "properties": {
+              "name": {"type": "string"},
+              "verdict": {"enum": ["pass", "warn", "fail"]},
+              "detail": {"type": "string"},
+              "technique": {"type": "string", "description": "Идентификатор приёма из каталога, по которому проверяли"}
+            }
+          }
+        },
+        "verdict": {"enum": ["pass", "revise", "fail"],
+                    "description": "Любой fail в проверках делает общий вердикт fail — без усреднения"},
+        "revise_targets": {"type": "array", "items": {"type": "string"},
+                           "description": "Идентификаторы кадров или блоков, которые надо переделать"}
+      }
+    },
+
+    "meta": {
+      "type": "object",
+      "properties": {
+        "workdir": {"type": "string"},
+        "created": {"type": "string"},
+        "stage": {"enum": ["brief", "structure", "storyboard", "generate",
+                           "audio", "edit", "qa", "done"]},
+        "cost_notes": {"type": "array", "items": {"type": "string"},
+                       "description": "Что уже оплачено генерациями — чтобы перезапуск не платил дважды"}
+      }
+    }
+  }
+}

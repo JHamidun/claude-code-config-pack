@@ -3,7 +3,7 @@
   "name": "video-media",
   "displayName": "Video Production",
   "version": "0.1.0",
-  "description": "Generation (Runway), avatars (HeyGen/D-ID), edit, download, export, subtitles, transcripts.",
+  "description": "8-role production pipeline (brief to QC), generation (Runway), avatars (HeyGen/D-ID), edit, download, export, subtitles, transcripts.",
   "author": {
     "name": "Zhemal Khamidun",
     "url": "https://github.com/JHamidun"
@@ -14,6 +14,7 @@
     "video",
     "runway",
     "youtube",
-    "avatar"
+    "avatar",
+    "pipeline"
   ]
 }

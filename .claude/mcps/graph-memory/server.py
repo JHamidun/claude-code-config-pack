@@ -47,6 +47,9 @@ COMMANDS = {
     "hubs":      ("Самые связанные узлы. Аргумент — сколько показать.", []),
     "orphans":   ("Узлы без единой связи.", []),
     "search":    ("Узлы, в имени или заголовке которых есть подстрока.", ["query"]),
+    "cases":     ("Кейсы (прошлые сессии) по проекту или подстроке названия. Берутся из "
+                  "кейсбука — опционального слоя поверх заметок; на свежей установке его "
+                  "нет, и «0 кейсов» — нормальный ответ, а не поломка.", ["query"]),
     "dangling":  ("Ссылки на заметки, которых ещё нет — кандидаты дописать.", []),
     "gaps":      ("Разрывы: одинокие узлы, битые ссылки, залежавшиеся хабы.", []),
 }
@@ -101,7 +104,8 @@ async def list_tools() -> list[Tool]:
         for arg in required:
             props[arg] = {"type": "string", "description": f"Аргумент «{arg}»"}
         if name in ("neighbors", "hubs"):
-            props["limit"] = {"type": "string", "description": "Число (глубина или количество)"}
+            props["limit"] = {"type": "string",
+                              "description": "Число: для neighbors — глубина обхода, для hubs — размер топа"}
         tools.append(Tool(
             name=f"graph_{name}",
             description=desc,
@@ -123,11 +127,27 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         if not val:
             return [TextContent(type="text", text=f"Не хватает аргумента «{arg}» для {cmd}.")]
         argv.append(str(val))
-    limit = (arguments or {}).get("limit")
-    if limit:
-        argv.append(str(limit))
+    # limit — это ПОЗИЦИОННЫЙ аргумент движка, и есть он не у всех команд: neighbors
+    # читает его как глубину, hubs — как размер топа. Остальным лишний позиционный
+    # аргумент ломает вызов (например, search принимает ровно один — был бы TypeError
+    # с трейсбеком вместо результата), поэтому для них limit не пробрасываем вовсе.
+    if cmd in ("neighbors", "hubs"):
+        limit = str((arguments or {}).get("limit") or "").strip()
+        if limit:
+            if not limit.isdigit():
+                # Отсекаем здесь, а не в движке: движок на int('abc') упал бы
+                # трейсбеком, а клиенту нужен ответ, который можно прочитать.
+                return [TextContent(type="text",
+                                    text=f"limit должен быть целым числом, получено: {limit!r}")]
+            argv.append(limit)
 
-    return [TextContent(type="text", text=run_engine(argv))]
+    text = run_engine(argv)
+    # «-- 0 кейсов» на чистой машине — штатная ситуация (кейсбука может не быть),
+    # но голая цифра выглядит как поломка. Поясняем словами, чтобы не пугать.
+    if cmd == "cases" and text == "-- 0 кейсов":
+        text += ("\nКейсбук не собран или по запросу ничего не нашлось. "
+                 "Граф заметок работает и без него — это не ошибка.")
+    return [TextContent(type="text", text=text)]
 
 
 async def main() -> None:
