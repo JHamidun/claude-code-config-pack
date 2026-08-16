@@ -1,4 +1,4 @@
-# Claude Code config pack — удаление (Windows / PowerShell)
+﻿# Claude Code config pack — удаление (Windows / PowerShell)
 #
 # === ГЛАВНЫЙ ИНВАРИАНТ: удаляем ТОЛЬКО то, что положил install.ps1 ===
 # Источник правды — ~/.claude/.ccpack-manifest.txt: install.ps1 записывает туда РОВНО те
