@@ -76,7 +76,7 @@
 |---|---|---|
 | `market-selection-ru` | — (старт) | Выбранный рынок/модель/страна |
 | `jtbd` | желателен market-selection | Работы клиента, сегменты → база для воронки и креативов |
-| `funnel-design-ru` | ajtbd (что цепляет) | Тип воронки + дерево метрик с целевыми значениями |
+| `funnel-design-ru` | jtbd (что цепляет) | Тип воронки + дерево метрик с целевыми значениями |
 | `media-planning-ru` | funnel-design (тип воронки, цель) | Channel mix → какой playbook открывать |
 | `ad-benchmarks-ru` | — (справочник, в любой момент) | Норматив для сверки / детект ботовода |
 | `yandex-direct-pro-ru` | media-planning (канал выбран) | Рабочая кампания → данные в analytics |
@@ -86,9 +86,9 @@
 | `meta-ads-launch-ru` | media-planning + capi-no-code (трекинг) | Рабочая кампания Meta |
 | `capi-no-code-setup` | до масштабирования любого канала | Серверный трекинг → корректные данные в analytics |
 | `tg-channel-buyout-ru` | media-planning (если посевы в миксе) | Размещения у каналов/блогеров |
-| `b2b-marketing-ru` | market-selection + ajtbd | Заменяет «воронка+канал» для B2B; передаёт лид в sales-team |
-| `ai-creative-factory-ru` | ajtbd (что цепляет) | Креативы для playbook'ов и органики |
-| `content-machine-instructor2-ru` | ajtbd | Поток контента → manychat-funnel |
+| `b2b-marketing-ru` | market-selection + jtbd | Заменяет «воронка+канал» для B2B; передаёт лид в sales-team |
+| `ai-creative-factory-ru` | jtbd (что цепляет) | Креативы для playbook'ов и органики |
+| `content-machine-instructor2-ru` | jtbd | Поток контента → manychat-funnel |
 | `manychat-funnel-ru` | content-machine (есть контент) | Лиды из SMM → analytics/sales |
 | `ai-seo-agent-pipeline` | — (параллельно) | Масса страниц → органический трафик |
 | `geo-aeo-ru` | — (параллельно) | Видимость в LLM-ответах |

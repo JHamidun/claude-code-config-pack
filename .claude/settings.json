@@ -161,7 +161,6 @@
       "Bash(mkdir -p ~/.claude/skills/geo-aeo-ru/references && echo \"created\")",
       "Bash(mkdir -p ~/.claude/skills/ai-marketing-stack-ru/references && echo \"created\")",
       "Bash(mkdir -p ~/.claude/skills/full-funnel-analytics-ru/references && echo \"created\")",
-      "Bash(mkdir -p ~/.claude/skills/ajtbd-instructor-ru/references ~/.claude/skills/ajtbd-instructor-ru/prompts && echo \"dirs created\")",
       "Bash(mkdir -p \"~/.claude/skills/ai-creative-factory-ru/references\" && echo \"created\")",
       "Bash(mkdir -p ~/.claude/skills/b2b-marketing-ru/references && echo \"created\")",
       "Bash(mkdir -p /c~/.claude/skills/sales-team-ru/references && echo \"created\")",
