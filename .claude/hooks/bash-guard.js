@@ -14,26 +14,50 @@
  * DELETE FROM without WHERE, git checkout/restore -- ., chattr -R -i,
  * quoted-target rm (`rm -rf "/"`), and an SSH branch: the remote command inside
  * `ssh host "..."` is re-scanned with the SAME destructive patterns
- * (your-server runs 44 prod containers — destroyers inside quotes were invisible).
+ * (Vertex runs 44 prod containers — destroyers inside quotes were invisible).
  *
  * 2026-07-19 dcg-port (Dicklesworthstone/destructive_command_guard, Rust, 2.9k*):
  * interpreter inline payloads (python -c / perl -e / node -e / bash -c + heredocs)
- * re-scanned via quote extraction (os.system('rm -rf /') was invisible — the closing
- * quote broke the TERM boundary); fs-nuke sinks on roots/home (shutil.rmtree,
- * fs.rmSync, FileUtils.rm_rf, File::Path remove_tree); decode-and-exec
- * (base64 -d | sh, eval $(base64|curl), bash <(curl), sh -c "$(curl)");
- * powershell -EncodedCommand decoded (UTF-16LE + UTF-8) and re-scanned;
- * wipefs -a; vssadmin/wmic shadowcopy delete.
+ * re-scanned; decode-and-exec (base64 -d | sh, eval $(base64|curl), bash <(curl),
+ * sh -c "$(curl)"); powershell -EncodedCommand decoded (UTF-16LE + UTF-8) and
+ * re-scanned; wipefs -a; vssadmin/wmic shadowcopy delete.
  *
- * 2026-07-31 infra-destruction gap-fill: the guard knew nothing about tearing down
- * running production infrastructure (your-server: 44 prod containers + pm2 + systemd).
- * Added to the SAME P[] list (so the ssh / interpreter / -EncodedCommand branches
- * re-scan payloads automatically): docker rm -f, docker rm/stop/kill $(docker ps ...),
- * docker compose down (+ -v/--volumes = data loss), docker volume rm, docker * prune,
- * pm2 delete/kill, systemctl stop/disable, service ... stop, kubectl delete.
- * Deliberately NOT sql/txt-gated: a text-display prefix must not open
- * `echo restarting && docker compose down -v`. Read-only ops (docker ps/logs,
- * docker compose up -d, pm2 list, systemctl status) never match.
+ * 2026-07-31 infra-destruction gap-fill: docker rm -f, docker rm/stop/kill
+ * $(docker ps ...), docker compose down (+ -v/--volumes = data loss),
+ * docker volume rm, docker * prune, pm2 delete/kill, systemctl stop/disable,
+ * service ... stop, kubectl delete. Read-only ops never match.
+ *
+ * 2026-08-17 intent-vs-text (замер владельца: `python - <<EOF`, внутри ТЕКСТА
+ * скрипта строка-литерал с "DROP TABLE" — гард заблокировал запуск [drop-table]).
+ * Причина: все паттерны прикладывались к СЫРОЙ строке команды — вместе с телами
+ * heredoc, содержимым кавычек и комментариями. Подстрока «нашлась» — блок,
+ * хотя шелл эту подстроку никогда не исполняет.
+ *
+ * Лекарство — не ослабление паттернов, а сопоставление с тем, что РЕАЛЬНО
+ * исполняется. Команда токенизируется на 4 слоя:
+ *   КОД        — то, что видит шелл как команды/аргументы;
+ *   СТРОКИ     — содержимое '...' и "..." (данные, не команды);
+ *   HEREDOC    — тела <<TAG ... TAG (stdin-данные для потребителя);
+ *   КОММЕНТЫ   — от невзятого в кавычки # до конца строки (выбрасываются).
+ * Паттерны прикладываются к КОДУ. Строки и heredoc-тела сканируются ОТДЕЛЬНО
+ * и только когда у полезной нагрузки есть ИСПОЛНИТЕЛЬ:
+ *   - ssh host "..."           → нагрузка исполняется удалённым шеллом;
+ *   - bash|sh -c / eval / bash <<EOF → нагрузка = команды;
+ *   - psql|mysql|sqlite3 -c/-e/heredoc → нагрузка = исполняемый SQL;
+ *   - python|node|perl -c/-e/heredoc  → нагрузка = код; его строки-литералы
+ *     проверяются ТОЛЬКО при наличии exec-стока (os.system/subprocess/spawn...)
+ *     — литерал без стока это данные, печать, анализ;
+ *   - $(...) и `...` внутри ДВОЙНЫХ кавычек → шелл подставляет и исполняет.
+ * Однословные закавыченные токены (без пробелов и метасимволов) вклеиваются
+ * обратно в КОД: цель команды остаётся целью и в кавычках — `rm -rf "/"`,
+ * `git push --force origin "main"`, `"mkfs.ext4" /dev/sda` не спрячутся.
+ *
+ * Почему это устойчиво: решение принимает не «нашлась подстрока», а «паттерн
+ * совпал в исполняемой позиции». Текст без исполнителя (литерал, комментарий,
+ * heredoc в cat, сообщение коммита) физически не может ничего разрушить —
+ * его пропуск не открывает дыру. А у настоящего разрушителя исполнитель есть
+ * всегда: либо сам код команды, либо один из каналов выше — и все каналы
+ * рекурсивно проходят через те же паттерны (глубина ≤ 3).
  */
 'use strict';
 const fs = require('fs');
@@ -53,11 +77,9 @@ try {
   const cmd = (ti.command || ti.script || '');
   if (typeof cmd !== 'string' || !cmd.trim()) allow();
 
-  // Запасной вариант раньше был литералом '${HOME}' — при обезличивании так заменили
-  // путь машины автора. Node таких подстановок не делает, и на системе без USERPROFILE
-  // (то есть везде кроме Windows) сторож сравнивал команды с каталогом по имени "${HOME}"
-  // и не узнавал ни одного домашнего пути — то есть молча переставал стеречь.
-  const HOMEwin = (process.env.USERPROFILE || require('os').homedir());
+  // Запасное значение не должно быть чьей-то конкретной папкой: на чужой машине
+  // такого пути нет, и защита молча перестаёт срабатывать.
+  const HOMEwin = (process.env.USERPROFILE || process.env.HOME || 'C:/Users/Default');
   const HOMEfwd = HOMEwin.replace(/\\/g, '/');
   const HOMEfwdEsc = HOMEfwd.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const HOMEbackEsc = HOMEwin.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -116,7 +138,7 @@ try {
     { id: 'git-plus-main',  re: /\bgit\s+push\b[^\n]*\s\+(main|master|prod|production|release)\b/i, why: 'git push +refspec в защищённую ветку' },
     // git checkout/restore of the ENTIRE working tree (`.`) — discards all uncommitted edits
     { id: 'git-checkout-dot', re: /\bgit\s+(?:-C\s+\S+\s+)?(?:checkout|restore)\s+(?:(?!--)[\w@^~{}\/.:-]+\s+)?(?:--\s+)?\.["']?\s*(?:$|[;&|])/i, why: 'git checkout/restore -- . (сброс ВСЕХ незакоммиченных правок)' },
-    // chattr recursive un-immutable (fleet brains on your-server are chattr +i protected)
+    // chattr recursive un-immutable (fleet brains on Vertex are chattr +i protected)
     { id: 'chattr-unimmute-R', re: /\bchattr\b(?=[^\n]*\s-[a-zA-Z]*R)[^\n]*\s-[a-zA-Z]*i/, why: 'chattr -R -i (рекурсивное снятие immutable-защиты)' },
     // PowerShell recursive-force delete of roots/home
     { id: 'ps-remove-root', re: /remove-item\b[^\n]*-(recurse|force)\b[^\n]*(\bc:\\?(\s|$|\*)|\$env:userprofile|\$home\b|~[\\/](\s|$))/i, why: 'Remove-Item -Recurse -Force корня/home' },
@@ -128,9 +150,6 @@ try {
     // download|execute (remote code exec)
     { id: 'curl-pipe-exec', re: /\b(curl|wget|iwr|invoke-webrequest)\b[^\n]*(\||;|&&)\s*(sh|bash|zsh|iex\b|invoke-expression\b|python3?\b|node\b|perl\b)\b/i, why: 'скачать-и-исполнить (curl|sh)' },
     // === 2026-07-31 infra-destruction (снос работающего прода) ===
-    // NO sql/txt gate on purpose: TEXTDISP matches only the START of the line, so a txt-flag
-    // would open `echo restarting && docker compose down -v`. Cost: `grep "docker rm -f" x.md`
-    // is blocked too — same trade-off as the existing rm-root/dd rules.
     { id: 'docker-rm-force', re: new RegExp(DKR + 'rm\\b(?=[^\\n;&|]*\\s(?:-[a-zA-Z]*f[a-zA-Z]*|--force)\\b)', 'i'),
       why: 'docker rm -f/--force — принудительное удаление контейнера' },
     { id: 'docker-mass-wipe', re: /\bdocker\b[^\n]*\s(?:rm|stop|kill)\b[^\n]*(?:\$\(|`)\s*docker\s+ps\b/i,
@@ -151,11 +170,10 @@ try {
       why: 'service ... stop — остановка системного сервиса' },
     { id: 'kubectl-delete', re: /\bkubectl\b[^\n;&|]*\sdelete(?=\s|$)/i,
       why: 'kubectl delete — удаление ресурсов кластера' },
-    // === dcg-port 2026-07-19 (8 patterns + 3 scan branches below) ===
-    // Interpreter fs-nuke sinks: match the RAW cmd (heredoc bodies and -c payloads are
-    // substrings of it). Root/home/sysdir targets only — rmtree('./build'|'/tmp/x') PASS.
-    // txt:true — text-display prefix (echo/git commit) makes these harmless mentions;
-    // the interpreter branch below still re-scans real payloads, so no echo-prefix bypass.
+    // === dcg-port 2026-07-19: interpreter fs-nuke sinks ===
+    // Эти паттерны совпадают в КОДЕ интерпретаторной нагрузки: однословный
+    // закавыченный путь-цель вклеен обратно, поэтому вызов rmtree с корнем,
+    // /home или системной папкой в аргументе виден. Субпути вида ./build — PASS.
     { id: 'interp-rmtree-root', re: new RegExp('\\b(?:shutil\\.rmtree|os\\.removedirs|FileUtils\\.rm_rf|FileUtils\\.rm_r|(?:File::Path::)?remove_tree|rmtree)\\s*\\(\\s*(?:r|rb|b)?["\'](?:\\/(?!tmp\\b)[a-z]{0,12}|\\/home\\/[\\w.-]+|~|[a-z]:\\\\{0,4}|' + HOMEfwdEsc + ')\\/?["\']', 'i'), why: 'shutil.rmtree/rm_rf/remove_tree корня, /home или системной папки (python/ruby/perl payload)', txt: true },
     { id: 'js-fs-rm-root', re: new RegExp('\\.\\s*rm(?:Sync|dirSync|dir)?\\s*\\(\\s*["\'](?:\\/(?!tmp\\b)[a-z]{0,12}|\\/home\\/[\\w.-]+|~|[a-z]:\\\\{0,4}|' + HOMEfwdEsc + ')\\/?["\']', 'i'), why: 'fs.rmSync/rmdir корня, /home или системной папки (node payload)', txt: true },
     // decode-and-execute (obfuscated payload — content invisible, execution intent explicit)
@@ -169,71 +187,228 @@ try {
     { id: 'shadowcopy-delete', re: /\bvssadmin\b[^\n]*\bdelete\s+shadows\b|\bwmic\b[^\n]*\bshadowcopy\b[^\n]*\bdelete\b/i, why: 'удаление Volume Shadow Copies (уничтожение точек восстановления)' },
   ];
 
-  // Scan one command string (top-level command OR the payload of a remote ssh command).
-  function findHit(str) {
+  // Scan one EXECUTABLE string with the pattern list.
+  // noSql=true: SQL-ключевые слова здесь — данные (строки-литералы интерпретатора),
+  // не исполняемый SQL; sql-паттерны пропускаются. Для реального SQL-канала
+  // (psql/mysql -c, sql-heredoc) вызывается без noSql.
+  function findHit(str, noSql) {
     const textDisplay = TEXTDISP.test(str);
     for (const p of P) {
-      if ((p.sql || p.txt) && textDisplay) continue; // "echo DROP DATABASE" / git commit -m "..." — harmless text
+      if ((p.sql || p.txt) && textDisplay) continue; // "echo DROP DATABASE" — harmless text
+      if (p.sql && noSql) continue;
       if (p.re.test(str)) return p;
     }
     return null;
   }
 
-  // Extract quoted substrings (both quote types => one nesting level covered) —
-  // used by the interpreter/heredoc branch below; mirrors the ssh-branch extraction.
+  // ===== 2026-08-17: шелл-токенизатор (приближённый, bash-флейвор) =====
+  // Возвращает { code, dq[], sq[], heredocs[{tag,body}] }.
+  // code = команда МИНУС содержимое кавычек, тела heredoc и #-комментарии.
+  // Однословный закавыченный токен (нет пробелов и ;&|<>()`"' — метасимволов,
+  // которые сделали бы его НЕ одним словом-целью) вклеивается обратно вместе
+  // с кавычками: `rm -rf "/"`, `rm -rf "$HOME"`, `"mkfs.ext4" /dev/sda`,
+  // `git push --force origin "main"` остаются видимыми паттернам с Q-бэкрефом.
+  // Многословное содержимое ("DROP TABLE users", прозаический текст) — данные,
+  // в code остаётся пустая пара кавычек.
+  const SIMPLE_TOKEN = /^[^\s;&|<>()`"']{1,128}$/;
+  function tokenize(str) {
+    let code = '';
+    const dq = [], sq = [], heredocs = [];
+    const pending = []; // heredoc-теги, ждущие тела после ближайшего невзятого в кавычки \n
+    let i = 0;
+    const n = str.length;
+    while (i < n) {
+      const c = str[i];
+      if (c === '\\') { code += c + (str[i + 1] || ''); i += 2; continue; }
+      if (c === "'") {
+        let j = i + 1, buf = '';
+        while (j < n && str[j] !== "'") { buf += str[j]; j++; }
+        sq.push(buf);
+        code += SIMPLE_TOKEN.test(buf) ? "'" + buf + "'" : "''";
+        i = j + 1; continue;
+      }
+      if (c === '"') {
+        let j = i + 1, buf = '';
+        while (j < n && str[j] !== '"') {
+          if (str[j] === '\\' && j + 1 < n) { buf += str[j] + str[j + 1]; j += 2; continue; }
+          buf += str[j]; j++;
+        }
+        const un = buf.replace(/\\(["\\$`])/g, '$1');
+        dq.push(un);
+        code += SIMPLE_TOKEN.test(un) ? '"' + un + '"' : '""';
+        i = j + 1; continue;
+      }
+      // Комментарий: невзятый в кавычки # в начале слова — до конца строки.
+      // (`foo#bar` — не комментарий, поэтому требуем границу слева.)
+      if (c === '#' && (code === '' || /[\s;&|(]$/.test(code))) {
+        while (i < n && str[i] !== '\n') i++;
+        continue;
+      }
+      // Heredoc-оператор <<[-~]? ['"]TAG['"] (но не herestring <<<)
+      if (c === '<' && str[i + 1] === '<' && str[i + 2] !== '<') {
+        const m = /^<<[-~]?\s*(["']?)([A-Za-z_]\w*)\1/.exec(str.slice(i));
+        if (m) { pending.push(m[2]); code += str.slice(i, i + m[0].length); i += m[0].length; continue; }
+        code += '<<'; i += 2; continue;
+      }
+      // Конец командной строки: если объявлены heredoc'и — забрать их тела.
+      if (c === '\n' && pending.length) {
+        code += '\n'; i++;
+        while (pending.length) {
+          const tag = pending.shift();
+          let body = '', done = false;
+          while (i < n) {
+            let eol = str.indexOf('\n', i);
+            if (eol === -1) eol = n;
+            const line = str.slice(i, eol);
+            i = (eol === n) ? n : eol + 1;
+            if (line.replace(/^\t+/, '').replace(/\r$/, '') === tag) { done = true; break; }
+            body += line + '\n';
+          }
+          heredocs.push({ tag, body });
+          if (!done) break; // незакрытый heredoc: остаток съеден как тело
+        }
+        continue;
+      }
+      code += c; i++;
+    }
+    return { code, dq, sq, heredocs };
+  }
+
+  // Закавыченные сегменты строки (для exec-стоков внутри интерпретаторного кода).
   function extractQuoted(str) {
     const out = [];
-    const dq = str.match(/"(?:[^"\\]|\\.)*"/g) || [];
-    for (const seg of dq) out.push(seg.slice(1, -1).replace(/\\(["\\$`])/g, '$1'));
-    const sq = str.match(/'[^']*'/g) || [];
-    for (const seg of sq) out.push(seg.slice(1, -1));
+    const dq2 = str.match(/"(?:[^"\\]|\\.)*"/g) || [];
+    for (const seg of dq2) out.push(seg.slice(1, -1).replace(/\\(["\\$`])/g, '$1'));
+    const sq2 = str.match(/'[^']*'/g) || [];
+    for (const seg of sq2) out.push(seg.slice(1, -1));
     return out;
   }
 
-  let hit = findHit(cmd);
+  // Исполнители полезной нагрузки. Триггеры проверяются по КОДУ (не по сырой
+  // строке): упоминание "ssh"/"psql" внутри литерала исполнителем не является.
+  const SSH_TRIG    = /(^|[;&|(]\s*|\$\(\s*)ssh\s/i;
+  // SQL-клиент + признак исполняемого SQL: -c/-e/-f/--command/--execute, heredoc
+  // или закавыченный позиционный аргумент (sqlite3 "..."). Пустые пары кавычек
+  // от вырезанных строк в code сохраняются — признак работает.
+  const SQLCLI_TRIG = /\b(?:psql|mysql|mariadb|sqlite3|sqlcmd|clickhouse-client|mongosh?)(?:\.exe)?\b[^\n;&|]*(?:\s(?:-c|-e|-f|--command|--execute|--file)\b|<<|["'])/i;
+  const SHELL_TRIG  = /(^|[;&|(]\s*|\$\(\s*)(?:bash|zsh|dash|ksh|sh|eval)(?:\.exe)?\s+(?:(?:-\S*|--\S+)\s+)*(?:-[a-zA-Z]*c[a-zA-Z]*(?:\s|$|["'])|<<|["'])/i;
+  const INTERP_TRIG = /(^|[;&|(]\s*|\$\(\s*)((?:python|perl|node(?:js)?|ruby|php)[\w.]*)(?:\.exe)?\s+(?:(?:-\S*|--\S+)\s+)*(?:-[a-zA-Z]*[ce][a-zA-Z]*(?:\s|$|["'])|<<)/i;
+  // Exec-стоки: только при их наличии строки-литералы интерпретаторного кода
+  // сканируются как команды. Литералы без стока — данные (доказанный кейс
+  // владельца: анализ-скрипт с опасными словами в строках, стоков нет).
+  const SINK_RE     = /\b(?:os\.system|subprocess\.\w+|popen|proc_open|shell_exec|passthru|exec(?:v[pe]*|l[pe]*|Sync|File)?\s*\(|spawn(?:Sync)?\s*\(|child_process|Runtime\.getRuntime|IO\.popen|Kernel\.(?:system|exec)|system\s*\()/i;
+  const SINK_ARGS   = /\b(?:os\.system|subprocess\.\w+|popen|proc_open|shell_exec|passthru|exec\w*|spawn\w*|IO\.popen|system)\s*\(([^)\n]*)/gi;
 
-  // SSH branch: `ssh host "..."` / `ssh host '...'` / `ssh host cmd...` — the remote payload
-  // must pass the SAME destructive patterns (closing quote used to break the TERM boundary,
-  // making e.g. `ssh your-server "rm -rf /"` invisible). Only when ssh is in COMMAND position —
-  // the word "ssh" inside a commit message must not trigger payload scanning.
-  if (!hit && /(^|[;&|(]\s*|\$\(\s*)ssh\s/i.test(cmd)) {
-    const inners = [];
-    const dq = cmd.match(/"(?:[^"\\]|\\.)*"/g) || [];
-    for (const seg of dq) inners.push(seg.slice(1, -1).replace(/\\(["\\$`])/g, '$1'));
-    const sq = cmd.match(/'[^']*'/g) || [];
-    for (const seg of sq) inners.push(seg.slice(1, -1));
-    // unquoted remote command: everything after `ssh [opts] host`
-    const m = cmd.match(/\bssh\s+(?:-[a-zA-Z]\S*\s+)*(?:\S+@)?[\w.\-]+\s+([\s\S]+)$/);
-    if (m) inners.push(m[1]);
-    for (const s of inners) {
-      hit = findHit(s);
-      if (hit) { hit = { id: hit.id + '@ssh', why: hit.why + ' — внутри ssh-команды (удалённый хост!)', re: hit.re }; break; }
+  function tagHit(h, suffix, note) { return { id: h.id + suffix, why: h.why + ' — ' + note }; }
+
+  // Нагрузка интерпретатора (python/node/perl/ruby/php): это КОД, не шелл.
+  // 1) его собственный код (минус литералы) — ловит вызовы rmtree корня и т.п.;
+  // 2) литералы — ТОЛЬКО из аргументов exec-стоков (os.system/subprocess/...).
+  function scanInterpreterPayload(p, interpName) {
+    const pt = tokenize(p);
+    let h = findHit(pt.code, true); // noSql: SQL-слова вне exec-канала — данные
+    if (h) return tagHit(h, '@inline', 'код интерпретатора (' + interpName + ')');
+    let m;
+    SINK_ARGS.lastIndex = 0;
+    while ((m = SINK_ARGS.exec(p)) !== null) {
+      for (const s of extractQuoted(m[1])) {
+        h = findHit(s, true);
+        if (h) return tagHit(h, '@inline', 'строка в exec-стоке (' + m[0].slice(0, 30) + '...)');
+      }
     }
+    // perl/ruby: `...` — исполнение шеллом
+    if (/^(perl|ruby)/i.test(interpName)) {
+      for (const bt of (p.match(/`([^`]*)`/g) || [])) {
+        h = findHit(bt.slice(1, -1));
+        if (h) return tagHit(h, '@inline', 'backtick-команда в ' + interpName);
+      }
+    }
+    return null;
   }
 
-  // Interpreter/heredoc branch (dcg-port): `python -c "..."`, `perl -e`, `node -e`,
-  // `ruby -e`, `bash|sh -c`, and `python <<EOF ... EOF` — inline payloads hide
-  // destroyers inside quotes (os.system('rm -rf /')) where the closing quote breaks
-  // the TERM boundary of the top-level scan. Extract quoted segments, re-scan each.
-  // Only fires when the interpreter is in COMMAND position with -c/-e flags or a heredoc.
-  if (!hit && /(^|[;&|(]\s*|\$\(\s*)(?:python[\w.]*|perl[\w.]*|node(?:js)?[\w.]*|ruby[\w.]*|php[\w.]*|bash|zsh|dash|ksh|sh)(?:\.exe)?\s+(?:(?:-\S*|--\S+)\s+)*(?:-[a-zA-Z]*[ce][a-zA-Z]*(?:\s|$|["'])|<<)/i.test(cmd)) {
-    for (const s of extractQuoted(cmd)) {
-      hit = findHit(s);
-      if (hit) { hit = { id: hit.id + '@inline', why: hit.why + ' — внутри inline-кода интерпретатора/heredoc', re: hit.re }; break; }
+  // Рекурсивный скан: код → каналы-исполнители. Глубина ≤ 3 (bash -c "ssh ...").
+  function scanCommand(cmdStr, depth) {
+    if (depth > 3 || typeof cmdStr !== 'string' || !cmdStr.trim()) return null;
+    const t = tokenize(cmdStr);
+
+    // 1) Исполняемый код команды
+    let h = findHit(t.code);
+    if (h) return h;
+
+    // 2) $(...) и `...` внутри ДВОЙНЫХ кавычек шелл исполняет (в одинарных — нет)
+    for (const s of t.dq) {
+      for (const sub of (s.match(/\$\(([^()]*)\)/g) || [])) {
+        h = scanCommand(sub.slice(2, -1), depth + 1);
+        if (h) return tagHit(h, '@subst', 'внутри $(...) в двойных кавычках');
+      }
+      for (const bt of (s.match(/`([^`]*)`/g) || [])) {
+        h = scanCommand(bt.slice(1, -1), depth + 1);
+        if (h) return tagHit(h, '@subst', 'внутри `...` в двойных кавычках');
+      }
     }
+
+    const strings = t.dq.concat(t.sq);
+
+    // 3) ssh: нагрузка исполняется удалённым шеллом (Vertex = 44 prod-контейнера)
+    if (SSH_TRIG.test(t.code)) {
+      const payloads = strings.slice();
+      const m = cmdStr.match(/\bssh\s+(?:-[a-zA-Z]\S*\s+)*(?:\S+@)?[\w.\-]+\s+([\s\S]+)$/);
+      if (m) payloads.push(m[1]);
+      for (const s of payloads) {
+        h = scanCommand(s, depth + 1);
+        if (h) return tagHit(h, '@ssh', 'внутри ssh-команды (удалённый хост!)');
+      }
+    }
+
+    // 4) SQL-клиент: его аргумент/heredoc — ИСПОЛНЯЕМЫЙ SQL (sql-паттерны активны)
+    if (SQLCLI_TRIG.test(t.code)) {
+      for (const s of strings) {
+        h = findHit(s);
+        if (h) return tagHit(h, '@sqlcli', 'аргумент SQL-клиента (psql/mysql/sqlite3)');
+      }
+      for (const hd of t.heredocs) {
+        h = findHit(hd.body);
+        if (h) return tagHit(h, '@sqlcli', 'heredoc, скормленный SQL-клиенту');
+      }
+    }
+
+    // 5) bash|sh -c / eval / shell-heredoc: нагрузка = КОМАНДЫ (рекурсивный скан)
+    if (SHELL_TRIG.test(t.code)) {
+      for (const s of strings) {
+        h = scanCommand(s, depth + 1);
+        if (h) return tagHit(h, '@inline', 'payload шелла (-c/eval/heredoc)');
+      }
+      for (const hd of t.heredocs) {
+        h = scanCommand(hd.body, depth + 1);
+        if (h) return tagHit(h, '@inline', 'shell-heredoc');
+      }
+    }
+
+    // 6) python/node/perl/ruby/php -c/-e/heredoc: нагрузка = код интерпретатора
+    const im = INTERP_TRIG.exec(t.code);
+    if (im) {
+      const payloads = strings.concat(t.heredocs.map(x => x.body));
+      for (const p of payloads) {
+        h = scanInterpreterPayload(p, im[2]);
+        if (h) return h;
+      }
+    }
+
+    return null;
   }
 
-  // PowerShell -EncodedCommand branch (dcg-port): decode the base64 payload
-  // (UTF-16LE — PowerShell canon — plus UTF-8 fallback) and re-scan it with the
-  // same patterns. Undecodable/garbled payload => fail-open, consistent with the guard.
+  let hit = scanCommand(cmd, 0);
+
+  // PowerShell -EncodedCommand: декодировать (UTF-16LE канон + UTF-8 fallback)
+  // и прогнать через тот же рекурсивный скан. Не декодится => fail-open.
   if (!hit) {
     const enc = cmd.match(/\b(?:powershell|pwsh)(?:\.exe)?\b[^\n]*?\s[-\/](?:e|ec|en|enc|encodedcommand)[:\s]+["']?([A-Za-z0-9+\/=]{16,})/i);
     if (enc) {
       try {
         const buf = Buffer.from(enc[1], 'base64');
         for (const dec of [buf.toString('utf16le'), buf.toString('utf8')]) {
-          hit = findHit(dec);
-          if (hit) { hit = { id: hit.id + '@encoded', why: hit.why + ' — внутри base64 -EncodedCommand', re: hit.re }; break; }
+          const h = scanCommand(dec, 1);
+          if (h) { hit = tagHit(h, '@encoded', 'внутри base64 -EncodedCommand'); break; }
         }
       } catch (e) { /* decode error => fail-open */ }
     }

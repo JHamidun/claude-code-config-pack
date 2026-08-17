@@ -121,7 +121,7 @@ def listen(path: pathlib.Path) -> str:
         "generationConfig": {"temperature": 0.2, "maxOutputTokens": 2000}}
     req = urllib.request.Request(
         "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"gemini-3.7-flash:generateContent?key={key}",
+        f"gemini-3-flash-preview:generateContent?key={key}",
         data=_json.dumps(body).encode(),
         headers={"Content-Type": "application/json"})
     try:
