@@ -6,6 +6,10 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 ## What's inside
 
+| Skill | What it does |
+|-------|--------------|
+| `google-workspace` | Google Workspace и рабочая почта одним набором инструментов: Google Docs (прочитать документ, найти документ, дописать текст), Google Sheets… |
+
 ### Commands
 
 - `/gads`

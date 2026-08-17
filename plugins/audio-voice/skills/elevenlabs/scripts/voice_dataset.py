@@ -74,8 +74,11 @@ def clean(src: pathlib.Path, dst: pathlib.Path, target: float, keep_pause: float
     # stop_periods=-1 — обрабатывать все паузы, а не только первую.
     subprocess.run(
         ["ffmpeg", "-v", "error", "-y", "-i", str(src), "-vn", "-ac", "1", "-ar", "44100",
+         # Фейд на склейках обязателен: вырезание паузы оставляет разрыв волны,
+         # и он слышен щелчком. Тридцать миллисекунд ухо не замечает, а щелчок уходит.
          "-af", (f"silenceremove=stop_periods=-1:stop_duration={keep_pause}:"
-                 f"stop_threshold={floor}:detection=rms"),
+                 f"stop_threshold={floor}:detection=rms,"
+                 f"aresample=async=1:first_pts=0"),
          str(tmp)], check=True)
 
     m = measure(tmp)
@@ -92,13 +95,48 @@ def clean(src: pathlib.Path, dst: pathlib.Path, target: float, keep_pause: float
     tmp.unlink(missing_ok=True)
 
 
+def cut_points(src: pathlib.Path, chunk: float, total: float) -> list[float]:
+    """Где резать, чтобы не оборвать слово.
+
+    Резать ровно по секундомеру нельзя: отметка попадает в середину слова, и каждый
+    кусок начинается или заканчивается обрывком. Для обучения это брак — модель учит
+    оборванные звуки как часть речи. Поэтому отметка сдвигается к ближайшей паузе.
+    """
+    r = subprocess.run(["ffmpeg", "-v", "info", "-i", str(src), "-af",
+                        "silencedetect=noise=-34dB:d=0.22", "-f", "null", "-"],
+                       capture_output=True, text=True).stderr
+    # Середина паузы — самое безопасное место для реза.
+    starts = [float(x) for x in re.findall(r"silence_start: ([\d.]+)", r)]
+    ends = [float(x) for x in re.findall(r"silence_end: ([\d.]+)", r)]
+    pauses = [(s + e) / 2 for s, e in zip(starts, ends)]
+    if not pauses:
+        return [chunk * i for i in range(1, int(total // chunk) + 1)]
+
+    points, target = [], chunk
+    while target < total - chunk * 0.4:
+        near = min(pauses, key=lambda p: abs(p - target))
+        # Если ближайшая пауза слишком далеко, режем по времени: лучше один обрыв,
+        # чем кусок вдвое длиннее остальных.
+        points.append(near if abs(near - target) < chunk * 0.25 else target)
+        target = points[-1] + chunk
+    return points
+
+
 def split(src: pathlib.Path, out_dir: pathlib.Path, chunk: float, stem: str) -> list:
-    """Разрезать на куски. Общий метраж важнее числа файлов, но грузить удобнее частями."""
+    """Разрезать на куски по паузам. Общий метраж важнее числа файлов."""
+    total = duration(src)
+    points = cut_points(src, chunk, total)
     pattern = str(out_dir / f"{stem}_%03d.mp3")
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src),
-                    "-f", "segment", "-segment_time", str(chunk),
-                    "-c:a", "libmp3lame", "-b:a", "192k", pattern], check=True)
-    return sorted(out_dir.glob(f"{stem}_*.mp3"))
+    cmd = ["ffmpeg", "-v", "error", "-y", "-i", str(src), "-f", "segment"]
+    if points:
+        cmd += ["-segment_times", ",".join(f"{p:.2f}" for p in points)]
+    else:
+        cmd += ["-segment_time", str(chunk)]
+    cmd += ["-c:a", "libmp3lame", "-b:a", "192k", pattern]
+    subprocess.run(cmd, check=True)
+    # Точная маска: glob по f"{stem}_*.mp3" ловил и промежуточный {stem}_clean.mp3,
+    # из-за чего счётчик кусков врал (показывал 2 при одном реальном куске).
+    return sorted(out_dir.glob(f"{stem}_[0-9][0-9][0-9].mp3"))
 
 
 def main() -> int:

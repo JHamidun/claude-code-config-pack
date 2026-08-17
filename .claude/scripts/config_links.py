@@ -27,10 +27,16 @@ from __future__ import annotations
 import argparse
 import json
 import pathlib
+import os
 import re
 import sys
 
-C = pathlib.Path.home() / ".claude"
+# Проверять надо ТО ДЕРЕВО, которое публикуется, а не домашнюю папку автора: там
+# всё на месте по определению, и линтер выдавал зелёный отчёт про чужую раскладку.
+# Ровно так в паке разошёлся каталог инструментов: 16 перечисленных файлов
+# отсутствуют, 18 существующих не перечислены, а проверка молчала.
+C = pathlib.Path(os.environ.get("CLAUDE_CONFIG_DIR")
+                 or pathlib.Path.home() / ".claude")
 
 
 def inventory() -> dict:

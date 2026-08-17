@@ -5,6 +5,11 @@ argument-hint: "[today | week | list <дней> | create <событие> | free
 
 # Google Calendar Operations
 
+> Готовый клиент: `python ~/.claude/skills/google-workspace/scripts/gcal_client.py {today|week|list|free|add|calendars}` — проверен на живом календаре.
+> Права ТОЛЬКО в `google_oauth_token_calendar.json`. В общем `google_oauth_token.json`
+> календарных прав нет: именно из-за этой строки поднимали авторизацию заново.
+
+
 /gcalendar - Работа с Google Календарём
 
 ## Описание
@@ -28,7 +33,7 @@ from datetime import datetime, timedelta
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-with open('${HOME}/.claude/google_oauth_token.json', 'r') as f:
+with open('~/.claude/google_oauth_token_calendar.json', 'r') as f:
     token_data = json.load(f)
 creds = Credentials.from_authorized_user_info(token_data)
 calendar = build('calendar', 'v3', credentials=creds)
@@ -62,11 +67,11 @@ event = {
     'description': 'Обсуждение проекта',
     'start': {
         'dateTime': '2025-12-22T10:00:00',
-        'timeZone': 'UTC',
+        'timeZone': YOUR_TIMEZONE,  # например 'Europe/Berlin'
     },
     'end': {
         'dateTime': '2025-12-22T11:00:00',
-        'timeZone': 'UTC',
+        'timeZone': YOUR_TIMEZONE,  # например 'Europe/Berlin'
     },
     'reminders': {
         'useDefault': False,
@@ -93,7 +98,7 @@ calendar.events().delete(calendarId='primary', eventId=event_id).execute()
 ## Форматы времени
 - Полное: `2025-12-22T10:00:00+03:00`
 - Весь день: `2025-12-22` (без времени)
-- TimeZone: `UTC`, `UTC`
+- TimeZone: свой пояс или `UTC`
 
 ## Примеры
 - `/gcalendar today` - что запланировано на сегодня

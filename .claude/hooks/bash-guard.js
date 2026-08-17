@@ -14,7 +14,7 @@
  * DELETE FROM without WHERE, git checkout/restore -- ., chattr -R -i,
  * quoted-target rm (`rm -rf "/"`), and an SSH branch: the remote command inside
  * `ssh host "..."` is re-scanned with the SAME destructive patterns
- * (Vertex runs 44 prod containers — destroyers inside quotes were invisible).
+ * (the prod server runs dozens of containers — destroyers inside quotes were invisible).
  *
  * 2026-07-19 dcg-port (Dicklesworthstone/destructive_command_guard, Rust, 2.9k*):
  * interpreter inline payloads (python -c / perl -e / node -e / bash -c + heredocs)
@@ -58,6 +58,41 @@
  * его пропуск не открывает дыру. А у настоящего разрушителя исполнитель есть
  * всегда: либо сам код команды, либо один из каналов выше — и все каналы
  * рекурсивно проходят через те же паттерны (глубина ≤ 3).
+ *
+ * 2026-08-17 (вторая правка): одной токенизации не хватило — остался класс
+ * ложных блокировок на ОДНОСЛОВНЫХ литералах. Токенизатор нарочно вклеивает
+ * однословную закавыченную цель обратно в код (иначе спрячется `rm -rf "/"`),
+ * но вместе с целью возвращается и безобидное слово: `grep 'mkfs' ops.md`
+ * блокировался как форматирование диска. Гейт «команда только показывает
+ * текст» (TEXTDISP) закрывал лишь SQL-правила, потому что проверялся на всей
+ * строке: `echo hi && rm -rf /` тоже начинается с echo.
+ * Лечение — сегментация: код режется по НЕВЗЯТЫМ в кавычки разделителям
+ * (; && || | перевод строки), и каждый сегмент оценивается сам по себе.
+ * Тогда гейт можно распространить на ВСЕ правила: в `echo hi && rm -rf /`
+ * второй сегмент показывалкой не является и блокируется, а `grep 'mkfs' f`
+ * состоит из одного сегмента-показывалки и проходит.
+ * Правила, чья улика САМА состоит из разделителей (curl | sh, форк-бомба),
+ * помечены span:true и по-прежнему смотрят строку целиком.
+ * Плюс: код интерпретатора сканируется узким набором INTERP_ONLY (там `mkfs`
+ * или `drop table` — слово языка, а не команда), а список-форма
+ * subprocess.run(["rm","-rf","/"]) ловится склейкой аргументов стока.
+ *
+ * ГРАНИЦЫ (осознанные):
+ *  - токенизатор приближённый, не bash. Незакрытая кавычка съедает остаток
+ *    строки, и код за ней в скан не попадает — но такую команду и сам bash
+ *    не выполнит (syntax error), так что дыры нет; в PowerShell правила
+ *    цитирования иные, там это ослабление реально;
+ *  - список TEXTDISP держать чистым: туда можно добавлять только команды,
+ *    физически неспособные разрушить (никаких xargs/find/sudo/env — они
+ *    исполняют чужое, и целый сегмент перестал бы проверяться);
+ *  - разделители ищутся в УЖЕ токенизированном коде, поэтому `;` внутри
+ *    строки сегмент не режет; но однословная вклейка не может их содержать
+ *    (SIMPLE_TOKEN это запрещает) — значит найденный разделитель настоящий;
+ *  - глубина рекурсии по каналам ≤ 3: `ssh a "ssh b \"ssh c ...\""` глубже
+ *    не разбирается (fail-open).
+ *
+ * Проверки: bash-guard.test.mjs рядом (36 команд + 5 контрактных).
+ * Запуск: node bash-guard.test.mjs   ·   замер: node bash-guard.test.mjs --bench
  */
 'use strict';
 const fs = require('fs');
@@ -84,9 +119,22 @@ try {
   const HOMEfwdEsc = HOMEfwd.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const HOMEbackEsc = HOMEwin.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-  // Pure text-display / text-processing command? Then SQL mentions are harmless text.
-  // (Gates ONLY sql-flagged patterns — gating rm/dd on this would open `echo hi && rm -rf /`.)
-  const TEXTDISP = /^\s*(echo|printf|cat|grep|rg|egrep|fgrep|less|more|head|tail|print|type|write-output|write-host|awk|sed|git\s+commit|git\s+log)\b/i;
+  // Команда-«показывалка»: только читает/печатает/ищет текст и сама ничего
+  // не разрушает. Упоминание опасного слова в её аргументах — данные.
+  // Раньше этот гейт закрывал ТОЛЬКО sql-паттерны, потому что проверялся на
+  // всей сырой строке: `echo hi && rm -rf /` тоже начинается с echo. После
+  // введения сегментации (см. SEP_RE ниже) проверка идёт по КАЖДОМУ командному
+  // сегменту отдельно, поэтому гейт безопасно распространить на ВСЕ правила:
+  // во втором сегменте `rm -rf /` показывалки нет и он будет заблокирован.
+  // В список входят только команды, физически неспособные разрушить систему
+  // (никаких xargs/find/sudo/env — они исполняют чужое).
+  const TEXTDISP = /^\s*(echo|printf|cat|grep|rg|egrep|fgrep|less|more|head|tail|print|type|write-output|write-host|awk|sed|man|which|whereis|whatis|apropos|stat|file|wc|sort|uniq|nl|cut|tr|column|jq|diff|ls|dir|pwd|date|vim?|nano|nvim|code|git\s+commit|git\s+log|git\s+show|git\s+diff|git\s+grep)\b/i;
+
+  // Разделители командных сегментов. Применяются к УЖЕ токенизированному коду:
+  // многословные строки оттуда вырезаны, а однословные вклейки не могут
+  // содержать ; & | (это запрещено SIMPLE_TOKEN) — значит любой найденный
+  // здесь разделитель настоящий, а не буква внутри текста.
+  const SEP_RE = /\|\||&&|[;&|\n]/;
 
   // rm root-target: block ONLY the whole root/home/drive (exact, or trailing / or /*), NOT subpaths.
   const RM = /\brm\s+(?:-[a-z]*\s+)*-[a-z]*[rf][a-z]*\s+(?:-[a-z]*\s+)*/i.source;
@@ -132,13 +180,14 @@ try {
     // power
     { id: 'shutdown',   re: /\bshutdown\s+\/(s|r)\b|\bstop-computer\b|\brestart-computer\b/i, why: 'shutdown/Stop-Computer' },
     // fork bomb
-    { id: 'fork-bomb',  re: /:\s*\(\s*\)\s*\{\s*:\s*\|\s*:\s*&\s*\}\s*;\s*:/, why: 'fork bomb' },
+    // span: сигнатура форк-бомбы САМА состоит из ; | & — по сегментам её не собрать.
+    { id: 'fork-bomb',  span: true, re: /:\s*\(\s*\)\s*\{\s*:\s*\|\s*:\s*&\s*\}\s*;\s*:/, why: 'fork bomb' },
     // git destructive force-push to protected branches
     { id: 'git-force-main', re: /\bgit\s+push\b[^\n]*\s(--force\b|-f\b|--force-with-lease\b)[^\n]*\b(main|master|prod|production|release)\b/i, why: 'git push --force в main/master/prod' },
     { id: 'git-plus-main',  re: /\bgit\s+push\b[^\n]*\s\+(main|master|prod|production|release)\b/i, why: 'git push +refspec в защищённую ветку' },
     // git checkout/restore of the ENTIRE working tree (`.`) — discards all uncommitted edits
     { id: 'git-checkout-dot', re: /\bgit\s+(?:-C\s+\S+\s+)?(?:checkout|restore)\s+(?:(?!--)[\w@^~{}\/.:-]+\s+)?(?:--\s+)?\.["']?\s*(?:$|[;&|])/i, why: 'git checkout/restore -- . (сброс ВСЕХ незакоммиченных правок)' },
-    // chattr recursive un-immutable (fleet brains on Vertex are chattr +i protected)
+    // chattr recursive un-immutable (fleet brains on the prod server are chattr +i protected)
     { id: 'chattr-unimmute-R', re: /\bchattr\b(?=[^\n]*\s-[a-zA-Z]*R)[^\n]*\s-[a-zA-Z]*i/, why: 'chattr -R -i (рекурсивное снятие immutable-защиты)' },
     // PowerShell recursive-force delete of roots/home
     { id: 'ps-remove-root', re: /remove-item\b[^\n]*-(recurse|force)\b[^\n]*(\bc:\\?(\s|$|\*)|\$env:userprofile|\$home\b|~[\\/](\s|$))/i, why: 'Remove-Item -Recurse -Force корня/home' },
@@ -148,7 +197,9 @@ try {
     // chmod -R on root/home
     { id: 'chmod-root', re: /\bchmod\s+(-[a-z]*\s+)*-[a-z]*r[a-z]*\s+[^\n]*\s(\/(\s|$)|~(\/(\s|$)|\s|$)|\$\{?home\}?(\s|$))/i, why: 'chmod -R на корень/home' },
     // download|execute (remote code exec)
-    { id: 'curl-pipe-exec', re: /\b(curl|wget|iwr|invoke-webrequest)\b[^\n]*(\||;|&&)\s*(sh|bash|zsh|iex\b|invoke-expression\b|python3?\b|node\b|perl\b)\b/i, why: 'скачать-и-исполнить (curl|sh)' },
+    // span: правило-конвейер — обязано видеть строку целиком (улика в связке
+    // «скачать | исполнить», разрезание по | её уничтожает).
+    { id: 'curl-pipe-exec', span: true, re: /\b(curl|wget|iwr|invoke-webrequest)\b[^\n]*(\||;|&&)\s*(sh|bash|zsh|iex\b|invoke-expression\b|python3?\b|node\b|perl\b)\b/i, why: 'скачать-и-исполнить (curl|sh)' },
     // === 2026-07-31 infra-destruction (снос работающего прода) ===
     { id: 'docker-rm-force', re: new RegExp(DKR + 'rm\\b(?=[^\\n;&|]*\\s(?:-[a-zA-Z]*f[a-zA-Z]*|--force)\\b)', 'i'),
       why: 'docker rm -f/--force — принудительное удаление контейнера' },
@@ -177,26 +228,56 @@ try {
     { id: 'interp-rmtree-root', re: new RegExp('\\b(?:shutil\\.rmtree|os\\.removedirs|FileUtils\\.rm_rf|FileUtils\\.rm_r|(?:File::Path::)?remove_tree|rmtree)\\s*\\(\\s*(?:r|rb|b)?["\'](?:\\/(?!tmp\\b)[a-z]{0,12}|\\/home\\/[\\w.-]+|~|[a-z]:\\\\{0,4}|' + HOMEfwdEsc + ')\\/?["\']', 'i'), why: 'shutil.rmtree/rm_rf/remove_tree корня, /home или системной папки (python/ruby/perl payload)', txt: true },
     { id: 'js-fs-rm-root', re: new RegExp('\\.\\s*rm(?:Sync|dirSync|dir)?\\s*\\(\\s*["\'](?:\\/(?!tmp\\b)[a-z]{0,12}|\\/home\\/[\\w.-]+|~|[a-z]:\\\\{0,4}|' + HOMEfwdEsc + ')\\/?["\']', 'i'), why: 'fs.rmSync/rmdir корня, /home или системной папки (node payload)', txt: true },
     // decode-and-execute (obfuscated payload — content invisible, execution intent explicit)
-    { id: 'decode-pipe-exec', re: /\b(?:base64\s+(?:-d|--decode)|openssl\s+enc\s+[^\n|]*-d|xxd\s+-r)[^\n|]*\|\s*(?:sh|bash|zsh|dash|iex|invoke-expression|python[\w.]*|node(?:js)?|perl|ruby)\b/i, why: 'декодировать-и-исполнить (base64 -d | sh)' },
+    { id: 'decode-pipe-exec', span: true, re: /\b(?:base64\s+(?:-d|--decode)|openssl\s+enc\s+[^\n|]*-d|xxd\s+-r)[^\n|]*\|\s*(?:sh|bash|zsh|dash|iex|invoke-expression|python[\w.]*|node(?:js)?|perl|ruby)\b/i, why: 'декодировать-и-исполнить (base64 -d | sh)' },
     { id: 'eval-download-decode', re: /\beval\b[^\n]*\$\([^)\n]*\b(?:base64|curl|wget)\b/i, why: 'eval $(base64/curl/wget ...) — исполнение декодированного/скачанного кода' },
     // pipe-to-shell variations beyond curl|sh
     { id: 'proc-subst-exec', re: /\b(?:sh|bash|zsh|dash|ksh)\s+(?:-\S+\s+)*<\(\s*(?:curl|wget)\b/i, why: 'bash <(curl ...) — исполнение скачанного через process substitution' },
     { id: 'shell-c-download', re: /\b(?:sh|bash|zsh|dash|ksh)\b[^\n]*\s-[a-z]*c[a-z]*\s+["']?\$\([^)\n]*\b(?:curl|wget)\b/i, why: 'sh -c "$(curl ...)" — исполнение скачанного через command substitution' },
+    // Тот же случай, но увиденный уже ИЗНУТРИ: содержимое кавычек вырезано
+    // токенизатором, поэтому предыдущее правило на коде не срабатывает —
+    // зато нагрузка `$(curl ...)` приходит в скан отдельной строкой, и там
+    // подстановка стоит в позиции команды, т.е. её вывод будет исполнен.
+    { id: 'subst-download-exec', re: /^\s*["']?\$\(\s*(?:curl|wget|iwr|invoke-webrequest)\b/i, why: 'исполнение вывода curl/wget через $(...) в позиции команды' },
     // disk signature wipe + Windows restore-point destruction
     { id: 'wipefs', re: /\bwipefs\s+(?:-[a-z]*a[a-z]*|--all)\b/i, why: 'wipefs -a — стирание сигнатур ФС' },
     { id: 'shadowcopy-delete', re: /\bvssadmin\b[^\n]*\bdelete\s+shadows\b|\bwmic\b[^\n]*\bshadowcopy\b[^\n]*\bdelete\b/i, why: 'удаление Volume Shadow Copies (уничтожение точек восстановления)' },
   ];
 
-  // Scan one EXECUTABLE string with the pattern list.
-  // noSql=true: SQL-ключевые слова здесь — данные (строки-литералы интерпретатора),
-  // не исполняемый SQL; sql-паттерны пропускаются. Для реального SQL-канала
-  // (psql/mysql -c, sql-heredoc) вызывается без noSql.
-  function findHit(str, noSql) {
-    const textDisplay = TEXTDISP.test(str);
+  // Правила, осмысленные только внутри КОДА интерпретатора (python/node/…):
+  // вызов rmtree/fs.rmSync с корнем. Помечены флагом txt.
+  const INTERP_ONLY = new Set(P.filter(p => p.txt).map(p => p.id));
+
+  // Скан одной ИСПОЛНЯЕМОЙ строки набором правил.
+  // opts.noSql — SQL-слова здесь данные (литералы интерпретатора), не команда;
+  //              для настоящего SQL-канала (psql -c, sql-heredoc) не ставится.
+  // opts.only  — ограничить набор правил этими id (код интерпретатора: там
+  //              «mkfs» или «drop table» в литерале — просто слово, а вот
+  //              rmtree('/') — реальный вызов).
+  //
+  // Порядок важен: сначала конвейерные (span) правила по строке целиком,
+  // затем — посегментно, пропуская сегменты-показывалки. Именно вторая часть
+  // отделяет НАМЕРЕНИЕ от ТЕКСТА: `grep 'mkfs' ops.md` — один сегмент, и он
+  // только ищет по файлу; `echo ok && rm -rf /` — два сегмента, и второй
+  // показывалкой не является.
+  function findHit(str, opts) {
+    opts = opts || {};
+    const only = opts.only || null;
+    const noSql = !!opts.noSql;
     for (const p of P) {
-      if ((p.sql || p.txt) && textDisplay) continue; // "echo DROP DATABASE" — harmless text
-      if (p.sql && noSql) continue;
+      if (!p.span) continue;
+      if (only && !only.has(p.id)) continue;
+      if (noSql && p.sql) continue;
       if (p.re.test(str)) return p;
+    }
+    for (const seg of str.split(SEP_RE)) {
+      if (!seg.trim()) continue;
+      if (TEXTDISP.test(seg)) continue;
+      for (const p of P) {
+        if (p.span) continue;
+        if (only && !only.has(p.id)) continue;
+        if (noSql && p.sql) continue;
+        if (p.re.test(seg)) return p;
+      }
     }
     return null;
   }
@@ -306,13 +387,22 @@ try {
   // 2) литералы — ТОЛЬКО из аргументов exec-стоков (os.system/subprocess/...).
   function scanInterpreterPayload(p, interpName) {
     const pt = tokenize(p);
-    let h = findHit(pt.code, true); // noSql: SQL-слова вне exec-канала — данные
+    // Код интерпретатора — НЕ шелл: `mkfs`, `drop table`, `shutdown` внутри него
+    // это слова языка или литералы, а не команды. Поэтому здесь работает только
+    // узкий набор INTERP_ONLY — вызовы, которые сносят ФС средствами самого
+    // языка (rmtree('/'), fs.rmSync('/')). Всё остальное опасное в скриптовом
+    // коде обязано пройти через exec-сток — он проверяется ниже.
+    let h = findHit(pt.code, { noSql: true, only: INTERP_ONLY });
     if (h) return tagHit(h, '@inline', 'код интерпретатора (' + interpName + ')');
     let m;
     SINK_ARGS.lastIndex = 0;
     while ((m = SINK_ARGS.exec(p)) !== null) {
-      for (const s of extractQuoted(m[1])) {
-        h = findHit(s, true);
+      const quoted = extractQuoted(m[1]);
+      // Список-форма (subprocess.run(["rm","-rf","/"])) разложена на отдельные
+      // литералы — по одному они безобидны, поэтому проверяется и склейка.
+      const candidates = quoted.length > 1 ? quoted.concat([quoted.join(' ')]) : quoted;
+      for (const s of candidates) {
+        h = findHit(s, { noSql: true });
         if (h) return tagHit(h, '@inline', 'строка в exec-стоке (' + m[0].slice(0, 30) + '...)');
       }
     }
@@ -349,7 +439,7 @@ try {
 
     const strings = t.dq.concat(t.sq);
 
-    // 3) ssh: нагрузка исполняется удалённым шеллом (Vertex = 44 prod-контейнера)
+    // 3) ssh: нагрузка исполняется удалённым шеллом (прод-сервер = десятки контейнеров)
     if (SSH_TRIG.test(t.code)) {
       const payloads = strings.slice();
       const m = cmdStr.match(/\bssh\s+(?:-[a-zA-Z]\S*\s+)*(?:\S+@)?[\w.\-]+\s+([\s\S]+)$/);

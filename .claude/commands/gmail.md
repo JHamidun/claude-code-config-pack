@@ -15,7 +15,7 @@ python ~/.claude/tools/gmail_search.py --read you@example.com:<id>
 
 python ~/.claude/tools/gmail_send.py --to кому@x.ru --subject "Тема" --body "Текст" --dry-run
 python ~/.claude/tools/gmail_download_attachments.py <ящик>:<id> ./вложения/
-python ~/.claude/tools/gmail_multi_auth.py <ящик>        # подключить новый ящик
+# подключить новый ящик: OAuth-токены Gmail кладутся в `~/.claude/.gmail-tokens/<ящик>.json` (client_id, client_secret, refresh_token). Скрипта авторизации в паке нет — заведи свой OAuth-клиент в Google Cloud Console и получи refresh_token любым стандартным способом (например, google-auth-oauthlib)
 ```
 
 Права — из `~/.claude/.gmail-tokens/*.json` (`gmail.modify`, включает отправку).
