@@ -1,6 +1,6 @@
 ---
 name: ai-creative-factory-ru
-description: "Маркетинговая методология performance-креативов (видео/статика для Meta/Google/VK/Yandex): структура хука, 5-блочный канон, дофаминовые триггеры, anti-AI-slop, декомпозиция виральных. НЕ техническая генерация — за ней video-generation, viral-shorts-playbook, image-generation, nano-banana-pro. Триггеры: «рекламный креатив», «performance креатив», «anti-AI-slop», «разбери виральное видео»."
+description: "Маркетинговая методология performance-креативов (видео/статика для Meta/Google/VK/Yandex): структура хука, 5-блочный канон, дофаминовые триггеры, anti-AI-slop, декомпозиция виральных. НЕ техническая генерация — за ней video-generation, image-generation, nano-banana-pro. Триггеры: «рекламный креатив», «performance креатив», «anti-AI-slop», «разбери виральное видео»."
 type: actionable
 ---
 
@@ -96,7 +96,7 @@ Production-гигиена, чтобы AI-генерация не выдавал�
 | Голос | ElevenLabs (голос + эмоции) | `elevenlabs`, `video-generation` |
 | Статика-креативы | Midjourney · DALL-E 3 · Nano Banana Pro | `image-generation`, `nano-banana-pro` |
 | Разбор видео по сценам | Gemini / GPT (video understanding) | `video-generation` |
-| Парсинг конкурентов / трендов | Apify · VidIQ · LiveDune | `ad-spy`, `apify-scraping`, `trend-engine` |
+| Парсинг конкурентов / трендов | Apify · VidIQ · LiveDune | `ad-spy`, `apify-scraping`, `tiktok-intel` |
 | Spy за креативами | Meta Ads Library · Bigspy · Atria | `ad-spy` |
 | Оркестрация фабрики | n8n · Cursor/Claude Code (1 формат = 1 агент) | `ai-marketing-stack-ru`, `n8n` |
 
@@ -114,12 +114,12 @@ Production-гигиена, чтобы AI-генерация не выдавал�
 ## 🔗 CROSS-LINKS (не дублируй — ходи туда)
 
 - **`video-generation`** — вся техническая AI-генерация видео (Veo/Runway/Sora/Seedance/Kling/Pika, keyframes, озвучка, сборка ffmpeg). Здесь только методология; за генерацией — туда.
-- **`viral-shorts-playbook`** — органические YouTube Shorts: 10 hook-формул, loop technique, abrupt ending, retention >100%. Родственный hook-слой для органики (этот скилл — про платный креатив; не дублируются, дополняют).
+- Органические YouTube Shorts (hook-формулы, loop technique, abrupt ending, retention >100%) — родственный hook-слой для органики, но отдельного плейбука в паке нет; хук-механика для платного креатива — здесь, в `references/hook-structure.md`.
 - **`image-generation`** — статика-креативы, prompt engineering DALL-E/Midjourney/Imagen/SD.
 - **`nano-banana-pro`** — Gemini Image Ultra для старт-фреймов и статики.
 - **`ad-spy`** — разведка креативов конкурентов (Meta Ads Library / Bigspy / Atria). Вход для декомпозиции.
 - **`ai-marketing-stack-ru`** — инфраструктура AI-агентов маркетолога — где живут «1 формат = 1 агент».
-- **`trend-engine`** / **`tiktok-intel`** — детект виральных трендов и аккаунт-радар.
+- **`tiktok-intel`** — детект виральных трендов и аккаунт-радар.
 - **`content-rules`** — анти-слоп правила контента (общие).
 - **`content-engine`** — органическая контент-машина (source-first workflow).
 

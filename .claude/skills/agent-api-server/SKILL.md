@@ -1,6 +1,6 @@
 ---
 name: agent-api-server
-description: "OpenAI-совместимый HTTP-сервер поверх ЛОКАЛЬНОГО claude CLI (подписка Max, без API-ключа) — отдаёт Claude как /v1/chat/completions для n8n, OpenAI-SDK, IDE, curl, Open WebUI; SSE-стрим, X-Session-Id. НЕ: наружу к OpenAI/Perplexity/Runway→local-gateway; разовый вызов из Python→claude-cli-runner; боевые Hermes-боты→agent-builder tooling."
+description: "OpenAI-совместимый HTTP-сервер поверх ЛОКАЛЬНОГО claude CLI (подписка Max, без API-ключа) — отдаёт Claude как /v1/chat/completions для n8n, OpenAI-SDK, IDE, curl, Open WebUI; SSE-стрим, X-Session-Id. НЕ: прокси наружу к OpenAI/Perplexity/Runway (отдельный сервис, в пак не входит); разовый вызов из Python→claude-cli-runner; боевые Hermes-боты→agent-builder tooling."
 ---
 
 # agent-api-server — Claude по подписке как OpenAI API
@@ -14,7 +14,7 @@ description: "OpenAI-совместимый HTTP-сервер поверх ЛО�
 
 | Инструмент | Куда | Что делает |
 |---|---|---|
-| `local-gateway` (127.0.0.1:**8200**) | НАРУЖУ | прокси к внешним провайдерам (OpenAI, Perplexity, Runway) |
+| Свой прокси-гейтвей к внешним провайдерам | НАРУЖУ | проксирует OpenAI/Perplexity/Runway; в пак не входит — если нужен, поднимается отдельно (например, LiteLLM) |
 | **`agent-api-server`** (127.0.0.1:**8199**) | ВНУТРЬ | отдаёт Claude-по-подписке как OpenAI-совместимый эндпоинт |
 | `claude-cli-runner` / `claude_cli.py` | — | разовый вызов из Python-кода, без HTTP |
 

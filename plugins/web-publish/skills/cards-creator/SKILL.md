@@ -1,11 +1,12 @@
 ---
 name: cards-creator
-description: Создание визуальных карточек-каруселей для Telegram-канала — editorial стиль. HTML+CSS шаблон → Playwright render → PNG-серия 1080×1350. Библиотека шаблонов лежит в templates/ (read-only образцы); новая серия создаётся в рабочей директории (CWD). Вызывается сам или из tg-post. Триггеры — «карточки для канала», «карусель в канал», «сделай series», «нарисуй cover», «slides для поста».
+description: Создание визуальных карточек-каруселей для Telegram-канала — editorial стиль. HTML+CSS → Playwright render → PNG-серия 1080×1350. Готовой библиотеки образцов в паке нет: серия собирается с нуля в рабочей директории по стартовому скелету и каталогу типов карточек из этого файла. Триггеры — «карточки для канала», «карусель в канал», «сделай series», «нарисуй cover», «slides для поста».
 ---
 
 # Cards Creator — карточки-карусели для Telegram-канала
 
-> Skill для editorial-style carousel-карточек. Production-tested editorial-magazine формат. Библиотека готовых шаблонов лежит в `templates/` как **образцы**. Новые серии создаются в **рабочей директории** на основе этих образцов.
+> Skill для editorial-style carousel-карточек. Production-tested editorial-magazine формат.
+> **Библиотека готовых образцов в пак не входит** — это реальные карточки авторского канала, они не публикуются. Всё, что нужно для сборки серии, лежит в этом файле: стартовый скелет (HTML + CSS-токены), каталог типов карточек, правила плотности и рендер-скрипт `scripts/render_cards.py`. Серия собирается **с нуля в рабочей директории** — первая занимает лишний час, дальше копируешь свою предыдущую.
 
 ## Когда использовать
 
@@ -13,60 +14,34 @@ description: Создание визуальных карточек-карусе
 - «карусель в канал на тему Y»
 - «нарисуй N cards в editorial-стиле»
 - «cover + screens + stats серия»
-- Из `tg-post` skill — автоматически если контент имеет list / before-after / 3+ цифры / режим long-roundup-announce
+- Из своего навыка-копирайтера постов — если контент имеет list / before-after / 3+ цифры / формат «обзор-подборка-анонс» (см. «Когда пост просит карточки»)
 
 ## Workflow — KEY PRINCIPLE
 
+Одна серия = одна отдельная папка. Скилл ничего в себя не пишет — только отдаёт скелет и скрипты.
+
 ```
-templates/            ← ОБРАЗЦЫ (read-only, источник истины)
-└── cards/
-    ├── palette.html    ← готовые шаблоны карточек
-    ├── *.css           ← CSS-tokens + class-types
-    └── theme-icons.svg ← Sprite
+~/.claude/skills/cards-creator/     ← read-only: скрипты + этот файл
+├── scripts/render_cards.py         ← HTML → png/series-NN.png
+├── scripts/card_image_generator.py ← иллюстрации в едином стиле
+└── references/visual-playbook.md   ← тип инфы → визуальный приём
 
-→ Читаем шаблоны → делаем по аналогии → пишем в **CWD** (working dir)
-
-/tmp/my-series/      ← НОВАЯ СЕРИЯ (output, обычная рабочая папка)
-├── series.html      ← собственный HTML с правильным контентом
-├── styles.css       ← скопированный из templates
-├── icons.svg        ← скопированный
-└── png/
-    ├── 01.png
-    ├── 02.png
+./cards-my-series/                  ← НОВАЯ СЕРИЯ (CWD или /tmp/cards-<topic>/)
+├── series.html                     ← карточки: по одному <section class="card"> на штуку
+├── styles.css                      ← токены + базовые классы (скелет ниже)
+├── img/                            ← иллюстрации/фото/вырезки
+├── logo.png, avatar.jpg            ← своя айдентика (опционально)
+└── png/                            ← вывод render_cards.py
+    ├── series-01.png
     └── ...
 ```
 
-**НИКОГДА не модифицируем `templates/`** — это образцы. Каждая новая серия делается копией нужных файлов в CWD (или `/tmp/cards-<topic>/`).
-
-## Структура библиотеки шаблонов
-
-```
-~/.claude/skills/cards-creator/templates/
-├── cards/                      ← основная палитра
-│   ├── palette.html            ← готовые карточки (grid)
-│   ├── palette-tokens.css      ← tokens + базовые классы
-│   ├── palette-cards.css       ← per-card overrides
-│   ├── palette-fixes.css       ← фиксы overflow и т.д.
-│   ├── styles.css              ← оригинальный базовый набор
-│   ├── theme-icons.svg         ← sprite глифов
-│   ├── preview-grid.html       ← thumbnails для общего обзора
-│   ├── samples.html            ← full-size sample карточки
-│   └── handoff/                ← self-contained handoff bundle
-│       ├── handoff.html        ← все карточки в одном файле + inline CSS
-│       ├── render.py           ← Playwright PNG export script
-│       ├── README.md           ← документация bundle
-│       └── photos/             ← placeholder-фото для карточек
-│
-├── uploads/                    ← оригинальные референсы + доп. фото
-│   └── photos/                 ← photo-pool
-│
-└── examples/                   ← legacy production-tested серии (старые workflow)
-    ├── example-cards.html      ← пример серии (cover + inner + closer)
-    ├── template.html           ← legacy базовый template
-    └── icons.svg               ← legacy sprite
-```
-
-> Плейсхолдер-фото и логотип — замени на свои брендовые ассеты перед первым использованием.
+**Своя библиотека образцов.** Когда серий станет несколько, заведи собственную папку-палитру
+(вне скилла, например `~/cards-lib/`) и держи там: `palette.html` со всеми типами карточек в одном
+файле, разбитый CSS (`tokens.css` — переменные бренда, `cards.css` — классы под типы,
+`fixes.css` — overflow-фиксы), `icons.svg`-спрайт, пул фото и логотип. Дальше новая серия — это
+`cp` из своей палитры, а не сборка с нуля. Палитру **не редактируй под конкретную серию** — она
+источник истины, правки идут в копии.
 
 ## Параметры
 
@@ -111,7 +86,7 @@ templates/            ← ОБРАЗЦЫ (read-only, источник истин
 
 ## Типы карточек (палитра)
 
-Открой `templates/cards/palette.html` чтобы увидеть все. Основные семейства:
+Разметку каждого типа пишешь сам поверх скелета (см. «Шаг 3»); ниже — каталог, что вообще стоит собирать. Основные семейства:
 
 ### Cover / Hero
 - **cover-hero** — большой headline + автор + eyebrow выпуска
@@ -191,36 +166,104 @@ cd ./cards-my-series
 
 **ВАЖНО**: НЕ создавай в `~/.claude/skills/cards-creator/`. Всегда — в текущей рабочей директории (CWD) или `/tmp/`.
 
-### Шаг 3 — Скопируй нужные файлы из templates/ как стартеры
+### Шаг 3 — Положи стартовый скелет (или копию своей прошлой серии)
 
-```bash
-# Скопируй CSS (выбери нужную версию)
-cp ~/.claude/skills/cards-creator/templates/cards/palette-tokens.css ./styles-tokens.css
-cp ~/.claude/skills/cards-creator/templates/cards/palette-cards.css ./styles-cards.css
-cp ~/.claude/skills/cards-creator/templates/cards/palette-fixes.css ./styles-fixes.css
+Если серия не первая — просто скопируй `styles.css` предыдущей и правь. Первый раз пиши эти два
+файла руками. Скелет минимальный, но рабочий: `render_cards.py` снимает ровно элементы `.card`,
+поэтому размер и `overflow` на `.card` — обязательны.
 
-# Скопируй SVG sprite
-cp ~/.claude/skills/cards-creator/templates/cards/theme-icons.svg ./
+`styles.css`:
 
-# Скопируй render.py + photos (если нужно)
-cp ~/.claude/skills/cards-creator/templates/cards/handoff/render.py ./
-cp -r ~/.claude/skills/cards-creator/templates/cards/handoff/photos ./
+```css
+/* ---- токены бренда: подставь свои цвета/шрифты ---- */
+:root{
+  --primary:#3B5BDB; --deep:#0B1021; --cyan:#4DABF7; --cyan-soft:#B5E1FF;
+  --cream:#F1F3F5; --cream-warm:#EFE6D6; --ink:#18181B; --terra:#CC7357;
+  --yellow:#FFD447; --text:#111; --text-muted:#4A4A55; --border:#D9D2C4;
+  --ft-head:"Inter Tight",system-ui;  --ft-body:"Manrope",sans-serif;
+  --ft-mono:"JetBrains Mono",monospace; --ft-script:"Caveat",cursive;
+}
+*{box-sizing:border-box;margin:0}
+body{background:#888;display:flex;flex-direction:column;align-items:center;gap:40px;padding:40px}
+
+/* ---- карточка: ровно 1080×1350, её и снимает render_cards.py ---- */
+.card{width:1080px;height:1350px;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;gap:26px;padding:64px 72px 56px;
+  background:var(--cream);color:var(--text);
+  font-family:var(--ft-body);font-size:26px;line-height:1.35}
+.card.dark{background:var(--deep);color:#fff}
+
+.eyebrow{font-family:var(--ft-mono);font-size:22px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text-muted)}
+h1{font-family:var(--ft-head);font-weight:900;font-size:112px;line-height:.92;
+  letter-spacing:-.02em;text-wrap:balance}
+.hl{background:linear-gradient(transparent 62%, var(--yellow) 62%)}
+.big{font-family:var(--ft-head);font-weight:900;font-size:280px;line-height:.85;
+  color:var(--primary);white-space:nowrap}
+.lead{font-size:30px;color:var(--text-muted);max-width:34ch}
+/* .grow — блок, который съедает свободную высоту. Ровно один на карточку:
+   без него всё липнет к верху, а низ карточки читается как дыра (см. ANTI-AIR) */
+.grow{flex:1}
+.hero{display:flex;flex-direction:column;justify-content:center;gap:18px}
+.teaser{list-style:none;padding:0;display:flex;flex-direction:column;font-size:28px}
+.teaser li{flex:1;display:flex;align-items:center;border-top:1px solid var(--border)}
+/* массивная полоса-вывод вплотную к футеру, а не тонкая строка */
+.takeaway{background:var(--deep);color:#fff;border-radius:18px;
+  padding:28px 32px;font-size:28px;line-height:1.3}
+.foot{font-family:var(--ft-mono);font-size:20px;color:var(--text-muted);
+  border-top:1px solid var(--border);padding-top:18px}
 ```
 
-### Шаг 4 — Создай series.html
+`series.html` — по одному `<section class="card">` на карточку, в порядке публикации:
 
-Возьми за основу нужный шаблон из `palette.html` (например `cover-hero` + 5× `inner` + `closer`). Найди разметку каждой карточки в `palette.html` и скопируй в новый `series.html`. Замени контент.
+```html
+<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@700;800;900&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@500;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css"></head><body>
 
-Альтернатива — использовать самодостаточный handoff:
-```bash
-cp ~/.claude/skills/cards-creator/templates/cards/handoff/handoff.html ./template-full.html
-# Открой template-full.html в редакторе, оставь нужные .card блоки, переписав контент
+<section class="card">                        <!-- 01 · cover-hero -->
+  <div class="eyebrow">выпуск 01</div>
+  <h1>Заголовок обложки<br><span class="hl">во всю ширину</span></h1>
+  <p class="lead">Один абзац лида — о чём серия.</p>
+  <ul class="teaser grow">                    <!-- тизер закрывает низ реальным контентом -->
+    <li>▸ что разбираем первым</li>
+    <li>▸ вторая тема</li>
+    <li>▸ третья тема</li>
+  </ul>
+  <footer class="foot">@yourchannel</footer>
+</section>
+
+<section class="card">                        <!-- 02 · stat-hero -->
+  <div class="eyebrow">01 / факт</div>
+  <div class="hero grow">
+    <div class="big">×4</div>
+    <p class="lead">Что означает эта цифра.</p>
+  </div>
+  <div class="takeaway">Вывод карточки — массивная полоса, а не тонкая строка.</div>
+  <footer class="foot">@yourchannel</footer>
+</section>
+
+</body></html>
 ```
+
+Проверено: этот скелет рендерится `render_cards.py` как есть и даёт 2160×2700 (1080×1350 @2×).
+Обложка высоту держит — тизер-индекс разбивает низ на равные строки. А вот на второй карточке
+`.hero` с `justify-content:center` оставляет по ~15% воздуха сверху и снизу от цифры: это ровно
+тот случай, который разбирает ANTI-AIR ниже. В боевой колоде это место закрывают вырезкой-объектом
+по теме или увеличивают кегль — скелет намеренно оставлен «как получается по умолчанию», чтобы
+было видно, с чем борешься.
+
+Дальше наращиваешь классы под нужные типы из каталога выше (`.cmp` таблица, `.bars` график,
+`.term` терминал-мок, `.col-img` split с картинкой) — правила плотности и анти-воздух ниже.
+
+### Шаг 4 — Наполни контентом
+
+Каждой карточке — один смысловой блок. Больше 10 карточек не собирай: `sendMediaGroup` берёт максимум 10.
 
 ### Шаг 5 — Render через Playwright
 
 ```bash
-python render.py series.html
+python ~/.claude/skills/cards-creator/scripts/render_cards.py series.html
 # → ./png/series-01.png, series-02.png, ...
 ```
 
@@ -231,22 +274,26 @@ python render.py series.html
 - Photos загрузились (relative paths корректны)
 - Footer-italic читается
 
-### Шаг 7 — Отправь / запланируй в Telegram
+### Шаг 7 — Отправь в Telegram
 
-⚠️ `tg_client.py` НЕ имеет `send-album`. Альбомы + богатую подпись (спойлер,
-раскрывающиеся цитаты, ссылки, фото+видео в одной группе, отложка) шлёт модуль
-**`~/.claude/skills/tg-post/scripts/tg_rich_post.py (скилл `tg-post` в пак не входит — он завязан на личный канал автора; публикацию делай своим ботом через `~/.claude/tools/tg_bot.py`)`** — см. секцию «ПЛАНИРОВАНИЕ И ПУБЛИКАЦИЯ»
-в `tg-post/SKILL.md`. Коротко:
+Альбом шлёт бот — `~/.claude/tools/tg_bot.py album` (навык `tg-bot-publish`). Бот должен быть
+**админом канала** с правом Post Messages; подпись HTML идёт на первую картинку, лимит альбома — 10 файлов:
 
-```python
-import sys; sys.path.insert(0, os.path.expanduser('~/.claude/skills/tg-post/scripts'))
-from tg_rich_post import client, schedule_album, UTC
-# schedule_album(c, 'YOUR_CHANNEL', files=[...png], html=CAPTION_HTML, when=datetime(...,tzinfo=UTC))
+```bash
+python ~/.claude/tools/tg_bot.py --token MYBOT --dry-run album --to @yourchannel \
+  png/series-01.png png/series-02.png png/series-03.png \
+  --text "<b>Заголовок</b>\n\nПодпись поста"   # убери --dry-run когда payload устроит
 ```
 
-## render.py (Playwright скрипт)
+`--token` принимает и сам токен, и имя переменной из `~/.claude/.credentials.master.env`.
 
-`templates/cards/handoff/render.py` уже готов. Использование:
+**Отложка.** В Bot API отложенных постов нет — бот шлёт только «сейчас». Варианты: cron/планировщик
+на этой же команде, либо user-аккаунт через Telethon (`send_file(..., schedule=dt)`); у `tg_client.py`
+подкоманды `send-album` нет, отложенный альбом — это несколько строк своего кода на Telethon.
+
+## render_cards.py (Playwright скрипт)
+
+`scripts/render_cards.py` уже готов — снимает каждый `.card` в документном порядке. Использование:
 
 ```bash
 # Установка зависимостей (один раз)
@@ -254,30 +301,31 @@ pip install playwright
 playwright install chromium
 
 # Render одной серии
-python render.py path/to/series.html
-# → выходные PNG в ./png/
+python ~/.claude/skills/cards-creator/scripts/render_cards.py path/to/series.html
+# → выходные PNG в <папке серии>/png/
 ```
 
-## Связь с `tg-post`
+## Когда пост просит карточки
 
-Skill `tg-post` автоматически предлагает запустить cards-creator если контент поста:
+Признаки, что текстовый пост стоит усилить каруселью:
 
 1. **list ≥ 4 пунктов** в посте
 2. **before/after** упоминание
 3. **3+ конкретных цифр** в тексте
-4. Режим `long` / `review` / `roundup` / `announce`
+4. Формат «лонгрид / обзор / подборка / анонс»
 5. Тематика «инструмент / стек / сетап»
 
-При ≥ 2 признаках — `tg-post` спросит юзера и передаст структуру в `cards-creator`.
-
-См. секцию «Связь с cards-creator» в `~/.claude/skills/tg-post/SKILL.md` для деталей.
+При ≥ 2 признаках — спроси автора и собирай серию: структура карточек берётся прямо из структуры
+поста (пункты списка → `numbered-list`/`checklist`, цифры → `stat-hero`/`stat-grid`, before/after →
+`vs-split`). Если пишешь посты отдельным своим навыком-копирайтером, вызов cards-creator удобно
+повесить туда же — этот шаг конвейера отдаёт готовый `png/series-NN.png` и подпись.
 
 ## ПЛОТНЫЕ КАРТОЧКИ + КАРТИНКИ (gpt-image-2)
 
 > Бриф требует «не бойся насыщать» — пустота на карточках читается как «кастрированно».
-> Готовый плотный пример-шаблон со ВСЕМИ приёмами: **`templates/examples/dense-cards.html`**
-> (9 карточек: cover-stats, таблица-сравнение, bar-chart, split с картинкой, терминал-мок,
-> effort-таблица, stat-strip, CTA).
+> Плотная колода — это 9 карточек примерно такого набора: cover-stats, таблица-сравнение,
+> bar-chart, split с картинкой, терминал-мок, effort-таблица, stat-strip, CTA. Приёмы каждого
+> расписаны ниже — собери такую колоду один раз и держи её у себя как эталон под копирование.
 
 ### Скрипты скилла (`scripts/`)
 
@@ -384,7 +432,7 @@ Editorial-референс НЕ ставит картинки в скруглё�
 
 ### Бренд-логотип в углу (айдентика)
 
-Положи логотип своего проекта в `templates/cards/logo.png` и встраивай **маленьким (~52px) в верхний-правый угол** каждой карточки — не отвлекает, держит айдентику. Один CSS-приём на всю колоду (копируй `logo.png` рядом с series.html):
+Положи логотип своего проекта рядом с `series.html` как `logo.png` и встраивай **маленьким (~52px) в верхний-правый угол** каждой карточки — не отвлекает, держит айдентику. Один CSS-приём на всю колоду:
 
 ```css
 .card.inner .ast.tr { display: none; }                 /* логотип занимает место правого астериска */
@@ -396,7 +444,7 @@ Editorial-референс НЕ ставит картинки в скруглё�
 
 ### Аватарка канала
 
-Аватарку канала зашей в обложку (`.cover-author .ava { background-image:url('avatar.jpg') }`). Положи свою в `templates/examples/avatar.jpg`. Генерация новых концептов из фото:
+Аватарку канала зашей в обложку (`.cover-author .ava { background-image:url('avatar.jpg') }`) — файл кладётся рядом с `series.html`. Генерация новых концептов из фото:
 
 ```bash
 python ~/.claude/skills/cards-creator/scripts/gen_avatar.py <фото.jpg> [concepts|all] [out_dir]
@@ -407,15 +455,16 @@ python ~/.claude/skills/cards-creator/scripts/gen_avatar.py <фото.jpg> [conc
 
 ### Публикация
 
-Альбом + богатая подпись (спойлер / раскрывающиеся цитаты / фото+видео / отложка) — модуль
-**`~/.claude/skills/tg-post/scripts/tg_rich_post.py`** (см. tg-post/SKILL.md). НЕ `tg_client.py send-album` (такой команды нет).
+Альбом + подпись (HTML: `<b>`, `<tg-spoiler>`, `<blockquote expandable>`, ссылки) — ботом:
+`python ~/.claude/tools/tg_bot.py --token MYBOT --dry-run album --to @yourchannel png/series-*.png --text "…"`,
+навык `tg-bot-publish`. НЕ `tg_client.py send-album` — такой подкоманды нет.
 
 ---
 
 ## Common gotchas
 
 1. **Overflow на длинных русских заголовках** → `text-wrap: balance` + line-height: 0.92, размер 96-140px
-2. **Шрифты не успевают загрузиться в Playwright** → wait 800ms после networkidle в render.py
+2. **Шрифты не успевают загрузиться в Playwright** → пауза после networkidle (в `render_cards.py` уже стоит 900 мс)
 3. **SVG sprite IDs дублируются** при merge нескольких серий — используй уникальные prefix
 4. **PNG export size** — каждое <2MB (Telegram сжимает большие)
 5. **Album max 10 photos в `sendMediaGroup`** — если серия больше — split
@@ -450,28 +499,30 @@ python ~/.claude/skills/cards-creator/scripts/post_stories.py edit YOUR_CHANNEL 
 
 | Скилл | Связь |
 |---|---|
-| **`tg-post`** | Пишет текст поста → передаёт структуру cards-creator |
-| **`crosspost`** | Адаптирует пост под платформы — карточки переиспользуются для LinkedIn |
-| **`image-generation`** (gemini-3.1-flash-image / gpt-image-2) | Генерация placeholder-фото для карточек |
-| **`brand-extractor`** | Расширение skill на другие проекты |
+| **`tg-bot-publish`** | Отправка альбома в канал ботом (`tools/tg_bot.py album`) |
+| **`image-generation`** (gemini-3.1-flash-image / gpt-image-2) | Генерация иллюстраций и placeholder-фото для карточек |
+| **`brand-extractor`** | Вытащить палитру и шрифты чужого бренда → свои токены в `styles.css` |
+| свой навык-копирайтер постов | Пишет текст поста → отдаёт сюда структуру серии (в паке такого навыка нет, он у каждого свой под свой канал) |
 
 ## Quick reference
 
-**Источник палитры (read-only):**
+**Что даёт скилл (read-only):**
 ```
-~/.claude/skills/cards-creator/templates/cards/palette.html
-~/.claude/skills/cards-creator/templates/cards/palette-*.css
-~/.claude/skills/cards-creator/templates/cards/theme-icons.svg
-~/.claude/skills/cards-creator/templates/cards/handoff/photos/
+~/.claude/skills/cards-creator/scripts/render_cards.py         # HTML → PNG
+~/.claude/skills/cards-creator/scripts/card_image_generator.py # иллюстрации в одном стиле
+~/.claude/skills/cards-creator/scripts/cut_bg.py               # rembg-вырезка фона
+~/.claude/skills/cards-creator/scripts/build_story_frames.py   # 4:5 → 9:16
+~/.claude/skills/cards-creator/scripts/post_stories.py         # сторис (Telethon)
+~/.claude/skills/cards-creator/references/visual-playbook.md   # тип инфы → приём
 ```
+Готовых HTML/CSS-образцов в паке нет — скелет в «Шаг 3», типы карточек в каталоге выше.
 
 **Output новых серий (CWD или /tmp):**
 ```
 ./cards-my-series/
 ├── series.html
-├── styles.css (копия palette-*.css)
-├── icons.svg (копия theme-icons.svg)
-├── photos/  (копия templates/cards/handoff/photos/)
+├── styles.css   (скелет из «Шаг 3» или копия прошлой серии)
+├── img/         (иллюстрации, вырезки, фото)
 └── png/
 ```
 
@@ -486,8 +537,8 @@ python ~/.claude/skills/cards-creator/scripts/render_cards.py series.html  # →
 python ~/.claude/skills/cards-creator/scripts/gen_card_images.py ./   # → ./<name>.png
 ```
 
-**post / schedule (Telethon, не tg_client):**
-```python
-# ~/.claude/skills/tg-post/scripts/tg_rich_post.py
-schedule_album(c, 'YOUR_CHANNEL', files=[...png], html=CAPTION_HTML, when=datetime(...,tzinfo=UTC), spoilers=[...])
+**post (альбом ботом, до 10 файлов):**
+```bash
+python ~/.claude/tools/tg_bot.py --token MYBOT --dry-run album --to @yourchannel \
+  png/series-01.png png/series-02.png --text "<b>Заголовок</b>"
 ```

@@ -135,7 +135,7 @@ curl -s https://public-api.gamma.app/v1.0/generations/$GEN -H "X-API-KEY: $KEY"
 ## Not this skill
 
 - Local slide building / templated decks without Gamma → `manus-slides`, `pptx`, `slides`
-- KP / Company decks (HTML→PNG→PPTX) → `kp-deck-factory`
+- KP / Company decks (HTML→PNG→PPTX) → тот же стек `manus-slides` + `pptx`; заточенного под КП навыка в паке нет
 - Editing an existing `.pptx` → `pptx`
 
 ## References

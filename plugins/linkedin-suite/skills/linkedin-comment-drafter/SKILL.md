@@ -1,6 +1,6 @@
 ---
 name: linkedin-comment-drafter
-description: "LinkedIn comments, replies, thread follow-ups по URL поста: 1-3 варианта в голосе юзера + reaction, approval → постинг через SocialPublisher; ответ по parent URN; трекинг ответов автора, follow-up, DM. NOT: RU-ответы в голосе пользователя без автопостинга→comment-replies."
+description: "LinkedIn comments, replies, thread follow-ups по URL поста: 1-3 варианта в голосе юзера + reaction, approval → автопостинг своим публикатором или copy-paste вручную; ответ по parent URN; трекинг ответов автора, follow-up, DM."
 ---
 
 # LinkedIn Comment Drafter
@@ -25,7 +25,7 @@ A LinkedIn post URL in any of the standard shapes (see the top-level `SKILL.md` 
 - Pattern label (which of the 7 templates was used)
 - Estimated engagement fit based on what the author typically responds to
 
-Then waits for user approval. On "post", calls SocialPublisher to react + comment.
+Then waits for user approval. On "post", posts the reaction + comment through whatever publishing backend the user has configured — or returns a copy-paste block when none is (the default).
 
 ## Steps
 
@@ -35,10 +35,10 @@ Then waits for user approval. On "post", calls SocialPublisher to react + commen
 4. **Draft comment variants.** Pick 2-3 templates from `references/comment-templates.md` that fit the post's topic. Fill them with user-voice phrasing.
 5. **Run the humanizer pass.** Strip em dashes, AI vocab, uniform sentence rhythm. Add a specific number or named entity if missing.
 6. **Present drafts for approval** using `lib.approval.render_approval_card`. Include: target URL, each variant, reaction suggestion, a one-line "why this template fits".
-7. **On approval — adapt to the active backend.** Call `lib.active_backend()`:
-   - **`socialpublisher`** (SOCIALPUBLISHER_API_KEY set) → react to the post with the chosen reaction type, pause 8-15s, then post via `lib.SocialPublisherClient.create_comment` (top-level, no `parent_comment`). Return the comment URN.
-   - **`manual`** (no backend configured — the default) → output the approved draft via `lib.manual_mode_message(draft_text, target_url, kind="comment")`. This gives the user a copy-paste block plus a one-time setup prompt for SocialPublisher (the preferred auto-post path). Do NOT attempt to post programmatically.
-   - **`diy`** (LINKEDIN_SKILLS_CUSTOM_POSTER set) → invoke the user's configured custom poster command with the draft text + target URL as arguments.
+7. **On approval — adapt to the posting setup.** Автопостер LinkedIn в пак не входит — подключай свой; без него skill работает в ручном режиме:
+   - **`manual`** (ничего не настроено — дефолт) → output the approved draft as a copy-paste block: текст варианта, целевой URL, рекомендованная реакция. Do NOT attempt to post programmatically.
+   - **`diy`** (`LINKEDIN_SKILLS_CUSTOM_POSTER` set) → invoke the user's configured custom poster command with the draft text + target URL as arguments.
+   - **свой API-публикатор** (например, Postiz self-hosted или собственный клиент LinkedIn API) → react to the post with the chosen reaction type, pause 8-15s, then post a top-level comment (no parent). Return the comment URN.
 
 ## Templates (see `references/comment-templates.md` for full list)
 

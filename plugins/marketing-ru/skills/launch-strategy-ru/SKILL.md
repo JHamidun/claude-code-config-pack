@@ -1,10 +1,10 @@
 ---
 name: launch-strategy-ru
-description: "Стратегия запусков продукта/курса/воркшопа/сообщества. ORB-фреймворк под RU (Owned/Rented/Borrowed), пятифазный запуск, RU-поверхности вместо Product Hunt (vc.ru, Habr, TG), запуск через Telegram Ads воронку. Триггеры: «запуск», «лонч», «go-to-market», «GTM», «анонс», «лист ожидания», «ранний доступ», «план запуска». НЕ: контент-маркетинг→content-engine; посты→tg-post."
+description: "Стратегия запусков продукта/курса/воркшопа/сообщества. ORB-фреймворк под RU (Owned/Rented/Borrowed), пятифазный запуск, RU-поверхности вместо Product Hunt (vc.ru, Habr, TG), запуск через Telegram Ads воронку. Триггеры: «запуск», «лонч», «go-to-market», «GTM», «анонс», «лист ожидания», «ранний доступ», «план запуска». НЕ: контент-маркетинг→content-engine; отдельные посты→content-creation."
 metadata:
   version: 1.1.0
   ported_from: coreyhaines31/marketingskills (launch)
-  reuses: tg-post, vc-post, habr-post, email-sequence, market-selection-ru, telegram-ads-pro-ru
+  reuses: email-sequence, market-selection-ru, telegram-ads-pro-ru
 ---
 
 # Стратегия запусков (RU)
@@ -34,7 +34,7 @@ metadata:
 ### Rented (арендованные)
 
 Площадки дают охват, но ты не контролируешь алгоритм:
-- **vc.ru** (рубрика «Личный опыт» — `vc-post`), **Habr** (инженерные кейсы — `habr-post`), **РБК Тренды** (`rbc-post`).
+- **vc.ru** (рубрика «Личный опыт»), **Habr** (инженерные кейсы), **РБК Тренды**.
 - **VK**, **YouTube**, **Telegram-каналы партнёров**.
 
 Как правильно: 1–2 площадки, где аудитория активна; гнать трафик в Owned. Пример: статья на vc.ru «как мы запускали продукт» → ссылка на trial/подписку.
@@ -67,16 +67,18 @@ metadata:
 ### Фаза 5: Полный запуск
 Открой self-serve подписку (эквайринг), начни брать деньги, объяви general availability по ВСЕМ каналам.
 
-**Касания запуска (RU):** письмо по базе; пост в TG-канал (`tg-post`, режим «анонс»); статья на vc.ru/Habr (`vc-post`/`habr-post`); сквозной баннер/CTA с контента → продукт; in-app попап в продукте; видео на YouTube; Telegram-анонсы в партнёрских каналах. **Без Product Hunt.**
+**Касания запуска (RU):** письмо по базе; пост в TG-канал (публикация ботом — `tg-bot-publish`); статья на vc.ru/Habr; сквозной баннер/CTA с контента → продукт; in-app попап в продукте; видео на YouTube; Telegram-анонсы в партнёрских каналах. **Без Product Hunt.**
 
 ## RU-поверхности для запуска (вместо Product Hunt)
 
 | Запад | RU-замена | Скилл |
 |-------|-----------|-------|
-| Product Hunt / BetaList | **vc.ru**, **Habr**, **Product Radar** (producthunt-ru), Telegram-анонсы | `vc-post`, `habr-post`, `tg-post` |
-| Hacker News | Habr (хабы по теме) | `habr-post` |
-| Twitter-тред | TG-тред + VK | `tg-post` |
+| Product Hunt / BetaList | **vc.ru**, **Habr**, **Product Radar** (producthunt-ru), Telegram-анонсы | `content-creation` (текст), `tg-bot-publish` (пост в TG) |
+| Hacker News | Habr (хабы по теме) | `content-creation` |
+| Twitter-тред | TG-тред + VK | `tg-bot-publish` |
 | Email-объявление | рассылка по своей базе | `email-sequence`, `html-email` |
+
+Навыков под конкретные площадки (статья в голосе автора под vc.ru/Habr/РБК, пост в личный канал) в паке нет — текст собирай через `content-creation`, публикацию в Telegram делай своим ботом.
 
 Как «прокачать» площадку (аналог Product Hunt launch day): заранее построить отношения с релевантными каналами/комьюнити; оформить лендинг (тэглайн, демо-видео, скриншоты); в день анонса — отвечать на каждый комментарий, поднимать обсуждение, гнать трафик в Owned; после — фоллоу-ап со всеми, кто откликнулся, конверсия в email/trial.
 
@@ -92,7 +94,7 @@ metadata:
 - **Онбординг новых:** авто-цепочка писем (`email-sequence`) — ключевые фичи/треки продукта.
 - **Усиление:** включи анонс в ближайший дайджест рассылки (кто пропустил).
 - **Отстройка:** сравнительные страницы «твой продукт vs альтернативы» (`competitive-analysis-mktg` → comparison-pages-ru).
-- **Обнови сайт:** блоки про новый трек/воркшоп (`tilda`).
+- **Обнови сайт:** блоки про новый трек/воркшоп в своём конструкторе/CMS.
 
 ## Постоянная стратегия запусков
 
@@ -117,11 +119,11 @@ metadata:
 |------|-------|
 | Pre-launch проверка рынка/страны ДО запуска | `references/prelaunch-market-check.md` → `market-selection-ru` |
 | Запуск курса/продукта через гибридную TG Ads воронку | `references/channels/telegram-ads-launch.md` → `telegram-ads-pro-ru` |
-| Пост-анонс в TG-канал | `tg-post` (режим «анонс») |
-| Статья запуска на vc.ru / Habr / РБК | `vc-post`, `habr-post`, `rbc-post` |
+| Пост-анонс в TG-канал (публикация ботом) | `tg-bot-publish` |
+| Статья запуска на vc.ru / Habr / РБК | `content-creation` (навыков под конкретные площадки в паке нет) |
 | Email-цепочка запуска и онбординга | `email-sequence`, `html-email` |
-| Лендинг под запуск + CRO | `page-cro-ru`, `tilda` |
-| Кросс-постинг анонса по площадкам | `crosspost` |
+| Лендинг под запуск + CRO | `page-cro-ru` |
+| Кросс-постинг анонса по площадкам | свой публикатор (например, Postiz self-hosted) — готовой обёртки в паке нет |
 | Сравнительные страницы (пост-запуск) | `competitive-analysis-mktg` |
 | Контент-кампания вокруг запуска | `campaign-planning`, `content-engine` |
 | Метрики запуска | `performance-analytics` |

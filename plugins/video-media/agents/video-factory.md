@@ -54,7 +54,9 @@ Wait for user confirmation before proceeding.
 
 **Skip if user provided explicit topic (not "auto").**
 
-Read skill `~/.claude/skills/trend-engine/SKILL.md` and execute:
+A dedicated trend-scanning skill is not part of this pack — the scoring heuristic below is
+self-contained, run it as written. If the user has their own trend-research skill, read it first
+and let it override steps 1-4.
 
 1. Run `last30days` with `--agent --quick` flag via Bash (timeout 300s):
    ```bash
@@ -79,9 +81,8 @@ Read skill `~/.claude/skills/trend-engine/SKILL.md` and execute:
 
 ### Phase 2: SCRIPT & STORYBOARD
 
-Read skills:
-- `~/.claude/skills/viral-shorts-playbook/SKILL.md` (hook formulas, abrupt ending, format constraints)
-- `~/.claude/skills/trend-engine/SKILL.md` (transcript analysis prompts)
+The hook formulas, abrupt-ending rule and format constraints are spelled out in 2.2 below —
+this phase needs no external skill.
 
 #### 2.1 Anti-hallucination Gate
 
@@ -94,7 +95,7 @@ Never include unverified claims in the script.
 
 #### 2.2 Generate Script
 
-Use the hook-value-abrupt formula from viral-shorts-playbook:
+Use the hook-value-abrupt formula:
 
 - **HOOK** (1-2s): shocking fact / question / contradiction / name drop / threat
   - Examples: "OpenAI только что убил целую индустрию", "Этот ИИ заменит 90% программистов"
@@ -178,10 +179,22 @@ Use HeyGen Workflow Gateway for AI video generation:
 ```
 
 For each B-roll scene:
-1. **Generate reference image** first via nano-banana-pro (Gemini Flash Image):
-   ```bash
-   python ~/.claude/skills/nano-banana-pro/scripts/generate.py --prompt "SCENE_DESCRIPTION" -o reference_NN.png
+1. **Generate reference image** first via Gemini Image — skill `nano-banana-pro` documents the
+   prompt patterns and reference-chaining; there is no CLI wrapper, call the SDK directly:
+   ```python
+   import os; os.environ.pop('GEMINI_API_KEY', None)     # конфликт SDK, ключ = GOOGLE_API_KEY
+   from google import genai
+   from google.genai import types
+   client = genai.Client()
+   resp = client.models.generate_content(
+       model='gemini-3-pro-image-preview',
+       config=types.GenerateContentConfig(response_modalities=['IMAGE', 'TEXT']),
+       contents=['SCENE_DESCRIPTION'])
+   blob = next(p.inline_data for p in resp.candidates[0].content.parts if p.inline_data)
+   open('reference_NN.png', 'wb').write(blob.data)
    ```
+   Для серии кадров одного персонажа — reference-chaining из `nano-banana-pro/SKILL.md`
+   (каждый следующий вызов получает предыдущий кадр как `types.Part.from_bytes`).
 2. **Generate video clip** from prompt or reference image
 3. If video generation fails, apply Ken Burns effect on the reference image:
    ```bash
@@ -217,13 +230,21 @@ For B-roll scenes that need narration (not covered by avatar speech):
 # Model: eleven_multilingual_v2
 ```
 
-Generate clip-by-clip (NOT all at once) to maintain timing control:
-```bash
-python ~/.claude/skills/elevenlabs/scripts/tts.py \
-  --voice-id "YOUR_ELEVENLABS_VOICE_ID" \
-  --model "eleven_multilingual_v2" \
-  --text "SCENE_TEXT" \
-  -o voice_NN.mp3
+Generate clip-by-clip (NOT all at once) to maintain timing control. CLI-обёртки у скилла нет —
+вызывай SDK (`pip install elevenlabs`, ключ `ELEVENLABS_API_KEY`), параметры голоса и гочи в
+`elevenlabs/SKILL.md`:
+```python
+from elevenlabs.client import ElevenLabs
+client = ElevenLabs()                      # ELEVENLABS_API_KEY из env
+audio = client.text_to_speech.convert(
+    text="SCENE_TEXT",
+    voice_id="YOUR_ELEVENLABS_VOICE_ID",
+    model_id="eleven_multilingual_v2",
+    voice_settings={"stability": 0.55, "similarity_boost": 0.80,
+                    "style": 0.15, "use_speaker_boost": True})
+with open("voice_NN.mp3", "wb") as f:
+    for chunk in audio:
+        f.write(chunk)
 ```
 
 #### 4.2 Background Music
@@ -232,10 +253,9 @@ Select from local pool or generate:
 ```bash
 # List available tracks
 python ~/.claude/skills/video-editor/video_editor.py music-pool
-
-# Or use ElevenLabs sound effects for custom music
-python ~/.claude/skills/elevenlabs/scripts/sfx.py --prompt "upbeat tech background music" -o music.mp3
 ```
+Или сгенерируй трек: скилл `ace-step` (локально, без API) либо `suno`. Короткие звуковые эффекты —
+ElevenLabs SFX endpoint `client.text_to_sound_effects.convert(text="whoosh transition")`.
 
 Music rules:
 - Volume: -18dB relative to voice (ducking)
@@ -244,10 +264,12 @@ Music rules:
 
 #### 4.3 Sound Effects (optional)
 
-For emphasis moments (transitions, key points):
+For emphasis moments (transitions, key points) — готовый банк UI-звуков в скилле video-editor:
 ```bash
-python ~/.claude/skills/elevenlabs/scripts/sfx.py --prompt "whoosh transition sound" -o sfx_whoosh.mp3
+python ~/.claude/skills/video-editor/scripts/ui_sfx.py --list      # каталог
+python ~/.claude/skills/video-editor/scripts/ui_sfx.py pop -o sfx_pop.wav
 ```
+Нужен уникальный звук — ElevenLabs: `client.text_to_sound_effects.convert(text="whoosh transition sound")`.
 
 **Output:** `voice_01.mp3` ... `voice_N.mp3`, `music.mp3`, optional `sfx_*.mp3`
 
@@ -272,13 +294,13 @@ python ~/.claude/skills/video-editor/video_editor.py concat \
 
 #### 5.2 Audio Mixing
 
-Layer voice and music with ducking:
+Layer voice and music with ducking. `video_editor.py` умеет: `concat`, `process`, `trim`, `probe`,
+`music-pool`, `ken-burns`, `ducking`, `thumbnail`. Склейки аудио среди них нет — она ffmpeg'ом:
+
 ```bash
-# First, merge voice clips into continuous track
-python ~/.claude/skills/video-editor/video_editor.py concat-audio \
-  voice_01.mp3 voice_02.mp3 voice_03.mp3 \
-  --gaps voice_timestamps.json \
-  -o voice_full.mp3
+# First, merge voice clips into continuous track (paths -> concat.txt)
+printf "file '%s'\n" voice_01.mp3 voice_02.mp3 voice_03.mp3 > voices.txt
+ffmpeg -f concat -safe 0 -i voices.txt -c copy voice_full.mp3
 
 # Mix voice + music with ducking
 python ~/.claude/skills/video-editor/video_editor.py ducking \
@@ -300,18 +322,16 @@ ffmpeg -i assembled.mp4 -i voice_full.mp3 -i music.mp3 \
 
 Choose based on availability (in priority order):
 
-1. **SubtitleService** (if `SUBMAGIC_API_KEY` exists):
+1. **WhisperX karaoke captions** (free, local, лучшее word-level попадание на русском):
    ```bash
-   python ~/.claude/skills/submagic/scripts/add_captions.py \
-     assembled_mixed.mp4 --style hormozi -o final_captioned.mp4
+   python ~/.claude/skills/video-editor/scripts/karaoke_captions.py \
+     assembled_mixed.mp4 final_captioned.mp4 --lang ru --style hormozi
    ```
+   Быстрый путь без WhisperX — `scripts/add_captions.py in.mp4 out.mp4 --style hormozi`.
 
-2. **Whisper + ASS word-highlight** (free, local):
-   ```bash
-   whisper assembled_mixed.mp4 --model medium --language ru --output_format srt
-   python ~/.claude/skills/video-editor/video_editor.py ass-captions \
-     assembled_mixed.mp4 --srt captions.srt --style word-highlight -o final_captioned.mp4
-   ```
+2. **SubtitleService** (if `SUBMAGIC_API_KEY` exists) — REST API, CLI-обёртки нет: POST проект на
+   `https://api.submagic.co/v1/projects` с заголовком `x-api-key`, поллить статус, скачать
+   `downloadUrl`. Точные payload'ы и гочи — в `submagic/SKILL.md`.
 
 3. **HeyGen Starfish word_timestamps** (if avatar was used):
    - Extract word_timestamps from HeyGen response
@@ -322,37 +342,34 @@ Choose based on availability (in priority order):
 
 #### 5.4 Logo Overlay (if branding requested)
 
+Отдельной подкоманды нет — ffmpeg overlay:
 ```bash
-python ~/.claude/skills/video-editor/video_editor.py logo-overlay \
-  final_captioned.mp4 --logo ~/Videos/branding/your_logo.png \
-  --position top-right --opacity 0.7 -o final_branded.mp4
+ffmpeg -i final_captioned.mp4 -i ~/Videos/branding/your_logo.png \
+  -filter_complex "[1]format=rgba,colorchannelmixer=aa=0.7[lg];[0][lg]overlay=W-w-40:40" \
+  -c:a copy final_branded.mp4
 ```
 
 #### 5.5 Outro Freeze (if requested)
 
-Add a 2-3s freeze frame at the end with subscribe CTA:
+Add a 2-3s freeze frame at the end with subscribe CTA. Подкоманды нет — ffmpeg:
 ```bash
-python ~/.claude/skills/video-editor/video_editor.py outro-freeze \
-  final_branded.mp4 --duration 3 --text "Подписывайтесь!" -o final_video.mp4
+ffmpeg -i final_branded.mp4 -vf "tpad=stop_mode=clone:stop_duration=3,\
+drawtext=text='Подписывайтесь!':fontcolor=white:fontsize=64:x=(w-tw)/2:y=h-200:\
+enable='gte(t,{DURATION})'" -c:a copy final_video.mp4
 ```
+`{DURATION}` — длительность исходника из `video_editor.py probe`.
 
 #### 5.6 Thumbnail Generation
 
 ```bash
-# Extract best frame
+# Extract frame at 2s mark, then build the thumbnail from it
+ffmpeg -i final_video.mp4 -ss 2 -vframes 1 frame.png
 python ~/.claude/skills/video-editor/video_editor.py thumbnail \
-  final_video.mp4 --text "TITLE_SHORT" --style bold -o thumbnail.png
+  frame.png --text "TITLE_SHORT" --style bold -o thumbnail.png
 ```
 
-If video_editor thumbnail command is unavailable:
-```bash
-# Extract frame at 2s mark
-ffmpeg -i final_video.mp4 -ss 2 -vframes 1 frame.png
-# Generate styled thumbnail via nano-banana-pro
-python ~/.claude/skills/nano-banana-pro/scripts/generate.py \
-  --prompt "YouTube thumbnail: TOPIC, bold text overlay, bright colors, face close-up" \
-  -o thumbnail.png
-```
+Нужна рисованная обложка вместо кадра — сгенерируй её тем же вызовом Gemini Image, что в Phase 3.1,
+промпт вида "YouTube thumbnail: TOPIC, bold text overlay, bright colors, face close-up".
 
 **Output:** `final_video.mp4`, `thumbnail.png`, `captions.srt`
 
@@ -360,7 +377,9 @@ python ~/.claude/skills/nano-banana-pro/scripts/generate.py \
 
 ### Phase 6: PUBLISH
 
-Read skill: `~/.claude/skills/youtube-channel/SKILL.md` (section «1. Upload»)
+Загрузка идёт командой `/youtube-upload` — она самодостаточна (YouTube Data API v3 напрямую,
+отдельного скилла-обёртки в паке нет). Прочитай `~/.claude/commands/youtube-upload.md` и выполни
+описанный там код.
 
 #### 6.1 Auth Check
 
@@ -369,25 +388,21 @@ Check YouTube OAuth token exists:
 test -f ~/.claude/.youtube-oauth-token.json && echo "TOKEN_EXISTS" || echo "NO_TOKEN"
 ```
 
-If no token, guide user through setup:
-```bash
-python ~/.claude/skills/youtube-channel/scripts/upload/yt_oauth_setup.py
-```
-
-Wait for user to complete OAuth flow in browser before proceeding.
+Нет токена — нужен OAuth client type *Desktop app* из Google Cloud Console (с включённым
+YouTube Data API v3), сохранённый в `~/.claude/.youtube-client-secrets.json`. Первый вызов
+`InstalledAppFlow(...).run_local_server(port=0)` откроет браузер и запишет токен.
+Дождись, пока пользователь пройдёт OAuth, и только потом продолжай.
 
 #### 6.2 Upload as Private
 
-```bash
-python ~/.claude/skills/youtube-channel/scripts/upload/yt_upload.py upload \
-  final_video.mp4 \
-  --title "GENERATED_TITLE" \
-  --description "GENERATED_DESCRIPTION" \
-  --tags "tag1,tag2,tag3" \
-  --thumbnail thumbnail.png \
-  --srt captions.srt \
-  --privacy private
+Вызови `/youtube-upload` (или его код) с:
 ```
+final_video.mp4 --title "GENERATED_TITLE" --description "GENERATED_DESCRIPTION"
+                --tags "tag1,tag2,tag3" --thumbnail thumbnail.png --private
+```
+
+Субтитры отдельным вызовом после заливки:
+`yt.captions().insert(part='snippet', body={'snippet': {'videoId': vid, 'language': 'ru', 'name': ''}}, media_body=MediaFileUpload('captions.srt')).execute()`
 
 #### 6.3 Present Result
 
@@ -408,7 +423,7 @@ Make it Public? (yes/no)
 
 #### 6.4 Privacy Update
 
-If user approves (note: yt_upload.py has only `upload` and `status` subcommands — no `update-privacy`; use the API directly with the same token):
+If user approves — тем же токеном через API (в `status` передавай **весь** объект из `videos().list`, иначе снесёшь остальные поля):
 ```bash
 python -c "
 from pathlib import Path
@@ -453,8 +468,8 @@ If user declines: leave as Private, print reminder.
 
 | Condition | Method | Style |
 |-----------|--------|-------|
-| `SUBMAGIC_API_KEY` exists | your subtitle API | hormozi (bold, centered) |
-| `whisper` installed | Whisper + ASS | word-highlight (karaoke) |
+| WhisperX ставится локально | `video-editor/scripts/karaoke_captions.py` | word-highlight (karaoke) |
+| `SUBMAGIC_API_KEY` exists | SubtitleService REST API | hormozi (bold, centered) |
 | HeyGen used with Starfish | word_timestamps → SRT | standard SRT burn-in |
 | None available | Skip | Warn user |
 
@@ -475,7 +490,7 @@ Every phase has a fallback strategy. Never fail silently.
 | Phase 4 | ElevenLabs fails | Use HeyGen Starfish TTS as backup |
 | Phase 4 | All TTS fails | Use pyttsx3 (offline, low quality) + warn user |
 | Phase 5 | video_editor.py missing command | Fall back to raw FFmpeg commands |
-| Phase 5 | SubtitleService fails | Fall back to Whisper + ASS |
+| Phase 5 | WhisperX не встаёт | `add_captions.py` (captacity) → SubtitleService API → без субтитров + warn |
 | Phase 5 | FFmpeg not installed | FATAL: cannot proceed, inform user |
 | Phase 6 | YouTube upload fails (auth) | Save video locally, print path, guide re-auth |
 | Phase 6 | YouTube upload fails (quota) | Save locally, schedule retry |

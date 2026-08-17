@@ -1,55 +1,53 @@
-# Данные и публикация: адаптеры к `yandex` и `tilda`
+# Данные и публикация: подключи свой стек (Яндекс-API и CMS)
 
-> Машина НЕ имеет своих API-клиентов к Яндексу/Tilda — она переиспользует существующие скиллы. Это сознательный выбор: один источник правды по OAuth/токенам. Здесь — как именно дёргать.
+> Машина НЕ имеет своих API-клиентов к Яндексу и CMS — сознательный выбор: один источник правды по OAuth/токенам. Готовые клиенты в пак не входят — подключи свои (тонкий скрипт поверх официальных API, токен из своего кабинета). Здесь — какие данные нужны на каждом шаге и что именно дёргать.
 
-## Семантика и частотность — Wordstat (скилл `yandex`)
+## Семантика и частотность — Wordstat
 
-Wordstat = Direct API v4 (legacy), service 13. Через скилл `yandex`:
-```bash
-# Создать отчёт Wordstat по фразам
-python ~/.claude/skills/yandex/scripts/yandex_api.py  # см. SKILL.md §12 Wordstat
-# Метод CreateNewWordstatReport {"Phrases": ["нейросети для бизнеса", ...]}
+Wordstat живёт в Direct API v4 (legacy), service 13. Нужен свой клиент с OAuth-токеном Яндекса:
+
+```
+# Создать отчёт Wordstat по фразам:
+# метод CreateNewWordstatReport {"Phrases": ["нейросети для бизнеса", ...]}
 # затем GetWordstatReportList / GetWordstatReport <id>
 ```
+
 Берёт частотность фраз и связанные запросы. Из результата собрать JSON для `opportunity_scorer.py`:
 ```json
 [{"keyword":"нейросети для бизнеса","volume":12000,"position":14,"intent":"commercial","competition":0.6,"cluster_size":8}]
 ```
 `position` — из Вебмастера (ниже), `competition` — оценка по топу выдачи, `intent` — классификация по запросу.
 
-## Позиции, запросы, индексация — Вебмастер (скилл `yandex`)
+## Позиции, запросы, индексация — Вебмастер
 
-Webmaster API v4, service 5:
-```bash
-python ~/.claude/skills/yandex/scripts/yandex_api.py webmaster sites
-# далее по SKILL.md §5: search queries, indexing, backlinks для host_id
-```
+Webmaster API v4 (`api.webmaster.yandex.net`), тот же OAuth-токен: список сайтов → `host_id` → search queries / indexing / backlinks.
+
 Даёт: текущие позиции и показы (для quick-win поз. 11-20), CTR, проиндексированность, ошибки, бэклинки. После публикации — отправить URL на переобход.
 
-## Трафик и конверсии — Метрика (скилл `yandex` / `product-analytics`)
+## Трафик и конверсии — Метрика
 
-```bash
-python ~/.claude/skills/yandex/scripts/yandex_api.py metrika report \
-  --metrics "ym:s:visits,ym:s:pageviews,ym:s:bounceRate" --date1 "30daysAgo" --date2 "today"
+Reporting API Метрики своим клиентом (или выгрузкой из кабинета):
+
 ```
-Для YourProduct — лучше `product-analytics` (уже умеет сегменты corporate/individual, воронки buy, UTM). Используется в фазе `performance` и для CRO-приоритизации.
+# метрики ym:s:visits, ym:s:pageviews, ym:s:bounceRate, окно 30daysAgo..today
+```
+
+Если у продукта есть собственная продуктовая аналитика (сегменты, воронки, UTM-разрезы) — для фазы `performance` и CRO-приоритизации лучше она, Метрика тогда остаётся источником по трафику.
 
 ## Конкуренты / объёмы рынка
 
 - Гэп-анализ контента, трафик конкурентов → `similarweb-analytics`, `competitive-analysis`.
 - Топ выдачи Яндекса для оценки конкуренции — WebFetch/WebSearch или `dev-browser`.
 
-## Публикация — Tilda (скилл `tilda`)
+## Публикация — своя CMS
 
-```bash
-# Пост в фид блога / медиа — Feeds API
-python ~/.claude/skills/tilda/scripts/...   # см. tilda/SKILL.md: posts_Add/Edit/Active
-# Лендинг / страница — page editor, T123 custom HTML, page publish
-```
-Мета (title/description/og) ставятся в SEO-полях страницы/поста Tilda (НЕ Yoast). После публикации обязательно `posts_Active` (Edit сбрасывает active — известная грабля, см. tilda skill memory).
+Публикатор зависит от движка; в паке клиента нет — подключи свой.
 
-Новостной материал в блог your-domain.com → готовый конвейер `ai-news-bot` (build_tilda_blocks + JSON-LD + push).
+- **Tilda:** посты — Feeds API (`posts_Add`/`posts_Edit`/`posts_Active`), страницы — page editor + T123 custom HTML + publish. Мета (title/description/og) ставится в SEO-полях страницы/поста (НЕ Yoast). Грабля: `posts_Edit` сбрасывает флаг active — после любой правки обязательно `posts_Active`.
+- **WordPress / свой движок:** REST API соответственно; мета — через SEO-плагин или поля шаблона.
+
+Поточный новостной конвейер (сборщик → рерайт → авто-публикация в блог) — отдельная система, в пак не входит; для регулярных лонгридов достаточно связки выше.
 
 ## Принцип
 
-Машина считает (Python-скрипты) и пишет (роли), но **данные берёт и публикует через `yandex`/`tilda`/`product-analytics`**. Не воспроизводить их OAuth/HTTP-клиенты здесь.
+Машина считает (Python-скрипты) и пишет (роли), но **данные берёт и публикует через твои клиенты к Яндекс-API и CMS**. Не воспроизводить их OAuth/HTTP-логику внутри машины — держи её одним слоем в своих скриптах.
