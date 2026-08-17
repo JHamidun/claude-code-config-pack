@@ -14,7 +14,7 @@
  * DELETE FROM without WHERE, git checkout/restore -- ., chattr -R -i,
  * quoted-target rm (`rm -rf "/"`), and an SSH branch: the remote command inside
  * `ssh host "..."` is re-scanned with the SAME destructive patterns
- * (the prod server runs dozens of containers — destroyers inside quotes were invisible).
+ * (Vertex runs 44 prod containers — destroyers inside quotes were invisible).
  *
  * 2026-07-19 dcg-port (Dicklesworthstone/destructive_command_guard, Rust, 2.9k*):
  * interpreter inline payloads (python -c / perl -e / node -e / bash -c + heredocs)
@@ -157,6 +157,11 @@ try {
     { id: 'rm-root',    re: new RegExp(RM + Q + '(?:\\/|c:\\\\?|\\/c)' + TERM, 'i'), why: 'rm -rf корня / C:\\ / /c/' },
     { id: 'rm-home',    re: new RegExp(RM + Q + '(?:~|\\$\\{?home\\}?|\\$\\{?userprofile\\}?)' + TERM, 'i'), why: 'rm -rf $HOME/~' },
     { id: 'rm-homeabs', re: new RegExp(RM + Q + '(?:' + HOMEfwdEsc + '|' + HOMEbackEsc + ')' + TERM, 'i'), why: 'rm -rf домашней папки (абс. путь)' },
+    // Выход наверх через «..» от дома, корня или абсолютной системной точки —
+    // это обратная дорога к родителю дома/корня, а не соседняя папка. Обычный
+    // относительный «../build» безопасен и сюда НЕ попадает: якорь обязателен —
+    // цель начинается с ~ , /  или абсолютного home, и в ней есть «..».
+    { id: 'rm-updir',   re: new RegExp(RM + Q + '(?:~|\\$\\{?home\\}?|\\$\\{?userprofile\\}?|' + HOMEfwdEsc + '|\\/[\\w.-]*)\\/\\.\\.(?:\\/|\\1|\\s|$|;|&|\\|)', 'i'), why: 'rm -rf с выходом наверх от дома/корня через ".." (~/.., /home/..)' },
     // Tier 2: system dirs (dir AND subpaths blocked — не пользовательские данные)
     { id: 'rm-sysdir',  re: new RegExp(RM + Q + '\\/(?:etc|usr|bin|sbin|boot|lib|sys|dev|proc|root)(?:\\/\\S*?)?\\1(?:\\s|$|;|&|\\|)', 'i'), why: 'rm -rf системной папки (/etc,/usr,/bin,...)' },
     { id: 'find-delete-root', re: /\bfind\s+(\/|~|\$\{?home\}?)\s+.*-delete\b/i, why: 'find / -delete' },
@@ -171,6 +176,9 @@ try {
     // SQL drops / truncate / unfiltered delete (skipped if text-display)
     { id: 'drop-db',    re: /\bdrop\s+(database|schema)\b/i, why: 'DROP DATABASE/SCHEMA', sql: true },
     { id: 'drop-table', re: /\bdrop\s+table\b/i, why: 'DROP TABLE', sql: true },
+    // Mongo пишет снос базы вызовом метода, а не SQL: db.dropDatabase(),
+    // db.<coll>.drop(), db.getSiblingDB("x").dropDatabase(). SQL-правила их не видят.
+    { id: 'mongo-drop', re: /\bdb(?:\.\w+|\.getSiblingDB\s*\([^)]*\))*\.drop(?:Database)?\s*\(/i, why: 'Mongo dropDatabase()/drop()', sql: true },
     { id: 'truncate',   re: /\btruncate\s+table\b/i, why: 'TRUNCATE TABLE', sql: true },
     { id: 'sql-delete-nowhere', re: /\bdelete\s+from\s+[\w"'`.\[\]]+\s*(?![^;]*\bwhere\b)/i, why: 'DELETE FROM без WHERE (сотрёт всю таблицу)', sql: true },
     // disk / filesystem destroyers
@@ -187,7 +195,7 @@ try {
     { id: 'git-plus-main',  re: /\bgit\s+push\b[^\n]*\s\+(main|master|prod|production|release)\b/i, why: 'git push +refspec в защищённую ветку' },
     // git checkout/restore of the ENTIRE working tree (`.`) — discards all uncommitted edits
     { id: 'git-checkout-dot', re: /\bgit\s+(?:-C\s+\S+\s+)?(?:checkout|restore)\s+(?:(?!--)[\w@^~{}\/.:-]+\s+)?(?:--\s+)?\.["']?\s*(?:$|[;&|])/i, why: 'git checkout/restore -- . (сброс ВСЕХ незакоммиченных правок)' },
-    // chattr recursive un-immutable (fleet brains on the prod server are chattr +i protected)
+    // chattr recursive un-immutable (fleet brains on Vertex are chattr +i protected)
     { id: 'chattr-unimmute-R', re: /\bchattr\b(?=[^\n]*\s-[a-zA-Z]*R)[^\n]*\s-[a-zA-Z]*i/, why: 'chattr -R -i (рекурсивное снятие immutable-защиты)' },
     // PowerShell recursive-force delete of roots/home
     { id: 'ps-remove-root', re: /remove-item\b[^\n]*-(recurse|force)\b[^\n]*(\bc:\\?(\s|$|\*)|\$env:userprofile|\$home\b|~[\\/](\s|$))/i, why: 'Remove-Item -Recurse -Force корня/home' },
@@ -371,7 +379,15 @@ try {
   // SQL-клиент + признак исполняемого SQL: -c/-e/-f/--command/--execute, heredoc
   // или закавыченный позиционный аргумент (sqlite3 "..."). Пустые пары кавычек
   // от вырезанных строк в code сохраняются — признак работает.
-  const SQLCLI_TRIG = /\b(?:psql|mysql|mariadb|sqlite3|sqlcmd|clickhouse-client|mongosh?)(?:\.exe)?\b[^\n;&|]*(?:\s(?:-c|-e|-f|--command|--execute|--file)\b|<<|["'])/i;
+  // Mongo передаёт скрипт через --eval, а не -c/-e. Флаг и кавычку ищем по
+  // отдельности (через lookahead), иначе жадный «всё до конца» съедал бы --eval
+  // и mongo --eval 'db.dropDatabase()' не распознавался как SQL-клиент.
+  // «mongosh?» — ловушка: на входе «mongo» движок берёт «mongos», ждёт опц. «h»,
+  // упирается в «\b» после «mongos…o» и НЕ откатывается к «mongo». Нужна явная
+  // альтернация, иначе `mongo --eval` (без sh) проходит мимо.
+  const SQLCLI_NAME = /\b(?:psql|mysql|mariadb|sqlite3|sqlcmd|clickhouse-client|mongosh|mongo)(?:\.exe)?\b/i;
+  const SQLCLI_TRIG = new RegExp(SQLCLI_NAME.source +
+    '(?=[^\\n;&|]*(?:\\s(?:-c|-e|-f|--command|--execute|--file|--eval)\\b|<<|["\']))', 'i');
   const SHELL_TRIG  = /(^|[;&|(]\s*|\$\(\s*)(?:bash|zsh|dash|ksh|sh|eval)(?:\.exe)?\s+(?:(?:-\S*|--\S+)\s+)*(?:-[a-zA-Z]*c[a-zA-Z]*(?:\s|$|["'])|<<|["'])/i;
   const INTERP_TRIG = /(^|[;&|(]\s*|\$\(\s*)((?:python|perl|node(?:js)?|ruby|php)[\w.]*)(?:\.exe)?\s+(?:(?:-\S*|--\S+)\s+)*(?:-[a-zA-Z]*[ce][a-zA-Z]*(?:\s|$|["'])|<<)/i;
   // Exec-стоки: только при их наличии строки-литералы интерпретаторного кода
@@ -439,7 +455,7 @@ try {
 
     const strings = t.dq.concat(t.sq);
 
-    // 3) ssh: нагрузка исполняется удалённым шеллом (прод-сервер = десятки контейнеров)
+    // 3) ssh: нагрузка исполняется удалённым шеллом (Vertex = 44 prod-контейнера)
     if (SSH_TRIG.test(t.code)) {
       const payloads = strings.slice();
       const m = cmdStr.match(/\bssh\s+(?:-[a-zA-Z]\S*\s+)*(?:\S+@)?[\w.\-]+\s+([\s\S]+)$/);
