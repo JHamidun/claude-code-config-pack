@@ -92,6 +92,102 @@ def ask(path: pathlib.Path, api_key: str) -> dict:
     return json.loads(text[s:e + 1])
 
 
+def refine(src: pathlib.Path, box: dict, search: float = 0.045) -> dict:
+    """Уточнить положение рта по самой картинке.
+
+    Модель показывает рот примерно: на отдельных позах промах доходил до двадцати
+    пяти пикселей, и рот открывался ниже губ — в бороде. На глаз разметка при этом
+    выглядела верной: овал накрывал губы целиком, а смещение внутри него не читалось.
+
+    Линия смыкания губ — самая тёмная горизонталь в окрестности: у рта всегда есть
+    тёмный контур, а кожа и борода вокруг светлее. Ищем её и сдвигаем центр туда.
+    """
+    from PIL import Image
+    import numpy as np
+
+    im = Image.open(src).convert("L")
+    a = np.asarray(im, dtype=float)
+    H, W = a.shape
+    cx, cy = box["cx"] * W, box["cy"] * H
+
+    # Окно поиска — по высоте самого рта, а не по высоте картинки. С широким окном
+    # находилась борода: она темнее губ, и на позах со светлым сомкнутым ртом центр
+    # уезжал на два сантиметра вниз, под нижнюю губу.
+    half = max(int(box["h"] * H * 1.1), 8)
+    x0, x1 = int(cx - box["w"] * W * 0.35), int(cx + box["w"] * W * 0.35)
+    y0, y1 = max(0, int(cy - half)), min(H, int(cy + half))
+    if x1 <= x0 or y1 <= y0:
+        return box
+
+    rows = a[y0:y1, x0:x1].mean(axis=1)
+
+    # Ищем не самую тёмную строку, а линию СМЫКАНИЯ губ. Разница принципиальная:
+    # под нижней губой тень переходит в бороду, и там темнее, чем во рту, — прежний
+    # способ уверенно ставил рот в бороду. Линия смыкания устроена иначе: узкая
+    # тёмная полоса, а сверху и снизу от неё светлее. Такой перепад и ищем.
+    k = max(int(box["h"] * H * 0.45), 3)
+    contrast = np.full(len(rows), 1e9)
+    for i in range(k, len(rows) - k):
+        above, below = rows[i - k:i].mean(), rows[i + 1:i + 1 + k].mean()
+        # Чем строка темнее ОБОИХ соседей, тем лучше. Если ниже так же темно —
+        # это переход в бороду, и кандидат отбраковывается сам собой.
+        contrast[i] = rows[i] - min(above, below)
+
+    dist = np.abs(np.arange(y0, y1) - cy)
+    score = contrast + dist * 1.2
+    found = y0 + int(np.argmin(score))
+
+    shift_px = found - cy
+    # Последняя страховка: сдвиг больше высоты рта — не уточнение, а промах.
+    if abs(shift_px) > box["h"] * H * 1.2:
+        out = dict(box)
+        out["shift_px"] = 0
+        return out
+
+    out = dict(box)
+    out["cy"] = round(box["cy"] + shift_px / H, 4)
+    out["shift_px"] = int(shift_px)
+    return out
+
+
+def skin_tone(src: pathlib.Path, box: dict) -> dict:
+    """Цвет кожи вокруг рта — им закрывается нарисованный рот.
+
+    Свой рот поверх нарисованного даёт кашу: губы персонажа остаются на месте, а
+    новая полость появляется внутри них, и это читается как дыра. Поэтому под свой
+    рот подкладывается заплатка цвета кожи. Цвет берётся не из палитры, а с самой
+    картинки — прямо над ртом, где кожа чистая: у разных поз тон отличается
+    освещением, и общий бежевый заметен заплаткой.
+    """
+    from PIL import Image
+    import numpy as np
+
+    im = Image.open(src).convert("RGB")
+    a = np.asarray(im)
+    H, W = a.shape[:2]
+    cx, cy = box["cx"] * W, box["cy"] * H
+    # Берём широкую область вокруг рта и отбираем из неё только кожу. Точка «над
+    # ртом» не годится: у персонажа там усы, и заплатка выходила коричневой.
+    dy = int(box["h"] * H * 3)
+    dx = int(box["w"] * W * 1.2)
+    y0, y1 = max(0, int(cy - dy)), min(H, int(cy + dy))
+    x0, x1 = max(0, int(cx - dx)), min(W, int(cx + dx))
+    patch = a[y0:y1, x0:x1].reshape(-1, 3).astype(int)
+    if not len(patch):
+        return {"skin": "#e8b795"}
+
+    r, g, b = patch[:, 0], patch[:, 1], patch[:, 2]
+    # Кожа на рисунке — светлая и тёплая: красного заметно больше синего. Усы,
+    # борода и тень внутри рта этому не отвечают и отсеиваются.
+    skin = patch[(r > 140) & (r > g) & (g > b) & (r - b > 25)]
+    if len(skin) < 20:
+        skin = patch[r > np.percentile(r, 75)]
+    if not len(skin):
+        return {"skin": "#e8b795"}
+    rr, gg, bb = (int(np.median(skin[:, i])) for i in range(3))
+    return {"skin": f"#{rr:02x}{gg:02x}{bb:02x}"}
+
+
 def draw_check(src: pathlib.Path, box: dict, out: pathlib.Path) -> None:
     """Обвести найденный рот — чтобы разметку можно было проверить глазами, а не верой."""
     from PIL import Image, ImageDraw
@@ -139,9 +235,15 @@ def main() -> int:
             print(f"  {p.stem:12} — рот не виден")
             missed.append(p.stem)
             continue
+        box = refine(p, box)
+        box.update(skin_tone(p, box))
         result[p.stem] = {k: round(float(box[k]), 4) for k in ("cx", "cy", "w", "h")}
+        result[p.stem]["skin"] = box.get("skin", "#e8b795")
+        note = ""
+        if abs(box.get("shift_px", 0)) >= 6:
+            note = f"  ← поправлено на {box['shift_px']:+d} px по линии губ"
         print(f"  {p.stem:12} рот на {box['cx']:.2f} × {box['cy']:.2f}, "
-              f"размер {box['w']:.3f} × {box['h']:.3f}")
+              f"размер {box['w']:.3f} × {box['h']:.3f}{note}")
         if out_dir:
             draw_check(p, result[p.stem], out_dir / p.name)
 
