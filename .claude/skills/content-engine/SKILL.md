@@ -127,5 +127,5 @@ Before delivering:
 ## Related Skills
 
 - `brand-voice` for source-derived voice profiles
-- `crosspost` for platform-specific distribution
-- `social-intel` for sourcing recent posts; `socialpublisher-post` / `postiz` for publishing approved X output
+- `social-intel` for sourcing recent posts
+- дистрибуция и публикация одобренных постов — своим публикатором (например, Postiz self-hosted; для Telegram — свой бот через `tg-bot-publish`); навыка-автомата кросс-постинга в паке нет

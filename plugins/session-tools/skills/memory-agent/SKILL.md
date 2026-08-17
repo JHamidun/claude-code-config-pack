@@ -15,7 +15,7 @@ name: memory-agent
 | **1. Файловая (курируемая)** | MEMORY.md индекс + topic-файлы, bi-temporal frontmatter | `~/.claude/projects/C--Users-youruser/memory/*.md` | Read/Write/Edit + команды `/memory-*` | Каноничные решения, root cause, паттерны, решения пользователя — то, что должно жить долго и читаться человеком |
 | **2. Граф** | Заметки+сущности как узлы, [[wikilinks]]+supersedes как рёбра | `~/.claude/memory-graph/graph.db` (SQLite, офлайн) | `scripts/memory_graph.py` | Связи, многохоповые вопросы, хронология, хабы, кейсы по проекту/человеку/компании |
 | **3. Полнотекст чатов** | Вся история сессий, FTS5+BM25 + knowledge base | `~/.claude/chats.db` | `tools/search_chats.py` | «Что мы делали с X», recall решений/грабель, точная цитата из прошлой сессии |
-| **4. Second Brain** | Семантическая память семьи/личного, гибрид FTS5+вектор | `ваше локальное хранилище памяти` (+ LanceDB) | MCP `second-brain`, `scripts/memory_brief.py` | Семантический recall, брифинги, обещания; тяжёлый векторизатор — только вручную под ресурс-гардом |
+| **4. Семантический (опционально)** | Векторный recall поверх личного архива; в паке не поставляется — поднимается собственным MCP-сервером | своё хранилище (гибрид FTS5+вектор, напр. LanceDB) | свой MCP + `scripts/memory_brief.py` | Семантический recall, брифинги; тяжёлый векторизатор — только вручную под ресурс-гардом |
 
 ## Маршрутизация: запрос → слой
 
@@ -27,7 +27,7 @@ name: memory-agent
 | «где я остановился / recap» | 3 | `search_chats.py search` по проекту, свежее окно |
 | «собери контекст для воркера по теме Y» | 4+1 | `memory_brief.py "Y"` → вставить KNOWN GOTCHAS в промпт |
 | «консолидируй / почисти память» | 1+2 | skill `dream` (rethink/decay/prune) + `memory_graph.py build` |
-| семантический recall личного/семейного | 4 | MCP `second-brain` → `brain_search` |
+| семантический recall личного/семейного | 4 | свой семантический MCP (если поднят; в паке слоя 4 нет) |
 
 **Recall-дисциплина:** любой вопрос о ПРОШЛОМ (решения / грабли / статусы / «что делали с X») → СНАЧАЛА слой 3 или 4, ПОТОМ веб/grep. Найденное применяй невидимо.
 
@@ -73,7 +73,7 @@ python ~/.claude/scripts/memory_graph.py build                 # пересоб�
 ```
 Узлы-сущности: `person:Имя` / `company:X` / `tool:Y` / `proj:Z`. Пересборка (`build`) — в рамках `dream`.
 
-> FalkorDB на your-server (старый бэкенд skill `graph-memory`) заморожен. Каноничный локальный движок — `memory_graph.py`.
+> Старый графовый бэкенд на FalkorDB (внешний сервер) заморожен. Каноничный локальный движок — `memory_graph.py`; доступ через MCP — `mcps/graph-memory/`.
 
 ---
 
@@ -96,17 +96,17 @@ python ~/.claude/tools/search_chats.py knowledge "query" [--type code|error|lear
 
 ---
 
-## Слой 4 — Second Brain (`ваше локальное хранилище памяти`) + брифинг для воркеров
+## Слой 4 — Семантическая память (опционально) + брифинг для воркеров
 
-Семантическая память (семья/личное/встречи). Доступ:
-- **MCP `second-brain`** — инструменты `brain_search`, `remember`, `contacts`, `graph`, `vectorize`, `stats` (см. skill `brain-briefing`).
-- **Векторизатор — ТОЛЬКО вручную под ресурс-гардом:** `python ваше локальное хранилище памяти --start` (idle-gated). Никакого молчаливого крона. Реестр тяжёлых задач: `ваше локальное хранилище памяти`.
+Семантический recall поверх личного архива (семья/личное/встречи). **В паке этот слой не поставляется** — это отдельный MCP-сервер с векторным индексом, который поднимается самостоятельно. Если он тебе нужен:
+- подними свой MCP с инструментами вида «семантический поиск / запомнить / статистика» над своим хранилищем (гибрид FTS5 + векторный индекс, например LanceDB);
+- тяжёлую векторизацию запускай ТОЛЬКО вручную под ресурс-гардом (idle-gated) — никакого молчаливого крона.
 
-**Брифинг для Fable-воркера** — перед промптом по знакомой теме собери грабли из brain + MEMORY.md:
+**Брифинг для Fable-воркера** — перед промптом по знакомой теме собери грабли из семантического слоя (если поднят) + MEMORY.md:
 ```bash
 python ~/.claude/scripts/memory_brief.py "<тема задачи>" [--max-tokens 600]
 ```
-Печатает компактный блок `KNOWN GOTCHAS` (деф ≤600 ток) для вставки verbatim в промпт воркера. Read-only, деградирует мягко (embedding down → FTS-only; brain недоступен → только MEMORY.md).
+Печатает компактный блок `KNOWN GOTCHAS` (деф ≤600 ток) для вставки verbatim в промпт воркера. Read-only, деградирует мягко (embedding down → FTS-only; семантический слой не поднят → только MEMORY.md).
 
 ---
 
@@ -136,7 +136,7 @@ python ~/.claude/scripts/memory_brief.py "<тема задачи>" [--max-tokens
 **B. Достать контекст (recall)**
 1. О прошлом? → `search_chats.py search` (слой 3) ПЕРЕД веб/grep.
 2. Про связи/хронологию → `memory_graph.py neighbors/timeline/path`.
-3. Семантический/личный → MCP `second-brain` brain_search.
+3. Семантический/личный → свой семантический MCP (слой 4, если поднят).
 4. Сузь → `get <ids>` только нужное. Применяй невидимо.
 
 **C. Брифинг воркера**
@@ -165,6 +165,5 @@ python ~/.claude/scripts/memory_brief.py "<тема задачи>" [--max-tokens
 ## Связанные
 - `save-knowledge-base` — полный 4-уровневый пайплайн записи.
 - `dream` — периодическая консолидация + frontmatter v2.
-- `brain-briefing` — режимы Second Brain (briefing/diary/evening-review/…).
-- `graph-memory` — граф-скилл (старый FalkorDB-бэкенд заморожен; канон — `memory_graph.py`).
+- MCP `mcps/graph-memory/` — граф как MCP-инструменты поверх того же `memory_graph.py`.
 - Команды: `/memory-search`, `/memory-learn`, `/memory-stats`, `/memory-ingest`, `/search-chats`.

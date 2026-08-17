@@ -1,18 +1,18 @@
 ---
 name: draft-outreach
-description: "Research a prospect, then draft personalized B2B outreach (email + LinkedIn + Telegram). RU cold-outreach: цепочки касаний, персонализация под корп-ЛПР. Триггеры: «письмо ЛПР/HR-директору», «цепочка касаний». NOT: newsletters→html-email; посты→tg-post."
+description: "Research a prospect, then draft personalized B2B outreach (email + LinkedIn + Telegram). RU cold-outreach: цепочки касаний, персонализация под корп-ЛПР. Триггеры: «письмо ЛПР/HR-директору», «цепочка касаний». NOT: newsletters→html-email; посты в каналы/соцсети — не сюда."
 metadata:
   version: 2.1.0
   updated: 2026-05-29
   ported_from: coreyhaines31/marketingskills (cold-email)
-  reuses: yourname-marketing-context, crm, headhunter, linkedin, gmail, outlook, lead-research, zoom
+  reuses: linkedin, gmail, outlook, lead-research, zoom
 ---
 
 # Draft Outreach
 
 Research first, then draft. This skill never sends generic outreach - it always researches the prospect first to personalize the message. Works standalone with web search, supercharged when you connect your tools.
 
-> **RU B2B mode:** For Russian-market cold outreach (продажа AI-воркшопов + консалтинга + B2B-когорт academy корп-ЛПР), jump to **«RU B2B Cold Outreach»** below. It ports the cold-email frameworks/sequences/personalization to the RU market (русский язык, корп-ЛПР, каналы email + LinkedIn + Telegram). Before drafting, read product context: `yourname-marketing-context` → `skills/yourname-marketing-context/references/business.md` + `skills/yourname-marketing-context/references/offerings.md` + `skills/yourname-marketing-context/references/funnel-another-db.md`.
+> **RU B2B mode:** For Russian-market cold outreach (продажа AI-воркшопов + консалтинга + B2B-когорт academy корп-ЛПР), jump to **«RU B2B Cold Outreach»** below. It ports the cold-email frameworks/sequences/personalization to the RU market (русский язык, корп-ЛПР, каналы email + LinkedIn + Telegram). Before drafting, read product context: заведи собственный навык-контекст продукта (business: персоны, боли, дифференциаторы; offerings: продукты и CTA; funnel: механика воронки и CRM) и читай его первым — в паке такой навык не поставляется, без него персонализация повиснет в воздухе.
 
 ## Connectors (Optional)
 
@@ -454,7 +454,7 @@ Draft created - check email
 
 ## Перед написанием
 
-1. Прочитай контекст продукта: `yourname-marketing-context` → `skills/yourname-marketing-context/references/business.md` (персоны, боли, дифференциаторы) + `skills/yourname-marketing-context/references/offerings.md` (воркшоп/консалтинг/academy B2B, CTA = бесплатная консультация) + `skills/yourname-marketing-context/references/funnel-another-db.md` (CRM `yourname-sales-postgres`, handoff_to_user, дыры воронки).
+1. Прочитай контекст продукта из своего навыка-контекста (в паке не поставляется — заведи собственный): персоны, боли, дифференциаторы; офферы (воркшоп/консалтинг/academy B2B, CTA = бесплатная консультация); воронка и CRM (`yourname-sales-postgres`, handoff_to_user, дыры воронки).
 2. Собери сигналы по компании/ЛПР — делегируй скиллу `lead-research` (RU-источники: Контур.Фокус, Rusprofile, СПАРК, HH, сайт). Не выдумывай факты.
 3. Определи: кому пишешь (роль из персон), что хочешь (цель касания → консультация/воркшоп), value под его роль, пруф (руководитель ИИ-направления / ClientCorp3 N+ / academy N+ материалов / корп-кейс), сигнал «почему сейчас».
 
@@ -474,7 +474,7 @@ Draft created - check email
 |---|---|---|---|
 | **Email** | есть рабочий email ЛПР/корп-домен | `gmail` или `outlook` (черновик) | основной для B2B; маркировка рекламы если применимо (см. ниже) |
 | **LinkedIn** | есть профиль, нет email | `linkedin` (connection request <300 симв + value-first follow-up) | работает по топам/иннов-директорам; внутренние правила LinkedIn, не 38-ФЗ |
-| **Telegram** | ЛПР активен в проф-ТГ, тёплый контекст | вручную / `tg-post` для контента | уместен после касания на конференции/в чате; не холодный спам |
+| **Telegram** | ЛПР активен в проф-ТГ, тёплый контекст | вручную; контент для прогрева — своим пайплайном постинга | уместен после касания на конференции/в чате; не холодный спам |
 
 Channel-mix под топов: **email → LinkedIn → (опц.) Telegram**, чередуя углы. Деталь по углам и каденсу — `references/sequences-ru.md`.
 
@@ -486,10 +486,10 @@ Channel-mix под топов: **email → LinkedIn → (опц.) Telegram**, ч
 | Отправка email / черновик | `gmail`, `outlook` |
 | LinkedIn касания | `linkedin` |
 | Бронь созвона / диагностики | `zoom` (бесплатная консультация) |
-| Контакты/история сделки, запись касания | `crm` + academy CRM `yourname-sales-postgres` |
-| Контент для ТГ | `tg-post` |
+| Контакты/история сделки, запись касания | API твоей CRM (Битрикс24/amoCRM/HubSpot) + academy CRM `yourname-sales-postgres` |
+| Контент для ТГ | свой пайплайн постинга (в паке не поставляется) |
 
-После касания — **зафиксируй активность в CRM**: контакт, канал, дата, реакция. Записывай в `crm` (`crm.activity.add`) и/или в academy-CRM `yourname-sales-postgres` (стадии new→interested→qualified→zoom_scheduled). Горячий enterprise эскалируется через `handoff_to_user`. Это вход в воронку (см. `revops-ru`).
+После касания — **зафиксируй активность в CRM**: контакт, канал, дата, реакция. Записывай в свою CRM (в Битрикс24 это метод `crm.activity.add`) и/или в academy-CRM `yourname-sales-postgres` (стадии new→interested→qualified→zoom_scheduled). Горячий enterprise эскалируется через `handoff_to_user`. Это вход в воронку (см. `revops-ru`).
 
 ## References (RU)
 
@@ -502,7 +502,7 @@ Channel-mix под топов: **email → LinkedIn → (опц.) Telegram**, ч
 
 ## Комплаенс (холодные касания, РФ)
 
-- **152-ФЗ «О персональных данных».** Контакт ЛПР — публичный рабочий канал (корп-email, профиль). Личные email/телефоны — повышенный риск, не использовать без основания. Храни источник + дату (через `lead-research`/`crm`).
+- **152-ФЗ «О персональных данных».** Контакт ЛПР — публичный рабочий канал (корп-email, профиль). Личные email/телефоны — повышенный риск, не использовать без основания. Храни источник + дату (собирает `lead-research`, фиксируй в своей CRM).
 - **38-ФЗ «О рекламе».** Холодное B2B-письмо «приглашаю на бесплатную диагностику» — деловая переписка, не реклама. Но если письмо = рекламная рассылка (оффер/акция массово, например цены на когорту) → нужна маркировка/согласие + механизм отписки. Один email конкретному ЛПР с деловым предложением обычно вне рекламного контура — но при массовости консультируйся.
 - **LinkedIn / Telegram** регулируются правилами площадок, не 38-ФЗ.
 
@@ -515,4 +515,4 @@ Channel-mix под топов: **email → LinkedIn → (опц.) Telegram**, ч
 - [ ] Один ясный CTA с низким трением (бесплатная консультация/диагностика)?
 - [ ] Нет канцелярита, хайпа («революционный»), AI-следов («надеюсь, письмо застало вас»)?
 - [ ] Факты (соцпруф: руководитель ИИ-направления / ClientCorp3 N+ / academy N+ / корп-кейсы) сверены с `business.md`, не выдуманы?
-- [ ] Касание записано в CRM (`crm` / `yourname-sales-postgres`)?
+- [ ] Касание записано в CRM (твоя CRM / `yourname-sales-postgres`)?

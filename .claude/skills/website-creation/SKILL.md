@@ -406,13 +406,10 @@ flex flex-col sm:flex-row gap-3
 ## Mode A: Vanilla HTML Quick Start
 
 ### Библиотека эффектов
-**ОБЯЗАТЕЛЬНО** используй: `~/.claude/skills/landing-page-effects/SKILL.md (скилл `landing-page-effects` в пак не входит)`
-- 50+ готовых эффектов (CSS + JS)
-- 15 шрифтов, цветовая палитра
-- Трендовые эффекты 2025
+Готовой библиотеки эффектов в паке нет. Снипеты частых мелочей (stagger reveal, parallax, counter, skeleton) — в скилле `microinteractions`; вкус, шрифты и палитру держат `design-taste`/`frontend-design`. Остальное из чеклиста ниже (preloader, grain overlay, hover, animated gradient) пишется руками — это по 10-30 строк CSS/JS каждое.
 
 ### Эталонный лендинг
-`${HOME}\your-project-landing\index.html`
+Держи собственный эталон (лучший из своих прошлых лендингов) и переиспользуй его структуру — в паке эталон не поставляется.
 
 ### Чеклист
 - [ ] Preloader + Custom cursor (опц.)

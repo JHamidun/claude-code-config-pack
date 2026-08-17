@@ -51,7 +51,12 @@ Before distributing this configuration to customers or open-sourcing:
 
 - [ ] Remove `.credentials.master.env` (include `.credentials.example.env` template)
 - [ ] **MUST-STRIP secret-bearing config files** (these carry live secrets/deanon fingerprints — NEVER distribute): `config/projects-registry.md`, `config/telegram.md`, `config/server-*.md`, `config/email.md`, `config/databases.md`, `config/cloudflare.md`, `config/aws.md`, and any `*.bak*` / `*.bak-pwrotate*`. Secrets in these were moved to `.credentials.master.env` (2026-07-17) and replaced with `<see ENV_VAR>` refs, but the files still hold operational PII (accounts, IPs, project names).
-- [ ] Run `python skills/leak-scan/scripts/leak_scan.py ~/.claude/config` — must report 0 credential hits before any push.
+- [ ] Прогнать сканер секретов по всему дереву — **0 находок** до любого push. Публичные инструменты:
+      `gitleaks detect --source ~/.claude --no-git --redact -v` (быстрый, есть в brew/scoop/apt)
+      или `trufflehog filesystem ~/.claude --results=verified,unknown`.
+      Оба ловят токены по энтропии и по сигнатурам провайдеров; `--redact` не печатает сам секрет в лог.
+      Скан по git-истории отдельно: `gitleaks detect --source . -v` (без `--no-git`) — секрет,
+      удалённый последним коммитом, всё ещё лежит в предыдущих.
 - [ ] Remove `rules/user-profile.md` (personal data)
 - [ ] Remove `memory/` files (project-specific knowledge)
 - [ ] Audit `mcp.json` for hardcoded credentials or internal URLs

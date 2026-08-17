@@ -5,7 +5,7 @@ description: "Конвейер производства ролика ролям�
 
 # Video Montage — Full Production Pipeline
 
-> **Windows-адаптация (стек пользователя):** `python` вместо `python3`; headless Chrome = `"C:/Program Files/Google/Chrome/Application/chrome.exe"` (те же флаги); временные файлы → scratchpad, не `/tmp`; ElevenLabs-ключ `ELEVENLABS_API_KEY` из `~/.claude/.credentials.master.env`, свой голос — см. навык `elevenlabs`; правило кодека то же: только `libx264 + yuv420p`. WhisperX уже стоит (см. `video-editor` karaoke_captions). Смежное: монтаж готового футажа → `video-editor`; AI-генерация сцен → `video-generation`; музыка → `ace-step`/`suno`; публикация → `postiz`/`tg-post`.
+> **Windows-адаптация (стек пользователя):** `python` вместо `python3`; headless Chrome = `"C:/Program Files/Google/Chrome/Application/chrome.exe"` (те же флаги); временные файлы → scratchpad, не `/tmp`; ElevenLabs-ключ `ELEVENLABS_API_KEY` из `~/.claude/.credentials.master.env`, свой голос — см. навык `elevenlabs`; правило кодека то же: только `libx264 + yuv420p`. WhisperX уже стоит (см. `video-editor` karaoke_captions). Смежное: монтаж готового футажа → `video-editor`; AI-генерация сцен → `video-generation`; музыка → `ace-step`/`suno`; публикация в Telegram-канал → `tg-bot-publish` (через своего бота), в остальные соцсети — своим публикатором (например, Postiz self-hosted), готовой обёртки в паке нет.
 
 Everything you need to produce vertical reels (9:16, 1080x1920, 30fps) with Claude Code — from raw footage to published content.
 

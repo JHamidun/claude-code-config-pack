@@ -1,11 +1,11 @@
 ---
 name: lead-research
-description: "Build and qualify a fresh B2B lead list from an ICP (RU market): discovery → decision-maker mapping → signals → scoring (Hot/Warm/Cold/Skip) → handoff, for selling AI-workshops / consulting / B2B cohorts. Triggers: 'lead research', 'prospect research', 'ICP', «список лидов». NOT: enrich an existing list→lead-enrichment; outreach copy→draft-outreach; CRM ops→crm/revops-ru; dossier on a known handle→social-intel."
+description: "Build and qualify a fresh B2B lead list from an ICP (RU market): discovery → decision-maker mapping → signals → scoring (Hot/Warm/Cold/Skip) → handoff, for selling AI-workshops / consulting / B2B cohorts. Triggers: 'lead research', 'prospect research', 'ICP', «список лидов». NOT: enrich an existing list→lead-enrichment; outreach copy→draft-outreach; CRM ops→revops-ru; dossier on a known handle→social-intel."
 allowed-tools: Bash, Read, Write, WebSearch, WebFetch, Skill
 metadata:
   version: 3.0.0
   updated: 2026-07-22
-  reuses: yourname-marketing-context, lead-enrichment, headhunter, linkedin, social-intel, maps-places, tender-search-ru, draft-outreach, crm, last30days, perplexity
+  reuses: lead-enrichment, linkedin, social-intel, maps-places, tender-search-ru, draft-outreach, last30days, perplexity
 ---
 
 # Lead Research (RU)
@@ -25,7 +25,7 @@ metadata:
 - Обогатить **уже существующий** список/фрагмент (email/телефон/ИНН) → `lead-enrichment`
 - Написать текст касания → `draft-outreach`
 - Досье на уже известный handle → `social-intel`
-- Учёт/операции в CRM → `crm` / `revops-ru`
+- Учёт/операции в CRM → `revops-ru` (+ API твоей CRM)
 
 ## Границы честности (важно)
 
@@ -41,7 +41,7 @@ metadata:
 | `references/qualification-ru.md` | 5-фазный фреймворк квалификации + RU-модель скоринга + 152-ФЗ |
 | `references/pain-signal-prospecting.md` | **Signal-first режим** для запуска нового оффера / первых клиентов / design-партнёров, когда ICP ещё не доказан |
 
-Перед стартом прочитай контекст оффера: `yourname-marketing-context` (ICP, персоны, что продаём, handoff/CRM).
+Перед стартом прочитай контекст оффера из своего навыка-контекста (ICP, персоны, что продаём, handoff/CRM) — в паке он не поставляется; заведи собственный и держи это там, а не в голове.
 
 ## Два режима
 
@@ -54,13 +54,13 @@ metadata:
 
 ## Процедура (top-down, по умолчанию)
 
-1. **ICP** — из `yourname-marketing-context`; иначе собери шаблоном ниже. Вывод: ICP одним абзацем + чеклист pass/fail. Без ICP в discovery не идти.
-2. **Discovery (кандидаты)** — собери 2–3× от нужного объёма (квалификация отсеет). Источники и исполняющие скиллы — `references/ru-data-sources.md`. Быстрый бесплатный стек: ЕГРЮЛ + Rusprofile (web) + сайт компании + `headhunter` + `linkedin`.
+1. **ICP** — из твоего навыка-контекста, если завёл; иначе собери шаблоном ниже. Вывод: ICP одним абзацем + чеклист pass/fail. Без ICP в discovery не идти.
+2. **Discovery (кандидаты)** — собери 2–3× от нужного объёма (квалификация отсеет). Источники и исполняющие скиллы — `references/ru-data-sources.md`. Быстрый бесплатный стек: ЕГРЮЛ + Rusprofile (web) + сайт компании + вакансии на hh.ru (руками или через API — готового навыка в паке нет) + `linkedin`.
 3. **Фирмографика по ИНН** — где нужны выручка/численность/статус, делегируй в `lead-enrichment` (Checko/DaData/ЕГРЮЛ). Оцени размер команды и L&D-бюджет.
-4. **ЛПР (decision-maker mapping)** — HR-директор / рук. L&D / гендир / рук. функции / директор трансформации: `linkedin`, `headhunter`, `social-intel`, раздел «Команда/Карьера» на сайте.
-5. **Сигнал «почему сейчас»** — вакансии «опыт работы с нейросетями» + L&D-роли (`headhunter`), новости про AI/трансформацию/нового CDO (WebSearch, `last30days`, CNews/TAdviser), тендеры на AI-внедрение/обучение как сигнал бюджета (`tender-search-ru`).
+4. **ЛПР (decision-maker mapping)** — HR-директор / рук. L&D / гендир / рук. функции / директор трансформации: `linkedin`, `social-intel`, вакансии на hh.ru, раздел «Команда/Карьера» на сайте.
+5. **Сигнал «почему сейчас»** — вакансии «опыт работы с нейросетями» + L&D-роли (hh.ru), новости про AI/трансформацию/нового CDO (WebSearch, `last30days`, CNews/TAdviser), тендеры на AI-внедрение/обучение как сигнал бюджета (`tender-search-ru`).
 6. **Квалификация и скоринг** — по `references/qualification-ru.md`: чеклист ICP + доказательство (URL) на каждый пункт, уровень уверенности, грейд Hot/Warm/Cold/Skip.
-7. **Handoff** — шортлист → `draft-outreach` (касания) + учёт с lineage (источник+дата) в `crm` / academy-CRM `yourname-sales-postgres`.
+7. **Handoff** — шортлист → `draft-outreach` (касания) + учёт с lineage (источник+дата) в твоей CRM / academy-CRM `yourname-sales-postgres`.
 
 ## ICP Definition Template
 
@@ -111,18 +111,18 @@ metadata:
 
 Запрос: «Найди 10 компаний под AI-воркшоп, ритейл РФ, 300+ сотрудников».
 
-1. ICP из `yourname-marketing-context`: ритейл РФ, 300+ сотр., есть L&D/корп-университет, публичный AI-интент.
+1. ICP из навыка-контекста: ритейл РФ, 300+ сотр., есть L&D/корп-университет, публичный AI-интент.
 2. Discovery: список ~25 ритейл-юрлиц (Rusprofile + отраслевые рейтинги, web).
 3. `lead-enrichment` по ИНН → выручка/численность отсеивает мелких.
-4. ЛПР: `headhunter` (кто открыл L&D/AI-вакансии) + `linkedin` (HR-директора).
+4. ЛПР: hh.ru (кто открыл L&D/AI-вакансии) + `linkedin` (HR-директора).
 5. Сигнал: у 4 компаний вакансии «опыт с нейросетями» за 14–30 дней; у 1 — тендер на корп-обучение (`tender-search-ru`).
 6. Скоринг → 3 Hot, 4 Warm, остальное Cold/Skip.
-7. Таблица + топ-3 касания → `draft-outreach`, lineage → `crm`.
+7. Таблица + топ-3 касания → `draft-outreach`, lineage → в CRM.
 
 ## Комплаенс (152-ФЗ)
 
 - Контакты — только публичные рабочие каналы (корп-email, профиль, info@). Личные email/телефоны — не использовать без основания.
-- На каждый контакт — источник + дата (lineage). Фиксировать в `crm` / `yourname-sales-postgres`.
+- На каждый контакт — источник + дата (lineage). Фиксировать в CRM / `yourname-sales-postgres`.
 - Не хранить ПДн дольше нужного, не перепродавать список.
 
 ## Чеклист перед сдачей
