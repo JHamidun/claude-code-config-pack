@@ -41,6 +41,9 @@ const DEV = '/de' + 'v/sda';
 const FORCE = '--for' + 'ce';
 const MAIN = 'ma' + 'in';
 const FORKBOMB = ':(){ :' + '|:& };:';
+// Собираем из кусков: цельная строка `db.dropDatabase()` — самостоятельная улика,
+// и файл с ней не удалось бы ни записать, ни прогнать под собственной защитой.
+const DB_DROP = 'db.dr' + 'opDatabase()';
 
 const rmrf = (target) => `${RM} ${RF} ${target}`;
 
@@ -139,6 +142,22 @@ const CASES = [
     expect: 'block',
     cmd: `ssh deploy@vertex '${rmrf('/etc/nginx')}'`,
   },
+  // Дыры, найденные состязательным прогоном 2026-08-18 (субпуть «..» и Mongo):
+  {
+    name: 'выход наверх от дома через ~/..',
+    expect: 'block',
+    cmd: `${rmrf('~/..')}`,
+  },
+  {
+    name: 'выход наверх от корня через /home/..',
+    expect: 'block',
+    cmd: `${rmrf('/home/..')}`,
+  },
+  {
+    name: 'Mongo снос базы через --eval (не SQL-синтаксис)',
+    expect: 'block',
+    cmd: `mongo --eval '${DB_DROP}'`,
+  },
 
   // ===== защита от регрессии: каналы, которые могла бы сломать сегментация ====
   // (6 «пройти» + 6 «заблокировать», баланс набора сохраняется)
@@ -150,6 +169,9 @@ const CASES = [
     expect: 'allow',
     cmd: "find . -name '*.log' -mtime +7 -delete",
   },
+  { name: 'относительный ../build (не выход к дому)', expect: 'allow', cmd: `${rmrf('../build')} && npm run build` },
+  { name: 'Mongo чтение через --eval (find)', expect: 'allow', cmd: "mongo --eval 'db.users.find().limit(5)'" },
+  { name: 'mongoexport (не drop)', expect: 'allow', cmd: 'mongoexport --db app --collection users --out u.json' },
   {
     name: 'node -e с опасной строкой в литерале (стока нет)',
     expect: 'allow',
