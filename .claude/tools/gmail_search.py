@@ -220,7 +220,7 @@ def main():
     if args.list_accounts:
         accounts = list_authorized_accounts()
         if not accounts:
-            print("No authorized accounts. Run gmail_multi_auth.py first.")
+            print("Нет авторизованных ящиков. Положи токен в ~/.claude/.gmail-tokens/<ящик>.json (client_id, client_secret, refresh_token).")
             return
         for a in accounts:
             status = "OK" if a["has_refresh"] else "NO REFRESH TOKEN"
@@ -244,7 +244,7 @@ def main():
         accounts = [a.strip() for a in args.accounts.split(",")]
 
     if not accounts:
-        print("No authorized accounts found. Run gmail_multi_auth.py first.")
+        print("Нет авторизованных ящиков. Положи токен в ~/.claude/.gmail-tokens/<ящик>.json (client_id, client_secret, refresh_token).")
         return
 
     all_results = {}

@@ -39,3 +39,9 @@ chromadb                      # tools/vector_memory.py (alternative backend)
 #   captacity   skills/video-editor (add_captions)     — install from git
 #   liteparse   skills/research-docs                   — vendor-provided
 #   opf         skills/privacy-filter                  — local on-device model
+
+# Доукомплектовано 2026-08-17: импорты были в коде, а в списке зависимостей нет —
+# на чистой машине это трейсбек при первом запуске, а не понятная просьба доставить.
+pywin32 ; sys_platform == "win32"   # outlook_local.py: import win32com.client
+scikit-learn   # isolate_speaker.py: кластеризация дикторов
+soundfile      # isolate_speaker.py: чтение и запись wav
