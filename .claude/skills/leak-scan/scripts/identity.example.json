@@ -1,0 +1,29 @@
+{
+ "_": "Личный словарь опознавания для leak_scan.py. Скопируй в ~/.claude/leak-scan-identity.json и впиши СВОИ признаки. Этот файл — только образец, реальные значения в него не клади.",
+ "patterns": [
+  [
+   "name:you",
+   "\\bYOURNAME\\b"
+  ],
+  [
+   "email:you",
+   "you@example\\.com"
+  ],
+  [
+   "domain:yours",
+   "your-domain\\.example"
+  ],
+  [
+   "ip:your_server",
+   "203\\.0\\.113\\.\\d+"
+  ],
+  [
+   "doc:your_id",
+   "\\bYOUR-ID-NUMBER\\b"
+  ],
+  [
+   "client:acme",
+   "\\bAcme Corp\\b"
+  ]
+ ]
+}
