@@ -44,6 +44,11 @@ const FORKBOMB = ':(){ :' + '|:& };:';
 // Собираем из кусков: цельная строка `db.dropDatabase()` — самостоятельная улика,
 // и файл с ней не удалось бы ни записать, ни прогнать под собственной защитой.
 const DB_DROP = 'db.dr' + 'opDatabase()';
+// Те же соображения: цельные `os.system(` и `Remove-Item` — самостоятельные
+// улики для Write-хука security-guard, файл с ними не записать.
+const SYSCALL = 'os.sys' + 'tem';
+const RI = 'Remove' + '-Item';
+const IFSVAR = '${' + 'IFS}';
 
 const rmrf = (target) => `${RM} ${RF} ${target}`;
 
@@ -205,6 +210,72 @@ const CASES = [
     expect: 'block',
     cmd: `powershell -EncodedCommand ${Buffer.from(rmrf(ROOT), 'utf16le').toString('base64')}`,
   },
+
+  // ===== дыры состязательного прогона 2026-08-18 (каждая — со своей парой) ====
+  // Каждый «block» ниже пролезал до правки; рядом стоит «allow» из обычной
+  // работы, который эта же правка не должна была задеть.
+
+  // 1. Обёртка перед интерпретатором выбивала его из триггер-позиции.
+  { name: 'обёртка timeout перед sh -c', expect: 'block', cmd: `timeout 5 sh -c "${rmrf(ROOT)}"` },
+  { name: 'timeout перед обычной сборкой', expect: 'allow', cmd: 'timeout 300 bash -c "npm ci && npm run build"' },
+  { name: 'sh -c внутри docker exec',   expect: 'block', cmd: `docker exec app sh -c "${rmrf(ROOT)}"` },
+  { name: 'docker exec с чтением файлов', expect: 'allow', cmd: 'docker exec -it app sh -c "ls /app && cat /app/package.json"' },
+  { name: 'абсолютный путь до интерпретатора', expect: 'block', cmd: `/bin/sh -c "${rmrf(ROOT)}"` },
+  { name: 'обёртка sudo перед python -c', expect: 'block', cmd: `sudo python -c "import os; ${SYSCALL}('${rmrf(ROOT)}')"` },
+  { name: 'sudo перед чтением состояния сервиса', expect: 'allow', cmd: 'sudo systemctl status nginx' },
+
+  // 2. PowerShell -Command не разбирался вовсе (а это основной шелл машины).
+  { name: 'powershell -Command со сносом диска', expect: 'block', cmd: `powershell -Command "${RI} -Recurse -Force C:\\"` },
+  { name: 'powershell -Command с целью до флагов', expect: 'block', cmd: `pwsh -Command "${RI} -Path C:\\ -Recurse -Force"` },
+  { name: 'powershell удаляет подпапку сборки', expect: 'allow', cmd: `powershell -Command "${RI} -Recurse -Force C:\\Temp\\build"` },
+  { name: 'powershell только читает', expect: 'allow', cmd: 'powershell -Command "Get-ChildItem C:\\Temp | Select-Object Name"' },
+
+  // 3. Обфускация имени команды и индирекция цели (шелл раскрывает до запуска).
+  { name: 'имя команды разорвано кавычками', expect: 'block', cmd: `"r"m ${RF} ${ROOT}` },
+  { name: 'имя команды разорвано экранированием', expect: 'block', cmd: `r\\m ${RF} ${ROOT}` },
+  { name: 'имя команды из переменной', expect: 'block', cmd: `X=${RM}; $X ${RF} ${ROOT}` },
+  { name: 'цель из переменной', expect: 'block', cmd: `X=${ROOT}; ${rmrf('$X')}` },
+  { name: 'переменная с безопасной целью', expect: 'allow', cmd: `D=/tmp/build; ${rmrf('$D')}` },
+  { name: 'переменная с относительной целью', expect: 'allow', cmd: `BUILD=dist; ${rmrf('$BUILD')} && npm run build` },
+  { name: `пробелы через ${IFSVAR}`, expect: 'block', cmd: `${RM}${IFSVAR}${RF}${IFSVAR}${ROOT}` },
+  { name: 'имя команды из $(echo …)', expect: 'block', cmd: `$(echo ${RM}) ${RF} ${ROOT}` },
+  { name: 'подстановка версии из $(node -p …)', expect: 'allow', cmd: `VERSION=$(node -p "require('./package.json').version"); echo $VERSION` },
+
+  // 4. Исполнитель не был смоделирован: find -exec, xargs, монтирование в docker.
+  { name: 'find по корню с -exec rm', expect: 'block', cmd: `find ${ROOT} -exec ${RM} {} +` },
+  { name: 'find по подпапке с -delete', expect: 'allow', cmd: "find /var/log -name '*.gz' -mtime +30 -delete" },
+  { name: 'корень приходит на stdin к xargs', expect: 'block', cmd: `echo ${ROOT} | xargs ${RM} ${RF}` },
+  { name: 'xargs rm по списку файлов проекта', expect: 'allow', cmd: `find . -name '*.tmp' | xargs ${RM} -f` },
+  {
+    name: 'docker: корень смонтирован и стирается через точку монтирования',
+    expect: 'block',
+    cmd: `docker run --rm -v ${ROOT}:/host alpine ${rmrf('/host')}`,
+  },
+  {
+    name: 'docker: корень смонтирован только на чтение (бэкап)',
+    expect: 'allow',
+    cmd: `docker run --rm -v ${ROOT}:/backup:ro alpine tar czf - /backup`,
+  },
+
+  // 4b. iex — это eval PowerShell'а; нагрузка пряталась во вложенной строке.
+  { name: 'iex со склеенным из кусков Remove-Item', expect: 'block', cmd: `powershell -c "iex('${RI.slice(0, 8)}' + '${RI.slice(8)} -Recurse -Force C:\\')"` },
+  { name: 'iex с безобидной сборкой', expect: 'allow', cmd: 'powershell -c "iex(\'npm\' + \' ci\')"' },
+
+  // 5. Список декодеров был перечислимым — любой другой трансформер проходил.
+  { name: 'октальный printf в конвейере к шеллу', expect: 'block', cmd: `printf '\\162\\155\\040\\055\\162\\146\\040\\057' | sh` },
+  { name: 'tr в конвейере к python-скрипту (данные)', expect: 'allow', cmd: `cat data.txt | tr -d '\\r' | python process.py` },
+
+  // 5b. Состязательный прогон 2026-08-18: якорь printf ловил бэкслеш-код только
+  //     в ПЕРВОМ закавыченном токене — hex-форма и второй аргумент пролезали.
+  //     Балансирующий allow: printf со спецификатором формата БЕЗ трубы к шеллу.
+  { name: 'hex-printf в конвейере к шеллу', expect: 'block', cmd: `printf '\\x72\\x6d\\x20\\x2d\\x72\\x66\\x20\\x2f' | sh` },
+  { name: 'printf со спецификатором формата (не в шелл)', expect: 'allow', cmd: `printf '%s\\n' "$LOGLINE"` },
+
+  // 5c. PowerShell: backtick-экранирование имени (R`emove-Item) разрывало слово,
+  //     expandRaw снимает только склейку — backtick снимает psDeobf в PS-ветке.
+  //     Балансирующий allow: безобидный powershell -Command только читает.
+  { name: 'powershell -Command с backtick в имени (обфускация)', expect: 'block', cmd: `powershell -Command "R${String.fromCharCode(96)}${RI.slice(1)} -Recurse -Force C:\\"` },
+  { name: 'powershell -Command только читает процессы', expect: 'allow', cmd: 'powershell -Command "Get-Process | Sort-Object CPU -Descending"' },
 ];
 
 // Контракт хука (не про содержимое команд, а про то, как он встроен):
