@@ -14,7 +14,7 @@
  * DELETE FROM without WHERE, git checkout/restore -- ., chattr -R -i,
  * quoted-target rm (`rm -rf "/"`), and an SSH branch: the remote command inside
  * `ssh host "..."` is re-scanned with the SAME destructive patterns
- * (Vertex runs 44 prod containers — destroyers inside quotes were invisible).
+ * (your-server runs 44 prod containers — destroyers inside quotes were invisible).
  *
  * 2026-07-19 dcg-port (Dicklesworthstone/destructive_command_guard, Rust, 2.9k*):
  * interpreter inline payloads (python -c / perl -e / node -e / bash -c + heredocs)
@@ -245,7 +245,7 @@ try {
     { id: 'git-plus-main',  re: /\bgit\s+push\b[^\n]*\s\+(main|master|prod|production|release)\b/i, why: 'git push +refspec в защищённую ветку' },
     // git checkout/restore of the ENTIRE working tree (`.`) — discards all uncommitted edits
     { id: 'git-checkout-dot', re: /\bgit\s+(?:-C\s+\S+\s+)?(?:checkout|restore)\s+(?:(?!--)[\w@^~{}\/.:-]+\s+)?(?:--\s+)?\.["']?\s*(?:$|[;&|])/i, why: 'git checkout/restore -- . (сброс ВСЕХ незакоммиченных правок)' },
-    // chattr recursive un-immutable (fleet brains on Vertex are chattr +i protected)
+    // chattr recursive un-immutable (immutable-protected files on a production host)
     { id: 'chattr-unimmute-R', re: /\bchattr\b(?=[^\n]*\s-[a-zA-Z]*R)[^\n]*\s-[a-zA-Z]*i/, why: 'chattr -R -i (рекурсивное снятие immutable-защиты)' },
     // PowerShell recursive-force delete of roots/home
     // Порядок аргументов в PowerShell свободный (`-Path C:\ -Recurse`), а цель
@@ -662,7 +662,7 @@ try {
 
     const strings = t.dq.concat(t.sq);
 
-    // 3) ssh: нагрузка исполняется удалённым шеллом (Vertex = 44 prod-контейнера)
+    // 3) ssh: нагрузка исполняется удалённым шеллом (your-server = 44 prod-контейнера)
     if (SSH_TRIG.test(t.code)) {
       const payloads = strings.slice();
       const m = cmdStr.match(/\bssh\s+(?:-[a-zA-Z]\S*\s+)*(?:\S+@)?[\w.\-]+\s+([\s\S]+)$/);
