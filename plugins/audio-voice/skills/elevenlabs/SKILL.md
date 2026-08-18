@@ -186,7 +186,7 @@ seg2 = client.music.compose(prompt='Continues from dark mystery, transitions int
 | Задача | Решение |
 |---|---|
 | Quick BGM под шортс | **ElevenLabs Music** — быстрее, не нужен service account |
-| Commercial-safe license для коммерческого ролика | **Lyria 2** (Vertex AI, см. `video-generation/references/audio.md`) |
+| Commercial-safe license для коммерческого ролика | **Lyria 2** (your-server AI, см. `video-generation/references/audio.md`) |
 | Кинематографический score для книжного трейлера | **Lyria 2** 2×30s + acrossfade |
 
 ## Production voice IDs
