@@ -77,7 +77,29 @@
  * или `drop table` — слово языка, а не команда), а список-форма
  * subprocess.run(["rm","-rf","/"]) ловится склейкой аргументов стока.
  *
- * ГРАНИЦЫ (осознанные):
+ * 2026-08-18 состязательный прогон (три атаки, 134 пробы): пролезло 39
+ * исполнимых разрушителей по шести причинам. Закрыто в этой правке:
+ *   1) ЯКОРЬ ИСПОЛНИТЕЛЯ был слишком строгим — интерпретатор требовался в
+ *      начале строки или сразу после разделителя. `sh -c "…"` блокировался,
+ *      `timeout 5 sh -c "…"`, `sudo sh -c "…"`, `/bin/sh -c "…"`,
+ *      `docker exec app sh -c "…"` — нет (15 пролазов). Лечение: WRAP —
+ *      закрытый список обёрток, которые сами ничего не делают, + PATHPFX;
+ *   2) POWERSHELL -Command не разбирался вовсе, декодировался только
+ *      -EncodedCommand. Это основной шелл машины (PS_TRIG + ps-remove-root,
+ *      где цель могла стоять до флагов и упираться в кавычку);
+ *   3) ОБФУСКАЦИЯ РАСКРЫТИЕМ: `r\m`, `"r"m`, `$'rm'`, `X=rm; $X -rf /`,
+ *      `rm -rf $X`, `rm${IFS}-rf${IFS}/`, `$(echo rm)` — bash раскрывает всё
+ *      это ДО исполнения, а гард видел исходный текст. Лечение: expandRaw —
+ *      второй проход по нормализованной копии (см. там же);
+ *   4) ИСПОЛНИТЕЛЬ ВНЕ МОДЕЛИ: `find / -exec rm`, `echo / | xargs rm -rf`,
+ *      `docker run -v /:/host … rm -rf /host` (псевдоним корня);
+ *   5) СПИСОК ДЕКОДЕРОВ был перечислимым (base64/openssl/xxd): `printf`
+ *      с восьмеричными и `tr` в конвейере к шеллу проходили;
+ *   6) ФАЙЛОВАЯ КОСВЕННОСТЬ — не чинится, см. ГРАНИЦЫ.
+ * Проверки-пары: на каждую правку в набор добавлен и блокируемый случай,
+ * и соседний из обычной работы, который правка не должна была задеть.
+ *
+ * ГРАНИЦЫ (осознанные — честная граница лучше ложного чувства защищённости):
  *  - токенизатор приближённый, не bash. Незакрытая кавычка съедает остаток
  *    строки, и код за ней в скан не попадает — но такую команду и сам bash
  *    не выполнит (syntax error), так что дыры нет; в PowerShell правила
@@ -89,9 +111,29 @@
  *    строки сегмент не режет; но однословная вклейка не может их содержать
  *    (SIMPLE_TOKEN это запрещает) — значит найденный разделитель настоящий;
  *  - глубина рекурсии по каналам ≤ 3: `ssh a "ssh b \"ssh c ...\""` глубже
- *    не разбирается (fail-open).
+ *    не разбирается (fail-open);
+ *  - ПОДСТАНОВКА КОМАНД раскручивается только для $(echo …) и $(printf …),
+ *    склейка литералов ('Rem'+'ove-Item') — снимается. НЕ раскручивается то,
+ *    что вычисляется в рантайме: `$(cat name.txt) -rf /`, `$(curl …)`,
+ *    `iex (Get-Content x.ps1 -Raw)`, значение переменной из окружения
+ *    (`rm -rf $EXTERNAL_ROOT`, где присваивания в этой же команде нет).
+ *    Воспроизвести это без интерпретатора нельзя, а «починить» регэкспом =
+ *    позвать настоящий шелл на этапе хука, то есть исполнить проверяемое;
+ *  - ФАЙЛОВАЯ КОСВЕННОСТЬ вне модели: `base64 -d > p.sh && sh p.sh`,
+ *    `psql -f drop.sql`, `echo … > x.py && python x.py`. Гард видит команду,
+ *    а не диск, и намеренно НЕ читает файлы: содержимое литерала — данные
+ *    (ровно тот дефект, который чинили 17.08), а чтение произвольных путей
+ *    на каждый вызов Bash — и цена, и новый источник сюрпризов;
+ *  - СОСТОЯНИЕ ШЕЛЛА недоступно: `alias x='…'`/функция/`export X=/` из
+ *    ПРЕДЫДУЩЕГО вызова Bash не видны — хук получает одну команду, а не
+ *    сессию. Подстановка переменных работает только внутри одной команды;
+ *  - ЮНИКОД-ГОМОГЛИФЫ (кир. «рm») и zero-width внутри имени пролезают, но и
+ *    настоящий шелл их не исполнит — это не дыра, а безвредный текст;
+ *  - НЕ-КОРНЕВЫЕ, но ценные цели (`rm -rf /opt/app`) пропускаются намеренно:
+ *    субпути разрешены, иначе гард встанет поперёк ежедневной работы.
+ *    Исключение — системные папки (rm-sysdir) и выход наверх через «..».
  *
- * Проверки: bash-guard.test.mjs рядом (36 команд + 5 контрактных).
+ * Проверки: bash-guard.test.mjs рядом (70 команд + 5 контрактных).
  * Запуск: node bash-guard.test.mjs   ·   замер: node bash-guard.test.mjs --bench
  */
 'use strict';
@@ -164,7 +206,15 @@ try {
     { id: 'rm-updir',   re: new RegExp(RM + Q + '(?:~|\\$\\{?home\\}?|\\$\\{?userprofile\\}?|' + HOMEfwdEsc + '|\\/[\\w.-]*)\\/\\.\\.(?:\\/|\\1|\\s|$|;|&|\\|)', 'i'), why: 'rm -rf с выходом наверх от дома/корня через ".." (~/.., /home/..)' },
     // Tier 2: system dirs (dir AND subpaths blocked — не пользовательские данные)
     { id: 'rm-sysdir',  re: new RegExp(RM + Q + '\\/(?:etc|usr|bin|sbin|boot|lib|sys|dev|proc|root)(?:\\/\\S*?)?\\1(?:\\s|$|;|&|\\|)', 'i'), why: 'rm -rf системной папки (/etc,/usr,/bin,...)' },
-    { id: 'find-delete-root', re: /\bfind\s+(\/|~|\$\{?home\}?)\s+.*-delete\b/i, why: 'find / -delete' },
+    // find по корню/дому: разрушает не сам find, а его исполнитель — -delete,
+    // -exec rm или конвейер в xargs rm. Ловилась только первая форма.
+    // Якорь — КОРЕНЬ в позиции пути find: `find /var/log … -delete` не матчится.
+    { id: 'find-delete-root', re: /\bfind\s+(?:-[\w-]+\s+)*["']?(?:\/|~|\$\{?home\}?|\$\{?userprofile\}?)["']?\s+[^\n]*(?:-delete\b|-exec(?:dir)?\s+(?:\S*\/)?(?:rm|shred|unlink|truncate)\b)/i, why: 'find / -delete / -exec rm' },
+    { id: 'find-pipe-rm-root', span: true, re: /\bfind\s+(?:-[\w-]+\s+)*["']?(?:\/|~|\$\{?home\}?)["']?\s[^\n]*\|\s*(?:[^|\n]*\|\s*)?xargs\b[^\n]*\b(?:rm|shred)\b/i, why: 'find / … | xargs rm — удаление всего дерева от корня' },
+    // Цель приходит на stdin, поэтому в сегменте `xargs rm -rf` корня не видно.
+    // Улика — производитель, печатающий именно корень (`echo / | xargs rm -rf`).
+    // Обычный `find . -name '*.pyc' | xargs rm -f` под правило не подпадает.
+    { id: 'xargs-rm-root', span: true, re: /(?:^|[;&|]\s*)(?:echo|printf|ls)\b[^|\n]*(?:^|\s)["']?(?:\/|~|\$\{?HOME\}?)["']?\s*\|\s*(?:[^|\n]*\|\s*)?xargs\b[^\n]*\b(?:rm|shred)\b/i, why: 'echo / | xargs rm — корень приходит на stdin' },
     // Windows cmd recursive delete of drive roots / home (del /s ... C:\ | %USERPROFILE% | home)
     { id: 'del-tree-root', re: new RegExp('\\bdel\\s+(?=(?:\\/[a-z]\\s+)*\\/s\\b)(?:\\/[a-z]\\s+)+' + Q +
         '(?:[a-z]:|%userprofile%|%homedrive%|%homepath%|' + HOMEfwdEsc + '|' + HOMEbackEsc + ')' + WINEND, 'i'),
@@ -198,7 +248,10 @@ try {
     // chattr recursive un-immutable (fleet brains on Vertex are chattr +i protected)
     { id: 'chattr-unimmute-R', re: /\bchattr\b(?=[^\n]*\s-[a-zA-Z]*R)[^\n]*\s-[a-zA-Z]*i/, why: 'chattr -R -i (рекурсивное снятие immutable-защиты)' },
     // PowerShell recursive-force delete of roots/home
-    { id: 'ps-remove-root', re: /remove-item\b[^\n]*-(recurse|force)\b[^\n]*(\bc:\\?(\s|$|\*)|\$env:userprofile|\$home\b|~[\\/](\s|$))/i, why: 'Remove-Item -Recurse -Force корня/home' },
+    // Порядок аргументов в PowerShell свободный (`-Path C:\ -Recurse`), а цель
+    // может упираться в закрывающую кавычку (`"… C:\"`) — поэтому флаги ищутся
+    // отдельным lookahead'ом, а к границам цели добавлены кавычки.
+    { id: 'ps-remove-root', re: /\b(?:remove-item|ri|rm|del|erase)\b(?=[^\n]*\s-(?:recurse|force|r|f)\b)[^\n]*?(?:\bc:[\\/]?(?=\s|$|\*|["'])|\$env:(?:userprofile|systemdrive|homepath)\b|\$home\b|~[\\/](?=\s|$|["']))/i, why: 'Remove-Item -Recurse -Force корня/home' },
     { id: 'ps-rd-root',     re: /\b(rd|rmdir)\s+\/s\s+\/q\s+(c:\\?(\s|$)|%userprofile%|"?c:\\)/i, why: 'rd /s /q корня/home' },
     // registry hive delete
     { id: 'reg-del-hive', re: /\breg\s+delete\s+(hk(lm|cu|cr|u|cc)\b|hkey_)/i, why: 'reg delete ветки реестра' },
@@ -215,12 +268,18 @@ try {
       why: 'docker rm/stop/kill $(docker ps ...) — массовый снос ВСЕХ контейнеров' },
     { id: 'compose-down-volumes', re: new RegExp(DKRC + 'compose\\b[^\\n;&|]*\\sdown\\b[^\\n;&|]*\\s(?:-[a-zA-Z]*v[a-zA-Z]*|--volumes)\\b', 'i'),
       why: 'docker compose down -v/--volumes — удаление томов = ПОТЕРЯ ДАННЫХ' },
-    { id: 'compose-down', re: new RegExp(DKRC + 'compose\\b[^\\n;&|]*\\sdown(?=\\s|$|[;&|])', 'i'),
-      why: 'docker compose down — остановка и удаление стека контейнеров' },
+    // Голый `compose down` — ежедневная операция разработки: останавливает стек,
+    // тома НЕ трогает, поднимается обратно одной командой. Блокировать его значит
+    // мешать работе каждый день ради предотвращения обратимого действия. Опасен
+    // именно вариант с томами — он выше, и он остаётся заблокированным.
     { id: 'docker-volume-rm', re: new RegExp(DKR + 'volume\\s+(?:rm|remove)\\b', 'i'),
       why: 'docker volume rm — удаление тома с данными' },
-    { id: 'docker-prune', re: new RegExp(DKR + '(?:system|volume|image|container|network|builder)\\s+prune\\b', 'i'),
-      why: 'docker prune — массовое удаление контейнеров/томов/образов' },
+    // Так же с очисткой: образы и слои сборки перекачиваются и пересобираются,
+    // а тома — нет. Поэтому режем только те очистки, что уносят данные.
+    { id: 'docker-prune', re: new RegExp(DKR + '(?:system|volume)\\s+prune\\b', 'i'),
+      why: 'docker system/volume prune — удаление томов с данными' },
+    { id: 'docker-prune-vol', re: new RegExp(DKR + '\\w+\\s+prune\\b[^\\n;&|]*--volumes\\b', 'i'),
+      why: 'docker prune --volumes — удаление томов с данными' },
     { id: 'pm2-delete', re: /\bpm2(?:\.exe)?\s+(?:(?:-[a-zA-Z]|--[a-z][\w-]*)(?:[=\s]+[^\s;&|]+)?\s+)*(?:delete|del|kill)\b/i,
       why: 'pm2 delete/kill — снятие процесса с продакшена' },
     { id: 'systemctl-stop', re: /\bsystemctl\b(?:\s+--?[\w][\w=.:@-]*)*\s+(?:stop|disable)\b/i,
@@ -236,6 +295,23 @@ try {
     { id: 'interp-rmtree-root', re: new RegExp('\\b(?:shutil\\.rmtree|os\\.removedirs|FileUtils\\.rm_rf|FileUtils\\.rm_r|(?:File::Path::)?remove_tree|rmtree)\\s*\\(\\s*(?:r|rb|b)?["\'](?:\\/(?!tmp\\b)[a-z]{0,12}|\\/home\\/[\\w.-]+|~|[a-z]:\\\\{0,4}|' + HOMEfwdEsc + ')\\/?["\']', 'i'), why: 'shutil.rmtree/rm_rf/remove_tree корня, /home или системной папки (python/ruby/perl payload)', txt: true },
     { id: 'js-fs-rm-root', re: new RegExp('\\.\\s*rm(?:Sync|dirSync|dir)?\\s*\\(\\s*["\'](?:\\/(?!tmp\\b)[a-z]{0,12}|\\/home\\/[\\w.-]+|~|[a-z]:\\\\{0,4}|' + HOMEfwdEsc + ')\\/?["\']', 'i'), why: 'fs.rmSync/rmdir корня, /home или системной папки (node payload)', txt: true },
     // decode-and-execute (obfuscated payload — content invisible, execution intent explicit)
+    // Список декодеров был перечислимым (base64/openssl/xxd) — любой другой
+    // трансформер в конвейере к шеллу проходил: `printf '\162\155…' | sh`,
+    // `echo … | tr … | sh`. Хвост сужен до ГОЛОГО шелла в конце конвейера,
+    // иначе под правило попал бы обычный `cat data | tr -d '\r' | python x.py`.
+    //
+    // 2026-08-18 (состязательный прогон): якорь printf был слишком узким —
+    // требовал бэкслеш-код В ПЕРВОМ закавыченном токене сразу после `printf `.
+    // Пролезали: `printf $'\162…' | sh` ($ перед кавычкой ломал `printf\s+["']`)
+    // и `printf '%b' '\162…' | sh` (коды во ВТОРОМ аргументе). Гарду не нужно
+    // ДЕКОДИРОВАТЬ payload — достаточно факта «printf с бэкслеш-октал/hex кодом
+    // где-либо в аргументах, уходящий в шелл» = блок. Ключ: `\\[0-7x]` обязан
+    // стоять ДО конвейера (класс [^\n|] не пускает за `|`), а хвост по-прежнему
+    // требует голый sh/bash в конце — printf со спецификатором (`%s\n`) без
+    // октал/hex кода или без трубы к шеллу не матчится (n∉[0-7x], трубы нет).
+    { id: 'obfus-pipe-exec', span: true,
+      re: /\b(?:base32\s+(?:-d|--decode)|uudecode|rev|tr\s+[^\n|]{1,80}|gunzip|zcat|bzcat|xzcat|gzip\s+-d|printf\b[^\n|]*\\[0-7x])[^\n|]*\|\s*(?:[^|\n]{0,80}\|\s*)?(?:sh|bash|zsh|dash|ksh)\b(?:\s+-\w+)*\s*(?:$|[;&|\n])/i,
+      why: 'обфусцированный конвейер в шелл (printf/tr/rev/… | sh)' },
     { id: 'decode-pipe-exec', span: true, re: /\b(?:base64\s+(?:-d|--decode)|openssl\s+enc\s+[^\n|]*-d|xxd\s+-r)[^\n|]*\|\s*(?:sh|bash|zsh|dash|iex|invoke-expression|python[\w.]*|node(?:js)?|perl|ruby)\b/i, why: 'декодировать-и-исполнить (base64 -d | sh)' },
     { id: 'eval-download-decode', re: /\beval\b[^\n]*\$\([^)\n]*\b(?:base64|curl|wget)\b/i, why: 'eval $(base64/curl/wget ...) — исполнение декодированного/скачанного кода' },
     // pipe-to-shell variations beyond curl|sh
@@ -267,6 +343,33 @@ try {
   // отделяет НАМЕРЕНИЕ от ТЕКСТА: `grep 'mkfs' ops.md` — один сегмент, и он
   // только ищет по файлу; `echo ok && rm -rf /` — два сегмента, и второй
   // показывалкой не является.
+  // `docker run -v /:/host alpine rm -rf /host` стирает РЕАЛЬНЫЙ хост, а для
+  // правил это «rm субпапки /host» — корень спрятан за псевдонимом монтирования.
+  // Правило узкое нарочно: одного монтирования корня мало (бывают легитимные
+  // backup/rescue-контейнеры) — нужен И корень в источнике, И удаление точки
+  // монтирования в ТОМ ЖЕ сегменте.
+  const ROOTSRC = /^(?:\/|~|\$\{?HOME\}?|[A-Za-z]:[\\/]?)$/;
+  function mountAliasHit(seg) {
+    if (!/\bdocker(?:\.exe)?\b/i.test(seg) || !/(?:-v|--volume|--mount)\b/i.test(seg)) return null;
+    const dests = [];
+    let m;
+    const vre = /(?:-v|--volume)[=\s]+["']?([^\s:"']{0,80}):([^\s:,"']{1,80})/gi;
+    while ((m = vre.exec(seg)) !== null && dests.length < 8) if (ROOTSRC.test(m[1])) dests.push(m[2]);
+    const mre = /--mount[=\s]+["']?([^\s"']{1,160})/gi;
+    while ((m = mre.exec(seg)) !== null && dests.length < 8) {
+      const src = /(?:^|,)(?:src|source)=([^,]+)/i.exec(m[1]);
+      const dst = /(?:^|,)(?:dst|destination|target)=([^,]+)/i.exec(m[1]);
+      if (src && dst && ROOTSRC.test(src[1])) dests.push(dst[1]);
+    }
+    for (const d of dests) {
+      const esc = d.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      if (new RegExp(RM + '["\']?' + esc + '(?:\\/\\*?|\\*)?["\']?(?:\\s|$|;|&|\\|)', 'i').test(seg)) {
+        return { id: 'docker-mount-root-rm', why: 'docker run -v ' + ' корня в контейнер + rm точки монтирования (' + d + ') — стирание ХОСТА' };
+      }
+    }
+    return null;
+  }
+
   function findHit(str, opts) {
     opts = opts || {};
     const only = opts.only || null;
@@ -280,6 +383,7 @@ try {
     for (const seg of str.split(SEP_RE)) {
       if (!seg.trim()) continue;
       if (TEXTDISP.test(seg)) continue;
+      if (!only) { const mh = mountAliasHit(seg); if (mh) return mh; }
       for (const p of P) {
         if (p.span) continue;
         if (only && !only.has(p.id)) continue;
@@ -375,7 +479,29 @@ try {
 
   // Исполнители полезной нагрузки. Триггеры проверяются по КОДУ (не по сырой
   // строке): упоминание "ssh"/"psql" внутри литерала исполнителем не является.
-  const SSH_TRIG    = /(^|[;&|(]\s*|\$\(\s*)ssh\s/i;
+  //
+  // 2026-08-18 (состязательный прогон): якорь исполнителя был слишком строгим —
+  // имя требовалось в начале строки или сразу после разделителя. `sh -c "…"`
+  // и `; sh -c "…"` блокировались, а `timeout 5 sh -c "…"`, `sudo sh -c "…"`,
+  // `/bin/sh -c "…"`, `docker exec app sh -c "…"` — нет: имя выпадало из
+  // триггер-позиции, нагрузка в кавычках не сканировалась вовсе (15 из 22
+  // пролезших разрушителей той партии). Лечение — не «любое слово перед sh»
+  // (тогда исполнителем стало бы что угодно), а ЗАКРЫТЫЙ список обёрток,
+  // которые сами ничего не делают, а лишь запускают следующий аргумент,
+  // плюс необязательный путь до имени.
+  // ВАЖНО не путать с TEXTDISP: там список нужен, чтобы ПРОПУСТИТЬ сегмент, и
+  // xargs/env/sudo в нём смертельны. Здесь наоборот — список нужен, чтобы НАЙТИ
+  // исполнителя за обёрткой, то есть проверить БОЛЬШЕ, а не меньше.
+  const CMDSTART = '(?:^|[;&|(]\\s*|\\$\\(\\s*)';
+  const WRAPWORD = '(?:sudo|doas|env|nohup|timeout|stdbuf|setsid|command|exec|nice|ionice|time|unbuffer|proxychains4?|xargs|wsl|winpty|script|runuser|su)';
+  const WRAPARGS = '(?:\\s+[^\\s;&|]{1,64}){0,6}';   // -u user, 5, -I{}, VAR=val
+  const WRAP =
+    '(?:(?:' + WRAPWORD + WRAPARGS +
+    '|docker(?:\\.exe)?(?:\\s+[^\\s;&|]{1,64}){0,4}\\s+exec(?:\\s+[^\\s;&|]{1,64}){0,6}' +
+    '|kubectl(?:\\s+[^\\s;&|]{1,64}){1,8}\\s+--' +
+    ')\\s+){0,3}';
+  const PATHPFX  = '(?:[\\w.$~-]*\\/)*';             // /bin/sh, /usr/bin/env, ./run
+  const SSH_TRIG    = new RegExp(CMDSTART + WRAP + PATHPFX + 'ssh(?:\\.exe)?\\s', 'i');
   // SQL-клиент + признак исполняемого SQL: -c/-e/-f/--command/--execute, heredoc
   // или закавыченный позиционный аргумент (sqlite3 "..."). Пустые пары кавычек
   // от вырезанных строк в code сохраняются — признак работает.
@@ -388,8 +514,17 @@ try {
   const SQLCLI_NAME = /\b(?:psql|mysql|mariadb|sqlite3|sqlcmd|clickhouse-client|mongosh|mongo)(?:\.exe)?\b/i;
   const SQLCLI_TRIG = new RegExp(SQLCLI_NAME.source +
     '(?=[^\\n;&|]*(?:\\s(?:-c|-e|-f|--command|--execute|--file|--eval)\\b|<<|["\']))', 'i');
-  const SHELL_TRIG  = /(^|[;&|(]\s*|\$\(\s*)(?:bash|zsh|dash|ksh|sh|eval)(?:\.exe)?\s+(?:(?:-\S*|--\S+)\s+)*(?:-[a-zA-Z]*c[a-zA-Z]*(?:\s|$|["'])|<<|["'])/i;
-  const INTERP_TRIG = /(^|[;&|(]\s*|\$\(\s*)((?:python|perl|node(?:js)?|ruby|php)[\w.]*)(?:\.exe)?\s+(?:(?:-\S*|--\S+)\s+)*(?:-[a-zA-Z]*[ce][a-zA-Z]*(?:\s|$|["'])|<<)/i;
+  const SHELL_TRIG  = new RegExp(CMDSTART + WRAP + PATHPFX +
+    '(?:bash|zsh|dash|ksh|sh|eval)(?:\\.exe)?\\s+(?:(?:-\\S*|--\\S+)\\s+)*(?:-[a-zA-Z]*c[a-zA-Z]*(?:\\s|$|["\'])|<<|["\'])', 'i');
+  const INTERP_TRIG = new RegExp(CMDSTART + WRAP + PATHPFX +
+    '((?:python|perl|node(?:js)?|ruby|php)[\\w.]*)(?:\\.exe)?\\s+(?:(?:-\\S*|--\\S+)\\s+)*(?:-[a-zA-Z]*[ce][a-zA-Z]*(?:\\s|$|["\'])|<<)', 'i');
+  // PowerShell — основной шелл этой машины, и хук ловит его наравне с Bash,
+  // но разбиралась только форма -EncodedCommand. Нативный
+  // `powershell -Command "Remove-Item -Recurse -Force C:\"` уходил в кавычки
+  // и не сканировался ничем. Нагрузка -Command/-c = команды PowerShell.
+  const PS_TRIG     = new RegExp(CMDSTART + WRAP + PATHPFX +
+    '(?:powershell|pwsh)(?:\\.exe)?(?=[^\\n]*\\s[-\\/](?:c|command)\\b)', 'i');
+  const IEX_TRIG    = /\b(?:iex|invoke-expression)\b/i;   // eval PowerShell'а
   // Exec-стоки: только при их наличии строки-литералы интерпретаторного кода
   // сканируются как команды. Литералы без стока — данные (доказанный кейс
   // владельца: анализ-скрипт с опасными словами в строках, стоков нет).
@@ -430,6 +565,78 @@ try {
       }
     }
     return null;
+  }
+
+  // ===== 2026-08-18: снятие обфускации (второй, отдельный проход) ===========
+  // Состязательный прогон показал класс, который токенизатор не закрывает:
+  // bash раскрывает кавычки, экранирование, $'…', ${IFS}, $(echo …) и
+  // переменные ДО исполнения, а гард видит исходный текст. `r\m -rf /`,
+  // `"r"m -rf /`, `X=rm; $X -rf /`, `X=/; rm -rf $X` исполнялись как удаление
+  // корня, но в тексте команды подстроки «rm … /» просто нет.
+  //
+  // Лечение — не ослабление правил, а ВТОРОЙ прогон по нормализованной копии:
+  // приводим текст к тому, что увидит шелл после раскрытия, и сканируем ещё
+  // раз тем же набором. Копия нужна именно отдельная: нормализация огрубляет
+  // (снимает кавычки внутри слов), и делать её основным взглядом нельзя.
+  // Полную раскрутку $(…) воспроизвести нельзя без интерпретатора — см. ГРАНИЦЫ.
+  const EXPAND_LIMIT = 16384;
+  function decodePrintfEscapes(s) {
+    return s.replace(/\\([0-7]{1,3})/g, (_, o) => String.fromCharCode(parseInt(o, 8)))
+            .replace(/\\x([0-9a-fA-F]{2})/g, (_, x) => String.fromCharCode(parseInt(x, 16)));
+  }
+  function expandRaw(str) {
+    if (str.length > EXPAND_LIMIT) return str;
+    let s = str;
+    // склейка литералов: 'Remove-I' + 'tem' → 'Remove-Item' (PowerShell/JS-обфускация)
+    s = s.replace(/(['"])\s*\+\s*\1/g, '');
+    // $(echo X) / `echo X` / $(printf 'X') — самые ходовые «сборщики слова»
+    s = s.replace(/\$\(\s*echo\s+(?:-[neE]+\s+)?([^()`;&|]{0,120}?)\s*\)/gi, '$1');
+    s = s.replace(/`\s*echo\s+(?:-[neE]+\s+)?([^`;&|]{0,120}?)\s*`/gi, '$1');
+    s = s.replace(/\$\(\s*printf\s+(['"])([^'"\n]{0,120})\1\s*\)/gi, (_, q, body) => decodePrintfEscapes(body));
+    // $'rm' — ANSI-C кавычки дают ровно одно слово, кавычки можно снять
+    s = s.replace(/\$'([^'\s;&|]{0,64})'/g, '$1');
+    // ${IFS} — классический разделитель-невидимка; $@/$* обычно пусты
+    s = s.replace(/\$\{IFS\}|\$IFS\b/g, ' ');
+    s = s.replace(/\$\{[@*]\}|\$[@*]/g, '');
+    // кавычки ВНУТРИ слова: "r"m, r""m, r''m → rm. Содержимое с пробелами
+    // не трогаем — иначе вернётся исходный дефект (текст станет кодом).
+    s = s.replace(/(\w)(['"])([^'"\s;&|]{0,64})\2/g, '$1$3');
+    s = s.replace(/(['"])([^'"\s;&|]{0,64})\1(?=\w)/g, '$2');
+    // экранирование внутри слова: r\m → rm
+    s = s.replace(/\\([A-Za-z0-9])/g, '$1');
+    // простые присваивания: X=rm; $X -rf /   ·   X=/; rm -rf ${X}
+    const vars = new Map();
+    const asg = /(?:^|[;&|\s(])([A-Za-z_]\w{0,31})=([^\s;&|"'`$]{0,64})(?=\s|$|[;&|])/g;
+    let m, guard = 0;
+    while ((m = asg.exec(s)) !== null && guard++ < 24) vars.set(m[1], m[2]);
+    if (vars.size) {
+      s = s.replace(/\$\{([A-Za-z_]\w{0,31})\}|\$([A-Za-z_]\w{0,31})/g,
+        (whole, a, b) => { const k = a || b; return vars.has(k) ? vars.get(k) : whole; });
+    }
+    return s;
+  }
+
+  // Снятие PowerShell-обфускации для payload'ов iex/-Command. Отдельно от
+  // expandRaw, потому что применяется ТОЛЬКО к PS-нагрузке: глобально трогать
+  // backtick нельзя — в bash `...` это подстановка команды, а не экранирование.
+  // Два приёма из состязательного прогона:
+  //   1) склейка литералов через + :  'Remove-It' + 'em … C:'  → 'Remove-Item … C:'
+  //      (в т.ч. цепочки 'a'+'b'+'c' и смешанные кавычки 'a'+"b");
+  //   2) backtick-экранирование имени:  R`emove-Item  →  Remove-Item
+  //      (PowerShell снимает ` перед символом; для нас это разрывало слово-команду
+  //      и правило ps-remove-root не срабатывало).
+  // Результат сканируется findHit'ом БЕЗ ре-токенизации: деструктивная команда
+  // живёт внутри кавычек, отдаваемых iex, — токенизатор счёл бы её данными,
+  // но iex её ИСПОЛНЯЕТ. Гейт TEXTDISP в findHit по-прежнему отделяет
+  // показывалки (Write-Output '…') от исполнения (iex '…').
+  function psDeobf(s) {
+    let out = s, prev, guard = 0;
+    do {
+      prev = out;
+      out = out.replace(/(['"])([^'"]*)\1\s*\+\s*(['"])([^'"]*)\3/g, (_, q, a, __, b) => q + a + b + q);
+      out = out.replace(/`(.)/g, '$1');
+    } while (out !== prev && ++guard < 20);
+    return out;
   }
 
   // Рекурсивный скан: код → каналы-исполнители. Глубина ≤ 3 (bash -c "ssh ...").
@@ -495,7 +702,34 @@ try {
     if (im) {
       const payloads = strings.concat(t.heredocs.map(x => x.body));
       for (const p of payloads) {
-        h = scanInterpreterPayload(p, im[2]);
+        h = scanInterpreterPayload(p, im[1]);
+        if (h) return h;
+      }
+    }
+
+    // 7) powershell/pwsh -Command "…" и iex '…': нагрузка = команды PowerShell.
+    //    iex — это eval PowerShell'а, и без него `iex('Remove-It' + 'em … C:\')`
+    //    прятал нагрузку во вложенной строке. Каждый payload проверяется дважды:
+    //    scanCommand (уже развёрнутые/вложенные команды) И findHit(psDeobf(...)) —
+    //    после снятия склейки 'a'+'b' и backtick-экранирования R`emove→Remove,
+    //    без ре-токенизации (иначе команда внутри кавычек iex снова стала бы
+    //    «данными»). psDeobf добавляет то, чего expandRaw не умеет — backtick.
+    const scanPS = (s, tag, note) => {
+      let h = scanCommand(s, depth + 1);
+      if (h) return tagHit(h, tag, note);
+      const deob = psDeobf(s);
+      if (deob !== s) { h = findHit(deob); if (h) return tagHit(h, tag, note + ' (деобфускация)'); }
+      return null;
+    };
+    if (IEX_TRIG.test(t.code)) {
+      for (const s of strings) {
+        h = scanPS(s, '@iex', 'аргумент iex/Invoke-Expression');
+        if (h) return h;
+      }
+    }
+    if (PS_TRIG.test(t.code)) {
+      for (const s of strings) {
+        h = scanPS(s, '@ps', 'payload powershell -Command');
         if (h) return h;
       }
     }
@@ -504,6 +738,15 @@ try {
   }
 
   let hit = scanCommand(cmd, 0);
+
+  // Второй взгляд — по копии со снятой обфускацией (см. expandRaw).
+  if (!hit) {
+    const ex = expandRaw(cmd);
+    if (ex !== cmd) {
+      const h = scanCommand(ex, 1);
+      if (h) hit = tagHit(h, '@expand', 'после снятия обфускации (кавычки/экранирование/переменные)');
+    }
+  }
 
   // PowerShell -EncodedCommand: декодировать (UTF-16LE канон + UTF-8 fallback)
   // и прогнать через тот же рекурсивный скан. Не декодится => fail-open.
