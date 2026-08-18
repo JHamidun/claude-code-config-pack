@@ -130,7 +130,7 @@ const CASES = [
   {
     name: 'исполнитель ssh host с удалением корня',
     expect: 'block',
-    cmd: `ssh vertex "${rmrf(ROOT)}"`,
+    cmd: `ssh your-server "${rmrf(ROOT)}"`,
   },
   {
     name: 'исполнитель psql -c со сносом базы',
@@ -145,7 +145,7 @@ const CASES = [
   {
     name: 'ssh с удалением системной папки на проде',
     expect: 'block',
-    cmd: `ssh deploy@vertex '${rmrf('/etc/nginx')}'`,
+    cmd: `ssh deploy@your-server '${rmrf('/etc/nginx')}'`,
   },
   // Дыры, найденные состязательным прогоном 2026-08-18 (субпуть «..» и Mongo):
   {
@@ -182,7 +182,7 @@ const CASES = [
     expect: 'allow',
     cmd: `node -e "console.log('пример опасного: ${rmrf(ROOT)}')"`,
   },
-  { name: 'ssh с безобидной командой', expect: 'allow', cmd: 'ssh vertex "docker ps -a"' },
+  { name: 'ssh с безобидной командой', expect: 'allow', cmd: 'ssh your-server "docker ps -a"' },
 
   {
     name: 'скачать-и-исполнить через конвейер',
@@ -203,7 +203,7 @@ const CASES = [
   {
     name: 'вложенность: bash -c внутри которого ssh с удалением',
     expect: 'block',
-    cmd: `bash -c 'ssh vertex "${rmrf(ROOT)}"'`,
+    cmd: `bash -c 'ssh your-server "${rmrf(ROOT)}"'`,
   },
   {
     name: 'powershell -EncodedCommand с удалением корня',
