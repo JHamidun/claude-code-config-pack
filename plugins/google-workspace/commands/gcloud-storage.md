@@ -1,5 +1,5 @@
 ---
-description: "Google Cloud Storage: бакеты, список объектов, upload/download файлов (REST + googleapiclient). Триггеры: «GCS», «gcloud storage», «бакет google», «залей в cloud storage»."
+description: "Google Cloud Storage: бакеты, объекты, upload/download файлов. Триггеры: «GCS», «бакет google», «залей в cloud storage»."
 argument-hint: "[buckets | list <bucket> | upload <bucket> <file> | download <bucket> <object>]"
 ---
 

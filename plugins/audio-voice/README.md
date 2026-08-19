@@ -8,9 +8,9 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `ace-step` | AI-музыка локально на your GPU (ACE-Step 1.5): инструменталы и песни, авто/кастомная лирика, модели base/xl-turbo; CLI scripts/generate.py. |
-| `deepgram` | Deepgram audio transcription and speech-to-text. |
-| `elevenlabs` | ElevenLabs text-to-speech, voice cloning, sound effects generation. |
+| `ace-step` | AI-музыка локально на your GPU (ACE-Step 1.5): инструменталы, песни, лирика; CLI scripts/generate.py. |
+| `deepgram` | Deepgram speech-to-text: transcribe audio/video, SRT subtitles, speaker diarization. |
+| `elevenlabs` | ElevenLabs: text-to-speech, voice cloning, sound effects. |
 | `suno` | Headless Suno client for music generation — instrumentals and songs, clip listing, MP3 download, credit balance. |
 
 ## Install

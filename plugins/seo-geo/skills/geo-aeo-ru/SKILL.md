@@ -1,6 +1,6 @@
 ---
 name: geo-aeo-ru
-description: "GEO / AEO / LLM SEO — видимость бренда в ответах ChatGPT, Claude, Perplexity, Gemini, AI Overviews, (regional LLM B), (regional LLM A), Нейро. Измерение (Citation Share), тактики (schema, llms.txt). Триггеры: «GEO», «AEO», «LLM SEO», «попасть в ChatGPT», «попасть в ответы AI», «Citation Share», «llms.txt», «(regional LLM B) оптимизация». НЕ: контент под Яндекс→seo-machine-ru; генерация страниц→ai-seo-agent-pipeline."
+description: "GEO/AEO/LLM SEO — видимость бренда в ответах ChatGPT, Perplexity, (regional LLM A); Citation Share, llms.txt. Триггеры: «попасть в ответы AI»."
 metadata:
   version: 1.1.0
   updated: 2026-07-18

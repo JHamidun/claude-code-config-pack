@@ -1,6 +1,6 @@
 ---
 name: dev-browser
-description: "Browser automation with persistent page state — navigate sites, fill forms, take screenshots, extract web data, test web apps. Trigger phrases: \"go to [url]\", \"click on\", \"fill out the form\", \"scrape\", \"log into\", or any browser interaction request."
+description: "Browser automation with persistent page state: navigate, fill forms, screenshots, scrape, log in. Triggers: «go to [url]», «click on», «scrape»."
 type: actionable
 ---
 

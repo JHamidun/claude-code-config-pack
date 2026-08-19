@@ -1,5 +1,5 @@
 ---
-description: "РАБОЧАЯ почта компании you@company.example через локальный Outlook (COM): входящие, непрочитанные, поиск, чтение, отправка, папки. Триггеры: «outlook», «рабочая почта», «письма компании», «рабочие треды», «exchange». Личная почта → /gmail. Полный набор Workspace → skill google-workspace."
+description: "Рабочая почта компании (you@company.example) через локальный Outlook по COM — пароль не нужен. Триггеры: «рабочая почта», «exchange». Личная → /gmail."
 argument-hint: "[inbox | unread | search <запрос> | read <номер|EntryID> | folders | send --to … --subject …]"
 ---
 

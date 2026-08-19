@@ -1,6 +1,6 @@
 ---
 name: server-health
-description: "Server health checks via SSH - docker, systemctl, disk, memory, logs. Use when asked to check server status or diagnose issues."
+description: "Server health via SSH: docker, systemctl, disk, memory, logs. Triggers: «check the server», «why did it crash on the server»."
 ---
 
 # Server Health Check Skill

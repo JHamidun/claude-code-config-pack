@@ -1,5 +1,5 @@
 ---
-description: "Профессиональный перевод через DeepL Pro: текст (авто-определение → RU по умолчанию), formality, документы docx/pptx/pdf/xlsx, лимиты API. Триггеры: «переведи», «translate», «перевод документа». Полный референс → skill deepl-pro; массовый Google-перевод → /gtranslate."
+description: "Перевод через DeepL Pro: текст, formality, документы docx/pptx/pdf/xlsx. Триггеры: «переведи», «перевод документа». Массовый Google-перевод → /gtranslate."
 argument-hint: "<text> [target_lang] [formal] | file <path> <lang> | usage"
 ---
 

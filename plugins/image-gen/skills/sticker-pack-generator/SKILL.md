@@ -1,6 +1,6 @@
 ---
 name: sticker-pack-generator
-description: 'End-to-end Telegram sticker pack pipeline — static WEBP, animated VP9-alpha video, custom emoji packs. PNG-секвенции или AI-кадры, маски SAM2+rembg, VP9 alpha_encoder, Telethon upload через @Stickers, MessageEntityCustomEmoji, реакции канала; TGS Lottie в 64KB не влезает — только WebM. Triggers: «стикерпак», «видео-эмодзи», «кастом эмодзи», "sticker pack", "custom emoji", "VP9 alpha".'
+description: "Стикерпаки Telegram: static WEBP, WebM VP9-alpha, кастом-эмодзи; Telethon upload через @Stickers. Триггеры: «стикерпак», «видео-эмодзи», «VP9 alpha»."
 ---
 
 # Sticker Pack Generator

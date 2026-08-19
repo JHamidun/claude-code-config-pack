@@ -1,6 +1,6 @@
 ---
 name: feature-spec
-description: Write structured product requirements documents (PRDs) with problem statements, user stories, requirements, and success metrics. Use when speccing a new feature, writing a PRD, defining acceptance criteria, prioritizing requirements, or documenting product decisions.
+description: "PRDs and feature specs: problem statement, user stories, acceptance criteria, success metrics. Triggers: «write a PRD». NOT RFC -> doc-coauthoring."
 ---
 
 # Feature Spec Skill

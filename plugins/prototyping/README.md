@@ -8,7 +8,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `canvas-design` | Create beautiful visual art in .png and .pdf documents using design philosophy. |
+| `canvas-design` | Оригинальный визуальный арт в PNG/PDF: постеры, обложки, композиции. |
 | `claude-in-html` | Call an LLM from inside an artifact (summaries, generation, classification) — prototypes with 'magic'. |
 | `component-playground` | Storybook-like page with every variant of every component, plus prop controls. |
 | `design-canvas` | Multiple design variants side-by-side with pan/zoom — compare layouts in one file. |

@@ -1,6 +1,6 @@
 ---
 name: playwright-automation
-description: Browser automation with Playwright - testing, scraping, screenshots, AND a live daemon-browser controllable via CLI (bdo.py) for parallel online work that does NOT collide with the singleton MCP playwright plugin
+description: "Playwright e2e tests and scraping + daemon browser CLI (bdo.py) for parallel sessions. Triggers: «e2e test», «bypass antibot». NOT quick browsing -> dev-browser."
 ---
 
 # Playwright Automation Skill

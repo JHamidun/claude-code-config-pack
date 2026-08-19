@@ -1,8 +1,7 @@
 ---
 name: dark-mode-add
 version: 1.0.0
-description: Превратить light-only дизайн в light+dark с переключателем. Не просто инверт цвета — продуманные dark-токены.
-when_to_use: Уже есть готовый дизайн в light, нужна dark-версия.
+description: "Добавить dark mode к light-дизайну: продуманные dark-токены, не инверт. Триггеры: «тёмная тема к дизайну», «dark theme tokens»."
 ---
 
 # Dark mode add

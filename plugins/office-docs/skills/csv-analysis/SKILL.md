@@ -1,6 +1,6 @@
 ---
 name: csv-analysis
-description: Analyze CSV/Excel data files - statistics, visualization, transformations, insights
+description: "Analyze CSV/Excel data: statistics, charts, transformations, insights. Triggers: «analyze this csv», «data analysis»."
 ---
 
 # CSV & Data Analysis Skill

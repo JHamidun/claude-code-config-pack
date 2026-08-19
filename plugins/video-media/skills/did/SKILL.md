@@ -1,6 +1,6 @@
 ---
 name: did
-description: "D-ID AI avatar videos - talking heads from photo + text/audio. Use when asked to create avatar videos or talking head presentations."
+description: "D-ID talking head from a photo plus text or audio. Triggers: «avatar video», «talking head from a photo». NOT full avatar suite → heygen."
 ---
 
 # D-ID API Skill

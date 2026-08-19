@@ -1,6 +1,6 @@
 ---
 name: docx
-description: "Create, edit and analyze professional .docx documents — tracked changes, comments, formatting preservation, text extraction. Use when creating new documents, modifying content, working with tracked changes, adding comments, or any other document tasks. Триггеры: «документ Word», «сделай docx», «правки в документе», «рецензирование», «комментарии в документе», «извлеки текст из docx»."
+description: "Word-документы .docx: создание, правка, tracked changes, комментарии. Триггеры: «сделай docx», «рецензирование», «правки в документе»."
 license: Proprietary. LICENSE.txt has complete terms
 type: actionable
 ---

@@ -1,6 +1,6 @@
 ---
 name: competitive-intelligence
-description: "Research your competitors and build an interactive battlecard — HTML artifact with clickable competitor cards and a comparison matrix. Trigger with \"competitive intel\", \"battlecard for [competitor]\", \"how do we compare to [competitor]\"."
+description: "Sales battlecard on competitors: interactive HTML with comparison matrix. Triggers: «battlecard», «how do we compare». NOT marketing -> competitive-analysis-mktg."
 ---
 
 # Competitive Intelligence

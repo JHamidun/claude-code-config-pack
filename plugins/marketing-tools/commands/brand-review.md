@@ -117,7 +117,7 @@ List any legal or compliance concerns separately with recommended actions.
 
 Auto-detection order (try each in sequence, use the first that succeeds):
 
-1. **Local config** — check `~/.claude/config/brand-voice.json`
+1. **Local config** — check `config/brand-voice.json` in your Claude config dir (личный файл, в пак не входит; готовый шаблон рядом — `~/.claude/config/brand-voice.example.json`, скопируй и заполни)
    - Expected format: JSON with `voice`, `tone`, `terminology`, `avoid`, `pillars` keys
    - If found, load and use as the canonical brand reference
 2. **Notion MCP** — search for "Brand Voice" or "Style Guide" pages

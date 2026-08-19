@@ -1,6 +1,6 @@
 ---
 name: deepwiki
-description: Fetch documentation for any GitHub repository via DeepWiki/gitmcp.io. Use when user needs docs for a specific GitHub repo (not npm packages - use Context7 for those).
+description: "Docs for any GitHub repo via DeepWiki/gitmcp.io. Trigger: «how does this repo work». NOT library/npm docs -> Context7 plugin."
 ---
 
 # DeepWiki: GitHub Repository Documentation

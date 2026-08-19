@@ -1,6 +1,6 @@
 ---
 name: serpapi
-description: "Real-time Google Search API через SerpAPI (SERPAPI_API_KEY): scraping выдачи Google Search / Maps / Shopping / News / Images / YouTube. Триггеры: serpapi, «google search API», «спарси выдачу гугла», «google maps данные», «цены google shopping»."
+description: "Google Search API через SerpAPI (SERPAPI_API_KEY): выдача, Maps, Shopping, News, YouTube. Триггеры: «спарси выдачу гугла», «цены google shopping»."
 ---
 
 # SerpAPI Skill

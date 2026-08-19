@@ -1,6 +1,6 @@
 ---
 name: signup-cro-ru
-description: "Оптимизация воронки регистрации ExampleProduct + захвата email на news.your-domain.com — снижение трения, рост completion rate. Триггеры: «воронка регистрации», «бросают на регистрации», «signup conversion», «конверсия в trial», «подписка на рассылку». НЕ: активация после регистрации→onboarding-cro-ru; лид-формы без аккаунта→form-cro-ru/page-cro-ru; пейволлы→paywall-cro-ru."
+description: "CRO воронки регистрации и подписки на рассылку: меньше трения, выше completion rate. Триггеры: «бросают на регистрации». НЕ активация→onboarding-cro-ru."
 metadata:
   version: 1.1.0
   updated: 2026-05-29

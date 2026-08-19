@@ -1,6 +1,6 @@
 ---
 name: check-skill-solo
-description: "Verify any fact, claim, number, statement, citation or AI-generated output for hallucinations — cross-check sources, validate research findings. Triggers: \"/check-skill-solo\", «проверь», «перепроверь», \"verify\", \"fact-check\"."
+description: "Fact-check claims, numbers, citations, AI output for hallucinations — cross-model checks with primary sources. Triggers: «verify», «fact-check»."
 ---
 
 # Check — Multi-LLM Anti-Hallucination Verification (portable)

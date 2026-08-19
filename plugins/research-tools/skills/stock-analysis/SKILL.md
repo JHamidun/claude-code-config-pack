@@ -1,6 +1,6 @@
 ---
 name: stock-analysis
-description: "Analyze stocks and companies using financial market data via yfinance Python library. Get company profiles, price charts, insider holdings, analyst recommendations, and SEC filings. Use when users ask about stocks, stock prices, company analysis, or financial data."
+description: "Stocks and companies via yfinance: prices, insider holdings, analyst recommendations, SEC filings. Triggers: «stock analysis», «should I buy this stock»."
 type: actionable
 ---
 
@@ -113,7 +113,7 @@ User: "Compare AAPL vs MSFT vs GOOGL"
 
 ## Excel Export Integration
 
-Use with skill `excel-xlsx` for professional reports:
+Use with skill `xlsx` for professional reports:
 
 ```python
 import yfinance as yf

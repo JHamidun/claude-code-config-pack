@@ -8,15 +8,15 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `claude-api` | Anthropic Claude API (ANTHROPIC_API_KEY) из Python: text generation, vision, tool use, streaming. |
-| `claude-cli-runner` | Запуск моделей Claude из Python БЕЗ API-ключа — через claude CLI binary с авторизацией подписки Claude Code. |
+| `claude-api` | Anthropic Claude API (ANTHROPIC_API_KEY) из Python: text, vision, tool use, streaming. |
+| `claude-cli-runner` | Запуск Claude из Python БЕЗ API-ключа — claude CLI по подписке; модуль claude_cli.py. |
 | `content-policy` | What NOT to reproduce — protected UI of big companies, unverified brands. The legal and ethical boundary. |
-| `context-engineering` | Паттерны оптимизации контекста LLM: progressive disclosure, semantic compression, structured references, summary-first / layered / delta /… |
+| `context-engineering` | Оптимизация контекста LLM: progressive disclosure, компрессия, structured references. |
 | `llm-evals` | Evaluate LLMs and agents — golden sets, two-tier grading (programmatic metrics + LLM judge), model sweeps, keep/rollback verdicts. |
-| `mcp-builder` | Guide for building high-quality MCP (Model Context Protocol) servers in Python (FastMCP) or Node/TypeScript (MCP SDK). |
-| `prompt-engineering` | Промпт-инжиниринг: системные промпты, few-shot, chain-of-thought, structured outputs, декомпозиция, оценка и итерация промптов. |
-| `sharing-skills` | Use when you've developed a broadly useful skill and want to contribute it upstream via pull request |
-| `skill-creator` | Create new skills, modify and improve existing skills, and measure skill performance. |
+| `mcp-builder` | Разработка MCP-серверов (Python FastMCP / TS SDK) и дизайн инструментов агента. |
+| `prompt-engineering` | Промпт-инжиниринг: системные промпты, few-shot, structured outputs. |
+| `sharing-skills` | Contribute your skill upstream via pull request: branch, commit, push. |
+| `skill-creator` | Create, edit and eval skills; optimize descriptions for triggering. |
 | `tool-search-protocol` | Don't refuse an MCP/connector capability outright — search via tool_search first; the tool may exist but be hidden. |
 
 ### Agents

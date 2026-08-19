@@ -1,8 +1,7 @@
 ---
 name: color-system-builder
 version: 1.0.0
-description: Из 1 акцента → полная палитра (light + dark, 9-step scale, semantic) с проверенным контрастом.
-when_to_use: Создание палитры с нуля, или когда нужно расширить один цвет до полноценной системы.
+description: "Из одного акцента — полная палитра: light+dark, 9-step scale, semantic, WCAG-контраст. Триггеры: «построй цветовую систему», «color tokens»."
 ---
 
 # Color system builder

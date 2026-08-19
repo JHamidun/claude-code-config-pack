@@ -8,10 +8,10 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `campaign-planning` | Plan marketing campaigns: objectives, audience segmentation, channel strategy, content calendars, KPIs, budget allocation, product launch. |
+| `campaign-planning` | Планирование маркетинговых кампаний: цели, сегменты, каналы, KPI, бюджет, дерево метрик CPM→CTR→CPL→CPA→LTV→CAC. |
 | `competitive-analysis` | Competitor research, market analysis, ad intelligence, positioning. |
-| `competitive-analysis-mktg` | Research competitors: positioning, messaging, content strategy, battlecards, content gaps, comparison/alternative pages (vs-pages) for SEO+sales… |
-| `performance-analytics` | Analyze marketing performance — метрики каналов (email, social, paid, SEO), отчёты, tracking plan / события / цели. |
+| `competitive-analysis-mktg` | Конкуренты в маркетинге: месседжинг, контент-гэпы, vs/alternative-страницы под SEO. |
+| `performance-analytics` | Метрики маркетинг-каналов и tracking plan: атрибуция, server-side GTM. |
 
 ### Commands
 

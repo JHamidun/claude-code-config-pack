@@ -1,6 +1,6 @@
 ---
 name: lead-enrichment
-description: "Enrich and qualify B2B leads (RU), two modes. Mode A (digital-trace): from a fragment (email, phone, name, domain) find person, company, DM status. Mode B: raw list + Your CRM export, by INN, firmographics (DaData/EGRUL/Checko). Triggers: дообогати базу, обогати лиды/список, enrich leads, checko, ЕГРЮЛ. NOT: outreach→draft-outreach; list from scratch→lead-research; social dossier→social-intel."
+description: "Enrich B2B leads (RU): fragment or Your CRM list -> person, company, DM via DaData/EGRUL/Checko. Triggers: «enrich leads», «ЕГРЮЛ». NOT new list -> lead-research."
 allowed-tools: Bash, Read, Write, WebSearch, WebFetch, Skill
 metadata:
   version: 1.0.0

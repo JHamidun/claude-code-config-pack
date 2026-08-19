@@ -434,21 +434,31 @@ def _build_duck_filter(regions, speech_vol=0.12, gap_vol=0.25, buffer=0.3):
 
 
 def _extract_speech_regions_whisper(video_path):
-    """Try to extract speech regions using openai-whisper."""
+    """Extract speech regions using faster-whisper (fallback: openai-whisper)."""
     try:
-        import whisper  # type: ignore
+        from faster_whisper import WhisperModel  # type: ignore
     except ImportError:
-        print("Error: --whisper flag requires 'openai-whisper' package.")
-        print("  Install: pip install openai-whisper")
-        sys.exit(1)
-
-    print("  Extracting speech regions with Whisper (this may take a moment)...")
-    model = whisper.load_model("base")
-    result = model.transcribe(str(video_path), word_timestamps=True)
+        WhisperModel = None
 
     regions = []
-    for segment in result.get("segments", []):
-        regions.append({"start": segment["start"], "end": segment["end"]})
+    if WhisperModel is not None:
+        print("  Extracting speech regions with faster-whisper (this may take a moment)...")
+        model = WhisperModel("base", device="cpu", compute_type="int8")
+        segments, _info = model.transcribe(str(video_path))
+        for segment in segments:
+            regions.append({"start": float(segment.start), "end": float(segment.end)})
+    else:
+        try:
+            import whisper  # type: ignore
+        except ImportError:
+            print("Error: --whisper flag requires 'faster-whisper' (or 'openai-whisper') package.")
+            print("  Install: pip install faster-whisper")
+            sys.exit(1)
+        print("  Extracting speech regions with Whisper (this may take a moment)...")
+        model = whisper.load_model("base")
+        result = model.transcribe(str(video_path), word_timestamps=True)
+        for segment in result.get("segments", []):
+            regions.append({"start": segment["start"], "end": segment["end"]})
 
     # Merge regions with gap < 0.5s
     if not regions:
@@ -697,7 +707,7 @@ def main():
     p.add_argument(
         "--whisper",
         action="store_true",
-        help="Auto-detect speech regions using Whisper (requires openai-whisper)",
+        help="Auto-detect speech regions using Whisper (requires faster-whisper)",
     )
     p.add_argument("--speech-vol", type=float, default=0.12, help="Music volume during speech (default: 0.12)")
     p.add_argument("--gap-vol", type=float, default=0.25, help="Music volume in gaps (default: 0.25)")

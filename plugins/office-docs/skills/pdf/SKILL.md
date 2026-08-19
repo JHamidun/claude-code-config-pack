@@ -1,6 +1,6 @@
 ---
 name: pdf
-description: Comprehensive PDF manipulation toolkit for extracting text and tables, creating new PDFs, merging/splitting documents, and handling forms. When Claude needs to fill in a PDF form or programmatically process, generate, or analyze PDF documents at scale. Триггеры: «пдф», «PDF», «вытащи текст из pdf», «объедини pdf», «раздели pdf», «таблицы из pdf», «заполни форму pdf».
+description: "Работа с PDF: извлечение текста и таблиц, создание, merge/split, заполнение форм. Триггеры: «пдф», «вытащи текст из pdf», «заполни форму pdf»."
 license: Proprietary. LICENSE.txt has complete terms
 type: actionable
 ---

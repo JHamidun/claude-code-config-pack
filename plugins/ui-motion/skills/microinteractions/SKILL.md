@@ -1,7 +1,6 @@
 ---
 name: microinteractions
-description: Готовые snippets для частых анимированных мелочей — skeleton, success-tick, draggable list, infinite scroll, stagger reveal, counter, parallax.
-when_to_use: Когда нужна одна конкретная микро-фича. Не используй как мудборд.
+description: "Готовые snippets анимированных микро-фич: skeleton, success-tick, stagger reveal, parallax. Триггеры: «оживи прототип», «hover эффекты»."
 ---
 
 # Microinteractions

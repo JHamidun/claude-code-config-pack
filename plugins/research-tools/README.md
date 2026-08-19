@@ -9,16 +9,16 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | Skill | What it does |
 |-------|--------------|
 | `building-an-exo` | ExO 3.0 consulting reference for AI-restructuring a company — intelligence stack, MTP, scorecards, governance pillars. |
-| `ceo-council` | Use when needing strategic project analysis from multiple independent expert perspectives. |
+| `ceo-council` | Strategic analysis by parallel independent C-level expert personas — cuts blind spots. |
 | `check-skill-solo` | Fact-check any claim, number, or citation against sources — mechanical URL and quote verification against hallucinations. |
-| `developer-growth` | Оценка и развитие навыков разработчика — self-assessment матрица, анализ git-вклада, персональный план развития (PDP), карьерная лестница IC. |
-| `domain-brainstormer` | Generate creative domain names and check availability |
-| `internal-comms` | A set of resources to help me write all kinds of internal communications, using the formats that my company likes to use. |
-| `investor-materials` | Create and update pitch decks, one-pagers, investor memos, accelerator applications, financial models and fundraising materials — projections… |
-| `meeting-analyzer` | Транскрипт встречи → структурный отчёт: решения, action items (владелец + дедлайн), риски/блокеры, открытые вопросы, next steps. |
+| `developer-growth` | Оценка и рост разработчика: skills matrix, анализ git-вклада, PDP, gap до senior. |
+| `domain-brainstormer` | Domain name ideas + availability checks. |
+| `internal-comms` | Internal comms in company formats: status reports, leadership/3P updates, newsletters, FAQs, incident reports. |
+| `investor-materials` | Investor materials: pitch decks, one-pagers, memos, financial models, accelerator apps, use-of-funds. |
+| `meeting-analyzer` | Транскрипт встречи → протокол: решения, action items, риски; вход tl;dv/Plaud/Spark или аудио. |
 | `research-docs` | Document Q&A с визуальными цитатами: парсит папку PDF/DOCX/PPTX/XLSX/картинок через LiteParse, отвечает на вопрос, отдаёт HTML-отчёт со скриншотами… |
-| `stock-analysis` | Analyze stocks and companies using financial market data via yfinance Python library. |
-| `thinking-frameworks` | Structured thinking frameworks for deep analysis and decision-making. |
+| `stock-analysis` | Stocks and companies via yfinance: prices, insider holdings, analyst recommendations, SEC filings. |
+| `thinking-frameworks` | Структурные фреймворки анализа и решений: first principles, pre-mortem, kaizen/PDCA. |
 
 ### Commands
 

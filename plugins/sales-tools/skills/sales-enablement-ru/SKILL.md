@@ -1,6 +1,6 @@
 ---
 name: sales-enablement-ru
-description: "Sales-материалы для российского B2B — продажа AI-воркшопов/консалтинга/когорт ExampleProduct корп-ЛПР: питч-деки, one-pager'ы, отработка возражений, демо-скрипты, battle-cards, playbook. Триггеры: «sales deck», «питч для клиента», «отработай возражение», «one-pager для ЛПР», «материалы для продаж». НЕ: слайды-файлы→manus-slides/pptx; холодные письма→draft-outreach; CRM-воронка→revops-ru."
+description: "Sales-материалы B2B: питч-деки, one-pager, возражения, battle-cards, демо-скрипты. Триггеры: «питч-дек продаж», «battle card». НЕ воронка→revops-ru."
 metadata:
   version: 1.1.0
   updated: 2026-05-29

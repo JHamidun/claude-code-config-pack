@@ -1,6 +1,6 @@
 ---
 name: content-creation
-description: "Draft generic marketing content — blog posts, social, email newsletters, landing pages, press releases, case studies; SEO copy, headlines, CTAs. НЕ: ТГ-канал пользователя→tg-post; контент-конвейер→content-engine; методология→content-machine-instructor2-ru; SEO→seo-machine-ru."
+description: "Generic marketing copy: blog, social, email, landing pages, case studies, SEO copy, CTAs. NOT: content pipeline→content-engine; SEO→seo-machine-ru."
 ---
 
 # Content Creation Skill

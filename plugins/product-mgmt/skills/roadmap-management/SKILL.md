@@ -1,6 +1,6 @@
 ---
 name: roadmap-management
-description: Построение и приоритизация продуктового роадмапа — пошаговая процедура от входов до готового документа. Скоринг RICE/ICE/MoSCoW, форматы Now/Next/Later, кварталы, OKR, зависимости, capacity. Триггеры «построй роадмап», «приоритизируй бэклог/фичи», «RICE», «Now/Next/Later», «что пилим в следующем квартале». НЕ для спеки одной фичи (feature-spec), спринт-планирования (sprint-planning-pm), апдейтов стейкхолдерам (stakeholder-comms).
+description: "Продуктовый роадмап: RICE/ICE/MoSCoW, Now/Next/Later, capacity. Триггеры: «приоритизируй бэклог», «что пилим в квартале». НЕ спека фичи→feature-spec."
 ---
 
 # Roadmap Management

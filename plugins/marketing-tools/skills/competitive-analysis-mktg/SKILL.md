@@ -1,6 +1,6 @@
 ---
 name: competitive-analysis-mktg
-description: "Research competitors: positioning, messaging, content strategy, battlecards, content gaps, comparison/alternative pages (vs-pages) for SEO+sales, профили RU AI-education/consulting конкурентов. Triggers: «сравнительная страница», «vs страница», «альтернатива конкуренту», «профиль конкурента», «реклама конкурентов» (указатель на ad-spy). Контекст вашего бизнеса → yourname-marketing-context."
+description: "Конкуренты в маркетинге: месседжинг, контент-гэпы, vs/alternative-страницы под SEO. Триггеры: «vs страница», «профиль конкурента»."
 metadata:
   version: 1.1.0
   updated: 2026-05-29

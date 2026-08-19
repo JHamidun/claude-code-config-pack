@@ -1,6 +1,6 @@
 ---
 name: pinecone
-description: "Pinecone vector DB (PINECONE_API_KEY): serverless-индексы, semantic search, RAG; текущие индексы company-tm-bot, company-plus-bot и др. Триггеры: pinecone, «vector database», «векторная база», «семантический поиск», embeddings, RAG."
+description: "Pinecone vector DB (PINECONE_API_KEY): serverless-индексы, semantic search, RAG, embeddings. Триггеры: «векторная база», «семантический поиск»."
 ---
 
 # Pinecone Vector Database Skill

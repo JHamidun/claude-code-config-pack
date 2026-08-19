@@ -1,6 +1,6 @@
 ---
 name: schema-markup-ru
-description: "Schema.org / JSON-LD разметка: шаблоны Organization, Course, FAQPage, Article, Person, Event; Яндекс читает JSON-LD — кормит AEO/GEO. Триггеры: «микроразметка», «rich snippets», «звёздочки в выдаче». НЕ: SEO-контент→seo-machine-ru; CRO→*-cro-ru."
+description: "Schema.org / JSON-LD разметка: Organization, Course, FAQPage; Яндекс читает JSON-LD. Триггеры: «микроразметка», «rich snippets», «звёздочки в выдаче»."
 metadata:
   version: 1.0.0
   updated: 2026-05-29

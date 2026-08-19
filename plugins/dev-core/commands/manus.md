@@ -1,5 +1,5 @@
 ---
-description: "Делегирование многоступенчатых задач платформе Manus AI через manus_helper.py: создание задач (режимы speed/quality/balanced), мониторинг, получение результатов. Триггеры: «manus», «делегируй манусу», «задача для manus». API-референс и capabilities платформы → skill manus (одноимённый)."
+description: "Делегирование задачи платформе Manus AI (manus_helper.py): режимы speed/quality/balanced, мониторинг, результаты. Триггеры: «делегируй манусу». API → skill manus."
 argument-hint: "\"<задача>\" [speed|quality|balanced]"
 ---
 

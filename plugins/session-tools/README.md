@@ -8,12 +8,12 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `away-summary` | Generate a brief "while you were away" recap of the current session. |
-| `btw` | Ask a quick side question without interrupting the main conversation flow. |
-| `dream` | Memory consolidation — рефлексивный проход по памяти + Second Brain sleeptime. |
+| `away-summary` | Recap the current session — what was done, where you stopped. |
+| `btw` | Answer a quick side question briefly, then return to the main task. |
+| `dream` | Консолидация памяти + Second Brain sleeptime: supersede, decay, prune, promote, TOP-INSTINCTS. |
 | `memory-agent` | Router across a layered memory system — picks the right layer (files, graph, vectors, chat history) for the question asked. |
 | `save-knowledge-base` | Persist an instruction or reference into long-term memory across four layers so future sessions retrieve it by trigger. |
-| `self-reflect` | Self-improvement analysis - review recent errors, find patterns, generate improvements for rules/skills. |
+| `self-reflect` | Review recent errors and patterns, generate rule/skill improvements. |
 | `session-mentor` | Local analysis of your Claude Code session history into an HTML report — themes, tool usage, friction points, unused features. |
 | `year-review` | Analyze session history and generate insights about work patterns, productivity, and tool usage over a time period. |
 

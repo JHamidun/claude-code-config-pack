@@ -8,11 +8,11 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `deepseek` | DeepSeek API (DEEPSEEK_API_KEY, deepseek-chat, OpenAI-совместимый эндпоинт) — кодогенерация, рефакторинг, reasoning, 128K контекст. |
-| `gemini-3-pro` | Google AI Suite через API (GOOGLE_API_KEY): Gemini text (2M контекст), embeddings, TTS/STT (Live API), code execution, Google Search grounding… |
-| `kimi` | Kimi K2 (Moonshot AI, KIMI_API_KEY, kimi-k2-thinking) — глубокий reasoning, код-анализ, алгоритмы. |
-| `multi-model-gateway` | Orchestrate tasks across Claude, GPT, and Gemini via AI Gateway. |
-| `perplexity` | Perplexity — веб-поиск и research с реалтайм-информацией и источниками. |
+| `deepseek` | DeepSeek API (deepseek-chat): кодогенерация, reasoning, 128K контекст. |
+| `gemini-3-pro` | Google AI API (GOOGLE_API_KEY): Gemini text 2M контекст, embeddings, TTS, grounding. |
+| `kimi` | Kimi K2 (Moonshot AI, KIMI_API_KEY, kimi-k2-thinking): глубокий reasoning, код-анализ, алгоритмы. |
+| `multi-model-gateway` | Run a task across Claude, GPT and Gemini via AI Gateway: comparison, consensus, second opinion. |
+| `perplexity` | Perplexity веб-поиск и research с источниками: дефолт pplx-max.py по подписке Max. |
 
 ### Agents
 

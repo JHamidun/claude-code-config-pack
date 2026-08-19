@@ -1,5 +1,5 @@
 ---
-description: "Тестирование фронтенда через Playwright MCP: скриншоты на 3 viewport (desktop/tablet/mobile), layout-проверки, E2E user flows, accessibility. Триггеры: «проверь вёрстку», «скриншот страницы», «протестируй фронтенд», «e2e тест UI». Полный фреймворк + daemon-браузер → skill playwright-automation."
+description: "Тест фронтенда через Playwright MCP: скриншоты 3 viewport, layout, E2E, accessibility. Триггеры: «проверь вёрстку», «скриншот страницы». Фреймворк → playwright-automation."
 argument-hint: "<url> [screenshot | e2e | layout | accessibility]"
 ---
 

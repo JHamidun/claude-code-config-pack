@@ -1,6 +1,6 @@
 ---
 name: theme-factory
-description: "Toolkit for styling artifacts (slides, docs, reports, HTML landing pages) with a theme: 10 pre-set themes with colors/fonts to apply to any artifact, or generate a new theme on-the-fly. Соседние: deck-themes (стартовые темы именно для слайдов), frontend-design (эстетика с нуля без дизайн-системы); развилка — в design-orchestrator."
+description: "Стилизация артефакта темой: 10 пресетов цвета/шрифтов или новая тема на лету. Триггеры: «смени тему артефакта», «стилизация». НЕ слайды → deck-themes."
 license: Complete terms in LICENSE.txt
 ---
 

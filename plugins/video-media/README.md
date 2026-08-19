@@ -8,15 +8,15 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `did` | D-ID AI avatar videos - talking heads from photo + text/audio. |
-| `heygen` | HeyGen API — AI avatar video, v3 primary (54 endpoints). |
-| `submagic` | your subtitle API — AI captions, Magic Brolls/Zooms/Hook, music, silence removal, audio cleanup, AI-edit templates, Magic Clips (YouTube → multi-clip), social publishing. |
+| `did` | D-ID talking head from a photo plus text or audio. |
+| `heygen` | HeyGen API v3: AI avatar video, digital twin, lip-sync translation, voice clone. |
+| `submagic` | your subtitle API (v1 REST): AI captions, Magic Brolls/Zooms, Magic Clips (YouTube to multi-clip), silence removal, social publishing. |
 | `video-downloader` | Download videos from YouTube and other platforms with yt-dlp |
-| `video-editor` | Локальный видеомонтаж на FFmpeg+Python: вырезка тишины/дублей, виральные субтитры, переходы, цветокор/LUT, авто-рефрейм 16:9→9:16, overlay-рил talking-head + AI b-roll. |
+| `video-editor` | Видеомонтаж FFmpeg+Python: тишина, субтитры, рефрейм 9:16. |
 | `video-export` | HTML animation → MP4 / GIF via FFmpeg (Playwright record + encode) — social explainers, product demos. |
-| `video-generation` | Полный пайплайн AI-видео: Veo, Sora, Seedance, Runway (Kling/Pika), voiceover, музыка, субтитры, сборка ffmpeg; включает движок Higgsfield… |
+| `video-generation` | AI-видео хаб: Veo, Sora, Seedance, Runway, Higgsfield. |
 | `video-montage` | Full 9:16 reels production — Whisper subtitles, TTS voiceover, word-accurate sync, pop-up cards, lip-sync, safe zones. |
-| `video-shotcraft` | Кинематографичные промо-ролики продукта на Remotion: 153 карточки-рецепта кадров, 2.5D-проходы по страницам, кадрирование под бит, звуковой дизайн… |
+| `video-shotcraft` | Промо-ролики продукта на Remotion: 153 рецепта кадров, 2.5D-проходы, шаблон Ink Press. |
 | `void-video` | Netflix VOID — remove objects from video with physics-aware handling via a free HuggingFace Spaces API. |
 | `watch-video` | Let the agent actually watch a video — timestamped frames plus transcript, so it can answer about what is on screen. |
 | `youtube-transcript` | Fetch YouTube video transcripts, summaries, and content analysis |

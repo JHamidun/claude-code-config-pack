@@ -8,7 +8,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `google-workspace` | Google Workspace и рабочая почта одним набором инструментов: Google Docs (прочитать документ, найти документ, дописать текст), Google Sheets… |
+| `google-workspace` | Хаб Google Workspace: Docs, Sheets, Gmail, Drive, Outlook/Exchange. |
 
 ### Commands
 

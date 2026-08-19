@@ -1,6 +1,6 @@
 ---
 name: home-assistant
-description: "Home Assistant CLI — умный дом через REST + WebSocket API: состояния сущностей, вызов сервисов (свет/климат/медиа), on/off/toggle, история состояний, live-поток событий, конфиг, areas/devices. НЕ: Яндекс умный дом / Алиса / Яндекс-экосистема→skill yandex (секция IoT); генерация ботов для HA→agent-builder tooling."
+description: "Умный дом Home Assistant через ha_client.py: состояния, сервисы, история, события. Триггеры: «включи свет через HA», «hass»."
 ---
 
 # Home Assistant CLI
@@ -14,9 +14,9 @@ CLI: `python ~/.claude/tools/ha_client.py <command>`.
 - Вызвать любой HA-сервис (`light.turn_on`, `climate.set_temperature`, `media_player.play_media`...).
 - Посмотреть историю состояний сенсора, live-поток событий, конфиг инстанса, комнаты/устройства.
 
-### HA vs Яндекс умный дом (skill `yandex`)
+### HA vs Яндекс умный дом (отдельный навык под Яндекс (в пак не входит))
 
-| Критерий | Home Assistant (этот skill) | Яндекс IoT (skill yandex) |
+| Критерий | Home Assistant (этот skill) | Яндекс IoT (отдельный навык под Яндекс (в пак не входит)) |
 |----------|------------------------------|---------------------------|
 | Где живёт | Локально (свой сервер/RPi/Docker), работает без интернета | Облако Яндекса |
 | Устройства | 2000+ интеграций: Zigbee, Z-Wave, MQTT, ESPHome, Xiaomi, и Яндекс-устройства тоже подключаемы | Только устройства, привязанные к аккаунту Яндекса |

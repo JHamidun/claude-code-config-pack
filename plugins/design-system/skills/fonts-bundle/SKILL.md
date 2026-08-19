@@ -1,7 +1,6 @@
 ---
 name: fonts-bundle
-description: Готовые блоки <link> для типовых пар шрифтов — Google Fonts с правильными весами и subset, плюс system-стек.
-when_to_use: Подключение шрифтов в HTML. Не пиши <link> с нуля — копируй проверенный блок.
+description: "Готовые блоки <link> для пар шрифтов Google Fonts (веса, subset) + system-стек. Триггеры: «подключи шрифты», «пара шрифтов»."
 ---
 
 # Fonts bundle

@@ -1,6 +1,6 @@
 ---
 name: agent-api-server
-description: "OpenAI-совместимый HTTP-сервер поверх ЛОКАЛЬНОГО claude CLI (подписка Max, без API-ключа) — отдаёт Claude как /v1/chat/completions для n8n, OpenAI-SDK, IDE, curl, Open WebUI; SSE-стрим, X-Session-Id. НЕ: прокси наружу к OpenAI/Perplexity/Runway (отдельный сервис, в пак не входит); разовый вызов из Python→claude-cli-runner; боевые Hermes-боты→agent-builder tooling."
+description: "Claude по подписке как OpenAI API (/v1/chat/completions поверх claude CLI) для n8n/IDE."
 ---
 
 # agent-api-server — Claude по подписке как OpenAI API

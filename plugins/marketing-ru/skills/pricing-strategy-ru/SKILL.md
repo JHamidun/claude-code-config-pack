@@ -1,6 +1,6 @@
 ---
 name: pricing-strategy-ru
-description: "Ценообразование, упаковка и монетизация продуктов — тарифы подписки, цены воркшопа/консалтинга, trial, value metric, повышение цен, willingness-to-pay. Триггеры: «ценообразование», «pricing», «тарифы», «упаковка», «free trial», «повышение цены», «value metric», «монетизация». НЕ: страница тарифов→page-cro-ru; экраны апгрейда→paywall-cro-ru; cancel-флоу→churn-prevention-ru."
+description: "Ценообразование и упаковка: тарифы Academy, trial, value metric. Триггеры: «сколько брать за», «freemium». НЕ экраны апгрейда→paywall-cro-ru."
 metadata:
   version: 1.1.0
   ported_from: coreyhaines31/marketingskills (pricing)

@@ -1,6 +1,6 @@
 ---
 name: lead-research
-description: "Build and qualify a fresh B2B lead list from an ICP (RU market): discovery → decision-maker mapping → signals → scoring (Hot/Warm/Cold/Skip) → handoff, for selling AI-workshops / consulting / B2B cohorts. Triggers: 'lead research', 'prospect research', 'ICP', «список лидов». NOT: enrich an existing list→lead-enrichment; outreach copy→draft-outreach; CRM ops→revops-ru; dossier on a known handle→social-intel."
+description: "Fresh B2B lead list from an ICP (RU): discovery, DM mapping, Hot/Warm/Cold scoring. Triggers: «lead research», «ICP». NOT enrich existing -> lead-enrichment."
 allowed-tools: Bash, Read, Write, WebSearch, WebFetch, Skill
 metadata:
   version: 3.0.0

@@ -1,7 +1,6 @@
 ---
 name: screen-labels
-description: Стейтить data-screen-label на каждом экране/слайде. Облегчает диалог "слайд 5 / экран Settings" и упрощает правки.
-when_to_use: Любой артефакт с >1 экраном/слайдом — slides, interactive-prototype, design-canvas.
+description: "Атрибут data-screen-label на каждом экране/слайде артефакта — правки адресуются «слайд 5». Триггеры: «подпиши экраны», «метки слайдов»."
 ---
 
 # Screen labels

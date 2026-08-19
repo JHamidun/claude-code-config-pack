@@ -1,6 +1,6 @@
 ---
 name: maps-places
-description: "Поиск мест, ресторанов, организаций, адресов, EV-зарядок, Airbnb и геокодинг через 11 провайдеров (Google Places, Yandex Geosearch, 2GIS, HERE, Mapbox, Foursquare, OpenCage, OSM, Open Charge Map, SerpAPI, Apify). Плюс часы работы, телефоны, рейтинги."
+description: "Поиск мест, адресов и геокодинг: 11 провайдеров — Google Places, Yandex Geosearch, 2GIS, OSM, Airbnb. Триггеры: «найди ресторан», «координаты адреса»."
 ---
 
 # Maps & Places
@@ -126,6 +126,6 @@ python ~/.claude/tools/places_search.py reverse_geocode --lat 55.7558 --lon 37.6
 
 - `~/.claude/projects/C--Users-youruser/memory/maps-api-setup-2026-05-28.md` — история ключей
 - `~/.claude/tools/places_search.py` — основной CLI (shim к скиллу)
-- Skill `yandex` — Метрика/Директ/Диск (не карты)
+- отдельный навык под Яндекс (в пак не входит) — Метрика/Директ/Диск (не карты)
 - Skill `apify-scraping` — для Airbnb actor
 - Skill `serpapi` — SERP scraping (включая google_maps)

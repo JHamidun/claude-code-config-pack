@@ -1,7 +1,6 @@
 ---
 name: device-frames
-description: Рамки iOS, Android, окно macOS, окно браузера. Оборачивают макет в реалистичный контейнер.
-when_to_use: Пользователь просит показать дизайн "в iPhone", "на Android", "в окне браузера", "в macOS-окне", или прототип мобильного приложения.
+description: "CSS-рамки iOS, Android, окно macOS и браузера вокруг макета. Триггеры: «в iPhone», «iOS frame», «browser frame»."
 ---
 
 # Device frames

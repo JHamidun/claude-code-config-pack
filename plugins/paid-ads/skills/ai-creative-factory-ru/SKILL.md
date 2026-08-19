@@ -1,6 +1,6 @@
 ---
 name: ai-creative-factory-ru
-description: "Маркетинговая методология performance-креативов (видео/статика для Meta/Google/VK/Yandex): структура хука, 5-блочный канон, дофаминовые триггеры, anti-AI-slop, декомпозиция виральных. НЕ техническая генерация — за ней video-generation, image-generation, nano-banana-pro. Триггеры: «рекламный креатив», «performance креатив», «anti-AI-slop», «разбери виральное видео»."
+description: "Performance-креативы Meta/VK/Директ: хук, 5-блочный канон, Creative System. Триггеры: «разбери виральное видео». НЕ генерация→video-generation."
 type: actionable
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: draft-outreach
-description: "Research a prospect, then draft personalized B2B outreach (email + LinkedIn + Telegram). RU cold-outreach: цепочки касаний, персонализация под корп-ЛПР. Триггеры: «письмо ЛПР/HR-директору», «цепочка касаний». NOT: newsletters→html-email; посты в каналы/соцсети — не сюда."
+description: "B2B-аутрич с рисёрчем проспекта: email + LinkedIn + Telegram, цепочки касаний под корп-ЛПР. Триггеры: «холодное письмо», «написать ЛПР»."
 metadata:
   version: 2.1.0
   updated: 2026-05-29
