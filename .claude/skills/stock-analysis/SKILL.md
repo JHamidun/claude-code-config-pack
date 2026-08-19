@@ -113,7 +113,7 @@ User: "Compare AAPL vs MSFT vs GOOGL"
 
 ## Excel Export Integration
 
-Use with skill `excel-xlsx` for professional reports:
+Use with skill `xlsx` for professional reports:
 
 ```python
 import yfinance as yf

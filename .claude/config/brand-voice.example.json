@@ -1,0 +1,28 @@
+{
+  "_readme": "Шаблон. Скопируй в config/brand-voice.json рядом и заполни своими значениями — команды /brand-review и /draft-content читают именно brand-voice.json (файл личный, в пак не входит).",
+  "brand_name": "Your Company",
+  "voice": "уверенный практик, говорит примерами, не лозунгами",
+  "tone": ["authoritative", "approachable"],
+  "pillars": [
+    "польза раньше саморекламы",
+    "конкретика: цифры, сроки, ограничения",
+    "честность о том, что не сработало"
+  ],
+  "terminology": {
+    "prefer": ["решение", "платформа", "внедрение"],
+    "avoid": ["синергия", "прорывной", "революционный", "уникальный"]
+  },
+  "vocabulary": {
+    "prefer": ["solution", "platform"],
+    "avoid": ["synergy", "disrupt", "game-changing"]
+  },
+  "avoid": [
+    "восклицательные заголовки",
+    "обещания без цифр",
+    "канцелярит"
+  ],
+  "sentence_style": "short, direct, active voice",
+  "emoji_policy": "minimal",
+  "formality": "semi-formal",
+  "languages": { "content": "ru", "code": "en" }
+}

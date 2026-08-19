@@ -147,4 +147,7 @@ def main():
     print(f"Rotation list (new env vars): {', '.join(to_add.values())}")
 
 if __name__ == "__main__":
+    if any(a in ("-h", "--help") for a in sys.argv[1:]):
+        print((__doc__ or "").strip())
+        sys.exit(0)
     main()

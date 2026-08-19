@@ -237,6 +237,9 @@ def ensure_python_mcp() -> bool:
 
 
 def main() -> int:
+    if any(a in ("-h", "--help") for a in sys.argv[1:]):
+        print((__doc__ or "").strip())
+        return 0
     if not CLAUDE.is_dir():
         print(f"Каталога {CLAUDE} нет — пак не установлен.")
         return 1

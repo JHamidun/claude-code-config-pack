@@ -1,6 +1,8 @@
 # Skills Catalog
 
-> 171 skills total: 23 actionable (with code) + 148 prompt-based
+> 287 skills total: 77 actionable (with executable code) + 210 prompt-based.
+> This catalog lists a categorized subset — per-section counts refer to entries
+> below, not the whole pack. Full list: `ls ~/.claude/skills/`.
 >
 > Last updated: see git history
 
@@ -28,7 +30,7 @@
 | Skill | Type | Description |
 |-------|------|-------------|
 | code-reviewer | **A** | Code review with checklists, two-pass review |
-| gstack | **A** | Browse daemon, zero silent failures (from <owner>/<repo>) |
+| gstack | **A** | Browse daemon, zero silent failures (from garrytan/gstack) |
 | systematic-debugging | P | 4-phase systematic debugging methodology |
 | root-cause-tracing | P | Root cause analysis for bugs |
 | test-driven-development | P | TDD workflow and practices |

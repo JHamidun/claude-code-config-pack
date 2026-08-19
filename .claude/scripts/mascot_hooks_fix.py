@@ -15,7 +15,7 @@ Claude Code. Пока приложение запущено, это стоит �
 
     python mascot_hooks_fix.py            # проверить и убрать
     python mascot_hooks_fix.py --check    # только показать, ничего не менять
-    python mascot_hooks_fix.py --port 45832
+    python mascot_hooks_fix.py --port 45700   # if you know the mascot's port
 """
 from __future__ import annotations
 

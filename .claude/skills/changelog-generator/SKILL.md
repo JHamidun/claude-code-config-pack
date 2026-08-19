@@ -80,6 +80,11 @@ PATCH - Bug fixes (fix:)
 
 ## Generation Algorithm
 
+> **Готового скрипта навык НЕ содержит** — в папке `changelog-generator/` только этот SKILL.md.
+> Код ниже — исходник, который надо сохранить в СВОЁМ репозитории (обычно `scripts/changelog.py`)
+> и добавить к нему разбор аргументов `--version` / `--since` / `--dry-run`. Все команды в разделах
+> «CLI Usage» и «Integration with CI/CD» подразумевают уже сохранённый файл, а не поставку навыка.
+
 ```python
 import subprocess
 import re

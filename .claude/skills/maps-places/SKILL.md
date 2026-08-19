@@ -126,6 +126,6 @@ python ~/.claude/tools/places_search.py reverse_geocode --lat 55.7558 --lon 37.6
 
 - `~/.claude/projects/C--Users-youruser/memory/maps-api-setup-2026-05-28.md` — история ключей
 - `~/.claude/tools/places_search.py` — основной CLI (shim к скиллу)
-- Skill `yandex` — Метрика/Директ/Диск (не карты)
+- отдельный навык под Яндекс (в пак не входит) — Метрика/Директ/Диск (не карты)
 - Skill `apify-scraping` — для Airbnb actor
 - Skill `serpapi` — SERP scraping (включая google_maps)

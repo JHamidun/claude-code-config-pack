@@ -89,7 +89,10 @@ def gmail_api_get(access_token: str, endpoint: str, params: dict = None) -> dict
     """Make a GET request to Gmail API."""
     url = f"https://gmail.googleapis.com/gmail/v1/users/me/{endpoint}"
     if params:
-        url += "?" + urllib.parse.urlencode(params)
+        # doseq: metadataHeaders — повторяющийся параметр. Склеенный через запятую
+        # ("Subject,From,Date") Gmail принимает как ОДНО имя заголовка, не находит
+        # его и молча отдаёт письмо без заголовков — выдача выглядит пустой.
+        url += "?" + urllib.parse.urlencode(params, doseq=True)
 
     req = urllib.request.Request(url)
     req.add_header("Authorization", f"Bearer {access_token}")
@@ -134,7 +137,7 @@ def search_account(email: str, query: str, max_results: int = 10) -> list:
         try:
             msg = gmail_api_get(access_token, f"messages/{msg_info['id']}", {
                 "format": "metadata",
-                "metadataHeaders": "Subject,From,To,Date",
+                "metadataHeaders": ["Subject", "From", "To", "Date"],
             })
 
             headers = {h["name"]: h["value"] for h in msg.get("payload", {}).get("headers", [])}

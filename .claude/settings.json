@@ -4,7 +4,7 @@
     "PYTHONUTF8": "1",
     "PYTHONIOENCODING": "utf-8",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "MCP_TIMEOUT": "120000",
+    "MCP_TIMEOUT": "30000",
     "MCP_TOOL_TIMEOUT": "180000",
     "ENABLE_TOOL_SEARCH": "auto",
     "SUPERPOWERS_DISABLE_TELEMETRY": "1"
@@ -262,22 +262,11 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash|PowerShell",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${HOME}/.claude/hooks/bash-guard.js\"",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"${HOME}/.claude/hooks/security-guard.js\"",
-            "timeout": 5
+            "command": "node \"${HOME}/.claude/hooks/guard.js\""
           }
         ]
       }
@@ -288,19 +277,6 @@
           {
             "type": "command",
             "command": "node \"${HOME}/.claude/hooks/gsd-check-update.js\"",
-            "async": true
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"${HOME}/.claude/hooks/stop-beep.js\"",
-            "timeout": 3,
             "async": true
           }
         ]
@@ -326,8 +302,8 @@
     "frontend-design@claude-plugins-official": true,
     "github@claude-plugins-official": true,
     "greptile@claude-plugins-official": true,
-    "linear@claude-plugins-official": true,
-    "notion@claude-plugins-official": true,
+    "linear@claude-plugins-official": false,
+    "notion@claude-plugins-official": false,
     "playground@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
     "plugin-dev@claude-plugins-official": true,
@@ -337,13 +313,13 @@
     "skill-creator@claude-plugins-official": true,
     "sourcegraph@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
-    "telegram@claude-plugins-official": true,
+    "telegram@claude-plugins-official": false,
     "typescript-lsp@claude-plugins-official": true,
     "claude-security@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
     "receipts@claude-plugins-official": true,
     "project-artifact@claude-plugins-official": true,
-    "pdf-viewer@knowledge-work-plugins": true,
+    "pdf-viewer@knowledge-work-plugins": false,
     "mcp-server-dev@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
@@ -404,87 +380,6 @@
         "--user-data-dir",
         "${HOME}/.claude/pw-profiles/live1"
       ]
-    },
-    "playwright-live2": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@0.0.78",
-        "--user-data-dir",
-        "${HOME}/.claude/pw-profiles/live2"
-      ],
-      "disabled": true
-    },
-    "playwright-live3": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@0.0.78",
-        "--user-data-dir",
-        "${HOME}/.claude/pw-profiles/live3"
-      ],
-      "disabled": true
-    },
-    "playwright-live4": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@0.0.78",
-        "--user-data-dir",
-        "${HOME}/.claude/pw-profiles/live4"
-      ],
-      "disabled": true
-    },
-    "playwright-live5": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@0.0.78",
-        "--user-data-dir",
-        "${HOME}/.claude/pw-profiles/live5"
-      ],
-      "disabled": true
-    },
-    "playwright-live6": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@0.0.78",
-        "--user-data-dir",
-        "${HOME}/.claude/pw-profiles/live6"
-      ],
-      "disabled": true
-    },
-    "playwright-live7": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@0.0.78",
-        "--user-data-dir",
-        "${HOME}/.claude/pw-profiles/live7"
-      ],
-      "disabled": true
-    },
-    "playwright-live8": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@0.0.78",
-        "--user-data-dir",
-        "${HOME}/.claude/pw-profiles/live8"
-      ],
-      "disabled": true
-    },
-    "playwright-live9": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@0.0.78",
-        "--user-data-dir",
-        "${HOME}/.claude/pw-profiles/live9"
-      ],
-      "disabled": true
-    },
-    "playwright-live10": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@0.0.78",
-        "--user-data-dir",
-        "${HOME}/.claude/pw-profiles/live10"
-      ],
-      "disabled": true
     },
     "pageindex": {
       "command": "npx",

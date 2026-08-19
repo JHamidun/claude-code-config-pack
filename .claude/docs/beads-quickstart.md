@@ -1,6 +1,6 @@
 # Beads — Краткий справочник
 
-> **Attribution**: [Beads](https://github.com/<author>/beads) — методология [Steve Yegge](https://github.com/<author>)
+> **Attribution**: [Beads](https://github.com/steveyegge/beads) — методология [Steve Yegge](https://github.com/steveyegge)
 
 ---
 
@@ -261,9 +261,9 @@ bd prime      # Контекст workflow
 
 ## Ссылки
 
-- [Beads GitHub](https://github.com/<author>/beads)
-- [CLI Reference](https://github.com/<author>/beads/blob/main/docs/CLI_REFERENCE.md)
-- [Molecules Guide](https://github.com/<author>/beads/blob/main/docs/MOLECULES.md)
+- [Beads GitHub](https://github.com/steveyegge/beads)
+- [CLI Reference](https://github.com/steveyegge/beads/blob/main/docs/CLI_REFERENCE.md)
+- [Molecules Guide](https://github.com/steveyegge/beads/blob/main/docs/MOLECULES.md)
 
 ---
 

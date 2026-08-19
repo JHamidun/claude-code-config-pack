@@ -18,9 +18,7 @@ H = Path.home()
 DB = H / ".claude" / "chats.db"
 CB = H / "_casebook"
 OUT = CB / "digests_db"
-OUT.mkdir(parents=True, exist_ok=True)
 
-MIN_MSGS = int(sys.argv[1]) if len(sys.argv) > 1 else 15
 USER_CAP, ASST_CAP, DIGEST_CAP = 6000, 3000, 280_000
 
 # системный/служебный шум — пропускать целиком
@@ -44,7 +42,12 @@ def clean(s):
     return s
 
 
-def build():
+def build(min_msgs=15):
+    if not DB.exists():
+        sys.exit(f"ERROR: chats.db not found at {DB}. Run search_chats.py index first.")
+    if not (CB / "all_cards_v2.json").exists():
+        sys.exit(f"ERROR: casebook not found at {CB / 'all_cards_v2.json'}.")
+    OUT.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(str(DB))
     cur = con.cursor()
     # непокрытые кейсбуком
@@ -54,7 +57,7 @@ def build():
     sessions = cur.execute(
         "SELECT session_id, created, message_count, first_prompt FROM sessions "
         "WHERE is_noise=0 AND message_count>=? AND session_id NOT LIKE 'agent-%' "
-        "ORDER BY created", (MIN_MSGS,)).fetchall()
+        "ORDER BY created", (min_msgs,)).fetchall()
     todo = [s for s in sessions if s[0].replace("cloud-", "") not in covered]
     manifest = []
     written = 0
@@ -89,9 +92,25 @@ def build():
     (OUT / "manifest.jsonl").write_text(
         "\n".join(json.dumps(m, ensure_ascii=False) for m in manifest), encoding="utf-8")
     con.close()
-    print(f"[digests-from-db] порог>={MIN_MSGS}msg  непокрытых={len(todo)}  дайджестов записано={written}  -> {OUT}")
+    print(f"[digests-from-db] порог>={min_msgs}msg  непокрытых={len(todo)}  дайджестов записано={written}  -> {OUT}")
     print(f"manifest: {OUT / 'manifest.jsonl'}")
 
 
+def main(argv=None):
+    argv = sys.argv[1:] if argv is None else argv
+    if argv and argv[0] in ("-h", "--help"):
+        print((__doc__ or "").strip())
+        return 0
+    min_msgs = 15
+    if argv:
+        try:
+            min_msgs = int(argv[0])
+        except ValueError:
+            print(f"ERROR: MIN_MSGS must be an integer, got: {argv[0]!r}", file=sys.stderr)
+            return 2
+    build(min_msgs)
+    return 0
+
+
 if __name__ == "__main__":
-    build()
+    sys.exit(main())

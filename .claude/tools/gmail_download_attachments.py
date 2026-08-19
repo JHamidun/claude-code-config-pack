@@ -93,10 +93,16 @@ def download_attachments(email, message_id, output_dir):
     return downloaded
 
 if __name__ == "__main__":
+    if any(a in ("-h", "--help") for a in sys.argv[1:]):
+        print("Usage: python gmail_download_attachments.py <email>:<message_id> <output_dir>")
+        sys.exit(0)
     if len(sys.argv) < 3:
         print("Usage: python gmail_download_attachments.py <email>:<message_id> <output_dir>")
         sys.exit(1)
 
+    if ":" not in sys.argv[1]:
+        print(f"ERROR: first argument must be <email>:<message_id>, got: {sys.argv[1]!r}", file=sys.stderr)
+        sys.exit(2)
     email, mid = sys.argv[1].split(":", 1)
     output_dir = sys.argv[2]
     os.makedirs(output_dir, exist_ok=True)

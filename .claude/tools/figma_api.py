@@ -22,19 +22,24 @@ import urllib.error
 sys.stdout.reconfigure(encoding="utf-8")
 sys.stderr.reconfigure(encoding="utf-8")
 
-# Load token
-TOKEN = os.getenv("FIGMA_ACCESS_TOKEN")
-if not TOKEN:
-    env_path = os.path.expanduser("~/.claude/.credentials.master.env")
-    if os.path.exists(env_path):
-        with open(env_path, "r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if line.startswith("FIGMA_ACCESS_TOKEN="):
-                    TOKEN = line.split("=", 1)[1].strip().strip('"').strip("'")
-                    break
+TOKEN = None  # resolved lazily in main() — never at import time
 
-TEAM_ID = "1344332887496918634"
+
+def load_token():
+    token = os.getenv("FIGMA_ACCESS_TOKEN")
+    if not token:
+        env_path = os.path.expanduser("~/.claude/.credentials.master.env")
+        if os.path.exists(env_path):
+            with open(env_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith("FIGMA_ACCESS_TOKEN="):
+                        token = line.split("=", 1)[1].strip().strip('"').strip("'")
+                        break
+    return token
+
+
+TEAM_ID = os.getenv("FIGMA_TEAM_ID", "")  # your Figma team id (from team URL)
 
 
 def figma_get(path):
@@ -62,6 +67,9 @@ def cmd_me():
 
 def cmd_projects():
     """List team projects."""
+    if not TEAM_ID:
+        print("Error: FIGMA_TEAM_ID not set (take it from your Figma team URL).", file=sys.stderr)
+        sys.exit(1)
     data = figma_get(f"teams/{TEAM_ID}/projects")
     for p in data.get("projects", []):
         print(f"  {p['name']:40s} id: {p['id']}")
@@ -171,35 +179,46 @@ def cmd_parse_url(url):
 
 
 def main():
-    if not TOKEN:
-        print("Error: FIGMA_ACCESS_TOKEN not found", file=sys.stderr)
-        print("Set it in ~/.claude/.credentials.master.env", file=sys.stderr)
-        sys.exit(1)
+    global TOKEN
 
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
         print(__doc__)
         sys.exit(0)
 
     cmd = sys.argv[1]
+
+    if cmd != "parse-url":  # parse-url is offline, no token needed
+        TOKEN = load_token()
+        if not TOKEN:
+            print("Error: FIGMA_ACCESS_TOKEN not found", file=sys.stderr)
+            print("Set it in ~/.claude/.credentials.master.env", file=sys.stderr)
+            sys.exit(1)
+
+    def arg(i, name):
+        if len(sys.argv) <= i:
+            print(f"Error: {cmd} requires <{name}>", file=sys.stderr)
+            print(__doc__)
+            sys.exit(2)
+        return sys.argv[i]
 
     if cmd == "me":
         cmd_me()
     elif cmd == "projects":
         cmd_projects()
     elif cmd == "files":
-        cmd_files(sys.argv[2])
+        cmd_files(arg(2, "project_id"))
     elif cmd == "pages":
-        cmd_pages(sys.argv[2])
+        cmd_pages(arg(2, "file_key"))
     elif cmd == "tree":
-        cmd_tree(sys.argv[2], sys.argv[3])
+        cmd_tree(arg(2, "file_key"), arg(3, "node_id"))
     elif cmd == "text":
-        cmd_text(sys.argv[2], sys.argv[3])
+        cmd_text(arg(2, "file_key"), arg(3, "node_id"))
     elif cmd == "export":
         scale = sys.argv[4] if len(sys.argv) > 4 else "2"
         fmt = sys.argv[5] if len(sys.argv) > 5 else "png"
-        cmd_export(sys.argv[2], sys.argv[3], scale, fmt)
+        cmd_export(arg(2, "file_key"), arg(3, "node_id"), scale, fmt)
     elif cmd == "parse-url":
-        cmd_parse_url(sys.argv[2])
+        cmd_parse_url(arg(2, "figma_url"))
     else:
         print(f"Unknown command: {cmd}", file=sys.stderr)
         print(__doc__)

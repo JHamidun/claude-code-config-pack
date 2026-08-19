@@ -1219,7 +1219,7 @@ def _fetch_video_comments(
         data = http.get(
             f"{SCRAPER_YT_BASE}/video/comments",
             params={"url": video_url},
-            headers=http.scraper-vendor_headers(token),
+            headers=http.scraper_vendor_headers(token),
             timeout=30,
             retries=2,
         )
@@ -1396,7 +1396,7 @@ def _sc_youtube_search(keyword: str, token: str) -> List[Dict[str, Any]]:
         data = http.get(
             f"{SCRAPER_YT_BASE}/search",
             params={"query": keyword},
-            headers=http.scraper-vendor_headers(token),
+            headers=http.scraper_vendor_headers(token),
             timeout=30,
             retries=2,
         )
@@ -1448,7 +1448,7 @@ def _sc_fetch_transcript(video_id: str, token: str) -> Optional[str]:
             data = http.get(
                 f"{SCRAPER_YT_BASE}/video/transcript",
                 params={"url": video_url},
-                headers=http.scraper-vendor_headers(token),
+                headers=http.scraper_vendor_headers(token),
                 timeout=30,
                 retries=1,
             )

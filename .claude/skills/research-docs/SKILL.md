@@ -161,7 +161,7 @@ Tell the user:
 - Нужна навигация «найди раздел про X / какая сумма в пункте Y», а не visual citations
 - Основной flow (LiteParse + полный текст в контекст) остаётся дефолтом для папок разнородных документов и отчётов с цитатами
 
-**Команды** (venv уже установлен, ключ берётся из `~/.claude/.credentials.master.env` автоматически):
+**Команды.** Движок в пак не входит: `git clone https://github.com/VectifyAI/PageIndex ~/.claude/mcps/pageindex`, поднять venv по их README и положить рядом свою обёртку `pi.py` с подкомандами index/list/tree/pages/ask. Ключ берётся из `~/.claude/.credentials.master.env`:
 
 ```bash
 PY=${HOME}/.claude/mcps/pageindex/.venv/Scripts/python.exe

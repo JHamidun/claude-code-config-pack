@@ -136,21 +136,21 @@ describe('config', () => {
 
     test('parses SSH remote URLs', () => {
       // Test the regex directly since we can't mock Bun.spawnSync easily
-      const url = 'git@github.com:<owner>/<repo>.git';
+      const url = 'git@github.com:garrytan/gstack.git';
       const match = url.match(/[:/]([^/]+)\/([^/]+?)(?:\.git)?$/);
       expect(match).not.toBeNull();
       expect(`${match![1]}-${match![2]}`).toBe('garrytan-gstack');
     });
 
     test('parses HTTPS remote URLs', () => {
-      const url = 'https://github.com/<owner>/<repo>.git';
+      const url = 'https://github.com/garrytan/gstack.git';
       const match = url.match(/[:/]([^/]+)\/([^/]+?)(?:\.git)?$/);
       expect(match).not.toBeNull();
       expect(`${match![1]}-${match![2]}`).toBe('garrytan-gstack');
     });
 
     test('parses HTTPS remote URLs without .git suffix', () => {
-      const url = 'https://github.com/<owner>/<repo>';
+      const url = 'https://github.com/garrytan/gstack';
       const match = url.match(/[:/]([^/]+)\/([^/]+?)(?:\.git)?$/);
       expect(match).not.toBeNull();
       expect(`${match![1]}-${match![2]}`).toBe('garrytan-gstack');

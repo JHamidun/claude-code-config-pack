@@ -428,6 +428,8 @@ if __name__ == "__main__":
         pass
     cmd = sys.argv[1] if len(sys.argv) > 1 else "stats"
     args = sys.argv[2:]
+    if cmd in ("-h", "--help", "help"):
+        print(__doc__); sys.exit(0)
     fn = {"build": build, "stats": stats, "neighbors": neighbors, "path": path,
           "timeline": timeline, "hubs": hubs, "orphans": orphans, "search": search,
           "dangling": dangling, "cases": cases, "gaps": gaps}.get(cmd)

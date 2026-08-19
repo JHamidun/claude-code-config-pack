@@ -43,7 +43,7 @@ def remove_object(input_video: str, mask_video: str, prompt: str,
     token = os.getenv('HUGGINGFACE_API_KEY')
 
     print(f"Connecting to VOID Space...")
-    client = Client("<author>/VOID", hf_token=token)
+    client = Client("sam-motamed/VOID", hf_token=token)
 
     print(f"Running inference ({steps} steps)...")
     result = client.predict(
@@ -80,7 +80,7 @@ Quadmask format (grayscale video):
   Pixel 127 (mid gray)  = Affected region (shadows, reflections)
   Pixel 255 (white)     = Background (keep)
 
-Demo: https://huggingface.co/spaces/<author>/VOID
+Demo: https://huggingface.co/spaces/sam-motamed/VOID
 GitHub: https://github.com/Netflix/void-model
         """
     )

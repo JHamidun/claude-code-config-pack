@@ -1,5 +1,5 @@
 ---
-description: "Google Search Console: сайты, топ поисковых запросов/страниц (клики, CTR, позиции), sitemaps. Триггеры: «search console», «GSC», «поисковые запросы google», «позиции в google». Яндекс.Вебмастер → skill yandex."
+description: "Google Search Console: сайты, топ поисковых запросов/страниц (клики, CTR, позиции), sitemaps. Триггеры: «search console», «GSC», «поисковые запросы google», «позиции в google». Яндекс.Вебмастер → отдельный навык под Яндекс (в пак не входит)."
 argument-hint: "[sites | analytics <site_url> | sitemaps <site_url>]"
 ---
 

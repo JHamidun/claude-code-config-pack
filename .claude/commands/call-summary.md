@@ -174,7 +174,7 @@ Before asking for manual input, attempt to fetch the transcript automatically.
 
 Sources (checked in order):
 
-1. **tl;dv skill** — fetch transcript by meeting title, date, or attendee name. Use skill `tldv` to list recent meetings and pull the matching transcript.
+1. **Meeting-recorder transcript** — fetch it by meeting title, date, or attendee name from whatever recorder you use (tl;dv, Granola, Fireflies, Zoom cloud). A connector for this is not shipped with the pack.
 2. **Paste raw transcript text** — if auto-fetch fails, accept pasted text from Zoom, Teams, Google Meet, or any conferencing tool.
 3. **Upload audio file** — if only a recording exists, use the `transcribe` command (Deepgram skill) to convert audio to text first, then process the resulting transcript.
 

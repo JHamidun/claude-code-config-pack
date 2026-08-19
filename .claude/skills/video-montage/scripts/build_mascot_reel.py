@@ -204,25 +204,34 @@ for (const [name, src] of Object.entries(POSES)) {{
     box.className = 'mouth';
     box.style.left = (m.cx * 100).toFixed(2) + '%';
     box.style.top  = (m.cy * 100).toFixed(2) + '%';
-    box.style.width = (m.w * 100 * 1.15).toFixed(2) + '%';
+    box.style.width = (m.w * 100 * 1.06).toFixed(2) + '%';
     box.innerHTML =
       '<svg viewBox="0 0 100 70" style="width:100%;height:auto;overflow:visible">'
       + '<defs><clipPath id="cl_' + name + '">'
       + '<ellipse class="cav" cx="50" cy="35" rx="26" ry="4"/></clipPath></defs>'
+      // Заплатка цветом кожи закрывает нарисованный рот. Без неё свой рот ложится
+      // поверх чужого: губы персонажа остаются на месте, полость появляется внутри
+      // них, и это читается как дыра, а не как открытый рот. Мягкий край — чтобы
+      // заплатка не выделялась прямоугольником на бороде.
+      + '<defs><filter id="sm_' + name + '" x="-30%" y="-30%" width="160%" height="160%">'
+      +   '<feGaussianBlur stdDeviation="1.6"/></filter></defs>'
+      + '<ellipse class="patch" cx="50" cy="35" rx="49" ry="9" fill="' + (m.skin || '#eebb9b')
+      +   '" filter="url(#sm_' + name + ')"/>'
       + '<ellipse class="cav" cx="50" cy="35" rx="26" ry="4" fill="#54202a"/>'
       + '<g clip-path="url(#cl_' + name + ')">'
       +   '<rect class="tt" x="0" y="0" width="100" height="12" fill="#f6f1ea"/>'
       +   '<rect class="tb" x="0" y="58" width="100" height="12" fill="#e8e0d6"/>'
       +   '<ellipse class="tg" cx="50" cy="66" rx="24" ry="13" fill="#c4676f"/>'
       + '</g>'
-      + '<ellipse class="lip" cx="50" cy="35" rx="26" ry="4" fill="none" '
-      +   'stroke="#20191a" stroke-width="3.4" stroke-linejoin="round"/>'
+      + '<ellipse class="lipline" cx="50" cy="35" rx="26" ry="4" fill="none" '
+      +   'stroke="#3a2a26" stroke-width="1.6" opacity="0.75"/>'
       + '</svg>';
     wrap.appendChild(box);
     mouthEls[name] = {{
       box,
       cav: box.querySelectorAll('.cav'),
-      lip: box.querySelector('.lip'),
+      patch: box.querySelector('.patch'),
+      lipline: box.querySelector('.lipline'),
       tt: box.querySelector('.tt'),
       tb: box.querySelector('.tb'),
       tg: box.querySelector('.tg'),
@@ -270,19 +279,19 @@ const ease = (t) => 1 - Math.pow(1 - Math.min(Math.max(t, 0), 1), 3);
 // зубов, tg — язык, cy — вертикальный центр: на закрытых звуках рот сидит выше, на
 // открытых челюсть уходит вниз.
 const SHAPES = {{
-  rest:   {{ rx: 25, ry: 3.0, tt: 0,  tb: 0, tg: 0,  cy: 35 }},
-  closed: {{ rx: 27, ry: 1.6, tt: 0,  tb: 0, tg: 0,  cy: 35 }},   // м, б, п
-  wide:   {{ rx: 28, ry: 21,  tt: 11, tb: 5, tg: 13, cy: 39 }},   // а, я
-  mid:    {{ rx: 26, ry: 12,  tt: 9,  tb: 3, tg: 8,  cy: 37 }},   // э, е, к, г, х, р
-  narrow: {{ rx: 29, ry: 6.5, tt: 7,  tb: 5, tg: 3,  cy: 35 }},   // и, ы, й
-  round:  {{ rx: 17, ry: 17,  tt: 4,  tb: 2, tg: 8,  cy: 37 }},   // о, ё
-  small:  {{ rx: 12, ry: 12,  tt: 2,  tb: 1, tg: 5,  cy: 36 }},   // у, ю
-  teeth:  {{ rx: 23, ry: 5.5, tt: 10, tb: 0, tg: 0,  cy: 34 }},   // ф, в
-  tongue: {{ rx: 23, ry: 11,  tt: 8,  tb: 3, tg: 14, cy: 37 }},   // л, т, д, н
-  hiss:   {{ rx: 25, ry: 5.5, tt: 8,  tb: 7, tg: 2,  cy: 35 }},   // с, з, ш, щ, ж, ц, ч
+  rest:   {{ rx: 46, ry: 1.0, tt: 0,  tb: 0, tg: 0,  cy: 35 }},
+  closed: {{ rx: 46, ry: 0.4, tt: 0,  tb: 0, tg: 0,  cy: 35 }},   // м, б, п
+  wide:   {{ rx: 44, ry: 17,  tt: 9,  tb: 4, tg: 10, cy: 39 }},   // а, я
+  mid:    {{ rx: 45, ry: 9,   tt: 8,  tb: 0, tg: 0,  cy: 37 }},   // э, е, к, г, х, р
+  narrow: {{ rx: 47, ry: 4,   tt: 6,  tb: 0, tg: 0,  cy: 36 }},   // и, ы, й
+  round:  {{ rx: 28, ry: 14,  tt: 3,  tb: 0, tg: 6,  cy: 38 }},   // о, ё
+  small:  {{ rx: 21, ry: 9,   tt: 0,  tb: 0, tg: 0,  cy: 37 }},   // у, ю
+  teeth:  {{ rx: 42, ry: 3,   tt: 7,  tb: 0, tg: 0,  cy: 35 }},   // ф, в
+  tongue: {{ rx: 40, ry: 8,   tt: 6,  tb: 0, tg: 9,  cy: 37 }},   // л, т, д, н
+  hiss:   {{ rx: 44, ry: 3,   tt: 6,  tb: 0, tg: 0,  cy: 36 }},   // с, з, ш, щ, ж, ц, ч
 }};
 // Текущее положение губ. Живёт между кадрами: губы подходят к цели, а не прыгают.
-const mouthNow = {{ rx: 25, ry: 3, tt: 0, tb: 0, tg: 0, cy: 35 }};
+const mouthNow = {{ rx: 46, ry: 1.0, tt: 0, tb: 0, tg: 0, cy: 35 }};
 
 // Затухающая пружина: значение перелетает цель и возвращается. Ровно то, чего не
 // хватало — без неё появление читается как подмена картинки, а не как движение.
@@ -363,15 +372,12 @@ function draw(t) {{
   const mm = MOUTHS[cur.pose];
   const mouthEl = mouthEls[cur.pose];
   if (mouthEl && mm) {{
-    const rx = mouthNow.rx, ry = Math.max(mouthNow.ry, 1.2);
+    const rx = mouthNow.rx, ry = Math.max(mouthNow.ry, 0.3);
     for (const e of mouthEl.cav) {{
       e.setAttribute('rx', rx.toFixed(2));
       e.setAttribute('ry', ry.toFixed(2));
       e.setAttribute('cy', mouthNow.cy.toFixed(2));
     }}
-    mouthEl.lip.setAttribute('rx', rx.toFixed(2));
-    mouthEl.lip.setAttribute('ry', ry.toFixed(2));
-    mouthEl.lip.setAttribute('cy', mouthNow.cy.toFixed(2));
     // Зубы и язык видны ровно настолько, насколько открыт рот: на сомкнутых губах
     // они не должны просвечивать сквозь контур.
     mouthEl.tt.setAttribute('height', Math.max(0, mouthNow.tt).toFixed(2));
@@ -380,6 +386,12 @@ function draw(t) {{
     mouthEl.tb.setAttribute('y', (mouthNow.cy + ry - mouthNow.tb).toFixed(2));
     mouthEl.tg.setAttribute('ry', Math.max(0.5, mouthNow.tg).toFixed(2));
     mouthEl.tg.setAttribute('cy', (mouthNow.cy + ry * 0.55).toFixed(2));
+    mouthEl.lipline.setAttribute('rx', rx.toFixed(2));
+    mouthEl.lipline.setAttribute('ry', ry.toFixed(2));
+    mouthEl.lipline.setAttribute('cy', mouthNow.cy.toFixed(2));
+    // Совсем сомкнутый рот не рисуем вовсе: видна нарисованная линия губ.
+    // Заплатка видна всегда: нарисованный рот должен быть закрыт и на сомкнутых
+    // звуках, иначе на них проступает исходная линия губ поверх нашей.
     mouthEl.box.style.opacity = 1;
   }}
   // Стикер: свой вход, чуть позже титра, чтобы глаз читал их по очереди

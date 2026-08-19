@@ -1,6 +1,8 @@
 # Skills
 
-> Reusable skill definitions that agents and commands reference. 110+ skills total.
+> Reusable skill definitions that agents and commands reference. 287 skills total
+> (77 with executable code, 210 prompt-based). The tables below are a curated
+> subset — full list: `ls ~/.claude/skills/` or `skills/CATALOG.md`.
 
 ## AI Models
 

@@ -158,7 +158,7 @@ Gap to Quota = Quota - Closed to Date - Weighted Forecast
 When Your CRM skill is connected, pull deals automatically instead of CSV:
 
 ```
-1. Use skill `crm` to fetch open deals:
+1. Fetch open deals through your CRM connector (the method names below are an example of a REST CRM API — adapt them to yours):
    - crm.deal.list with FILTER[CLOSED]=N, FILTER[CATEGORY_ID]=0
    - Fields: TITLE, OPPORTUNITY, STAGE_ID, CLOSEDATE, ASSIGNED_BY_ID, COMPANY_ID
 2. Map Your CRM stages to probabilities:

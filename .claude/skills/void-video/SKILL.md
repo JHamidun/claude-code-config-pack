@@ -32,7 +32,7 @@ pip install gradio_client
 ```python
 from gradio_client import Client
 
-client = Client("<author>/VOID", hf_token=HF_TOKEN)
+client = Client("sam-motamed/VOID", hf_token=HF_TOKEN)
 
 result = client.predict(
     input_video="path/to/input.mp4",       # Input video file
@@ -107,7 +107,7 @@ def remove_object(input_video: str, mask_video: str, prompt: str,
         Path to output video
     """
     token = os.getenv('HUGGINGFACE_API_KEY')
-    client = Client("<author>/VOID", hf_token=token)
+    client = Client("sam-motamed/VOID", hf_token=token)
     
     result = client.predict(
         input_video=input_video,
@@ -185,7 +185,7 @@ python ~/.claude/skills/void-video/void_remove.py input.mp4 mask.mp4 "Empty room
 
 ## Links
 
-- Demo: https://huggingface.co/spaces/<author>/VOID
+- Demo: https://huggingface.co/spaces/sam-motamed/VOID
 - GitHub: https://github.com/Netflix/void-model
 - Model weights: https://huggingface.co/netflix/void-model
 - Paper: VOID (Netflix Research, 2025)
