@@ -33,9 +33,10 @@ def load_env():
                 if key and not os.environ.get(key):
                     os.environ[key] = value
 
-load_env()
-
-from telethon import TelegramClient
+try:
+    from telethon import TelegramClient
+except ImportError:
+    sys.exit("ERROR: telethon is not installed. Install it with: pip install telethon")
 from telethon.tl.types import (
     Channel, Chat, User,
     MessageMediaPhoto, MessageMediaDocument, MessageMediaWebPage,
@@ -64,10 +65,29 @@ from telethon.tl.functions.account import UpdateProfileRequest
 from telethon.tl.functions.stories import GetPeerStoriesRequest
 from telethon.tl.types import ChatBannedRights
 
-API_ID = int(os.environ.get("TELEGRAM_API_ID", "YOUR_TELEGRAM_API_ID"))
-API_HASH = os.environ.get("TELEGRAM_API_HASH", "YOUR_TELEGRAM_API_HASH")
 SESSION_PATH = str(Path.home() / ".claude" / "telegram_session")
 DOWNLOAD_DIR = str(Path.home() / ".claude" / "downloads")
+
+
+def get_api_credentials():
+    """Resolve Telegram API credentials lazily — never at import time.
+
+    Returns (api_id, api_hash). Exits with a clear message if missing/invalid.
+    """
+    load_env()
+    api_id_raw = os.environ.get("TELEGRAM_API_ID", "")
+    api_hash = os.environ.get("TELEGRAM_API_HASH", "")
+    if not api_id_raw or not api_hash:
+        sys.exit(
+            "ERROR: TELEGRAM_API_ID / TELEGRAM_API_HASH are not set.\n"
+            "Get them at https://my.telegram.org/apps and put them into\n"
+            "~/.claude/.credentials.master.env (or export as environment variables)."
+        )
+    try:
+        api_id = int(api_id_raw)
+    except ValueError:
+        sys.exit(f"ERROR: TELEGRAM_API_ID must be an integer, got: {api_id_raw!r}")
+    return api_id, api_hash
 
 
 def fmt_date(dt):
@@ -4524,7 +4544,8 @@ async def main():
         parser.print_help()
         return
 
-    client = TelegramClient(SESSION_PATH, API_ID, API_HASH)
+    api_id, api_hash = get_api_credentials()
+    client = TelegramClient(SESSION_PATH, api_id, api_hash)
     await client.connect()
 
     if not await client.is_user_authorized():

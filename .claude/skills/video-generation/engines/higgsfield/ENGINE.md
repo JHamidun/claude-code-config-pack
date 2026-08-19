@@ -71,7 +71,8 @@ python assemble.py platform_export raw.mp4 final_reels.mp4
 
 ### Bootstrap
 ```bash
-HF="./bin/hf.exe"                 # bundled (относительно engines/higgsfield/; в гит НЕ коммитим — см. ../../.gitignore)
+HF="./bin/hf"                     # вендорский Go-бинарь, в репозитории его НЕТ (*.exe в .gitignore).
+                                  # Взять релиз github.com/higgsfield-ai/cli (v0.1.40+) и положить в bin/
 "$HF" account status              # courseyour-product — ultimate
 "$HF" auth login                  # только если "Session expired" (device flow)
 "$HF" model list --json           # live-каталог (51). schema: "$HF" model get <jst> --json

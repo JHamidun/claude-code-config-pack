@@ -20,7 +20,7 @@ description: "Конвертация файлов локально, без API-�
     "command": "uvx",
     "args": [
       "--from",
-      "git+https://github.com/<author>/file-converter-mcp",
+      "git+https://github.com/wowyuarm/file-converter-mcp",
       "file-converter-mcp"
     ]
   }
@@ -175,4 +175,4 @@ markitdown doc.pdf -o doc.md && python ~/.claude/scripts/text_sanitize.py doc.md
 
 ## Source
 
-GitHub: [<author>/file-converter-mcp](https://github.com/<author>/file-converter-mcp)
+GitHub: [wowyuarm/file-converter-mcp](https://github.com/wowyuarm/file-converter-mcp)

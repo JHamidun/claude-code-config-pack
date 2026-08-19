@@ -17,7 +17,7 @@ pnpm lint          # опционально
 
 Always find root cause before fixing. If you can't find it — say so honestly, don't guess.
 
-## Prime Directives (inspired by <owner>/<repo>)
+## Prime Directives (inspired by garrytan/gstack)
 
 1. **Make failures visible.** Every failure mode should be surfaced — to the system, the team, and the user. Silent failures are the hardest bugs to diagnose, so ensure all error paths are logged or exposed.
 2. **Every error has a name.** Don't say "handle errors." Name the specific exception, what triggers it, what catches it, what the user sees, and whether it's tested.

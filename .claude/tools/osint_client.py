@@ -54,8 +54,6 @@ def load_env():
                     os.environ[key] = value
 
 
-load_env()
-
 # Optional fast paths (stdlib-first, these are pure accelerators)
 try:
     import requests  # noqa
@@ -63,12 +61,11 @@ try:
 except ImportError:
     HAS_REQUESTS = False
 
-try:
-    import dns.resolver  # noqa
-    import dns.exception  # noqa
-    HAS_DNSPYTHON = True
-except ImportError:
-    HAS_DNSPYTHON = False
+# dnspython is detected WITHOUT importing it: on Windows importing dns.resolver
+# pulls win32com/WMI and writes a gen_py codegen cache into TEMP — a side effect
+# we must not trigger on --help. The real import happens lazily in dns_via_dnspython().
+import importlib.util
+HAS_DNSPYTHON = importlib.util.find_spec("dns") is not None
 
 
 UA = "osint-client/1.0 (OSINT recon CLI; public-sources only)"
@@ -535,6 +532,8 @@ def cmd_ip(args):
 # ========== dns ==========
 
 def dns_via_dnspython(domain, rtypes, timeout=DEFAULT_TIMEOUT):
+    import dns.resolver
+    import dns.exception
     resolver = dns.resolver.Resolver()
     resolver.lifetime = timeout
     resolver.timeout = timeout
@@ -1788,6 +1787,7 @@ def main():
     if not getattr(args, "command", None):
         parser.print_help()
         return 1
+    load_env()
     try:
         # requests/urllib turn a non-positive timeout into an internal ValueError that
         # then gets retried and printed twice - reject it up front instead.

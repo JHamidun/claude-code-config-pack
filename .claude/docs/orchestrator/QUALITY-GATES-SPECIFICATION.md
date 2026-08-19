@@ -13,7 +13,7 @@ This document defines **Quality Gates** for all orchestrated workflows in our Cl
 
 **Key Principle**: Block progression on critical failures, warn on non-critical issues.
 
-**Source**: Research from <author>/claude-code-sub-agent-collective
+**Source**: Research from vanzan01/claude-code-sub-agent-collective
 
 ---
 

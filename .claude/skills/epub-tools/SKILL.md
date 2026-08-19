@@ -256,7 +256,7 @@ markdown_to_epub(
 
 ## Notes
 
-- Based on [ebooklib](https://github.com/<author>/ebooklib) (EPUB2/EPUB3 support)
+- Based on [ebooklib](https://github.com/aerkalov/ebooklib) (EPUB2/EPUB3 support)
 - Kindle: convert EPUB → MOBI via `calibre` or send EPUB to Kindle email
 - For large books, read chapter-by-chapter to manage context
 - Complements existing PDF skills in `document-skills/pdf/`

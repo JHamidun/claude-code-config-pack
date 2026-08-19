@@ -50,7 +50,7 @@ openwiki требует LLM-провайдера. Порядок предпоч�
    ```sh
    OPENWIKI_PROVIDER=openai-chatgpt openwiki code --init   # браузер-логин auth.openai.com
    ```
-2. **Локальный гейтвей (0 токенов)** — `openai-compatible` на `http://127.0.0.1:GATEWAY_PORT/openai/v1` (Codex-backed, см. skill `local-gateway`):
+2. **Локальный гейтвей (0 токенов)** — `openai-compatible` на `http://127.0.0.1:GATEWAY_PORT/openai/v1` (Codex-backed; свой локальный OpenAI-совместимый прокси, в пак не входит):
    ```sh
    OPENWIKI_PROVIDER=openai-compatible
    OPENAI_COMPATIBLE_API_KEY=local            # гейтвей игнорит значение, но поле обязательно

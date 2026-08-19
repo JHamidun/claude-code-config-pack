@@ -922,6 +922,13 @@ def cmd_check_select(phrase, skills):
 # Main
 # ---------------------------------------------------------------------------
 def main():
+    if sys.argv[1:] and sys.argv[1] in ("-h", "--help"):
+        print("Usage: python config_lint.py [--check-select \"phrase\"] [--probe-mcp]")
+        print("Read-only lint of ~/.claude config: counters, token weights (TILE), hygiene.")
+        print("  --check-select \"phrase\"  which skills a phrase would match")
+        print("  --probe-mcp              re-probe MCP servers (slow stdio handshake)")
+        return
+
     enc, mode = build_encoder()
 
     skills, broken = collect_skills()

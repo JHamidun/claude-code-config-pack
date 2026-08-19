@@ -647,7 +647,7 @@ _OPENCLAW_KEY_NAMES = [
 ]
 
 
-def run_your-gateway-project_setup(config: Dict[str, Any]) -> Dict[str, Any]:
+def run_your_gateway_project_setup(config: Dict[str, Any]) -> Dict[str, Any]:
     """Server-side setup probe: no cookies, tool + key availability, Digg CLI.
 
     Best-effort installs digg-pp-cli when npx is available (same as desktop
@@ -703,7 +703,7 @@ _DEVICE_BASE = "https://api.your-scraper.example/v1/github/device"
 _DEVICE_CODE_RE = re.compile(r"^[0-9A-Z]{4}-[0-9A-Z]{4}$")
 
 
-def _existing_scraper-vendor_key() -> Optional[str]:
+def _existing_scraper_vendor_key() -> Optional[str]:
     """Return the SCRAPER_API_KEY already saved in the .env, if any."""
     try:
         from . import env as _env
@@ -891,7 +891,7 @@ def _start_device_flow() -> "Tuple[Dict[str, Any], Optional[Dict[str, Any]]]":
 
     # Already-registered short-circuit: a saved key means no device dance. The
     # key is returned raw here and masked at the CLI boundary before print.
-    existing = _existing_scraper-vendor_key()
+    existing = _existing_scraper_vendor_key()
     if existing:
         return (
             {

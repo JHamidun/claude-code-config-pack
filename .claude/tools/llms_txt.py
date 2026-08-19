@@ -206,6 +206,9 @@ def parse(text: str) -> dict:
 
 # ------------------------------ CLI ------------------------------
 def _cli(argv) -> int:
+    if any(a in ("-h", "--help") for a in argv[1:]):
+        print(__doc__.split("CLI:")[-1].strip())
+        return 0
     args = [a for a in argv[1:] if not a.startswith("--")]
     flags = {a for a in argv[1:] if a.startswith("--")}
     if not args:

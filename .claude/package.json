@@ -1,0 +1,10 @@
+{
+  "name": "claude-config-mcp-runtime",
+  "private": true,
+  "description": "Локальные пакеты MCP-серверов. Ставятся по желанию: без них серверы всё равно работают через npx, но каждый разворачивается в 5 процессов ОС вместо 2. Установка: npm install --prefix ~/.claude",
+  "dependencies": {
+    "@modelcontextprotocol/server-filesystem": "*",
+    "@playwright/mcp": "*",
+    "chrome-devtools-mcp": "*"
+  }
+}

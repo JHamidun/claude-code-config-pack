@@ -41,6 +41,28 @@ if (!fs.existsSync(cacheDir)) {
   fs.mkdirSync(cacheDir, { recursive: true });
 }
 
+// Спрашивать реестр не чаще раза в сутки.
+//
+// Раньше проверка запускалась при КАЖДОМ старте сессии: результат в кэш писался,
+// но обратно не читался. При десятке параллельных сессий это десяток запусков npm
+// с сетевым запросом — ровно в тот момент, когда поднимается всё остальное.
+// Новая версия пакета не появляется чаще раза в день, так что суточного окна
+// достаточно, а стоимость старта падает до нуля во всех сессиях, кроме первой.
+const CHECK_EVERY_SEC = 24 * 60 * 60;
+try {
+  if (fs.existsSync(cacheFile)) {
+    const prev = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
+    const age = Math.floor(Date.now() / 1000) - (prev.checked || 0);
+    if (age >= 0 && age < CHECK_EVERY_SEC) {
+      // Свежий ответ уже есть — отдаём его и в сеть не идём.
+      process.stdout.write(JSON.stringify(prev));
+      process.exit(0);
+    }
+  }
+} catch (e) {
+  // Кэш нечитаем — просто проверяем заново, это не повод падать.
+}
+
 // Run check in background (spawn background process, windowsHide prevents console flash)
 const child = spawn(process.execPath, ['-e', `
   const fs = require('fs');

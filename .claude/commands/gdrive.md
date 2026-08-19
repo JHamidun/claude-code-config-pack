@@ -1,74 +1,26 @@
 ---
-description: "Google Drive: список последних файлов, поиск по имени, чтение и метаданные файла (Drive API v3). Триггеры: «google drive», «гугл диск», «найди файл на диске», «файлы drive». НЕ Яндекс.Диск → skill yandex."
-argument-hint: "[list <N> | search <запрос> | read <file_id> | info <file_id>]"
+description: "Google Drive: что в папке, поиск файла, скачать файл или папку, залить. Триггеры: «google drive», «гугл диск», «найди файл на диске», «скачай с диска», «расшаренная папка». НЕ Яндекс.Диск → отдельный навык под Яндекс (в пак не входит). Полный набор Workspace → skill google-workspace."
+argument-hint: "[ls <id|ссылка> | find <запрос> | get <id> -o <папка> | pull <id> -o <папка>]"
 ---
 
-# Google Drive Operations
+# /gdrive
 
-/gdrive - Работа с Google Drive
+Рабочий клиент — `~/.claude/tools/gdrive_client.py`.
 
-## Описание
-Поиск, чтение и управление файлами на Google Drive пользователя.
-
-## Использование
-```
-/gdrive list [количество]     - Список последних файлов
-/gdrive search <запрос>       - Поиск файлов по имени
-/gdrive read <file_id>        - Прочитать содержимое файла
-/gdrive info <file_id>        - Информация о файле
+```bash
+python ~/.claude/tools/gdrive_client.py ls <id_или_ссылка> [--recursive]
+python ~/.claude/tools/gdrive_client.py find "вебинар"
+python ~/.claude/tools/gdrive_client.py get <id_файла> -o ./куда/
+python ~/.claude/tools/gdrive_client.py pull <id_папки> -o ./куда/ --ext mp4,m4a --min-mb 5
+python ~/.claude/tools/gdrive_upload.py upload <локальная_папка> <имя_на_диске>
 ```
 
-## Инструкции для Claude
+Принимает ссылку целиком — идентификатор вынимается сам. Права — из
+`~/.claude/google_oauth_token.json` (скоуп `drive`, чтение и запись).
 
-При вызове этой команды:
+За подробностями — Skill `google-workspace`.
 
-1. **Загрузи OAuth токен:**
-```python
-import json
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
-
-with open('${HOME}/.claude/google_oauth_token.json', 'r') as f:
-    token_data = json.load(f)
-creds = Credentials.from_authorized_user_info(token_data)
-drive = build('drive', 'v3', credentials=creds)
-```
-
-2. **Операции:**
-
-**Список файлов:**
-```python
-results = drive.files().list(
-    pageSize=10,
-    fields='files(id, name, mimeType, modifiedTime, size)'
-).execute()
-```
-
-**Поиск:**
-```python
-results = drive.files().list(
-    q=f"name contains '{query}'",
-    pageSize=20,
-    fields='files(id, name, mimeType)'
-).execute()
-```
-
-**Информация о файле:**
-```python
-file = drive.files().get(
-    fileId=file_id,
-    fields='id,name,mimeType,size,createdTime,modifiedTime,webViewLink'
-).execute()
-```
-
-3. **Типы файлов Google:**
-- `application/vnd.google-apps.document` - Google Doc
-- `application/vnd.google-apps.spreadsheet` - Google Sheet
-- `application/vnd.google-apps.presentation` - Google Slides
-
-4. **Для чтения содержимого Google Docs/Sheets** используй соответствующие API (Docs API, Sheets API).
-
-## Примеры
-- `/gdrive list 5` - показать 5 последних файлов
-- `/gdrive search отчёт` - найти файлы со словом "отчёт"
-- `/gdrive read 1abc...xyz` - прочитать файл по ID
+> Здесь лежал inline-код `files().list()` БЕЗ `supportsAllDrives` и
+> `includeItemsFromAllDrives`. Без этих двух флагов API молча скрывает всё, что
+> лежит на общих дисках: папка выглядит пустой, хотя файлы в ней есть. В клиенте
+> флаги проставлены — и в списке, и при скачивании. Код удалён.

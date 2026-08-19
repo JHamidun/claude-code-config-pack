@@ -200,7 +200,7 @@ Specific CRITICAL patterns to scan for (complement Phase 2):
 - `Math.random()` used for secrets/tokens → require `crypto.randomUUID()` / CSPRNG
 - Missing `.includes()` / eager loading in loops (N+1 variant)
 
-**Suppressions — DO NOT flag these** (noise control, from <owner>/<repo>):
+**Suppressions — DO NOT flag these** (noise control, from garrytan/gstack):
 
 - Redundant checks that aid readability (e.g., `!= null` when already checked)
 - "Add a comment explaining this threshold" — thresholds change, comments rot

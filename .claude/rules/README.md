@@ -21,8 +21,14 @@
 | `scaling` | Decision tree: when 1 agent, when orchestrator |
 | `security` | API key handling, credential safety |
 | `security-hardening` | Sandbox, audit logging, commercial deployment |
-| `try-before-refusing` | Проверить инструментом, прежде чем сказать «не могу» |
+| `task-tracking` | Живой список задач: разбивка на подзадачи, вычёркивание по ходу |
+| `where-to-look` | Где искать, если ответа нет сходу: конфиг → память → история чатов → система |
+| `try-before-refusing` | Стоп-лист фраз отказа: назвать пару «инструмент → результат», дождаться фоновых проверок |
 | `user-profile` | User identity, contacts, preferences |
+
+> `try-before-refusing` сокращён до стоп-листа (~680 токенов); обоснование, ступени
+> результата и список «когда человек действительно нужен» →
+> `config/rules-ref/try-before-refusing-full.md` (по требованию).
 
 ## Перенесено в config/rules-ref/ (справочники, по требованию)
 

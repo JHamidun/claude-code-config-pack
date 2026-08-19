@@ -525,8 +525,8 @@ This ecosystem is built on patterns from:
 - [GoatReview Tutorial](https://goatreview.com/how-to-use-claude-code-subagents-tutorial/)
 
 **Repositories**:
-- [<author>/claude-code-sub-agent-collective](https://github.com/<author>/claude-code-sub-agent-collective) - Hub-and-spoke, quality gates
-- [<author>/claude-sub-agent](https://github.com/<author>/claude-sub-agent) - Spec-driven workflows
+- [vanzan01/claude-code-sub-agent-collective](https://github.com/vanzan01/claude-code-sub-agent-collective) - Hub-and-spoke, quality gates
+- [zhsama/claude-sub-agent](https://github.com/zhsama/claude-sub-agent) - Spec-driven workflows
 
 **Official**:
 - [Claude Code Skills Documentation](https://docs.claude.com/en/docs/claude-code/skills)

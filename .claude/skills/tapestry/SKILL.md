@@ -123,7 +123,7 @@ Knowledge graphs are saved as Markdown files in the project directory:
 
 ## Notes
 
-- Based on [tapestry-skills-for-claude-code](https://github.com/<author>/tapestry-skills-for-claude-code)
+- Based on [tapestry-skills-for-claude-code](https://github.com/michalparkola/tapestry-skills-for-claude-code)
 - Works best with 3-10 sources on a related topic
 - Can be combined with vector_memory for persistent knowledge storage
 - For visual graphs, use Mermaid diagrams or excalidraw-flowchart skill

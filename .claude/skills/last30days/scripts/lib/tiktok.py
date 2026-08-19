@@ -191,7 +191,7 @@ def _hashtag_search(
         data = http.get(
             f"{SCRAPER_BASE}/search/hashtag",
             params={"hashtag": hashtag},
-            headers=http.scraper-vendor_headers(token),
+            headers=http.scraper_vendor_headers(token),
             timeout=30,
             retries=2,
         )
@@ -225,7 +225,7 @@ def _profile_videos(
         data = http.get(
             profile_url,
             params={"handle": handle, "sort_by": "latest"},
-            headers=http.scraper-vendor_headers(token),
+            headers=http.scraper_vendor_headers(token),
             timeout=30,
             retries=2,
         )
@@ -269,7 +269,7 @@ def search_tiktok(
         data = http.get(
             f"{SCRAPER_BASE}/search/keyword",
             params={"query": core_topic, "sort_by": "relevance"},
-            headers=http.scraper-vendor_headers(token),
+            headers=http.scraper_vendor_headers(token),
             timeout=30,
             retries=2,
         )
@@ -362,7 +362,7 @@ def fetch_captions(
                 data = http.get(
                     f"{SCRAPER_BASE}/video/transcript",
                     params={"url": url},
-                    headers=http.scraper-vendor_headers(token),
+                    headers=http.scraper_vendor_headers(token),
                     timeout=15,
                     retries=1,
                 )
@@ -560,7 +560,7 @@ def _fetch_post_comments(
         data = http.get(
             f"{SCRAPER_BASE}/video/comments",
             params={"url": post_url, "trim": "true"},
-            headers=http.scraper-vendor_headers(token),
+            headers=http.scraper_vendor_headers(token),
             timeout=30,
             retries=2,
         )

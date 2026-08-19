@@ -2,7 +2,7 @@
 """Анализ ключевых слов для русского текста с учётом словоформ.
 
 Русский флективный — «нейросеть/нейросети/нейросетью» = одно ключевое.
-Если установлен pymorphy2 — лемматизируем; иначе грубая нормализация
+Если установлен pymorphy3 (или pymorphy2 на Python<3.11) — лемматизируем; иначе грубая нормализация
 по общему корню (отрезаем типовые окончания). Считаем плотность,
 распределение по тексту, риск переспама.
 
@@ -21,10 +21,14 @@ except Exception:
     pass
 
 try:
-    import pymorphy2
-    _MORPH = pymorphy2.MorphAnalyzer()
+    import pymorphy3 as _pymorphy
+    _MORPH = _pymorphy.MorphAnalyzer()
 except Exception:
-    _MORPH = None
+    try:
+        import pymorphy2 as _pymorphy  # legacy; broken on Python >= 3.11 (inspect.getargspec)
+        _MORPH = _pymorphy.MorphAnalyzer()
+    except Exception:
+        _MORPH = None
 
 _ENDINGS = ("ами", "ями", "ого", "его", "ому", "ему", "ыми", "ими",
             "ах", "ях", "ам", "ям", "ом", "ем", "ой", "ей", "ую", "юю",
@@ -101,7 +105,7 @@ def analyze(text: str, keywords):
             "distribution_quarters": dist,
             "even": all(d > 0 for d in dist) if cnt else False,
         })
-    return {"total_words": total, "lemmatizer": "pymorphy2" if _MORPH else "fallback", "keywords": out}
+    return {"total_words": total, "lemmatizer": _pymorphy.__name__ if _MORPH else "fallback", "keywords": out}
 
 
 def main():

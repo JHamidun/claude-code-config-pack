@@ -9,7 +9,7 @@ description: "Операционные процедуры флота your-server
 
 Скилл даёт две вещи: **канон процедуры** (как её записать, чтобы её можно было выполнить в три ночи и откатить) и **готовые процедуры** под этот флот.
 
-Смежное, НЕ дублировать здесь: базовые проверки сервера → skill `server-health`; конфиг/деплой/провайдеры/53 гочи Hermes и OpenClaw → skill agent-builder tooling; специфика OpenClaw-контейнеров → skill `your-gateway-project-ops`; мониторы → skill `uptime-kuma-ops`; откат правок в коде по changes-log → skill `rollback-changes`.
+Смежное, НЕ дублировать здесь: базовые проверки сервера → skill `server-health`; конфиг/деплой/провайдеры/53 гочи Hermes и OpenClaw → skill agent-builder tooling; специфика контейнеров конкретного бот-рантайма → свой ops-навык (в пак не входит); мониторы → skill `uptime-kuma-ops`; откат правок в коде по changes-log → skill `rollback-changes`.
 
 ## Канон процедуры
 

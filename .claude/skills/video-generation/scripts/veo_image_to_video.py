@@ -34,8 +34,11 @@ os.environ.pop("GEMINI_API_KEY", None)
 from google import genai
 from google.genai import types
 
-DEFAULT_MODEL = "veo-3.0-fast-generate-001"   # Veo 3.0 Fast — default (STABLE, verified via ListModels)
-FULL_MODEL = "veo-3.0-generate-001"           # Veo 3.0 Full (4× slower, 4× cost)
+DEFAULT_MODEL = "veo-3.1-fast-generate-preview"  # проверено ListModels 2026-08-17
+# Ранее здесь стояли veo-3.0-*-001: на текущем ключе их БОЛЬШЕ НЕТ — API отвечает
+# 404 "not found for API version v1beta, or is not supported for predictLongRunning".
+# Живых video-моделей ровно три, все preview: veo-3.1-{generate,fast-generate,lite-generate}-preview.
+FULL_MODEL = "veo-3.1-generate-preview"        # Full (медленнее и дороже Fast)
 # Veo 3.1 exists ONLY as preview ids on this key: veo-3.1-fast-generate-preview /
 # veo-3.1-generate-preview / veo-3.1-lite-generate-preview (NOT "-001"). Swap if you want 3.1.
 PARALLEL_CAP = 3                              # empirical reliable ceiling
@@ -144,13 +147,14 @@ def main() -> int:
     ap.add_argument("--aspect", default="9:16", choices=["9:16", "16:9", "1:1", "21:9"])
     ap.add_argument("--duration", type=int, default=8, choices=[4, 6, 8])
     ap.add_argument("--full", action="store_true", help="Use Veo 3.1 Full instead of Fast")
+    ap.add_argument("--model", help="Явный id модели; перебивает --full. Список: client.models.list()")
     ap.add_argument("--workers", type=int, default=PARALLEL_CAP,
                     help=f"Parallelism (default={PARALLEL_CAP}, empirical Veo ceiling)")
     ap.add_argument("--max-retries", type=int, default=2,
                     help="Soften-and-retry attempts on safety filter (default=2)")
     args = ap.parse_args()
 
-    model = FULL_MODEL if args.full else DEFAULT_MODEL
+    model = args.model or (FULL_MODEL if args.full else DEFAULT_MODEL)
     clips = json.loads(Path(args.clips_json).read_text(encoding="utf-8"))
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)

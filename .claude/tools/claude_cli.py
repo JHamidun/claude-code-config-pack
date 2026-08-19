@@ -290,18 +290,31 @@ def validate_response(
 
 
 # CLI entrypoint for quick testing
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python claude_cli.py 'your prompt here' [--model MODEL]")
-        print(f"CLI path: {CLAUDE_CLI_PATH or 'not found'}")
-        sys.exit(1)
+def _print_usage():
+    print("Usage: python claude_cli.py 'your prompt here' [--model MODEL]")
+    print("Calls the live claude CLI binary (needs Claude Code installed and authenticated).")
+    print(f"CLI path: {CLAUDE_CLI_PATH or 'not found'}")
 
-    prompt_text = sys.argv[1]
+
+if __name__ == "__main__":
+    argv = sys.argv[1:]
+    if not argv:
+        _print_usage()
+        sys.exit(1)
+    if argv[0] in ("-h", "--help"):
+        _print_usage()
+        sys.exit(0)
+    if argv[0].startswith("-"):
+        print(f"ERROR: expected a prompt as the first argument, got option {argv[0]!r}", file=sys.stderr)
+        _print_usage()
+        sys.exit(2)
+
+    prompt_text = argv[0]
     model_name = "claude-sonnet-4-5"
 
-    if "--model" in sys.argv:
-        idx = sys.argv.index("--model")
-        if idx + 1 < len(sys.argv):
-            model_name = sys.argv[idx + 1]
+    if "--model" in argv:
+        idx = argv.index("--model")
+        if idx + 1 < len(argv):
+            model_name = argv[idx + 1]
 
     print(claude(prompt_text, model=model_name))

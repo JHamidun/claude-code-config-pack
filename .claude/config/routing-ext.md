@@ -64,32 +64,8 @@
 | Cloud Translation | "переведи через google", "gtranslate" | Command `gtranslate` |
 | Cloud Storage | "GCS", "бакеты", "gcloud storage" | Command `gcloud-storage` |
 | Telegram бот (разработка) | "бот", "telegram бот", "напиши бота", "handlers", "scenes", "deploy бота" | Skill `telegram-bot-toolkit` |
-| Публикация через бота (Bot API) | "опубликуй через бота", "пост в канал от бота", "бот-админ канала", "кнопка к посту в канале", "rich-пост с таблицей", "таблица/заголовок в тг-посте", "рассылка подписчикам бота", "отправь подписчику в личку", "опрос от бота", "платный пост Stars", "инвайт-ссылка бот", "почему updates молчит", "вебхук бота", "tg_bot.py" | Skill `tg-bot-publish`, CLI: `python ~/.claude/tools/tg_bot.py` (+ TG_BOT_CAPABILITIES.md, TG_BOT_API_REFERENCE.md) |
-| MAX переписка | "чат в максе", "max chat", "прочитай макс" | `python ~/.claude/tools/max_client.py read-chat <target>` |
-| MAX каналы | "канал в максе", "max channel", "посты макс" | `python ~/.claude/tools/max_client.py parse-channel <@username>` |
-| MAX поиск каналов | "найди канал макс", "public search max" | `python ~/.claude/tools/max_client.py public-search <query>` |
-| MAX глобальный поиск | "поиск в максе", "max search" | `python ~/.claude/tools/max_client.py global-search <query>` |
-| MAX участники | "участники макс", "members max" | `python ~/.claude/tools/max_client.py parse-members <@username>` |
-| MAX статистика | "статистика макс канала" | `python ~/.claude/tools/max_client.py channel-stats <@username>` |
-| MAX отправить | "напиши в макс", "отправь в max" | `python ~/.claude/tools/max_client.py send <chat_id> "text"` |
-| MAX файл | "отправь файл в макс" | `python ~/.claude/tools/max_client.py send-file <chat_id> <file>` |
-| MAX юзер инфо | "кто это в максе", "max user info" | `python ~/.claude/tools/max_client.py user-info <user_id>` |
-| MAX онлайн | "онлайн ли в максе", "max online" | `python ~/.claude/tools/max_client.py online-status <user_id>` |
-| MAX поиск телефон | "найди в максе по телефону" | `python ~/.claude/tools/max_client.py search-phone <phone>` |
-| MAX вступить | "вступи в канал макс" | `python ~/.claude/tools/max_client.py join <@username>` |
-| MAX экспорт | "экспортируй чат макс" | `python ~/.claude/tools/max_client.py export-chat <chat_id>` |
-| MAX папки | "папки макс" | `python ~/.claude/tools/max_client.py folders` |
-| MAX устройства | "устройства макс", "сессии max" | `python ~/.claude/tools/max_client.py active-sessions` |
-| MAX слушать | "слушай макс", "listen max" | `python ~/.claude/tools/max_client.py listen [--ai]` |
-| MAX рассылка | "рассылка макс", "broadcast max" | `python ~/.claude/tools/max_client.py broadcast "text" --targets` |
-| MAX упоминания | "упоминания макс", "mentions max" | `python ~/.claude/tools/max_client.py mentions` |
-| MAX медиа | "медиа из макс чата", "фото макс" | `python ~/.claude/tools/max_client.py chat-media <chat_id>` |
-| MAX профиль | "обнови био макс", "max bio" | `python ~/.claude/tools/max_client.py set-bio/set-name/set-photo` |
-| MAX группа | "создай группу макс" | `python ~/.claude/tools/max_client.py create-group "name" <user_ids>` |
-| MAX канал создать | "создай канал макс" | `python ~/.claude/tools/max_client.py create-channel "name"` |
-| MAX архив | "архивируй макс чат" | `python ~/.claude/tools/max_client.py archive/unarchive <chat_id>` |
-| MAX мьют | "замьють макс" | `python ~/.claude/tools/max_client.py mute/unmute <chat_id>` |
-| MAX блок | "заблокируй в максе" | `python ~/.claude/tools/max_client.py block/unblock <user_id>` |
+| Публикация через бота (Bot API) | "опубликуй через бота", "пост в канал от бота", "бот-админ канала", "кнопка к посту в канале", "rich-пост с таблицей", "таблица/заголовок в тг-посте", "рассылка подписчикам бота", "отправь подписчику в личку", "опрос от бота", "платный пост Stars", "инвайт-ссылка бот", "почему updates молчит", "вебхук бота", "tg_bot.py" | Skill `tg-bot-publish`, CLI: `python ~/.claude/tools/tg_bot.py` (+ TG_BOT_API_REFERENCE.md) |
+| MAX мессенджер | "чат в максе", "max chat", "канал в максе", "напиши в макс", "поиск в максе", "экспортируй чат макс" | Неофициальный клиент MAX в пак НЕ входит (нужен свой `max_client.py` поверх их web-API). Ближайшие поставляемые аналоги: Skill `whatsapp-client`, Skill `telegram-bot-toolkit` |
 | N8N | "автоматизация", "workflow" | Skill `n8n` |
 | CEO Council | "совет директоров", "ceo council", "стратегическое решение", "параллельные эксперты", "мнения экспертов" | Skill `ceo-council` |
 | Investor Materials | "питч-дек", "investor", "one-pager", "финмодель", "инвестор", "фандрейзинг", "pitch deck" | Skill `investor-materials` |
@@ -120,7 +96,7 @@
 | Фронтенд | "React", "UI", "компонент" | Agent `frontend-dev` |
 | Бэкенд | "API", "endpoint" | Agent `backend-dev` |
 | БД | "миграция", "schema", "SQL" | Command `setup-db` |
-| CI/CD | "pipeline", "docker" | Agent `devops-engineer`, Skill `senior-devops` — graveyard-стаб 2026-07-18 (no-op шаблон) |
+| CI/CD | "pipeline", "docker" | Agent `devops-engineer` |
 | Презентация | "слайды", "презентация", "pitch deck", "whiteboard", "маркерная доска" | Agent `slide-designer`, Skill `manus-slides`, Command `slides` |
 | Manus Slides | "manus slides", "html slides", "html презентация" | Skill `manus-slides`, Command `slides` |
 | Marp слайды | "marp", "slides from markdown", "слайды из markdown" | Skill `marp-presentations` |
@@ -135,7 +111,7 @@
 | Код-ревью | "проверь код", "ревью", "review" | Agent `code-reviewer` (skill-стаб в graveyard 2026-07-18), Plugin `pr-review-toolkit` |
 | Ошибки/баги | "ошибка", "error", "stack trace", "не работает" | Agent `error-handler` |
 | Бизнес-анализ | "бизнес-анализ", "market sizing", "ROI", "stakeholder mapping" | Agent `business-analyst` |
-| DevOps | "CI/CD", "docker", "pipeline", "infrastructure" | Agent `devops-engineer` (skill senior-devops = graveyard-стаб) |
+| DevOps | "CI/CD", "docker", "pipeline", "infrastructure" | Agent `devops-engineer` |
 | Интеграции | "интеграция", "webhook", "third-party API" | Agent `integration-dev` |
 | Kimi алгоритмы | "алгоритм", "data structure", "computational", "kimi" | Agent `kimi-algorithm-specialist` |
 | Memory agent | "запомни контекст", "memory agent", "long-term memory" | Agent `memory-agent` |
@@ -276,7 +252,7 @@
 | Бренд | "бренд", "brand voice", "tone of voice" | Skill `brand-voice`, Command `brand-review` |
 | Маркетинг аналитика | "маркетинг отчёт", "performance report", "ROAS", "CPL" | Skill `performance-analytics`, Command `performance-report` |
 | Браузер (dev) | "открой в браузере", "dev browser", "browse with cookies" | Skill `dev-browser` (лёгкий, с куками) / Plugin `playwright` (полный) |
-| Браузер (gstack) | "gstack browse", "browse fast", "скриншот headless", "быстрый браузер" | `~/.claude/skills/gstack/browse/dist/browse.exe` (~100ms/cmd, daemon auto-start) |
+| Браузер (gstack) | "gstack browse", "browse fast", "скриншот headless", "быстрый браузер" | `~/.claude/skills/gstack/browse/dist/browse` (~100ms/cmd, daemon auto-start). Бинаря в репозитории нет (`*.exe` в .gitignore) — собрать из исходников: `cd ~/.claude/skills/gstack && bun install && bun run build` |
 | Алгоритм-арт | "generative art", "алгоритмическое искусство", "p5.js art" | Skill `algorithmic-art` |
 | API документация | "API docs", "swagger", "openapi", "postman collection" | Skill `api-documentation` |
 | Apify скрапинг | "apify", "scrape website", "actors" | Skill `apify-scraping` |

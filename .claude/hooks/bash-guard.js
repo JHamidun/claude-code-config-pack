@@ -133,7 +133,7 @@
  *    субпути разрешены, иначе гард встанет поперёк ежедневной работы.
  *    Исключение — системные папки (rm-sysdir) и выход наверх через «..».
  *
- * Проверки: bash-guard.test.mjs рядом (70 команд + 5 контрактных).
+ * Проверки: bash-guard.test.mjs рядом (85 команд + 5 контрактных).
  * Запуск: node bash-guard.test.mjs   ·   замер: node bash-guard.test.mjs --bench
  */
 'use strict';
@@ -194,6 +194,21 @@ try {
   const DKR  = '\\bdocker(?:\\.exe)?\\s+' + DKRFLAGS;          // `docker <sub>`
   const DKRC = '\\bdocker(?:\\.exe)?[\\s-]+' + DKRFLAGS;       // `docker compose` AND `docker-compose`
 
+  // Префикс шелл-стока в конвейере. Все правила «скачать/декодировать | шелл»
+  // якорили сток на ГОЛОЕ имя (sh|bash|…), поэтому `curl … | /bin/sh`,
+  // `base64 -d | sudo bash`, `printf … | env sh` пролезали — классический
+  // install-script RCE и его вариации (состязательный прогон 2026-08-18, вторая
+  // партия). Триггер-сторона это уже учитывала (WRAP/PATHPFX); симметрично
+  // добавляем СТОК-сторону: необязательная цепочка безобидных обёрток, которые
+  // сами ничего не делают, лишь запускают следующий аргумент, плюс путь до имени.
+  // Обёртки-исполнители чужого (xargs/find/sudo -в TEXTDISP-смысле) тут наоборот
+  // НУЖНЫ — мы ищем шелл ЗА ними, а не пропускаем сегмент.
+  // Внешний повтор ОГРАНИЧЕН {0,3}: без границы обёртка-слово могла разбираться и
+  // как аргумент предыдущей обёртки, а безграничный внешний `*` на входе вида
+  // `sudo sudo … sudo` давал катастрофический бэктрекинг (ReDoS вешал хук на
+  // КАЖДЫЙ вызов Bash). Реальные цепочки — 1-2 обёртки, {0,3} с запасом.
+  const SHWRAP = '(?:(?:sudo|doas|env|nohup|timeout|stdbuf|setsid|command|exec|nice|ionice|unbuffer|time)(?:\\s+[^\\s;&|]{1,64}){0,4}\\s+){0,3}';
+  const SHPFX  = '(?:[\\w.$~-]*\\/)*';   // /bin/, /usr/bin/, ./
   const P = [
     // Tier 1: root / home / drive roots (subpaths ALLOWED)
     { id: 'rm-root',    re: new RegExp(RM + Q + '(?:\\/|c:\\\\?|\\/c)' + TERM, 'i'), why: 'rm -rf корня / C:\\ / /c/' },
@@ -260,7 +275,7 @@ try {
     // download|execute (remote code exec)
     // span: правило-конвейер — обязано видеть строку целиком (улика в связке
     // «скачать | исполнить», разрезание по | её уничтожает).
-    { id: 'curl-pipe-exec', span: true, re: /\b(curl|wget|iwr|invoke-webrequest)\b[^\n]*(\||;|&&)\s*(sh|bash|zsh|iex\b|invoke-expression\b|python3?\b|node\b|perl\b)\b/i, why: 'скачать-и-исполнить (curl|sh)' },
+    { id: 'curl-pipe-exec', span: true, re: new RegExp('\\b(curl|wget|iwr|invoke-webrequest)\\b[^\\n]*(\\||;|&&)\\s*' + SHWRAP + SHPFX + '(sh|bash|zsh|iex\\b|invoke-expression\\b|python3?\\b|node\\b|perl\\b)\\b', 'i'), why: 'скачать-и-исполнить (curl|sh)' },
     // === 2026-07-31 infra-destruction (снос работающего прода) ===
     { id: 'docker-rm-force', re: new RegExp(DKR + 'rm\\b(?=[^\\n;&|]*\\s(?:-[a-zA-Z]*f[a-zA-Z]*|--force)\\b)', 'i'),
       why: 'docker rm -f/--force — принудительное удаление контейнера' },
@@ -310,9 +325,9 @@ try {
     // требует голый sh/bash в конце — printf со спецификатором (`%s\n`) без
     // октал/hex кода или без трубы к шеллу не матчится (n∉[0-7x], трубы нет).
     { id: 'obfus-pipe-exec', span: true,
-      re: /\b(?:base32\s+(?:-d|--decode)|uudecode|rev|tr\s+[^\n|]{1,80}|gunzip|zcat|bzcat|xzcat|gzip\s+-d|printf\b[^\n|]*\\[0-7x])[^\n|]*\|\s*(?:[^|\n]{0,80}\|\s*)?(?:sh|bash|zsh|dash|ksh)\b(?:\s+-\w+)*\s*(?:$|[;&|\n])/i,
+      re: new RegExp('\\b(?:base32\\s+(?:-d|--decode)|uudecode|rev|tr\\s+[^\\n|]{1,80}|gunzip|zcat|bzcat|xzcat|gzip\\s+-d|printf\\b[^\\n|]*\\\\[0-7x])[^\\n|]*\\|\\s*(?:[^|\\n]{0,80}\\|\\s*)?' + SHWRAP + SHPFX + '(?:sh|bash|zsh|dash|ksh)\\b(?:\\s+-\\w+)*\\s*(?:$|[;&|\\n])', 'i'),
       why: 'обфусцированный конвейер в шелл (printf/tr/rev/… | sh)' },
-    { id: 'decode-pipe-exec', span: true, re: /\b(?:base64\s+(?:-d|--decode)|openssl\s+enc\s+[^\n|]*-d|xxd\s+-r)[^\n|]*\|\s*(?:sh|bash|zsh|dash|iex|invoke-expression|python[\w.]*|node(?:js)?|perl|ruby)\b/i, why: 'декодировать-и-исполнить (base64 -d | sh)' },
+    { id: 'decode-pipe-exec', span: true, re: new RegExp('\\b(?:base64\\s+(?:-d|--decode)|openssl\\s+enc\\s+[^\\n|]*-d|xxd\\s+-r)[^\\n|]*\\|\\s*' + SHWRAP + SHPFX + '(?:sh|bash|zsh|dash|iex|invoke-expression|python[\\w.]*|node(?:js)?|perl|ruby)\\b', 'i'), why: 'декодировать-и-исполнить (base64 -d | sh)' },
     { id: 'eval-download-decode', re: /\beval\b[^\n]*\$\([^)\n]*\b(?:base64|curl|wget)\b/i, why: 'eval $(base64/curl/wget ...) — исполнение декодированного/скачанного кода' },
     // pipe-to-shell variations beyond curl|sh
     { id: 'proc-subst-exec', re: /\b(?:sh|bash|zsh|dash|ksh)\s+(?:-\S+\s+)*<\(\s*(?:curl|wget)\b/i, why: 'bash <(curl ...) — исполнение скачанного через process substitution' },
@@ -639,6 +654,50 @@ try {
     return out;
   }
 
+  // ===== 2026-08-18 (второй состязательный прогон): пробел в printf-аргументе ==
+  // obfus-pipe-exec — span-правило, проверяемое по t.code (после токенизации).
+  // Токенизатор вырезает ЛЮБОЙ многословный закавыченный токен в '' ДО того, как
+  // правило увидит октал/hex-коды. Пробел внутри аргумента делает токен
+  // многословным — и `printf 'rm -rf \057' | sh` (шелл печатает "rm -rf /" и
+  // отдаёт sh) проходил: коды исчезали из t.code вместе с кавычкой. Проба
+  // 2026-08-18: пролезло 5 форм с литеральным пробелом.
+  //
+  // Тестировать сырую строку целиком нельзя — вернётся дефект 17.08:
+  // `echo "printf '\162' | sh"` (данные в echo) заблокировался бы ложно.
+  // Отличие настоящего разрушителя: труба к ГОЛОМУ шеллу НЕ закавычена. Поэтому
+  // режем сырую строку по НЕВЗЯТЫМ в кавычки трубам (splitPipesRaw, bash-правила
+  // кавычек) и требуем И стадию-producer `printf … \NNN/\xNN` (коды берём из
+  // СЫРОГО текста стадии — там кавычки целы), И следующую стадию, начинающуюся
+  // с голого sh/bash/zsh/dash/ksh. В echo-данных труба внутри кавычек не режет —
+  // стадия одна, sink-стадии нет, ложного блока нет.
+  function splitPipesRaw(str) {
+    const stages = [];
+    let cur = '', q = null;
+    for (let i = 0; i < str.length; i++) {
+      const c = str[i];
+      if (q === "'") { cur += c; if (c === "'") q = null; continue; }   // в '' backslash литерал
+      if (c === '\\') { cur += c + (str[i + 1] || ''); i++; continue; }
+      if (q === '"') { cur += c; if (c === '"') q = null; continue; }
+      if (c === "'" || c === '"') { q = c; cur += c; continue; }
+      if (c === '|' && str[i + 1] !== '|' && str[i - 1] !== '|') { stages.push(cur); cur = ''; continue; }
+      cur += c;
+    }
+    stages.push(cur);
+    return stages;
+  }
+  const BARE_SHELL_SINK = new RegExp('^\\s*' + SHWRAP + SHPFX + '(?:sh|bash|zsh|dash|ksh)\\b', 'i');
+  const PRINTF_ENC_STAGE = /\bprintf\b[^\n]*?\\(?:[0-7]|x[0-9a-fA-F])/i;
+  function printfEncPipeShell(str) {
+    const stages = splitPipesRaw(str);
+    if (stages.length < 2) return false;
+    let sawEnc = false;
+    for (const stage of stages) {
+      if (sawEnc && BARE_SHELL_SINK.test(stage)) return true;
+      if (PRINTF_ENC_STAGE.test(stage)) sawEnc = true;
+    }
+    return false;
+  }
+
   // Рекурсивный скан: код → каналы-исполнители. Глубина ≤ 3 (bash -c "ssh ...").
   function scanCommand(cmdStr, depth) {
     if (depth > 3 || typeof cmdStr !== 'string' || !cmdStr.trim()) return null;
@@ -647,6 +706,12 @@ try {
     // 1) Исполняемый код команды
     let h = findHit(t.code);
     if (h) return h;
+
+    // 1b) printf-энкодинг с пробелом в аргументе: токенизатор стёр коды из t.code,
+    //     но труба к голому шеллу настоящая (см. printfEncPipeShell выше).
+    if (printfEncPipeShell(cmdStr)) {
+      return { id: 'obfus-pipe-exec', why: 'обфусцированный конвейер в шелл (printf с бэкслеш-кодом и пробелом | sh)' };
+    }
 
     // 2) $(...) и `...` внутри ДВОЙНЫХ кавычек шелл исполняет (в одинарных — нет)
     for (const s of t.dq) {

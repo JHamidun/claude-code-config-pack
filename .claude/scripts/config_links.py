@@ -82,8 +82,35 @@ PATTERNS = {
 PATH_RE = re.compile(r"[~`\"']?(?:~|C:/Users/[\w.-]+)/\.claude/([\w./-]+\.(?:mjs|json|py|js|md|ts))")
 
 
+# Путь, которого нет на диске, — не всегда протухшая ссылка. Часть таких путей
+# ОБЯЗАНА отсутствовать: токен появляется после входа в аккаунт, кэш плагина —
+# после установки, а имя папки памяти у каждого своё и пишется плейсхолдером.
+# Смешивать их с настоящими разрывами нельзя в обе стороны: настоящие тонут в
+# шуме, а «почини» для них означает выдумать файл. Поэтому — отдельное ведро,
+# которое печатается ПОЛНОСТЬЮ, а не прячется.
+PLACEHOLDER_BITS = ("C--Users-youruser", "YYYY-MM-DD", "<", "{")
+RUNTIME_NAME_RE = re.compile(r"(?i)(token|secret|credential|service_account|session)s?[\w.-]*\.json$")
+RUNTIME_DIR_PREF = ("data/", "plugins/cache/", "logs/", "workspace/")
+DEPRECATED_MARKS = ("deprecated", "не использовать", "устаревш", "do not use")
+
+
+def path_is_expected_absent(sub: str, line: str) -> str | None:
+    """Почему этого файла законно нет: шаблон / рантайм / помечен устаревшим."""
+    if any(b in sub for b in PLACEHOLDER_BITS):
+        return "плейсхолдер в пути"
+    if RUNTIME_NAME_RE.search(pathlib.Path(sub).name):
+        return "создаётся при авторизации"
+    if sub.startswith(RUNTIME_DIR_PREF):
+        return "создаётся при работе"
+    low = line.lower()
+    if any(d in low for d in DEPRECATED_MARKS):
+        return "помечен устаревшим в самом тексте"
+    return None
+
+
 def check_links(inv: dict) -> dict:
     broken: dict = {"skills": {}, "commands": {}, "agents": {}, "paths": {}}
+    expected: dict = {}
     mentioned: dict = {k: set() for k in ("skills", "commands", "agents", "tools", "scripts")}
 
     for f in text_files():
@@ -112,9 +139,14 @@ def check_links(inv: dict) -> dict:
             elif sub.startswith("scripts/"):
                 mentioned["scripts"].add(base)
             if not p.exists():
-                broken["paths"].setdefault(sub, []).append(rel)
+                line = t[t.rfind("\n", 0, m.start()) + 1: t.find("\n", m.end())]
+                why = path_is_expected_absent(sub, line)
+                if why:
+                    expected.setdefault(sub, (why, []))[1].append(rel)
+                else:
+                    broken["paths"].setdefault(sub, []).append(rel)
 
-    return {"broken": broken, "mentioned": mentioned}
+    return {"broken": broken, "mentioned": mentioned, "expected": expected}
 
 
 # Вызов скрипта в описании навыка. Берём путь ЦЕЛИКОМ, вместе с приставкой:
@@ -178,7 +210,16 @@ def main() -> int:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--json", help="куда сохранить полный отчёт")
     ap.add_argument("--quiet", action="store_true", help="только итоговые числа")
+    ap.add_argument("--root", type=pathlib.Path,
+                    help="какое дерево .claude проверять (иначе CLAUDE_CONFIG_DIR или ~/.claude)")
     a = ap.parse_args()
+
+    if a.root:
+        global C
+        C = a.root.resolve()
+        if not C.exists():
+            raise SystemExit(f"нет такого дерева: {C}")
+    print(f"  ПРОВЕРЯЮ: {C}")
 
     inv = inventory()
     res = check_links(inv)
@@ -204,6 +245,13 @@ def main() -> int:
             print(f"      {pth:34} ← {', '.join(sorted(set(where)))[:56]}")
     total_broken += len(broken["paths"])
 
+    print("\n  ЗАКОННО ОТСУТСТВУЮТ — шаблон/рантайм, чинить нечего")
+    exp = res["expected"]
+    print(f"    путей: {len(exp)}")
+    if not a.quiet:
+        for pth, (why, where) in sorted(exp.items()):
+            print(f"      {pth:52} {why}")
+
     print("\n  НЕВИДИМЫЕ — есть на диске, не упомянуто нигде")
     invisible = {}
     for kind in ("skills", "commands", "agents", "tools", "scripts"):
@@ -227,6 +275,8 @@ def main() -> int:
             "inventory": {k: sorted(v) for k, v in inv.items()},
             "broken": {k: {n: sorted(set(w)) for n, w in d.items()} for k, d in broken.items()},
             "invisible": invisible,
+            "expected_absent": {k: {"why": v[0], "where": sorted(set(v[1]))}
+                                for k, v in res["expected"].items()},
             "skill_scripts_missing": skill_scripts,
         }, ensure_ascii=False, indent=1), encoding="utf-8")
         print(f"  полный отчёт: {a.json}")
