@@ -1,6 +1,6 @@
 ---
 name: ai-marketing-stack-ru
-description: "AI-инструментарий МАРКЕТОЛОГА (не разработчика) — Cursor/Claude Code как сотрудник, vibe-coding вместо подрядчиков: разворачивает Marketing-OS (9 папок + rules.md), запускает 6 use-cases автоматизации, считает экономику замены подрядчика. Триггеры: «AI для маркетолога», «Cursor для маркетинга», «vibe-coding маркетинг», «заменить подрядчика AI», «настрой AI-сотрудника», «marketing OS»; EN: AI marketing employee. НЕ: Telegram-боты→agent-builder tooling; production n8n→n8n; AI-видео→ai-creative-factory-ru."
+description: "Marketing-OS: Cursor как AI-сотрудник маркетолога, vibe-coding вместо подрядчиков. Триггеры: «AI для маркетолога»."
 metadata:
   version: 2.0.0
   updated: 2026-07-22

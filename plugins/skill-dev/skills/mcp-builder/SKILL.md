@@ -1,6 +1,6 @@
 ---
 name: mcp-builder
-description: "Guide for building high-quality MCP (Model Context Protocol) servers in Python (FastMCP) or Node/TypeScript (MCP SDK). Also covers agent tool design (reference/agent-tool-design-examples.md). Триггеры: создание MCP серверов, проектирование API для агентов, оптимизация существующих tools, review tool definitions, tool-loop ergonomics (error contract, idempotency, MAX_TOOL_ITERATIONS)."
+description: "Разработка MCP-серверов (Python FastMCP / TS SDK) и дизайн инструментов агента. Триггеры: «создай MCP», «спроектируй инструменты агента»."
 license: Complete terms in LICENSE.txt
 type: actionable
 ---

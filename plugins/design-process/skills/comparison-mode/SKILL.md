@@ -1,7 +1,6 @@
 ---
 name: comparison-mode
-description: Diff между двумя HTML-файлами — DOM-разница, визуальная разница, side-by-side. Полезно для ревью.
-when_to_use: Есть две версии артефакта (до/после, A/B), нужно показать что изменилось.
+description: "Diff двух HTML-версий: side-by-side, DOM-, pixel- и style-разница. Триггеры: «сравни две версии», «что изменилось в макете»."
 ---
 
 # Comparison mode

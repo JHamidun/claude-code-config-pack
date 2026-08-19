@@ -1,6 +1,6 @@
 ---
 name: canvas-design
-description: Create beautiful visual art in .png and .pdf documents using design philosophy. You should use this skill when the user asks to create a poster, piece of art, design, or other static piece. Create original visual designs, never copying existing artists' work to avoid copyright violations. НЕ путать со скиллом design-canvas (тот — сравнение нескольких вариантов макета бок-о-бок с pan/zoom).
+description: "Оригинальный визуальный арт в PNG/PDF: постеры, обложки, композиции. Триггеры: «сделай постер», «нарисуй обложку». НЕ сравнение макетов → design-canvas."
 license: Complete terms in LICENSE.txt
 metadata:
   origin: anthropics/skills@fa0fa64

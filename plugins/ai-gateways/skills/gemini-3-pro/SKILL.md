@@ -1,6 +1,6 @@
 ---
 name: gemini-3-pro
-description: "Google AI Suite через API (GOOGLE_API_KEY): Gemini text (2M контекст), embeddings, TTS/STT (Live API), code execution, Google Search grounding, function calling; секции Imagen/Veo. Триггеры: «gemini api», «gemini 3 pro», «спроси gemini по api», «google embeddings». Канон image/video-моделей — config/models.md (генерация картинок → image-generation / nano-banana-pro)."
+description: "Google AI API (GOOGLE_API_KEY): Gemini text 2M контекст, embeddings, TTS, grounding. Триггеры: «gemini api», «спроси gemini». НЕ картинки→image-generation."
 ---
 
 > ⚠️ **NO-KEY GUARD (обязательно):** этот функционал требует ОПЦИОНАЛЬНОГО стороннего API-ключа. Перед вызовом проверь ключ в `.credentials.master.env`. Если ключ отсутствует, пустой или placeholder (`your_*_api_key`) — **НЕ проси пользователя оплатить счёт, включить биллинг или купить API**. Скажи одной строкой: «Эта функция опциональна и требует свой API-ключ (например, бесплатный ключ на aistudio.google.com); из коробки всё остальное работает по подписке Claude» — и предложи альтернативу или продолжай без неё.

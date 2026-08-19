@@ -1,6 +1,6 @@
 ---
 name: ai-seo-agent-pipeline
-description: "Программатическая AI-SEO фабрика: массовая генерация сотен SEO-страниц под длинный хвост через n8n+Perplexity+OpenAI; «1 запрос = 1 статья = 1 страница», автоперелинковка, автопубликация в CMS. Триггеры: «AI SEO агент», «программатический SEO», «массовая генерация SEO-страниц», «from-to страницы», «long-tail в топ», programmatic SEO. НЕ: статья под Яндекс и GEO/AEO→seo-machine-ru; посты→tg-post."
+description: "Программатическая SEO-фабрика: сотни страниц под длинный хвост через n8n+Perplexity. Триггеры: «программатический SEO». НЕ статья→seo-machine-ru."
 metadata:
   version: 1.0.0
   updated: 2026-06-22

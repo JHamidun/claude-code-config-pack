@@ -9,17 +9,17 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | Skill | What it does |
 |-------|--------------|
 | `agent-api-server` | OpenAI-compatible HTTP server on top of the local Claude CLI — expose /v1/chat/completions to n8n, SDKs, IDEs, curl. |
-| `aws-skills` | AWS development with CDK, Lambda, serverless patterns, infrastructure |
-| `claude-server-auth` | Use when authenticating Claude CLI on a headless server - generates subscription tokens via tmux + local Playwright OAuth flow |
-| `deepl-pro` | DeepL professional translation - text, documents, glossaries. |
+| `aws-skills` | AWS development: CDK, Lambda, serverless patterns, S3, infrastructure as code. |
+| `claude-server-auth` | Authenticate Claude CLI on a headless server: subscription setup-token via tmux + local Playwright OAuth. |
+| `deepl-pro` | DeepL translation of text and documents (docx/pptx/pdf/xlsx), glossaries, formality. |
 | `home-assistant` | Home Assistant CLI over REST + WebSocket — entity states, service calls, on/off/toggle, state history, live events. |
 | `maps-places` | Places, addresses and geocoding across 11 providers (Google Places, Yandex, 2GIS, HERE, Mapbox, Foursquare, OSM and more). |
-| `n8n` | n8n workflow automation — API integration, nodes, triggers, expressions, MCP, 400+ integrations. |
-| `pinecone` | Pinecone vector DB (PINECONE_API_KEY): serverless-индексы, semantic search, RAG; текущие индексы company-tm-bot, company-plus-bot и др. |
-| `runbook` | Операционные процедуры флота your-server: «бот молчит», рестарт агента Hermes, правка конфига, крон не отработал, место на диске — каждая с точкой… |
-| `server-health` | Server health checks via SSH - docker, systemctl, disk, memory, logs. |
-| `telegram-bot-toolkit` | Telegram bot development, testing, debugging and deployment — python-telegram-bot, Telethon, scene management patterns, middleware, production deploy. |
-| `uptime-kuma-ops` | Manage Uptime Kuma monitors via API - list, add, update, delete, check status. |
+| `n8n` | n8n workflow automation: API, nodes, triggers, expressions, MCP, 400+ integrations; Meta CAPI server-side event recipes. |
+| `pinecone` | Pinecone vector DB (PINECONE_API_KEY): serverless-индексы, semantic search, RAG, embeddings. |
+| `runbook` | Операционные процедуры флота your-server: «бот молчит», рестарт агента, крон не отработал — каждая с точкой отката. |
+| `server-health` | Server health via SSH: docker, systemctl, disk, memory, logs. |
+| `telegram-bot-toolkit` | Разработка Telegram-ботов: python-telegram-bot, Telethon, деплой; антипаттерн бот-воронки из TG Ads. |
+| `uptime-kuma-ops` | Uptime Kuma monitors via API: list, add, update, delete, check status. |
 | `webhook-receiver` | Receive webhooks (GitHub, Stripe, GitLab, JIRA, forms) on a local CLI server with HMAC signature validation and a JSONL log. |
 | `yandex-forms` | Create Yandex Forms (surveys, questionnaires) programmatically instead of clicking through every question by hand. |
 | `zoom` | Zoom meetings management — create, list, update, delete meetings and manage recordings via Server-to-Server OAuth API |

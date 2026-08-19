@@ -1,6 +1,6 @@
 ---
 name: dream
-description: "Memory consolidation — рефлексивный проход по памяти + Second Brain sleeptime. Несёт полный регламент v2 из rules/auto-learning.md: frontmatter v2, rethink/supersede (bi-temporal), decay −0.02/нед, prune pending>30д, promote project→global, TOP-INSTINCTS."
+description: "Консолидация памяти + Second Brain sleeptime: supersede, decay, prune, promote, TOP-INSTINCTS. Триггеры: «консолидируй память», «сон мозга»."
 triggers:
   - "dream"
   - "консолидируй память"

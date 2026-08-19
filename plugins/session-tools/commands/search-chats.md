@@ -1,5 +1,5 @@
 ---
-description: "Полнотекстовый поиск по всем чатам Claude Code (SQLite FTS5+BM25, ~/.claude/chats.db): titles (поиск по ИМЕНИ чата), search с фильтрами, index, stats, archive. КАНОН поиска по истории. Триггеры: «найди в чатах», «как назывался тот чат», «найди чат про», «search chats», «поиск по истории чатов», «что мы обсуждали про». Внешняя KB встреч/почты → /kb; +слой знаний → /memory-search."
+description: "КАНОН поиска по истории чатов Claude Code (chats.db FTS5): search, titles, index. Триггеры: «найди в чатах», «как назывался тот чат». KB встреч → /kb."
 argument-hint: "<запрос> [--after DATE] [--limit N] [--role user|assistant] | titles <имя> | index | stats | archive"
 ---
 

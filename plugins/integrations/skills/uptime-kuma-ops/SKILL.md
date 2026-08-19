@@ -1,6 +1,6 @@
 ---
 name: uptime-kuma-ops
-description: Manage Uptime Kuma monitors via API - list, add, update, delete, check status. Use when user asks about "мониторинг", "uptime", or status page management.
+description: "Uptime Kuma monitors via API: list, add, update, delete, check status. Triggers: «мониторинг», «uptime», status page."
 ---
 
 # Uptime Kuma Operations

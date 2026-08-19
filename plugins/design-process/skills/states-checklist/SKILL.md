@@ -1,8 +1,7 @@
 ---
 name: states-checklist
 version: 1.0.0
-description: Чек-лист — у каждого экрана должны быть empty, loading, error, partial, success состояния. Skill следит, что они есть.
-when_to_use: Финал работы над прототипом — пройдись по списку перед сдачей.
+description: "Чек-лист состояний экрана перед сдачей прототипа: empty, loading, error, partial, success. Триггеры: «happy path только», «8 состояний UI»."
 ---
 
 # States checklist

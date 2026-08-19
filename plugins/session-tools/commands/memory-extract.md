@@ -1,5 +1,5 @@
 ---
-description: "Пакетное извлечение знаний из истории чатов по топикам (легаси chat_ingester_v2.py: extract-knowledge / dedupe / scan) — ошибки, код, решения, learnings. Триггеры: «извлеки знания из чатов», «сгруппируй знания по топикам». Повседневный поиск/индексация → /search-chats (канон)."
+description: "Пакетное извлечение знаний из чатов по топикам (легаси chat_ingester_v2.py). Триггеры: «извлеки знания из чатов». Повседневный поиск → /search-chats."
 argument-hint: "[extract-knowledge | dedupe | scan]"
 ---
 

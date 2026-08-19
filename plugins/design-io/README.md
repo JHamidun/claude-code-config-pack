@@ -18,7 +18,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `export-pptx` | HTML slides → PPTX where each slide is a screenshot image (no text editability). |
 | `github-import` | GitHub repo → design system, components, and CSS tokens as context so a new prototype matches the codebase. |
 | `i18n-stress-test` | Stress-test UI for i18n — long words (German), RTL (Arabic/Hebrew), CJK, and emoji in text. |
-| `miro` | Работа с досками Miro двумя путями — MCP-сервер (31 инструмент: чтение/саммари доски, layout-DSL, диаграммы, доки, таблицы, код-виджеты, комментарии… |
+| `miro` | Доски Miro: MCP (чтение/саммари, layout-DSL, диаграммы, комменты) + REST v2 (коннекторы, теги — чего MCP не умеет). |
 | `onboarding-ux` | First-run patterns — welcome screens, permission requests, teaching empty states, progressive disclosure, time-to-value. |
 | `perf-audit` | Lighthouse performance audit — measures LCP / CLS / TBT / FCP / TTI on an artifact with actionable advice. |
 | `proto-smoketest` | E2E click-through smoke test via Playwright over the critical user paths of an interactive prototype. |

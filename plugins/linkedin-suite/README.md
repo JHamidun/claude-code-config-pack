@@ -8,12 +8,12 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `linkedin` | LinkedIn intelligence via Scraping API — profile enrichment, company research, post monitoring, ad library analysis. |
-| `linkedin-comment-drafter` | LinkedIn comments, replies, thread follow-ups по URL поста: 1-3 варианта в голосе юзера + reaction, approval → автопостинг своим публикатором или… |
-| `linkedin-employee-advocacy` | Plan, launch and operate a LinkedIn employee advocacy program for a marketing team: 14-day launch playbook, authentic-voice posting at scale, brand… |
-| `linkedin-humanizer` | Anti-AI-tells suite for LinkedIn (EN), 5 modes: humanize/scrub (forensic/strict/aesthetic), rules explainer, emoji detector, detector tester… |
-| `linkedin-post-writer` | Viral-ready LinkedIn посты на hook-формулах 2026: пост+хук, humanizer pass, approval, schedule via SocialPublisher; разбор viral поста по URL →… |
-| `linkedin-profile-optimizer` | Audit and rewrite a LinkedIn profile end-to-end — headline, About, Featured, banner, photo, Experience metrics, Skills pinning, custom URL, recommendations. |
+| `linkedin` | LinkedIn intelligence via Scraping API: profiles, companies, posts, ad library. |
+| `linkedin-comment-drafter` | Комменты и ответы в тредах LinkedIn по URL поста: 1-3 варианта, reaction, автопостинг, follow-up, DM. |
+| `linkedin-employee-advocacy` | LinkedIn employee advocacy program: 14-day launch, posting at scale, governance, ROI. |
+| `linkedin-humanizer` | Strip AI-tells from EN LinkedIn texts: humanize tiers, emoji detector, GPTZero/ZeroGPT tests, pre-publish audit. |
+| `linkedin-post-writer` | Viral LinkedIn посты на hook-формулах: хук+пост, humanizer, schedule через Publora; разбор viral поста по URL → формула. |
+| `linkedin-profile-optimizer` | LinkedIn profile audit and rewrite: headline, About, Featured, banner, Experience metrics, Skills. |
 
 ## Install
 

@@ -8,18 +8,18 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `brand-extractor` | Вытащить цвета, шрифты, базовый копирайт из лендинга по URL. |
-| `brand-guidelines` | Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic's look-and-feel. |
-| `color-system-builder` | Из 1 акцента → полная палитра (light + dark, 9-step scale, semantic) с проверенным контрастом. |
-| `dark-mode-add` | Превратить light-only дизайн в light+dark с переключателем. |
-| `deck-themes` | Несколько готовых "тем" для slides — минимал, editorial, dark, data, brutalist. |
+| `brand-extractor` | Вытащить цвета, шрифты, копирайт из сайта по URL (headless Playwright). |
+| `brand-guidelines` | Anthropic official brand colors and typography for artifacts. |
+| `color-system-builder` | Из одного акцента — полная палитра: light+dark, 9-step scale, semantic, WCAG-контраст. |
+| `dark-mode-add` | Добавить dark mode к light-дизайну: продуманные dark-токены, не инверт. |
+| `deck-themes` | Готовые CSS-темы для slides без бренда: минимал, editorial, dark, data, brutalist. |
 | `design-md-brands` | A bank of ready-made DESIGN.md design systems for 73+ known brands (Stripe, Linear, Vercel, Notion, Apple) — pulled on demand. |
 | `design-system-create` | Собрать дизайн-систему с нуля: токены, типографика, компоненты, гайдлайны. |
-| `design-tokens-w3c` | Экспорт дизайн-токенов в формат W3C Design Tokens (DTCG). |
-| `fonts-bundle` | Готовые блоки <link> для типовых пар шрифтов — Google Fonts с правильными весами и subset, плюс system-стек. |
-| `moodboard` | Собрать HTML-мудборд из 5-15 референсов с подписями и палитрой, извлечённой из изображений. |
-| `theme-factory` | Toolkit for styling artifacts (slides, docs, reports, HTML landing pages) with a theme: 10 pre-set themes with colors/fonts to apply to any artifact… |
-| `type-scale` | Modular typographic scale из base + ratio. |
+| `design-tokens-w3c` | Экспорт дизайн-токенов в W3C DTCG tokens.json: Style Dictionary, Token Studio. |
+| `fonts-bundle` | Готовые блоки <link> для пар шрифтов Google Fonts (веса, subset) + system-стек. |
+| `moodboard` | HTML-мудборд из 5-15 референсов с палитрой из картинок — согласовать визуальный язык на старте. |
+| `theme-factory` | Стилизация артефакта темой: 10 пресетов цвета/шрифтов или новая тема на лету. |
+| `type-scale` | Modular type scale из base + ratio, плюс 30 проверенных font-пар. |
 
 ## Install
 

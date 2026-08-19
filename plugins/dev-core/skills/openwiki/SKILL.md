@@ -1,6 +1,6 @@
 ---
 name: openwiki
-description: "CLI (langchain-ai/openwiki) авто-генерации и поддержки agent-facing wiki для кодбазы + авто-PR доков в CI. Строит openwiki/ (архитектура, workflows) + AGENTS.md/CLAUDE.md со ссылками. Триггеры: «авто-документация кодбазы», «openwiki», «agent wiki для репо», «AGENTS.md автогенерация». НЕ: OpenAPI/Swagger→api-documentation; fetch чужого репо→deepwiki; граф вызовов/impact→codegraph."
+description: "Агентная wiki кодбазы CLI openwiki (langchain-ai) + авто-PR доков в CI: openwiki/, AGENTS.md. Триггеры: «agent wiki для репо». НЕ чужой репо→deepwiki."
 ---
 
 # OpenWiki — agent wiki для кодбазы
@@ -50,7 +50,7 @@ openwiki требует LLM-провайдера. Порядок предпоч�
    ```sh
    OPENWIKI_PROVIDER=openai-chatgpt openwiki code --init   # браузер-логин auth.openai.com
    ```
-2. **Локальный гейтвей (0 токенов)** — `openai-compatible` на `http://127.0.0.1:GATEWAY_PORT/openai/v1` (Codex-backed, см. skill `local-gateway`):
+2. **Локальный гейтвей (0 токенов)** — `openai-compatible` на `http://127.0.0.1:GATEWAY_PORT/openai/v1` (Codex-backed; свой локальный OpenAI-совместимый прокси, в пак не входит):
    ```sh
    OPENWIKI_PROVIDER=openai-compatible
    OPENAI_COMPATIBLE_API_KEY=local            # гейтвей игнорит значение, но поле обязательно

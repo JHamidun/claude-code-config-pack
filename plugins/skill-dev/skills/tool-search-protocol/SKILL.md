@@ -1,7 +1,6 @@
 ---
 name: tool-search-protocol
-description: Не отказывайся от MCP/connector-возможности сходу. Сначала ищи через `tool_search` — может, инструмент есть, но не виден.
-when_to_use: Любой запрос упоминает Slack/Drive/Linear/Notion/GitHub/etc. До отказа — поиск.
+description: "До отказа «нет интеграции» с Slack/Drive/Linear — сначала поиск инструмента через tool_search. Триггеры: «есть ли коннектор», «найди инструмент»."
 ---
 
 # Tool search protocol

@@ -1,76 +1,26 @@
 ---
-description: "Google Docs: чтение документа, краткое содержание, поиск документов, вставка текста (Docs API + Drive API). Триггеры: «google docs», «гугл документ», «прочитай документ», «саммари документа»."
-argument-hint: "[read <doc_id> | summary <doc_id> | search <запрос>]"
+description: "Google Docs (gdocs_client.py): прочитать документ, найти по названию, дописать. Триггеры: «гугл документ», «саммари документа». Хаб → skill google-workspace."
+argument-hint: "[read <id|ссылка> | search <запрос> | append <id> --text <текст>]"
 ---
 
-# Google Docs Operations
+# /gdocs
 
-/gdocs - Работа с Google Docs
+Рабочий код — в навыке `google-workspace`, скрипт
+`~/.claude/skills/google-workspace/scripts/gdocs_client.py`.
 
-## Описание
-Чтение и редактирование Google Документов.
-
-## Использование
-```
-/gdocs read <doc_id>          - Прочитать документ
-/gdocs summary <doc_id>       - Краткое содержание документа
-/gdocs search <запрос>        - Найти документы по запросу
+```bash
+python ~/.claude/skills/google-workspace/scripts/gdocs_client.py read <id_или_ссылка>
+python ~/.claude/skills/google-workspace/scripts/gdocs_client.py read <id> --limit 2000
+python ~/.claude/skills/google-workspace/scripts/gdocs_client.py search "резюме встреч"
+python ~/.claude/skills/google-workspace/scripts/gdocs_client.py append <id> --text "строка" --yes
 ```
 
-## Инструкции для Claude
+Принимает ссылку целиком. Права берутся из `~/.claude/google_oauth_token.json`:
+у токена единственный скоуп `drive`, и Docs API на нём работает — проверено.
 
-При вызове этой команды:
+За подробностями (таблицы в документах, разграничение токенов, что делать при 404)
+— Skill `google-workspace`.
 
-1. **Загрузи credentials:**
-```python
-import json
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
-
-with open('${HOME}/.claude/google_oauth_token.json', 'r') as f:
-    token_data = json.load(f)
-creds = Credentials.from_authorized_user_info(token_data)
-docs = build('docs', 'v1', credentials=creds)
-```
-
-2. **Чтение документа:**
-```python
-document = docs.documents().get(documentId=doc_id).execute()
-title = document.get('title', 'Untitled')
-
-# Извлечение текста
-content = document.get('body', {}).get('content', [])
-text = ''
-for element in content:
-    if 'paragraph' in element:
-        for elem in element['paragraph'].get('elements', []):
-            if 'textRun' in elem:
-                text += elem['textRun'].get('content', '')
-```
-
-3. **Поиск документов (через Drive API):**
-```python
-drive = build('drive', 'v3', credentials=creds)
-results = drive.files().list(
-    q="mimeType='application/vnd.google-apps.document' and name contains 'запрос'",
-    fields='files(id, name, modifiedTime)'
-).execute()
-```
-
-4. **Вставка текста в документ:**
-```python
-requests = [
-    {
-        'insertText': {
-            'location': {'index': 1},
-            'text': 'Новый текст\n'
-        }
-    }
-]
-docs.documents().batchUpdate(documentId=doc_id, body={'requests': requests}).execute()
-```
-
-## Примеры
-- `/gdocs read 1abc...xyz` - прочитать документ
-- `/gdocs summary 1abc...xyz` - получить summary документа
-- `/gdocs search AI News` - найти документы с "AI News"
+> Раньше здесь лежал inline-код работы с Docs API. Он был рабочим, но не проверялся
+> ничем: тела команд линтер связности не покрывает. Код перенесён в скрипт навыка и
+> прогнан на живом документе.

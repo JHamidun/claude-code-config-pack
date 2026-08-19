@@ -1,7 +1,6 @@
 ---
 name: forms-a11y
-description: Формы, которые работают со скрин-ридерами и клавиатурой. Label, описания, ошибки, focus-management.
-when_to_use: Любая форма в production-продукте. Не для прототипа на 5 минут.
+description: "Доступные production-формы: label, ошибки, focus-management, скрин-ридеры, клавиатура. Триггеры: «доступная форма», «accessible form», «fieldset»."
 ---
 
 # Forms a11y

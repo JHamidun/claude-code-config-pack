@@ -1,6 +1,6 @@
 ---
 name: video-generation
-description: "Полный пайплайн AI-видео: Veo, Sora, Seedance, Runway (Kling/Pika), voiceover, музыка, субтитры, сборка ffmpeg; включает движок Higgsfield (cinematic, motion design, UGC, Virality Predictor). Триггер: «оцени виральность видео». НЕ монтаж футажа→video-editor."
+description: "AI-видео хаб: Veo, Sora, Seedance, Runway, Higgsfield. Триггеры: «сгенерь видео», «оживи картинку», «оцени виральность». НЕ монтаж футажа→video-editor."
 type: actionable
 ---
 

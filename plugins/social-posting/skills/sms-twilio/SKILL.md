@@ -1,6 +1,6 @@
 ---
 name: sms-twilio
-description: "Отправка SMS через Twilio REST API — одиночные и массовые (bulk с dry-run/джиттером), статус доставки, история сообщений, баланс, номера аккаунта. CLI: python ~/.claude/tools/sms_client.py. НЕ: Telegram→tg_client.py/tg-bot-publish; WhatsApp→whatsapp-client; email-рассылки→gmail/outlook; звонки/телефония."
+description: "SMS через Twilio (CLI sms_client.py): bulk с dry-run, статус доставки, баланс. Триггеры: «отправь смс». НЕ WhatsApp → whatsapp-client."
 ---
 
 # SMS via Twilio

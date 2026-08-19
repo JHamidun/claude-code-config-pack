@@ -1,5 +1,5 @@
 ---
-description: "Глубокий reasoning через Kimi K2 (k2-thinking, MoE 1T): сложные алгоритмы, трудные баги, архитектурные и математические задачи. Триггеры: «kimi», «спроси kimi», «глубокий анализ алгоритма». Агент-обёртка для делегирования → kimi-algorithm-specialist."
+description: "Глубокий reasoning через Kimi K2 (k2-thinking): алгоритмы, трудные баги, архитектура, математика. Триггеры: «спроси kimi». Агент-обёртка → kimi-algorithm-specialist."
 argument-hint: "<problem>"
 ---
 

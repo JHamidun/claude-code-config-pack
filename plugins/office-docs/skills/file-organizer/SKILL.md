@@ -1,6 +1,6 @@
 ---
 name: file-organizer
-description: Intelligent file organization by context, type, date with automation
+description: "Organize files by context, type, date with automation. Triggers: «organize files», «clean up downloads», «sort files»."
 ---
 
 # File Organizer Skill

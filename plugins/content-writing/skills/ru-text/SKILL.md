@@ -1,9 +1,6 @@
 ---
 name: ru-text
-description: >
-  Use when writing, editing, or reviewing Russian-language text, or when user
-  mentions ru-text. Covers typography, info-style, editorial, UX writing, business
-  correspondence, AI-text cleanup. Auto-activates on Russian text output.
+description: "Russian text quality: typography, info-style, editorial, UX writing, AI-text cleanup. Apply when writing or editing Russian text; trigger «ru-text»."
 metadata:
   your-gateway-project:
     always: true

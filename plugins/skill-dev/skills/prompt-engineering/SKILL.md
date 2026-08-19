@@ -1,6 +1,6 @@
 ---
 name: prompt-engineering
-description: "Промпт-инжиниринг: системные промпты, few-shot, chain-of-thought, structured outputs, декомпозиция, оценка и итерация промптов. Триггеры: «оптимизируй/улучши промпт», «system prompt», «few-shot», «chain of thought», «structured output», «leaked prompts», prompt patterns. Промпты широкий набор моделей → references/system-prompt-leaks.md. НЕ context-engineering; агент-обёртка → prompt-engineer."
+description: "Промпт-инжиниринг: системные промпты, few-shot, structured outputs. Триггеры: «улучши промпт», «leaked prompts». Агент-обёртка→prompt-engineer."
 ---
 
 # Prompt Engineering Skill

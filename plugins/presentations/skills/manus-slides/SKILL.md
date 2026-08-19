@@ -1,6 +1,6 @@
 ---
 name: manus-slides
-description: "Full-pipeline slide presentation creator. 25 AI styles (Gemini image generation) + HTML templates. Export to PPTX/PDF/HTML. Replicas of all 26 Manus 1.6 slide themes — use for slides 'в стиле Manus' or theme names Sketch, Whiteboard, Etching, Editorial, Pixel, Vellum, Dossier, Glamour, Cobalt, Onyx, Neon ('сделай слайды как Manus', 'тема Manus')."
+description: "Slide decks full-cycle: 25 AI styles (Gemini images) + HTML templates, Manus 1.6 themes, export PPTX/PDF/HTML. Triggers: «slides», «presentation», «pitch deck»."
 type: actionable
 ---
 

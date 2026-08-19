@@ -8,20 +8,20 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `api-documentation` | Generates comprehensive API documentation from code including OpenAPI/Swagger specs, Postman collections, interactive docs, and usage examples. |
+| `api-documentation` | API docs from code: OpenAPI/Swagger specs, Postman collections, examples for REST, GraphQL, gRPC. |
 | `apple-developer` | Sign (Developer ID) and notarize macOS apps and DMGs without a Mac — the whole cycle from Windows/Linux and CI. |
-| `beads` | Beads git-backed AI-native issue tracking. |
-| `build-fix` | Incrementally fix build and type errors with minimal, safe changes. |
-| `changelog-generator` | Generate user-facing changelogs from git commits with semantic versioning |
+| `beads` | Beads — git-backed issue tracker for AI agents (bd CLI): issues, bugs, tasks in a repo. |
+| `build-fix` | Fix failing builds and type errors with minimal safe changes until green. |
+| `changelog-generator` | Changelog from git commits: semver bump, Keep a Changelog format, PR links via gh, GitHub Releases. |
 | `codegraph` | A code graph for navigation, symbol lookup and impact analysis on large codebases — a replacement for grep-by-hand. |
-| `database-design` | Database schema design, migration planning, query optimization, and data modeling for SQL and NoSQL databases. |
-| `deepwiki` | Fetch documentation for any GitHub repository via DeepWiki/gitmcp.io. |
-| `git-workflow` | Git operations - commits, branches, PRs, merge conflicts, history analysis |
+| `database-design` | DB schema design, migrations, query optimization: PostgreSQL, MongoDB, Redis; normalization, indexing. |
+| `deepwiki` | Docs for any GitHub repo via DeepWiki/gitmcp.io. |
+| `git-workflow` | Git operations: commits, branches, PRs, merge conflicts, history analysis. |
 | `installer-builder` | One-click installers (Windows .exe + macOS .dmg) on Electron — component selection, fully offline bundling, CI macOS builds. |
-| `javascript-typescript-dev` | Modern JS/TS development including React, Next.js, Node.js, testing (Jest, Vitest, Playwright), and TypeScript patterns. |
-| `manus` | Manus autonomous AI agent platform via its REST API v2 (api.manus.ai). |
+| `javascript-typescript-dev` | JS/TS development: React, Next.js, Node.js, TypeScript patterns, tests (Jest, Vitest, Playwright). |
+| `manus` | Delegate long autonomous tasks to Manus cloud agents (REST API v2): research, browsing, code; poll results. |
 | `openwiki` | Auto-generate and maintain an agent-facing wiki for a codebase, plus documentation PRs in CI (architecture, workflows, AGENTS.md). |
-| `python-fullstack-dev` | Complete Python development expertise covering Django, FastAPI, Flask, data science, testing, and deployment. |
+| `python-fullstack-dev` | Python development: Django, FastAPI, Flask, data science, testing, deployment. |
 
 ### Agents
 

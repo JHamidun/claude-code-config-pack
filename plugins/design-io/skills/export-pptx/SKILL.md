@@ -1,7 +1,6 @@
 ---
 name: export-pptx
-description: Конверт HTML-дека в PPTX. Два режима — картинки (всегда работает) и редактируемый (текст и фигуры остаются нативными).
-when_to_use: Пользователь просит "выгрузить в PowerPoint", "PPTX-файл", "сделать редактируемым в PowerPoint".
+description: "HTML-дек в PPTX: режим картинок (надёжный) или редактируемый (нативный текст, pptxgenjs). Триггеры: «html в pptx», «выгрузи в PowerPoint»."
 ---
 
 # Export PPTX

@@ -8,10 +8,10 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `dev-browser` | Browser automation with persistent page state — navigate sites, fill forms, take screenshots, extract web data, test web apps. |
-| `gstack` | Fast headless browser for QA testing and site dogfooding. |
-| `playwright-automation` | Browser automation with Playwright - testing, scraping, screenshots, AND a live daemon-browser controllable via CLI (bdo.py) for parallel online work… |
-| `webapp-testing` | Toolkit for interacting with and testing local web applications using Playwright. |
+| `dev-browser` | Browser automation with persistent page state: navigate, fill forms, screenshots, scrape, log in. |
+| `gstack` | Fast headless browser (~100ms/command) for QA: navigate, interact, before/after diffs, annotated screenshots. |
+| `playwright-automation` | Playwright e2e tests and scraping + daemon browser CLI (bdo.py) for parallel sessions. |
+| `webapp-testing` | Test local web apps with Playwright: verify UI, debug behavior, screenshots, browser logs. |
 
 ### Agents
 

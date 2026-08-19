@@ -1,6 +1,6 @@
 ---
 name: apple-developer
-description: Подпись (Developer ID) и нотаризация macOS-приложений/dmg БЕЗ Mac — весь цикл на Windows/Linux + браузере + CI. Использовать когда: «подпиши dmg», «нотаризуй приложение», «приложение повреждено на маке», «Gatekeeper блокирует», «Developer ID сертификат», «App Store Connect API ключ», «notarytool», «продлить Apple Developer». Реквизиты аккаунта храни в своём секрет-хранилище (env / GitHub Secrets).
+description: "Подпись Developer ID и нотаризация macOS dmg без Mac (Windows+CI, notarytool). Триггеры: «подпиши dmg», «Gatekeeper блокирует», «повреждено на маке»."
 metadata:
   type: reference
 ---

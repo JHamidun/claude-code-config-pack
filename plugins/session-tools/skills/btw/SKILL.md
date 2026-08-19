@@ -1,6 +1,6 @@
 ---
 name: btw
-description: Ask a quick side question without interrupting the main conversation flow. Answers briefly and returns to the main task.
+description: "Answer a quick side question briefly, then return to the main task. Triggers: «btw», «кстати», «side question»."
 triggers:
   - "/btw"
   - "btw"

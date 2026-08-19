@@ -1,6 +1,6 @@
 ---
 name: api-documentation
-description: Generates comprehensive API documentation from code including OpenAPI/Swagger specs, Postman collections, interactive docs, and usage examples. Supports REST, GraphQL, and gRPC APIs with automatic schema extraction.
+description: "API docs from code: OpenAPI/Swagger specs, Postman collections, examples for REST, GraphQL, gRPC. NOT whole-codebase docs -> openwiki."
 keywords: api, documentation, openapi, swagger, postman, rest, graphql, api-docs
 ---
 

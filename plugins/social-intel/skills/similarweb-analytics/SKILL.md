@@ -1,6 +1,6 @@
 ---
 name: similarweb-analytics
-description: "Analyze website traffic and engagement metrics using web search and public SimilarWeb data — traffic estimates, rankings, engagement stats, traffic sources, geographic distribution. Use for domain analysis and competitive web analytics."
+description: "Website traffic estimates from public SimilarWeb data: rankings, engagement, sources, geo. Triggers: «competitor site traffic», «how many visitors»."
 type: actionable
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: doc-coauthoring
-description: "Guide users through a structured workflow for co-authoring documentation. Use when the user wants to write documentation, proposals, technical specs, decision docs, or similar structured content — helps transfer context, refine through iteration, and verify the doc works for readers. Trigger when the user mentions writing docs, drafting a proposal, or creating a spec."
+description: "Co-author docs: context transfer, iteration, fresh-reader test — proposals, specs, decision docs. Triggers: «write an RFC». NOT PRD -> feature-spec."
 metadata:
   origin: anthropics/skills@fa0fa64
 ---

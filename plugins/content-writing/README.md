@@ -8,14 +8,14 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `brand-voice` | Apply and enforce brand voice, style guide, and messaging pillars across content. |
-| `content-creation` | Draft generic marketing content — blog posts, social, email newsletters, landing pages, press releases, case studies; SEO copy, headlines, CTAs. |
-| `content-engine` | Create platform-native content systems for X, LinkedIn, TikTok, YouTube, newsletters, and repurposed multi-platform campaigns. |
-| `content-research` | Исследование под контент — поиск и верификация источников, CRAAP-оценка, цитирование, fact-checking. |
-| `de-ai-ify` | КАНОН анти-AI-tells для РУССКИХ текстов (ТГ, Habr, VC, РБК, сайты, письма) — убирает ИИ-жаргон и клише. |
-| `doc-coauthoring` | Guide users through a structured workflow for co-authoring documentation. |
-| `ru-text` | Use when writing, editing, or reviewing Russian-language text, or when user |
-| `tapestry` | Tapestry — knowledge weaving: связывает документы (YouTube-транскрипты, статьи, PDF, код) в интерлинкованный граф знаний + implementation plans. |
+| `brand-voice` | Define and enforce brand voice: tone docs, style-guide compliance checks, audience adaptation. |
+| `content-creation` | Generic marketing copy: blog, social, email, landing pages, case studies, SEO copy, CTAs. |
+| `content-engine` | Platform-native content from one source: X, LinkedIn, TikTok, YouTube, newsletters; threads, scripts, calendars. |
+| `content-research` | Research под контент-артефакт: источники, CRAAP, цитаты с пруфами. |
+| `de-ai-ify` | КАНОН чистки русских текстов от ИИ-клише и жаргона. |
+| `doc-coauthoring` | Co-author docs: context transfer, iteration, fresh-reader test — proposals, specs, decision docs. |
+| `ru-text` | Russian text quality: typography, info-style, editorial, UX writing, AI-text cleanup. |
+| `tapestry` | Tapestry — связывает документы (транскрипты, статьи, PDF, код) в граф знаний + implementation plans. |
 
 ### Agents
 

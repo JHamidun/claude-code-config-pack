@@ -1,6 +1,6 @@
 ---
 name: emil-design-eng
-description: Design-engineering guidance on UI polish, component design, animation decisions, and the invisible details that make software feel great. За точными ЗНАЧЕНИЯМИ (easing curves, duration tables, spring configs, per-element budgets) — единый каталог review-animations/STANDARDS.md; здесь философия и решения, не цифры.
+description: "Философия UI-полиша Emil Kowalski: анимации, микродетали. Триггеры: «отполируй интерфейс», «UI polish». Цифры → review-animations/STANDARDS.md."
 ---
 
 # Design Engineering

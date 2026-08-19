@@ -1,6 +1,6 @@
 ---
 name: deepseek
-description: "DeepSeek API (DEEPSEEK_API_KEY, deepseek-chat, OpenAI-совместимый эндпоинт) — кодогенерация, рефакторинг, reasoning, 128K контекст. Триггеры: deepseek, «дипсик», «спроси deepseek»."
+description: "DeepSeek API (deepseek-chat): кодогенерация, reasoning, 128K контекст. Триггеры: «дипсик», «спроси deepseek», «дешёвая кодогенерация»."
 ---
 
 # DeepSeek API Skill

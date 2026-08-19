@@ -1,6 +1,6 @@
 ---
 name: free-tools-lead-magnets-ru
-description: "Лид-магниты и бесплатные инструменты (engineering as marketing) как лидген: калькуляторы/грейдеры/квизы, чек-листы/шаблоны/гайды. Триггеры: «лид-магнит», «бесплатный инструмент», «ROI-калькулятор», «грейдер», «квиз», «gated content», «что отдать за email». НЕ: вёрстка виджета→interactive-prototype; посадочная→page-cro-ru; квиз в ТГ-боте→manychat-funnel-ru; nurture-серия→email-sequence."
+description: "Лид-магниты и бесплатные тулы: калькуляторы, квизы, чек-листы (engineering as marketing). Триггеры: «ROI-калькулятор», «что отдать за email». НЕ вёрстка→interactive-prototype."
 metadata:
   version: 1.0.0
   updated: 2026-07-18

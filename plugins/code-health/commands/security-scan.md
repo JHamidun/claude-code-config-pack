@@ -1,5 +1,5 @@
 ---
-description: "Комплексный security-аудит проекта: секреты в коде, pip/npm audit зависимостей, OWASP Top 10, конфигурация (DEBUG/CORS/rate limiting) — с приоритизированным отчётом. Триггеры: «security audit», «аудит безопасности», «проверь на уязвимости». Воркер-пайплайн скан→фикс → /health-security; пентест → agent pentest-engineer."
+description: "Security-аудит проекта: секреты в коде, pip/npm audit, OWASP Top 10, конфигурация DEBUG/CORS. Триггеры: «аудит безопасности», «проверь на уязвимости»."
 argument-hint: "[путь к проекту]"
 ---
 

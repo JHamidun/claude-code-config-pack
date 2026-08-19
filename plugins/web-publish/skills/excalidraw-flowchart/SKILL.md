@@ -1,6 +1,6 @@
 ---
 name: excalidraw-flowchart
-description: Generate Excalidraw JSON for architecture diagrams, flowcharts, sequence diagrams. Use when user asks for "диаграмма", "flowchart", "excalidraw", "архитектурная схема".
+description: "Excalidraw JSON: флоучарты, архитектурные и sequence-диаграммы, ER, mind map. Триггеры: «нарисуй схему», «блок-схема», «диаграмма», «excalidraw»."
 ---
 
 # Excalidraw Flowchart Generator

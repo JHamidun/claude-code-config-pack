@@ -1,6 +1,6 @@
 ---
 name: n8n
-description: "n8n workflow automation — API integration, nodes, triggers, expressions, MCP, 400+ integrations. Ready-made recipes: CAPI через n8n, server-side события Meta, передать квал-лид в Meta, LTV в Pixel, webhook CRM в Facebook (CRM webhook → SHA-256 → Meta Conversions API), programmatic AI-SEO factory. EN: n8n CAPI workflow, server-side Meta events, CRM webhook to Facebook Conversions API."
+description: "n8n workflow automation: API, nodes, triggers, expressions, MCP, 400+ integrations; Meta CAPI server-side event recipes. Triggers: «n8n workflow», «automation»."
 ---
 
 # N8N Workflow Automation Skill

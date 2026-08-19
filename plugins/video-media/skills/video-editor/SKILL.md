@@ -1,6 +1,6 @@
 ---
 name: video-editor
-description: "Локальный видеомонтаж на FFmpeg+Python: вырезка тишины/дублей, виральные субтитры, переходы, цветокор/LUT, авто-рефрейм 16:9→9:16, overlay-рил talking-head + AI b-roll. Триггеры: «вырежи паузы», «рилс из видео блогера». НЕ: генерация AI-видео→video-generation."
+description: "Видеомонтаж FFmpeg+Python: тишина, субтитры, рефрейм 9:16. Триггеры: «вырежи паузы», «склей видео», «наложи музыку». НЕ AI-генерация→video-generation."
 type: actionable
 ---
 

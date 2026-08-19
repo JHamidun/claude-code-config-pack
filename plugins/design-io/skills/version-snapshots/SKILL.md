@@ -1,8 +1,7 @@
 ---
 name: version-snapshots
 version: 1.0.0
-description: При значимых правках сохраняет копию артефакта в .snapshots/ + ведёт MANIFEST.md с миниатюрами.
-when_to_use: Любая итеративная работа, чтобы можно было откатиться без git.
+description: "Копии артефакта в .snapshots/ + MANIFEST.md — откат без git. Триггеры: «snapshot перед правкой», «откати к baseline», «история версий»."
 ---
 
 # Version snapshots

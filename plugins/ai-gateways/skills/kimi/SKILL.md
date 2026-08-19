@@ -1,6 +1,6 @@
 ---
 name: kimi
-description: "Kimi K2 (Moonshot AI, KIMI_API_KEY, kimi-k2-thinking) — глубокий reasoning, код-анализ, алгоритмы. Триггеры: kimi, «Kimi K2», moonshot, «спроси кими», «глубокое ревью через kimi»."
+description: "Kimi K2 (Moonshot AI, KIMI_API_KEY, kimi-k2-thinking): глубокий reasoning, код-анализ, алгоритмы. Триггеры: «спроси кими», «Kimi K2»."
 ---
 
 # Kimi K2 API Skill

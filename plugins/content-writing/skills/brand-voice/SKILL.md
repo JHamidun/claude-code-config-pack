@@ -1,6 +1,6 @@
 ---
 name: brand-voice
-description: Apply and enforce brand voice, style guide, and messaging pillars across content. Use when reviewing content for brand consistency, documenting a brand voice, adapting tone for different audiences, or checking terminology and style guide compliance.
+description: "Define and enforce brand voice: tone docs, style-guide compliance checks, audience adaptation. Triggers: «brand voice», «check against brand»."
 ---
 
 # Brand Voice Skill

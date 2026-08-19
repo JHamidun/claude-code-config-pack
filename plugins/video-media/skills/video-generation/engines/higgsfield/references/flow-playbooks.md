@@ -70,7 +70,7 @@ Tail-freeze: последние кадры pixel-identical (clean tail под м
 ## ФЛОУ 1 — Cinematic clip (их Cinematic Director)
 **Когда:** кино-ролик, продукт/персонаж в движении, 1 шот или короткая сцена.
 ```bash
-HF="${HOME}/.claude/skills/higgsfield/bin/hf.exe"
+HF="${HOME}/.claude/skills/video-generation/engines/higgsfield/bin/hf"   # вендорский бинарь, ставится отдельно (github.com/higgsfield-ai/cli)
 # 1) (опц.) консистентный герой — Soul ID
 "$HF" soul-id create --name hero --soul-cinematic --image p1.jpg --image p2.jpg ; "$HF" soul-id wait <id>
 # 2) keyframe (Nano Banana Pro / GPT Image 2), вшить §A LOCK

@@ -1,6 +1,6 @@
 ---
 name: ad-spy
-description: "Ad Library intelligence: Facebook, Google, LinkedIn, Reddit — мониторинг рекламы конкурентов, креативы, бюджеты via Scraping API. Российские каналы: Яндекс.Директ, Google Transparency Center, Telegram Ads (TGMaps/TGSpice), VK, Meta через Atria. Триггеры: реклама конкурентов, ad spy, ad library, competitor ads, креативы конкурентов, vk ads spy, admobispy, TGMaps, Atria, tryatria."
+description: "Реклама конкурентов из Ad Library (Facebook, Google, LinkedIn) через Scraping API; RU: Директ, TG Ads, VK. Триггеры: «что рекламируют конкуренты», ad spy."
 allowed-tools: Bash, Read, Write, WebSearch
 ---
 

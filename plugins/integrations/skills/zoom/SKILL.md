@@ -160,7 +160,7 @@ API выше работает только для записей **твоего*
 # 3) ctx.cookies() → requests.get(mp4_url, cookies=..., headers={'Referer':'https://us06web.zoom.us/'}, stream=True)
 # Селекторы Vue-страницы пароля: поле #passcode, кнопка #passcode_btn (дождись рендера wait_for_selector).
 ```
-Рабочий референс: `presentations/company-mastermind/_download_zoom.py` + `_dl_mp4.py`. Дальше — транскрипт через skill `deepgram` (REST), пакет по спикерам — skill `webinar-to-pdf`.
+Рабочий референс: `presentations/company-mastermind/_download_zoom.py` + `_dl_mp4.py`. Дальше — транскрипт через skill `deepgram` (REST); сборка пакета по спикерам делается своим скриптом (в пак не входит).
 
 #### Delete Recording
 

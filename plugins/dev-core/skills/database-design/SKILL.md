@@ -1,6 +1,6 @@
 ---
 name: database-design
-description: Database schema design, migration planning, query optimization, and data modeling for SQL and NoSQL databases. Covers PostgreSQL, MongoDB, Redis, and includes normalization, indexing strategies, and performance tuning.
+description: "DB schema design, migrations, query optimization: PostgreSQL, MongoDB, Redis; normalization, indexing. Triggers: «design the database», «slow query»."
 keywords: database, schema, migration, postgres, mongodb, redis, normalization, indexing, query-optimization
 ---
 

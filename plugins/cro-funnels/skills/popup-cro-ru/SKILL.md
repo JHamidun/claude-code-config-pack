@@ -1,6 +1,6 @@
 ---
 name: popup-cro-ru
-description: "Попапы, модалки, оверлеи, слайд-ины и баннеры для конверсии — захват email на контент-портале, лид-магниты, exit-intent, баннер trial продукта; согласие по 152-ФЗ. Триггеры: «попап», «popup», «модалка», «exit intent», «email попап», «sticky bar», «лид-магнит попап», «scroll trigger», «всплывающее окно». НЕ: формы вне попапов→form-cro-ru; конверсия страницы→page-cro-ru; пейволлы→paywall-cro-ru."
+description: "Попапы, модалки, слайд-ины, баннеры: захват email, лид-магниты, exit-intent, согласие по 152-ФЗ. Триггеры: «всплывающее окно», «sticky bar». НЕ формы→form-cro-ru."
 metadata:
   version: 1.1.0
   updated: 2026-05-29

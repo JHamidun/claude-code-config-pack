@@ -8,10 +8,10 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `gamma` | Generate presentations, documents, social posts and webpages with Gamma's Generate API (v1.0); export a Gamma to PDF/PPTX/PNG. |
-| `manus-slides` | Full-pipeline slide presentation creator. |
-| `marp-presentations` | Marp — Markdown → слайды (HTML/PDF/PPTX/PNG) через npx @marp-team/marp-cli; бесплатная альтернатива Gamma; превью в VSCode. |
-| `pptx` | Presentation creation, editing, and analysis. |
+| `gamma` | Генерация презентаций, доков и страниц через Gamma Generate API + экспорт в PDF/PPTX/PNG. |
+| `manus-slides` | Slide decks full-cycle: 25 AI styles (Gemini images) + HTML templates, Manus 1.6 themes, export PPTX/PDF/HTML. |
+| `marp-presentations` | Marp: Markdown → слайды (HTML/PDF/PPTX) через npx marp-cli, бесплатная альтернатива Gamma. |
+| `pptx` | Создание, правка и разбор .pptx файлов: layouts, спикер-ноты, комментарии. |
 | `pptx-editable-extractor` | HTML slides → PPTX with NATIVE editable text boxes — parses the DOM and extracts text nodes with coordinates. |
 | `pptx-import` | Unpack a PPTX as zip, read slide XML, extract text/images/coordinates — edit someone's deck as HTML. |
 

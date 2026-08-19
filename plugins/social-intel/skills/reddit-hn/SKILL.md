@@ -1,6 +1,6 @@
 ---
 name: reddit-hn
-description: Search Reddit and Hacker News for technology opinions, trends, and discussions. Use for social research on tech topics.
+description: "Search Reddit and Hacker News for tech opinions, trends, discussions. Triggers: «what does reddit say», «developer opinions on X»."
 ---
 
 # Reddit & Hacker News Research

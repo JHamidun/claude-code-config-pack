@@ -1,7 +1,7 @@
 ---
 name: building-an-exo
 version: 1.3.0
-description: "Консалтинговый reference ExO 3.0 / The Organizational Singularity (OpenExO) для AI-перестройки компании: Intelligence Stack, REWRITE-плейбук, Edge Twin, MTP, DRIVE/SHAPE скоркарды, Four Pillars governance. Use when: «ExO», «экспоненциальная организация», «Exponential Organization», «Edge Twin», «Intelligence Stack», «MTP». Для ИИ-стратсессий и слайдов КП. НЕ для маркетинг/CRO/продуктовых задач."
+description: "Справочник ExO 3.0 (OpenExO) для AI-перестройки компании: Intelligence Stack, REWRITE, Edge Twin, DRIVE/SHAPE, MTP. Триггеры: «экспоненциальная организация». НЕ маркетинг/CRO."
 metadata:
   license: MIT
   source: "Salim Ismail — The Organizational Singularity, OS Outline v20 (OpenExO Pro, May 2026); operationalized by Kent Langley"

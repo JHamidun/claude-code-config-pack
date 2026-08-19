@@ -258,7 +258,7 @@ MEDIA CONTACT:
 
 Before generating any content, resolve brand voice settings in this priority order:
 
-1. **Local config file** — check `~/.claude/config/brand-voice.json`
+1. **Local config file** — check `config/brand-voice.json` in your Claude config dir (личный файл, в пак не входит; шаблон рядом — `~/.claude/config/brand-voice.example.json`)
 
    Expected schema:
 

@@ -1,8 +1,7 @@
 ---
 name: type-scale
 version: 1.0.0
-description: Modular typographic scale из base + ratio. Plus 30 проверенных font-pair'ов на выбор.
-when_to_use: В начале проекта без дизайн-системы, или когда нужно «причесать» бардак с размерами.
+description: "Modular type scale из base + ratio, плюс 30 проверенных font-пар. Триггеры: «modular scale», «font pair», «причесать размеры шрифтов»."
 ---
 
 # Type scale

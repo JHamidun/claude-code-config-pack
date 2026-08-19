@@ -1,6 +1,6 @@
 ---
 name: performance-analytics
-description: "Analyze marketing performance — метрики каналов (email, social, paid, SEO), отчёты, tracking plan / события / цели. Триггеры: tracking plan, «план аналитики», «настроить цели/трекинг», «модели атрибуции», «ROMI vs ROAS», «CPL CPA CAC LTV», «UTM-структура», server-side GTM, Stape, «фаза обучения по платформам», lookalike quality events."
+description: "Метрики маркетинг-каналов и tracking plan: атрибуция, server-side GTM. Триггеры: «ROMI vs ROAS», «UTM-структура», «фаза обучения по платформам»."
 metadata:
   version: 1.2.0
   reuses: yandex, full-funnel-analytics-ru, capi-no-code-setup, ad-benchmarks-ru

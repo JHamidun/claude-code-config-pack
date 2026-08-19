@@ -1,6 +1,6 @@
 ---
 name: onboarding-cro-ru
-description: "Пост-регистрационный онбординг и активация — быстрее к аха-моменту, time-to-value в trial. Триггеры: «онбординг», «активация», «activation rate», «аха-момент», «чеклист онбординга», «empty states», «дроп после регистрации». НЕ: сама регистрация→signup-cro-ru; пейволлы trial→paid→paywall-cro-ru; email-рассылки→html-email/n8n; удержание платящих→churn-prevention-ru."
+description: "Онбординг и активация после регистрации — до аха-момента, time-to-value в trial. Триггеры: «activation rate», «дроп после регистрации». НЕ регистрация→signup-cro-ru."
 metadata:
   version: 1.1.0
   updated: 2026-05-29

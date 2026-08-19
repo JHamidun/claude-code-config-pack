@@ -8,16 +8,16 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `algorithmic-art` | Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. |
-| `edit-banana` | Edit Banana — convert diagram images (PNG/JPG) into editable DrawIO XML. |
-| `image-enhancer` | Improve image quality, upscale, enhance resolution, optimize |
-| `image-generation` | AI image generation prompt engineering — DALL-E 3, Gemini Imagen, Stable Diffusion, Midjourney. |
-| `nano-banana-pro` | Nano Banana Pro / Gemini Image Ultra — prompt engineering. |
-| `ocr-restore` | Use when processing scanned documents where OCR output contains garbled text, merged or split words, garbage characters, unreadable fragments, or corrupted passages. |
-| `openai-dalle` | OpenAI media API (OPENAI_API_KEY): gpt-image-2 (флагман, face-swap/multi-input edit), Sora 2 video, Whisper STT, TTS (6 голосов), embeddings, moderation. |
-| `replicate` | Replicate - run 1000+ AI models (FLUX, Stable Diffusion, Whisper, LLaMA, etc.) via API. |
-| `slack-gif-creator` | Toolkit for creating animated GIFs optimized for Slack, with validators for size constraints and composable animation primitives. |
-| `sticker-pack-generator` | End-to-end Telegram sticker pack pipeline — static WEBP, animated VP9-alpha video, custom emoji packs. |
+| `algorithmic-art` | Generative art with p5.js: seeded randomness, flow fields, particle systems, interactive parameters. |
+| `edit-banana` | Edit Banana: diagram images (PNG/JPG) to editable DrawIO XML — flowcharts, tables, screenshot text (SAM 3 + PaddleOCR + Gemini). |
+| `image-enhancer` | Improve image quality: upscale, denoise, enhance resolution, optimize. |
+| `image-generation` | Промпт-инжиниринг генерации картинок (DALL-E, Midjourney, SD, Gemini) + сюрреализм-пресет Крестинина. |
+| `nano-banana-pro` | Prompt engineering Nano Banana Pro (Gemini Image): реставрация фото, VK-креативы без VPN. |
+| `ocr-restore` | Restore garbled OCR text in escalating tiers with quality scoring: merged words, garbage chars. |
+| `openai-dalle` | OpenAI media API (OPENAI_API_KEY): gpt-image-2 face-swap/edit, Sora 2 video, Whisper STT, TTS, embeddings. |
+| `replicate` | Run 1000+ AI models via Replicate API: FLUX, SDXL, Whisper, LLaMA — when a model is not available natively. |
+| `slack-gif-creator` | Animated GIFs for Slack within size limits (emoji 64KB): validators + animation primitives. |
+| `sticker-pack-generator` | Стикерпаки Telegram: static WEBP, WebM VP9-alpha, кастом-эмодзи; Telethon upload через @Stickers. |
 
 ### Agents
 

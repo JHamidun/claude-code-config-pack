@@ -1,8 +1,7 @@
 ---
 name: comment-injector
 version: 1.0.0
-description: Inject overlay в HTML — пользователь кликает на элемент, в clipboard падает CSS-селектор + outerHTML, чтобы вставить в чат.
-when_to_use: Когда пользователь хочет точно указать, какой элемент менять, без скриншотов.
+description: "Overlay в HTML: Alt+Click по элементу кладёт в clipboard CSS-селектор и outerHTML — правки без скриншотов. Триггеры: «ревью прототипа в браузере»."
 ---
 
 # Comment injector

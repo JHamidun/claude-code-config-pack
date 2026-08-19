@@ -1,6 +1,6 @@
 ---
 name: account-research
-description: "Research a company or person for sales intel — web search standalone, richer with enrichment tools or CRM connected. Trigger with \"research [company]\", \"look up [person]\", \"intel on [prospect]\", \"who is [name] at [company]\"."
+description: "Sales intel on a company or person: web search + CRM enrichment. Triggers: «research [company]», «who is [name]». NOT social dossier -> social-intel."
 ---
 
 # Account Research
