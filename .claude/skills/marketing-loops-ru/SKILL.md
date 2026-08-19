@@ -1,6 +1,6 @@
 ---
 name: marketing-loops-ru
-description: "Растущие маркетинг-петли и рекуррентные циклы — повторяемые воркфлоу по расписанию: SEO-скан, контент→лиды→кейсы, churn-watch. Триггеры: «маркетинг-петля», «marketing loop», «маркетинг на автопилоте», «flywheel». НЕ: разовые тактики→marketing-masterminds-ru; A/B→ab-testing-ru; новости→ai-news-bot; новый бот→agent-builder tooling; удержание→churn-prevention-ru."
+description: "Маркетинг-петли — воркфлоу по расписанию: SEO-скан, churn-watch. Триггеры: «маркетинг-петля», «маркетинг на автопилоте». НЕ разовое→marketing-masterminds-ru."
 metadata:
   version: 1.0.0
   updated: 2026-07-18

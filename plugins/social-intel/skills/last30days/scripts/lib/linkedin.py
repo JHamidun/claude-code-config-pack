@@ -59,7 +59,7 @@ def search_linkedin(
         response = http.get(
             f"{SC_BASE}/search/posts",
             params={"query": topic, "date_posted": date_posted},
-            headers=http.scraper-vendor_headers(token),
+            headers=http.scraper_vendor_headers(token),
             timeout=30,
             retries=2,
         )
@@ -286,7 +286,7 @@ def search_profile(profile_url: str, token: str) -> Dict[str, Any]:
         response = http.get(
             f"{SC_BASE}/profile",
             params={"url": profile_url},
-            headers=http.scraper-vendor_headers(token),
+            headers=http.scraper_vendor_headers(token),
             timeout=30,
             retries=2,
         )

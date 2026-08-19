@@ -1,7 +1,6 @@
 ---
 name: storybook-bridge
-description: Экспорт component-playground в формат Storybook 7+ (CSF3). Чтобы команда с существующим Storybook смогла подхватить.
-when_to_use: У команды уже есть Storybook 7+; вы делаете компоненты и хотите положить их туда.
+description: "Экспорт component-playground в Storybook 7+ (CSF3) для команды с существующим Storybook. Триггеры: «выгрузи в Storybook», «CSF3»."
 ---
 
 # Storybook bridge

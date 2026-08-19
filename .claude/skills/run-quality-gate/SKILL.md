@@ -1,6 +1,6 @@
 ---
 name: run-quality-gate
-description: Execute quality gate validation with configurable blocking behavior. Use when running type-check, build, tests, lint, or custom validation commands in orchestrators or workers to enforce quality standards.
+description: "Run quality gates: type-check, build, tests, lint with configurable blocking. Worker utility. Triggers: «run checks», «quality gate»."
 allowed-tools: Bash, Read
 ---
 

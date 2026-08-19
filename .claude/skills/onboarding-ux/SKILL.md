@@ -1,7 +1,6 @@
 ---
 name: onboarding-ux
-description: Паттерны первого запуска — welcome, tour, empty-states, progressive disclosure. Не плодить «Welcome to X».
-when_to_use: Прототип содержит первый запуск, регистрацию, обучение пользователя.
+description: "Паттерны первого запуска: welcome, tour, empty-states. Триггеры: «первый запуск», «setup wizard», «TTV». НЕ активация Academy→onboarding-cro-ru."
 ---
 
 # Onboarding UX

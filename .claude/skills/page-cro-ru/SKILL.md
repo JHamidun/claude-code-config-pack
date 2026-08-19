@@ -1,6 +1,6 @@
 ---
 name: page-cro-ru
-description: "CRO маркетинговых страниц (лендинги услуг, воркшоп, продукт, главная, контент-портал, блог): аудит и рост конверсии визит→заявка/trial→оплата. Триггеры: «конверсия», «страница не конвертит», «улучши лендинг», «CRO». НЕ: регистрация→signup-cro-ru; активация→onboarding-cro-ru; пейволлы→paywall-cro-ru; попапы→popup-cro-ru; формы→form-cro-ru; цены→pricing-strategy-ru; удержание→churn-prevention-ru."
+description: "CRO маркетинговых страниц: рост конверсии визит→заявка/trial. Триггеры: «улучши лендинг», «страница не конвертит». НЕ: попапы→popup-cro-ru; формы→form-cro-ru."
 metadata:
   version: 1.2.0
   updated: 2026-06-23

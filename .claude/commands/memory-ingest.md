@@ -1,5 +1,5 @@
 ---
-description: "Индексация всех сессий Claude Code в ~/.claude/chats.db (SQLite FTS5): инкрементально или --force полный ре-индекс, затем stats. Триггеры: «проиндексируй чаты», «обнови индекс чатов», «memory ingest», «index chats»."
+description: "Индексация сессий Claude Code в chats.db (search_chats.py index, --force ре-индекс). Триггеры: «проиндексируй чаты», «обнови индекс чатов». Поиск → /search-chats."
 argument-hint: "[--force]"
 ---
 

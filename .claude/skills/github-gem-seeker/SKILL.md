@@ -1,6 +1,6 @@
 ---
 name: github-gem-seeker
-description: "Search GitHub for battle-tested open source instead of writing code from scratch — especially format conversion, media downloading, file manipulation, web scraping, automation scripts and CLI tools."
+description: "Find battle-tested open source on GitHub instead of coding from scratch. Triggers: «find a library», «ready-made solution», «find a repo»."
 ---
 
 # GitHub Gem Seeker

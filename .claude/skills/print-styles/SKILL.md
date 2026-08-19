@@ -1,7 +1,6 @@
 ---
 name: print-styles
-description: Print stylesheet для лендинга / документа / отчёта. Чтобы Cmd+P давал что-то приличное.
-when_to_use: Документы, контракты, лендинги, которые могут быть распечатаны или сохранены в PDF.
+description: "Print stylesheet, чтобы Cmd+P давал приличный результат. Триггеры: «стили для печати», «@media print», «page-break»."
 ---
 
 # Print styles

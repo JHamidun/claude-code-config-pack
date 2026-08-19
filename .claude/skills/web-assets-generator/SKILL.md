@@ -1,6 +1,6 @@
 ---
 name: web-assets-generator
-description: Generate favicons, PWA icons, and social/og images. Branded social cards (og-image, webinar/event banners, covers with avatars) — HTML template → screenshot, crisper than Pillow text. Use when «сделай баннер», «og картинка», «обложка для анонса», «баннер вебинара/события», «фавикон», «иконки PWA», «social card», «og-image 1200×630», «баннер с фото спикеров», «аватары в кружках».
+description: "Фавиконы, PWA-иконки, og-images и брендовые баннеры: HTML-шаблон → скриншот. Триггеры: «сделай баннер», «og картинка», «обложка для анонса», «фавикон»."
 ---
 
 # Web Assets Generator Skill

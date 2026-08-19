@@ -1,6 +1,6 @@
 ---
 name: llm-evals
-description: "Эвалюация LLM/агентов: golden-set, двухуровневый грейдинг (программные метрики + LLM-судья), пробник vs полный прогон, отчёт вариант×метрика, вердикт keep/rollback, свип моделей и effort/thinking ради quality-per-dollar. Триггеры: «судья-LLM», «grader», «сравнение effort». НЕ: фактчек→check-skill-solo; адверсарное ревью и код-ревью→verifier; второе мнение→multi-model-gateway; RAG-метрики→rag-eval-opik.md."
+description: "Эвалы LLM/агентов: golden-set, LLM-судья + метрики, вердикт keep/rollback, свип моделей и effort. Триггеры: «судья-LLM», «grader», «сделай эвал». НЕ фактчек→check-skill-solo."
 ---
 
 # LLM Evals — измерять, а не верить

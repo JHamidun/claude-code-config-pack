@@ -261,7 +261,7 @@ def _user_reels(
         data = http.get(
             reels_url,
             params={"handle": handle},
-            headers=http.scraper-vendor_headers(token),
+            headers=http.scraper_vendor_headers(token),
             timeout=30,
             retries=2,
         )
@@ -305,7 +305,7 @@ def search_instagram(
         data = http.get(
             f"{SCRAPER_BASE}/v2/instagram/reels/search",
             params={"query": core_topic},
-            headers=http.scraper-vendor_headers(token),
+            headers=http.scraper_vendor_headers(token),
             timeout=30,
             retries=2,
         )
@@ -319,7 +319,7 @@ def search_instagram(
                 data = http.get(
                     f"{SCRAPER_BASE}/v2/instagram/reels/search",
                     params={"query": _to_hashtag_form(core_topic)},
-                    headers=http.scraper-vendor_headers(token),
+                    headers=http.scraper_vendor_headers(token),
                     timeout=30,
                     retries=2,
                 )
@@ -422,7 +422,7 @@ def fetch_captions(
                 data = http.get(
                     f"{SCRAPER_BASE}/v2/instagram/media/transcript",
                     params={"url": url},
-                    headers=http.scraper-vendor_headers(token),
+                    headers=http.scraper_vendor_headers(token),
                     timeout=transcript_timeout,
                     retries=1,
                 )
@@ -600,7 +600,7 @@ def _fetch_post_comments(
         data = http.get(
             f"{SCRAPER_BASE}/v2/instagram/post/comments",
             params={"url": post_url},
-            headers=http.scraper-vendor_headers(token),
+            headers=http.scraper_vendor_headers(token),
             timeout=30,
             retries=2,
         )

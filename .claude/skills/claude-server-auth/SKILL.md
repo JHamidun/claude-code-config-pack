@@ -1,6 +1,6 @@
 ---
 name: claude-server-auth
-description: "Use when authenticating Claude CLI on a headless server - generates subscription tokens via tmux + local Playwright OAuth flow"
+description: "Authenticate Claude CLI on a headless server: subscription setup-token via tmux + local Playwright OAuth. Trigger: «authorize claude on server»."
 ---
 
 # Claude Server Auth

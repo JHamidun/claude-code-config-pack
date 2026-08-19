@@ -1,5 +1,5 @@
 ---
-description: "Google Tasks: списки задач, создание/завершение задач, дедлайны (Tasks API v1). Триггеры: «google tasks», «задачи google», «добавь задачу в google», «спиши задачу». Todoist-workflow → /gtd."
+description: "Google Tasks: списки задач, создание/завершение, дедлайны. Триггеры: «задачи google», «добавь задачу в google». Todoist → /gtd."
 argument-hint: "[lists | tasks <list_id> | create <список> <задача> | complete <list_id> <id>]"
 ---
 

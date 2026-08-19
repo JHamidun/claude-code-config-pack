@@ -1,5 +1,5 @@
 ---
-description: "Сборка оптимального контекста под тип задачи (bug fix / feature / review / refactoring / testing) по принципам Context Engineering: релевантные источники, few-shot, компрессия токенов. Триггеры: «оптимизируй контекст», «собери контекст под задачу», «context engineering». Методология целиком → skill context-engineering."
+description: "Сборка контекста под задачу (bug fix/feature/review): источники, few-shot, компрессия. Триггеры: «собери контекст», «оптимизируй контекст». Методология → context-engineering."
 argument-hint: "[тип задачи] \"<описание>\""
 ---
 

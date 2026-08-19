@@ -1,6 +1,6 @@
 ---
 name: ocr-restore
-description: Use when processing scanned documents where OCR output contains garbled text, merged or split words, garbage characters, unreadable fragments, or corrupted passages. Applies escalating restoration tiers based on quality score — stops as soon as the result is good enough.
+description: "Restore garbled OCR text in escalating tiers with quality scoring: merged words, garbage chars. Triggers: «broken OCR», «scan poorly recognized»."
 ---
 
 # OCR Scan Restoration

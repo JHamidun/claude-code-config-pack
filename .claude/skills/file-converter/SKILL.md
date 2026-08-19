@@ -1,6 +1,6 @@
 ---
 name: file-converter
-description: "Конвертация файлов локально, без API-ключей: формат→формат через MCP file-converter (Word↔PDF, изображения, Excel→CSV) и ЧТО УГОДНО→Markdown через markitdown (PDF/Office/HTML/EPub/ZIP, OCR картинок, аудио, YouTube-URL). Триггеры: «word в pdf», «вытащи текст из pdf/docx», «файл для модели». НЕ: pixel-perfect PDF-вёрстка→pdf; Q&A по папке документов→research-docs; сложные сканы→ocr-restore."
+description: "Конвертация файлов локально: Word↔PDF, Excel→CSV, что угодно→Markdown (markitdown). Триггеры: «word в pdf», «вытащи текст из pdf». НЕ сканы→ocr-restore."
 ---
 
 # File Converter MCP Server Skill

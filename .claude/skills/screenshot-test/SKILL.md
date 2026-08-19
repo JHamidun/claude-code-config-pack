@@ -1,7 +1,6 @@
 ---
 name: screenshot-test
-description: Pixel-diff между текущим и эталонным скриншотом. Падает, если артефакт визуально сломался.
-when_to_use: CI / pre-commit для дизайн-системы, лендинга, ключевых экранов прототипа.
+description: "Pixel-diff текущего скриншота с эталоном — падает при визуальной поломке; CI/pre-commit. Триггеры: «pixel diff», «визуальный регресс»."
 ---
 
 # Screenshot test

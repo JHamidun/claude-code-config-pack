@@ -505,7 +505,7 @@ def show_diagnostic_banner(diag: dict):
     """
     available_sources = set(diag.get("available_sources") or [])
     has_reddit = "reddit" in available_sources
-    has_scraper-vendor = diag.get("has_scraper-vendor", False)
+    has_scraper_vendor = diag.get("has_scraper-vendor", False)
     has_x = "x" in available_sources
     has_youtube = "youtube" in available_sources
     has_web = "grounding" in available_sources
@@ -526,7 +526,7 @@ def show_diagnostic_banner(diag: dict):
         lines.append(f"{Colors.DIM}│{Colors.RESET}                                                     {Colors.DIM}│{Colors.RESET}")
 
         # Reddit
-        if has_reddit and has_scraper-vendor:
+        if has_reddit and has_scraper_vendor:
             lines.append(f"{Colors.DIM}│{Colors.RESET}  {Colors.GREEN}✅ Reddit{Colors.RESET}    — full threads with comments          {Colors.DIM}│{Colors.RESET}")
         elif has_reddit:
             lines.append(f"{Colors.DIM}│{Colors.RESET}  {Colors.GREEN}✅ Reddit{Colors.RESET}    — public threads (titles + scores)   {Colors.DIM}│{Colors.RESET}")
@@ -573,7 +573,7 @@ def show_diagnostic_banner(diag: dict):
         lines.append(f"│ {_header_plain}{' ' * (52 - len(_header_plain))}│")
         lines.append("│                                                     │")
 
-        if has_reddit and has_scraper-vendor:
+        if has_reddit and has_scraper_vendor:
             lines.append("│  ✅ Reddit    — full threads with comments          │")
         elif has_reddit:
             lines.append("│  ✅ Reddit    — public threads (titles + scores)   │")

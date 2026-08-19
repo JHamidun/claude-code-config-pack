@@ -1,6 +1,6 @@
 ---
 name: self-reflect
-description: Self-improvement analysis - review recent errors, find patterns, generate improvements for rules/skills. Use with "проанализируй себя", "self-reflect".
+description: "Review recent errors and patterns, generate rule/skill improvements. Triggers: «self-reflect», «проанализируй себя», «what mistakes repeat»."
 ---
 
 # Self-Reflect: Continuous Improvement

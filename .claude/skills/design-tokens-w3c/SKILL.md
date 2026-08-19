@@ -1,7 +1,6 @@
 ---
 name: design-tokens-w3c
-description: Экспорт дизайн-токенов в формат W3C Design Tokens (DTCG). Совместимо со Style Dictionary, Token Studio, всеми современными tools.
-when_to_use: После color-system-builder + type-scale, когда нужно отдать токены в команду, использующую стандарт.
+description: "Экспорт дизайн-токенов в W3C DTCG tokens.json: Style Dictionary, Token Studio. Триггеры: «экспорт токенов», «отдай токены команде»."
 ---
 
 # W3C Design Tokens

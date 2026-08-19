@@ -1,6 +1,6 @@
 ---
 name: tg-bot-publish
-description: "Публикация и управление в Telegram ЧЕРЕЗ БОТА (Bot API), CLI tg_bot.py: посты в канал, rich-вёрстка (таблицы/картинки), рассылка подписчикам, inline-кнопки, админка, Stars, вебхуки. НЕ: текст поста→tg-post; разработка→telegram-bot-toolkit; user-аккаунт→tg_client.py."
+description: "Публикация в Telegram через бота (Bot API, tg_bot.py): посты в канал, рассылка, кнопки. Триггеры: «пост в канал от бота»."
 keywords: telegram bot api, tg_bot.py, sendRichMessage, пост в канал от бота, бот админ канала, кнопка к посту, rich пост таблица, рассылка подписчикам, sendMessage, inline keyboard, broadcast, paid media stars, инвайт ссылка, вебхук, getFile, опрос от бота
 ---
 

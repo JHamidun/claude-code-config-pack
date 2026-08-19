@@ -1,6 +1,6 @@
 ---
 name: heygen
-description: HeyGen API — AI avatar video, v3 primary (54 endpoints). Avatar V/IV/III engines, Cinematic Avatar, HyperFrames (HTML→video), photo/digital-twin/prompt avatars, Image-to-Video, 175+ lang translation with lip-sync, TTS, Voice Clone, Video Agent (prompt-to-video), Brand Kits, webhooks, asset uploads. Use for «heygen», «аватар видео», «видео с аватаром». Verified against OpenAPI spec 2026-06-05.
+description: "HeyGen API v3: AI avatar video, digital twin, lip-sync translation, voice clone. Triggers: «avatar video», «talking head». NOT photo-only -> did."
 ---
 
 # HeyGen API Skill

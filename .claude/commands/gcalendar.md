@@ -1,5 +1,5 @@
 ---
-description: "Google Calendar: события на сегодня/неделю, создание событий, свободные слоты (Calendar API v3, OAuth). Триггеры: «календарь», «события на сегодня», «создай событие в календаре», «свободные слоты», «что у меня по расписанию»."
+description: "Google Calendar (gcal_client.py): события сегодня/неделя, создание. Триггеры: «календарь», «что по расписанию», «свободные слоты». Токен: google_oauth_token_calendar.json."
 argument-hint: "[today | week | list <дней> | create <событие> | free]"
 ---
 

@@ -1,7 +1,6 @@
 ---
 name: sketch-to-html
-description: Скетч / фото маркерной доски / напканная заметка → HTML каркас. Вариант document-import, специально для рукописных штук.
-when_to_use: Пользователь приложил фото скетча, рисунок на салфетке, экспорт из Excalidraw/tldraw.
+description: "Скетч, фото доски, салфетки или Excalidraw → HTML-каркас. Триггеры: «из скетча в html», «whiteboard в каркас». НЕ PDF/DOCX → document-import."
 ---
 
 # Sketch to HTML

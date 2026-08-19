@@ -1,6 +1,6 @@
 ---
 name: sharing-skills
-description: Use when you've developed a broadly useful skill and want to contribute it upstream via pull request
+description: "Contribute your skill upstream via pull request: branch, commit, push. Triggers: «share the skill», «contribute skill»."
 ---
 
 # Sharing Skills

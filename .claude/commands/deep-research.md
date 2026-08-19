@@ -1,5 +1,5 @@
 ---
-description: "Глубокое исследование через Perplexity AI (real-time веб-поиск, цитаты, источники) — perplexity_helper.py. Триггеры: «research», «deep research», «найди информацию», «исследуй тему», «сравни технологии», «проверь факты по источникам». НЕ для вопросов о внутреннем коде проекта. Perplexity API-референс → skill perplexity."
+description: "Research через Perplexity (perplexity_helper.py): веб-поиск, источники. Триггеры: «исследуй тему», «проверь факты по источникам». НЕ код проекта; API → perplexity."
 argument-hint: "\"<исследовательский вопрос>\""
 ---
 

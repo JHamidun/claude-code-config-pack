@@ -1,6 +1,6 @@
 ---
 name: rollback-changes
-description: Automatically rollback changes from failed workflow phases using changes log files. Use when workflows fail and need to restore previous state, including file restoration, artifact cleanup, and command reversal. Use for error recovery after failed bug fixes, security patches, or refactoring operations.
+description: "Roll back failed workflow phases via changes logs: restore files, clean artifacts, reverse commands. Triggers: «roll back changes», «restore state»."
 allowed-tools: Bash, Read, Write
 ---
 

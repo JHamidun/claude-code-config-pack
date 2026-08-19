@@ -1,6 +1,6 @@
 ---
 name: marp-presentations
-description: "Marp — Markdown → слайды (HTML/PDF/PPTX/PNG) через npx @marp-team/marp-cli; бесплатная альтернатива Gamma; превью в VSCode. Триггеры: marp, «слайды из markdown», «slides from markdown», «markdown презентация»."
+description: "Marp: Markdown → слайды (HTML/PDF/PPTX) через npx marp-cli, бесплатная альтернатива Gamma. Триггеры: «слайды из markdown», «marp»."
 ---
 
 # Marp — Markdown Presentations

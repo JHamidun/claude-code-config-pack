@@ -1,5 +1,5 @@
 ---
-description: "Google Analytics 4: аккаунты, ресурсы (properties), отчёты по трафику/страницам через GA4 Data+Admin API. Триггеры: «GA4», «google analytics», «аналитика google», «трафик сайта в GA». НЕ Яндекс Метрика → отдельный навык под Яндекс (в пак не входит)."
+description: "Google Analytics 4: аккаунты, properties, отчёты по трафику (GA4 Data+Admin API). Триггеры: «GA4», «аналитика google», «трафик в GA»."
 argument-hint: "[accounts | properties | report <property_id>]"
 ---
 

@@ -1,7 +1,6 @@
 ---
 name: pptx-editable-extractor
-description: HTML → редактируемый PPTX. Каждый текст-узел становится нативным TextBox с координатами, шрифтом, цветом. Пользователь редактирует в PowerPoint.
-when_to_use: Нужен PPTX, который можно править. Не путать с export-pptx (screenshots).
+description: "HTML → редактируемый PPTX: каждый текст-узел — нативный TextBox, правится в PowerPoint. Триггеры: «pptx с editable text». НЕ скриншоты→export-pptx."
 ---
 
 # PPTX editable extractor

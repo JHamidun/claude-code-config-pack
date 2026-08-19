@@ -1,6 +1,6 @@
 ---
 name: telegram-bot-toolkit
-description: "Telegram bot development, testing, debugging and deployment — python-telegram-bot, Telethon, scene management patterns, middleware, production deploy. Also when NOT to use a bot as a TG Ads funnel: «антипаттерн бот-воронки», «бот как коллектор базы»."
+description: "Разработка Telegram-ботов: python-telegram-bot, Telethon, деплой; антипаттерн бот-воронки из TG Ads. Триггеры: «напиши бота», «deploy бота»."
 keywords: telegram, bot, python-telegram-bot, telethon, scenes, middleware, webhooks, deployment, debugging, бот как коллектор, антипаттерн бот-воронки, бот из TG Ads, воронка через бот
 ---
 

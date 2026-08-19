@@ -849,7 +849,7 @@ def reddit_keyless_get_text(
     return get_text(url, timeout=timeout, retries=retries, accept=accept, headers=headers)
 
 
-def scraper-vendor_headers(token: str) -> Dict[str, str]:
+def scraper_vendor_headers(token: str) -> Dict[str, str]:
     """Build ScraperVendor request headers (x-api-key + JSON content type)."""
     return {
         "x-api-key": token,

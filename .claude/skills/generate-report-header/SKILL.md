@@ -1,6 +1,6 @@
 ---
 name: generate-report-header
-description: Create standardized report headers with metadata for all agent-generated reports. Use when generating bug reports, security audits, dependency reports, or any worker output requiring consistent formatting.
+description: "Standard header with metadata for agent-generated reports: type, version, status, phase. Worker utility. Trigger: «report header»."
 ---
 
 # Generate Report Header

@@ -1,6 +1,6 @@
 ---
 name: image-enhancer
-description: Improve image quality, upscale, enhance resolution, optimize
+description: "Improve image quality: upscale, denoise, enhance resolution, optimize. Triggers: «upscale», «image is blurry»."
 ---
 
 # Image Enhancer Skill

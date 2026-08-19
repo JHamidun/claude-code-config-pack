@@ -1,5 +1,5 @@
 ---
-description: "Google Docs: прочитать документ, найти документ по названию, дописать текст. Триггеры: «google docs», «гугл документ», «прочитай документ», «саммари документа». Полный набор Workspace → skill google-workspace."
+description: "Google Docs (gdocs_client.py): прочитать документ, найти по названию, дописать. Триггеры: «гугл документ», «саммари документа». Хаб → skill google-workspace."
 argument-hint: "[read <id|ссылка> | search <запрос> | append <id> --text <текст>]"
 ---
 

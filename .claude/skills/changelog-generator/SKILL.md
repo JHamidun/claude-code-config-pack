@@ -1,6 +1,6 @@
 ---
 name: changelog-generator
-description: Generate user-facing changelogs from git commits with semantic versioning
+description: "Changelog from git commits: semver bump, Keep a Changelog format, PR links via gh, GitHub Releases. Triggers: «changelog», «release notes»."
 ---
 
 # Changelog Generator Skill

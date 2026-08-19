@@ -1,5 +1,5 @@
 ---
-description: "Google Sheets: прочитать таблицу, записать, найти таблицу, посмотреть листы. Триггеры: «google sheets», «гугл таблица», «прочитай таблицу», «запиши в таблицу», «анализ таблицы». Полный набор Workspace → skill google-workspace."
+description: "Google Sheets (gsheets_client.py): прочитать/записать таблицу, найти, листы. Триггеры: «гугл таблица», «запиши в таблицу». Хаб → skill google-workspace."
 argument-hint: "[info <id> | read <id> [--tab лист] | write <id> --range … --values … | search <запрос>]"
 ---
 

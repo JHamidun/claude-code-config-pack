@@ -1,6 +1,6 @@
 ---
 name: capi-no-code-setup
-description: "Серверная передача событий (Conversions API / server-side) БЕЗ кода — Zapier/n8n/Albato + CRM (your CRM/Битрикс24): Meta CAPI (Event ID дедупликация), server-side GTM, офлайн-конверсии из CRM. Триггеры: «настрой CAPI», «Conversions API без кода», «server-side события», «офлайн-конверсии». НЕ: аукцион→meta-ads-launch-ru/google-ads-pro-ru; дашборды→performance-analytics; эндпоинт→senior-devops."
+description: "Server-side события (Meta CAPI, GTM, офлайн-конверсии) БЕЗ кода — Zapier/n8n/Albato + CRM. Триггеры: «настрой CAPI». НЕ аукцион → meta-ads-launch-ru."
 metadata:
   version: 1.0.0
   updated: 2026-06-22

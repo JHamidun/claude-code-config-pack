@@ -1,6 +1,6 @@
 ---
 name: suno
-description: "Headless-клиент Suno (генерация музыки) через внутренний API studio-api-prod.suno.com без браузера. Инструменталы и песни, листинг клипов, скачивание mp3, баланс. Триггеры: «сделай музыку/трек в Suno», «suno generate», «саундтрек для ролика», «инструментал», «фоновая музыка», «песня со словами», «мои треки suno». Аккаунт companyaudio (Pro). НЕ: ElevenLabs Music (BGM ≤30с), Lyria."
+description: "Генерация музыки в Suno без браузера (suno_client.py): треки, mp3, кредиты. Триггеры: «трек в Suno», «фоновая музыка». НЕ BGM ≤30с → elevenlabs."
 ---
 
 # Suno — headless internal API

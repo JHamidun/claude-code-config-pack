@@ -1,7 +1,6 @@
 ---
 name: mobile-overlays
-description: Дополнительные мобильные паттерны поверх device-frames — клавиатура, bottom sheet, тосты, контекстные меню.
-when_to_use: Прототип в iOS/Android рамке, нужен реалистичный overlay (клавиатура при вводе, всплывающий sheet, тост-уведомление).
+description: "Мобильные оверлеи поверх device-frames: iOS-клавиатура, bottom sheet, тосты. Триггеры: «action sheet», «toast», «mobile UI overlay»."
 ---
 
 # Mobile overlays

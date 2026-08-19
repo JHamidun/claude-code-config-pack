@@ -1,7 +1,6 @@
 ---
 name: animations
-description: Таймлайн-анимации с плеером, скраббером, ease-функциями. Для motion-дизайна и видео-стиля.
-when_to_use: Пользователь просит "анимацию", "motion", "видео", "ролик", "интро", "transitions для презентации".
+description: "Таймлайн-анимации в HTML (React): плеер, скраббер, ease. Триггеры: «анимация в HTML», «motion design», «интро», «transitions для презентации»."
 ---
 
 # Animations

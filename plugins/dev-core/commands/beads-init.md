@@ -4,7 +4,7 @@ description: Initialize Beads issue tracking in your project with interactive co
 
 # Beads Initialization
 
-> **Attribution**: [Beads](https://github.com/<author>/beads) is created by [Steve Yegge](https://github.com/<author>).
+> **Attribution**: [Beads](https://github.com/steveyegge/beads) is created by [Steve Yegge](https://github.com/steveyegge).
 
 ## User Input
 
@@ -24,7 +24,7 @@ If not installed, provide installation options:
 
 **Option 1: Go (recommended)**
 ```bash
-go install github.com/<author>/beads/cmd/bd@latest
+go install github.com/steveyegge/beads/cmd/bd@latest
 ```
 
 **Option 2: npm**
@@ -118,7 +118,7 @@ END:    bd sync → git push
 
 - Quick reference: .claude/docs/beads-quickstart.md
 - Templates: .beads-templates/README.md
-- Official docs: https://github.com/<author>/beads
+- Official docs: https://github.com/steveyegge/beads
 
 ### Next Steps
 

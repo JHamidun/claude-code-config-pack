@@ -1,6 +1,6 @@
 ---
 name: security-audit
-description: Security auditing - vulnerability scanning, code review, OWASP checks, penetration testing guidance
+description: "Security audit: secret scanning, dependency audit, OWASP Top 10 checks, code review. Triggers: «security audit», «check for vulnerabilities»."
 ---
 
 # Security Audit Skill

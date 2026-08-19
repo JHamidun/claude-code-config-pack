@@ -1,6 +1,6 @@
 ---
 name: ace-step
-description: "AI-музыка локально на your GPU (ACE-Step 1.5): инструменталы и песни, авто/кастомная лирика, модели base/xl-turbo; CLI scripts/generate.py. Триггеры: «напиши песню», jingle, soundtrack, background music. НЕ Suno (skill suno), не ElevenLabs Music."
+description: "AI-музыка локально на your GPU (ACE-Step 1.5): инструменталы, песни, лирика; CLI scripts/generate.py. Триггеры: «напиши песню», jingle, soundtrack. НЕ Suno→suno."
 ---
 
 # ACE-Step: AI Music Generation

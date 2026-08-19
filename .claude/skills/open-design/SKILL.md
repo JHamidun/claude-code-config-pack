@@ -1,6 +1,6 @@
 ---
 name: open-design
-description: Open-source альтернатива Claude Design — локальный design-tool с 35 скиллами, 72 дизайн-системами и поддержкой 10 AI-агентов. Запуск, workflow, сравнение с Claude Design / Manus Slides / Your Slide Service, интеграция с Claude Code.
+description: "Open Design — локальный open-source дизайн-тул, 72 дизайн-системы, агент Claude Code. Триггеры: «open design», «запусти дизайн приложение»."
 ---
 
 # open-design

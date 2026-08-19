@@ -2057,7 +2057,7 @@ def _main(
     if topic.lower() == "setup":
         from lib import setup_wizard
         if "--your-gateway-project" in extra_argv:
-            results = setup_wizard.run_your-gateway-project_setup(config)
+            results = setup_wizard.run_your_gateway_project_setup(config)
             print(json.dumps(results))
             return 0
         if any(f in extra_argv for f in ("--github", "--device-auth", "--github-start", "--github-poll")):

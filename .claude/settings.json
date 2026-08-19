@@ -7,7 +7,8 @@
     "MCP_TIMEOUT": "30000",
     "MCP_TOOL_TIMEOUT": "180000",
     "ENABLE_TOOL_SEARCH": "auto",
-    "SUPERPOWERS_DISABLE_TELEMETRY": "1"
+    "SUPERPOWERS_DISABLE_TELEMETRY": "1",
+    "CLAUDE_CODE_THRIFTY_SONIC": "false"
   },
   "permissions": {
     "allow": [
@@ -394,5 +395,7 @@
       "url": "https://mcp.miro.com/",
       "disabled": true
     }
-  }
+  },
+  "skillListingBudgetFraction": 0.08,
+  "skillListingMaxDescChars": 400
 }

@@ -88,3 +88,9 @@ plugins/*/skills/*/state/
 live_shot.png
 **/identity.local.json
 **/leak-scan-identity.json
+
+# WhatsApp-мост: исходники (bridge.js, allowlist.js, package*.json) публикуются,
+# всё остальное — состояние конкретного телефона и в репозиторий не идёт.
+.claude/tools/wa-bridge/.session/
+.claude/tools/wa-bridge/store/
+.claude/tools/wa-bridge/bridge.log

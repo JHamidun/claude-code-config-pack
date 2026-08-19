@@ -1,6 +1,6 @@
 ---
 name: pr-outreach-ru
-description: "Earned media / PR-аутрич RU для эксперта/продукта: питчи журналистам, Pressfeed вместо HARO, newsjacking, медиа-лист, пресс-кит, комментарии, подкасты. Триггеры: «PR», «пиар», «попасть в СМИ», «Pressfeed», «инфоповод», «как попасть в РБК», «HARO». НЕ: мониторинг упоминаний→last30days/social-intel; статью→rbc/habr/vc-post; sales-аутрич→draft-outreach; пост в канал→tg-post; цикл→marketing-loops-ru."
+description: "PR-аутрич RU: питчи журналистам, Pressfeed (вместо HARO), newsjacking, пресс-кит. Триггеры: «инфоповод», «попасть в СМИ». НЕ статья→rbc/habr/vc-post."
 metadata:
   version: 1.0.0
   ported_from: coreyhaines31/marketingskills (public-relations)

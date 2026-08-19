@@ -1,6 +1,6 @@
 ---
 name: thinking-frameworks
-description: "Structured thinking frameworks for deep analysis and decision-making. Триггеры: «проанализируй», «фреймворк», think deeper, first principles. Плюс kaizen / кайдзен / PDCA: устранение waste (muda), Gemba, A3 Report (режим 7)."
+description: "Структурные фреймворки анализа и решений: first principles, pre-mortem, kaizen/PDCA. Триггеры: «фреймворк», «кайдзен», «улучшение процессов»."
 ---
 
 # Thinking Frameworks

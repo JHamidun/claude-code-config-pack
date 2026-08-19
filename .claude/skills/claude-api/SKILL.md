@@ -1,6 +1,6 @@
 ---
 name: claude-api
-description: "Anthropic Claude API (ANTHROPIC_API_KEY) из Python: text generation, vision, tool use, streaming. Триггеры: «claude api», «вызови клода из кода», «anthropic sdk». Для запуска БЕЗ ключа по подписке → claude-cli-runner. Model ID актуализированы 2026-07-18 (opus-4-8 / sonnet-4-5-20250929 / haiku-4-5-20251001 / fable-5); канон — config/models.md."
+description: "Anthropic Claude API (ANTHROPIC_API_KEY) из Python: text, vision, tool use, streaming. Триггеры: «claude api». БЕЗ ключа → claude-cli-runner."
 ---
 
 # Claude API Skill

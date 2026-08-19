@@ -1,5 +1,5 @@
 ---
-description: "Поиск по истории чатов + извлечённым знаниям (search_chats.py search/knowledge; --type code|error|learning|decision). Алиас-надстройка над /search-chats с доп. слоем knowledge base. Триггеры: «поищи в памяти», «memory search», «найди в базе знаний ошибку/код»."
+description: "Поиск по памяти: заметки (memory_find.py) + чаты + знания (search_chats.py knowledge). Триггеры: «поищи в памяти», «найди в базе знаний». Чистый поиск чатов → /search-chats."
 argument-hint: "<запрос> [--type code|error|learning|decision]"
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: whatsapp-client
-description: "CLI к ЛИЧНОМУ WhatsApp через локальный Baileys-мост (Node): чтение чатов и истории, поиск, отправка текста/медиа, группы, контакты, профили, экспорт чата, рассылка с анти-бан гардами. CLI: python ~/.claude/tools/wa_client.py <cmd>. НЕ: Telegram→tg_client.py/tg-bot-publish; MAX→max-messenger; SMS→sms-twilio; WhatsApp Business Cloud API здесь нет; спам запрещён ToS Meta."
+description: "CLI к личному WhatsApp (Baileys-мост, wa_client.py): чтение, отправка, группы, анти-бан рассылка. Триггеры: «напиши в whatsapp», «вотсап». НЕ Telegram→tg_client.py."
 ---
 
 # WhatsApp Client (личный номер, локально)
