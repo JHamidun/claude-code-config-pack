@@ -1,6 +1,6 @@
 ---
 name: offers-ru
-description: "Конструирование офферов: value equation, бонус-стек, гарантия, дефицит, risk reversal, диагностика оффера. Триггеры: «оффер», «собери оффер», «grand slam offer», «Хормози», «value stack», «риск-реверсал», «почему оффер не конвертит», «high-ticket», «продуктизировать услугу». НЕ: уровень цен→pricing-strategy-ru; страница→page-cro-ru; пейволл→paywall-cro-ru; КП для B2B→sales-enablement-ru."
+description: "Конструирование офферов: value equation, бонус-стек, risk reversal. Триггеры: «Хормози», «почему оффер не конвертит». НЕ цены→pricing-strategy-ru."
 metadata:
   version: 1.0.0
   ported_from: coreyhaines31/marketingskills (offers)

@@ -1,6 +1,6 @@
 ---
 name: media-planning-ru
-description: "Стратегическое медиапланирование — «в какой канал вообще идти» ДО ad-playbook. (ROMI/ROAS/CPL/CPA), аукц. vs неаукц. каналы, матрица ниша×бюджет→канал. Маршрутизирует на yandex/google/telegram/vk/meta ads playbook'и. Триггеры: «выбор канала», «медиапланирование», «медиаплан», «куда лить трафик». НЕ: настройка канала→playbook; воронка→funnel-design-ru; сквозная→full-funnel-analytics-ru."
+description: "Выбор рекламного канала ДО настройки: матрица ниша×бюджет→канал. Триггеры: «куда лить трафик», «медиаплан». НЕ настройка канала→его playbook."
 metadata:
   version: 1.0.0
   reuses: yandex-direct-pro-ru, google-ads-pro-ru, telegram-ads-pro-ru, vk-ads-pro-ru, meta-ads-launch-ru, tg-channel-buyout-ru, funnel-design-ru, full-funnel-analytics-ru

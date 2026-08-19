@@ -1,6 +1,6 @@
 ---
 name: parse-git-status
-description: Parse git status output into structured data showing staged, modified, and untracked files. Use for pre-flight validation, checking clean working directory, or listing changed files before commits.
+description: "Parse git status into structured data: staged, modified, untracked, branch. Pre-flight check utility. Trigger: «parse git status»."
 ---
 
 # Parse Git Status

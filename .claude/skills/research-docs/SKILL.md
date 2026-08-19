@@ -1,6 +1,6 @@
 ---
 name: research-docs
-description: "Document Q&A с визуальными цитатами: парсит папку PDF/DOCX/PPTX/XLSX/картинок через LiteParse, отвечает на вопрос, отдаёт HTML-отчёт со скриншотами страниц и подсветкой цитат. Триггеры: «Q&A по PDF», «отчёт по документам с цитатами»."
+description: "Document Q&A с визуальными цитатами: парсит папку PDF/DOCX/PPTX/XLSX/картинок через LiteParse, отвечает на вопрос, отдаёт HTML-отчёт со скриншотами страниц и подсветкой цитат. Триггеры: «Q&A по PDF», «отчёт по документам с цитатами», «Q&A по документам», «отчёт по PDF с цитатами», «проанализируй папку документов», «research docs»."
 argument-hint: "[data_directory] [question]"
 disable-model-invocation: true
 allowed-tools: Bash(python *)

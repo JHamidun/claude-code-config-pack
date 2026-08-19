@@ -1,6 +1,6 @@
 ---
 name: submagic
-description: your subtitle API — AI captions, Magic Brolls/Zooms/Hook, music, silence removal, audio cleanup, AI-edit templates, Magic Clips (YouTube → multi-clip), social publishing. Reference for full v1 REST API.
+description: "your subtitle API (v1 REST): AI captions, Magic Brolls/Zooms, Magic Clips (YouTube to multi-clip), silence removal, social publishing. Trigger: «captions»."
 ---
 
 # your subtitle API Skill

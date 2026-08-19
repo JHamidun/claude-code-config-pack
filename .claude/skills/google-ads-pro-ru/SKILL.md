@@ -1,6 +1,6 @@
 ---
 name: google-ads-pro-ru
-description: "Google Ads playbook для СНГ и международного рынка: 8 типов кампаний (Search/КМС/Shopping/YouTube/Demand Gen/Performance Max), карта базисов, прогноз бюджета, запуск Search, RSA, decision tree ставок (Target CPA/ROAS), аудитории, ремаркетинг. Триггеры: «Google Ads», «PMax», «Quality Score», «RSA», «Keyword Planner». НЕ: Яндекс.Директ→yandex-direct-pro-ru; Meta/VK/TG→их скиллы; API кабинета→/gads."
+description: "Google Ads playbook (СНГ/мир): Search, PMax, YouTube, семантика, ставки, аудитории. Триггеры: «Google Ads», «PMax», «RSA». НЕ: Директ→yandex-direct-pro-ru; API→/gads."
 metadata:
   version: 1.0.0
   updated: 2026-06-22

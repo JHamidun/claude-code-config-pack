@@ -1,6 +1,6 @@
 ---
 name: telegram-ads-pro-ru
-description: "Платная реклама Telegram Ads (еврокабинет/тонкабинет): CPM-аукцион, Target Channels vs Target Users, топики, подбор каналов, RPP, воронки, омниканальность. Триггеры: «Telegram Ads», «ТГ Ads», «реклама в Telegram», «таргет в телеграме», «еврокабинет», «тонкабинет», «ClientCorp8 Маркетолог Pro», «медиаплан TG Ads». НЕ: посты канала→tg-post; боты→telegram-bot-toolkit; посевы→tg-channel-buyout-ru; Meta/VK/Директ→другие скиллы."
+description: "Платная реклама Telegram Ads: еврокабинет/тонкабинет, подбор каналов. Триггеры: «таргет в телеграме», «ТГ Ads»."
 metadata:
   version: 2.0.0
   updated: 2026-07-22

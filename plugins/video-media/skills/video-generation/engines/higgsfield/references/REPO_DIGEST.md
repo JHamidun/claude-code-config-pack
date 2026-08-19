@@ -317,7 +317,7 @@ Mark: (D) = directly documented, (I) = inferred from CLI noun/verb pattern.
 
 **Generation response includes `adjustments` field** for non-fatal coercions (e.g. aspect_ratio clamped).
 
-**Virality Predictor job params field** contains: `brain_example_url`, `your-serverMapBinaryUrl`, `your-serverMapUrl` (implementation detail, not for normal output), plus Open report URL.
+**Virality Predictor job params field** contains: `brain_example_url`, `vertexMapBinaryUrl`, `vertexMapUrl` (implementation detail, not for normal output), plus Open report URL.
 
 **Product fetch response:** `{id, status, fail_reason}` — dedupes by URL, reuses existing non-failed entity.
 

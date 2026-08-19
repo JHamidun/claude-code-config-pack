@@ -1,6 +1,6 @@
 ---
 name: ceo-council
-description: Use when needing strategic project analysis from multiple independent expert perspectives. Triggers on business decisions, growth strategy, product direction, competitive analysis, or any situation where diverse C-level opinions reduce blind spots
+description: "Strategic analysis by parallel independent C-level expert personas — cuts blind spots. Triggers: «ceo council», «expert opinions», big decisions."
 ---
 
 # CEO Council — Independent Strategic Analysis

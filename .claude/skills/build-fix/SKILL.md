@@ -1,6 +1,6 @@
 ---
 name: build-fix
-description: Incrementally fix build and type errors with minimal, safe changes. Use when build fails, type errors appear, or user says "fix build", "build broken", "build-fix".
+description: "Fix failing builds and type errors with minimal safe changes until green. Triggers: «fix build», «build broken», «type errors»."
 origin: ECC
 ---
 

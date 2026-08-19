@@ -1,6 +1,6 @@
 ---
 name: health-inline
-description: "Inline orchestration workflows для codebase health — 5 режимов: bug, cleanup, deps, reuse, security. Ты сам оркестратор: фазы детекции (bug-hunter/dead-code-hunter/dependency-auditor/reuse-hunter/security-scanner), приоритетного фикса и верификации. Триггеры: /health-bugs, /health-cleanup, /health-deps, /health-reuse, /health-security, «bug health check», «inline orchestration»."
+description: "Codebase health инлайн (сам оркестратор): детекция→фикс→верификация. Триггеры: /health-bugs, /health-cleanup, /health-deps, /health-reuse, /health-security."
 version: 2.1.0
 ---
 

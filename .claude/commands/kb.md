@@ -1,5 +1,5 @@
 ---
-description: "Поиск по локальной базе знаний kb.py (SQLite FTS5+BM25): встречи tl;dv/Spark, письма Gmail/Outlook, Telegram-экспорты, Calendar; + ingest новых данных. Триггеры: «kb», «база знаний», «найди в встречах», «поиск по транскриптам». История чатов Claude Code → /search-chats."
+description: "Поиск по локальной KB kb.py: встречи tl;dv/Spark, письма Gmail/Outlook, Telegram; + ingest. Триггеры: «база знаний», «найди в встречах». История чатов → /search-chats."
 argument-hint: "\"<запрос>\" [--source tldv|spark|gmail|outlook|telegram] [--after DATE] [--speaker Name]"
 ---
 

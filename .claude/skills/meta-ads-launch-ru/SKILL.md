@@ -1,6 +1,6 @@
 ---
 name: meta-ads-launch-ru
-description: "Запуск и ведение СВОЕЙ Meta Ads (Facebook/Instagram): BM→Campaign→Ad Set→Ads, антидетект из РФ, Pixel + CAPI no-code, аудитории + Lookalike, ставки + CBO. Meta запрещена в РФ — для международных/СНГ. Триггеры: «запусти Meta Ads», «настрой Facebook Pixel», «настрой CAPI», «scaling Meta», «Lookalike Meta». НЕ: чужие кампании→meta-ads-analyzer; креативы→ad-spy; выбор канала→media-planning-ru."
+description: "Запуск своей Meta Ads (не РФ): Pixel + CAPI, аудитории, Lookalike. Триггеры: «запусти Meta Ads», «настрой CAPI». НЕ диагностика→meta-ads-analyzer."
 metadata:
   version: 1.0.0
   reuses: meta-ads-analyzer, ad-spy, n8n, image-generation, performance-analytics

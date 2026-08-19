@@ -1,6 +1,6 @@
 ---
 name: aws-skills
-description: AWS development with CDK, Lambda, serverless patterns, infrastructure
+description: "AWS development: CDK, Lambda, serverless patterns, S3, infrastructure as code. Triggers: «deploy to AWS», «lambda»."
 ---
 
 # AWS Skills

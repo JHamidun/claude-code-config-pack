@@ -1,7 +1,6 @@
 ---
 name: pwa-shell
-description: Превратить HTML-артефакт в устанавливаемое PWA — manifest, service worker, иконки.
-when_to_use: Прототип, который пользователь хочет "поставить на телефон" или открыть offline.
+description: "HTML-артефакт → устанавливаемое PWA: manifest, service worker, иконки. Триггеры: «поставить на телефон», «install prompt», «service worker offline»."
 ---
 
 # PWA shell

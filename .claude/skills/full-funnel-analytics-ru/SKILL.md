@@ -1,6 +1,6 @@
 ---
 name: full-funnel-analytics-ru
-description: "Сквозная (full-funnel) когортная маркетинг-аналитика на масштабе — решения по когортной выручке, а не CPL: когортная воронка, Predict LTV, дашборд. Триггеры: «сквозная аналитика», «full-funnel аналитика», «когортная воронка», «predict LTV», «zero day revenue». НЕ: метрики каналов→performance-analytics; CAPI→capi-no-code-setup; аукцион→google-ads-pro-ru."
+description: "Сквозная когортная аналитика: когортная воронка, Predict LTV, решения по выручке, не CPL. Триггеры: «сквозная аналитика», «full-funnel». НЕ метрики каналов→performance-analytics."
 metadata:
   version: 1.0.0
   updated: 2026-06-22

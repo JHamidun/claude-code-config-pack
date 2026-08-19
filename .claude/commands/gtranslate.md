@@ -1,5 +1,5 @@
 ---
-description: "Google Cloud Translation v2: перевод текста (в т.ч. батч), определение языка, список языков. Триггеры: «переведи через google», «google translate», «определи язык». Качественный перевод текста/документов → /translate (DeepL)."
+description: "Google Cloud Translation v2: перевод текста и батчей, определение языка. Триггеры: «переведи через google», «определи язык». Качественный перевод → /translate."
 argument-hint: "[translate <текст> <язык> | detect <текст> | languages]"
 ---
 

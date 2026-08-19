@@ -1,6 +1,6 @@
 ---
 name: deepgram
-description: "Deepgram audio transcription and speech-to-text. Use when asked to transcribe audio, video, meetings, or generate subtitles."
+description: "Deepgram speech-to-text: transcribe audio/video, SRT subtitles, speaker diarization. Triggers: «transcribe», «subtitles from audio»."
 ---
 
 # Deepgram API Skill

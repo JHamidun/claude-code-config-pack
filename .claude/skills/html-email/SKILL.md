@@ -1,7 +1,6 @@
 ---
 name: html-email
-description: HTML-письма с табличной разметкой, inline CSS, dark-mode-aware. Outlook-safe.
-when_to_use: Транзакционные письма, рассылки, подтверждения. НЕ обычная веб-страница.
+description: "HTML-письма: табличная разметка, inline CSS, Outlook-safe, dark-mode. Триггеры: «newsletter html», «MJML», «transactional email». НЕ обычная веб-страница."
 ---
 
 # HTML email

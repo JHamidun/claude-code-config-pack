@@ -1,7 +1,6 @@
 ---
 name: brand-extractor
-description: Вытащить цвета, шрифты, базовый копирайт из лендинга по URL. Через headless Playwright.
-when_to_use: Юзер: "сделай в стиле как у нас на сайте", показывает URL. Чтобы не угадывать.
+description: "Вытащить цвета, шрифты, копирайт из сайта по URL (headless Playwright). Триггеры: «сделай в стиле нашего сайта», «вытащи цвета с сайта»."
 ---
 
 # Brand extractor

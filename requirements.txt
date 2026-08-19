@@ -84,3 +84,7 @@ PyJWT>=2.8
 pydantic>=2.7            # skills/n8n (модели запросов)
 six>=1.16                # skills/pptx (совместимость внутри ooxml-обвязки)
 websockets>=12.0         # tools/ (клиенты с постоянным соединением)
+
+# Fonts (skills/video-editor: fetch_fonts.py / font_catalog.py — импорт без guard,
+# лёгкий pure-python пакет, поэтому здесь, а не в optional)
+fonttools>=4.50

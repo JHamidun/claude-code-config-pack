@@ -1,6 +1,6 @@
 ---
 name: jtbd
-description: "Advanced Jobs To Be Done (AJTBD): Job = задача, ради которой клиент нанимает продукт; сегментация по работам, не по демографии. Триггеры: «AJTBD», «JTBD», «граф работ», «Forces of Progress», «Switch Interview», «Job Story», «ODI». НЕ: CRO→*-cro-ru; воронки→funnel-design-ru; CustDev→user-research-synthesis; модели→marketing-psychology-ru."
+description: "AJTBD и Next Move Theory: работы клиента, сегментация по работам, Forces/Switch Interview, ODI. Триггеры: «JTBD», «граф работ», «NMT». НЕ CustDev→user-research-synthesis."
 metadata:
   version: 2.1.0
   updated: 2026-07-24

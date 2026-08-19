@@ -1,6 +1,6 @@
 ---
 name: linkedin-comment-drafter
-description: "LinkedIn comments, replies, thread follow-ups по URL поста: 1-3 варианта в голосе юзера + reaction, approval → автопостинг своим публикатором или copy-paste вручную; ответ по parent URN; трекинг ответов автора, follow-up, DM."
+description: "Комменты и ответы в тредах LinkedIn по URL поста: 1-3 варианта, reaction, автопостинг, follow-up, DM. Триггеры: «коммент на linkedin», «автор ответил»."
 ---
 
 # LinkedIn Comment Drafter

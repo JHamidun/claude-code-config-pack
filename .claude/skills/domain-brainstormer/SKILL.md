@@ -1,6 +1,6 @@
 ---
 name: domain-brainstormer
-description: Generate creative domain names and check availability
+description: "Domain name ideas + availability checks. Triggers: «domain name», «is the domain free», «what to name the site»."
 ---
 
 # Domain Name Brainstormer Skill

@@ -1,6 +1,6 @@
 ---
 name: invoice-organizer
-description: Organize invoices and receipts for tax preparation and expense tracking
+description: "Sort invoices and receipts for tax prep and expense tracking. Triggers: «organize invoices», «expenses for the month»."
 ---
 
 # Invoice Organizer Skill

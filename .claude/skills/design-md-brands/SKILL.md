@@ -1,13 +1,6 @@
 ---
 name: design-md-brands
-description: "Банк готовых DESIGN.md дизайн-систем брендов (формат Google Stitch): Stripe, Linear, Vercel, Notion, Apple — 73+, тянет по WebFetch. Триггеры: «как у Linear», «эстетика Notion». НЕ: стиль по URL→brand-extractor; система с нуля→design-system-create."
-when_to_use: |
-  Пользователь называет реальный известный бренд как визуальный референс для артефакта
-  (лендинг, слайды, прототип, письмо) — «в стиле Stripe», «как Linear», «эстетика Notion»,
-  «фирменные цвета Apple/Tesla/Ferrari». Вместо угадывания палитры или скрейпинга живого
-  сайта (может лечь на Cloudflare) — забери готовый DESIGN.md из банка awesome-design-md.
-  Также: когда нужен сам ФОРМАТ DESIGN.md (Google Stitch) как способ передать дизайн-систему
-  ИИ-агенту в проект.
+description: "Банк DESIGN.md брендов (Stripe, Linear, Vercel, Notion, Apple — 73+). Триггеры: «как у Linear», «эстетика Notion». НЕ стиль по URL → brand-extractor."
 ---
 
 # DESIGN.md brands — банк дизайн-систем брендов

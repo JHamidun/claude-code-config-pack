@@ -1,6 +1,6 @@
 ---
 name: perplexity
-description: "Perplexity — веб-поиск и research с реалтайм-информацией и источниками. Дефолт: pplx-max.py через подписку Max (режимы reasoning / pro / deep research, без API-квоты): python ~/.claude/skills/perplexity/pplx-max.py. Fallback — Perplexity API (PERPLEXITY_API_KEY). Триггеры: perplexity, «перплексити», «AI search», «deep research», «поищи в вебе с источниками»."
+description: "Perplexity веб-поиск и research с источниками: дефолт pplx-max.py по подписке Max. Триггеры: «перплексити», «поищи в вебе с источниками»."
 ---
 
 # Perplexity AI API Skill

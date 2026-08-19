@@ -1,6 +1,6 @@
 ---
 name: webhook-receiver
-description: "Приём вебхуков (GitHub, Stripe, GitLab, JIRA, HTML-формы) локальным CLI-сервером: HMAC-валидация подписей, JSONL-лог, запуск команды на payload. CLI: python ~/.claude/tools/webhook_server.py serve. НЕ: постоянные боты на вебхуках→agent-builder tooling (Hermes webhook-адаптер); исходящие уведомления→tg-bot-publish/n8n; туннели наружу — cloudflared/ngrok отдельно."
+description: "Приём вебхуков (GitHub, Stripe, формы) локальным сервером webhook_server.py: HMAC-подписи. Триггеры: «поймай вебхук», «лови POST от формы»."
 ---
 
 # Webhook Receiver

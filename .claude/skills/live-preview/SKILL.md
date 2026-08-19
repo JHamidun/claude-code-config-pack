@@ -1,8 +1,7 @@
 ---
 name: live-preview
 version: 1.0.0
-description: Локальный сервер с auto-reload — браузер обновляется при сохранении файла Claude'ом.
-when_to_use: Любая итеративная работа над HTML/CSS. Запускай ОДИН РАЗ в начале сессии и оставь окно открытым.
+description: "Локальный сервер с auto-reload для итеративной работы над HTML/CSS — браузер обновляется при сохранении. Триггеры: «live reload», «browser-sync»."
 ---
 
 # Live preview

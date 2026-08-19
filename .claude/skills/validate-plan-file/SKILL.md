@@ -1,6 +1,6 @@
 ---
 name: validate-plan-file
-description: Validate that orchestrator plan files conform to expected JSON schema. Use before workers read plan files or after orchestrators create them to ensure proper structure and required fields.
+description: "Validate orchestrator plan files against JSON schema before workers read them. Utility. Trigger: «validate plan.json»."
 allowed-tools: Read
 ---
 

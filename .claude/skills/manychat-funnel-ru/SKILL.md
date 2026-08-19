@@ -1,6 +1,6 @@
 ---
 name: manychat-funnel-ru
-description: "Автоворонки ManyChat «комментарий → автосообщение в директ» для Instagram/Facebook/Telegram: ключевое слово под Reels/постом → цепочка в директ → прогрев → лид. Триггеры: «manychat воронка», «автоворонка инстаграм», «коммент в директ», «comment to dm», «reels воронка», «ключевое слово автоответ», «SMM автоворонка», «лиды из SMM». НЕ: свои боты→telegram-bot-toolkit/agent-builder tooling."
+description: "Автоворонки ManyChat «коммент → директ» для Instagram/FB/Telegram. Триггеры: «автоворонка инстаграм», «лиды из SMM». НЕ свои боты→telegram-bot-toolkit."
 type: actionable
 ---
 

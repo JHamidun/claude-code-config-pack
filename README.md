@@ -275,20 +275,21 @@ python ~/.claude/scripts/setup_runtime.py           # fix it (idempotent)
 
 ## Inventory
 
-- 270+ skills (`~/.claude/skills/`)
-- 50+ agents (`~/.claude/agents/`)
-- 110+ slash commands (`~/.claude/commands/`)
-- 23 auto-loaded rules (`~/.claude/rules/`)
-- 33 plugins (3 disabled by default — see `settings.json`)
-- 21 MCP servers, **2 enabled by default**: `filesystem` and `playwright-live1`.
-  The other 19 are `disabled: true` on purpose — some need your own keys and accounts, some
+- 287 skills (`~/.claude/skills/`) — 77 with executable code, 210 prompt-based
+- 75 agents (`~/.claude/agents/`) — 58 top-level + 17 workers in `health/`, `meta/`, `testing/`
+- 156 slash commands (`~/.claude/commands/`) — 99 top-level + 57 in `gsd/`
+- 19 auto-loaded rules (`~/.claude/rules/`)
+- 33 plugins (all enabled by default — see `enabledPlugins` in `settings.json`)
+- 15 MCP servers in `settings.json`, **3 enabled by default**: `graph-memory`, `filesystem`
+  and `playwright-live1`.
+  The other 12 are `disabled: true` on purpose — some need your own keys and accounts, some
   point at infrastructure only the author has, and `playwright-live2..10` are parallel browser
   profiles that each add ~7 s to session startup.
   Enable one by editing `mcpServers` in `~/.claude/settings.json` (that is the file Claude Code
-  actually reads). `~/.claude/mcp.json` is a **reference sheet of ready-made blocks**, not live
-  config — copy a block from there into `settings.json`; the file explains this at its top.
-- 5 GSD hooks (`~/.claude/hooks/`)
-- 6 generic Python tools (`~/.claude/tools/`)
+  actually reads). `~/.claude/mcp.json` is a **reference sheet of 17 ready-made blocks**, not
+  live config — copy a block from there into `settings.json`; the file explains this at its top.
+- 7 hook scripts (`~/.claude/hooks/`): 2 guards (`bash-guard`, `security-guard`), 4 GSD, 1 Stop-beep
+- 25 generic Python tools (`~/.claude/tools/`)
 
 ## Permission model — read this before installing
 

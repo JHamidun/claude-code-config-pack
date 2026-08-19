@@ -1,6 +1,6 @@
 ---
 name: campaign-planning
-description: "Plan marketing campaigns: objectives, audience segmentation, channel strategy, content calendars, KPIs, budget allocation, product launch. Builds campaign metrics tree (CPM→CTR→CPC→CR1/CPL→CR2/CPA→LTV→CAC) and «3 hypotheses × 2-3 weeks» experiment template. Триггеры: «дерево метрик кампании», «шаблон гипотезы 3×2-3 недели», «гипотезы кампании», «экспериментальная кампания», content calendar."
+description: "Планирование маркетинговых кампаний: цели, сегменты, каналы, KPI, бюджет, дерево метрик CPM→CTR→CPL→CPA→LTV→CAC. Триггеры: «маркетинговый план»."
 ---
 
 # Campaign Planning Skill

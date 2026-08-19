@@ -1,6 +1,6 @@
 ---
 name: manus
-description: Manus autonomous AI agent platform via its REST API v2 (api.manus.ai). Delegate a long-running, self-planning task (web browsing, research, code execution, file/artifact generation) to a Manus cloud agent, then poll for the result. Use when the user says «запусти задачу в Manus», «отправь в Manus», «manus api», «пусть Manus сделает research/автоматизацию», or wants an autonomous agent to run a multi-step job unattended. NOT for slides «в стиле Manus» (→ manus-slides) and NOT for local browser automation (→ dev-browser / playwright-automation).
+description: "Delegate long autonomous tasks to Manus cloud agents (REST API v2): research, browsing, code; poll results. Trigger: «run in Manus». NOT slides -> manus-slides."
 ---
 
 # Manus AI (API v2)

@@ -1,7 +1,6 @@
 ---
 name: react-pinning
-description: Закреплённые версии React/ReactDOM/Babel с integrity-хешами. Готовый блок script-тегов для interactive-prototype.
-when_to_use: Любой HTML-артефакт с inline JSX. Подключай ровно эти теги, не апгрейдь без причины.
+description: "Готовый блок script-тегов React/ReactDOM/Babel с integrity-хешами для HTML-артефактов с inline JSX. Триггеры: «pin react», «integrity хеши»."
 ---
 
 # React pinning

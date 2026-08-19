@@ -1,6 +1,6 @@
 ---
 name: away-summary
-description: Generate a brief "while you were away" recap of the current session. Use when resuming after a break or at session start.
+description: "Recap the current session — what was done, where you stopped. Triggers: «recap», «while you were away», resuming after a break."
 triggers:
   - "away summary"
   - "что я делал"

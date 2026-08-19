@@ -1,6 +1,6 @@
 ---
 name: market-selection-ru
-description: "Выбор рынка перед запуском: цепочка «бизнес-модель → страна → TAM → конкуренты → CustDev», 20 вопросов фаундерам, расчёт TAM, «венчур vs lifestyle», карта эмпатии. Триггеры: «выбор рынка», «TAM расчёт», «в какую страну выходить», «CustDev», «валидация рынка». НЕ: GTM-запуск→launch-strategy-ru; JTBD→jtbd; синтез интервью→user-research-synthesis; конкуренты→competitive-analysis."
+description: "Выбор рынка: страна, TAM, CustDev, 20 вопросов фаундерам. Триггеры: «выбор рынка», «в какую страну выходить». НЕ запуск→launch-strategy-ru."
 metadata:
   version: 1.0.0
   updated: 2026-06-22

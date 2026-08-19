@@ -1,6 +1,6 @@
 ---
 name: linkedin-post-writer
-description: "Viral-ready LinkedIn посты на hook-формулах 2026: пост+хук, humanizer pass, approval, schedule via SocialPublisher; разбор viral поста по URL → формула + шаблон; 7-дневный план (pillars, hooks, CTA). Триггеры: hook formula, content pillars."
+description: "Viral LinkedIn посты на hook-формулах: хук+пост, humanizer, schedule через Publora; разбор viral поста по URL → формула. Триггеры: «hook formula», «разбери viral пост»."
 ---
 
 # LinkedIn Post Writer

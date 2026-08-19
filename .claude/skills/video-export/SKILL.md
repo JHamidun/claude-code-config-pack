@@ -1,7 +1,6 @@
 ---
 name: video-export
-description: Покадровый рендер HTML-анимации в MP4 / GIF через Playwright + ffmpeg.
-when_to_use: Пользователь сделал анимацию (см. animations) и просит "выгрузи как видео / гифку".
+description: "Покадровый рендер готовой HTML-анимации в MP4 или GIF (Playwright + ffmpeg). Триггеры: «выгрузи как видео», «html в mp4», «GIF из html»."
 ---
 
 # Video export

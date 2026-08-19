@@ -1,6 +1,6 @@
 ---
 name: javascript-typescript-dev
-description: "Modern JS/TS development including React, Next.js, Node.js, testing (Jest, Vitest, Playwright), and TypeScript patterns."
+description: "JS/TS development: React, Next.js, Node.js, TypeScript patterns, tests (Jest, Vitest, Playwright). Triggers: «write in typescript», «react component»."
 ---
 
 # JavaScript & TypeScript Development Skill

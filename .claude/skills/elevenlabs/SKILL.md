@@ -1,6 +1,6 @@
 ---
 name: elevenlabs
-description: "ElevenLabs text-to-speech, voice cloning, sound effects generation. Use when asked to voice text, clone voice, generate audio, or create sound effects."
+description: "ElevenLabs: text-to-speech, voice cloning, sound effects. Triggers: «voice this text», «clone a voice». NOT speech-to-text → deepgram."
 ---
 
 # ElevenLabs API Skill

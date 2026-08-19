@@ -9,6 +9,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | Skill | What it does |
 |-------|--------------|
 | `health-inline` | Inline codebase-health orchestration in five modes — bugs, cleanup, dependencies, reuse, security — detect, fix, verify. |
+| `leak-scan` | Сканер безопасности в две стороны. |
 | `osint-recon` | Open-source recon on infrastructure and counterparties — IP/ASN, DNS, RDAP whois, BGP, subdomains, exposed ports, CVEs. |
 | `privacy-filter` | Local on-device PII detection and redaction (OpenAI `opf` model): de-identify text BEFORE sending to any cloud LLM (152-ФЗ/GDPR), strip PII from… |
 | `security-audit` | Security auditing - vulnerability scanning, code review, OWASP checks, penetration testing guidance |

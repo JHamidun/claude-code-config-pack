@@ -1,6 +1,6 @@
 ---
 name: revops-ru
-description: "RevOps RU для двух воронок: B2C self-serve (free→trial→paid) и B2B sales-led. Учёт: продуктовая CRM + Your CRM/your CRM. Жизненный цикл лида, скоринг, MQL/SQL-хэндофф, категоризация A/B/C/D, SLA. Триггеры: «RevOps», «скоринг лидов», «MQL», «SQL», «trial→paid», «перелидоз». НЕ: письма→draft-outreach; поиск лидов→lead-research; API→crm; тип воронки→funnel-design-ru; операционка ОП→sales-team-ru."
+description: "RevOps: воронки B2C self-serve и B2B sales-led, скоринг, MQL/SQL-хэндофф, SLA; учёт в Your CRM. Триггеры: «скоринг лидов», «перелидоз». НЕ поиск лидов→lead-research."
 metadata:
   version: 1.2.0
   reuses: crm, lead-research, draft-outreach, zoom, churn-prevention-ru, paywall-cro-ru, funnel-design-ru, sales-team-ru, full-funnel-analytics-ru

@@ -342,7 +342,7 @@ def _global_search(
     try:
         data = http.get(
             f"{SCRAPER_BASE}/search",
-            headers=http.scraper-vendor_headers(token),
+            headers=http.scraper_vendor_headers(token),
             params={"query": query, "sort": sort, "timeframe": timeframe},
             timeout=30,
             retries=2,
@@ -380,7 +380,7 @@ def _subreddit_search(
     try:
         data = http.get(
             f"{SCRAPER_BASE}/subreddit/search",
-            headers=http.scraper-vendor_headers(token),
+            headers=http.scraper_vendor_headers(token),
             params={
                 "subreddit": subreddit,
                 "query": query,
@@ -417,7 +417,7 @@ def fetch_post_comments(
     try:
         data = http.get(
             f"{SCRAPER_BASE}/post/comments",
-            headers=http.scraper-vendor_headers(token),
+            headers=http.scraper_vendor_headers(token),
             params={"url": url},
             timeout=30,
             retries=2,

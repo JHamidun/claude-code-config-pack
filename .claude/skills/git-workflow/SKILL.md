@@ -1,6 +1,6 @@
 ---
 name: git-workflow
-description: Git operations - commits, branches, PRs, merge conflicts, history analysis
+description: "Git operations: commits, branches, PRs, merge conflicts, history analysis. Triggers: «merge conflict», «create a branch», «open a PR»."
 ---
 
 # Git Workflow Skill

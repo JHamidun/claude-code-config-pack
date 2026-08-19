@@ -1,6 +1,6 @@
 ---
 name: python-fullstack-dev
-description: "Complete Python development expertise covering Django, FastAPI, Flask, data science, testing, and deployment."
+description: "Python development: Django, FastAPI, Flask, data science, testing, deployment. Triggers: «write in python», «fix python code»."
 ---
 
 # Python Full-Stack Development Expert

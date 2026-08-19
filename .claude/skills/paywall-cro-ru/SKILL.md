@@ -1,6 +1,6 @@
 ---
 name: paywall-cro-ru
-description: "In-app пейволлы, экраны апгрейда, апселлы и фиче-гейты — конверсия trial→платящий, апгрейд тарифов. Триггеры: «пейволл», «paywall», «экран апгрейда», «feature gate», «лимит достигнут», «trial to paid», «trial не апгрейдятся», «экран окончания триала». НЕ: публичная страница тарифов→page-cro-ru; структура цен→pricing-strategy-ru; cancel-флоу/save-офферы→churn-prevention-ru."
+description: "Пейволлы, экраны апгрейда, фиче-гейты: конверсия trial→платящий. Триггеры: «пейволл», «feature gate», «лимит достигнут». НЕ страница тарифов→page-cro-ru."
 metadata:
   version: 1.1.0
   updated: 2026-05-29

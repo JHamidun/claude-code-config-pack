@@ -1,7 +1,6 @@
 ---
 name: export-pdf
-description: Печать HTML-макета или дека в PDF через headless Chrome (Playwright). Одна страница = один слайд.
-when_to_use: Пользователь просит сохранить дизайн/презентацию в PDF.
+description: "Печать HTML-макета или дека в PDF через headless Chrome (Playwright), слайд = страница. Триггеры: «html в pdf», «сохрани в pdf»."
 ---
 
 # Export PDF

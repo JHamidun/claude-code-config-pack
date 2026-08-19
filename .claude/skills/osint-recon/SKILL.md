@@ -1,6 +1,6 @@
 ---
 name: osint-recon
-description: "CLI-разведка публичной инфраструктуры домена/IP: DNS, RDAP-whois, ASN/BGP, субдомены из Certificate Transparency, порты и CVE (Shodan InternetDB), HTTP security-заголовки, санкции OpenSanctions/OFAC. Триггеры: «recon», «OSINT», «due diligence инфраструктуры». НЕ: люди→social-intel; ЕГРЮЛ→lead-enrichment; живые карты бортов/судов/спутников — в пак не входят; свой код→security-audit."
+description: "Разведка инфраструктуры домена/IP CLI osint_client.py: DNS, whois, субдомены, порты/CVE, санкции. Триггеры: «пробей домен». НЕ люди→social-intel."
 metadata:
   version: 1.0.1
   updated: 2026-07-30

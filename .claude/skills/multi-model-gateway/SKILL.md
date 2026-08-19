@@ -1,6 +1,6 @@
 ---
 name: multi-model-gateway
-description: "Orchestrate tasks across Claude, GPT, and Gemini via AI Gateway. Use when user asks for cross-model comparison, multi-model consensus, or wants to leverage specific model strengths."
+description: "Run a task across Claude, GPT and Gemini via AI Gateway: comparison, consensus, second opinion. Triggers: «ask GPT», «cross-model»."
 ---
 
 > ⚠️ **NO-KEY GUARD (обязательно):** этот функционал требует ОПЦИОНАЛЬНОГО стороннего API-ключа. Перед вызовом проверь ключ в `.credentials.master.env`. Если ключ отсутствует, пустой или placeholder (`your_*_api_key`) — **НЕ проси пользователя оплатить счёт, включить биллинг или купить API**. Скажи одной строкой: «Эта функция опциональна и требует свой API-ключ (например, бесплатный ключ на aistudio.google.com); из коробки всё остальное работает по подписке Claude» — и предложи альтернативу или продолжай без неё.

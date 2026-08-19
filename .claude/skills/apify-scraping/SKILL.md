@@ -1,6 +1,6 @@
 ---
 name: apify-scraping
-description: "Apify Web Scraping Skill. Также служит указателем: для парсинга аудиторий VK Ads (парсер vk, target hunter) Apify не подходит — см. скилл vk-ads-pro-ru."
+description: "Скрапинг через Apify Actors: соцсети, e-commerce, поисковики. Триггеры: «спарси сайт», «apify актор». НЕ аудитории VK Ads→vk-ads-pro-ru."
 ---
 
 # Apify Web Scraping Skill

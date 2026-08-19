@@ -1,6 +1,6 @@
 ---
 name: maps-places
-description: "Поиск мест, ресторанов, организаций, адресов, EV-зарядок, Airbnb и геокодинг через 11 провайдеров (Google Places, Yandex Geosearch, 2GIS, HERE, Mapbox, Foursquare, OpenCage, OSM, Open Charge Map, SerpAPI, Apify). Плюс часы работы, телефоны, рейтинги."
+description: "Поиск мест, адресов и геокодинг: 11 провайдеров — Google Places, Yandex Geosearch, 2GIS, OSM, Airbnb. Триггеры: «найди ресторан», «координаты адреса»."
 ---
 
 # Maps & Places

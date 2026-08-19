@@ -1,6 +1,6 @@
 ---
 name: linkedin
-description: "LinkedIn intelligence via Scraping API — profile enrichment, company research, post monitoring, ad library analysis. Use when user mentions LinkedIn, контакты LinkedIn, outreach, обогащение лидов, LinkedIn ads, конкуренты LinkedIn."
+description: "LinkedIn intelligence via Scraping API: profiles, companies, posts, ad library. Triggers: «look up a LinkedIn profile», «enrich leads», competitor ads."
 allowed-tools: Bash, Read, Write, WebSearch
 ---
 

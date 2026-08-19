@@ -1,6 +1,6 @@
 ---
 name: claude-cli-runner
-description: "Запуск моделей Claude из Python БЕЗ API-ключа — через claude CLI binary с авторизацией подписки Claude Code. Модуль ~/.claude/tools/claude_cli.py (claude, claude_async, claude_json, claude_stream). Триггеры: «клод из скрипта», run Claude from Python."
+description: "Запуск Claude из Python БЕЗ API-ключа — claude CLI по подписке; модуль claude_cli.py. Триггеры: «клод из скрипта», «без API ключа»."
 ---
 
 # Claude CLI Runner

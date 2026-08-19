@@ -1,6 +1,6 @@
 ---
 name: claude-design
-description: Работа с Claude Design (claude.ai/design) — AI-инструмент Anthropic для дизайн-мокапов. Skill покрывает workflow от мокапа до production code, структуру handoff-bundle, как читать прототипы и переносить их pixel-perfect в проект, советы пользователю по эффективному созданию мокапов, анти-паттерны.
+description: "Claude Design (claude.ai/design): от AI-мокапа до production-кода, handoff-bundle. Триггеры: «claude design», «перенеси мокап в код»."
 ---
 
 # claude-design

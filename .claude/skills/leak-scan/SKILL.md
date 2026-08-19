@@ -1,6 +1,6 @@
 ---
 name: leak-scan
-description: "Сканер безопасности в две стороны. ИСХОДЯЩЕЕ: PII/деанон перед публикацией (leak_scan.py). ВХОДЯЩЕЕ: prompt-injection и захват полномочий в чужом скилле/плагине/агенте перед установкой (skill_injection_scan.py: Unicode, hooks, MCP, postinstall)."
+description: "PII/деанон перед публикацией (leak_scan.py) + prompt-injection в чужом скилле (skill_injection_scan.py). Триггеры: «обезличь репо», «проверь скилл перед установкой»."
 metadata:
   version: 2.0.0
   updated: 2026-08-02

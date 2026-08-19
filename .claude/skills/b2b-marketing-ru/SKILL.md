@@ -1,6 +1,6 @@
 ---
 name: b2b-marketing-ru
-description: "B2B-маркетинг playbook: (1) воронка TOFU/MOFU/BOFU вместо AIDA (ICP, intent); (2) Cold Outreach (5-блочное письмо, цепочка 4-7 касаний, email+LinkedIn+звонок, домены/прогрев/SPF-DKIM-DMARC); (3) B2B-контент (3 типа, недельный цикл, PDF-карусели LinkedIn). Выход: ICP-карточка + карта воронки + цепочка писем. Триггеры: «B2B маркетинг», «TOFU MOFU BOFU», «cold outreach», «аутрич», «ICP», «прогрев домена». НЕ: одно письмо конкретному ЛПР→draft-outreach; список лидов по ICP→lead-research; MQL→SQL/CRM→revops-ru."
+description: "B2B playbook: воронка TOFU/MOFU/BOFU, cold outreach, B2B-контент. Триггеры: «аутрич», «ICP», «прогрев домена». НЕ письмо ЛПР→draft-outreach."
 metadata:
   version: 2.0.0
   updated: 2026-07-22

@@ -5,7 +5,7 @@ description: "Beads git-backed AI-native issue tracking. Use when managing issue
 
 # Beads Issue Tracking Skill
 
-> **Attribution**: [Beads](https://github.com/<author>/beads) by [Steve Yegge](https://github.com/<author>)
+> **Attribution**: [Beads](https://github.com/steveyegge/beads) by [Steve Yegge](https://github.com/steveyegge)
 
 ## Description
 
@@ -100,5 +100,5 @@ For large features (>1 day):
 
 ## Links
 
-- [Beads GitHub](https://github.com/<author>/beads)
-- [CLI Reference](https://github.com/<author>/beads/blob/main/docs/CLI_REFERENCE.md)
+- [Beads GitHub](https://github.com/steveyegge/beads)
+- [CLI Reference](https://github.com/steveyegge/beads/blob/main/docs/CLI_REFERENCE.md)

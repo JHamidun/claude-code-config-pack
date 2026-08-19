@@ -157,7 +157,7 @@ def search_threads(
         data = http.get(
             f"{SCRAPER_BASE}/search",
             params={"query": core_topic},
-            headers=http.scraper-vendor_headers(token),
+            headers=http.scraper_vendor_headers(token),
             timeout=30,
             retries=2,
         )

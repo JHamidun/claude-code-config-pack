@@ -1,6 +1,6 @@
 ---
 name: call-prep
-description: "Prepare for a sales call — account context, attendee research, suggested agenda; richer with CRM, email, chat or transcripts connected. Trigger with \"prep me for my call with [company]\", \"call prep [company]\", \"get me ready for [meeting]\"."
+description: "Sales call prep: account context, attendee research, agenda; uses CRM, email, transcripts. Triggers: «prep me for my call», «call prep»."
 ---
 
 # Call Prep

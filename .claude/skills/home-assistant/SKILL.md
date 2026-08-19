@@ -1,6 +1,6 @@
 ---
 name: home-assistant
-description: "Home Assistant CLI — умный дом через REST + WebSocket API: состояния сущностей, вызов сервисов (свет/климат/медиа), on/off/toggle, история состояний, live-поток событий, конфиг, areas/devices. НЕ: Яндекс умный дом / Алиса / Яндекс-экосистема→отдельный навык под Яндекс (в пак не входит) (секция IoT); генерация ботов для HA→agent-builder tooling."
+description: "Умный дом Home Assistant через ha_client.py: состояния, сервисы, история, события. Триггеры: «включи свет через HA», «hass»."
 ---
 
 # Home Assistant CLI

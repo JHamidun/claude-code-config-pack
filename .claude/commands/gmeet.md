@@ -1,5 +1,5 @@
 ---
-description: "Google Meet: создание встреч (OPEN/TRUSTED), информация о встрече, записи и участники конференций (Meet REST API v2). Триггеры: «google meet», «создай встречу meet», «ссылка на мит», «записи конференций». Zoom → skill zoom; Телемост → отдельный навык под Яндекс (в пак не входит)."
+description: "Google Meet (REST API v2): создание встреч, инфо, записи и участники конференций. Триггеры: «создай встречу meet», «ссылка на мит». Zoom → skill zoom; Телемост → yandex."
 argument-hint: "[create <название> | list | get <space_name>]"
 ---
 

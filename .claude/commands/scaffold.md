@@ -1,5 +1,5 @@
 ---
-description: "Каркас нового проекта по шаблону: fastapi / react / nextjs / telegram-bot / cli (структура папок, конфиги, Dockerfile). Триггеры: «scaffold», «создай структуру проекта», «каркас проекта». Полная инициализация с выбором стека и настройкой → /init-project."
+description: "Каркас проекта по шаблону: fastapi, react, nextjs, telegram-bot, cli — папки, конфиги, Dockerfile. Триггеры: «каркас проекта». Полная инициализация → /init-project."
 argument-hint: "[fastapi | react | nextjs | telegram-bot | cli]"
 ---
 

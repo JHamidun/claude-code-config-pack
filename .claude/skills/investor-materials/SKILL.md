@@ -1,6 +1,6 @@
 ---
 name: investor-materials
-description: "Create and update pitch decks, one-pagers, investor memos, accelerator applications, financial models and fundraising materials — projections, use-of-funds tables, milestone plans, kept internally consistent across assets."
+description: "Investor materials: pitch decks, one-pagers, memos, financial models, accelerator apps, use-of-funds. Triggers: «pitch deck», «fundraising»."
 origin: ECC
 ---
 

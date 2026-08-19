@@ -1,6 +1,6 @@
 ---
 name: deepl-pro
-description: "DeepL professional translation - text, documents, glossaries. Use when asked to translate text or documents between languages."
+description: "DeepL translation of text and documents (docx/pptx/pdf/xlsx), glossaries, formality. Triggers: «translate», «translate this document»."
 ---
 
 # DeepL Pro API Skill
