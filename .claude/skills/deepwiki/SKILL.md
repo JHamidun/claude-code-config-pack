@@ -1,6 +1,6 @@
 ---
 name: deepwiki
-description: "Docs for any GitHub repo via DeepWiki/gitmcp.io. Trigger: «how does this repo work». NOT library/npm docs -> Context7 plugin."
+description: "Доки любого GitHub-репо через DeepWiki/gitmcp.io и llms.txt. Триггеры: «как устроен этот репозиторий»."
 ---
 
 # DeepWiki: GitHub Repository Documentation

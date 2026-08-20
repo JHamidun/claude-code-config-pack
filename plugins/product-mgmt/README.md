@@ -8,10 +8,10 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `feature-spec` | PRDs and feature specs: problem statement, user stories, acceptance criteria, success metrics. |
-| `metrics-tracking` | Product metrics: OKRs, north star, dashboard design, weekly metric reviews, trend analysis. |
+| `feature-spec` | PRD и спеки фич: user stories, требования, критерии приёмки, метрики. |
+| `metrics-tracking` | Продуктовые метрики: OKR, north star, дашборды, еженедельные разборы. |
 | `roadmap-management` | Продуктовый роадмап: RICE/ICE/MoSCoW, Now/Next/Later, capacity. |
-| `stakeholder-comms` | Stakeholder updates by audience: weekly statuses, monthly reports, launch announcements, risk comms. |
+| `stakeholder-comms` | Апдейты для стейкхолдеров под аудиторию: статусы, отчёты, анонсы, риски. |
 | `user-research-synthesis` | Синтез исследований в инсайты: интервью, опросы → темы, персоны; CustDev: респонденты, карта эмпатии. |
 
 ### Agents

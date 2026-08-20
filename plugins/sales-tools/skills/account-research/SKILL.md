@@ -1,6 +1,6 @@
 ---
 name: account-research
-description: "Sales intel on a company or person: web search + CRM enrichment. Triggers: «research [company]», «who is [name]». NOT social dossier -> social-intel."
+description: "Досье на компанию/человека: веб-поиск + CRM. Триггеры: «что за компания», «пробей контрагента». НЕ соцсети→social-intel; ЕГРЮЛ→lead-enrichment; домен/IP→osint-recon."
 ---
 
 # Account Research

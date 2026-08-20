@@ -1,6 +1,6 @@
 ---
 name: stock-analysis
-description: "Stocks and companies via yfinance: prices, insider holdings, analyst recommendations, SEC filings. Triggers: «stock analysis», «should I buy this stock»."
+description: "Акции и компании через yfinance: цены, инсайдеры, рекомендации аналитиков, SEC. Триггеры: «акции», «биржа», «стоит ли покупать бумагу»."
 type: actionable
 ---
 

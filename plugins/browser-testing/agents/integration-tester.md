@@ -85,14 +85,14 @@ When invoked, follow these steps:
 
 6. **Database Testing (using mcp**supabase**):**
    - Validate table constraints and foreign keys
-   - Test RLS policies for each role (Admin/Instructor/Student)
+   - Test RLS policies for each role (Admin/Manager/Customer)
    - Verify indexes and query performance
    - Check data integrity after operations
    - Example: Use `mcp__supabase__execute_sql` to verify RLS:
      ```sql
      SET LOCAL role = 'authenticated';
-     SET LOCAL request.jwt.claims.role = 'student';
-     SELECT * FROM courses WHERE organization_id = 'test-org';
+     SET LOCAL request.jwt.claims.role = 'customer';
+     SELECT * FROM orders WHERE tenant_id = 'test-tenant';
      ```
 
 7. **API Integration Testing:**

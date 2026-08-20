@@ -1,6 +1,6 @@
 ---
 name: cards-creator
-description: "Карточки-карусели для Telegram-канала: HTML+CSS → Playwright → PNG 1080×1350, editorial стиль. Триггеры: «карточки для канала», «карусель в канал»."
+description: "Карточки-карусели для ТГ-канала Telegram-канал: HTML+CSS → Playwright → PNG 1080×1350. Триггеры: «карточки для канала», «карусель в канал»."
 ---
 
 # Cards Creator — карточки-карусели для Telegram-канала

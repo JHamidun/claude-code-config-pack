@@ -1,6 +1,6 @@
 ---
 name: javascript-typescript-dev
-description: "JS/TS development: React, Next.js, Node.js, TypeScript patterns, tests (Jest, Vitest, Playwright). Triggers: «write in typescript», «react component»."
+description: "Разработка на JS/TS: React, Next.js, Node.js, тесты Jest/Vitest/Playwright. Триггеры: «напиши на typescript», «react-компонент», «типизируй»."
 ---
 
 # JavaScript & TypeScript Development Skill

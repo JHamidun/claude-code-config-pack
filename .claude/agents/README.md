@@ -79,7 +79,7 @@
 | `proofreader-punctuation` | Stage 2: Russian punctuation |
 | `proofreader-typography` | Stage 3: Typographic corrections |
 
-## Article Pipeline (8 stages, YourFirstName voice)
+## Long-form Content (1 agent)
 
 | Agent | Description |
 |-------|-------------|

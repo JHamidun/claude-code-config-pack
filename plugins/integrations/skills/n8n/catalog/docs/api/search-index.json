@@ -38394,7 +38394,7 @@
     },
     {
       "id": "1444_Extractfromfile_Converttofile_Automation_Webhook",
-      "name": "Extract text from PDF and image using your-server AI (Gemini) into CSV",
+      "name": "Extract text from PDF and image using Vertex AI (Gemini) into CSV",
       "description": "Complex multi-step automation that orchestrates Converttofile, Lmchatgooglegemini, and Httprequest for data processing. Uses 16 nodes and integrates with 6 services.",
       "filename": "1444_Extractfromfile_Converttofile_Automation_Webhook.json",
       "active": 0,
@@ -38411,7 +38411,7 @@
       ],
       "tags": [],
       "category": "Data Processing & Analysis",
-      "searchable_text": "extract text from pdf and image using your-server ai (gemini) into csv complex multi-step automation that orchestrates converttofile, lmchatgooglegemini, and httprequest for data processing. uses 16 nodes and integrates with 6 services. 1444_extractfromfile_converttofile_automation_webhook.json converttofile lmchatgooglegemini httprequest google drive chainllm extractfromfile ",
+      "searchable_text": "extract text from pdf and image using Vertex ai (gemini) into csv complex multi-step automation that orchestrates converttofile, lmchatgooglegemini, and httprequest for data processing. uses 16 nodes and integrates with 6 services. 1444_extractfromfile_converttofile_automation_webhook.json converttofile lmchatgooglegemini httprequest google drive chainllm extractfromfile ",
       "download_url": "https://raw.githubusercontent.com/Zie619/n8n-workflows/main/workflows/Extractfromfile/1444_Extractfromfile_Converttofile_Automation_Webhook.json"
     },
     {
@@ -38620,7 +38620,7 @@
     },
     {
       "id": "1978_Extractfromfile_Converttofile_Automation_Webhook",
-      "name": "Extract text from PDF and image using your-server AI (Gemini) into CSV",
+      "name": "Extract text from PDF and image using Vertex AI (Gemini) into CSV",
       "description": "Complex multi-step automation that orchestrates Converttofile, Lmchatgooglegemini, and Httprequest for data processing. Uses 16 nodes and integrates with 6 services.",
       "filename": "1978_Extractfromfile_Converttofile_Automation_Webhook.json",
       "active": 0,
@@ -38637,7 +38637,7 @@
       ],
       "tags": [],
       "category": "Data Processing & Analysis",
-      "searchable_text": "extract text from pdf and image using your-server ai (gemini) into csv complex multi-step automation that orchestrates converttofile, lmchatgooglegemini, and httprequest for data processing. uses 16 nodes and integrates with 6 services. 1978_extractfromfile_converttofile_automation_webhook.json converttofile lmchatgooglegemini httprequest google drive chainllm extractfromfile ",
+      "searchable_text": "extract text from pdf and image using Vertex ai (gemini) into csv complex multi-step automation that orchestrates converttofile, lmchatgooglegemini, and httprequest for data processing. uses 16 nodes and integrates with 6 services. 1978_extractfromfile_converttofile_automation_webhook.json converttofile lmchatgooglegemini httprequest google drive chainllm extractfromfile ",
       "download_url": "https://raw.githubusercontent.com/Zie619/n8n-workflows/main/workflows/Extractfromfile/1978_Extractfromfile_Converttofile_Automation_Webhook.json"
     },
     {

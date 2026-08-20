@@ -7,7 +7,7 @@ argument-hint: "[inbox | unread | search <запрос> | read <номер|Entry
 
 Рабочий путь — локальный Outlook через COM, скрипт
 `~/.claude/skills/google-workspace/scripts/outlook_local.py`. Приложение стоит на
-машине, учётная запись настроена, пароль не нужен. Проверено: 5166 писем.
+машине, учётная запись настроена, пароль не нужен. Проверено на рабочем ящике.
 
 ```bash
 python ~/.claude/skills/google-workspace/scripts/outlook_local.py inbox --limit 10

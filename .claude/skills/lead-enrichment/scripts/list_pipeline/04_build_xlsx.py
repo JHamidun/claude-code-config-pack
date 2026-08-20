@@ -65,10 +65,10 @@ def normalize(s):
     return s
 
 
+# Латиница → кириллица для сопоставления названий компаний. Здесь только
+# демонстрационные пары: расширь под свой список целей.
 LATIN_TO_CYRILLIC = {
-    'fixprice': 'фикс прайс', 'rusagro': 'русагро', 'uralchem': 'уралхим',
-    'ingosstrakh': 'ингосстрах', 'invitro': 'инвитро', 'splat': 'сплат',
-    'selectel': 'селектел', 'la redoute russia': 'ла редут', 'sanoma learning russia': 'саномо',
+    'sberbank': 'сбербанк', 'gazprom': 'газпром', 'magnit': 'магнит',
 }
 
 

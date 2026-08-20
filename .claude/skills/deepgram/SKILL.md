@@ -1,6 +1,6 @@
 ---
 name: deepgram
-description: "Deepgram speech-to-text: transcribe audio/video, SRT subtitles, speaker diarization. Triggers: «transcribe», «subtitles from audio»."
+description: "Deepgram: транскрипция аудио и видео, SRT-субтитры, диаризация спикеров. Триггеры: «транскрибируй», «расшифруй запись», «субтитры из аудио»."
 ---
 
 # Deepgram API Skill

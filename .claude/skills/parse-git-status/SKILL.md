@@ -1,6 +1,6 @@
 ---
 name: parse-git-status
-description: "Parse git status into structured data: staged, modified, untracked, branch. Pre-flight check utility. Trigger: «parse git status»."
+description: "Разбор вывода git status в структуру: staged, изменённые, ветка, ahead/behind. Служебный для пре-флайт-проверок. Триггеры: «разбери git status»."
 ---
 
 # Parse Git Status

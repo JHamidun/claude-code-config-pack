@@ -1,6 +1,6 @@
 ---
 name: manus
-description: "Delegate long autonomous tasks to Manus cloud agents (REST API v2): research, browsing, code; poll results. Trigger: «run in Manus». NOT slides -> manus-slides."
+description: "Автономная облачная задача в Manus (REST API v2, manus_helper.py): research, browsing, код. Триггеры: «запусти в Manus». НЕ слайды→manus-slides. Слэш-запуск→команда /manus."
 ---
 
 # Manus AI (API v2)

@@ -36,7 +36,7 @@ For each chapter draft file:
 - Names of people (with their attribution: "according to X")
 - Quotes (verbatim or paraphrased — note which)
 - Company/organization facts (revenue, headcount, product details)
-- Research citations (McKinsey, ConsultingFirm2, MIT, NBER, Gartner, etc.)
+- Research citations (McKinsey, BCG, MIT, NBER, Gartner, etc.)
 - URLs (if any)
 
 ### Step 2. Classify each fact
@@ -110,13 +110,13 @@ Write to `output_path`:
 ## What NOT to check (out of scope)
 
 - **Author's personal stories** with names (a lighting setup, a weekend bot, a colleague on stage) — not externally verifiable, classified as UNKNOWN.
-- **Author's qualitative assessments** ("around 65% of people fear their colleagues, not AI") — the author's opinion based on their practice; classified as UNKNOWN if no public source.
+- **Author's qualitative assessments** ("about X% of respondents say the blocker is people, not the technology") — the author's opinion based on their practice; classified as UNKNOWN if no public source.
 - **Forward predictions** (AGI by 2031 / market shifts) — the author's hypothesis, not a fact.
 - **Internal product metrics** (private user counts, internal hours, internal budget figures) — confidential; classified as UNKNOWN.
 
 ## Anti-patterns (what weaker fact-checkers get wrong)
 
-❌ **Treating internal data as fail** — "320 hours to deploy on-prem" may have no public source, but it IS the author's own data. Classify as UNKNOWN, not CRITICAL.
+❌ **Treating internal data as fail** — "N hours to deploy on-prem" may have no public source, but it IS the author's own data. Classify as UNKNOWN, not CRITICAL.
 
 ❌ **Blindly trusting the manuscript's own citation** — the source it lists might be wrong. Always verify the source URL itself, not just that a citation exists.
 

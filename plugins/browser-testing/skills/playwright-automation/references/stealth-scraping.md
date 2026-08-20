@@ -135,7 +135,7 @@ with sync_playwright() as p:
 | Конфиг | Результат |
 |--------|-----------|
 | Наивный `launch(headless=True)`, bundled Chromium | 19 passed. WebDriver побеждён, но `HeadlessChrome` в UA, нет `window.chrome`, 0 плагинов. |
-| **Best: `launch_persistent_context(channel="chrome", headless=True)`** | **28 passed / 3 failed / 0 warn.** `navigator.webdriver=False`, `window.chrome` есть, реальные плагины, реальный GPU (ANGLE NVIDIA your GPU), permissions/chrome-object OK. |
+| **Best: `launch_persistent_context(channel="chrome", headless=True)`** | **28 passed / 3 failed / 0 warn.** `navigator.webdriver=False`, `window.chrome` есть, реальные плагины, реальный GPU (ANGLE NVIDIA), permissions/chrome-object OK. |
 
 3 остаточных FAIL best-конфига = только UA-строка содержит `HeadlessChrome`
 (User Agent Old, HEADCHR_UA) + CHR_MEMORY. Косметика headless — уходит при `headless=False`.
@@ -261,7 +261,7 @@ with sync_playwright() as p:
    выставляй язык под задачу (`--lang=ru-RU` и заголовок `Accept-Language`), иначе маскировка
    отпечатка спасает, а несоответствие локали и гео выдаёт.
 2. **Отпечаток «средний», а не твой.** Отдаёт 4 ядра, 8 ГБ, WebGL `AMD Radeon` — при том что
-   машина 16-ядерная с your GPU. Это by design, но помни: значения не совпадут с реальным железом,
+   машина 16-ядерная с дискретной видеокартой. Это by design, но помни: значения не совпадут с реальным железом,
    если цель сверяет их с чем-то ещё.
 3. **Windows-сборки нет в свежем релизе.** В `v150` только Linux. Windows-архивы лежат
    в `v149` (stable) и `v151` (latest) — если обновляешься, проверяй список ассетов.

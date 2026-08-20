@@ -67,7 +67,7 @@ metadata:
 |---|---|
 | «AI для маркетолога», «Cursor для маркетинга», «vibe-coding маркетинг», «заменить подрядчика AI», «AI-сотрудник» | `ai-marketing-stack-ru` |
 | «рекламный креатив», «хук видео», «структура креатива», «A/B креативов», «декомпозиция виральных», «anti-AI-slop» | `ai-creative-factory-ru` |
-| «машинка контента», «контент-фабрика», «масштабирование органики», «1 формат 1 агент», «органический канал продаж под ключ» | `content-machine-instructor2-ru` |
+| «машинка контента», «контент-фабрика», «масштабирование органики», «1 формат 1 агент», «органический канал продаж под ключ» | `content-machine-ru` |
 | «manychat воронка», «коммент в директ», «comment to dm», «reels воронка», «лиды из SMM» | `manychat-funnel-ru` |
 | «AI SEO агент», «программатический SEO», «массовая генерация SEO-страниц», «1 keyword 1 page», «n8n SEO» | `ai-seo-agent-pipeline` |
 | «GEO», «AEO», «LLM SEO», «попасть в ответы ChatGPT/AI», «видимость в нейросетях», «Citation Share», «(regional LLM B)/(regional LLM A) видимость» | `geo-aeo-ru` |
@@ -118,7 +118,7 @@ metadata:
 ```
 
 Параллельные ветки, которые подключаются по задаче, а не по порядку:
-- **Контент/органика:** `ai-creative-factory-ru` (креативы под платный трафик) + `content-machine-instructor2-ru` (фабрика органики) + `manychat-funnel-ru` (автоворонка из органики) + `ai-seo-agent-pipeline` / `geo-aeo-ru` (поисковая и LLM-видимость).
+- **Контент/органика:** `ai-creative-factory-ru` (креативы под платный трафик) + `content-machine-ru` (фабрика органики) + `manychat-funnel-ru` (автоворонка из органики) + `ai-seo-agent-pipeline` / `geo-aeo-ru` (поисковая и LLM-видимость).
 - **B2B:** `b2b-marketing-ru` заменяет связку «воронка + канал» для длинного цикла (TOFU/MOFU/BOFU + outreach + LinkedIn-контент).
 - **AI-усилитель:** `ai-marketing-stack-ru` — поверх всего (Cursor/vibe-coding автоматизирует рутину любой стадии).
 - **Кейсы:** `marketing-masterminds-ru` — справочник нестандартных ходов на любой стадии.
@@ -135,7 +135,7 @@ metadata:
    `media-planning-ru` → конкретные ad-playbook'и (`yandex-direct-pro-ru` / `google-ads-pro-ru` / `meta-ads-launch-ru` / `vk-ads-pro-ru` / `telegram-ads-pro-ru`) → `ad-benchmarks-ru` (норматив) → `capi-no-code-setup` (трекинг) → `full-funnel-analytics-ru` (когорты, LTV).
 
 2. **Контент-маркетолог** (органика, видео, видимость)
-   `jtbd` (что цепляет) → `content-machine-instructor2-ru` (фабрика) → `ai-creative-factory-ru` (хук, структура) → `manychat-funnel-ru` (лиды из SMM) → `geo-aeo-ru` + `ai-seo-agent-pipeline` (поисковая и LLM-видимость).
+   `jtbd` (что цепляет) → `content-machine-ru` (фабрика) → `ai-creative-factory-ru` (хук, структура) → `manychat-funnel-ru` (лиды из SMM) → `geo-aeo-ru` + `ai-seo-agent-pipeline` (поисковая и LLM-видимость).
 
 3. **B2B-маркетолог** (длинный цикл, ЛПР, аккаунты)
    `market-selection-ru` → `jtbd` → `b2b-marketing-ru` (TOFU/MOFU/BOFU + outreach + контент) → `sales-team-ru` (передача в продажи) → `full-funnel-analytics-ru`.
@@ -154,7 +154,7 @@ metadata:
 3. **JTBD.** → `jtbd` — что клиент нанимает, какие силы прогресса, сегменты по работам. Это база для воронки, креативов и копирайта.
 4. **Воронка.** → `funnel-design-ru` — выбрать ТИП воронки (звонок / лид-магнит / tripwire / вебинар / бот / комьюнити / freemium) и собрать дерево метрик с целевыми значениями.
 5. **Канал.** → `media-planning-ru` — channel mix под нишу/бюджет/гео/цель + минимальные бюджеты. (B2B → `b2b-marketing-ru` вместо обычного channel-mix.)
-6. **Исполнение.** Открыть playbook(и) выбранного канала (см. Слой 2). Параллельно — креативы (`ai-creative-factory-ru`) и/или органика (`content-machine-instructor2-ru` + `manychat-funnel-ru`).
+6. **Исполнение.** Открыть playbook(и) выбранного канала (см. Слой 2). Параллельно — креативы (`ai-creative-factory-ru`) и/или органика (`content-machine-ru` + `manychat-funnel-ru`).
 7. **Трекинг.** → `capi-no-code-setup` — пиксель/события/CAPI/офлайн-конверсии ДО масштабирования (иначе нечем измерять).
 8. **Аналитика.** → `full-funnel-analytics-ru` — когортный дашборд, predict LTV, выбор атрибуции; еженедельный цикл анализа.
 9. **Продажи (лид-бизнес).** → `sales-team-ru` — скрипты, контроль, AI-разбор звонков.
@@ -173,7 +173,7 @@ metadata:
 |---|---|---|
 | **SEO под Яндекс** | `geo-aeo-ru` (LLM-видимость), `ai-seo-agent-pipeline` (масса страниц) | `seo-machine-ru` (одна качественная статья + пайплайн) |
 | **Аутрич** | `b2b-marketing-ru` (вся B2B-система, инфраструктура) | `draft-outreach` (одно письмо), `lead-research` (список лидов) |
-| **Контент** | `content-machine-instructor2-ru` (фабрика как бизнес), `ai-creative-factory-ru` (структура) | `content-engine`, `tg-post`, `crosspost` (производство постов) |
+| **Контент** | `content-machine-ru` (фабрика как бизнес), `ai-creative-factory-ru` (структура) | `content-engine`, `tg-post`, `crosspost` (производство постов) |
 | **Реклама-аналитика** | `full-funnel-analytics-ru` (когорты на масштабе) | `performance-analytics`, `yandex` (Метрика API) |
 | **Конкуренты в рекламе** | — | `ad-spy`, `meta-ads-analyzer` (шпионаж за чужими креативами) |
 | **Воронка/CRO** | `funnel-design-ru` (тип воронки, дерево метрик) | `*-cro-ru` (page/signup/onboarding/paywall/popup/form), `revops-ru` (MQL/SQL) |

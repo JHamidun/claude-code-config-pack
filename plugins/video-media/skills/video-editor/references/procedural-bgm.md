@@ -1,10 +1,10 @@
-# Procedural BGM — синтез музыкального бэда чистым ffmpeg (0 кредитов, 0 API)
+# Procedural BGM — синтез музыкальной подложки чистым ffmpeg (локально, без внешних сервисов)
 
-Трюк, снятый реверсом Higgsfield `montage` skill (их песочница генерит музыку, когда аудиофайла нет).
-Полезно как **мгновенная бесплатная подложка** (drone/sub-bass/cyberpunk pad) без Suno/ElevenLabs/Lyria —
-когда нужен фон под короткий клип и не жалко «вкуса» ради скорости/нуля затрат.
+Подложка собирается генераторами самого ffmpeg (`sine`, `aevalsrc`, `anoisesrc`) — аудиофайл-исходник не нужен.
+Полезно как **мгновенная подложка** (drone/sub-bass/cyberpunk pad), когда генератор музыки не нужен или
+недоступен: фон под короткий клип, где важнее скорость, чем «вкус».
 
-## Базовый cyberpunk sub-bass drone (как у Higgsfield)
+## Базовый cyberpunk sub-bass drone
 
 ```bash
 # суб-бас 55 Гц + пилообразный лид (гармоники 110/220/330 через aevalsrc) + апульсатор 4 Гц (~120 BPM)
@@ -39,8 +39,8 @@ ffmpeg -f lavfi -i "anoisesrc=d=10:c=pink:a=0.3" -y noise.mp3
 ```
 
 ## Когда что
-- Нужна **быстрая бесплатная подложка** под короткий ролик / превью → procedural BGM (этот файл).
+- Нужна **быстрая подложка** под короткий ролик / превью → procedural BGM (этот файл).
 - Нужен **настоящий трек/драматургия** (60s+, дуга, узнаваемая музыка) → `suno` (через браузер) или `elevenlabs` Music / Lyria 2 (см. video-generation `skills/video-generation/references/audio.md`).
 
-Источник: реверс Higgsfield Supercomputer `montage` skill → `higgsfield/references/supercomputer-architecture.md` §7c.
-Их финальная сборка 9:16: blurred-bg overlay + drawtext-сабы + `amix weights=1.0 0.4` (видео+bgm) — у нас это уже есть лучше (ASS-караоке вместо drawtext), см. `montage-toolkit.md`.
+Типовая финальная сборка 9:16, под которую рассчитана эта подложка: blurred-bg overlay + сабы + `amix weights=1.0 0.4`
+(видео + bgm). В нашем пайплайне субтитры делаются ASS-караоке вместо `drawtext` — см. `montage-toolkit.md`.

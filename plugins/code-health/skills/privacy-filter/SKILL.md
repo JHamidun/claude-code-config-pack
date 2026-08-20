@@ -1,6 +1,6 @@
 ---
 name: privacy-filter
-description: "Local PII detection and redaction (OpenAI opf, on-device): de-identify text before cloud LLMs, reversible, RU support. Triggers: «strip PII», «anonymize text»."
+description: "Локальный PII-фильтр (OpenAI opf, on-device): обезличить текст перед облачным LLM, обратимая редакция. Триггеры: «обезличь текст», «найди ПД»."
 metadata:
   version: 1.0.0
   updated: 2026-05-31
@@ -113,7 +113,7 @@ opf train train.jsonl --output-dir ckpt/     # fine-tune
 
 Out-of-the-box recall on Russian is roughly two-thirds. Strong: emails, URLs, dates,
 phones, account numbers. Weak: **person names** (patronymics/diminutives split or
-missed — e.g. "Парамонов | Сергей Викторович" detected as two spans), **addresses**
+missed — e.g. «Фамилия | Имя Отчество» detected as two spans), **addresses**
 (partial spans), **secrets** (novel formats missed). OpenAI reports fine-tuning on just
 10% in-domain data lifts F1 0.545 → 0.962.
 

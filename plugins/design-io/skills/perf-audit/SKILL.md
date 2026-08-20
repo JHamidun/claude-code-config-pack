@@ -1,8 +1,7 @@
 ---
 name: perf-audit
 version: 1.0.0
-description: Lighthouse в headless. Отчёт по LCP, CLS, TBT, размер бандла. Конкретные советы.
-when_to_use: Лендинг или продуктовая страница перед публикацией.
+description: "Lighthouse в headless перед публикацией страницы: LCP, CLS, TBT, размер бандла, конкретные советы. Триггеры: «Core Web Vitals», «оптимизация перформанс»."
 ---
 
 # Perf audit

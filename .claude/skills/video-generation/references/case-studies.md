@@ -139,7 +139,7 @@ python ~/.claude/skills/shorts-pipeline-user/scripts/trigger_word_check.py scrip
 
 17 RU-триггеров. Замены в скрипте: «разворот концепции», «ротация», «трансформация».
 
-## Case 5 — Client birthday tribute «Хроники Восхождения» (июнь 2026)
+## Case 5 — Client birthday tribute «клиентский трибьют» (июнь 2026)
 
 **Бриф:** запоминающееся видео-поздравление юбиляру [Client] (со-основатель изд. группы «Company», CEO Your Company, руководитель User) от команды YourProduct. Эпик с реальным лицом юбиляра + 9 лиц команды.
 
@@ -156,7 +156,7 @@ python ~/.claude/skills/shorts-pipeline-user/scripts/trigger_word_check.py scrip
 | Голос | ElevenLabs **George** `JBFqnCBsd6RMkjVDRZzb`, RU, `eleven_multilingual_v2` (0.35/0.85/0.35) |
 | Музыка | **Suno** (Pro-аккаунт), оркестровый инструментал, климакс-нарезка 62s |
 | Сборка | ffmpeg: xfade 0.4 + per-line VO `adelay` поверх музыки (vol 2.8/0.42) + `loudnorm I=-14` + PIL-титр |
-| Экспорт | `HVOSHDENIE_master.mp4` (4K) + `HVOSHDENIE_1080p.mp4` (lanczos upscale) |
+| Экспорт | `TRIBUTE_master.mp4` (4K) + `TRIBUTE_1080p.mp4` (lanczos upscale) |
 | Cost | $0 (Runway exploreMode + ElevenLabs/Suno подписки) |
 
 ### Что было трудно и как решилось (ядро уроков)
@@ -172,7 +172,7 @@ python ~/.claude/skills/shorts-pipeline-user/scripts/trigger_word_check.py scrip
 ### Локальная структура
 
 ```
-${HOME}/_client_birthday/
+${HOME}/_tribute_project/
 ├── SCENARIO.md                       # раскадровка 12 сцен + титр + пасхалка
 ├── refs/                             # client_main.jpg, user_hero.jpg, team_*.jpg (10 лиц)
 ├── keyframes/final/sc01-12.png       # утверждённые (микс Nano + GPT-Image-2)
@@ -180,7 +180,7 @@ ${HOME}/_client_birthday/
 ├── audio/   vo_01-12.mp3 (George) + music_suno2_cut.mp3
 ├── scripts/ gen_keyframes.py gen_team_gpt_cine.py animate_subset.py gen_vo.py
 │            gen_music.py analyze_cut.py contact_sheet.py assemble.py cred.py
-├── HVOSHDENIE_master.mp4  HVOSHDENIE_1080p.mp4
+├── TRIBUTE_master.mp4  TRIBUTE_1080p.mp4
 ```
 
 ### Урок для будущих трибьютов

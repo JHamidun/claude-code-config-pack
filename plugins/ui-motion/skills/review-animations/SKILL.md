@@ -1,6 +1,6 @@
 ---
 name: review-animations
-description: Reviews animation and motion code against a high craft bar derived from Emil Kowalski's design engineering philosophy. Default to flagging; approval is earned.
+description: "Ревью анимаций и motion-кода по высокой планке ремесла (философия Emil Kowalski): по умолчанию флагует, одобрение нужно заслужить. Триггеры: «проверь анимацию», «ревью motion-кода», «анимация дёргается», «review animations»."
 disable-model-invocation: true
 ---
 

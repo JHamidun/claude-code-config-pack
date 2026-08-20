@@ -1,6 +1,6 @@
 ---
 name: ad-spy
-description: "Реклама конкурентов из Ad Library (Facebook, Google, LinkedIn) через Scraping API; RU: Директ, TG Ads, VK. Триггеры: «что рекламируют конкуренты», ad spy."
+description: "Разведка рекламы конкурентов: Ad Library FB/Google/LinkedIn (Scraping API); RU: Директ, TG Ads, VK, Atria. Триггеры: «что рекламируют конкуренты»."
 allowed-tools: Bash, Read, Write, WebSearch
 ---
 
@@ -16,7 +16,7 @@ allowed-tools: Bash, Read, Write, WebSearch
 - "ad spy [бренд]" — полный анализ рекламы
 - "креативы конкурентов" — сбор рекламных материалов
 - "мониторинг рекламы" — периодический трекинг
-- Your Tracker: мониторинг рекламы конкурентов строительных смесей
+- Your Tracker: мониторинг рекламы конкурентов в своей нише
 - YourProduct: что рекламируют AI-конкуренты
 - "spy за Яндекс Директом / VK / Telegram Ads" — российские каналы (см. references)
 - "лучшие креативы конкурентов в FB", "бюджет конкурента", "Atria" — Meta-креативный спай
@@ -159,7 +159,7 @@ mkdir -p ~/Documents/Ad-Intel
 ## Use Case: Your Tracker
 
 Competitors to monitor:
-- Your-Brand (ClientCorp3) — own brand awareness
+- Your-Brand — own brand awareness
 - [Competitor1], [Competitor2], [Competitor3]
 
 ```bash

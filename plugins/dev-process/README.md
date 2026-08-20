@@ -8,11 +8,11 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `parse-git-status` | Parse git status into structured data: staged, modified, untracked, branch. |
-| `rollback-changes` | Roll back failed workflow phases via changes logs: restore files, clean artifacts, reverse commands. |
-| `run-quality-gate` | Run quality gates: type-check, build, tests, lint with configurable blocking. |
+| `parse-git-status` | Разбор вывода git status в структуру: staged, изменённые, ветка, ahead/behind. |
+| `rollback-changes` | Откат упавшей фазы воркфлоу по changes-log: восстановление файлов, чистка артефактов, отмена команд. |
+| `run-quality-gate` | Прогон quality gate: type-check, build, tests, lint со структурным отчётом. |
 | `scaling-stage` | Letterbox wrapper for fixed-size content (video, posters, fixed mockups) — a deck-stage for non-slides. |
-| `validate-plan-file` | Validate orchestrator plan files against JSON schema before workers read them. |
+| `validate-plan-file` | Проверка plan-файлов оркестратора по JSON-схеме до чтения воркерами. |
 
 ### Agents
 

@@ -1,6 +1,6 @@
 ---
 name: ceo-council
-description: "Strategic analysis by parallel independent C-level expert personas — cuts blind spots. Triggers: «ceo council», «expert opinions», big decisions."
+description: "Параллельный разбор стратегического вопроса независимыми C-level экспертами — срезает слепые зоны. Триггеры: «совет директоров», «мнения экспертов»."
 ---
 
 # CEO Council — Independent Strategic Analysis

@@ -1,11 +1,11 @@
-# Flow Playbooks — наши локальные «сотрудники» поверх hf.exe
+# Flow Playbooks — готовые сценарии генерации поверх hf
 
-Рабочие рецепты, реконструированные из реверса Higgsfield-флоу (наблюдением за их employees) и
-переложенные на наш стек: `hf.exe` (генерация) + Nano/GPT Image (кейфреймы) + наш `video-editor`/ffmpeg (монтаж)
-+ ElevenLabs/Suno (звук). Цель — запускать «сделай кинематографичный ролик / motion-design интро / UGC» и
-получать качество их Supercomputer, но своими руками и моделями напрямую.
+Рабочие рецепты генерации в Higgsfield, переложенные на наш стек: `hf.exe` (генерация) + Nano/GPT Image
+(кейфреймы) + наш `video-editor`/ffmpeg (монтаж) + ElevenLabs/Suno (звук). Цель — запускать «сделай
+кинематографичный ролик / motion-design интро / UGC» и получать предсказуемый результат на своих моделях
+и своём монтаже.
 
-Общий конвейер (как у них): **бриф → prompt-enhance → [storyboard] → keyframe(s) → video (Seedance/Veo) → montage**.
+Общий конвейер: **бриф → prompt-enhance → [storyboard] → keyframe(s) → video (Seedance/Veo) → montage**.
 Ключевые переиспользуемые блоки — ниже (§A LOCK, §B MDCM, §C prompt-схемы), потом 4 готовых флоу.
 
 ---
@@ -20,8 +20,8 @@ PALETTE LOCK   — 3 доминирующих цвета (hex), сэмплиро
 ATMOSPHERE LOCK— настроение в 3-5 словах (futuristic, quiet-power, luminous…)
 CAMERA/FILM LOCK (для photoreal) — ARRI Alexa Mini LF, Leica Summilux 40mm f/2.0, LogC→Rec709, fine grain
 ```
-Без LOCK serpentine-морфинг и «разъезд» стиля между кадрами. Это их главный приём консистентности
-(подтверждено: cinematic-flow Soul-anchor + classicMD LOCKS RECAP).
+Без LOCK — serpentine-морфинг и «разъезд» стиля между кадрами. Блок LOCK повторяется в промпте каждого
+кадра серии целиком, включая финальный кадр: сокращённый повтор консистентность не держит.
 
 ## §B. MDCM — Master Camera Doctrine (анти-клише движения)
 
@@ -37,7 +37,7 @@ CAMERA/FILM LOCK (для photoreal) — ARRI Alexa Mini LF, Leica Summilux 40mm 
 
 ## §C. Prompt-схемы
 
-### C1. Cinematic (их `cinematic-dramaturg`) — для одиночного/мультишот киношного клипа
+### C1. Cinematic — для одиночного/мультишот киношного клипа
 ```
 Camera: <body+lens+stop>. Camera Style: <движение, что запрещено>. Light: <источники, направления, без fill>.
 Style & Mood: <палитра, атмосфера, погода/частицы, bloom/haze>.
@@ -50,13 +50,13 @@ Audio: <слоёный саунд-дизайн: ambient + foley + mechanical + r
 Негативы: No subtitles. No text overlay. No captions. No title cards. No watermarks.
 ```
 
-### C2. Motion-design storyboard sheet (их `classicMD-board`) — 6-панельный лист одним изображением
+### C2. Motion-design storyboard sheet — 6-панельный лист одним изображением
 6 панелей 3×2, sheet 3:2, dark void + hairline gutters. Pattern A {01,03,05} = текстовые панели (панчи 2-4 слова).
 Realism ban (силуэты/3D/2D, не photoreal). Min-text ≥10-12% высоты панели. Каждая панель: CONTENT / NARRATIVE
 BEAT (hook→develop→escalate→sustain→build→resolve) / INTERNAL CHOREOGRAPHY (%/Hz) / TEXT / LIGHT (type+direction+does)
 / EFFECTS / PARALLAX. Бренд-wordmark на P06. Полный шаблон → `motion-designer-classicMD-board-prompt.md`.
 
-### C3. Motion-design clip (их `classicMD-clip`) — Seedance-промпт из раскадровки
+### C3. Motion-design clip — Seedance-промпт из раскадровки
 ```
 CRITICAL: один непрерывный full-frame 16:9 фильм, НЕ панель-грид. Раскадровка = ПЛАНИРОВОЧНЫЙ бриф; каждый
 панель → full-frame шот edge-to-edge. НИКОГДА не показывать сам лист/границы/номера/таймкоды.
@@ -67,7 +67,7 @@ Tail-freeze: последние кадры pixel-identical (clean tail под м
 
 ---
 
-## ФЛОУ 1 — Cinematic clip (их Cinematic Director)
+## ФЛОУ 1 — Cinematic clip
 **Когда:** кино-ролик, продукт/персонаж в движении, 1 шот или короткая сцена.
 ```bash
 HF="${HOME}/.claude/skills/video-generation/engines/higgsfield/bin/hf"   # вендорский бинарь, ставится отдельно (github.com/higgsfield-ai/cli)
@@ -81,7 +81,7 @@ HF="${HOME}/.claude/skills/video-generation/engines/higgsfield/bin/hf"   # ве�
 # 4) montage (наш) — музыка+сабы+9:16: python ~/.claude/skills/video-editor/...  (ASS-караоке лучше их drawtext)
 ```
 
-## ФЛОУ 2 — Motion-design intro (их Motion Designer, classicMD)
+## ФЛОУ 2 — Motion-design intro
 **Когда:** бренд-интро, 5с, абстрактный/3D/типографика.
 ```bash
 # 1) moodboard 4 стиля (GPT Image 2 3:2) — "4 DIFFERENT motion-design styles, 2x2 board, dark+neon"
@@ -93,10 +93,10 @@ HF="${HOME}/.claude/skills/video-generation/engines/higgsfield/bin/hf"   # ве�
 # 4) (опц.) SFX-only через procedural BGM / ElevenLabs SFX; reframe под платформу
 ```
 
-## ФЛОУ 3 — UGC / product short (их UGC/Unboxing/Tutorial/TV-Ad)
-**Когда:** реклама/обзор продукта с «человеком».
+## ФЛОУ 3 — UGC / product short
+**Когда:** реклама/обзор продукта с «человеком» (unboxing, tutorial, TV-ad).
 ```bash
-# Marketing Studio (их движок) напрямую:
+# Marketing Studio напрямую:
 "$HF" marketing-studio products fetch --url <shop-url> --wait        # импорт товара
 "$HF" marketing-studio avatars list --json                          # выбрать аватар
 printf '[{"id":"<avatar>","type":"preset"}]' > /tmp/a.json ; printf '["<product>"]' > /tmp/p.json
@@ -105,8 +105,8 @@ printf '[{"id":"<avatar>","type":"preset"}]' > /tmp/a.json ; printf '["<product>
 # Альтернатива (наш контроль): Soul-аватар пользователя (HeyGen) + i2v продукта Seedance + наш монтаж.
 ```
 
-## ФЛОУ 4 — Quick i2v (их Video/Image Generator) — оживить кадр
-**Когда:** есть картинка, надо движение; обход затыка Runway.
+## ФЛОУ 4 — Quick i2v — оживить кадр
+**Когда:** есть картинка, надо движение; либо Runway не даёт нужного результата.
 ```bash
 "$HF" generate create seedance_2_0 --prompt "<motion + camera по §B>" --start-image img.png \
   --duration 5 --aspect_ratio 9:16 --resolution 720p --wait

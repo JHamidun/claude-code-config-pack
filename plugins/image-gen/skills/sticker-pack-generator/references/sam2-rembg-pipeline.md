@@ -58,7 +58,7 @@ PER-FRAME final alpha:
 | alpha threshold low | `<60 → 0` | Убивает faint trails от SAM2 интерполяции |
 | alpha threshold high | `>180 → 255` | Делает edges чёткими |
 | SAM2 model | `sam2.1_hiera_small.pt` | tiny слишком слаб, base/large — overkill для 90 кадров |
-| SAM2 propagate | bfloat16 autocast | На your GPU ~12 it/s, на RTX 3060 ~5 it/s |
+| SAM2 propagate | bfloat16 autocast | На топовой мобильной видеокарте ~12 it/s, на RTX 3060 ~5 it/s |
 | ffmpeg JPEG quality | `-qmin 1 -q:v 1` | SAM2 init_state читает JPEG — нужно сохранить качество |
 | fps | 30 | Стандарт для Telegram |
 | длительность | `-t 3` | Жёсткий лимит Telegram = 3s |

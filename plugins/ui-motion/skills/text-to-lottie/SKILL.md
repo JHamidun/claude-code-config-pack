@@ -1,6 +1,6 @@
 ---
 name: text-to-lottie
-description: "Author Lottie (Bodymovin) JSON animations, rendered in a local skia player. Triggers: «lottie», «animated icon», «loader animation»."
+description: "Lottie (Bodymovin) JSON-анимация с рендером в skia-плеере. Триггеры: «лотти», «анимированная иконка», «лоадер», «after effects в json»."
 ---
 
 # Authoring Renderable Lottie Files

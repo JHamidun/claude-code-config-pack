@@ -1,4 +1,4 @@
-"""Lyria 2 (your-server AI) — instrumental music generation with multi-sample crossfade.
+"""Lyria 2 (Vertex AI) — instrumental music generation with multi-sample crossfade.
 
 your-server Predict endpoint requires OAuth2 service account, NOT API key.
 API key returns 401 UNAUTHENTICATED immediately.

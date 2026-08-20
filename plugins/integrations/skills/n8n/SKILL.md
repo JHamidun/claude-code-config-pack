@@ -1,6 +1,6 @@
 ---
 name: n8n
-description: "n8n workflow automation: API, nodes, triggers, expressions, MCP, 400+ integrations; Meta CAPI server-side event recipes. Triggers: «n8n workflow», «automation»."
+description: "n8n workflow automation: API, ноды, MCP + локальный каталог 2061 готового воркфлоу. Триггеры: «сценарий в n8n», «нода n8n», «автоматизация»."
 ---
 
 # N8N Workflow Automation Skill

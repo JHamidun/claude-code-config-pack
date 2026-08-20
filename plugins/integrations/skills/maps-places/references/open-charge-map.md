@@ -21,8 +21,8 @@
 # Зарядки в радиусе 10 км от точки
 curl "https://api.openchargemap.io/v3/poi?\
 output=json&\
-latitude=-8.305&\
-longitude=-34.948&\
+latitude=-22.971&\
+longitude=-43.182&\
 distance=10&\
 distanceunit=KM&\
 maxresults=50&\
@@ -60,8 +60,8 @@ curl "https://api.openchargemap.io/v3/referencedata/?key=$OPENCHARGEMAP_API_KEY"
     "Postcode": "54522-000",
     "CountryID": 33,
     "Country": {"ID": 33, "Title": "Brazil", "ISOCode": "BR"},
-    "Latitude": -8.305,
-    "Longitude": -34.948,
+    "Latitude": -22.971,
+    "Longitude": -43.182,
     "ContactTelephone1": "+55 XX XXXXX-XXXX",
     "ContactEmail": "info@example.com",
     "RelatedURL": "https://example.com",

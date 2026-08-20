@@ -1,6 +1,6 @@
 ---
 name: launch-strategy-ru
-description: "Стратегия запусков: когорта Academy, воркшоп, конференция; ORB-фреймворк, RU-поверхности vc.ru/Habr/TG. Триггеры: «лонч», «лист ожидания», «ранний доступ»."
+description: "Стратегия запусков: когорта, воркшоп, конференция; ORB-фреймворк, RU-поверхности vc.ru/Habr/TG. Триггеры: «лонч», «лист ожидания», «ранний доступ»."
 metadata:
   version: 1.1.0
   ported_from: coreyhaines31/marketingskills (launch)

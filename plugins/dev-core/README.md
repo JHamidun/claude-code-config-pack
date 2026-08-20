@@ -8,20 +8,20 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `api-documentation` | API docs from code: OpenAPI/Swagger specs, Postman collections, examples for REST, GraphQL, gRPC. |
+| `api-documentation` | Документация API из кода: OpenAPI/Swagger, Postman, REST/GraphQL/gRPC. |
 | `apple-developer` | Sign (Developer ID) and notarize macOS apps and DMGs without a Mac — the whole cycle from Windows/Linux and CI. |
-| `beads` | Beads — git-backed issue tracker for AI agents (bd CLI): issues, bugs, tasks in a repo. |
-| `build-fix` | Fix failing builds and type errors with minimal safe changes until green. |
-| `changelog-generator` | Changelog from git commits: semver bump, Keep a Changelog format, PR links via gh, GitHub Releases. |
+| `beads` | Beads — git-трекер задач и багов для AI-агентов (команды bd). |
+| `build-fix` | Чинит падающую сборку и ошибки типов минимальными правками до зелёного прогона. |
+| `changelog-generator` | Changelog из git-коммитов: semver, Keep a Changelog, PR/issues через gh, git tag, GitHub Release. |
 | `codegraph` | A code graph for navigation, symbol lookup and impact analysis on large codebases — a replacement for grep-by-hand. |
-| `database-design` | DB schema design, migrations, query optimization: PostgreSQL, MongoDB, Redis; normalization, indexing. |
-| `deepwiki` | Docs for any GitHub repo via DeepWiki/gitmcp.io. |
-| `git-workflow` | Git operations: commits, branches, PRs, merge conflicts, history analysis. |
+| `database-design` | Схема БД, миграции, оптимизация запросов: PostgreSQL, MongoDB, Redis; нормализация, индексы. |
+| `deepwiki` | Доки любого GitHub-репо через DeepWiki/gitmcp.io и llms.txt. |
+| `git-workflow` | Git: коммиты, ветки, PR, merge-конфликты, анализ истории. |
 | `installer-builder` | One-click installers (Windows .exe + macOS .dmg) on Electron — component selection, fully offline bundling, CI macOS builds. |
-| `javascript-typescript-dev` | JS/TS development: React, Next.js, Node.js, TypeScript patterns, tests (Jest, Vitest, Playwright). |
-| `manus` | Delegate long autonomous tasks to Manus cloud agents (REST API v2): research, browsing, code; poll results. |
+| `javascript-typescript-dev` | Разработка на JS/TS: React, Next.js, Node.js, тесты Jest/Vitest/Playwright. |
+| `manus` | Автономная облачная задача в Manus (REST API v2, manus_helper.py): research, browsing, код. |
 | `openwiki` | Auto-generate and maintain an agent-facing wiki for a codebase, plus documentation PRs in CI (architecture, workflows, AGENTS.md). |
-| `python-fullstack-dev` | Python development: Django, FastAPI, Flask, data science, testing, deployment. |
+| `python-fullstack-dev` | Разработка на Python: Django, FastAPI, Flask, data science, тесты, деплой. |
 
 ### Agents
 

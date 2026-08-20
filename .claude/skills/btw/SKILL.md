@@ -1,6 +1,6 @@
 ---
 name: btw
-description: "Answer a quick side question briefly, then return to the main task. Triggers: «btw», «кстати», «side question»."
+description: "Быстрый ответ на побочный вопрос — коротко и назад к основной задаче. Триггеры: «кстати», «/btw», «side question»."
 triggers:
   - "/btw"
   - "btw"

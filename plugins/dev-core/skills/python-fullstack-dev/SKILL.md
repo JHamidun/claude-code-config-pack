@@ -1,6 +1,6 @@
 ---
 name: python-fullstack-dev
-description: "Python development: Django, FastAPI, Flask, data science, testing, deployment. Triggers: «write in python», «fix python code»."
+description: "Разработка на Python: Django, FastAPI, Flask, data science, тесты, деплой. Триггеры: «напиши на питоне», «python-скрипт», «поправь питон-код». НЕ Telegram-бот→telegram-bot-toolkit."
 ---
 
 # Python Full-Stack Development Expert

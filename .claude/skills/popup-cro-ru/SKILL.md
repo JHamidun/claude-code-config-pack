@@ -1,6 +1,6 @@
 ---
 name: popup-cro-ru
-description: "Попапы, модалки, слайд-ины, баннеры: захват email, лид-магниты, exit-intent, согласие по 152-ФЗ. Триггеры: «всплывающее окно», «sticky bar». НЕ формы→form-cro-ru."
+description: "Попапы, модалки, баннеры: захват email на news.your-domain.com, exit-intent. Триггеры: «всплывающее окно», «sticky bar». НЕ формы вне попапов→form-cro-ru."
 metadata:
   version: 1.1.0
   updated: 2026-05-29

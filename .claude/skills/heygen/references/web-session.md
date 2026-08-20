@@ -1,19 +1,15 @@
-# HeyGen WEB-session internal API (api2.heygen.com)
+# HeyGen: работа через сессию веб-приложения (api2.heygen.com)
 
-> Reverse-engineered 2026-06-05 via Playwright. Account `your-heygen-account@example.com`,
-> **plan = Team Unlimited** (`tier:team`, `is_trial:false`). Use this to bill the
-> **web subscription** instead of the empty **$0 public-API wallet**.
-> Public API (`api.heygen.com` v1/v2/v3) is documented in `../SKILL.md`; it bills the
-> API wallet and the web session token is NOT accepted there as Bearer (401).
+> Как обращаться к HeyGen от имени СВОЕЙ учётной записи её же сессией — тем самым
+> токеном, который выдаёт браузер после входа. Нужно, когда у аккаунта есть активная
+> подписка, а работать хочется из скрипта, а не руками в интерфейсе.
+>
+> Публичный API (`api.heygen.com` v1/v2/v3) описан в `../SKILL.md` — это отдельный
+> контур со своим кошельком, и токен веб-сессии там не принимается (401). Один и тот
+> же аккаунт, два разных способа обращения; выбирай тот, который соответствует
+> оплаченному тарифу.
 
-## Why this exists
-
-`GET api.heygen.com/v3/users/me` → `wallet.remaining_balance = 0.0`. But the account
-has an active paid **Team Unlimited** subscription used via the web app. The web app
-talks to a **separate internal API** at `api2.heygen.com` that bills the subscription
-(paid videos created this cycle). This skill drives that internal API headlessly.
-
-## Auth (cracked)
+## Авторизация
 
 - The web app sends header **`x-guest-session-token`** = the value of the
   **`heygen_token` cookie** (domain `.heygen.com`, NOT httpOnly → readable).

@@ -1,6 +1,6 @@
 ---
 name: metrics-tracking
-description: "Product metrics: OKRs, north star, dashboard design, weekly metric reviews, trend analysis. Triggers: «product metrics», «set up OKRs»."
+description: "Продуктовые метрики: OKR, north star, дашборды, еженедельные разборы. Триггеры: «продуктовые метрики», «собери дашборд метрик»."
 ---
 
 # Metrics Tracking Skill

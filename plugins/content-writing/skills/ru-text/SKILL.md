@@ -1,6 +1,6 @@
 ---
 name: ru-text
-description: "Russian text quality: typography, info-style, editorial, UX writing, AI-text cleanup. Apply when writing or editing Russian text; trigger «ru-text»."
+description: "Качество русского текста: типографика, инфостиль, чистка канцелярита. Триггеры: «поправь стиль», «убери канцелярит». НЕ орфография→/proofread."
 metadata:
   your-gateway-project:
     always: true

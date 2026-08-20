@@ -9,7 +9,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | Skill | What it does |
 |-------|--------------|
 | `campaign-planning` | Планирование маркетинговых кампаний: цели, сегменты, каналы, KPI, бюджет, дерево метрик CPM→CTR→CPL→CPA→LTV→CAC. |
-| `competitive-analysis` | Competitor research, market analysis, ad intelligence, positioning. |
+| `competitive-analysis` | Продуктовый анализ конкурентов: рынок, позиционирование, цены. |
 | `competitive-analysis-mktg` | Конкуренты в маркетинге: месседжинг, контент-гэпы, vs/alternative-страницы под SEO. |
 | `performance-analytics` | Метрики маркетинг-каналов и tracking plan: атрибуция, server-side GTM. |
 

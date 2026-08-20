@@ -1,6 +1,6 @@
 ---
 name: lead-research
-description: "Fresh B2B lead list from an ICP (RU): discovery, DM mapping, Hot/Warm/Cold scoring. Triggers: «lead research», «ICP». NOT enrich existing -> lead-enrichment."
+description: "Свежий B2B-список лидов по ICP (РФ): discovery → ЛПР → скоринг Hot/Warm/Cold. Триггеры: «поиск компаний», «список лидов». НЕ готовый список→lead-enrichment."
 allowed-tools: Bash, Read, Write, WebSearch, WebFetch, Skill
 metadata:
   version: 3.0.0

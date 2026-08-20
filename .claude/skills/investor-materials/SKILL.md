@@ -1,6 +1,6 @@
 ---
 name: investor-materials
-description: "Investor materials: pitch decks, one-pagers, memos, financial models, accelerator apps, use-of-funds. Triggers: «pitch deck», «fundraising»."
+description: "Материалы для инвесторов: питч-дек, one-pager, меморандум, финмодель, заявки в акселераторы. Триггеры: «питч-дек», «финмодель», «фандрейзинг»."
 origin: ECC
 ---
 

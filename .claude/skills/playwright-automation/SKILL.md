@@ -1,6 +1,6 @@
 ---
 name: playwright-automation
-description: "Playwright e2e tests and scraping + daemon browser CLI (bdo.py) for parallel sessions. Triggers: «e2e test», «bypass antibot». NOT quick browsing -> dev-browser."
+description: "Playwright: e2e-тесты, скрапинг + демон-браузер bdo.py (параллельные сессии). Триггеры: «e2e тест», «обойти антибот». НЕ заход с куками→dev-browser."
 ---
 
 # Playwright Automation Skill

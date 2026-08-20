@@ -1,6 +1,6 @@
 ---
 name: lead-enrichment
-description: "Enrich B2B leads (RU): fragment or Your CRM list -> person, company, DM via DaData/EGRUL/Checko. Triggers: «enrich leads», «ЕГРЮЛ». NOT new list -> lead-research."
+description: "Обогащение B2B-лидов РФ (DaData/ЕГРЮЛ, Битрикс24 по ИНН): фрагмент → человек, компания, ЛПР. Триггеры: «дообогати базу», «кто оставил заявку». НЕ список с нуля→lead-research."
 allowed-tools: Bash, Read, Write, WebSearch, WebFetch, Skill
 metadata:
   version: 1.0.0

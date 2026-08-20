@@ -1,6 +1,6 @@
 ---
 name: void-video
-description: "Netflix VOID object removal from video, physics-aware inpainting (free HuggingFace Spaces). Triggers: «remove object from video», «убери из видео»."
+description: "Netflix VOID: удаление объектов из видео с физикой взаимодействий, HuggingFace Spaces бесплатно. Триггеры: «удали объект из видео», «затри логотип»."
 ---
 
 # VOID — Video Object & Interaction Deletion

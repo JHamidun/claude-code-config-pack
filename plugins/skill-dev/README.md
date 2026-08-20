@@ -15,8 +15,8 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `llm-evals` | Evaluate LLMs and agents — golden sets, two-tier grading (programmatic metrics + LLM judge), model sweeps, keep/rollback verdicts. |
 | `mcp-builder` | Разработка MCP-серверов (Python FastMCP / TS SDK) и дизайн инструментов агента. |
 | `prompt-engineering` | Промпт-инжиниринг: системные промпты, few-shot, structured outputs. |
-| `sharing-skills` | Contribute your skill upstream via pull request: branch, commit, push. |
-| `skill-creator` | Create, edit and eval skills; optimize descriptions for triggering. |
+| `sharing-skills` | Отправка своего навыка в upstream-репозиторий через PR: ветка, коммит, пуш. |
+| `skill-creator` | Создание, правка и эвалы навыков, оптимизация description. |
 | `tool-search-protocol` | Don't refuse an MCP/connector capability outright — search via tool_search first; the tool may exist but be hidden. |
 
 ### Agents

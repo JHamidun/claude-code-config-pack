@@ -1,6 +1,8 @@
-# Runway internal API + Seedance 2.0 — deep reference
+# Runway + Seedance 2.0 — справочник по работе через API
 
-Reverse-engineered internal endpoints `api.runwayml.com/v1`. JWT от веб-подписки. Безлимит через подписку — НЕ списывает credits на каждый вызов (Unlimited 2250 credits = web UI only, API usage = отдельный pool).
+Что здесь: как ходить в `api.runwayml.com/v1` из скриптов, как устроен upload и создание задачи, промпт-инжиниринг Seedance, известные ограничения и коды ошибок.
+
+Доступ — по JWT из сессии своей учётной записи Runway (см. §1).
 
 ## §1 — JWT auth + 30-day refresh
 
@@ -92,7 +94,7 @@ Reference image уже encodes appearance. **Не повторяй физиче�
 > Cinematic film look, photorealistic, smooth natural motion. No text overlays, no warping,
 > no extra or deformed limbs, stable consistent faces, no identity drift.
 > ```
-> Проверено на «Хрониках Восхождения» (4 командных кадра, Seedance start-only + exploreMode) — лица держались.
+> Проверено на «клиентском трибьюте» (4 командных кадра, Seedance start-only + exploreMode) — лица держались.
 
 ## §4 — 8 mutation patterns + verbatim patches
 
@@ -142,7 +144,7 @@ Seedance безусловно блокирует:
 | Terra (proper name) | the protagonist, the cluster |
 | winged child | the small winged shape |
 
-**Правило:** keep animation intent identical, swap only terminology. Никогда не submit'и с personally-identifying language.
+**Правило:** меняй только термины — описание движения и камеры оставляй как есть, иначе поедет смысл кадра. Персональных данных в prompt'е быть не должно.
 
 ## §7 — Hard limits + конверсия форматов
 
@@ -211,37 +213,37 @@ Long generations (>7 sec) часто получают temporal flicker. Workarou
 | Multi-Shot | `multi_shot` |
 | TTS | `generated_audio` |
 
-## §12 — Billing pools + credits-mode vs exploreMode
+## §12 — Пулы кредитов + credits-mode vs exploreMode
 
-- **Unlimited subscription** = 2250 credits free + flat-rate провайдеры (Seedance 2.0 = 180 credits/job, на Unlimited это $0 marginal)
-- **API usage** = отдельный pool, требует credit purchase + billing setup
-- **Gen-4 = per-second variable** (cost не flat), на Unlimited тоже даёт значимую экономию
+- Кредиты подписки и кредиты API — **разные пулы**. Пул API включается отдельно (покупка кредитов + billing setup); наличие подписки его не наполняет.
+- Seedance 2.0 тарифицируется фиксированно: 180 credits/job.
+- Gen-4 тарифицируется per-second (переменная стоимость задачи).
 
 ### `exploreMode` (опция в options тела задачи)
 
 | `exploreMode` | Кредиты | Параллелизм | Скорость |
 |---|---|---|---|
-| `False` (credits-mode) | СПИСЫВАЕТ из пула (180/job Seedance) | до ~30 concurrent (`canStartNewTask.currentLimit: 30`) | быстро, без троттла |
-| `True` (explore) | **БЕСПЛАТНО / unlimited** | троттл ~3 concurrent | медленнее |
+| `False` (credits-mode) | списывает из пула (180/job Seedance) | до ~30 concurrent (`canStartNewTask.currentLimit: 30`) | быстро, без троттла |
+| `True` (explore) | пул не расходуется | троттл ~3 concurrent | медленнее |
 
-Дефолт для пакетной генерации — **`exploreMode=True`** (бесплатно). Credits-mode бери, когда нужно >3 параллельно срочно и пул не жалко.
+Дефолт для пакетной генерации — **`exploreMode=True`**: пакет всё равно упирается не в скорость, а в ручной просмотр клипов. Credits-mode — когда срочно нужно >3 параллельно.
 
-> **Гоча (заработано боем):** на чистой Unlimited-подписке с 0 купленных кредитов credits-mode
-> (`exploreMode=False`) ВСЕГДА возвращает `400 "You do not have enough credits"` — пула просто нет.
-> Значит explore — ЕДИНСТВЕННЫЙ режим, а он сейчас жёстко троттлит: `429` на submit даже при 2
-> в полёте, задачи висят `THROTTLED progress=0`. **Escape: фолбэк на Veo 3.1 Fast** (`veo-3.1-fast-generate-preview`,
-> свой GOOGLE_API_KEY, t2v без картинки, 3 concurrent, ~60с/клип) — 30 клипов за ~15 мин вместо часов. Это документированный спаситель, реально работает.
+> **Грабля:** если пул кредитов пустой, credits-mode (`exploreMode=False`) всегда возвращает
+> `400 "You do not have enough credits"`. Остаётся только explore, а он жёстко троттлит: `429` на
+> submit даже при 2 задачах в полёте, задачи висят `THROTTLED progress=0`.
+> **Запасной путь: фолбэк на Veo 3.1 Fast** (`veo-3.1-fast-generate-preview`, свой `GOOGLE_API_KEY`,
+> t2v без картинки, 3 concurrent, ~60с/клип) — 30 клипов за ~15 мин вместо часов.
 
 ### КРИТИЧНО — кредит списывается в момент ОТПРАВКИ (POST /v1/tasks), НЕ при скачивании
 
 - Остановка локального раннера в середине батча **НЕ возвращает** уже списанные кредиты.
 - Но и не «жжёт впустую»: отправленная задача **досчитывается на сервере** и остаётся скачиваемой по `task_id`.
-- **Keyframe-картинки независимы от видео-задач** — стоп анимации НЕ тратит keyframes (юзер прямо ругался на путаницу: «ты впустую потратил кадры?» — нет, картинки целы, видео-задача либо уже оплачена и досчитается, либо не отправлялась).
-- При credits-mode **не делай resubmit на «фейл»** не проверив сервер — каждый submit = новое списание (в exploreMode resubmit бесплатен, но плодит дубли).
+- **Keyframe-картинки независимы от видео-задач** — остановка анимации keyframes не тратит: картинки остаются, а видео-задача либо уже списана и досчитается, либо не отправлялась.
+- При credits-mode **не делай resubmit на «фейл»** не проверив сервер — каждый submit = новое списание (в exploreMode resubmit пул не расходует, но плодит дубли).
 
-### Credits-exhaustion → exploreMode pivot
+### Пул исчерпан → переход на exploreMode
 
-`POST /v1/tasks` вернул `400 "not enough credits"` → переотправь оставшиеся задачи с `exploreMode=True` (тот же JWT) — бесплатно, троттл ~3. Бесшовно доводит проект.
+`POST /v1/tasks` вернул `400 "not enough credits"` → переотправь оставшиеся задачи с `exploreMode=True` (тот же JWT), с поправкой на троттл ~3 параллельных.
 
 ### Recovery — забрать SUCCEEDED задачи по task_id (без ре-генерации)
 

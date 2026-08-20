@@ -177,7 +177,9 @@ def main() -> int:
 
     K = creds()
     api = K.get("ELEVENLABS_API_KEY", "")
-    voice = a.voice or K.get("ELEVENLABS_VOICE_ID_RU") or "MWyJiWDobXN8FX3CJTdE"
+    voice = a.voice or K.get("ELEVENLABS_VOICE_ID_RU")
+    if not voice:
+        raise SystemExit("нужен ELEVENLABS_VOICE_ID_RU или --voice: у голоса нет запасного значения")
     if not api:
         raise SystemExit("нет ключа ElevenLabs")
 

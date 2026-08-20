@@ -1,6 +1,6 @@
 ---
 name: linkedin-humanizer
-description: "Strip AI-tells from EN LinkedIn texts: humanize tiers, emoji detector, GPTZero/ZeroGPT tests, pre-publish audit. Triggers: «remove AI tells». NOT Russian -> de-ai-ify."
+description: "Чистка EN-текстов LinkedIn от AI-tells: humanize 3 tiers, emoji-детектор, тест детекторов GPTZero/ZeroGPT. Триггеры: «убери AI tells», «детекторы AI». НЕ русские тексты→de-ai-ify."
 ---
 
 # LinkedIn Humanizer V2

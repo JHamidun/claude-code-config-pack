@@ -55,12 +55,12 @@ access_token=$MAPBOX_TOKEN"
 
 # Reverse
 curl "https://api.mapbox.com/search/geocode/v6/reverse?\
-longitude=-34.948&latitude=-8.305&\
+longitude=-43.182&latitude=-22.971&\
 language=pt&\
 access_token=$MAPBOX_TOKEN"
 
 # Directions (маршрут с трафиком)
-curl "https://api.mapbox.com/directions/v5/mapbox/driving-traffic/-46.633,-23.550;-34.881,-8.054?\
+curl "https://api.mapbox.com/directions/v5/mapbox/driving-traffic/-46.633,-23.550;-43.210,-22.905?\
 geometries=geojson&\
 access_token=$MAPBOX_TOKEN"
 ```

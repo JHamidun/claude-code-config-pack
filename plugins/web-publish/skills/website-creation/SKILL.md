@@ -1,6 +1,6 @@
 ---
 name: website-creation
-description: Создание современных лендингов и сайтов — от vanilla HTML до React+Tailwind (Lovable-style)
+description: "Создание современных лендингов и сайтов — от vanilla HTML до React+Tailwind (Lovable-style). Триггеры: «создай сайт», «landing page», «website»."
 ---
 
 # Website Creation Skill

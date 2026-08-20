@@ -8,12 +8,12 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `csv-analysis` | Analyze CSV/Excel data: statistics, charts, transformations, insights. |
+| `csv-analysis` | Анализ CSV и Excel: статистика, графики, трансформации, выводы. |
 | `docx` | Word-документы .docx: создание, правка, tracked changes, комментарии. |
 | `epub-tools` | EPUB: чтение, поиск по главам, сборка из Markdown (ebooklib). |
 | `file-converter` | Конвертация файлов локально: Word↔PDF, Excel→CSV, что угодно→Markdown (markitdown). |
-| `file-organizer` | Organize files by context, type, date with automation. |
-| `invoice-organizer` | Sort invoices and receipts for tax prep and expense tracking. |
+| `file-organizer` | Раскладка файлов по контексту, типу и дате с автоматизацией. |
+| `invoice-organizer` | Разбор счетов и чеков для налогов и учёта расходов. |
 | `pdf` | Работа с PDF: извлечение текста и таблиц, создание, merge/split, заполнение форм. |
 | `xlsx` | Excel: создание, правка, анализ .xlsx/.csv с сохранением формул (openpyxl, pandas). |
 

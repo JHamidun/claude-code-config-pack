@@ -1,6 +1,6 @@
 ---
 name: video-generation
-description: "AI-видео хаб: Veo, Sora, Seedance, Runway, Higgsfield. Триггеры: «сгенерь видео», «оживи картинку», «оцени виральность». НЕ монтаж футажа→video-editor."
+description: "AI-видео хаб: Veo, Sora, Seedance, Runway. Триггеры: «сгенерь видео», «оживи картинку», «оцени виральность». НЕ монтаж футажа→video-editor; промо продукта→video-shotcraft."
 type: actionable
 ---
 
@@ -89,7 +89,7 @@ python scripts/run.py --brief brief.json --execute
 Бриф (JSON): `{flow, brief, aspect, platform, duration, palette[], voiceover_text, voice, music_prompt, scenes[], out_dir}`. flow ∈ cinematic / highMD / productMD / typographyMD / infographicMD / classicMD / simple. Под капотом зовёт `prompt_builders` (промпт), `router` (DIRECT vs hf), `nano_banana_keyframes`/`runway_client`/`veo_image_to_video` (генерация своими ключами), `elevenlabs_voiceover`/`lyria_music` (аудио), `ffmpeg_assemble`+`engines/.../assemble.py` (сборка). hf.exe — только если флоу требует эксклюзив. Для сложного/творческого — оркеструй фазы сам по ROUTING-MAP ниже.
 
 ### Turnkey battle-notes (заработано боем на @YourUsername, 2026-06)
-- **Текст/числа в хуке → PIL-оверлей + Ken Burns, НЕ image-моделью и НЕ i2v.** Nano/Veo гарбят цифры; крупное «$48 000 000» компонуй PIL (arialbd) на затемнённый bg → `ken_burns` (без AI-морфа = текст чёткий). Виральный хук всегда = число/имя крупно в 1-ю секунду (топ-шортсы канала так и сделаны).
+- **Текст/числа в хуке → PIL-оверлей + Ken Burns, НЕ image-моделью и НЕ i2v.** Nano/Veo гарбят цифры; крупное «$10 000 000» компонуй PIL (arialbd) на затемнённый bg → `ken_burns` (без AI-морфа = текст чёткий). Виральный хук всегда = число/имя крупно в 1-ю секунду (топ-шортсы канала так и сделаны).
 - **Runway 429 throttle (account-level, даже sequential) → фолбэк на Veo** (свой GOOGLE_API_KEY). Архитектура фолбэка реально спасает.
 - **Veo ID:** рабочий `veo-3.0-fast-generate-001` (stable). 3.1 ТОЛЬКО как `veo-3.1-*-preview` (НЕ `-001`). Veo `--duration` ∈ {4,6,8} (не 5). Veo 9:16 = 720×1280 (concat нормализует до 1080×1920).
 - **brain_activity (virality) ≤16 секунд** — финал для проверки режь ≤15.5с.
@@ -123,7 +123,7 @@ python scripts/run.py --brief brief.json --execute
 |---|---|
 | `GOOGLE_API_KEY` | Veo 3.1 (google-genai SDK) |
 | `GEMINI_API_KEY` | **КОНФЛИКТ** с GOOGLE_API_KEY. `os.environ.pop('GEMINI_API_KEY', None)` ПЕРЕД `import genai` |
-| `GOOGLE_CLOUD_PROJECT_ID` | Lyria 2 через your-server AI |
+| `GOOGLE_CLOUD_PROJECT_ID` | Lyria 2 через Vertex AI |
 | `GOOGLE_SERVICE_ACCOUNT_KEY_PATH` | Абсолютный путь к service-account JSON для Lyria (НЕ конфликт с GOOGLE_API_KEY) |
 | `RUNWAY_TOKEN_PLACEHOLDER` | Runway internal API. **30 дней TTL**. Refresh: app.runwayml.com → DevTools → Application → localStorage → `RW_TOKEN_PLACEHOLDER` |
 | `RUNWAY_TEAM_ID` | `?asTeamId=<id>` параметр для большинства endpoints |
@@ -453,7 +453,7 @@ audio = client.music.compose(
 
 Когда нужен **60s+ score с полной драматургией** (шторм→триумф) или **песня со словами** — это Suno, а не ElevenLabs Music. Полный headless-клиент (Clerk auth, generate/download без браузера) — в **`suno` skill**. Сборочные уроки (2 дубля/запрос, CDN 403-loop, климакс-нарезка длинного трека под короткое видео) → `references/audio.md` §4b. Для трибьютов предпочтителен **инструментал Suno + ElevenLabs закадр**, статический баланс (без sidechain) — см. assembly ниже.
 
-### Lyria 2 через your-server AI (OAuth2 service account)
+### Lyria 2 через Vertex AI (OAuth2 service account)
 
 ```python
 from google.oauth2 import service_account
@@ -673,7 +673,7 @@ ffmpeg -i master.mp4 -c:v libx264 -preset medium -crf 22 \
 | Terra ch1 dynamic pilot | 2 раскадровки × (narrative ~10s + loop 5s) = 4 ролика 2:3 | 7 keyframe + edit-fix глифов + 9 Seedance (2 фикса: меч-левитация, glyph-pulse) | ~1 день | $0 (Unlimited) |
 | Amber cinematic trailer | 12 scenes 21:9 | parallel-tabs 4 VSCode | ~6h active | $0 |
 | ConferenceX announcement | 30s Avatar V + SubMagic | 1 pass + 1 trigger-fix | ~45 min | ~$2 |
-| Client tribute (Хроники Восхождения) | 60s 21:9, 12 сцен + титр, 12 реальных лиц | GPT-Image-2 multi-ref + Seedance start-only (exploreMode) | ~1 день | $0 |
+| Client tribute (клиентский трибьют) | 60s 21:9, 12 сцен + титр, 12 реальных лиц | GPT-Image-2 multi-ref + Seedance start-only (exploreMode) | ~1 день | $0 |
 | YourFirstName shortform (Avatar V) | 60s 9:16 1080p | 1 pass | ~3 min | ~$4 |
 | **Reference 77s vertical** | **77s 9:16** | **3 parallel + 1 keyframe pass** | **~4 min** | **~$8 Veo Fast** |
 

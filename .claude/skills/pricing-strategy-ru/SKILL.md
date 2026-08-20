@@ -1,6 +1,6 @@
 ---
 name: pricing-strategy-ru
-description: "Ценообразование и упаковка: тарифы Academy, trial, value metric. Триггеры: «сколько брать за», «freemium». НЕ экраны апгрейда→paywall-cro-ru."
+description: "Ценообразование и упаковка: тарифы, trial, value metric. Триггеры: «сколько брать за», «freemium». НЕ экраны апгрейда→paywall-cro-ru."
 metadata:
   version: 1.1.0
   ported_from: coreyhaines31/marketingskills (pricing)

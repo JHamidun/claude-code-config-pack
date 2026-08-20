@@ -1,6 +1,6 @@
 ---
 name: export-png
-description: "PNG-скриншоты слайдов/экранов через Playwright: кадр на слайд или по селектору. Триггеры: «html в png», «выгрузи слайды картинками», «социалки cover»."
+description: "PNG-скриншоты слайдов/экранов через Playwright: кадр на слайд или по селектору. Триггеры: «html в png», «выгрузи слайды картинками», «социалки cover». НЕ тест UI→webapp-testing."
 ---
 
 # Export PNG

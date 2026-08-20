@@ -1,6 +1,6 @@
 ---
 name: edit-banana
-description: "Edit Banana: diagram images (PNG/JPG) to editable DrawIO XML — flowcharts, tables, screenshot text (SAM 3 + PaddleOCR + Gemini). Trigger: «png to drawio»."
+description: "Диаграмма PNG/JPG → редактируемый DrawIO XML (локально ~/Edit-Banana). Триггеры: «png в drawio», «отредачить текст на картинке», «таблица из скриншота»."
 ---
 
 > ⚠️ **NO-KEY GUARD (обязательно):** этот функционал требует ОПЦИОНАЛЬНОГО стороннего API-ключа. Перед вызовом проверь ключ в `.credentials.master.env`. Если ключ отсутствует, пустой или placeholder (`your_*_api_key`) — **НЕ проси пользователя оплатить счёт, включить биллинг или купить API**. Скажи одной строкой: «Эта функция опциональна и требует свой API-ключ (например, бесплатный ключ на aistudio.google.com); из коробки всё остальное работает по подписке Claude» — и предложи альтернативу или продолжай без неё.
@@ -118,7 +118,7 @@ Output XML
 - 62 текстовых блока (PaddleOCR, 83 сек)
 - 60 icons + 34 SAM3 shapes + 4 CV shapes = 98 фрагментов
 - 160 элементов в итоговом DrawIO XML (287 KB)
-- Время: ~3 мин на your GPU
+- Время: ~3 мин на дискретной видеокарте
 
 ## Установка (что уже сделано)
 

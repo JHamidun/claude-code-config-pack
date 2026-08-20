@@ -9,7 +9,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | Skill | What it does |
 |-------|--------------|
 | `brand-extractor` | Вытащить цвета, шрифты, копирайт из сайта по URL (headless Playwright). |
-| `brand-guidelines` | Anthropic official brand colors and typography for artifacts. |
+| `brand-guidelines` | Официальные цвета и шрифты бренда Anthropic для артефактов. |
 | `color-system-builder` | Из одного акцента — полная палитра: light+dark, 9-step scale, semantic, WCAG-контраст. |
 | `dark-mode-add` | Добавить dark mode к light-дизайну: продуманные dark-токены, не инверт. |
 | `deck-themes` | Готовые CSS-темы для slides без бренда: минимал, editorial, dark, data, brutalist. |

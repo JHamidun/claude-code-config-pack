@@ -11,9 +11,9 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `health-inline` | Inline codebase-health orchestration in five modes — bugs, cleanup, dependencies, reuse, security — detect, fix, verify. |
 | `leak-scan` | PII/деанон перед публикацией (leak_scan.py) + prompt-injection в чужом скилле (skill_injection_scan.py). |
 | `osint-recon` | Open-source recon on infrastructure and counterparties — IP/ASN, DNS, RDAP whois, BGP, subdomains, exposed ports, CVEs. |
-| `privacy-filter` | Local PII detection and redaction (OpenAI opf, on-device): de-identify text before cloud LLMs, reversible, RU support. |
-| `security-audit` | Security audit: secret scanning, dependency audit, OWASP Top 10 checks, code review. |
-| `threat-hunting` | Threat hunting: Sigma rules, detection engineering, security analysis. |
+| `privacy-filter` | Локальный PII-фильтр (OpenAI opf, on-device): обезличить текст перед облачным LLM, обратимая редакция. |
+| `security-audit` | Security-аудит: секреты в коде, pip/npm audit, OWASP Top 10. |
+| `threat-hunting` | Threat hunting: правила Sigma, detection engineering. |
 
 ### Agents
 

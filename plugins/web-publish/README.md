@@ -10,9 +10,9 @@ Part of the **[hamidun marketplace](../../README.md)**.
 |-------|--------------|
 | `canonical-html` | Write HTML canonically — closed tags, double quotes, no implied closes — so tools can edit markup safely. |
 | `cards-creator` | Editorial card carousels for social channels — HTML/CSS template rendered through Playwright into a 1080×1350 PNG series. |
-| `d3-visualization` | Interactive D3.js charts and data visualizations. |
+| `d3-visualization` | Интерактивные графики и визуализации данных на D3.js. |
 | `excalidraw-flowchart` | Generate Excalidraw JSON for architecture diagrams, flowcharts, and sequence diagrams. |
-| `generate-report-header` | Standard header with metadata for agent-generated reports: type, version, status, phase. |
+| `generate-report-header` | Единая шапка отчётов агентов: тип, версия, статус, время, фаза. |
 | `html-email` | Table-based HTML email for Outlook / Gmail / Apple Mail / mobile — old-school tables and inline styles, not modern CSS. |
 | `print-styles` | CSS @media print styles so an artifact prints / exports to PDF cleanly — hides nav, sets page breaks. |
 | `pwa-shell` | PWA wrapper for a prototype — manifest.json, offline service worker, install prompt, app icon. |

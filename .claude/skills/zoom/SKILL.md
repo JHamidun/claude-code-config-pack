@@ -1,6 +1,6 @@
 ---
 name: zoom
-description: Zoom meetings management — create, list, update, delete meetings and manage recordings via Server-to-Server OAuth API
+description: "Zoom через Server-to-Server OAuth: создание и правка встреч, записи. Триггеры: «зум», «создай встречу zoom»."
 triggers:
   - zoom
   - зум

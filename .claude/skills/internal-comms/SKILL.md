@@ -1,6 +1,6 @@
 ---
 name: internal-comms
-description: "Internal comms in company formats: status reports, leadership/3P updates, newsletters, FAQs, incident reports. Triggers: «team update», «status report»."
+description: "Внутренние коммуникации: статус-репорты, 3P-апдейты, рассылки, FAQ, инциденты. Триггеры: «апдейт для руководства», «письмо команде». НЕ апдейт под стейкхолдера→stakeholder-comms."
 license: Complete terms in LICENSE.txt
 ---
 

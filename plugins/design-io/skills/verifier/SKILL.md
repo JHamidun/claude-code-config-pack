@@ -1,6 +1,6 @@
 ---
 name: verifier
-description: "Открыть готовый HTML в headless-браузере перед сдачей: console-ошибки + скриншот. Триггеры: «проверь артефакт», «screenshot verify»."
+description: "Открыть готовый HTML в headless-браузере перед сдачей: console-ошибки + скриншот. Триггеры: «проверь артефакт», «screenshot verify». НЕ WCAG→a11y-audit."
 ---
 
 # Verifier

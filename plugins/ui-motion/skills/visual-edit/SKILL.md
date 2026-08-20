@@ -1,7 +1,7 @@
 ---
 name: visual-edit
 version: 1.0.0
-description: "Overlay: двигать и resize элементы мышкой, правки патчатся в CSS через локальный сервер. Триггеры: «drag handle в браузере», «alt+click resize»."
+description: "Overlay: двигать и resize элементы мышкой, правки патчатся в CSS через локальный сервер. Триггеры: «drag handle в браузере», «alt+click resize». НЕ ревью→comment-injector."
 ---
 
 # Visual edit

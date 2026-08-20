@@ -1,6 +1,6 @@
 ---
 name: churn-prevention-ru
-description: "Отток подписчиков: cancel-флоу, save-офферы, dunning через платёжный провайдер, win-back. Триггеры: «отмена подписки», churn. НЕ цены→pricing-strategy-ru."
+description: "Отток подписчиков ExampleProduct: cancel-флоу, save-офферы, dunning (ЮKassa), win-back. Триггеры: «отмена подписки». НЕ цены → pricing-strategy-ru."
 metadata:
   version: 1.1.0
   updated: 2026-05-29

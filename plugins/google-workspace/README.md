@@ -8,7 +8,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `google-workspace` | Хаб Google Workspace: Docs, Sheets, Gmail, Drive, Outlook/Exchange. |
+| `google-workspace` | Хаб Google Workspace: Docs, Sheets, Gmail (20 ящиков), Drive, Outlook компания; карта скриптов и токенов. |
 
 ### Commands
 

@@ -1,6 +1,6 @@
 ---
 name: manus-slides
-description: "Slide decks full-cycle: 25 AI styles (Gemini images) + HTML templates, Manus 1.6 themes, export PPTX/PDF/HTML. Triggers: «slides», «presentation», «pitch deck»."
+description: "Слайды полным циклом: 24 AI-стиля (Gemini) + HTML-шаблоны, темы Manus 1.6, экспорт PPTX/PDF/HTML. Триггеры: «слайды», «презентация», «pitch deck»."
 type: actionable
 ---
 
@@ -60,7 +60,7 @@ python ~/.claude/skills/manus-slides/scripts/slide_export.py html ./project ./pr
 | `diorama` | Pop-up book, 3D paper craft, bright colors | Startup, innovation, fun |
 | `chromatic` | Colorful tech explainer, floating 3D objects, rainbow | Tech explainer, education, startup |
 
-### Manus Hybrid (7) — AI-replicated via Gemini
+### Manus Hybrid (7) — стили по мотивам Manus, рендер на Gemini
 
 | Style | Description | Best For |
 | ----- | ----------- | -------- |
@@ -87,9 +87,9 @@ python ~/.claude/skills/manus-slides/scripts/slide_export.py html ./project ./pr
 | `watercolor` | Soft watercolor washes, calligraphic text | Art, poetry, invitations |
 | `minimal-clean` | Pure white, black text only, max whitespace | Luxury, minimalist |
 
-### Manus 1.6 Image Themes (6) — reverse-engineered from Manus's image-mode slide themes (2026-07-02)
+### Manus 1.6 Image Themes (6) — стили по мотивам image-режима Manus (2026-07-02)
 
-Replicas of Manus 1.6's premium image-mode presentation themes, generated on our Gemini. Reference sample slides: `references/manus-theme-samples/<Theme>__<model>/`. **Full 26-theme Manus catalog (modes, models, palettes, HTML-theme mappings): `references/manus-26-themes.md`.**
+Наши промпт-стили, повторяющие внешний вид image-тем Manus 1.6; рендер идёт на Gemini. Образцы слайдов для сверки: `references/manus-theme-samples/<Theme>__<model>/`. **Карта 26 тем (режимы, модели, палитры, соответствие HTML-темам): `references/manus-26-themes.md`.**
 
 | Style | Manus model | Description | Best For |
 | ----- | ----------- | ----------- | -------- |
@@ -103,12 +103,12 @@ Replicas of Manus 1.6's premium image-mode presentation themes, generated on our
 > ⚠️ Manus's "Sketch" theme = our `sketch-notebook` (light cream ink-doodle). Our legacy `sketch` (white chalk on DARK paper) is a different look — kept for back-compat. Manus's "Whiteboard" = our `whiteboard`.
 > ⚠️ `pixel` footer tags and `dossier`/`vellum` decorative stamps are auto-invented by the model if you don't specify them — put real footer/tag text in the slide prompt to avoid gibberish (standard "specify all text" rule).
 
-### Emulating Manus 1.6 themes — honest limitations
+### Что даёт эмуляция тем Manus 1.6 и где её предел
 
-- Manus's **server-side prompts were NOT extracted** (nothing in the 34-MB sandbox binary; model choice + prompts live on Manus's servers). Our STYLES prompts are visual reconstructions from previews + 8-slide samples — **style emulation, not a pixel copy**.
-- End-to-end Manus generation was observed live only for **Sketch/nano-banana**; other themes are confirmed via the catalog API + samples.
-- Manus's 19 **HTML/react themes**: 6 are covered by our AI-image styles (`glamour`, `amber`, `arctic`, `neon`, `patina`, `onyx`), 9 map onto our HTML template categories + palettes (see `references/manus-26-themes.md`), 4 need a new photo-based HTML template (Emerald, Mist, Linen, Mahogany) — no 1:1 path today.
-- Exact "as Manus" output is only possible via Manus itself (tool `slides`, export `manus-export-slides manus-slides://<version_id>`).
+- Наши STYLES-промпты собраны по внешнему виду: превью тем плюс 8-слайдовые образцы. Это **эмуляция стиля, а не точная копия** — совпадения слайд-в-слайд не будет.
+- Живьём генерация в Manus прогонялась только для **Sketch/nano-banana**; остальные темы сверялись по образцам слайдов.
+- Из 19 **HTML/react-тем** Manus: 6 закрываются нашими AI-image стилями (`glamour`, `amber`, `arctic`, `neon`, `patina`, `onyx`), 9 ложатся на наши HTML-шаблоны и палитры (см. `references/manus-26-themes.md`), под 4 (Emerald, Mist, Linen, Mahogany) нужен новый photo-based HTML-шаблон — готового соответствия нет.
+- Результат «ровно как в Manus» получается только в самом Manus.
 
 ## Image Model Selection (env `MANUS_SLIDES_MODEL`)
 
@@ -117,7 +117,7 @@ Replicas of Manus 1.6's premium image-mode presentation themes, generated on our
 | `MANUS_SLIDES_MODEL=` | Marketing name | When |
 | --- | --- | --- |
 | *(unset — default)* | Nano Banana 2 | Default; fast, great text, cheapest |
-| `nano-banana-pro-preview` | Nano Banana Pro | Premium: richest detail, best incidental/small text (this is what Manus uses) |
+| `nano-banana-pro-preview` | Nano Banana Pro | Premium: richest detail, best incidental/small text |
 | `gemini-3-pro-image` | Nano Banana Pro | Same tier; even localizes decorative text to Cyrillic |
 | `gemini-3.1-flash-lite-image` | Nano Banana 2 Lite | Cheapest, quick drafts |
 
@@ -179,7 +179,7 @@ Generates slides using Gemini Image (`gemini-3.1-flash-image-preview` / Nano Ban
 
 A logo is composited AFTER generation (the prompt no longer reserves an empty corner — see the white-box fix below). Hard-won lessons when assembling/maintaining real decks:
 
-- **Logo is a separate composite, not part of the prompt.** Keep a logo PNG with alpha (e.g. an "H" mark) and `img.alpha_composite()` it post-gen. Position is a design choice — be consistent across the WHOLE deck. Standard for YourFirstName's ClientCorpN decks = **top-RIGHT**: right edge ≈ `0.976*W`, top `0.038*H`, height `0.072*H` → `x = W - lw - int(W*0.024); y = int(H*0.038)`. (Top-left works too but clips left-aligned titles — see below.)
+- **Logo is a separate composite, not part of the prompt.** Keep a logo PNG with alpha (your brand mark) and `img.alpha_composite()` it post-gen. Position is a design choice — be consistent across the WHOLE deck. A safe default for client decks = **top-RIGHT**: right edge ≈ `0.976*W`, top `0.038*H`, height `0.072*H` → `x = W - lw - int(W*0.024); y = int(H*0.038)`. (Top-left works too but clips left-aligned titles — see below.)
 - **Keep the pre-logo RAW PNGs** (`exec_slides_raw/`, no logo). To move the logo to the other side / resize / rebrand, re-run the composite on raws — never try to "erase" a baked-in logo.
 - **⭐ WHITE-BOX ROOT CAUSE = the prompt itself.** The old `exec-sketch` prompt said *"Leave the very top-left corner clean and empty (… a logo is composited there later)"* — telling Gemini to "leave a corner empty" makes it literally draw an **empty white box/container** there. FIXED at the prompt level (2026-06-14): the style string now says the cream bg *"COMPLETELY covers all four corners — NO white rectangles, NO empty blocks, NO containers, NO reserved boxes in any corner"* and no longer reserves a logo corner. New decks won't have the box. The logo is composited on top of the cream afterwards regardless.
   - **For decks generated with the OLD prompt** (box already baked in): fix ONLY a real box, never a title. Sample slide bg (median of edge points away from corners) and fill the corner with it **only if**: `white_px > 1500 AND dark_px < 300` inside `[0,0, 0.14W, 0.15H]` (`>244` all-channels = white; `<120` all-channels = dark text). A *left-aligned title* gives ~200-400 "white" px (antialiasing) + lots of dark px — DO NOT fill, or you erase the first word ("2012:" → cut).

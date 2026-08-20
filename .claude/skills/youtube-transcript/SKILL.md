@@ -1,6 +1,6 @@
 ---
 name: youtube-transcript
-description: Fetch YouTube video transcripts, summaries, and content analysis
+description: "Транскрипты роликов YouTube, саммари и разбор содержимого. Триггеры: «о чём это видео», «текст видео с ютуба», «саммари ролика»."
 ---
 
 # YouTube Transcript Skill

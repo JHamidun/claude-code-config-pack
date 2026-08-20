@@ -1,6 +1,6 @@
 ---
 name: sharing-skills
-description: "Contribute your skill upstream via pull request: branch, commit, push. Triggers: «share the skill», «contribute skill»."
+description: "Отправка своего навыка в upstream-репозиторий через PR: ветка, коммит, пуш. Триггеры: «поделись навыком», «контрибьютни skill»."
 ---
 
 # Sharing Skills

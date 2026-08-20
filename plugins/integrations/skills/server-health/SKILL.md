@@ -1,6 +1,6 @@
 ---
 name: server-health
-description: "Server health via SSH: docker, systemctl, disk, memory, logs. Triggers: «check the server», «why did it crash on the server»."
+description: "Проверка сервера по SSH: docker, systemctl, диск, память, логи. Триггеры: «проверь сервер», «почему упало на сервере». НЕ процедуры и откаты→runbook."
 ---
 
 # Server Health Check Skill

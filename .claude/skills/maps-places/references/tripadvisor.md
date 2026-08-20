@@ -31,7 +31,7 @@ language=pt"
 # Nearby restaurants
 curl "https://api.content.tripadvisor.com/api/v1/location/nearby_search?\
 key=$TRIPADVISOR_API_KEY&\
-latLong=-8.305,-34.948&\
+latLong=-22.971,-43.182&\
 category=restaurants&\
 radius=5&\
 radiusUnit=km&\
@@ -60,8 +60,8 @@ curl "https://api.content.tripadvisor.com/api/v1/location/12345678/reviews?key=$
       "postalcode": "[REDACTED_CEP]",
       "address_string": "Av. Beira Mar, 1000, Sample City, ST [REDACTED_CEP], Brazil"
     },
-    "latitude": "-8.305",
-    "longitude": "-34.948"
+    "latitude": "-22.971",
+    "longitude": "-43.182"
   }]
 }
 ```

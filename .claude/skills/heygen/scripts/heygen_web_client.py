@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-"""HeyGen WEB-session headless client (api2.heygen.com internal API).
+"""HeyGen web-session headless client (api2.heygen.com — the host used by the HeyGen web app).
 
-Bills against the **web subscription** (Team Unlimited) instead of the empty $0
-public-API wallet. Analog of suno_client.py / runway_client.py.
+Works through the session of your own HeyGen account instead of a public-API key,
+so the feature set matches what that account sees in the web app. Analog of
+suno_client.py / runway_client.py.
 
 Auth = `heygen_token` cookie value (base64 JSON {token,token_type,created_at})
 sent as header `x-guest-session-token`, plus `x-space-id`. Stored in
 ~/.claude/.credentials.master.env as HEYGEN_WEB_TOKEN / HEYGEN_WEB_SPACE_ID.
 Re-capture when expired: see ../references/web-session.md.
 
-Reverse-engineered 2026-06-05 (account with Team plan).
-All endpoints below captured live from the HeyGen web app.
+Endpoints and payloads below reflect the product's behaviour as observed in 2026-06;
+HeyGen can change them without notice, so treat 4xx/unknown fields as "product moved on".
 """
 import os, sys, json, base64, argparse, mimetypes, urllib.request, urllib.parse, urllib.error
 from pathlib import Path
@@ -66,7 +67,7 @@ class HeyGenWeb:
         return h
 
     def call(self, path, method="GET", params=None, json_body=None):
-        """Generic internal-API call. path e.g. '/v1/pacific/account.get'. Unwraps {data}."""
+        """Generic API call. path e.g. '/v1/pacific/account.get'. Unwraps {data}."""
         url = BASE + path
         if params:
             url += ("&" if "?" in url else "?") + urllib.parse.urlencode(params, doseq=True)
@@ -440,11 +441,11 @@ class HeyGenWeb:
         """Convert a deck → heygen_video draft. Returns {workflow_id}; poll ppt_conversion_status;
         result opens as a create-v4 draft → render via studio_generate.
 
-        ⚠️ The PPT converter ingests decks through a web-only react-dropzone path; a deck uploaded via
-        the generic file.url/file.upload (asset pipeline) is NOT indexed by the converter → convert
-        returns 400569 'Not found'. Pass `ppt_uuid` of a deck already uploaded through the PPT web page
-        (app.heygen.com/apps → PPT/PDF to Video → drop deck), OR drive that page once. The convert
-        endpoint + body below are exact and verified."""
+        ⚠️ Known limitation: the converter only sees decks uploaded through the upload form on the
+        PPT/PDF page. A deck sent via the generic file.url/file.upload (asset pipeline) is NOT indexed
+        by the converter → convert returns 400569 'Not found'. Pass `ppt_uuid` of a deck already
+        uploaded on the PPT web page (app.heygen.com/apps → PPT/PDF to Video → drop deck), or upload
+        it there once."""
         if not ppt_uuid:
             ppt_uuid = self.file_upload(file_path, file_type="document")["id"]  # best-effort; see warning
         name = Path(file_path).stem if file_path else "deck"
@@ -495,7 +496,7 @@ def _print(x):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="HeyGen web-session client (api2 internal API, Team plan)")
+    ap = argparse.ArgumentParser(description="HeyGen web-session client (api2.heygen.com)")
     sub = ap.add_subparsers(dest="cmd", required=True)
     for c in ("whoami", "quota", "account", "subscription", "usage", "avatars", "items",
               "agent-sessions", "translations", "translate-languages", "seedance-list"):

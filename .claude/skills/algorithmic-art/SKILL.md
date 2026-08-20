@@ -1,6 +1,6 @@
 ---
 name: algorithmic-art
-description: "Generative art with p5.js: seeded randomness, flow fields, particle systems, interactive parameters. Triggers: «generative art», «art with code»."
+description: "Генеративное искусство на p5.js: seeded randomness, flow fields, частицы. Триггеры: «generative art», «арт кодом», «флоу-филд»."
 license: Complete terms in LICENSE.txt
 ---
 

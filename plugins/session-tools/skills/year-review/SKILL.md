@@ -1,6 +1,6 @@
 ---
 name: year-review
-description: Analyze session history and generate insights about work patterns, productivity, and tool usage over a time period.
+description: "Разбор истории сессий за период: паттерны, продуктивность, инструменты. Триггеры: «итоги месяца», «итоги года». НЕ одна сессия → session-mentor."
 triggers:
   - "year review"
   - "month review"

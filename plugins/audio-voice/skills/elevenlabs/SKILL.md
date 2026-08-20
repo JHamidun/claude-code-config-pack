@@ -1,6 +1,6 @@
 ---
 name: elevenlabs
-description: "ElevenLabs: text-to-speech, voice cloning, sound effects. Triggers: «voice this text», «clone a voice». NOT speech-to-text → deepgram."
+description: "ElevenLabs: TTS, клонирование голоса, звуковые эффекты; свой клонированный голос. Триггеры: «озвучь», «наговори текст». НЕ расшифровка речи→deepgram; говорящее фото→did."
 ---
 
 # ElevenLabs API Skill
@@ -29,7 +29,7 @@ ELEVENLABS_VOICE_ID_RU=<идентификатор своего клона>   # 
 Список доступных голосов аккаунта — `GET /v1/voices`; клонированные помечены
 категорией `cloned`. Как подготовить материал для клонирования — `scripts/voice_dataset.py`.
 
-> **Локальная альтернатива (экономия кредитов):** для массовой/черновой RU-озвучки, длинных аудиокниг, dictation и офлайн — см. `references/local-voicebox-eval.md` (Voicebox / Chatterbox / Qwen3-TTS на видеокарта с 16 ГБ памяти, 0 кредитов). ElevenLabs остаётся каноном для флагманской озвучки, звуковых эффектов и музыки.
+> **Локальная альтернатива (экономия кредитов):** для массовой/черновой RU-озвучки, длинных аудиокниг, dictation и офлайн — см. `references/local-voicebox-eval.md` (Voicebox / Chatterbox / Qwen3-TTS на видеокарте с 16 ГБ памяти, без обращений к API). ElevenLabs остаётся каноном для флагманской озвучки, звуковых эффектов и музыки.
 
 ## When to Use ElevenLabs
 
@@ -186,7 +186,7 @@ seg2 = client.music.compose(prompt='Continues from dark mystery, transitions int
 | Задача | Решение |
 |---|---|
 | Quick BGM под шортс | **ElevenLabs Music** — быстрее, не нужен service account |
-| Commercial-safe license для коммерческого ролика | **Lyria 2** (your-server AI, см. `video-generation/references/audio.md`) |
+| Commercial-safe license для коммерческого ролика | **Lyria 2** (Vertex AI, см. `video-generation/references/audio.md`) |
 | Кинематографический score для книжного трейлера | **Lyria 2** 2×30s + acrossfade |
 
 ## Production voice IDs

@@ -1,6 +1,6 @@
 ---
 name: doc-coauthoring
-description: "Co-author docs: context transfer, iteration, fresh-reader test — proposals, specs, decision docs. Triggers: «write an RFC». NOT PRD -> feature-spec."
+description: "Совместное написание дока: контекст → структура → тест свежим читателем. Триггеры: «напиши документ», «помоги написать RFC». НЕ PRD → feature-spec."
 metadata:
   origin: anthropics/skills@fa0fa64
 ---

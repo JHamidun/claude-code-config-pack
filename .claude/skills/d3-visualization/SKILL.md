@@ -1,6 +1,6 @@
 ---
 name: d3-visualization
-description: "Interactive D3.js charts and data visualizations. Triggers: «build a chart», «data visualization», «graph the data»."
+description: "Интерактивные графики и визуализации данных на D3.js. Триггеры: «построй чарт», «график данных», «data visualization»."
 ---
 
 # D3.js Visualization Skill

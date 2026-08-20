@@ -1,6 +1,6 @@
 ---
 name: create-an-asset
-description: "Sales assets from your deal context: landing pages, decks, one-pagers, workflow demos. Triggers: «sales deck», «asset for this prospect»."
+description: "Продажные материалы под сделку: лендинг, дек. Триггеры: «sales deck», «материал для клиента»."
 ---
 
 # Create an Asset
@@ -431,7 +431,7 @@ Write a clear, specific walkthrough:
 
 ```
 Step 1: Human Trigger
-"Alex, a Brand Performance Analyst at ExampleCorp, needs to review
+"Alex, a Brand Performance Analyst at [Client Company], needs to review
 Q4 performance for the Nike license agreement. She opens the review
 dashboard and clicks 'Start Review'..."
 
@@ -795,7 +795,7 @@ Strategic Fit | Business Impact | ROI Calculator | Security & Trust | Next Steps
 ### Example 2: Technical Workflow Demo
 
 **Input:**
-- Prospect: ExampleCorp
+- Prospect: [Prospect Company]
 - Audience: IT architects
 - Purpose: POC proposal
 - Format: Workflow demo

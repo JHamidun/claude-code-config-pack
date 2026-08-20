@@ -59,10 +59,10 @@ openwiki требует LLM-провайдера. Порядок предпоч�
    openwiki --init
    ```
    Оговорка: `openai-compatible` ходит через chat-completions; tool-calling openwiki через гейтвей НЕ верифицирован — прогнать на маленьком репо и проверить, что доки реально сгенерились, прежде чем гнать на большой боевой репо. Если tool-calling ломается — fallback на п.1 или п.3.
-3. **CI (гейтвей недоступен с раннера)** — дешёвая метрируемая модель или your-server AI:
+3. **CI (гейтвей недоступен с раннера)** — дешёвая метрируемая модель или Vertex AI:
    - OpenRouter + дешёвая модель (в шаблоне `z-ai/glm-5.2`): `OPENWIKI_PROVIDER=openrouter`, `OPENROUTER_API_KEY`, `OPENWIKI_MODEL_ID=...`.
    - Gemini AI Studio: `OPENWIKI_PROVIDER=gemini`, `GEMINI_API_KEY` (ключ `GOOGLE_API_KEY`/AI Studio есть).
-   - your-server AI ADC (без ключа): `OPENWIKI_PROVIDER=gemini-enterprise`, `GOOGLE_CLOUD_PROJECT` + workload-identity/ADC.
+   - Vertex AI ADC (без ключа): `OPENWIKI_PROVIDER=gemini-enterprise`, `GOOGLE_CLOUD_PROJECT` + workload-identity/ADC.
    - Anthropic доступен (`OPENWIKI_PROVIDER=anthropic`, `ANTHROPIC_API_KEY`), но это метрируемый API — не через Max-подписку. Использовать только если ключ уже оплачен.
 
 Custom модель — всегда `OPENWIKI_MODEL_ID`. Дефолт онбординга — OpenAI `gpt-5.6-terra` (метрируемый — сменить на п.1/2).
@@ -85,7 +85,7 @@ GitHub-шаблон (суть): по cron (напр. `0 9 * * *`) ставит N
 Порядок внедрения (решение владельца репо — НЕ гнать вслепую, это спенд токенов + запись в боевые репо + PR):
 1. Пилот на маленьком/непроизводственном репо провайдером `openai-chatgpt` или локальным гейтвеем → проверить качество openwiki/ и что CLAUDE.md проекта не пострадал.
 2. Затем `openwiki --init` на целевых больших репо тем же провайдером, ревью сгенерённого, коммит.
-3. Вшить CI-workflow с телеметрией OFF и дешёвым CI-провайдером (OpenRouter glm / Gemini AI Studio / your-server AI ADC).
+3. Вшить CI-workflow с телеметрией OFF и дешёвым CI-провайдером (OpenRouter glm / Gemini AI Studio / Vertex AI ADC).
 
 ## Прочее
 

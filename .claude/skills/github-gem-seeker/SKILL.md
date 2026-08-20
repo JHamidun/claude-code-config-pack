@@ -1,6 +1,6 @@
 ---
 name: github-gem-seeker
-description: "Find battle-tested open source on GitHub instead of coding from scratch. Triggers: «find a library», «ready-made solution», «find a repo»."
+description: "Поиск проверенного open source на GitHub вместо кода с нуля. Триггеры: «найди библиотеку», «есть готовое решение», «найди репо»."
 ---
 
 # GitHub Gem Seeker

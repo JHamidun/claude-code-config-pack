@@ -1,6 +1,6 @@
 ---
 name: api-documentation
-description: "API docs from code: OpenAPI/Swagger specs, Postman collections, examples for REST, GraphQL, gRPC. NOT whole-codebase docs -> openwiki."
+description: "Документация API из кода: OpenAPI/Swagger, Postman, REST/GraphQL/gRPC. Триггеры: «задокументируй API». НЕ: кодбаза→openwiki; чужие репо→deepwiki."
 keywords: api, documentation, openapi, swagger, postman, rest, graphql, api-docs
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: memory-agent
-description: "Orchestrator of 4 memory layers: curated files, graph (memory_graph.py), chat full-text (search_chats.py), semantic. Triggers: «remember this», «what did we decide»."
+description: "Оркестратор 4 слоёв памяти: файловая, граф, чаты, Second Brain. Триггеры: «запомни», «что мы решали про»."
 ---
 
 # Memory Agent — оркестратор многослойной памяти

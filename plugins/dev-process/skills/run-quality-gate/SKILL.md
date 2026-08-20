@@ -1,6 +1,6 @@
 ---
 name: run-quality-gate
-description: "Run quality gates: type-check, build, tests, lint with configurable blocking. Worker utility. Triggers: «run checks», «quality gate»."
+description: "Прогон quality gate: type-check, build, tests, lint со структурным отчётом. Служебный. Триггеры: «прогони проверки», «проверь перед мержем»."
 allowed-tools: Bash, Read
 ---
 

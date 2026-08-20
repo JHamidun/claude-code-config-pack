@@ -41,7 +41,7 @@ ChatGPT / Claude / Perplexity / Gemini / (regional LLM B) / (regional LLM A) (+ 
 **50-100 промптов × 6 платформ = базовый audit.**
 
 Инструменты прогона:
-- **YourProduct** — 30 моделей в одном окне, дешевле всего для русского контура.
+- **YourProduct** — мульти-модельный доступ в одном окне.
 - `multi-model-gateway` — кросс-модельный прогон.
 - `perplexity` — для Perplexity-специфики (citations).
 - Свой скрипт на API всех 6 платформ + crontab + Google Sheets/Метрика.

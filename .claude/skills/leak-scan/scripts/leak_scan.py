@@ -5,7 +5,7 @@ Usage: python leak_scan.py <target_dir_or_file> [--allow SUBSTR ...]
 
 Two layers of patterns:
 - GENERIC_PATTERNS (in this file): key/token/secret SHAPES that are not tied to any
-  person — API keys, bot tokens, JWT, SMTP keys, phone number formats, CPF language cue.
+  person — API keys, bot tokens, JWT, SMTP keys, phone number formats, national ID cues.
 - IDENTITY_PATTERNS (loaded from ~/.claude/leak-scan-identity.json, NOT shipped):
   the specific names, documents, domains, server IPs and client names of THIS owner.
   Without that file the scanner still catches generic secret shapes and warns that

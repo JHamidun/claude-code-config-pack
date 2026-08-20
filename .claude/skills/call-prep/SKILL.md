@@ -1,6 +1,6 @@
 ---
 name: call-prep
-description: "Sales call prep: account context, attendee research, agenda; uses CRM, email, transcripts. Triggers: «prep me for my call», «call prep»."
+description: "Подготовка к продажному звонку: разведка компании и участников, повестка. Триггеры: «подготовься к звонку», «с кем встреча». НЕ саммари → /call-summary."
 ---
 
 # Call Prep

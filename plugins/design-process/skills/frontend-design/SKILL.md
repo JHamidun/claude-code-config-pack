@@ -1,6 +1,6 @@
 ---
 name: frontend-design
-description: "Эстетика без дизайн-системы: типографика, цвет, ритм, 5 направлений. Триггеры: «просто сделай красиво», «soft brutalism», «premium dark». НЕ готовые темы→theme-factory."
+description: "Эстетика без дизайн-системы: типографика, цвет, ритм. Триггеры: «просто сделай красиво», «soft brutalism», «premium dark». НЕ готовые темы→theme-factory; слайды→deck-themes."
 ---
 
 # Frontend design

@@ -1,6 +1,6 @@
 ---
 name: competitive-intelligence
-description: "Sales battlecard on competitors: interactive HTML with comparison matrix. Triggers: «battlecard», «how do we compare». NOT marketing -> competitive-analysis-mktg."
+description: "Sales-батлкарта конкурентов: интерактивный HTML с матрицей сравнения. Триггеры: «battlecard», «чем мы лучше конкурента». НЕ маркетинг → competitive-analysis-mktg."
 ---
 
 # Competitive Intelligence

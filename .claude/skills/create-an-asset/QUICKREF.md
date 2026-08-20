@@ -47,7 +47,7 @@ last week. Need something for the exec team.
 
 **Workflow demo:**
 ```
-Mock up a workflow for ExampleCorp showing how they'd use
+Mock up a workflow for [Client Company] showing how they'd use
 our product to monitor contract compliance. Components: our AI,
 their Snowflake warehouse, and scanned PDF contracts.
 ```

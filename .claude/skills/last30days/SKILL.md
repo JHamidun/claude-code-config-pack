@@ -1,7 +1,7 @@
 ---
 name: last30days
 version: "3.16.0"
-description: "What people say about a topic in the last 30 days: posts + engagement from Reddit, X, YouTube, TikTok, HN, GitHub. Triggers: «last30», «what are people saying»."
+description: "Что говорят о теме за 30 дней: посты и вовлечённость Reddit, X, YouTube, TikTok, HN, GitHub. Триггеры: «что обсуждают», «тренды соцсетей», «last30». НЕ только Reddit/HN→reddit-hn."
 argument-hint: 'last30days nvidia earnings reaction | last30days AI video tools | last30days what users want in react'
 allowed-tools: Bash, Read, Write, AskUserQuestion, WebSearch
 homepage: https://github.com/mvanhorn/last30days-skill

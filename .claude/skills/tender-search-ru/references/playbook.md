@@ -51,7 +51,7 @@ Extended-search results page accepts GET params with the keyword:
 - fz44/fz223 = laws; af active, ca completed, pc/pa cancelled/postponed.
 - Advantage over rostender: filter by **ОКПД2/КТРУ code** and see customer + НМЦК + docs free.
 
-## Keyword set for AI / LLM products (YourProduct-type)
+## Keyword set for AI / LLM products
 
 `доступ к нейросетям`, `большие языковые модели`, `LLM`, `генеративный искусственный интеллект`,
 `ИИ-ассистент`, `чат-бот на основе ИИ`, `генеративный контент`, `языковая модель`,

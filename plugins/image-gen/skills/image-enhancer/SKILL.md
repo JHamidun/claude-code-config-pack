@@ -1,6 +1,6 @@
 ---
 name: image-enhancer
-description: "Improve image quality: upscale, denoise, enhance resolution, optimize. Triggers: «upscale», «image is blurry»."
+description: "Улучшение картинок: апскейл, denoise, оптимизация (Pillow/OpenCV). Триггеры: «улучши качество», «увеличь разрешение», «картинка мыльная»."
 ---
 
 # Image Enhancer Skill

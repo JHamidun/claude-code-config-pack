@@ -1,7 +1,7 @@
 ---
 name: a11y-audit
 version: 1.0.0
-description: Прогон axe-core в headless. Отчёт по WCAG-нарушениям с ссылками на конкретные элементы.
+description: "Прогон axe-core в headless перед сдачей: отчёт по WCAG-нарушениям. Триггеры: «проверь accessibility», «WCAG», «контраст AA»."
 when_to_use: Финал работы. Часть пайплайна перед сдачей.
 ---
 

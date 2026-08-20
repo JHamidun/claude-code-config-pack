@@ -1,6 +1,6 @@
 ---
 name: revops-ru
-description: "RevOps: воронки B2C self-serve и B2B sales-led, скоринг, MQL/SQL-хэндофф, SLA; учёт в Your CRM. Триггеры: «скоринг лидов», «перелидоз». НЕ поиск лидов→lead-research."
+description: "RevOps: воронки B2C self-serve и B2B sales-led, скоринг, MQL/SQL-хэндофф, SLA; учёт в Your CRM. Триггеры: «перелидоз». НЕ операционка ОП→sales-team-ru."
 metadata:
   version: 1.2.0
   reuses: crm, lead-research, draft-outreach, zoom, churn-prevention-ru, paywall-cro-ru, funnel-design-ru, sales-team-ru, full-funnel-analytics-ru
@@ -83,7 +83,7 @@ Speed-to-lead: чем быстрее первый контакт, тем выш�
 
 - **Категоризация лидов A/B/C/D** (деньги × срочность): A = бренд/поиск/email/SMM/органика; B = спецпредложения/вебинары; C = остальные каналы; D = мусор/отсев. Связка «A-лиды → A-сейлзам» по правилу **«усиливать сильное»**. → `references/lead-categorization-abcd.md`.
 - **SLA дозвона ≤15 мин** + дозваниваемость **≥40%** + анти-паттерн **«перелидоз»** (>~12 лидов/сейлза/день роняет конверсию), трекать на ежедневном синке маркетинг↔продажи. → `references/sla-perelidoz.md`.
-- **CLV/CEV/CRV по стадиям** MQL→SQL→Customer→Advocate: оптимизация на полную ценность клиента (покупки + продления + рекомендации) против CAC, Predict LTV из когорт. → `references/instructor2-clv-funnel.md`.
+- **CLV/CEV/CRV по стадиям** MQL→SQL→Customer→Advocate: оптимизация на полную ценность клиента (покупки + продления + рекомендации) против CAC, Predict LTV из когорт. → `references/clv-funnel.md`.
 
 ## Стадии B2B-сделки в Your CRM
 
@@ -138,7 +138,7 @@ B2B-операции (сделки, поля, стадии, бизнес-про�
 | `references/crm-mapping.md` | как реализовать B2B-часть RevOps через `crm` + интеграция с продуктовой CRM, маппинг процесс→API |
 | `references/lead-categorization-abcd.md` | категоризация лидов A/B/C/D по матрице деньги × срочность, анкета определения категории, связка «категория лида ↔ категория сейлза A/B/C», правило «усиливать сильное» |
 | `references/sla-perelidoz.md` | SLA первого контакта ≤15 мин, дозваниваемость ≥40%, анти-паттерн «перелидоз» (>~12 лидов/сейлза), ежедневный синк маркетинг↔продажи |
-| `references/instructor2-clv-funnel.md` | расчёт ценности клиента CLV/CEV/CRV по стадиям MQL→SQL→Customer→Advocate, Predict LTV из когорт, оптимизация на CLV/CAC вместо CPL |
+| `references/clv-funnel.md` | расчёт ценности клиента CLV/CEV/CRV по стадиям MQL→SQL→Customer→Advocate, Predict LTV из когорт, оптимизация на CLV/CAC вместо CPL |
 
 ## Чеклист
 
@@ -149,7 +149,7 @@ B2B-операции (сделки, поля, стадии, бизнес-про�
 - [ ] Скоринг откалиброван по историческим конверсиям?
 - [ ] Лиды размечены A/B/C/D, сейлзы A/B/C; правило «A-лиды → A-сейлзам» настроено (`lead-categorization-abcd.md`)?
 - [ ] SLA дозвона ≤15 мин и дозваниваемость ≥40% трекаются; посчитан потолок лидов на сейлза (анти-перелидоз) (`sla-perelidoz.md`)?
-- [ ] Оптимизация на CLV/CAC (не CPL); CEV/CRV отслеживаются; Advocate-петля замкнута (`instructor2-clv-funnel.md`)?
+- [ ] Оптимизация на CLV/CAC (не CPL); CEV/CRV отслеживаются; Advocate-петля замкнута (`clv-funnel.md`)?
 - [ ] У каждой стадии обязательные поля?
 - [ ] Коды отклонения + recycling настроены?
 - [ ] 152-ФЗ: источник+дата лида сохранены (из `lead-research`)?

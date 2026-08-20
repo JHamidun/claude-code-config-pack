@@ -1,6 +1,6 @@
 ---
 name: google-workspace
-description: "Хаб Google Workspace: Docs, Sheets, Gmail, Drive, Outlook/Exchange. Триггеры: «гугл таблица», «гугл диск», «отправь письмо». НЕ произвольный IMAP→email-imap."
+description: "Хаб Google Workspace: Docs, Sheets, Gmail (20 ящиков), Drive, Outlook компания; карта скриптов и токенов. Триггеры: «гугл таблица», «гугл диск»."
 ---
 
 # Google Workspace + рабочая почта

@@ -1,4 +1,9 @@
-# DELIVERABLE 1 — SKILL_DRAFT
+Working notes on the Higgsfield CLI. Part 1 is a draft skill: how to route a brief to
+the right model and assemble the command. Part 2 covers what the CLI does over HTTP
+(base URL, credentials file, endpoint and payload shapes) and how the same tasks map
+onto our own stack. Everything here assumes the CLI runs under your own account.
+
+# PART 1 — Draft skill: Higgsfield CLI
 
 ```markdown
 ---
@@ -253,17 +258,17 @@ Cost estimate without submitting: `higgsfield generate cost <jst> [same flags]`
 
 ---
 
-# DELIVERABLE 2 — RAW_API_AND_REPLICATION
+# PART 2 — HTTP layer under the CLI and capability mapping
 
-## (a) Direct API Access — What We Know
+## (a) What the CLI does over HTTP
 
 ### Base URL
 
-`https://api.higgsfield.ai` — documented in CLI source/CLAUDE.md. The CLAUDE.md forbids direct curl explicitly: "Do not call api.higgsfield.ai directly with curl. The CLI handles auth, retries, polling, schema validation, and auto-uploads."
+`https://api.higgsfield.ai` — named in the CLI's own documentation. That documentation asks not to call the API with curl directly: "Do not call api.higgsfield.ai directly with curl. The CLI handles auth, retries, polling, schema validation, and auto-uploads." Use the CLI as the entry point; the notes below only explain what happens under it.
 
 ### Auth Token Location
 
-`~/.config/higgsfield/credentials.json` — device-flow OAuth result. Token format: **unknown** (not documented in reverse-engineered files). Likely a Bearer JWT injected as `Authorization: Bearer <token>`. Must be inferred by inspecting the file after `higgsfield auth login`.
+`~/.config/higgsfield/credentials.json` — the result of the device-flow OAuth login into your own account. Token format is **not stated** in the CLI documentation; most likely a Bearer JWT sent as `Authorization: Bearer <token>`. Check the file contents after `higgsfield auth login` if you need the exact shape.
 
 ### Inferred Endpoint Mapping
 
@@ -295,7 +300,7 @@ Mark: (D) = directly documented, (I) = inferred from CLI noun/verb pattern.
 | `marketing-studio dtc-ads generate` | `POST /v1/marketing/dtc-ads` | POST | (I) |
 | `marketing-studio webproducts fetch` | `POST /v1/marketing/webproducts/fetch` | POST | (I) App Store URLs route here |
 
-### Known Request/Response Shape (from reverse-engineering)
+### Known Request/Response Shape (from observed CLI behaviour)
 
 **Generation create body (inferred):**
 ```json
@@ -317,7 +322,7 @@ Mark: (D) = directly documented, (I) = inferred from CLI noun/verb pattern.
 
 **Generation response includes `adjustments` field** for non-fatal coercions (e.g. aspect_ratio clamped).
 
-**Virality Predictor job params field** contains: `brain_example_url`, `vertexMapBinaryUrl`, `vertexMapUrl` (implementation detail, not for normal output), plus Open report URL.
+**Virality Predictor job `params` field** also carries service fields with links to intermediate assets — they are not meant for user-facing output; take the score and the Open report URL instead.
 
 **Product fetch response:** `{id, status, fail_reason}` — dedupes by URL, reuses existing non-failed entity.
 
@@ -361,7 +366,7 @@ Mark: (D) = directly documented, (I) = inferred from CLI noun/verb pattern.
 | **Skill/command system** | Not offered | Our 172 skills + 111 commands | We exceed Higgsfield here |
 | **MCP connectors** | Not offered | 19 local + 10 cloud MCP servers | We exceed Higgsfield here |
 
-### What Is Missing to Build Full Higgsfield Capability Without Their API
+### What Is Missing to Cover the Same Tasks with Our Own Stack
 
 | Gap | Effort | How to Fill |
 |-----|--------|------------|
@@ -380,7 +385,7 @@ Mark: (D) = directly documented, (I) = inferred from CLI noun/verb pattern.
 
 ### Priority Build Order (highest ROI first)
 
-1. **Install Higgsfield CLI** and integrate as a skill (SKILL_DRAFT above) — gives full access to all 30+ models immediately via one binary
+1. **Install Higgsfield CLI** and integrate as a skill (draft in Part 1) — one binary covers all 30+ models under your own account
 2. **Product photoshoot prompt enhancer** — 10 templates, low effort, high output quality improvement
 3. **Hook/Setting library** — JSON file, 2 hours work, unlocks full Marketing Studio UGC workflow
 4. **Brand kit builder** — wire Firecrawl scrape + Claude Vision + memory storage

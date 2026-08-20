@@ -1,6 +1,6 @@
 ---
 name: reddit-hn
-description: "Search Reddit and Hacker News for tech opinions, trends, discussions. Triggers: «what does reddit say», «developer opinions on X»."
+description: "Поиск мнений и обсуждений по технологиям в Reddit и Hacker News. Триггеры: «что пишут на реддите», «мнения разработчиков», «обсуждают ли X»."
 ---
 
 # Reddit & Hacker News Research

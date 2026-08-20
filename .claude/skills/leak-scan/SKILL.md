@@ -33,7 +33,7 @@ Single consolidated scanner (`scripts/leak_scan.py`, 248 patterns) that finds pe
 
 Regex alone gives FALSE confidence. A 248-pattern scan once passed a repo "clean" — then a semantic LLM review of the same repo found a real client name in an example, a live API credit-balance, real production resource names, a private multi-account auth gateway, and ToS-grey subscription-bypass tooling. None matched a literal pattern. So ALWAYS run BOTH stages before declaring clean:
 
-**Stage 1 — regex scan** (`scripts/leak_scan.py`): catches literal tells (names, emails, IPs, keys, tokens, known clients, CPF). Fast, deterministic, exhaustive for what it knows.
+**Stage 1 — regex scan** (`scripts/leak_scan.py`): catches literal tells (names, emails, IPs, keys, tokens, known clients, national IDs). Fast, deterministic, exhaustive for what it knows.
 
 **Stage 2 — semantic review** (LLM): read the actual content (skill bodies, examples, READMEs) and hunt for what regex CANNOT see:
 - **Real proper nouns in examples** — client/company/person names, project codenames, product names (not in the pattern list)
@@ -76,7 +76,7 @@ python ~/.claude/skills/leak-scan/scripts/leak_scan.py ./my-public-repo
 | Infra | server IPs, internal Docker IPs, gateway/hook ports, hostnames |
 | Clients/brands | your employer, your clients (+ localized forms) |
 | Secrets | `sk-ant`, `sk-proj`, `AIza`, `ghp_`, `xoxb`, `ntn_`, `pplx-`, JWT, Telegram bot tokens |
-| Brazil docs | CRNM, CPF, phone (multiple formats) |
+| National ID formats | tax/residence IDs, phone (multiple formats) |
 | Deanon fingerprints | timezone, specific hardware model, region defaults, telltale counts, voice IDs |
 | Stego | zero-width characters |
 
@@ -86,7 +86,7 @@ Allowlist covers placeholders (`your-username`, `YOUR_*`, `${HOME}`, `${WORKSPAC
 
 Not every hit is a leak. After running, triage:
 
-- **Real leak** → scrub: secrets, CPF/CRNM, server IPs, private client names, personal emails, hardware/timezone fingerprints.
+- **Real leak** → scrub: secrets, national IDs, server IPs, private client names, personal emails, hardware/timezone fingerprints.
 - **Intended/unavoidable** → keep: a public marketplace's own `owner/repo` in its install command and `repository`/`author.url` fields necessarily name the repo. Decide identity policy (full name vs handle vs placeholder) with the user before deciding these are acceptable.
 - **Baseline pre-existing** → if a hit already lives in the live public source, it was previously accepted; flag it but don't treat it as newly introduced.
 

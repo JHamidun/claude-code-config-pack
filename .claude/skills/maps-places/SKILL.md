@@ -66,7 +66,7 @@ python ~/.claude/tools/places_search.py foursquare "pizza" --lat 40.7128 --lon -
 python ~/.claude/tools/places_search.py opencage "Sample Beach, Brazil"
 python ~/.claude/tools/places_search.py nominatim "Тверская 13"
 python ~/.claude/tools/places_search.py overpass "cafe" --lat 55.7558 --lon 37.6173 --radius 1000 --limit 50
-python ~/.claude/tools/places_search.py ocm "ev" --lat -8.305 --lon -34.948 --radius 50000
+python ~/.claude/tools/places_search.py ocm "ev" --lat -22.971 --lon -43.182 --radius 50000
 python ~/.claude/tools/places_search.py serpapi "pizza" --lat 40.71 --lon -74.00
 
 # Airbnb

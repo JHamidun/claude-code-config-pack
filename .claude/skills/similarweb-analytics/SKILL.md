@@ -1,6 +1,6 @@
 ---
 name: similarweb-analytics
-description: "Website traffic estimates from public SimilarWeb data: rankings, engagement, sources, geo. Triggers: «competitor site traffic», «how many visitors»."
+description: "Трафик чужого сайта по публичным данным SimilarWeb: посещаемость, источники. Триггеры: «сколько людей на сайте конкурента»."
 type: actionable
 ---
 

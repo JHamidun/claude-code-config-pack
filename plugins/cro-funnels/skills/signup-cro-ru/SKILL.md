@@ -1,6 +1,6 @@
 ---
 name: signup-cro-ru
-description: "CRO воронки регистрации и подписки на рассылку: меньше трения, выше completion rate. Триггеры: «бросают на регистрации». НЕ активация→onboarding-cro-ru."
+description: "CRO регистрации ExampleProduct и захвата email на news. Триггеры: «бросают на регистрации», «конверсия в trial». НЕ активация→onboarding-cro-ru; оплата→paywall-cro-ru."
 metadata:
   version: 1.1.0
   updated: 2026-05-29

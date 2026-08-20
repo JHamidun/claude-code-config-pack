@@ -53,7 +53,7 @@
 
 ПАРАЛЛЕЛЬНЫЕ ВЕТКИ (подключаются по задаче, не по порядку):
 
-  ОРГАНИКА:   content-machine-instructor2-ru ──▶ manychat-funnel-ru
+  ОРГАНИКА:   content-machine-ru ──▶ manychat-funnel-ru
               (фабрика контента)            (лиды из SMM: коммент→директ)
               ai-creative-factory-ru        (структура хука для органики и платного)
 
@@ -88,7 +88,7 @@
 | `tg-channel-buyout-ru` | media-planning (если посевы в миксе) | Размещения у каналов/блогеров |
 | `b2b-marketing-ru` | market-selection + jtbd | Заменяет «воронка+канал» для B2B; передаёт лид в sales-team |
 | `ai-creative-factory-ru` | jtbd (что цепляет) | Креативы для playbook'ов и органики |
-| `content-machine-instructor2-ru` | jtbd | Поток контента → manychat-funnel |
+| `content-machine-ru` | jtbd | Поток контента → manychat-funnel |
 | `manychat-funnel-ru` | content-machine (есть контент) | Лиды из SMM → analytics/sales |
 | `ai-seo-agent-pipeline` | — (параллельно) | Масса страниц → органический трафик |
 | `geo-aeo-ru` | — (параллельно) | Видимость в LLM-ответах |
@@ -112,7 +112,7 @@
 | **A/B-тесты** | все performance + meta (5×4) | По каналу → playbook; универсальная статистика → `ab-testing-ru` (стек) |
 | **ManyChat коммент→директ** | manychat-funnel, content-machine, masterminds | → `manychat-funnel-ru` |
 | **CAC / LTV / ROMI / ROAS** | все performance + full-funnel | Решения по ним → `full-funnel-analytics-ru` |
-| **Трендвотчинг / декомпозиция виральных** | ai-creative-factory, content-machine | Структура → `ai-creative-factory-ru`; операционка → `content-machine-instructor2-ru` |
+| **Трендвотчинг / декомпозиция виральных** | ai-creative-factory, content-machine | Структура → `ai-creative-factory-ru`; операционка → `content-machine-ru` |
 | **Cursor / vibe-coding** | ai-marketing-stack, full-funnel, masterminds | → `ai-marketing-stack-ru` |
 
 ---
@@ -137,7 +137,7 @@
 Не каждая задача требует всех 5 слоёв. Типовые короткие маршруты:
 
 - **«Просто запустить один канал, продукт уже валиден»** → `media-planning-ru` (подтвердить канал) → playbook → `capi-no-code-setup` → `full-funnel-analytics-ru`.
-- **«Только органика/контент»** → `jtbd` → `content-machine-instructor2-ru` → `manychat-funnel-ru`.
+- **«Только органика/контент»** → `jtbd` → `content-machine-ru` → `manychat-funnel-ru`.
 - **«Только видимость в поиске/AI»** → `ai-seo-agent-pipeline` и/или `geo-aeo-ru`.
 - **«Только B2B-аутрич»** → `b2b-marketing-ru` (+ `lead-research`/`draft-outreach` из стека).
 - **«Диагностика проседающей воронки»** → `funnel-design-ru` (найти узел) → `full-funnel-analytics-ru` (подтвердить данными) → точечный playbook/CRO.

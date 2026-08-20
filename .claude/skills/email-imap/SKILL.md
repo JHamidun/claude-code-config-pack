@@ -1,6 +1,6 @@
 ---
 name: email-imap
-description: "IMAP/SMTP CLI для любого ящика: Яндекс.Почта, Mail.ru, корпоративные. Триггеры: «почта по imap», «корпоративный ящик». НЕ: Gmail OAuth→gmail; Exchange→outlook."
+description: "IMAP/SMTP CLI для любого ящика: Яндекс.Почта, Mail.ru, корпоративные. Триггеры: «почта по imap», «корпоративный ящик»."
 ---
 
 # Email IMAP/SMTP CLI
