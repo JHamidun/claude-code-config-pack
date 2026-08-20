@@ -1,6 +1,6 @@
 ---
 name: linkedin-employee-advocacy
-description: "LinkedIn employee advocacy program: 14-day launch, posting at scale, governance, ROI. Triggers: «get the team posting», «employee-generated content»."
+description: "Employee advocacy в LinkedIn: 14-дневный запуск, посты сотрудников, governance, ROI. Триггеры: «сотрудники должны постить», «раскачать команду в linkedin»."
 ---
 
 # LinkedIn Employee Advocacy

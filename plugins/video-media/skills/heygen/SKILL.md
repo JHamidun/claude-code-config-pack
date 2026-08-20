@@ -1,6 +1,6 @@
 ---
 name: heygen
-description: "HeyGen API v3: AI avatar video, digital twin, lip-sync translation, voice clone. Triggers: «avatar video», «talking head». NOT photo-only -> did."
+description: "HeyGen API v3: AI-аватар видео, digital-twin, lip-sync перевод, Voice Clone. Триггеры: «аватар видео», «видео со своим аватаром», «говорящая голова»."
 ---
 
 # HeyGen API Skill
@@ -22,11 +22,11 @@ HeyGen = AI avatar video platform. **v3 is the primary API** (`developers.heygen
 **Server (OpenAPI):** `https://api.heygen.com` (Production)
 
 **Docs:**
-- v3 (current): https://developers.heygen.com — full source dump `${HOME}/_heygen_v3_docs.md`
-- **OpenAPI spec (authoritative): `${HOME}/_heygen_openapi.json`** (54 paths, 145 schemas, 3.1.0) ← verified source for this skill
+- v3 (current): https://developers.heygen.com — локальная копия документации `${HOME}/_heygen_v3_docs.md`
+- **OpenAPI spec (authoritative): `${HOME}/_heygen_openapi.json`** (54 paths, 145 schemas, 3.1.0) ← основной источник для этого навыка
 - llms.txt: https://developers.heygen.com/llms.txt
 - Changelog: https://developers.heygen.com/changelog
-- v1/v2 legacy dump: `${HOME}/_heygen_docs.md`
+- v1/v2 legacy: локальная копия `${HOME}/_heygen_docs.md`
 
 ## Auth
 
@@ -43,46 +43,47 @@ curl -s "https://api.heygen.com/v3/users/me" -H "x-api-key: $HEYGEN_API_KEY"
 # {"data":{"billing_type":"wallet","email":"...","wallet":{"currency":"usd","remaining_balance":0.0,...}}}
 ```
 
-### Keys (rotated 2026-06-05) — account `your-heygen-account@example.com`
+### Ключи
 
-In `.credentials.master.env`:
-- `HEYGEN_API_KEY` — alias for DEV key
-- `HEYGEN_API_KEY_DEV` = `sk_V2_...` — "ключ для разработки" (full API, direct video creation)
-- `HEYGEN_API_KEY_AGENT` = `sk_V2_...` — "ключ для агентов" (Video Agent / agentic skills)
+В `.credentials.master.env`:
+- `HEYGEN_API_KEY` — алиас DEV-ключа
+- `HEYGEN_API_KEY_DEV` = `sk_V2_...` — ключ для разработки (полный API, прямое создание видео)
+- `HEYGEN_API_KEY_AGENT` = `sk_V2_...` — ключ для агентных сценариев (Video Agent)
 
-Both return identical `/v3/users/me` and `/v3/avatars` — same account, **shared wallet**, no permission difference observed. Use DEV for direct creation, AGENT for Video Agent / agentic flows (semantic split only).
+Оба ключа дают одинаковый ответ на `/v3/users/me` и `/v3/avatars`: одна учётная запись, общий кошелёк, разницы в правах нет. Разделение смысловое — DEV для прямого создания, AGENT для Video Agent.
 
-> ⚠️ **Wallet = $0.00 as of recent.** Pay-as-you-go top-up required before any billable job via the PUBLIC API. Check before generating: `GET /v3/users/me` → `wallet.remaining_balance`.
+> ⚠️ Кошелёк API бывает пустым. Платные задачи через публичный API идут только при положительном балансе — проверяй перед генерацией: `GET /v3/users/me` → `wallet.remaining_balance`.
 
-## TWO billing surfaces — pick the right one
+## Два пути обращения к сервису
 
-| Surface | Base | Auth | Billed against | Use |
+| Путь | Base | Auth | Учёт расхода | Когда |
 |---|---|---|---|---|
-| **Public API** (this doc) | `api.heygen.com` | `x-api-key` | **API wallet = $0** | needs top-up; full documented v3 |
-| **Web session** (internal) | `api2.heygen.com` | `x-guest-session-token` (cookie) | **Team Unlimited subscription** ✅ | 0 extra cost, billed to the paid web plan |
+| **Публичный API** (этот документ) | `api.heygen.com` | `x-api-key` | кошелёк API | документированный v3; нужен положительный баланс кошелька |
+| **Сессия своей учётной записи** | `api2.heygen.com` | `x-guest-session-token` (cookie) | тариф учётной записи | работа в рамках уже подключённого плана |
 
-The account **`your-heygen-account@example.com` has an active paid HeyGen Team Unlimited plan** (`tier:team`, `is_trial:false`) (usage visible in account). That value lives on the **web subscription**, NOT the empty API wallet. To generate without paying, drive the **internal web API** like the Suno/Runway skills.
+Что доступно сейчас, видно из `GET /v3/users/me` (баланс кошелька API) и команды `quota` веб-клиента (тариф и лимиты учётной записи).
 
-→ **Full web-session reverse-engineering + headless client: `references/web-session.md`** + `scripts/heygen_web_client.py`.
-Creds in `.credentials.master.env`: `HEYGEN_WEB_TOKEN` / `HEYGEN_WEB_RAW_TOKEN` / `HEYGEN_WEB_SPACE_ID` (captured 2026-06-05).
+→ **Работа через сессию учётной записи и клиент без браузера: `references/web-session.md`** + `scripts/heygen_web_client.py`.
+Креды в `.credentials.master.env`: `HEYGEN_WEB_TOKEN` / `HEYGEN_WEB_RAW_TOKEN` / `HEYGEN_WEB_SPACE_ID` (берутся из своей сессии).
 
 ```bash
 cd ~/.claude/skills/heygen/scripts
-python heygen_web_client.py whoami        # confirm real account (email set, not guest)
-python heygen_web_client.py quota         # tier/entitlements/usage
-python heygen_web_client.py avatars       # your avatar groups (incl. YourFirstName)
-# GENERATE (all billed to Team plan, $0 wallet untouched):
+python heygen_web_client.py whoami        # проверка сессии: email заполнен, а не гостевой вход
+python heygen_web_client.py quota         # тариф, доступные функции, расход
+python heygen_web_client.py avatars       # свои группы аватаров
+# Генерация:
 python heygen_web_client.py agent "Сделай 15-сек видео-интро про YourProduct"     # Video Agent
 python heygen_web_client.py translate "https://my.mp4" "Russian (Russia),Spanish (Spain)" --precision
 python heygen_web_client.py seedance "Man in neon city talks to camera" <look_id> --res 1080p --dur 10  # Cinematic
 python heygen_web_client.py avatar-iv ./photo.jpg "Привет!" <voice_id>          # Photo-to-Video (Avatar IV)
 python heygen_web_client.py image "product ad scene" --refs s3://...            # image / product placement
 python heygen_web_client.py seedance-list   # poll your jobs; or: status <item_id>
-python heygen_web_client.py call /v1/payment/subscription   # generic internal call
+python heygen_web_client.py call /v1/payment/subscription   # произвольный вызов
 ```
 
-**Status:** auth + ALL read endpoints + ALL major WRITE/generate flows reverse-engineered & **verified live** (created real Team-plan jobs + downloaded a valid mp4, 2026-06-05):
-| Feature | Internal endpoint | CLI |
+**Что проверено на практике:** авторизация, все чтения и основные сценарии генерации — запрос проходит, задача создаётся, готовый mp4 скачивается.
+
+| Feature | Endpoint | CLI |
 |---|---|---|
 | AI Studio (talking-head, multi-scene) | `text_draft.create`→`text_draft.save`→`text_draft.generate` | `studio "<script>" <avatar_id> <voice_id>` |
 | Video Agent (prompt→video) | `POST /v1/video_agent/sessions` + `/v2/video_agent/interactive_chat` | `agent "<prompt>"` |
@@ -100,7 +101,7 @@ python heygen_web_client.py call /v1/payment/subscription   # generic internal c
 | File upload (any) | `file.url` → PUT(SSE) → `file.upload` (3-step) | auto in methods |
 | Status / download | `GET /v1/project/items/status` · `/v1/apps/<slug>/{id}/status` · `.check?workflow_id=` | `status <id>` · `download <id> <out> --wait` |
 
-⚠️ **Each app has its OWN API namespace** (frontend slug ≠ API route — Face Swap = `/v1/face_swap_v2.*`, Speech Cleanup = `filler-removal`, B-Roll = `/v1/file.ai_generate_element`, Batch = `/v1/avatar/batch_mode/submit`, PPT = `/v1/ent_ppt_pdf_conversion/convert`). Guessing 404s — capture from a live submit. Upload is a 3-step `file.url`→PUT(`x-amz-server-side-encryption:AES256`)→`file.upload`, NOT multipart. Full payloads (AI Studio scene graph + every app body) in **`references/web-session.md`**. Only **Lipsync** (use public `/v3/lipsyncs`) and **LiveAvatar** (realtime WS) remain — niche.
+⚠️ **Each app has its OWN API namespace** (frontend slug ≠ API route — Face Swap = `/v1/face_swap_v2.*`, Speech Cleanup = `filler-removal`, B-Roll = `/v1/file.ai_generate_element`, Batch = `/v1/avatar/batch_mode/submit`, PPT = `/v1/ent_ppt_pdf_conversion/convert`). Угадывать путь по названию раздела бесполезно — 404; сверяйся с таблицей выше. Upload is a 3-step `file.url`→PUT(`x-amz-server-side-encryption:AES256`)→`file.upload`, NOT multipart. Full payloads (AI Studio scene graph + every app body) in **`references/web-session.md`**. Only **Lipsync** (use public `/v3/lipsyncs`) and **LiveAvatar** (realtime WS) remain — niche.
 
 ## Complete v3 endpoint map (54 paths, OpenAPI-verified)
 
@@ -387,7 +388,7 @@ Returns a poll-able clone job; clone `voice_id` usable anywhere. Quota exceeded 
   "speed": 1.0,                   // 0.5–2.0
   "language": "ru", "locale": "ru-RU" }  // optional; locale infers language
 ```
-Returns audio URL + duration. **$0.000667/sec** — effectively free for hooks/intros.
+Returns audio URL + duration. **$0.000667/sec** — самый дешёвый вызов в API, удобен для коротких хуков и интро.
 
 ## Lipsync — `POST /v3/lipsyncs` (dub existing video)
 
@@ -519,7 +520,7 @@ Verify payloads via HMAC-SHA256 of raw body using `signing_secret`.
 | **Digital Twin** | **$0.0667/s** | $0.0833/s |
 | Studio Avatar | $0.0667/s | $0.0833/s |
 
-**YourFirstName = digital_twin → $2.00 per 30-s short (1080p), $162 per 81 shorts.** Avatar V no longer costs more than IV.
+**YourFirstName = digital_twin → $2.00 per 30-s short (1080p), $200 per 100 shorts.** Avatar V no longer costs more than IV.
 
 ### Other
 | Feature | Rate |
@@ -746,7 +747,7 @@ render_id = r.json()['data']['render_id']
 ## Gotchas (verified 2026-06-05)
 
 - **Auth header `x-api-key`** (case-insensitive). NOT Bearer (unless OAuth). NOT `X-Api-Key` required-case.
-- **Wallet $0.00** — top up before billable jobs; check `GET /v3/users/me`.
+- **Баланс кошелька API** — платные задачи идут только при положительном балансе; проверка `GET /v3/users/me`.
 - **`POST /v3/videos` is a 3-way union** on `type`: `avatar` / `image` / `cinematic_avatar`.
 - **Cinematic `avatar_id` is an ARRAY** of 1–3 look IDs; no script/voice; flat $7.
 - **Translation: `output_languages` = language NAMES not codes** (`'Spanish (Spain)'`), field is `video` not `video_url`. Get names from `GET /v3/video-translations/languages`.
@@ -818,8 +819,8 @@ print(r.json())
 
 ## Local references
 - **OpenAPI spec (authoritative): `${HOME}/_heygen_openapi.json`** (54 paths, 145 schemas)
-- v3 docs dump: `${HOME}/_heygen_v3_docs.md`
-- v1/v2 legacy dump: `${HOME}/_heygen_docs.md`
+- v3 docs (локальная копия): `${HOME}/_heygen_v3_docs.md`
+- v1/v2 legacy (локальная копия): `${HOME}/_heygen_docs.md`
 - Skill backups: `SKILL.md.bak.v3-pre-20260605` (this update), `SKILL.md.bak.v2`
 - Creds: `~/.claude/.credentials.master.env` → `HEYGEN_API_KEY` / `_DEV` / `_AGENT`
 - your-server pipeline (legacy v2): `ssh your-server` → `/root/video-production/services/heygen.py`

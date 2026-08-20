@@ -1,6 +1,6 @@
 ---
 name: brand-guidelines
-description: "Anthropic official brand colors and typography for artifacts. Trigger: «Anthropic style». NOT other brands -> design-md-brands."
+description: "Официальные цвета и шрифты бренда Anthropic для артефактов. Триггеры: «стиль Anthropic». НЕ свой бренд или бренд клиента→design-md-brands."
 license: Complete terms in LICENSE.txt
 ---
 

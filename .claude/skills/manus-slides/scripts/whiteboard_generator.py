@@ -84,8 +84,8 @@ The hand-drawn marker content on this clean white slide:
 """,
 
     # ================================================================
-    # MANUS ORIGINALS — 7 AI-compatible templates from Manus platform
-    # These are the styles marked with banana emoji in Manus UI
+    # MANUS ORIGINALS — 7 prompt presets in the spirit of the image-based
+    # Manus themes (the ones the Manus UI marks with a banana emoji)
     # ================================================================
 
     "vinyl": """A retro vintage poster-style presentation slide in the style of 1930s-1950s jazz/concert posters.
@@ -173,8 +173,8 @@ The colorful content on this slide:
 """,
 
     # ================================================================
-    # MANUS "HTML" STYLES — Actually AI-generated, we replicate via Gemini
-    # In Manus these don't use Nano Banana but clearly need AI generation
+    # MANUS "HTML" STYLES — visual look reproduced here via Gemini image generation
+    # (in this pipeline every style below is rendered as an image, not as CSS)
     # ================================================================
 
     "sketch": """A hand-drawn chalk and charcoal sketch style presentation slide on a dark charcoal/black paper background.
@@ -258,8 +258,9 @@ The bold statement on this slide:
 """,
 
     # ================================================================
-    # MANUS 1.6 IMAGE THEMES — gpt-image replicas (added 2026-07-02)
-    # Reverse-engineered from the Manus 1.6 slide catalog (ListSlideTemplatesPublic).
+    # MANUS 1.6 IMAGE THEMES (added 2026-07-02)
+    # Prompt presets written in the spirit of the Manus 1.6 image themes,
+    # composed by looking at published sample slides for each theme.
     # Reference sample slides: references/manus-theme-samples/<Theme>__gpt-image/
     # ================================================================
 
@@ -537,7 +538,7 @@ STYLE_CATEGORIES = {
     "Manus AI (Nano Banana originals)": [
         "vinyl", "whiteboard", "grove", "fresco", "easel", "diorama", "chromatic",
     ],
-    "Manus Hybrid (AI-replicated via Gemini)": [
+    "Manus Hybrid (rendered via Gemini)": [
         "sketch", "glamour", "amber", "arctic", "neon", "patina", "onyx",
     ],
     "Bonus AI styles": [
@@ -545,7 +546,7 @@ STYLE_CATEGORIES = {
         "corporate", "dark-tech", "dashboard", "infographic",
         "watercolor", "minimal-clean",
     ],
-    "Manus 1.6 image themes (replicas)": [
+    "Manus 1.6 image themes (prompt presets)": [
         "etching", "editorial", "pixel", "vellum", "dossier", "sketch-notebook",
     ],
 }

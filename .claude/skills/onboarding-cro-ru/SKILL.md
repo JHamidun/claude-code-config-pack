@@ -1,6 +1,6 @@
 ---
 name: onboarding-cro-ru
-description: "Онбординг и активация после регистрации — до аха-момента, time-to-value в trial. Триггеры: «activation rate», «дроп после регистрации». НЕ регистрация→signup-cro-ru."
+description: "Онбординг и активация trial ExampleProduct — до аха-момента. Триггеры: «activation rate», «дроп после регистрации». НЕ: регистрация→signup-cro-ru; апгрейд→paywall-cro-ru."
 metadata:
   version: 1.1.0
   updated: 2026-05-29

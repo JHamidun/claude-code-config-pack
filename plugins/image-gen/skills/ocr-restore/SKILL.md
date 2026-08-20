@@ -1,6 +1,6 @@
 ---
 name: ocr-restore
-description: "Restore garbled OCR text in escalating tiers with quality scoring: merged words, garbage chars. Triggers: «broken OCR», «scan poorly recognized»."
+description: "Восстановление битого OCR по ступеням с оценкой качества: склейки, мусорные символы. Триггеры: «битый OCR», «скан распознан криво»."
 ---
 
 # OCR Scan Restoration

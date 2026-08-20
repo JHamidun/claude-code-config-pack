@@ -61,7 +61,7 @@
 
 ### BiRefNet OOM на 32GB your-server server
 - **Причина**: BiRefNet требует ~40GB VRAM при batch processing
-- **Фикс**: переехать на локальный 96GB ноут с your GPU
+- **Фикс**: переехать на локальную машину с дискретной видеокартой
 
 ### your-server 3-wide parallel rembg в 30x медленнее single
 - **Причина**: ONNX thread thrashing на vCPU без isolation

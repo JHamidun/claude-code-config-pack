@@ -1,6 +1,6 @@
 ---
 name: onboarding-ux
-description: "Паттерны первого запуска: welcome, tour, empty-states. Триггеры: «первый запуск», «setup wizard», «TTV». НЕ активация Academy→onboarding-cro-ru."
+description: "Паттерны первого запуска: welcome, tour, empty-states. Триггеры: «первый запуск», «setup wizard», «TTV». НЕ активация trial→onboarding-cro-ru."
 ---
 
 # Onboarding UX

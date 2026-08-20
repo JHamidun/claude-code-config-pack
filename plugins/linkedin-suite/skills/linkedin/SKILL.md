@@ -1,6 +1,6 @@
 ---
 name: linkedin
-description: "LinkedIn intelligence via Scraping API: profiles, companies, posts, ad library. Triggers: «look up a LinkedIn profile», «enrich leads», competitor ads."
+description: "LinkedIn-разведка (Scraping API): профили, компании, посты. Триггеры: «пробей профиль linkedin», «найди контакты в linkedin». НЕ реклама→ad-spy; свой пост→linkedin-post-writer."
 allowed-tools: Bash, Read, Write, WebSearch
 ---
 

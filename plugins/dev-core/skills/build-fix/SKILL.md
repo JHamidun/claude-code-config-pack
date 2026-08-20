@@ -1,6 +1,6 @@
 ---
 name: build-fix
-description: "Fix failing builds and type errors with minimal safe changes until green. Triggers: «fix build», «build broken», «type errors»."
+description: "Чинит падающую сборку и ошибки типов минимальными правками до зелёного прогона. Триггеры: «не собирается», «почини сборку», «tsc ругается»."
 origin: ECC
 ---
 

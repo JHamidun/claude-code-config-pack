@@ -88,7 +88,7 @@ academy.your-domain.com и страницы треков. Ключевая ра�
   "@context": "https://schema.org",
   "@type": "Course",
   "name": "Claude Code — флагманский трек ExampleProduct",
-  "description": "Практический трек по работе с Claude Code: от основ до production. Доступ к множество моделей через YourProduct включён.",
+  "description": "Практический трек по работе с Claude Code: от основ до production. Мульти-модельный доступ через YourProduct включён.",
   "provider": {
     "@type": "Organization",
     "name": "ExampleProduct",
@@ -104,7 +104,7 @@ academy.your-domain.com и страницы треков. Ключевая ра�
   "offers": {
     "@type": "Offer",
     "category": "Paid",
-    "price": "19900",
+    "price": "[ВАША_ЦЕНА]",
     "priceCurrency": "RUB",
     "url": "https://academy.your-domain.com/tracks/claude-code",
     "availability": "https://schema.org/InStock"

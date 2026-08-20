@@ -244,7 +244,7 @@
       ],
       "webhookId": "fb878391-270b-47d8-addf-2917c71a3e09",
       "parameters": {
-        "owner": "vishalinstructor21",
+        "owner": "vishalkumar1",
         "events": [
           "merge_requests"
         ],
@@ -422,7 +422,7 @@
       ],
       "webhookId": "REPLACE_WITH_WEBHOOK_ID",
       "parameters": {
-        "owner": "vishalinstructor21",
+        "owner": "vishalkumar1",
         "events": [
           "merge_requests"
         ],
@@ -447,7 +447,7 @@
       ],
       "webhookId": "REPLACE_WITH_WEBHOOK_ID",
       "parameters": {
-        "owner": "vishalinstructor21",
+        "owner": "vishalkumar1",
         "events": [
           "merge_requests"
         ],

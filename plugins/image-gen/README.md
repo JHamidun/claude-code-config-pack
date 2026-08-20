@@ -8,15 +8,15 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `algorithmic-art` | Generative art with p5.js: seeded randomness, flow fields, particle systems, interactive parameters. |
-| `edit-banana` | Edit Banana: diagram images (PNG/JPG) to editable DrawIO XML — flowcharts, tables, screenshot text (SAM 3 + PaddleOCR + Gemini). |
-| `image-enhancer` | Improve image quality: upscale, denoise, enhance resolution, optimize. |
+| `algorithmic-art` | Генеративное искусство на p5.js: seeded randomness, flow fields, частицы. |
+| `edit-banana` | Диаграмма PNG/JPG → редактируемый DrawIO XML (локально ~/Edit-Banana). |
+| `image-enhancer` | Улучшение картинок: апскейл, denoise, оптимизация (Pillow/OpenCV). |
 | `image-generation` | Промпт-инжиниринг генерации картинок (DALL-E, Midjourney, SD, Gemini) + сюрреализм-пресет Крестинина. |
 | `nano-banana-pro` | Prompt engineering Nano Banana Pro (Gemini Image): реставрация фото, VK-креативы без VPN. |
-| `ocr-restore` | Restore garbled OCR text in escalating tiers with quality scoring: merged words, garbage chars. |
+| `ocr-restore` | Восстановление битого OCR по ступеням с оценкой качества: склейки, мусорные символы. |
 | `openai-dalle` | OpenAI media API (OPENAI_API_KEY): gpt-image-2 face-swap/edit, Sora 2 video, Whisper STT, TTS, embeddings. |
-| `replicate` | Run 1000+ AI models via Replicate API: FLUX, SDXL, Whisper, LLaMA — when a model is not available natively. |
-| `slack-gif-creator` | Animated GIFs for Slack within size limits (emoji 64KB): validators + animation primitives. |
+| `replicate` | Replicate: запуск 1000+ AI-моделей по API (FLUX, SDXL, Whisper), если модели нет нативно. |
+| `slack-gif-creator` | Анимированные GIF под лимиты Slack (emoji 64KB): валидаторы и анимационные примитивы. |
 | `sticker-pack-generator` | Стикерпаки Telegram: static WEBP, WebM VP9-alpha, кастом-эмодзи; Telethon upload через @Stickers. |
 
 ### Agents

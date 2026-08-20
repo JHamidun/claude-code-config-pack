@@ -1,6 +1,6 @@
 ---
 name: brand-extractor
-description: "Вытащить цвета, шрифты, копирайт из сайта по URL (headless Playwright). Триггеры: «сделай в стиле нашего сайта», «вытащи цвета с сайта»."
+description: "Вытащить цвета, шрифты, копирайт из сайта по URL (headless Playwright). Триггеры: «сделай в стиле нашего сайта», «вытащи цвета с сайта». НЕ чужие продукты→content-policy."
 ---
 
 # Brand extractor

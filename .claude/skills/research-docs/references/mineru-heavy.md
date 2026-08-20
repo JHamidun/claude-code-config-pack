@@ -28,8 +28,8 @@ MinerU — VLM+OCR парсер документов в Markdown/JSON для RAG
 
 ## Ресурсы (почему heavy)
 
-- **VRAM:** 4GB (pipeline) → 8GB (vlm/hybrid). your GPU тянет vlm с запасом.
-- **RAM:** 16GB мин (32GB+ желательно). У нас 96GB — ок.
+- **VRAM:** 4GB (pipeline) → 8GB (vlm/hybrid). Видеокарта с 16 ГБ VRAM тянет vlm с запасом.
+- **RAM:** 16GB минимум, 32GB и выше — комфортно.
 - **Диск:** ≥20GB (веса моделей + кэш), SSD.
 - **Python:** 3.10–3.13. **Ставить ТОЛЬКО в отдельный venv** (не в базовый), чтобы не тащить torch/vllm в общее окружение.
 

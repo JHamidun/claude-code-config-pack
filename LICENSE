@@ -29,8 +29,12 @@ file before redistributing the directory in question. Notably:
   removed (provenance undocumented); the remaining sound effects ship with the
   upstream `ATTRIBUTION.md`.
 - `.claude/skills/gstack/`, `.claude/skills/last30days/` — see LICENSE inside.
-- `.claude/skills/{docx,pdf,pptx,xlsx}/` — Anthropic's own terms, see each
-  `LICENSE.txt`.
+- `.claude/skills/{docx,pdf,pptx,xlsx}/` and their copies under
+  `plugins/office-docs/skills/{docx,pdf,xlsx}/` and
+  `plugins/presentations/skills/pptx/` — Anthropic's own terms, see each
+  `LICENSE.txt`. Those terms are restrictive: they forbid retaining copies
+  outside Anthropic's Services, derivative works, and distribution to third
+  parties. The MIT grant above does NOT extend to them.
 - `get-shit-done/` — adapted from Get Shit Done, originally by TÂCHES, now at
   https://github.com/open-gsd.
 - Plugins adapted from Anthropic's knowledge-work-plugins carry `UPSTREAM.md`.

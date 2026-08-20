@@ -1,6 +1,6 @@
 ---
 name: competitive-analysis
-description: Competitor research, market analysis, ad intelligence, positioning. Триггер «реклама конкурентов» — указатель на скилл ad-spy.
+description: "Продуктовый анализ конкурентов: рынок, позиционирование, цены. Триггеры: «конкуренты», «конкурентная разведка». Реклама конкурентов → ad-spy."
 ---
 
 # Competitive Analysis Skill

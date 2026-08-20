@@ -1,6 +1,6 @@
 ---
 name: changelog-generator
-description: "Changelog from git commits: semver bump, Keep a Changelog format, PR links via gh, GitHub Releases. Triggers: «changelog», «release notes»."
+description: "Changelog из git-коммитов: semver, Keep a Changelog, PR/issues через gh, git tag, GitHub Release. Триггеры: «сгенерируй changelog», «release notes»."
 ---
 
 # Changelog Generator Skill

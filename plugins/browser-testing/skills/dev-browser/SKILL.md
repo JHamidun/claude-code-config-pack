@@ -1,6 +1,6 @@
 ---
 name: dev-browser
-description: "Browser automation with persistent page state: navigate, fill forms, screenshots, scrape, log in. Triggers: «go to [url]», «click on», «scrape»."
+description: "Браузер с сохранением состояния страницы: формы, скриншоты, логин. Триггеры: «зайди на сайт», «залогинься». НЕ e2e-тесты→playwright-automation; тест своего фронта→webapp-testing."
 type: actionable
 ---
 

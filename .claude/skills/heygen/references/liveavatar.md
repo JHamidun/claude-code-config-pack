@@ -1,6 +1,7 @@
 # HeyGen LiveAvatar — Realtime Video Avatar API
 
-> Reverse-engineered from OpenAPI spec (187KB, `api.liveavatar.com/openapi.json`) + SDK source (`github.com/heygen-com/liveavatar-web-sdk`, `packages/js-sdk/src/`).
+> Reference notes compiled from the published OpenAPI schema (`api.liveavatar.com/openapi.json`)
+> and the official SDK sources (`github.com/heygen-com/liveavatar-web-sdk`, `packages/js-sdk/src/`).
 > Verified 2026-06-09.
 
 ## Overview
@@ -174,7 +175,7 @@ LiveAvatar = realtime talking-head avatar. User speaks → avatar animates lip-s
 
 **Response:** JWT token string — decoded payload contains `start_session_data` with mode, configs
 
-## SDK Internals (from source code)
+## SDK reference (`@heygen/liveavatar-web-sdk`)
 
 ### Session lifecycle
 ```

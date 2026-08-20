@@ -1,6 +1,6 @@
 ---
 name: claude-server-auth
-description: "Authenticate Claude CLI on a headless server: subscription setup-token via tmux + local Playwright OAuth. Trigger: «authorize claude on server»."
+description: "Авторизация Claude CLI на headless-сервере: setup-token в tmux + локальный Playwright-OAuth. Триггеры: «авторизуй на сервере», «токен подписки»."
 ---
 
 # Claude Server Auth
@@ -46,14 +46,16 @@ callback URL ---- code --------> tmux paste-buffer
 
 ### 1. Create account directory and start setup-token
 
+> `/root/.claude-accounts/` — каталог по умолчанию; переименуй под своё соглашение.
+
 ```bash
 ACCOUNT="account-1"
 SESSION="auth1"
-ssh your-server "mkdir -p /root/.claude-accounts/  # rename to your convention$ACCOUNT"
+ssh your-server "mkdir -p /root/.claude-accounts/$ACCOUNT"
 ssh your-server "tmux kill-session -t $SESSION 2>/dev/null; \
   rm -f /tmp/${SESSION}-output.txt; \
   tmux new-session -d -s $SESSION -x 400 -y 30 \
-  'CLAUDE_CONFIG_DIR=/root/.claude-accounts/  # rename to your convention$ACCOUNT claude setup-token'"
+  'CLAUDE_CONFIG_DIR=/root/.claude-accounts/$ACCOUNT claude setup-token'"
 ```
 
 Key flags:
@@ -191,22 +193,22 @@ ssh your-server "tmux capture-pane -t $SESSION -p -S -50"
 ssh your-server "tmux kill-session -t $SESSION 2>/dev/null; \
   rm -f /tmp/${SESSION}-output.txt; \
   tmux new-session -d -s $SESSION -x 400 -y 30 \
-  'CLAUDE_CONFIG_DIR=/root/.claude-accounts/  # rename to your convention$ACCOUNT claude setup-token'"
+  'CLAUDE_CONFIG_DIR=/root/.claude-accounts/$ACCOUNT claude setup-token'"
 # Re-setup pipe-pane and repeat from step 2
 ```
 
-**The 500 error is random and may happen 1-3 times before succeeding.** Account-1 took 2 attempts, account-2 took 2 attempts, account-3 took 4 attempts. Don't give up.
+**The 500 error is random and may happen 1-3 times before succeeding.** Обычно требуется 2–4 попытки. Don't give up.
 
 **NOTE:** Each retry generates a new `code_challenge` and `state`. The browser must re-authorize with the new URL — old codes won't work with a new challenge.
 
 ### 10. Save and verify token
 
 ```bash
-ssh your-server "echo 'sk-ant-oat01-...' > /root/.claude-accounts/  # rename to your convention$ACCOUNT/token.txt"
-ssh your-server "chmod 600 /root/.claude-accounts/  # rename to your convention$ACCOUNT/token.txt"
+ssh your-server "echo 'sk-ant-oat01-...' > /root/.claude-accounts/$ACCOUNT/token.txt"
+ssh your-server "chmod 600 /root/.claude-accounts/$ACCOUNT/token.txt"
 
 # Verify — use single quotes for SSH to avoid local shell expansion
-ssh your-server 'CLAUDE_CODE_OAUTH_TOKEN=$(cat /root/.claude-accounts/  # rename to your conventionACCOUNT/token.txt) claude -p --model claude-haiku-4-5-20251001 --output-format text "respond with just OK"'
+ssh your-server 'CLAUDE_CODE_OAUTH_TOKEN=$(cat /root/.claude-accounts/$ACCOUNT/token.txt) claude -p --model claude-haiku-4-5-20251001 --output-format text "respond with just OK"'
 # Expected: OK
 ```
 
@@ -236,7 +238,7 @@ When authenticating multiple accounts sequentially, the browser stays logged int
 
 ## Token Rotation Setup
 
-Rotation script at `/root/.claude-accounts/  # rename to your conventiontoken-rotator.sh`:
+Rotation script at `/root/.claude-accounts/token-rotator.sh`:
 
 ```bash
 token-rotator.sh status     # show all accounts and which is active
@@ -249,7 +251,7 @@ token-rotator.sh init       # re-scan account directories
 
 Usage in projects:
 ```bash
-export CLAUDE_CODE_OAUTH_TOKEN=$(bash /root/.claude-accounts/  # rename to your conventiontoken-rotator.sh get-valid)
+export CLAUDE_CODE_OAUTH_TOKEN=$(bash /root/.claude-accounts/token-rotator.sh get-valid)
 claude -p "your prompt"
 ```
 

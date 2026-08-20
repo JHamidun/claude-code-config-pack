@@ -12,7 +12,7 @@
     "priority": "high",
     "environment": "production"
   },
-  "name": "Extract text from PDF and image using your-server AI (Gemini) into CSV",
+  "name": "Extract text from PDF and image using Vertex AI (Gemini) into CSV",
   "tags": [
     "automation",
     "n8n",
@@ -369,14 +369,14 @@
         "color": 6,
         "width": 399.0962343096232,
         "height": 517.154811715481,
-        "content": "## your-server AI for image recogniztion\nWe send the photo to your-server AI to extract text. You'll need to activate your-server AI and add the correct rights to your Google cloud credentials. \n- Enable your-server API\n- Add your-server to user account"
+        "content": "## Vertex AI for image recogniztion\nWe send the photo to Vertex AI to extract text. You'll need to activate Vertex AI and add the correct rights to your Google cloud credentials. \n- Enable Vertex API\n- Add Vertex to user account"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."
     },
     {
       "id": "daa3ab66-fa14-4792-96d0-3bcbeffd5d60",
-      "name": "your-server A.I. extract text",
+      "name": "Vertex A.I. extract text",
       "type": "n8n-nodes-base.noOp",
       "position": [
         980,
@@ -585,6 +585,6 @@
       ]
     }
   },
-  "description": "Automated workflow: Extract text from PDF and image using your-server AI (Gemini) into CSV. This workflow integrates 10 different services: convertToFile, stickyNote, httpRequest, googleDriveTrigger, lmChatGoogleGemini. It contains 27 nodes and follows best practices for error handling and security.",
-  "notes": "Excellent quality workflow: Extract text from PDF and image using your-server AI (Gemini) into CSV. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+  "description": "Automated workflow: Extract text from PDF and image using Vertex AI (Gemini) into CSV. This workflow integrates 10 different services: convertToFile, stickyNote, httpRequest, googleDriveTrigger, lmChatGoogleGemini. It contains 27 nodes and follows best practices for error handling and security.",
+  "notes": "Excellent quality workflow: Extract text from PDF and image using Vertex AI (Gemini) into CSV. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
 }

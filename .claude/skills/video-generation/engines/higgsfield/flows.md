@@ -1,6 +1,6 @@
 # Higgsfield Local — flow cookbook (готовые пайплайны)
 
-Каждый флоу = последовательность: **prompt_builders → router (генерация) → assemble**. Камера-доктрины и шаблоны — из реверса
+Каждый флоу = последовательность: **prompt_builders → router (генерация) → assemble**. Камера-доктрины и шаблоны — в справочниках навыка
 (`references/flow-skills-*.md`, `references/subagents-*.md`). Модель выбирает `router.py` (direct где можно, hf.exe для эксклюзивов).
 
 ## cinematic (кино-трейлер, сюжет)
@@ -10,7 +10,7 @@
 python -c "import prompt_builders as p,json; print(json.dumps(p.build_cinematic_5('<сюжет>'),ensure_ascii=False,indent=1))"
 # на отдельный кадр — camera-rig (6 камер/11 линз/6 фокусных/3 диафрагмы):
 python scripts/prompt_builders.py cinematic --base "<кадр>" --camera "Modular 8K" --lens "Creative Tilt" --focal 35 --aperture f1.4
-# keyframes: Soul/nano (router) → видео: Seedance 2.0 (Runway, $0) или Veo 3.1 (cinematic+audio)
+# keyframes: Soul/nano (router) → видео: Seedance 2.0 (Runway) или Veo 3.1 (cinematic+audio)
 python scripts/router.py generate seedance_2_0 --prompt "<shot>" --image kf.jpg --aspect 21:9
 python scripts/assemble.py concat clips.txt out.mp4 ; assemble.py platform_export out.mp4 final.mp4
 ```
@@ -49,9 +49,9 @@ hf soul-id create --name X --soul-2 --image f1..f5                            # 
 ```
 
 ## Аудио (router/hf или свои ключи)
-TTS: ElevenLabs (YourFirstName voice YOUR_ELEVENLABS_VOICE_ID) ИЛИ hf voices (60, voices.json). Музыка: ElevenLabs Music / Lyria 2.
+TTS: ElevenLabs (свой голос, id в `YOUR_ELEVENLABS_VOICE_ID`) ИЛИ hf voices (60, voices.json). Музыка: ElevenLabs Music / Lyria 2.
 Микс: `assemble.py audio_duck video music out` (sidechaincompress) → `loudnorm -14`.
 
-## Дефолты (их, проверенные)
+## Дефолты (проверенные значения)
 Seedance 720p, Veo Fast 5s, NB resolution:2k, карусель=параллельные вызовы, Audio: секция обязательна в Seedance,
 TAIL FREEZE 13.7-15s, платформенный экспорт -14 LUFS / GOP 2с / h264 high@4.2.

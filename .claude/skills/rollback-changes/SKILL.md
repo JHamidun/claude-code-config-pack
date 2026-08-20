@@ -1,6 +1,6 @@
 ---
 name: rollback-changes
-description: "Roll back failed workflow phases via changes logs: restore files, clean artifacts, reverse commands. Triggers: «roll back changes», «restore state»."
+description: "Откат упавшей фазы воркфлоу по changes-log: восстановление файлов, чистка артефактов, отмена команд. Триггеры: «откати изменения», «верни как было»."
 allowed-tools: Bash, Read, Write
 ---
 

@@ -1,6 +1,6 @@
 # Audio для видео: Lyria 2 + ElevenLabs Music + TTS
 
-## §1 — Lyria 2 (your-server AI, commercial-safe)
+## §1 — Lyria 2 (Vertex AI, commercial-safe)
 
 **Auth: OAuth2 service account ONLY.** API key возвращает `401 UNAUTHENTICATED` immediately.
 

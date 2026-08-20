@@ -2,7 +2,7 @@
 
 Карта на 2026-06-07 (веб-проверка model-id/цен). Цель: звать модели **своими ключами** (дешевле / уже есть),
 `hf.exe` — только под HF-эксклюзивы. Твой стек: GOOGLE_API_KEY · RUNWAY_TOKEN_PLACEHOLDER (Unlimited = flat) · OPENAI_API_KEY ·
-Replicate · локальный your GPU (rembg/Topaz бесплатно). НЕТ: xAI, BFL, Topaz, Recraft, MiniMax, Kuaishou, AIMLAPI/PiAPI, WaveSpeed, fal.
+Replicate · локальный GPU (rembg/Topaz). НЕТ: xAI, BFL, Topaz, Recraft, MiniMax, Kuaishou, AIMLAPI/PiAPI, WaveSpeed, fal.
 
 > ⚠️ Поправка маппинга Nano Banana (по `models_all.json` display_name): `nano_banana`=«Nano Banana» (база), `nano_banana_flash`=«Nano Banana 2»=`gemini-3.1-flash-image-preview`, `nano_banana_2`=«Nano Banana Pro»=`gemini-3-pro-image-preview`.
 

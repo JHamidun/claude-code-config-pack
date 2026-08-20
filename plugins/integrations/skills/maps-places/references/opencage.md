@@ -27,7 +27,7 @@ no_annotations=0"
 
 # Reverse (координаты → адрес) — q="lat,lon" или q="lat+lon"
 curl "https://api.opencagedata.com/geocode/v1/json?\
-q=-8.305,-34.948&\
+q=-22.971,-43.182&\
 key=$OPENCAGE_API_KEY&\
 language=pt"
 
@@ -62,7 +62,7 @@ key=$OPENCAGE_API_KEY"
       "postcode": "[REDACTED_CEP]",
       "_type": "residential"
     },
-    "geometry": {"lat": -8.3052, "lng": -34.9478},
+    "geometry": {"lat": -22.9714, "lng": -43.1824},
     "confidence": 9,
     "bounds": {"northeast": {...}, "southwest": {...}},
     "annotations": {
@@ -80,7 +80,7 @@ key=$OPENCAGE_API_KEY"
       "Mercator": {"x": -3893415.2, "y": -1149621.6},
       "OSM": {
         "edit_url": "https://www.openstreetmap.org/edit?node=...",
-        "url": "https://www.openstreetmap.org/?mlat=-8.3052&mlon=-34.9478"
+        "url": "https://www.openstreetmap.org/?mlat=-22.9714&mlon=-43.1824"
       },
       "wikidata": "Q...",
       "qibla": 84.5,

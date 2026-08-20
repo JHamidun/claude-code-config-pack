@@ -9,7 +9,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | Skill | What it does |
 |-------|--------------|
 | `gamma` | Генерация презентаций, доков и страниц через Gamma Generate API + экспорт в PDF/PPTX/PNG. |
-| `manus-slides` | Slide decks full-cycle: 25 AI styles (Gemini images) + HTML templates, Manus 1.6 themes, export PPTX/PDF/HTML. |
+| `manus-slides` | Слайды полным циклом: 24 AI-стиля (Gemini) + HTML-шаблоны, темы Manus 1.6, экспорт PPTX/PDF/HTML. |
 | `marp-presentations` | Marp: Markdown → слайды (HTML/PDF/PPTX) через npx marp-cli, бесплатная альтернатива Gamma. |
 | `pptx` | Создание, правка и разбор .pptx файлов: layouts, спикер-ноты, комментарии. |
 | `pptx-editable-extractor` | HTML slides → PPTX with NATIVE editable text boxes — parses the DOM and extracts text nodes with coordinates. |

@@ -1,6 +1,6 @@
 ---
 name: beads
-description: "Beads — git-backed issue tracker for AI agents (bd CLI): issues, bugs, tasks in a repo. Triggers: «beads», «issue tracking»."
+description: "Beads — git-трекер задач и багов для AI-агентов (команды bd). Триггеры: «заведи задачу в beads», «issue tracking», «список задач репо»."
 ---
 
 # Beads Issue Tracking Skill

@@ -24,7 +24,7 @@ curl -A "maps-places-skill/1.0 (your-email@gmail.com)" \
 
 # Reverse
 curl -A "maps-places-skill/1.0 (your-email@gmail.com)" \
-  "https://nominatim.openstreetmap.org/reverse?lat=-8.305&lon=-34.948&format=json&accept-language=pt-BR"
+  "https://nominatim.openstreetmap.org/reverse?lat=-22.971&lon=-43.182&format=json&accept-language=pt-BR"
 ```
 
 ## Структура ответа
@@ -34,8 +34,8 @@ curl -A "maps-places-skill/1.0 (your-email@gmail.com)" \
   "place_id": 12345,
   "osm_type": "node",
   "osm_id": 67890,
-  "lat": "-8.30523",
-  "lon": "-34.94782",
+  "lat": "-22.97139",
+  "lon": "-43.18239",
   "display_name": "Sample Beach, Sample City, Sample State, Brasil",
   "address": {
     "road": "Sample Street",
@@ -46,7 +46,7 @@ curl -A "maps-places-skill/1.0 (your-email@gmail.com)" \
     "country": "Brasil",
     "country_code": "br"
   },
-  "boundingbox": ["-8.31", "-8.30", "-34.95", "-34.94"],
+  "boundingbox": ["-22.98", "-22.96", "-43.19", "-43.17"],
   "importance": 0.5,
   "type": "house"
 }]

@@ -201,7 +201,7 @@ The methodology above covers how to *synthesize* research that already exists. T
 
 ### References
 
-- **`references/custdev-instructor2.md`** — full CustDev workflow: finding respondents (Respondent.io for EU/US, Conv.ru for Russia, Reddit, competitors' Facebook groups), hallway / коридорные interviews, the Empathy Map (Says / Thinks / Does / Feels = Говорит / Думает / Делает / Чувствует), demand validation by running ads to multiple landing pages, and comparing CPQL/CPL across segments to pick the priority segment. Load this when the user wants to conduct customer development, not just analyze existing notes.
+- **`references/custdev-demand-test.md`** — full CustDev workflow: finding respondents (Respondent.io for EU/US, Conv.ru for Russia, Reddit, competitors' Facebook groups), hallway / коридорные interviews, the Empathy Map (Says / Thinks / Does / Feels = Говорит / Думает / Делает / Чувствует), demand validation by running ads to multiple landing pages, and comparing CPQL/CPL across segments to pick the priority segment. Load this when the user wants to conduct customer development, not just analyze existing notes.
 - **`references/founder-interview-checklist.md`** — 20 questions to ask founders of *similar business models* as a discovery-interview / B2B competitive-intelligence checklist (market, unit economics, risks, channels, trust, team, local specifics). Load this for founder/advisor discovery interviews before launch.
 
 ### How this connects to the synthesis methodology

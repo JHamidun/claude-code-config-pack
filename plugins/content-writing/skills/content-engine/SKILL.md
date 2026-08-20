@@ -1,6 +1,6 @@
 ---
 name: content-engine
-description: "Platform-native content from one source: X, LinkedIn, TikTok, YouTube, newsletters; threads, scripts, calendars. Triggers: «social posts», «repurpose»."
+description: "Platform-native контент из одного исходника под X, LinkedIn, TikTok, YouTube: контент-план, посты. Триггеры: «контент для соцсетей»."
 origin: ECC
 ---
 

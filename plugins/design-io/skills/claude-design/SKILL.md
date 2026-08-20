@@ -289,8 +289,8 @@ Reference для mobile screens: Telegram Mini App
 Используя ту же DS, сделай Admin ExampleProduct:
 sidebar + topbar + tracks CRUD / lessons CRUD / users /
 cohorts / organizations / submissions / live sessions /
-analytics. Поддержка multi-tenancy (ClientCorp1, ClientCorp2,
-ClientCorp4) — в структуре orgs → cohorts → users.
+analytics. Поддержка multi-tenancy (несколько корпоративных
+заказчиков) — в структуре orgs → cohorts → users.
 ```
 
 После каждого — handoff отдельным bundle'ом. Получаешь 3 zip с единой DS, но разной функциональностью.

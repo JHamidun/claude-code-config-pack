@@ -56,7 +56,7 @@ function Avatar({ name, size = 40 }) {
 ```
 
 ```jsx
-<Avatar name="Your Name" size={48} />  // → "ЖХ"
+<Avatar name="Your Name" size={48} />  // → "JD"
 ```
 
 ## Logo placeholder
@@ -73,11 +73,11 @@ function Avatar({ name, size = 40 }) {
 Для «trusted by» секций:
 ```html
 <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; opacity: 0.6;">
-  <div class="logo-ph">[ClientCorp1]</div>
-  <div class="logo-ph">[ClientCorp5]</div>
-  <div class="logo-ph">[ClientCorp3]</div>
-  <div class="logo-ph">[ClientCorp4]</div>
-  <div class="logo-ph">[ClientCorp2]</div>
+  <div class="logo-ph">[ЛОГОТИП 1]</div>
+  <div class="logo-ph">[ЛОГОТИП 2]</div>
+  <div class="logo-ph">[ЛОГОТИП 3]</div>
+  <div class="logo-ph">[ЛОГОТИП 4]</div>
+  <div class="logo-ph">[ЛОГОТИП 5]</div>
 </div>
 ```
 

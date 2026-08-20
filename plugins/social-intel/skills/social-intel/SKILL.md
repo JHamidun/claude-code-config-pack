@@ -1,6 +1,6 @@
 ---
 name: social-intel
-description: "Dossier on a person, brand or company across LinkedIn, Instagram, TikTok, X, YouTube via Scraping API. Triggers: KYC check, research person, find socials."
+description: "Досье на человека/компанию по соцсетям (Scraping API). Триггеры: «досье на», «кто этот человек». НЕ домены → osint-recon; ЕГРЮЛ → lead-enrichment."
 allowed-tools: Bash, Read, Write, WebSearch
 ---
 

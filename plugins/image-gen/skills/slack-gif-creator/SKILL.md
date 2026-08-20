@@ -1,6 +1,6 @@
 ---
 name: slack-gif-creator
-description: "Animated GIFs for Slack within size limits (emoji 64KB): validators + animation primitives. Triggers: «gif for slack», «slack emoji»."
+description: "Анимированные GIF под лимиты Slack (emoji 64KB): валидаторы и анимационные примитивы. Триггеры: «гифка для slack», «slack emoji»."
 license: Complete terms in LICENSE.txt
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: away-summary
-description: "Recap the current session — what was done, where you stopped. Triggers: «recap», «while you were away», resuming after a break."
+description: "Пересказ «пока тебя не было»: на чём остановились и что сделано в сессии. Триггеры: «где остановился», «recap», «while you were away»."
 triggers:
   - "away summary"
   - "что я делал"

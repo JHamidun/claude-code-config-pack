@@ -1,6 +1,6 @@
 ---
 name: generate-report-header
-description: "Standard header with metadata for agent-generated reports: type, version, status, phase. Worker utility. Trigger: «report header»."
+description: "Единая шапка отчётов агентов: тип, версия, статус, время, фаза. Служебный навык воркеров. Триггеры: «шапка отчёта», «оформи отчёт агента»."
 ---
 
 # Generate Report Header

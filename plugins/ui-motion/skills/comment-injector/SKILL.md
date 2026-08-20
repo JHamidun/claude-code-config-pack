@@ -1,7 +1,7 @@
 ---
 name: comment-injector
 version: 1.0.0
-description: "Overlay в HTML: Alt+Click по элементу кладёт в clipboard CSS-селектор и outerHTML — правки без скриншотов. Триггеры: «ревью прототипа в браузере»."
+description: "Overlay в HTML: Alt+Click по элементу кладёт в clipboard CSS-селектор и outerHTML — правки без скриншотов. Триггеры: «ревью прототипа в браузере». НЕ правка мышкой→visual-edit."
 ---
 
 # Comment injector

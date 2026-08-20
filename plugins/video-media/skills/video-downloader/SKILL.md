@@ -1,6 +1,6 @@
 ---
 name: video-downloader
-description: Download videos from YouTube and other platforms with yt-dlp
+description: "Скачивание видео с YouTube и других площадок через yt-dlp. Триггеры: «скачай видео», «выкачай ролик», «yt-dlp», «сохрани с ютуба», «download video». НЕ текст→youtube-transcript."
 ---
 
 # Video Downloader Skill

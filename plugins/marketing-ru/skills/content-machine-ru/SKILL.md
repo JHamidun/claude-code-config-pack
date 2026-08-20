@@ -1,5 +1,5 @@
 ---
-name: content-machine-instructor2-ru
+name: content-machine-ru
 description: "Операционка контент-фабрики: органика → лиды, 6-шаговый pipeline, «1 формат = 1 агент». Триггеры: «машинка контента». НЕ отдельный пост→content-engine."
 type: actionable
 ---
@@ -16,7 +16,7 @@ type: actionable
 
 | Слой | Где живёт | Что делает |
 |------|-----------|-----------|
-| **Операционка фабрики** (этот скилл) | `content-machine-instructor2-ru` | 6 шагов, unit-экономика, KPI, roadmap, архитектура агентов |
+| **Операционка фабрики** (этот скилл) | `content-machine-ru` | 6 шагов, unit-экономика, KPI, roadmap, архитектура агентов |
 | Структура креатива / хук / декомпозиция | `ai-creative-factory-ru` | 5-блочный канон, хук 0-3 сек, дофамин-триггеры, anti-AI-slop, разбор виралки |
 | Написание поста в голосе автора | `content-engine` | platform-native текст без слопа |
 | Виральные Shorts hooks/loops/retention | `viral-shorts-playbook` | hook-формулы, дофаминовый ритм |

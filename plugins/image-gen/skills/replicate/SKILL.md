@@ -1,6 +1,6 @@
 ---
 name: replicate
-description: "Run 1000+ AI models via Replicate API: FLUX, SDXL, Whisper, LLaMA — when a model is not available natively. Triggers: «replicate», «stable diffusion»."
+description: "Replicate: запуск 1000+ AI-моделей по API (FLUX, SDXL, Whisper), если модели нет нативно. Триггеры: «запусти модель по api», «stable diffusion»."
 ---
 
 # Replicate API Skill

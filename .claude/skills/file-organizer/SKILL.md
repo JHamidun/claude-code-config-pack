@@ -1,6 +1,6 @@
 ---
 name: file-organizer
-description: "Organize files by context, type, date with automation. Triggers: «organize files», «clean up downloads», «sort files»."
+description: "Раскладка файлов по контексту, типу и дате с автоматизацией. Триггеры: «организуй файлы», «разбери папку», «наведи порядок в загрузках», «sort files»."
 ---
 
 # File Organizer Skill

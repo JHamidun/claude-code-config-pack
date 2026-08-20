@@ -10,7 +10,7 @@ metadata:
 
 ## Overview
 
-Find Russian procurement tenders relevant to a product/company and return a curated, filtered shortlist (number, subject, region, deadline, price, link). Built from a real session searching AI/LLM tenders for YourProduct. The core difficulty is not search syntax - it is the **geo-block** on the official portal and the **weak free-tier relevance** on aggregators. This skill encodes the workarounds.
+Find Russian procurement tenders relevant to a product/company and return a curated, filtered shortlist (number, subject, region, deadline, price, link). Built from a real session searching AI/LLM tenders. The core difficulty is not search syntax - it is the **geo-block** on the official portal and the **weak free-tier relevance** on aggregators. This skill encodes the workarounds.
 
 ## When to Use
 
@@ -25,7 +25,7 @@ Not for: writing the commercial proposal (КП) or outreach - that is `kp-deck-f
 
 | Fact | Consequence |
 |------|-------------|
-| **zakupki.gov.ru geo-blocks foreign IPs** -> `ERR_CONNECTION_TIMED_OUT` | From a non-RU IP (e.g. Brazil) the official portal will NOT load. Confirm IP first. |
+| **zakupki.gov.ru geo-blocks foreign IPs** -> `ERR_CONNECTION_TIMED_OUT` | From a non-RU IP (any non-RU IP) the official portal will NOT load. Confirm IP first. |
 | The MCP Playwright browser **cannot install extensions at runtime** | A VPN browser-extension cannot be added to the running automation browser. Extensions load only at launch (`--load-extension`, headed, persistent profile). |
 | Most free VPN extensions give a **foreign** IP, not a Russian one | To open zakupki you need a server *inside* RU. Free Planet VPN / Browsec usually lack RU - won't unblock it. Need a RU-capable paid VPN or RU proxy. |
 | **rostender.info works from any IP** and aggregates ALL RF tenders (7600+ sources, incl. zakupki data) | Default to rostender when no RU IP is available - coverage is effectively complete. |
@@ -45,7 +45,7 @@ context). Он скрывает `navigator.webdriver` и CDP-утечки, ко�
 ## Workflow
 
 ### 1. Build the product profile -> query set
-Translate the product into procurement language. For an AI/LLM aggregator (YourProduct-type): subjects are *доступ к нейросетям / большим языковым моделям*, *ИИ-ассистент*, *чат-бот*, *генеративный ИИ*, *неисключительные права на ПО*. Keyword + OKPD2 sets are in `references/playbook.md`.
+Translate the product into procurement language. For an AI/LLM product: subjects are *доступ к нейросетям / большим языковым моделям*, *ИИ-ассистент*, *чат-бот*, *генеративный ИИ*, *неисключительные права на ПО*. Keyword + OKPD2 sets are in `references/playbook.md`.
 
 ### 2. Check the IP / decide the route
 Navigate to `http://ip-api.com/json/?fields=query,country,countryCode,city` (plain HTTP - `ipapi.co` is Cloudflare-walled).

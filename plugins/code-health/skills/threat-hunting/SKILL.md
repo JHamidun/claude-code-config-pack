@@ -1,6 +1,6 @@
 ---
 name: threat-hunting
-description: "Threat hunting: Sigma rules, detection engineering, security analysis. Triggers: «sigma rules», «threat hunt». NOT own code audit -> security-audit."
+description: "Threat hunting: правила Sigma, detection engineering. Триггеры: «охота на угрозы», «sigma rules». НЕ свой код → security-audit."
 ---
 
 # Threat Hunting Skill

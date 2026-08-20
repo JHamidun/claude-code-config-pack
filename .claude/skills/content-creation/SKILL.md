@@ -1,6 +1,6 @@
 ---
 name: content-creation
-description: "Generic marketing copy: blog, social, email, landing pages, case studies, SEO copy, CTAs. NOT: content pipeline→content-engine; SEO→seo-machine-ru."
+description: "Generic маркетинг-копирайт: блог, соцсети, рассылки, лендинги, кейсы, SEO copy. Триггеры: «напиши пост», «копирайт»."
 ---
 
 # Content Creation Skill

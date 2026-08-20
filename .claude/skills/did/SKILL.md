@@ -1,6 +1,6 @@
 ---
 name: did
-description: "D-ID talking head from a photo plus text or audio. Triggers: «avatar video», «talking head from a photo». NOT full avatar suite → heygen."
+description: "D-ID: говорящая голова из фото + текст или аудио. Триггеры: «озвучь фото», «видео-презентер из фотографии». НЕ свой аватар → heygen."
 ---
 
 # D-ID API Skill

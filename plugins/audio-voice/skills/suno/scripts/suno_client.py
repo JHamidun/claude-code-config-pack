@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-Suno headless client — reverse-engineered internal API (studio-api-prod.suno.com).
+Suno без браузера — HTTP-клиент к studio-api-prod.suno.com, работает через сессию своей
+учётной записи.
 
-Auth: Clerk. A short-lived Bearer (~1h, aud=suno-api) is minted from the durable
-`__client` cookie via the Clerk token endpoint. Reads/list/download/status work fully
-headless. Web generation (/api/generate/v2-web/) is captcha-gated (token_provider:1);
-this client tries the non-web /api/generate/v2/ path — if Suno rejects it, fall back to
-the browser (Playwright) for generation only, then use this client for everything else.
+Авторизация: Clerk. Короткоживущий Bearer (~1 ч, aud=suno-api) выпускается из долгоживущей
+cookie `__client` через token-эндпоинт Clerk. Список, статус и скачивание доступны без
+браузера. Генерация отправляется на /api/generate/v2/; веб-эндпоинт /api/generate/v2-web/
+требует прохождения капчи. Если запрос на генерацию не принимается, генерацию делают
+через браузер (Playwright), остальные операции — этим клиентом.
 
 Creds (in ~/.claude/.credentials.master.env):
   SUNO_CLIENT_COOKIE   __client cookie value (durable; DevTools → Application → Cookies → suno.com → __client)
@@ -159,10 +160,10 @@ class SunoClient:
             f.write(r.content)
         return out
 
-    # ---------- generate (non-web endpoint /api/generate/v2/ — NO captcha) ----------
+    # ---------- generate (/api/generate/v2/) ----------
     def generate(self, description, instrumental=True, title=None, model="chirp-fenix"):
-        """Submit a generation. /api/generate/v2/ works headless without the web captcha.
-        Returns the batch dict with 'clips' (each has an 'id' and status 'submitted')."""
+        """Отправить задание на генерацию через /api/generate/v2/ — работает без браузера.
+        Возвращает батч с 'clips' (у каждого есть 'id' и статус 'submitted')."""
         body = {
             "generation_type": "TEXT", "mv": model, "prompt": "",
             "gpt_description_prompt": description, "make_instrumental": bool(instrumental),
@@ -173,10 +174,10 @@ class SunoClient:
         return self._post("/api/generate/v2/", body)
 
     def generate_custom(self, lyrics, tags, title=None, model="chirp-fenix"):
-        """Custom mode: OUR lyrics + style tags (not GPT-written). Correct schema, but the
-        /api/generate/v2/ endpoint is captcha-gated headless (422 token_validation_failed,
-        2026-06). Use the Playwright UI recipe in SKILL.md gotcha #3 for custom songs; this
-        method documents the exact payload for a future headless fix."""
+        """Кастомный режим: свой текст песни + стилевые теги (не сгенерированные моделью).
+        Формат тела запроса приведён ниже, но в этом режиме /api/generate/v2/ отвечает
+        422 token_validation_failed: нужна капча, которая проходится в браузере
+        (проверено 2026-06). Рецепт через Playwright — в SKILL.md, гоча #3."""
         body = {
             "generation_type": "TEXT", "mv": model,
             "prompt": lyrics, "tags": tags,

@@ -11,7 +11,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `ai-marketing-stack-ru` | AI tooling for marketers (not developers) — treat Cursor/Claude Code as staff, with concrete workflows and guardrails. |
 | `b2b-marketing-ru` | B2B playbook — TOFU/MOFU/BOFU funnel with ICP and intent, cold outreach, content, and pipeline handoff to sales. |
 | `churn-prevention-ru` | Reduce voluntary and involuntary churn — cancel flow, win-back, dunning for failed payments, retention triggers. |
-| `content-machine-instructor2-ru` | Content factory operating system — organic reach → leads → sales as a six-step pipeline with per-format agents and KPIs. |
+| `content-machine-ru` | Операционка контент-фабрики: органика → лиды, 6-шаговый pipeline, «1 формат = 1 агент». |
 | `free-tools-lead-magnets-ru` | Lead magnets and free tools as lead generation (engineering as marketing) — calculators, graders, quizzes, gated content. |
 | `jtbd` | Advanced Jobs To Be Done — segment by the job customers hire the product for: job graph, Forces of Progress, switch interviews. |
 | `launch-strategy-ru` | Launch strategy for a product, course, workshop or community — ORB framework, launch calendar, and channel sequencing. |

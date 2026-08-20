@@ -1,6 +1,6 @@
 ---
 name: domain-brainstormer
-description: "Domain name ideas + availability checks. Triggers: «domain name», «is the domain free», «what to name the site»."
+description: "Подбор доменных имён и проверка их доступности. Триггеры: «придумай домен», «доменное имя», «свободен ли домен», «domain name», «как назвать сайт»."
 ---
 
 # Domain Name Brainstormer Skill

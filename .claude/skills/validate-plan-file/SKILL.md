@@ -1,6 +1,6 @@
 ---
 name: validate-plan-file
-description: "Validate orchestrator plan files against JSON schema before workers read them. Utility. Trigger: «validate plan.json»."
+description: "Проверка plan-файлов оркестратора по JSON-схеме до чтения воркерами. Служебный. Триггеры: «валидируй plan.json», «проверь план-файл»."
 allowed-tools: Read
 ---
 

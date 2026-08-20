@@ -8,12 +8,12 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `linkedin` | LinkedIn intelligence via Scraping API: profiles, companies, posts, ad library. |
-| `linkedin-comment-drafter` | Комменты и ответы в тредах LinkedIn по URL поста: 1-3 варианта, reaction, автопостинг, follow-up, DM. |
-| `linkedin-employee-advocacy` | LinkedIn employee advocacy program: 14-day launch, posting at scale, governance, ROI. |
-| `linkedin-humanizer` | Strip AI-tells from EN LinkedIn texts: humanize tiers, emoji detector, GPTZero/ZeroGPT tests, pre-publish audit. |
-| `linkedin-post-writer` | Viral LinkedIn посты на hook-формулах: хук+пост, humanizer, schedule через Publora; разбор viral поста по URL → формула. |
-| `linkedin-profile-optimizer` | LinkedIn profile audit and rewrite: headline, About, Featured, banner, Experience metrics, Skills. |
+| `linkedin` | LinkedIn-разведка (Scraping API): профили, компании, посты. |
+| `linkedin-comment-drafter` | Комменты и ответы в тредах LinkedIn: черновики + постинг через Publora, follow-up. |
+| `linkedin-employee-advocacy` | Employee advocacy в LinkedIn: 14-дневный запуск, посты сотрудников, governance, ROI. |
+| `linkedin-humanizer` | Чистка EN-текстов LinkedIn от AI-tells: humanize 3 tiers, emoji-детектор, тест детекторов GPTZero/ZeroGPT. |
+| `linkedin-post-writer` | Viral LinkedIn посты на hook-формулах: хук+пост, Publora-schedule. |
+| `linkedin-profile-optimizer` | Аудит и переписывание профиля LinkedIn: headline, About, Featured, баннер, навыки. |
 
 ## Install
 

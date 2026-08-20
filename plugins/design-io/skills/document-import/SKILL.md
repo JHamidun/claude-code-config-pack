@@ -1,6 +1,6 @@
 ---
 name: document-import
-description: "Извлечь текст и картинки из PDF/DOCX/PPTX/скетча для прототипа или дека. Триггеры: «из PDF в слайды», «DOCX в лендинг»."
+description: "Извлечь текст и картинки из PDF/DOCX/PPTX/скетча для прототипа или дека. Триггеры: «из PDF в слайды», «DOCX в лендинг». НЕ переверстать дек 1-в-1→pptx-import."
 ---
 
 # Document import

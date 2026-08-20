@@ -115,7 +115,7 @@ TAM = (общее число клиентов, которые могут у ва
 
 **Источники для оценки TAM:**
 - **Google Trends** — динамика и сезонность спроса.
-- Отчёты **big3** (McKinsey, ConsultingFirm2, ConsultingFirm1) — крупнейшие стратегические консалтинги по выручке.
+- Отчёты **big3** (McKinsey, BCG, Bain) — крупнейшие стратегические консалтинги по выручке.
 - Отчёты **big4** (Deloitte, KPMG, Ernst&Young, PwC).
 - **Statista** — рыночные данные.
 - **ChatGPT-4 / Claude / Perplexity / Grok / Manus** в роли рыночного аналитика. Стартовый промпт из урока: «Представьте, что вы рыночный аналитик. Основываясь на данных из интернета, …».
@@ -147,7 +147,7 @@ TAM = (общее число клиентов, которые могут у ва
 | **LinkedIn** | поиск 5 фаундеров + 5 инвесторов + адвайзеров |
 | **Google Trends** | тренд спроса, TAM-прикидка |
 | **Statista** | рыночные данные по странам/отраслям |
-| **big3/big4 отчёты** | McKinsey/ConsultingFirm2/ConsultingFirm1 + Deloitte/KPMG/EY/PwC |
+| **big3/big4 отчёты** | McKinsey/BCG/Bain + Deloitte/KPMG/EY/PwC |
 | **ChatGPT-4 / Claude / Perplexity / Grok / Manus** | LLM в роли рыночного аналитика |
 | **PRNewsWire** | пресс-релизы и мониторинг их KPI (траст) |
 | **Сайты с работой** (LinkedIn, местные хантеры) | анализ рынка труда (параметр 8) |

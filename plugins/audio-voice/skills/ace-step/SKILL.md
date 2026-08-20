@@ -1,11 +1,11 @@
 ---
 name: ace-step
-description: "AI-музыка локально на your GPU (ACE-Step 1.5): инструменталы, песни, лирика; CLI scripts/generate.py. Триггеры: «напиши песню», jingle, soundtrack. НЕ Suno→suno."
+description: "AI-музыка локально (ACE-Step 1.5, на своей видеокарте), CLI scripts/generate.py. Триггеры: «сгенерируй музыку», «сделай трек», «напиши песню». НЕ Suno→suno."
 ---
 
 # ACE-Step: AI Music Generation
 
-Generate music tracks locally using ACE-Step 1.5. Runs on local your GPU.
+Generate music tracks locally using ACE-Step 1.5. Runs locally on your own GPU.
 
 ## When to use
 

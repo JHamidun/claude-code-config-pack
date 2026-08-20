@@ -1,6 +1,6 @@
 ---
 name: check-skill-solo
-description: "Fact-check claims, numbers, citations, AI output for hallucinations — cross-model checks with primary sources. Triggers: «verify», «fact-check»."
+description: "Фактчек и проверка на галлюцинации кросс-моделями (Claude+Gemini+GPT) с первоисточниками. Триггеры: «проверь факты», «фактчек», «fact-check»."
 ---
 
 # Check — Multi-LLM Anti-Hallucination Verification (portable)

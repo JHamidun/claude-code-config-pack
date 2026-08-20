@@ -1,7 +1,7 @@
 ---
 name: gstack
 version: 1.1.0
-description: "Fast headless browser (~100ms/command) for QA: navigate, interact, before/after diffs, annotated screenshots. Triggers: «gstack browse», «verify deployment»."
+description: "Быстрый headless-браузер (~100 мс) для QA: переходы, действия, дифф, скриншоты. Триггеры: «быстрый браузер», «gstack browse», «проверь деплой»."
 allowed-tools:
   - Bash
   - Read

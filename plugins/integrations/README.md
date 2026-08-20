@@ -9,20 +9,20 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | Skill | What it does |
 |-------|--------------|
 | `agent-api-server` | OpenAI-compatible HTTP server on top of the local Claude CLI — expose /v1/chat/completions to n8n, SDKs, IDEs, curl. |
-| `aws-skills` | AWS development: CDK, Lambda, serverless patterns, S3, infrastructure as code. |
-| `claude-server-auth` | Authenticate Claude CLI on a headless server: subscription setup-token via tmux + local Playwright OAuth. |
-| `deepl-pro` | DeepL translation of text and documents (docx/pptx/pdf/xlsx), glossaries, formality. |
+| `aws-skills` | Разработка под AWS: CDK, Lambda, serverless, S3. |
+| `claude-server-auth` | Авторизация Claude CLI на headless-сервере: setup-token в tmux + локальный Playwright-OAuth. |
+| `deepl-pro` | Перевод текста и документов (docx/pptx/pdf/xlsx) через DeepL, глоссарии, formality. |
 | `home-assistant` | Home Assistant CLI over REST + WebSocket — entity states, service calls, on/off/toggle, state history, live events. |
 | `maps-places` | Places, addresses and geocoding across 11 providers (Google Places, Yandex, 2GIS, HERE, Mapbox, Foursquare, OSM and more). |
-| `n8n` | n8n workflow automation: API, nodes, triggers, expressions, MCP, 400+ integrations; Meta CAPI server-side event recipes. |
-| `pinecone` | Pinecone vector DB (PINECONE_API_KEY): serverless-индексы, semantic search, RAG, embeddings. |
-| `runbook` | Операционные процедуры флота your-server: «бот молчит», рестарт агента, крон не отработал — каждая с точкой отката. |
-| `server-health` | Server health via SSH: docker, systemctl, disk, memory, logs. |
+| `n8n` | n8n workflow automation: API, ноды, MCP + локальный каталог 2061 готового воркфлоу. |
+| `pinecone` | Pinecone vector DB (PINECONE_API_KEY): semantic search, RAG; индексы company-<name>-bot и др. |
+| `runbook` | Операционные процедуры флота your-server: «бот молчит», рестарт агента Hermes, крон не отработал. |
+| `server-health` | Проверка сервера по SSH: docker, systemctl, диск, память, логи. |
 | `telegram-bot-toolkit` | Разработка Telegram-ботов: python-telegram-bot, Telethon, деплой; антипаттерн бот-воронки из TG Ads. |
-| `uptime-kuma-ops` | Uptime Kuma monitors via API: list, add, update, delete, check status. |
+| `uptime-kuma-ops` | Мониторы Uptime Kuma на your-server через socket.io API: список, добавить, статус. |
 | `webhook-receiver` | Receive webhooks (GitHub, Stripe, GitLab, JIRA, forms) on a local CLI server with HMAC signature validation and a JSONL log. |
 | `yandex-forms` | Create Yandex Forms (surveys, questionnaires) programmatically instead of clicking through every question by hand. |
-| `zoom` | Zoom meetings management — create, list, update, delete meetings and manage recordings via Server-to-Server OAuth API |
+| `zoom` | Zoom через Server-to-Server OAuth: создание и правка встреч, записи. |
 
 ### Agents
 

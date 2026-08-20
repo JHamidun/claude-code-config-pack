@@ -8,18 +8,18 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `did` | D-ID talking head from a photo plus text or audio. |
-| `heygen` | HeyGen API v3: AI avatar video, digital twin, lip-sync translation, voice clone. |
-| `submagic` | your subtitle API (v1 REST): AI captions, Magic Brolls/Zooms, Magic Clips (YouTube to multi-clip), silence removal, social publishing. |
-| `video-downloader` | Download videos from YouTube and other platforms with yt-dlp |
+| `did` | D-ID: говорящая голова из фото + текст или аудио. |
+| `heygen` | HeyGen API v3: AI-аватар видео, digital-twin, lip-sync перевод, Voice Clone. |
+| `submagic` | Submagic API: ИИ-субтитры, Magic Brolls/Zooms, Magic Clips (YouTube в нарезку). |
+| `video-downloader` | Скачивание видео с YouTube и других площадок через yt-dlp. |
 | `video-editor` | Видеомонтаж FFmpeg+Python: тишина, субтитры, рефрейм 9:16. |
 | `video-export` | HTML animation → MP4 / GIF via FFmpeg (Playwright record + encode) — social explainers, product demos. |
-| `video-generation` | AI-видео хаб: Veo, Sora, Seedance, Runway, Higgsfield. |
+| `video-generation` | AI-видео хаб: Veo, Sora, Seedance, Runway. |
 | `video-montage` | Full 9:16 reels production — Whisper subtitles, TTS voiceover, word-accurate sync, pop-up cards, lip-sync, safe zones. |
 | `video-shotcraft` | Промо-ролики продукта на Remotion: 153 рецепта кадров, 2.5D-проходы, шаблон Ink Press. |
 | `void-video` | Netflix VOID — remove objects from video with physics-aware handling via a free HuggingFace Spaces API. |
 | `watch-video` | Let the agent actually watch a video — timestamped frames plus transcript, so it can answer about what is on screen. |
-| `youtube-transcript` | Fetch YouTube video transcripts, summaries, and content analysis |
+| `youtube-transcript` | Транскрипты роликов YouTube, саммари и разбор содержимого. |
 
 ### Agents
 

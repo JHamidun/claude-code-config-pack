@@ -12,7 +12,7 @@ Stack assumed available:
   RUNWAY_TOKEN_PLACEHOLDER     (Runway Unlimited = flat $0 marginal: Seedance 2.0, Kling 2.6/3.0)
   OPENAI_API_KEY (GPT-Image-2 / 1.5)
   REPLICATE_API_KEY (flux/recraft/topaz/wan/minimax/grok/seedance1.5/seedream/sam)
-  Local your GPU (rembg, Topaz — $0)
+  Local GPU (rembg, Topaz)
 NOT available: xAI, BFL, Topaz API, Recraft API, MiniMax, Kuaishou, AIMLAPI/PiAPI, WaveSpeed, fal.
 
 CLI:

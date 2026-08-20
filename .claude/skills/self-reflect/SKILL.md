@@ -1,6 +1,6 @@
 ---
 name: self-reflect
-description: "Review recent errors and patterns, generate rule/skill improvements. Triggers: «self-reflect», «проанализируй себя», «what mistakes repeat»."
+description: "Разбор недавних ошибок и паттернов, генерация правок для rules/skills. Триггеры: «проанализируй себя», «какие ошибки повторяются»."
 ---
 
 # Self-Reflect: Continuous Improvement

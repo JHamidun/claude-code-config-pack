@@ -94,3 +94,9 @@ live_shot.png
 .claude/tools/wa-bridge/.session/
 .claude/tools/wa-bridge/store/
 .claude/tools/wa-bridge/bridge.log
+
+# Отчёты семантического аудита. Внутри — открытая расшифровка заглушек
+# («метка N = такая-то компания»), то есть готовый дешифровальный ключ ко всему
+# паку. Публиковать их опаснее, чем то, что они помогли вычистить.
+_audit_batches/
+_pack_en_list.txt

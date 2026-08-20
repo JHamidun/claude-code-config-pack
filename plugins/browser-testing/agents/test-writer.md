@@ -78,7 +78,7 @@ When invoked, follow these steps systematically:
 2. **Gather requirements**:
    - Read source files to understand implementation
    - Check contracts/ for API schemas
-   - Review functional requirements (FR-015, FR-018, FR-019)
+   - Review functional requirements (REQ-07, REQ-08, REQ-09)
    - Check existing test patterns in codebase
 
 3. **Check Context7 patterns** (RECOMMENDED):
@@ -142,136 +142,136 @@ describe('getStylePrompt', () => {
 });
 ```
 
-**T010 - Generation Result Schema Tests** - `packages/shared-types/tests/generation-result.test.ts`:
+**T010 - Order Structure Schema Tests** - `packages/shared-types/tests/order-result.test.ts`:
 
 ```typescript
 import { describe, it, expect } from 'vitest';
-import { CourseStructureSchema, SectionSchema, LessonSchema } from '../src/generation/generation-result';
+import { OrderStructureSchema, ShipmentSchema, ItemSchema } from '../src/orders/order-result';
 
-describe('CourseStructureSchema', () => {
-  it('should validate valid course structure', () => {
-    const validCourse = {
-      course_title: 'Test Course',
-      course_description: 'A test course',
-      target_audience: 'Beginners',
-      estimated_hours: 10,
-      difficulty_level: 'beginner',
-      prerequisites: [],
-      sections: [
+describe('OrderStructureSchema', () => {
+  it('should validate valid order structure', () => {
+    const validOrder = {
+      order_reference: 'Test Order',
+      order_note: 'A test order',
+      customer_segment: 'Retail',
+      estimated_days: 10,
+      priority_level: 'low',
+      depends_on: [],
+      shipments: [
         {
-          section_title: 'Section 1',
-          section_description: 'First section',
-          learning_outcomes: ['Outcome 1'],
-          lessons: [
+          shipment_label: 'Shipment 1',
+          shipment_note: 'First shipment',
+          handling_notes: ['handle with care'],
+          items: [
             {
-              lesson_title: 'Lesson 1',
-              lesson_objective: 'Learn basics',
-              key_concepts: ['Concept 1'],
+              item_name: 'Item 1',
+              item_sku: 'SKU-001',
+              tags: ['fragile'],
             },
           ],
         },
       ],
     };
 
-    const result = CourseStructureSchema.safeParse(validCourse);
+    const result = OrderStructureSchema.safeParse(validOrder);
     expect(result.success).toBe(true);
   });
 
-  it('should reject course with section missing lessons (FR-015)', () => {
-    const invalidCourse = {
-      course_title: 'Test Course',
-      sections: [
+  it('should reject order with shipment missing items (REQ-07)', () => {
+    const invalidOrder = {
+      order_reference: 'Test Order',
+      shipments: [
         {
-          section_title: 'Section 1',
-          lessons: [], // FR-015 violation: no lessons
+          shipment_label: 'Shipment 1',
+          items: [], // REQ-07 violation: no items
         },
       ],
     };
 
-    const result = CourseStructureSchema.safeParse(invalidCourse);
+    const result = OrderStructureSchema.safeParse(invalidOrder);
     expect(result.success).toBe(false);
   });
 
-  it('should reject invalid difficulty_level enum', () => {
-    const invalidCourse = {
-      course_title: 'Test Course',
-      difficulty_level: 'super-hard', // Invalid enum value
+  it('should reject invalid priority_level enum', () => {
+    const invalidOrder = {
+      order_reference: 'Test Order',
+      priority_level: 'ultra-hard', // Invalid enum value
     };
 
-    const result = CourseStructureSchema.safeParse(invalidCourse);
+    const result = OrderStructureSchema.safeParse(invalidOrder);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toContain('difficulty_level');
+      expect(result.error.issues[0].message).toContain('priority_level');
     }
   });
 });
 
-describe('LessonSchema', () => {
-  it('should validate valid lesson', () => {
-    const validLesson = {
-      lesson_title: 'Lesson 1',
-      lesson_objective: 'Learn basics',
-      key_concepts: ['Concept 1', 'Concept 2'],
+describe('ItemSchema', () => {
+  it('should validate valid item', () => {
+    const validItem = {
+      item_name: 'Item 1',
+      item_sku: 'SKU-001',
+      tags: ['fragile', 'stackable'],
     };
 
-    const result = LessonSchema.safeParse(validLesson);
+    const result = ItemSchema.safeParse(validItem);
     expect(result.success).toBe(true);
   });
 
-  it('should reject lesson with missing required fields', () => {
-    const invalidLesson = {
-      lesson_title: 'Lesson 1',
-      // Missing lesson_objective
+  it('should reject item with missing required fields', () => {
+    const invalidItem = {
+      item_name: 'Item 1',
+      // Missing item_sku
     };
 
-    const result = LessonSchema.safeParse(invalidLesson);
+    const result = ItemSchema.safeParse(invalidItem);
     expect(result.success).toBe(false);
   });
 });
 ```
 
-**T011 - Generation Job Schema Tests** - `packages/shared-types/tests/generation-job.test.ts`:
+**T011 - Order Job Schema Tests** - `packages/shared-types/tests/order-job.test.ts`:
 
 ```typescript
 import { describe, it, expect } from 'vitest';
-import { GenerationJobSchema } from '../src/generation/generation-job';
+import { OrderJobSchema } from '../src/orders/order-job';
 
-describe('GenerationJobSchema', () => {
-  it('should validate title-only generation job', () => {
+describe('OrderJobSchema', () => {
+  it('should validate reference-only generation job', () => {
     const titleOnly = {
-      course_title: 'Test Course',
+      order_reference: 'Test Order',
       styles: { style_1: 'minimalist' },
-      generation_mode: 'title-only',
+      generation_mode: 'reference-only',
     };
 
-    const result = GenerationJobSchema.safeParse(titleOnly);
+    const result = OrderJobSchema.safeParse(titleOnly);
     expect(result.success).toBe(true);
   });
 
-  it('should validate full Analyze generation job', () => {
-    const fullAnalyze = {
-      analyze_id: 'analyze_123',
-      analyze_result: {
-        course_title: 'Test Course',
-        course_description: 'Description',
-        sections: [],
+  it('should validate full draft generation job', () => {
+    const fullDraft = {
+      draft_id: 'draft_123',
+      draft_result: {
+        order_reference: 'Test Order',
+        order_note: 'Description',
+        shipments: [],
       },
       styles: { style_1: 'technical' },
-      generation_mode: 'full-analyze',
+      generation_mode: 'full-draft',
     };
 
-    const result = GenerationJobSchema.safeParse(fullAnalyze);
+    const result = OrderJobSchema.safeParse(fullDraft);
     expect(result.success).toBe(true);
   });
 
   it('should reject job missing required styles', () => {
     const invalid = {
-      course_title: 'Test Course',
-      generation_mode: 'title-only',
+      order_reference: 'Test Order',
+      generation_mode: 'reference-only',
       // Missing styles
     };
 
-    const result = GenerationJobSchema.safeParse(invalid);
+    const result = OrderJobSchema.safeParse(invalid);
     expect(result.success).toBe(false);
   });
 });
@@ -301,18 +301,18 @@ describe('generateMetadata', () => {
     vi.clearAllMocks();
   });
 
-  it('should generate metadata for title-only job', async () => {
+  it('should generate metadata for reference-only job', async () => {
     const job = {
-      course_title: 'Test Course',
+      order_reference: 'Test Order',
       styles: { style_1: 'minimalist' },
-      generation_mode: 'title-only' as const,
+      generation_mode: 'reference-only' as const,
     };
 
     // Mock LLM response
     const mockLLMResponse = JSON.stringify({
-      course_title: 'Test Course',
-      course_description: 'Generated description',
-      target_audience: 'Beginners',
+      order_reference: 'Test Order',
+      order_note: 'Generated description',
+      customer_segment: 'Retail',
     });
 
     const { callOpenAI } = await import('@/services/llm/openai-service');
@@ -320,14 +320,14 @@ describe('generateMetadata', () => {
 
     // Mock JSON parse
     (safeJSONParse as any).mockReturnValue({
-      course_title: 'Test Course',
-      course_description: 'Generated description',
+      order_reference: 'Test Order',
+      order_note: 'Generated description',
     });
 
     const result = await generateMetadata(job);
 
     expect(result).toBeDefined();
-    expect(result.course_title).toBe('Test Course');
+    expect(result.order_reference).toBe('Test Order');
     expect(callOpenAI).toHaveBeenCalledWith(
       expect.objectContaining({
         model: 'OSS 20B', // Default model
@@ -337,9 +337,9 @@ describe('generateMetadata', () => {
 
   it('should use style prompts when provided', async () => {
     const job = {
-      course_title: 'Test Course',
+      order_reference: 'Test Order',
       styles: { style_1: 'technical' },
-      generation_mode: 'title-only' as const,
+      generation_mode: 'reference-only' as const,
     };
 
     const { callOpenAI } = await import('@/services/llm/openai-service');
@@ -357,19 +357,19 @@ describe('generateMetadata', () => {
 
   it('should handle JSON repair on malformed LLM response', async () => {
     const job = {
-      course_title: 'Test Course',
+      order_reference: 'Test Order',
       styles: {},
-      generation_mode: 'title-only' as const,
+      generation_mode: 'reference-only' as const,
     };
 
     // Mock malformed JSON response
-    const malformedJSON = '```json\n{"course_title": "Test",}\n```';
+    const malformedJSON = '```json\n{"order_reference": "Test",}\n```';
 
     const { callOpenAI } = await import('@/services/llm/openai-service');
     (callOpenAI as any).mockResolvedValue(malformedJSON);
 
     // Mock JSON repair success
-    (safeJSONParse as any).mockReturnValue({ course_title: 'Test' });
+    (safeJSONParse as any).mockReturnValue({ order_reference: 'Test' });
 
     const result = await generateMetadata(job);
 
@@ -379,21 +379,21 @@ describe('generateMetadata', () => {
 });
 ```
 
-**T024 - Section Batch Generator Tests** - `packages/your-app/tests/unit/section-batch-generator.test.ts`:
+**T024 - Shipment Batch Generator Tests** - `packages/your-app/tests/unit/shipment-batch-generator.test.ts`:
 
 ```typescript
 import { describe, it, expect, vi } from 'vitest';
-import { generateSectionBatch } from '@/services/stage5/section-batch-generator';
+import { generateShipmentBatch } from '@/services/stage5/shipment-batch-generator';
 
 vi.mock('@/services/llm/openai-service', () => ({
   callOpenAI: vi.fn(),
 }));
 
-describe('generateSectionBatch', () => {
-  it('should generate section batch with SECTIONS_PER_BATCH=1', async () => {
+describe('generateShipmentBatch', () => {
+  it('should generate shipment batch with SHIPMENTS_PER_BATCH=1', async () => {
     const metadata = {
-      course_title: 'Test Course',
-      sections: ['Section 1', 'Section 2'],
+      order_reference: 'Test Order',
+      shipments: ['Shipment 1', 'Shipment 2'],
     };
 
     const batchIndex = 0;
@@ -401,52 +401,52 @@ describe('generateSectionBatch', () => {
     const { callOpenAI } = await import('@/services/llm/openai-service');
     (callOpenAI as any).mockResolvedValue(
       JSON.stringify({
-        section_title: 'Section 1',
-        lessons: [{ lesson_title: 'Lesson 1' }],
+        shipment_label: 'Shipment 1',
+        items: [{ item_name: 'Item 1' }],
       })
     );
 
-    const result = await generateSectionBatch(metadata, batchIndex);
+    const result = await generateShipmentBatch(metadata, batchIndex);
 
     expect(result).toBeDefined();
-    expect(result.section_title).toBe('Section 1');
+    expect(result.shipment_label).toBe('Shipment 1');
     expect(callOpenAI).toHaveBeenCalledOnce();
   });
 
-  it('should retry on validation failure (FR-019, max 3 retries)', async () => {
-    const metadata = { course_title: 'Test', sections: ['Section 1'] };
+  it('should retry on validation failure (REQ-09, max 3 retries)', async () => {
+    const metadata = { order_reference: 'Test', shipments: ['Shipment 1'] };
     const batchIndex = 0;
 
     const { callOpenAI } = await import('@/services/llm/openai-service');
 
-    // First 2 calls return invalid (no lessons), 3rd call succeeds
+    // First 2 calls return invalid (no items), 3rd call succeeds
     (callOpenAI as any)
-      .mockResolvedValueOnce(JSON.stringify({ section_title: 'Section 1', lessons: [] }))
-      .mockResolvedValueOnce(JSON.stringify({ section_title: 'Section 1', lessons: [] }))
+      .mockResolvedValueOnce(JSON.stringify({ shipment_label: 'Shipment 1', items: [] }))
+      .mockResolvedValueOnce(JSON.stringify({ shipment_label: 'Shipment 1', items: [] }))
       .mockResolvedValueOnce(
         JSON.stringify({
-          section_title: 'Section 1',
-          lessons: [{ lesson_title: 'Lesson 1' }],
+          shipment_label: 'Shipment 1',
+          items: [{ item_name: 'Item 1' }],
         })
       );
 
-    const result = await generateSectionBatch(metadata, batchIndex);
+    const result = await generateShipmentBatch(metadata, batchIndex);
 
     expect(callOpenAI).toHaveBeenCalledTimes(3);
-    expect(result.lessons).toHaveLength(1);
+    expect(result.items).toHaveLength(1);
   });
 
-  it('should integrate style prompts into section generation', async () => {
+  it('should integrate style prompts into shipment generation', async () => {
     const metadata = {
-      course_title: 'Test',
-      sections: ['Section 1'],
+      order_reference: 'Test',
+      shipments: ['Shipment 1'],
       styles: { style_1: 'minimalist' },
     };
 
     const { callOpenAI } = await import('@/services/llm/openai-service');
     (callOpenAI as any).mockResolvedValue('{}');
 
-    await generateSectionBatch(metadata, 0);
+    await generateShipmentBatch(metadata, 0);
 
     expect(callOpenAI).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -515,17 +515,17 @@ describe('safeJSONParse - 4-level repair', () => {
   });
 });
 
-describe('fixFieldNames - camelCase to snake_case (FR-019)', () => {
+describe('fixFieldNames - camelCase to snake_case (REQ-09)', () => {
   it('should fix camelCase field names', () => {
-    const input = { courseTitle: 'Test', targetAudience: 'Beginners' };
+    const input = { orderReference: 'Test', targetAudience: 'Retail' };
     const result = fixFieldNames(input);
 
-    expect(result).toEqual({ course_title: 'Test', target_audience: 'Beginners' });
+    expect(result).toEqual({ order_reference: 'Test', customer_segment: 'Retail' });
   });
 
   it('should recursively fix nested objects', () => {
     const input = {
-      courseTitle: 'Test',
+      orderReference: 'Test',
       metadata: {
         createdBy: 'User',
         lastModified: '2025-01-01',
@@ -539,15 +539,15 @@ describe('fixFieldNames - camelCase to snake_case (FR-019)', () => {
 
   it('should handle arrays of objects', () => {
     const input = {
-      sections: [
-        { sectionTitle: 'Section 1' },
-        { sectionTitle: 'Section 2' },
+      shipments: [
+        { shipmentLabel: 'Shipment 1' },
+        { shipmentLabel: 'Shipment 2' },
       ],
     };
     const result = fixFieldNames(input);
 
-    expect(result.sections[0].section_title).toBe('Section 1');
-    expect(result.sections[1].section_title).toBe('Section 2');
+    expect(result.shipments[0].shipment_label).toBe('Shipment 1');
+    expect(result.shipments[1].shipment_label).toBe('Shipment 2');
   });
 });
 ```
@@ -556,111 +556,111 @@ describe('fixFieldNames - camelCase to snake_case (FR-019)', () => {
 
 ```typescript
 import { describe, it, expect } from 'vitest';
-import { validateMinimumLessons } from '@/services/stage5/minimum-lessons-validator';
-import { sanitizeCourseStructure } from '@/services/stage5/sanitize-course-structure';
+import { validateMinimumItems } from '@/services/stage5/minimum-items-validator';
+import { sanitizeOrderStructure } from '@/services/stage5/sanitize-order-structure';
 
-describe('validateMinimumLessons (FR-015)', () => {
-  it('should pass validation when all sections have lessons', () => {
-    const course = {
-      sections: [
+describe('validateMinimumItems (REQ-07)', () => {
+  it('should pass validation when all shipments have items', () => {
+    const order = {
+      shipments: [
         {
-          section_title: 'Section 1',
-          lessons: [{ lesson_title: 'Lesson 1' }],
+          shipment_label: 'Shipment 1',
+          items: [{ item_name: 'Item 1' }],
         },
         {
-          section_title: 'Section 2',
-          lessons: [{ lesson_title: 'Lesson 2' }],
+          shipment_label: 'Shipment 2',
+          items: [{ item_name: 'Item 2' }],
         },
       ],
     };
 
-    const result = validateMinimumLessons(course);
+    const result = validateMinimumItems(order);
 
     expect(result.valid).toBe(true);
     expect(result.errors).toHaveLength(0);
   });
 
-  it('should fail validation when section has no lessons (FR-015 violation)', () => {
-    const course = {
-      sections: [
+  it('should fail validation when shipment has no items (REQ-07 violation)', () => {
+    const order = {
+      shipments: [
         {
-          section_title: 'Section 1',
-          lessons: [],
+          shipment_label: 'Shipment 1',
+          items: [],
         },
       ],
     };
 
-    const result = validateMinimumLessons(course);
+    const result = validateMinimumItems(order);
 
     expect(result.valid).toBe(false);
     expect(result.errors).toHaveLength(1);
-    expect(result.errors[0]).toContain('Section 1');
-    expect(result.sectionsWithNoLessons).toContain('Section 1');
+    expect(result.errors[0]).toContain('Shipment 1');
+    expect(result.shipmentsWithNoItems).toContain('Shipment 1');
   });
 });
 
-describe('sanitizeCourseStructure - XSS protection', () => {
+describe('sanitizeOrderStructure - XSS protection', () => {
   it('should sanitize XSS attack vectors with DOMPurify', () => {
-    const maliciousCourse = {
-      course_title: '<script>alert("XSS")</script>Test Course',
-      sections: [
+    const maliciousOrder = {
+      order_reference: '<script>alert("XSS")</script>Test Order',
+      shipments: [
         {
-          section_title: '<img src=x onerror=alert(1)>Section 1',
-          lessons: [
+          shipment_label: '<img src=x onerror=alert(1)>Shipment 1',
+          items: [
             {
-              lesson_title: '<a href="javascript:alert(1)">Lesson 1</a>',
+              item_name: '<a href="javascript:alert(1)">Item 1</a>',
             },
           ],
         },
       ],
     };
 
-    const sanitized = sanitizeCourseStructure(maliciousCourse);
+    const sanitized = sanitizeOrderStructure(maliciousOrder);
 
-    expect(sanitized.course_title).not.toContain('<script>');
-    expect(sanitized.sections[0].section_title).not.toContain('<img');
-    expect(sanitized.sections[0].lessons[0].lesson_title).not.toContain('javascript:');
+    expect(sanitized.order_reference).not.toContain('<script>');
+    expect(sanitized.shipments[0].shipment_label).not.toContain('<img');
+    expect(sanitized.shipments[0].items[0].item_name).not.toContain('javascript:');
   });
 
   it('should preserve safe text content', () => {
-    const safeCourse = {
-      course_title: 'Safe Course Title',
-      sections: [
+    const safeOrder = {
+      order_reference: 'Safe Order Title',
+      shipments: [
         {
-          section_title: 'Safe Section',
-          lessons: [{ lesson_title: 'Safe Lesson' }],
+          shipment_label: 'Safe Shipment',
+          items: [{ item_name: 'Safe Item' }],
         },
       ],
     };
 
-    const sanitized = sanitizeCourseStructure(safeCourse);
+    const sanitized = sanitizeOrderStructure(safeOrder);
 
-    expect(sanitized.course_title).toBe('Safe Course Title');
-    expect(sanitized.sections[0].section_title).toBe('Safe Section');
+    expect(sanitized.order_reference).toBe('Safe Order Title');
+    expect(sanitized.shipments[0].shipment_label).toBe('Safe Shipment');
   });
 
   it('should recursively sanitize nested structures', () => {
-    const course = {
-      sections: [
+    const order = {
+      shipments: [
         {
-          lessons: [
-            { key_concepts: ['<script>XSS</script>Concept 1', 'Concept 2'] },
+          items: [
+            { tags: ['<script>XSS</script>Concept 1', 'Concept 2'] },
           ],
         },
       ],
     };
 
-    const sanitized = sanitizeCourseStructure(course);
+    const sanitized = sanitizeOrderStructure(order);
 
-    expect(sanitized.sections[0].lessons[0].key_concepts[0]).not.toContain('<script>');
-    expect(sanitized.sections[0].lessons[0].key_concepts[1]).toBe('Concept 2');
+    expect(sanitized.shipments[0].items[0].tags[0]).not.toContain('<script>');
+    expect(sanitized.shipments[0].items[0].tags[1]).toBe('Concept 2');
   });
 });
 ```
 
 **For Contract Tests (T041)**:
 
-**T041 - Generation tRPC Contract Tests** - `packages/your-app/tests/contract/generation.tRPC.test.ts`:
+**T041 - Orders tRPC Contract Tests** - `packages/your-app/tests/contract/orders.tRPC.test.ts`:
 
 ```typescript
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -685,9 +685,9 @@ describe('generation.tRPC contract tests', () => {
 
     await expect(
       caller.generation.create({
-        course_title: 'Test',
+        order_reference: 'Test',
         styles: {},
-        generation_mode: 'title-only',
+        generation_mode: 'reference-only',
       })
     ).rejects.toThrow('UNAUTHORIZED');
   });
@@ -696,9 +696,9 @@ describe('generation.tRPC contract tests', () => {
     const caller = createCaller(mockContext);
 
     const input = {
-      course_title: 'Test Course',
+      order_reference: 'Test Order',
       styles: { style_1: 'minimalist' },
-      generation_mode: 'title-only' as const,
+      generation_mode: 'reference-only' as const,
     };
 
     const result = await caller.generation.create(input);
@@ -712,9 +712,9 @@ describe('generation.tRPC contract tests', () => {
     const caller = createCaller(mockContext);
 
     const invalidInput = {
-      // Missing course_title
+      // Missing order_reference
       styles: {},
-      generation_mode: 'title-only',
+      generation_mode: 'reference-only',
     };
 
     await expect(caller.generation.create(invalidInput as any)).rejects.toThrow('Validation error');
@@ -724,7 +724,7 @@ describe('generation.tRPC contract tests', () => {
     const caller = createCaller(mockContext);
 
     const invalidInput = {
-      course_title: 'Test',
+      order_reference: 'Test',
       styles: {},
       generation_mode: 'invalid-mode' as any,
     };
@@ -732,16 +732,16 @@ describe('generation.tRPC contract tests', () => {
     await expect(caller.generation.create(invalidInput)).rejects.toThrow();
   });
 
-  it('should validate CourseStructure output schema', async () => {
+  it('should validate OrderStructure output schema', async () => {
     const caller = createCaller(mockContext);
 
     const result = await caller.generation.getResult({ job_id: 'job_123' });
 
     expect(result).toBeDefined();
     if (result.status === 'completed') {
-      expect(result.course_structure).toBeDefined();
-      expect(result.course_structure.course_title).toBeDefined();
-      expect(result.course_structure.sections).toBeInstanceOf(Array);
+      expect(result.order_structure).toBeDefined();
+      expect(result.order_structure.order_reference).toBeDefined();
+      expect(result.order_structure.shipments).toBeInstanceOf(Array);
     }
   });
 });

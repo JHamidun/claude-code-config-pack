@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: "Create, edit and eval skills; optimize descriptions for triggering. Triggers: «create a skill», «fix skill», «why does the skill not trigger»."
+description: "Создание, правка и эвалы навыков, оптимизация description. Триггеры: «создай навык», «почини скилл», «почему навык не вызывается»."
 metadata:
   origin: anthropics/skills@fa0fa64
 ---

@@ -1,6 +1,6 @@
 ---
 name: geo-aeo-ru
-description: "GEO/AEO/LLM SEO — видимость бренда в ответах ChatGPT, Perplexity, (regional LLM A); Citation Share, llms.txt. Триггеры: «попасть в ответы AI»."
+description: "GEO/AEO/LLM SEO — видимость бренда в ответах ChatGPT, Perplexity, (regional LLM A); Citation Share, llms.txt. Триггеры: «попасть в ответы AI». НЕ контент под Яндекс→seo-machine-ru."
 metadata:
   version: 1.1.0
   updated: 2026-07-18
@@ -211,7 +211,7 @@ python brand_scanner.py "YourBrand" yourbrand.ru
 
 - **(regional LLM B) vs (regional LLM A)/Alice:** одни и те же бренды показывают **2-3× разную Share of Voice**
   между ними (GeoScout). → отдельный мониторинг каждой русской платформы обязателен.
-- **(regional LLM B) (ClientCorp3):** обучен на русскоязычных данных, бизнес-фокус, экосистема Сбера. Любит
+- **(regional LLM B):** обучен на русскоязычных данных, бизнес-фокус, экосистема Сбера. Любит
   присутствие в RU-инфополе (vc.ru, Habr, новости). Training-weight высокий.
 - **(regional LLM A) / Alice / Нейро:** поверх Яндекс-индекса. Оптимизация = классический SEO под Яндекс
   (см. `seo-machine-ru` + `yandex`) + структурированные ответы + FAQ + recency. 12% пользователей

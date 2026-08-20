@@ -1,6 +1,6 @@
 ---
 name: uptime-kuma-ops
-description: "Uptime Kuma monitors via API: list, add, update, delete, check status. Triggers: «мониторинг», «uptime», status page."
+description: "Мониторы Uptime Kuma на your-server через socket.io API: список, добавить, статус. Триггеры: «добавь монитор», «проверь мониторы», «статус-страница»."
 ---
 
 # Uptime Kuma Operations

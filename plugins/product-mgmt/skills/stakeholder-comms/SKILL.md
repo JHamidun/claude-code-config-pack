@@ -1,6 +1,6 @@
 ---
 name: stakeholder-comms
-description: "Stakeholder updates by audience: weekly statuses, monthly reports, launch announcements, risk comms. Triggers: «update for leadership», «weekly status»."
+description: "Апдейты для стейкхолдеров под аудиторию: статусы, отчёты, анонсы, риски. Триггеры: «апдейт для руководства», «недельный статус», «письмо про риск». НЕ рассылки/FAQ→internal-comms."
 ---
 
 # Stakeholder Communications Skill

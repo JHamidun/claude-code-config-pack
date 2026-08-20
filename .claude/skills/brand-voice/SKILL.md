@@ -1,6 +1,6 @@
 ---
 name: brand-voice
-description: "Define and enforce brand voice: tone docs, style-guide compliance checks, audience adaptation. Triggers: «brand voice», «check against brand»."
+description: "Tone of voice бренда: описание, проверка контента на соответствие, стайлгайд. Триггеры: «brand voice», «проверь на соответствие бренду»."
 ---
 
 # Brand Voice Skill

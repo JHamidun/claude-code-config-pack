@@ -1,6 +1,6 @@
 ---
 name: web-artifacts-builder
-description: "Multi-component claude.ai HTML artifacts with React, Tailwind, shadcn/ui: state, routing. Trigger: «shadcn artifact». NOT simple single-file HTML — build directly."
+description: "HTML-артефакты claude.ai на React, Tailwind, shadcn/ui. Триггеры: «shadcn artifact», «веб-приложение артефактом». НЕ простой HTML/JSX — напрямую."
 license: Complete terms in LICENSE.txt
 metadata:
   origin: anthropics/skills@fa0fa64

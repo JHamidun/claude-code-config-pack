@@ -1,4 +1,4 @@
-# i2v cost & lipsync — battle-notes (2026-06-08, Камила music-video)
+# i2v cost & lipsync — battle-notes (2026-06-08, музыкальное видео)
 
 Hard-won findings from building a 60s music video. Read before choosing an i2v / lipsync route.
 
@@ -6,7 +6,7 @@ Hard-won findings from building a 60s music video. Read before choosing an i2v /
 
 | Route | Cost | Verdict |
 |---|---|---|
-| **Veo 3.1 Fast via Google API** (`veo-3.1-fast-generate-preview`, `GOOGLE_API_KEY`) | Google budget, ~44-54s/6s-clip | **DEFAULT for i2v motion.** Not Runway credits. Script pattern: `_client2_birthday/scripts/veo_animate.py` (JPG keyframe → mime `image/jpeg`, aspect 9:16, `duration_seconds`∈{4,6,8}, workers≤3, soften-retry on safety filter). Veo emits native audio → strip with `-an` at assembly. |
+| **Veo 3.1 Fast via Google API** (`veo-3.1-fast-generate-preview`, `GOOGLE_API_KEY`) | Google budget, ~44-54s/6s-clip | **DEFAULT for i2v motion.** Not Runway credits. Script pattern: `_tribute_project_2/scripts/veo_animate.py` (JPG keyframe → mime `image/jpeg`, aspect 9:16, `duration_seconds`∈{4,6,8}, workers≤3, soften-retry on safety filter). Veo emits native audio → strip with `-an` at assembly. |
 | Runway **Seedance 2.0** (internal API) | **~180 credits / 5s 720p clip** — EXPENSIVE (1000 cr = only 5 clips) | Use sparingly. Quality good but burns credits fast. |
 | Runway **Gen-4** | ~62 cr / 5s (3× cheaper than Seedance) | Cheaper Runway option if you must stay on Runway credits. |
 | Runway **explore mode** (`exploreMode:True`, free on Unlimited) | Free | **THROTTLED to 0% for free users** — sits in queue, unreliable for batches. Don't depend on it. |

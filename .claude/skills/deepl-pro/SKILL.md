@@ -1,6 +1,6 @@
 ---
 name: deepl-pro
-description: "DeepL translation of text and documents (docx/pptx/pdf/xlsx), glossaries, formality. Triggers: «translate», «translate this document»."
+description: "Перевод текста и документов (docx/pptx/pdf/xlsx) через DeepL, глоссарии, formality. Триггеры: «переведи», «перевод документа», «google translate»."
 ---
 
 # DeepL Pro API Skill

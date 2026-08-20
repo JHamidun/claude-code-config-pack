@@ -1,6 +1,6 @@
 ---
 name: database-design
-description: "DB schema design, migrations, query optimization: PostgreSQL, MongoDB, Redis; normalization, indexing. Triggers: «design the database», «slow query»."
+description: "Схема БД, миграции, оптимизация запросов: PostgreSQL, MongoDB, Redis; нормализация, индексы. Триггеры: «дизайн базы», «оптимизируй запрос»."
 keywords: database, schema, migration, postgres, mongodb, redis, normalization, indexing, query-optimization
 ---
 

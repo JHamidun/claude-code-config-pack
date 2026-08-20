@@ -8,16 +8,16 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `ad-spy` | Реклама конкурентов из Ad Library (Facebook, Google, LinkedIn) через Scraping API; RU: Директ, TG Ads, VK. |
+| `ad-spy` | Разведка рекламы конкурентов: Ad Library FB/Google/LinkedIn (Scraping API); RU: Директ, TG Ads, VK, Atria. |
 | `apify-scraping` | Скрапинг через Apify Actors: соцсети, e-commerce, поисковики. |
-| `github-gem-seeker` | Find battle-tested open source on GitHub instead of coding from scratch. |
-| `last30days` | What people say about a topic in the last 30 days: posts + engagement from Reddit, X, YouTube, TikTok, HN, GitHub. |
+| `github-gem-seeker` | Поиск проверенного open source на GitHub вместо кода с нуля. |
+| `last30days` | Что говорят о теме за 30 дней: посты и вовлечённость Reddit, X, YouTube, TikTok, HN, GitHub. |
 | `meta-ads-analyzer` | Диагностика кампаний Meta Ads: Breakdown Effect. |
-| `reddit-hn` | Search Reddit and Hacker News for tech opinions, trends, discussions. |
+| `reddit-hn` | Поиск мнений и обсуждений по технологиям в Reddit и Hacker News. |
 | `serpapi` | Google Search API через SerpAPI (SERPAPI_API_KEY): выдача, Maps, Shopping, News, YouTube. |
-| `similarweb-analytics` | Website traffic estimates from public SimilarWeb data: rankings, engagement, sources, geo. |
-| `social-intel` | Dossier on a person, brand or company across LinkedIn, Instagram, TikTok, X, YouTube via Scraping API. |
-| `tiktok-intel` | TikTok and Instagram intelligence via Scraping API: trends, influencers, demographics, Shop products, Reels. |
+| `similarweb-analytics` | Трафик чужого сайта по публичным данным SimilarWeb: посещаемость, источники. |
+| `social-intel` | Досье на человека/компанию по соцсетям (Scraping API). |
+| `tiktok-intel` | Аналитика TikTok и Instagram через Scraping API: тренды, инфлюенсеры, демография, TikTok Shop, Reels. |
 
 ## Install
 

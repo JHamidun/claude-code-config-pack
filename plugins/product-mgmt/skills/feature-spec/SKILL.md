@@ -1,6 +1,6 @@
 ---
 name: feature-spec
-description: "PRDs and feature specs: problem statement, user stories, acceptance criteria, success metrics. Triggers: «write a PRD». NOT RFC -> doc-coauthoring."
+description: "PRD и спеки фич: user stories, требования, критерии приёмки, метрики. Триггеры: «PRD», «напиши спеку». НЕ: RFC→doc-coauthoring; роадмап→roadmap-management."
 ---
 
 # Feature Spec Skill

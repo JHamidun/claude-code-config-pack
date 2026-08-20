@@ -8,13 +8,13 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `brand-voice` | Define and enforce brand voice: tone docs, style-guide compliance checks, audience adaptation. |
-| `content-creation` | Generic marketing copy: blog, social, email, landing pages, case studies, SEO copy, CTAs. |
-| `content-engine` | Platform-native content from one source: X, LinkedIn, TikTok, YouTube, newsletters; threads, scripts, calendars. |
+| `brand-voice` | Tone of voice бренда: описание, проверка контента на соответствие, стайлгайд. |
+| `content-creation` | Generic маркетинг-копирайт: блог, соцсети, рассылки, лендинги, кейсы, SEO copy. |
+| `content-engine` | Platform-native контент из одного исходника под X, LinkedIn, TikTok, YouTube: контент-план, посты. |
 | `content-research` | Research под контент-артефакт: источники, CRAAP, цитаты с пруфами. |
 | `de-ai-ify` | КАНОН чистки русских текстов от ИИ-клише и жаргона. |
-| `doc-coauthoring` | Co-author docs: context transfer, iteration, fresh-reader test — proposals, specs, decision docs. |
-| `ru-text` | Russian text quality: typography, info-style, editorial, UX writing, AI-text cleanup. |
+| `doc-coauthoring` | Совместное написание дока: контекст → структура → тест свежим читателем. |
+| `ru-text` | Качество русского текста: типографика, инфостиль, чистка канцелярита. |
 | `tapestry` | Tapestry — связывает документы (транскрипты, статьи, PDF, код) в граф знаний + implementation plans. |
 
 ### Agents

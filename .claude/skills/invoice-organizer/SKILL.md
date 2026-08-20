@@ -1,6 +1,6 @@
 ---
 name: invoice-organizer
-description: "Sort invoices and receipts for tax prep and expense tracking. Triggers: «organize invoices», «expenses for the month»."
+description: "Разбор счетов и чеков для налогов и учёта расходов. Триггеры: «разбери инвойсы», «расходы за месяц», «собери документы для налоговой»."
 ---
 
 # Invoice Organizer Skill

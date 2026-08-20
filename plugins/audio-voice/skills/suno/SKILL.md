@@ -3,9 +3,11 @@ name: suno
 description: "Генерация музыки в Suno без браузера (suno_client.py): треки, mp3, кредиты. Триггеры: «трек в Suno», «фоновая музыка». НЕ BGM ≤30с → elevenlabs."
 ---
 
-# Suno — headless internal API
+# Suno без браузера
 
-Полноценная работа с Suno **без браузера**: токен минтится из durable `__client` cookie, дальше — generate / list / status / download через `studio-api-prod.suno.com`. Аккаунт **companyaudio (Pro, 2500 кредитов/мес)**.
+Работа с Suno из скрипта: Bearer минтится из cookie своей авторизованной сессии,
+дальше generate / list / status / download. Тариф, лимиты и остаток кредитов —
+те, что действуют для этой учётной записи.
 
 Аналог `runway_client.py`. Клиент: `scripts/suno_client.py`.
 
@@ -41,9 +43,9 @@ SUNO_USER_AGENT      # UA строка
 SUNO_BEARER          # (опц.) вставить свежий Bearer для разовой работы без __client (~1ч)
 ```
 
-Уже сохранены (2026-06-05, аккаунт companyaudio).
+Заполняются один раз значениями своей учётной записи — как их взять, см. ниже.
 
-### Если `__client` протух (через ~год или при logout) — пере-захват из браузера
+### Если `__client` протух (через ~год или при logout) — обновить из браузера
 
 Через Playwright MCP (как делалось для perplexity/notebooklm): залогиниться на suno.com, затем
 `browser_run_code_unsafe`:
@@ -105,16 +107,16 @@ paths = c.make_track("Cinematic trailer, instrumental", instrumental=True, out_d
 `gpt_description_prompt` = одно описание (стиль + настроение + структура). Suno сам решает аранжировку.
 - Инструментал: `make_instrumental=True` (никакого вокала).
 - Хороший эпик-промпт: указывай дугу («intimate cello → storm with war drums → triumphant brass + choir → tender resolution»), BPM, инструменты, референс-жанр (БЕЗ имён артистов — Suno фильтрует меньше, но лучше дескрипторы).
-- Полноценная песня со СВОИМИ словами (custom mode): тело `/api/generate/v2/` = `{generation_type:"TEXT", mv, prompt:<LYRICS с тегами [Verse]/[Chorus]>, tags:<STYLE>, title, make_instrumental:false, metadata:{create_mode:"custom", lyrics_model:"default"}}`. **Реверс подтверждён (2026-06-08), но headless этот payload тоже ловит `422 token_validation_failed`** (капча) — поэтому custom-песни делаем через Playwright UI, см. gotcha #3 (Custom-recipe).
-- Suno выдаёт **2 дубля** на запрос, каждый ~2-4 мин. Под короткий ролик — нарезать нужный 60с фрагмент (ставить кульминацию по макс-RMS, см. `_client_birthday/scripts/analyze_cut.py`).
+- Полноценная песня со СВОИМИ словами (custom mode): тело `/api/generate/v2/` = `{generation_type:"TEXT", mv, prompt:<LYRICS с тегами [Verse]/[Chorus]>, tags:<STYLE>, title, make_instrumental:false, metadata:{create_mode:"custom", lyrics_model:"default"}}`. **Схема тела проверена (2026-06-08), но headless этот payload тоже ловит `422 token_validation_failed`** (капча) — поэтому custom-песни делаем через Playwright UI, см. gotcha #3 (Custom-recipe).
+- Suno выдаёт **2 дубля** на запрос, каждый ~2-4 мин. Под короткий ролик — нарезать нужный 60с фрагмент (ставить кульминацию по макс-RMS, см. `scripts/analyze_cut.py` в проекте ролика).
 
 ## Gotchas
 
 1. **Bearer TTL ~1 час** — клиент переминчивает сам из `__client`. Не кешировать Bearer надолго вручную.
 2. **`__client` httpOnly** — достаётся только через `context.cookies()` (Playwright `browser_run_code_unsafe`), НЕ через `document.cookie`.
-3. **Генерация теперь КАПЧА-ГЕЙТ даже на `/api/generate/v2/`** (2026-06-07: `422 token_validation_failed` / "We couldn't verify your request"). Headless generate БОЛЬШЕ НЕ РАБОТАЕТ. Чтения (billing/list/feed) и **скачивание `cdn1.suno.ai/{id}.mp3` работают headless**. Для генерации — **Playwright-браузер** (логин companyaudio через Clerk-сессию персистит): `browser_navigate suno.com/create` → ввести Song Description → toggle Instrumental → Create → дождаться `streaming→complete` через headless `list_clips` → скачать по cdn. Рецепт проверен (трек «Signal at Dawn», проект `_viral_ai`).
+3. **Генерация теперь КАПЧА-ГЕЙТ даже на `/api/generate/v2/`** (2026-06-07: `422 token_validation_failed` / "We couldn't verify your request"). Headless generate БОЛЬШЕ НЕ РАБОТАЕТ. Чтения (billing/list/feed) и **скачивание `cdn1.suno.ai/{id}.mp3` работают headless**. Для генерации — **Playwright-браузер** (логин своей учётной записи через Clerk-сессию персистит): `browser_navigate suno.com/create` → ввести Song Description → toggle Instrumental → Create → дождаться `streaming→complete` через headless `list_clips` → скачать по cdn. Рецепт проверен на инструментальном треке под короткий ролик.
 
-   **Custom-mode (свои слова) через Playwright — точные селекторы (проверено 2026-06-08, проект `_client2_birthday`):**
+   **Custom-mode (свои слова) через Playwright — точные селекторы (проверено 2026-06-08):**
    1. `browser_navigate https://suno.com/create` (по умолчанию режим Simple).
    2. Клик `button "Add your own lyrics"` → форма переключается в custom (radio "Lyrics mode" = **Write**).
    3. Заполнить 3 поля (`browser_fill_form`):
@@ -130,10 +132,10 @@ paths = c.make_track("Cinematic trailer, instrumental", instrumental=True, out_d
 7. **device-id / browser-token** требуются как заголовки (browser-token = `{"token": base64({"timestamp": ms})}` — генерится клиентом).
 8. **suno.com vs suno.ai** — API на `studio-api-prod.suno.com`; CDN на `cdn1.suno.ai`; auth на `auth.suno.com`.
 9. **Playwright «Browser is already in use»** (профиль `ms-playwright/mcp-chrome-*` залочен зависшим инстансом) → перед стартом убить процессы: PowerShell `Get-CimInstance Win32_Process -Filter "Name='chrome.exe'" | ? {$_.CommandLine -match 'mcp-chrome'} | % {Stop-Process -Id $_.ProcessId -Force}`, затем `browser_navigate` заново.
-10. **Custom-mode payload (для будущего fix headless):** `metadata.create_mode:"custom"` + `prompt`=lyrics + `tags`=style (НЕ `gpt_description_prompt`). Сейчас 422 (капча), но это верная схема — если появится способ отдавать валидный `browser-token`/captcha-solve, headless custom заработает этим телом.
+10. **Custom-mode payload (для будущего fix headless):** `metadata.create_mode:"custom"` + `prompt`=lyrics + `tags`=style (НЕ `gpt_description_prompt`). Сейчас 422 (капча), но это верная схема — если появится штатный способ передавать валидный `browser-token`, headless custom заработает этим телом.
 
 ## Файлы
 
 - `scripts/suno_client.py` — клиент (token mint, billing, list, status, download, generate, wait_clips, make_track) + CLI.
 
-Реверс-инжиниринг проведён 2026-06-05 (сессия видео-поздравления [Client]). Проверено headless: token/billing/list/download/generate/make — всё работает без браузера.
+Схема вызовов зафиксирована 2026-06-05 по работе через свою авторизованную сессию. Проверено headless: token/billing/list/download/generate/make — всё работает без браузера.

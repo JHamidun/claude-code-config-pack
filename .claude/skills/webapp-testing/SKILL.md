@@ -1,6 +1,6 @@
 ---
 name: webapp-testing
-description: "Test local web apps with Playwright: verify UI, debug behavior, screenshots, browser logs. Triggers: «test the site», «browser logs»."
+description: "Проверка локального веб-фронта через Playwright: UI, скриншоты, консоль. Триггеры: «протестируй сайт», «логи браузера». НЕ e2e-набор→playwright-automation."
 license: Complete terms in LICENSE.txt
 type: actionable
 ---

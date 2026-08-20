@@ -1,14 +1,15 @@
-# Manus 1.6 — каталог 26 тем слайдов (реверс 2026-07-01/02)
+# Каталог 26 тем слайдов в стиле Manus 1.6
 
-Источник: живой network-capture `POST api.manus.im/session.v1.SessionPublicService/ListSlideTemplatesPublic` (26 тем, все official + free, status FINISHED).
-Сырой JSON: `${WORKSPACE}\manus-extraction-2026-07-01\slide_templates_catalog_api.json`.
+Описания тем — наблюдения за продуктом (июль 2026): что за визуальный язык, каким
+способом рендерится, где уместна. Это ориентир для СВОИХ шаблонов, а не выгрузка
+чужого каталога.
 Превью (смотрены глазами, описания ниже — по ним): `${WORKSPACE}\manus-extraction-2026-07-01\slide_templates_previews\<Тема>__<режим>__<модель>.webp`.
 Полные 8-слайдовые сэмплы для 7 image-тем: `references/manus-theme-samples/<Theme>__<model>/`.
 
-## Как это устроено у Manus (наблюдено e2e + реверс бинаря)
+## Как устроен такой пайплайн
 
 1. Агент пишет **markdown-outline** (`# Title`, `## Слайд N: …`) → тул `slides` с `generate_mode: html | image`.
-2. Режим и модель привязаны к теме (поля `slidesGenerateMode` f12 / `imageSlidesModel` f13 в `SlideTemplate`, оба — строки, приходят с сервера):
+2. Режим рендера и модель привязаны к теме:
    - `image` + **nano-banana** → Whiteboard, Sketch (в UI шаг «Generating with Nano Banana Pro»);
    - `image` + **gpt-image** → Etching, Editorial, Pixel, Vellum, Dossier (GPT Image 2);
    - пустой режим = **html/react** → остальные 19 тем (LLM пишет React/HTML, рендер headless-Chromium).

@@ -64,7 +64,7 @@ When invoked, follow these phases systematically:
 2. **Map requirements and constraints**:
    - Expected traffic and load patterns
    - Uptime requirements (SLA targets)
-   - Budget constraints (your-server: 6 vCPU, 16GB RAM, 300GB SSD)
+   - Budget constraints (your-server: <план вашего VPS>)
    - Compliance or regulatory requirements
 3. **Identify risks**:
    - Single points of failure

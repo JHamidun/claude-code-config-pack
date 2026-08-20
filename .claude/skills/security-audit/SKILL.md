@@ -1,6 +1,6 @@
 ---
 name: security-audit
-description: "Security audit: secret scanning, dependency audit, OWASP Top 10 checks, code review. Triggers: «security audit», «check for vulnerabilities»."
+description: "Security-аудит: секреты в коде, pip/npm audit, OWASP Top 10. Триггеры: «аудит безопасности», «проверь на уязвимости»."
 ---
 
 # Security Audit Skill

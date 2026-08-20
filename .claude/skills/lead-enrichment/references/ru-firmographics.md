@@ -30,7 +30,7 @@ Returns: name, inn, ogrn, kpp, address, **director**, status, reg_date, kind (ul
 
 - **Rusprofile** (rusprofile.ru) — free: реквизиты, ОКВЭД, руководитель, финансы (Росстат), связанные лица. Fast manual check.
 - **Checko** (checko.ru) — free card: ИНН/ОГРН, выручка, налоги, госконтракты, арбитраж, аффилированность, **связанные лица и их др. компании**. Has a paid API; without a key, fetch the public card via WebFetch and extract.
-- **The combo Pavel mentioned (checko.ru + nalog.ru):** checko.ru gives the rich company picture (finances, links, risks); `egrul.nalog.ru` gives the authoritative legal extract (director, status, founders). Use checko for breadth, ЕГРЮЛ to verify the legal facts. Это про **компанию**, не про человека.
+- **The checko + nalog combo:** checko.ru gives the rich company picture (finances, links, risks); `egrul.nalog.ru` gives the authoritative legal extract (director, status, founders). Use checko for breadth, ЕГРЮЛ to verify the legal facts. Это про **компанию**, не про человека.
 
 ## 4. Domain → company
 
