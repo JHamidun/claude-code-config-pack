@@ -269,7 +269,7 @@
 | Лиды | "lead research", "поиск лидов", "qualify leads" | Skill `lead-research` |
 | Manus | "manus agent", "autonomous agent", "manus task" | Skill `manus` |
 | MCP builder | "создай MCP", "build MCP server", "MCP сервер" | Skill `mcp-builder` |
-| MCP usage | "как использовать MCP", "MCP tools", "какой MCP сервер" | Read `config/mcp-servers.md` (skill mcp-usage merged туда 2026-07-18, секция «Советы по выбору») |
+| MCP usage | "как использовать MCP", "MCP tools", "какой MCP сервер" | Read `config/mcp-servers.md` — секция «Советы по выбору» (отдельного навыка нет, всё там) |
 | Анализ встреч | "анализ встречи", "meeting analysis", "action items" | Skill `meeting-analyzer` |
 | OCR восстановление | "OCR", "распознай скан", "garbled text" | Skill `ocr-restore` |
 | PDF обработка | "обработай PDF", "merge PDF", "split PDF", "fill PDF form" | Skill `pdf` |

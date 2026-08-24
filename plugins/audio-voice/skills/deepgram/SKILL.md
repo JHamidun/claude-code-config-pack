@@ -12,10 +12,34 @@ Expert skill for audio transcription and speech-to-text using Deepgram - fast, a
 ## API Key
 
 ```bash
-# API ключи: ~/.claude/.credentials.master.env
-# Переменная: DEEPGRAM_API_KEY
-DEEPGRAM_API_KEY=os.getenv('DEEPGRAM_API_KEY')
+# ~/.claude/.credentials.master.env — впиши САМ КЛЮЧ, не код на Python
+DEEPGRAM_API_KEY=ВСТАВЬ_СЮДА_СВОЙ_КЛЮЧ   # https://console.deepgram.com/
 ```
+
+> Строка `DEEPGRAM_API_KEY=os.getenv('DEEPGRAM_API_KEY')` ключ НЕ настраивает: это
+> непустое значение, любая проверка `if not key` сочтёт ключ заданным, запрос уйдёт с
+> этим текстом и вернётся `401` без объяснения. В коде читай ключ так:
+> `os.getenv('DEEPGRAM_API_KEY')` — но в файле `.credentials.master.env` должен лежать
+> сам ключ. Файл не подгружается сам: `load_dotenv(Path.home()/'.claude'/'.credentials.master.env')`.
+
+<!-- no-key-block -->
+## Ключа нет — что тогда
+
+`DEEPGRAM_API_KEY` платный и бесплатного тарифа под серьёзный объём не даёт.
+Без него любой запрос вернётся `401 INVALID_AUTH` — по тексту не понять, что ключ
+просто не задан.
+
+Чем заменить:
+
+| Задача | Без ключа |
+|--------|-----------|
+| расшифровать аудио/видео локально | `openai-whisper` (строка в `requirements-optional.txt`), `whisper <файл> --language ru`. Медленнее, диаризации нет, качество на чистой речи сопоставимо |
+| диаризация (кто что сказал) | `whisperx` (там же в optional) — выравнивание + разметка дикторов локально |
+| встречи, которые уже записаны сервисом | транскрипт обычно отдаёт сам сервис записи — забери готовый, расшифровывать нечего |
+| субтитры к готовому ролику | навык `submagic` (свой ключ) или `video-editor` поверх whisper |
+
+Навык `meeting-analyzer` тоже зовёт Deepgram — но только на шаге транскрипции;
+разбор готового транскрипта в нём ключа не требует.
 
 ## When to Use Deepgram
 

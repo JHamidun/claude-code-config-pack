@@ -38,7 +38,7 @@ id: feedback-kp-use-deck-factory
 type: feedback
 status: active
 trigger: "user asks for a КП / commercial proposal for a client"
-action: "Build via skill kp-deck-factory + donor deck (kp-client-a/kp-client-b/kp-client-c), never ad-hoc HTML. Jargon fixes: топы→руководители."
+action: "Собирать из шаблона и донор-дека, а не вёрсткой с нуля. Правка жаргона: топы→руководители."
 confidence: 0.95
 evidence:
   - "2026-07-16: ad-hoc HTML КП rejected by YourFirstName, redone via deck-factory"
@@ -129,7 +129,7 @@ Dream rebuilds this block on every pass. No hook, no cron — dream itself does 
 ```markdown
 <!-- TOP-INSTINCTS:BEGIN — auto-rebuilt by dream, do not hand-edit -->
 ## TOP-INSTINCTS (K=7 · rebuilt 2026-07-18)
-1. `0.95` КП Company → только kp-deck-factory + донор-дек, не ad-hoc HTML — [feedback-kp-use-deck-factory](feedback-kp-use-deck-factory.md)
+1. `0.95` КП клиенту → только шаблон плюс донор-дек, не вёрстка с нуля — пример записи о предпочтении
 2. `0.93` Всё публичное/внешнее → leak-scan ДО заливки — [feedback_depersonalize_before_upload](feedback_depersonalize_before_upload.md)
 3. `0.91` UI-мокапы → HTML-мок + chrome-devtools скрин, не image-генерация — [ui-mockups-via-devtools](ui-mockups-via-devtools.md)
 ...
