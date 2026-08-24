@@ -22,11 +22,10 @@ always_consider:
 
 # Граф связей: после X стоит подумать о Y
 edges:
-  design-orchestrator: [questions-protocol, frontend-design, content-rules, design-guide, cookbook, project-init]
+  design-orchestrator: [questions-protocol, frontend-design, content-rules, design-guide, cookbook]
 
   # Процесс
   questions-protocol: [design-orchestrator]
-  project-init: [design-system-create, frontend-design]
   moodboard: [design-system-create, color-system-builder]
 
   # Артефакты
@@ -37,7 +36,7 @@ edges:
   animations: [video-export, scaling-stage, verifier]
   wireframe: [slides, interactive-prototype, design-canvas]
   mobile-overlays: [interactive-prototype, microinteractions, device-frames]
-  tweaks-panel: [tweaks-persist, version-snapshots]
+  tweaks-panel: [version-snapshots]
   microinteractions: [animations]
   placeholders: [interactive-prototype, slides]
   comment-injector: [live-preview]
@@ -86,9 +85,8 @@ edges:
 
   # Расширения преимуществ (нативной web-среды)
   live-preview: [tweaks-panel, comment-injector, version-snapshots]
-  visual-edit: [live-preview, version-snapshots, tweaks-persist]
+  visual-edit: [live-preview, version-snapshots]
   version-snapshots: [live-preview]
-  tweaks-persist: [tweaks-panel, version-snapshots]
 
 # Рецепты cookbook → скиллы
 recipes:
@@ -99,4 +97,4 @@ recipes:
   social-explainer:  [questions-protocol, wireframe, frontend-design, animations, placeholders, verifier, video-export]
   email-newsletter:  [questions-protocol, frontend-design, html-email, license-check, verifier]
   pwa-app:           [questions-protocol, frontend-design, design-system-create, interactive-prototype, mobile-overlays, microinteractions, pwa-shell, verifier, proto-smoketest]
-  iterative-design:  [project-init, live-preview, tweaks-panel, tweaks-persist, version-snapshots, visual-edit]
+  iterative-design:  [live-preview, tweaks-panel, version-snapshots, visual-edit]
