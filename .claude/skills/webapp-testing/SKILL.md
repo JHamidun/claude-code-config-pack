@@ -50,6 +50,19 @@ python scripts/with_server.py \
   -- python your_automation.py
 ```
 
+**When it refuses (exit code 3): `port already in use before starting anything`.**
+A previous run left a server behind, or something else owns the port. The script
+prints the holding PID and the exact command to stop it. Do that — do **not** work
+around it: a second server cannot bind the port, so the run would silently test the
+*old* code that is still answering. If you deliberately want to test whatever is
+already up, pass `--reuse-running`.
+
+The server's own stdout/stderr is written to a temp log whose path is printed; on a
+failed start its last lines are shown, so "server failed to start" always comes with
+the server's own reason. Cleanup kills the whole process tree (a shell started with
+`cd x && npm run dev` is not the server), then re-probes the port and warns loudly if
+anything is still listening.
+
 To create an automation script, include only Playwright logic (servers are managed automatically):
 ```python
 from playwright.sync_api import sync_playwright

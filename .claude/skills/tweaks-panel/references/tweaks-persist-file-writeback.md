@@ -88,6 +88,6 @@ node live.mjs index.html           # терминал 2
 
 При сохранении в tweaks-panel — файл переписывается, live-preview перезагружает страницу с новыми defaults.
 
-## Legacy reference
+## Если короткого описания не хватило
 
-Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-tweaks-persist.md`. Секции там: localStorage tier (auto), CSS file tier (manual «Save»), Sidecar JSON (без overwrite tokens.css), Multi-state (compare versions), Reset to defaults, Stack, Антипаттерны.
+Прежняя, более длинная версия лежит целиком в `legacy-tweaks-persist.md` (рядом, в этой же папке). Секции там: localStorage tier (auto), CSS file tier (manual «Save»), Sidecar JSON (без overwrite tokens.css), Multi-state (compare versions), Reset to defaults, Stack, Антипаттерны.

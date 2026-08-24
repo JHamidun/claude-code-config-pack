@@ -68,7 +68,7 @@ share) — `references/programmatic-strategy.md`.
 - SEO под Яндекс, Wordstat, семантическое ядро, кластеризация → `seo-machine-ru` + `yandex`.
 - **YMYL-ниши** (медицина, финансы, право) — там нельзя массово AI-генерить, нужны E-A-T,
   карточки экспертов, ручная экспертиза → `seo-machine-ru` (E-A-T режим), `schema-markup-ru`.
-- GEO/AEO **одной** страницы под Нейро/Alice/(regional LLM B) → `seo-machine-ru` (`references/aeo-geo.md`).
+- GEO/AEO **одной** страницы под Нейро/Alice/GigaChat → `seo-machine-ru` (`references/aeo-geo.md`).
 - Посты в соцсети/Telegram → `tg-post`, `content-engine`.
 
 > **Главное ограничение метода:** «Полная автоматизация невозможна — исследование ключей требует
@@ -193,7 +193,7 @@ Low-code workflow на **n8n** (можно Gumloop / Relevance.ai). В прод�
 | Schema (Service / AreaServed / FAQ) | разметка programmatic-страниц | `schema-markup-ru` |
 
 > GEO/AEO (попасть в ответы AI) живёт в `seo-machine-ru` → `references/aeo-geo.md`
-> (Яндекс Нейро / Alice / (regional LLM B) / ChatGPT / Perplexity). Отдельного скилла `geo-aeo-ru` пока нет —
+> (Яндекс Нейро / Alice / GigaChat / ChatGPT / Perplexity). Отдельного скилла `geo-aeo-ru` пока нет —
 > если появится, перелинковать сюда.
 
 ---
@@ -250,7 +250,7 @@ Low-code workflow на **n8n** (можно Gumloop / Relevance.ai). В прод�
 ## Связанные скиллы (cross-links)
 
 - **`seo-machine-ru`** — общая SEO/GEO/AEO контент-машина под Яндекс (Python-пайплайн качества,
-  семантика, кластеризация, написание/оптимизация одной статьи, AEO под Нейро/Alice/(regional LLM B)). **Для
+  семантика, кластеризация, написание/оптимизация одной статьи, AEO под Нейро/Alice/GigaChat). **Для
   русскоязычного SEO-контента под Яндекс и общей SEO-стратегии — туда.** Этот скилл — про массовую
   программатическую генерацию через n8n.
 - **`n8n`** — движок оркестрации workflow (узлы, триггеры, импорт/экспорт JSON).

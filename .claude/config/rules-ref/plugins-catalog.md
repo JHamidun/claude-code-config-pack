@@ -2,20 +2,23 @@
 
 # Plugins Catalog
 
-> 38 plugins total (see settings.json). All from settings.json `enabledPlugins`.
-> Last updated: see git history
+> **Источник истины — `settings.json` → `enabledPlugins`.** На момент правки там
+> 33 записи: 29 включены (`true`), 4 выключены (`false`: linear, notion,
+> pdf-viewer, telegram). Каталог ниже сгенерирован из этого списка; при
+> расхождении верь settings.json, не документу.
 
 ---
 
-## Core Development (5)
+## Core Development (6)
 
 | Plugin | What It Does | Key Commands/Skills |
 |--------|-------------|---------------------|
-| code-review | Automated code review with checklists | /code-review, review-pr |
+| code-review | Automated code review with checklists | /code-review |
 | pr-review-toolkit | Multi-agent PR review (reviewer, simplifier, type analyzer) | /review-pr |
 | feature-dev | Guided feature development with architecture focus | /feature-dev |
 | code-simplifier | Refines code for clarity after implementation | Auto-triggers after coding |
 | commit-commands | Git commit, push, PR workflow | /commit, /commit-push-pr |
+| claude-security | Security scan pipeline: inventory → research → verify → patch | /claude-security |
 
 ## Language Servers (2)
 
@@ -26,43 +29,40 @@
 
 ## Frontend & Design (2)
 
-| Plugin | What It Does | Key Skills |
-|--------|-------------|-----------|
-| frontend-design | Production-grade UI with high design quality | /frontend-design |
-| figma | Figma design to code, Code Connect components | /implement-design, /code-connect |
+| Plugin | What It Does |
+|--------|-------------|
+| frontend-design | Production-grade UI with high design quality |
+| playground | Interactive HTML playgrounds for prototyping |
 
-## Infrastructure & Agents (4)
+## Infrastructure, Agents & Plugin Dev (6)
 
 | Plugin | What It Does |
 |--------|-------------|
 | agent-sdk-dev | Build Claude Agent SDK applications |
 | claude-code-setup | Analyze codebase, recommend automations |
 | claude-md-management | Audit and improve CLAUDE.md files |
-| playground | Interactive HTML playgrounds for prototyping |
-
-## Code Quality (3)
-
-| Plugin | What It Does |
-|--------|-------------|
-| security-guidance | Security best practices, vulnerability detection |
-| semgrep | Static analysis with Semgrep rules |
 | plugin-dev | Create and validate plugins (skills, agents, hooks, commands) |
+| mcp-server-dev | Build MCP servers and MCP apps |
+| hookify | Create hooks from natural-language rules |
 
-## Integrations (11)
+## Integrations (7)
 
 | Plugin | Service | Key Use Case |
 |--------|---------|-------------|
 | github | GitHub | PRs, issues, repos, actions |
-| slack | Slack | Messages, channels, search |
-| linear | Linear | Tasks, issues, sprints |
-| sentry | Sentry | Error monitoring, debugging |
-| notion | Notion | Knowledge base, databases |
+| linear *(disabled)* | Linear | Tasks, issues, sprints |
+| notion *(disabled)* | Notion | Knowledge base, databases |
 | firecrawl | Firecrawl | URL extraction, site crawling |
 | coderabbit | CodeRabbit | AI code review on PRs |
 | greptile | Greptile | AI review for GitHub/GitLab repos |
 | context7 | Library docs | Up-to-date API documentation for any library |
-| mintlify | Mintlify | Documentation sites generation |
-| sourcegraph | Sourcegraph | Code search across repositories |
+
+## Search & Docs (2)
+
+| Plugin | What It Does |
+|--------|-------------|
+| sourcegraph | Code search across repositories |
+| pdf-viewer *(disabled)* | View and read PDF files |
 
 ## Browser & Testing (2)
 
@@ -71,44 +71,39 @@
 | playwright | Browser automation, E2E testing, screenshots |
 | dev-browser | Browser with persistent state, cookies, login sessions |
 
-## AI & Specialized (4)
+## Workflow & Reporting (5)
 
 | Plugin | What It Does |
 |--------|-------------|
-| huggingface-skills | HuggingFace model training, datasets, inference |
-| superpowers | Core workflow enhancements |
+| superpowers | Core workflow enhancements (brainstorming, TDD, debugging) |
 | ralph-loop | Recurring task execution loop |
 | skill-creator | Create and benchmark skills |
-
-## Automation & SaaS (2)
-
-| Plugin | What It Does |
-|--------|-------------|
-| zapier | Zapier automation integration (5000+ apps) |
-| adspirer-ads-agent | Google/Meta/LinkedIn ad campaign management |
-
-## Domain-Specific (2)
-
-| Plugin | What It Does |
-|--------|-------------|
-| laravel-boost | Laravel PHP development patterns *(disabled)* |
-| legalzoom | Legal document analysis and guidance |
+| receipts | Usage & impact report from local session transcripts |
+| project-artifact | Project status artifact pages |
 
 ## Channels & Communication (1)
 
 | Plugin | What It Does |
 |--------|-------------|
-| telegram | Channels — управление Claude Code через Telegram-бота |
+| telegram *(disabled)* | Channels — управление Claude Code через Telegram-бота |
 
 ---
+
+## Not in this pack (ставятся из official marketplace при желании)
+
+`slack`, `sentry`, `semgrep`, `security-guidance`, `figma`, `huggingface-skills`,
+`mintlify`, `zapier`, `adspirer-ads-agent`, `laravel-boost`, `legalzoom` — в
+старых версиях этого каталога значились как установленные; в паке их НЕТ.
+Нужен такой — `/plugin` → marketplace, а потом впиши строку в `enabledPlugins`.
 
 ## Summary by Source
 
 | Source | Count |
 |--------|-------|
-| claude-plugins-official | 37 |
+| claude-plugins-official | 31 |
 | dev-browser-marketplace | 1 |
-| **Total** | **38** (35 enabled, 3 disabled: mintlify, zapier, laravel-boost) |
+| knowledge-work-plugins | 1 |
+| **Total** | **33** (29 enabled, 4 disabled: linear, notion, pdf-viewer, telegram) |
 
 ## Plugin Management
 
@@ -121,6 +116,5 @@
 ## When to Disable
 
 - Language servers (pyright-lsp, typescript-lsp) only useful when working with that language
-- Domain-specific (laravel-boost, legalzoom) only if working in that domain
-- Marketplace plugins (dev-browser, adspirer-ads-agent) if not actively used
+- Marketplace plugins (dev-browser) if not actively used
 - Removing unused plugins reduces prompt size and saves tokens

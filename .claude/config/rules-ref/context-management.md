@@ -6,8 +6,8 @@
 
 | Model | Window | Effective (after system prompt) |
 |-------|--------|-------------------------------|
-| Opus 4.6 | 1M tokens | ~900K usable |
-| Sonnet 4.5 | 200K tokens | ~180K usable |
+| Opus 5 | 1M tokens | ~900K usable |
+| Sonnet 5 | 200K tokens | ~180K usable |
 | Haiku 4.5 | 200K tokens | ~180K usable |
 
 ## When to /compact

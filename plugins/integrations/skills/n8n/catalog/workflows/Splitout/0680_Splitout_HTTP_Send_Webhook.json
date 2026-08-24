@@ -160,7 +160,7 @@
         "options": {},
         "subject": "=Here are Top HN Recommendations for Learning {{ $('GetTopicFromToLearn').item.json[\"I want to learn\"] }}",
         "toEmail": "={{ $('GetTopicFromToLearn').item.json[\"What's your email ?\"] }}",
-        "fromEmail": "allsmallnocaps@gmail.com"
+        "fromEmail": "REPLACE_ME@example.com"
       },
       "credentials": {
         "smtp": {

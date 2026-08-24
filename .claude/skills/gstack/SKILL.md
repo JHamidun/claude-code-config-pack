@@ -15,18 +15,21 @@ type: actionable
 ## Preamble (run first)
 
 ```bash
-_UPD=$(~/.claude/skills/gstack/bin/gstack-update-check 2>/dev/null || .claude/skills/gstack/bin/gstack-update-check 2>/dev/null || true)
+# Call the helpers through bash: they ship without the exec bit, so running
+# them directly is a silent no-op. A failure is reported, never swallowed.
+_GS="$HOME/.claude/skills/gstack"; [ -f "$_GS/bin/gstack-update-check" ] || _GS=".claude/skills/gstack"
+_UPD=$(bash "$_GS/bin/gstack-update-check" 2>&1) || _UPD="UPDATE_CHECK_BROKEN: $_UPD"
 [ -n "$_UPD" ] && echo "$_UPD" || true
 mkdir -p ~/.gstack/sessions
 touch ~/.gstack/sessions/"$PPID"
 _SESSIONS=$(find ~/.gstack/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
 find ~/.gstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_CONTRIB=$(~/.claude/skills/gstack/bin/gstack-config get gstack_contributor 2>/dev/null || true)
+_CONTRIB=$(bash "$_GS/bin/gstack-config" get gstack_contributor 2>/dev/null || true)
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"
 ```
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/gstack/gstack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running gstack v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/gstack/gstack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running gstack v{to} (just updated!)" and continue. If `UPDATE_CHECK_UNAVAILABLE <ver> <reason>` or `UPDATE_CHECK_BROKEN …`: the version check could not run — say so in one line and continue; do not treat it as up to date.
 
 ## AskUserQuestion Format
 
@@ -97,9 +100,15 @@ fi
 ```
 
 If `NEEDS_SETUP`:
-1. Tell the user: "gstack browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
-2. Run: `cd <SKILL_DIR> && ./setup`
-3. If `bun` is not installed: `curl -fsSL https://bun.sh/install | bash`
+1. Check for the builder FIRST — the binary is produced by `bun build --compile`, npm has no
+   equivalent, and no prebuilt binary ships with the pack: `command -v bun`.
+   If missing, tell the user and install it (needs a NEW shell afterwards — bun edits PATH):
+   - macOS / Linux: `curl -fsSL https://bun.sh/install | bash`
+   - Windows: `powershell -c "irm bun.sh/install.ps1 | iex"`
+2. Tell the user: "gstack browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
+3. Run: `cd "$HOME/.claude/skills/gstack" && bash ./setup`
+   (call it through `bash`: the file may arrive without the exec bit, and then `./setup`
+   answers `Permission denied` instead of building).
 
 ## IMPORTANT
 

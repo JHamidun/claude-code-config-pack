@@ -9,11 +9,29 @@ Example:
     python utils/package_skill.py skills/public/my-skill
     python utils/package_skill.py skills/public/my-skill ./dist
 """
+# UTF-8 на выход. Консоль Windows по умолчанию cp1251/cp866/cp1252, и первый же
+# не-ASCII символ (кириллица, →, ✓) валит процесс UnicodeEncodeError — обычно на
+# --help, то есть ДО любой полезной работы. errors="replace" оставляет вывод
+# читаемым, если терминал всё же не UTF-8.
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 import fnmatch
 import sys
 import zipfile
 from pathlib import Path
+# Запуск двумя способами, а не одним. Импорт `scripts.*` работает, только когда на
+# sys.path стоит КОРЕНЬ навыка — это даёт `python -m scripts.<имя>` из каталога навыка.
+# Прямой `python scripts/<имя>.py` кладёт на sys.path сам каталог scripts/, и тот же
+# импорт падает `ModuleNotFoundError: No module named 'scripts'` — при папке scripts,
+# лежащей на виду. Добавляем корень навыка сами: тогда обе формы запуска рабочие.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from scripts.quick_validate import validate_skill
 
 # Patterns to exclude when packaging skills.

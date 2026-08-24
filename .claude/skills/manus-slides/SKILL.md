@@ -209,7 +209,7 @@ deck/
 - **PowerPoint lock:** if the target .pptx is open, `assemble` raises `PermissionError`. Fall back to a new name (`import assemble; assemble.OUT_NAMES['slides']='..._обновлено.pptx'; assemble.main('slides')`) and tell the user to close the original.
 - **QA before delivery:** montage `exec_raw/*.png` into 2–3 contact sheets (PIL, 4×4) and eyeball the whole deck.
 
-### Slide text + speaker notes: NO infobiz, human language ⭐ (YourFirstName's hard rule)
+### Slide text + speaker notes: NO infobiz, human language ⭐
 On-slide text AND speaker notes must read like a human, not an info-business coach. Strip on every pass:
 - Empty value-less framing: «Инструмент мощный, но толк только если правильно», «честная рамка, чтобы не разочароваться».
 - Hype adjectives: «прям клад», «огонь», «золото», «кайф», vague «в десять раз».
@@ -217,8 +217,8 @@ On-slide text AND speaker notes must read like a human, not an info-business coa
 - Garbled idioms: «не молотком по гвоздику» → plain («простую — лёгкой моделью, сложную — мощной»).
 Replace each with a concrete, useful statement or cut it. Bottom-marker lines should teach or instruct, not motivate.
 
-### Speaker-notes voice for YourFirstName's decks
-Write `notes.py` in the speaker's real spoken voice — заведи собственный voice-profile файл (в пак он не входит: голос спикера — вещь личная) with concrete markers: metronome/filler openers for transitions, favourite connectives, peer-address forms, homely analogies, self-irony on glitches.
+### Speaker-notes voice
+Write `notes.py` in the **speaker's real spoken voice**, not in deck-English. The voice sample does not ship with the pack — how a specific person talks is personal data, and someone else's markers in your notes read as a forgery. Take yours from `~/.claude/voice-sample.md` (шаблон — `~/.claude/templates/voice-sample.md`); if the speaker is not you, ask for 2-3 transcripts of their own talks and pull the markers from there: metronome/filler openers for transitions, favourite connectives, forms of address to the room, homely analogies, self-irony on glitches. No sample and no time to get one — write plainly and say so in the handoff, instead of inventing a voice.
 
 ### slide_manager.py (HTML Mode Core)
 

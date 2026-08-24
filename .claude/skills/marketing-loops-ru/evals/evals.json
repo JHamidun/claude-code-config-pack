@@ -4,10 +4,10 @@
     {
       "id": 1,
       "prompt": "Хочу еженедельную петлю, которая следит за SEO news.your-domain.com и говорит, что делать. Настрой.",
-      "expected_output": "Читает yourname-marketing-context первым. Мапит на SEO-петли каталога (keyword-gap / ranking-drop / content-decay), предлагает ближайшую. Подаёт петлю через 9-частную анатомию, каденция еженедельная (обоснована правилом каденции), источники = Яндекс Вебмастер/Wordstat через skill yandex (не Ahrefs/GSC-only). Включает state/идемпотентность и явный stop/bail-out, отмечает что большинство прогонов = no action.",
+      "expected_output": "Читает ~/.claude/business-context.md первым. Мапит на SEO-петли каталога (keyword-gap / ranking-drop / content-decay), предлагает ближайшую. Подаёт петлю через 9-частную анатомию, каденция еженедельная (обоснована правилом каденции), источники = Яндекс Вебмастер/Wordstat через skill yandex (не Ahrefs/GSC-only). Включает state/идемпотентность и явный stop/bail-out, отмечает что большинство прогонов = no action.",
       "files": [],
       "expectations": [
-        "Читает yourname-marketing-context до вопросов",
+        "Читает ~/.claude/business-context.md до вопросов",
         "Выбирает подходящую SEO-петлю из loop-catalog-ru",
         "Все 9 частей анатомии заполнены",
         "Инструменты = Вебмастер/Wordstat/Метрика (skill yandex), не US-стек",

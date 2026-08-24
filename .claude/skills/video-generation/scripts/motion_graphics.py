@@ -20,8 +20,57 @@ import os
 import subprocess
 import sys
 
-FONT = "C:/Windows/Fonts/arialbd.ttf"          # real path (for PIL)
-FONT_FF = FONT.replace(":", "\\:")              # escaped colon (for ffmpeg drawtext)
+# ---------------------------------------------------------------------------
+# Шрифт. Жёсткий "C:/Windows/Fonts/arialbd.ttf" был путём машины автора: на macOS и
+# Linux его нет. Ломалось по двум линиям сразу — PIL в _text_png (→ lower_third, pop)
+# кидал `OSError: cannot open resource`, а ffmpeg drawtext в like_counter/countdown
+# падал через subprocess(check=True). Из шести режимов уцелевал один (progress).
+# Порядок: переменная окружения → системные шрифты трёх ОС → шрифт из самого пака
+# (skills/canvas-design/canvas-fonts, OFL, кириллица есть). Ничего нет — громкий отказ.
+# Ищем ЛЕНИВО, в момент отрисовки: иначе `--help` умирал бы вместе с поиском шрифта.
+# ---------------------------------------------------------------------------
+_SYS_FONTS_BOLD = (
+    "C:/Windows/Fonts/arialbd.ttf", "C:/Windows/Fonts/segoeuib.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+    "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
+    "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+    "/Library/Fonts/Arial Bold.ttf",
+)
+_SYS_FONTS_REG = (
+    "C:/Windows/Fonts/arial.ttf", "C:/Windows/Fonts/segoeui.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+    "/usr/share/fonts/TTF/DejaVuSans.ttf",
+    "/System/Library/Fonts/Supplemental/Arial.ttf",
+    "/Library/Fonts/Arial.ttf",
+)
+
+
+def font_path(bold=True):
+    env = os.environ.get("VIDEO_FONT_BOLD" if bold else "VIDEO_FONT_REGULAR")
+    bundled = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+        "canvas-design", "canvas-fonts",
+        "Montserrat-Bold.ttf" if bold else "Montserrat-Regular.ttf")
+    tried = []
+    for cand in ([env] if env else []) + list(_SYS_FONTS_BOLD if bold else _SYS_FONTS_REG) + [bundled]:
+        tried.append(cand)
+        if cand and os.path.exists(cand):
+            return cand
+    sys.exit(
+        "Шрифт не найден — рисовать оверлей нечем.\n"
+        "  Искал: " + "\n         ".join(tried) + "\n"
+        "  Почини одним из двух:\n"
+        "    1) укажи свой TTF:  VIDEO_FONT_%s=/путь/к/шрифту.ttf\n"
+        "    2) поставь системные шрифты: Linux — fonts-dejavu-core или fonts-liberation.\n"
+        "  Запасной шрифт пака должен лежать здесь: %s" % ("BOLD" if bold else "REGULAR", bundled)
+    )
+
+
+def _font_ff(bold=True):
+    """Тот же путь, но с экранированным двоеточием — этого требует ffmpeg drawtext."""
+    return font_path(bold).replace(":", "\\:")
 
 
 def _run(inp, out, vf):
@@ -32,7 +81,7 @@ def _run(inp, out, vf):
 def like_counter(a):
     vf = ("drawtext=fontfile='%s':text='%%{eif\\:min(%d*(t-%g)/%g\\,%d)\\:d}':"
           "x=(w-tw)/2:y=h*0.5:fontsize=110:fontcolor=white:borderw=6:bordercolor=black:"
-          "enable='between(t,%g,%g)'" % (FONT_FF, a.to, a.start, max(0.1, a.end - a.start), a.to, a.start, a.end))
+          "enable='between(t,%g,%g)'" % (_font_ff(True), a.to, a.start, max(0.1, a.end - a.start), a.to, a.start, a.end))
     _run(a.input, a.output, vf)
 
 
@@ -48,14 +97,14 @@ def countdown(a):
         t0 = a.at + (a.frm - k)
         parts.append("drawtext=fontfile='%s':text='%d':x=(w-tw)/2:y=(h-th)/2:fontsize=240:"
                      "fontcolor=white:borderw=8:bordercolor=black:enable='between(t,%g,%g)'"
-                     % (FONT_FF, k, t0, t0 + 1))
+                     % (_font_ff(True), k, t0, t0 + 1))
     _run(a.input, a.output, ",".join(parts))
 
 
 def _text_png(text, sub, png, fs=64, sfs=34):
     from PIL import Image, ImageDraw, ImageFont
-    f1 = ImageFont.truetype(FONT, fs)
-    f2 = ImageFont.truetype("C:/Windows/Fonts/arial.ttf", sfs)
+    f1 = ImageFont.truetype(font_path(True), fs)
+    f2 = ImageFont.truetype(font_path(False), sfs)
     dummy = ImageDraw.Draw(Image.new("RGBA", (10, 10)))
     b1 = dummy.textbbox((0, 0), text, font=f1)
     tw = b1[2] - b1[0]

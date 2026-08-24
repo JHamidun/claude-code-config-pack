@@ -130,7 +130,7 @@ git blame [affected-file]
 ### Assignment
 - **Owner:** @[developer]
 - **Reviewer:** @[reviewer]
-- **QA:** @[qa-engineer]
+- **QA:** @[qa-specialist]
 
 ### Timeline
 - **ETA for Fix:** [date/time]

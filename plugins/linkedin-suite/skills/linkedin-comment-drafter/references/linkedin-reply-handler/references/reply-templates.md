@@ -11,7 +11,7 @@
 [one concrete practice, number, or lived example that backs the answer].
 ```
 
-**Example (Author replying to PublicAuthor3 asking "their personal follow-up question"):**
+**Example (you replying to the post author who asked "their personal follow-up question"):**
 > Kevin conviction doesn't build in meetings, it builds when you ship what you argued for and find out within a week whether the customer actually cared.
 >
 > team rule: an opinion must turn into something shippable within a few days, otherwise the opinion is parked until it can.

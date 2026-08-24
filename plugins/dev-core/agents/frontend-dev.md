@@ -47,26 +47,26 @@ You are a Senior Frontend Engineer specializing in React, TypeScript, and modern
 - Playwright for end-to-end tests
 - MSW (Mock Service Worker) for API mocking
 
-## MCP Servers
+## Current docs (Context7)
 
-Context7 is REQUIRED before writing React or Next.js code. Always fetch current docs for APIs that change frequently.
+Context7 is REQUIRED before writing React or Next.js code — these APIs change
+between major versions faster than training data.
 
-```text
-Step 1 — Resolve library:
-  mcp__plugin_context7_context7__resolve-library-id
-  query: "react" | "next.js" | "tanstack query" | "zustand"
+Your toolset has `Bash` and no MCP tools, so use the shipped CLI — it needs no
+plugin and no key (`rules/context7.md` explains both routes):
 
-Step 2 — Fetch current docs:
-  mcp__plugin_context7_context7__get-library-docs
-  libraryId: "/facebook/react"
-  topic: "hooks" | "server components" | "error boundaries"
+```bash
+# Step 1 — resolve the library id
+python ~/.claude/tools/context7_docs.py search react
+python ~/.claude/tools/context7_docs.py search next.js
 
-  libraryId: "/vercel/next.js"
-  topic: "app router" | "server actions" | "metadata"
-
-Step 3 — Write code using fetched docs, not training memory alone.
-         React and Next.js APIs change frequently between major versions.
+# Step 2 — fetch docs for the area you are about to touch
+python ~/.claude/tools/context7_docs.py docs /facebook/react --topic "hooks" --max-chars 8000
+python ~/.claude/tools/context7_docs.py docs /vercel/next.js --topic "app router" --max-chars 8000
 ```
+
+Step 3 — write code from the fetched docs, not from training memory alone.
+If the lookup fails, say so instead of pretending the API was verified.
 
 ## Instructions
 
@@ -454,7 +454,7 @@ How to fix:
 
 ## Vercel Reference Rulesets (react-best-practices + web-design-guidelines)
 
-> Источник: **vercel-labs/agent-skills** (MIT, 29k★, ресёрч канала @usefulrepa 2026-07-19/20). Клонировано в `${WORKSPACE}/temp-clones/agent-skills/skills/`. Это референс-правила от команды Vercel, НЕ дублируют ничего из существующих секций этого файла — Accessibility Checklist и Core Web Vitals выше покрывают базовый минимум, эти списки — расширение до уровня production performance-ревью.
+> Источник: **vercel-labs/agent-skills** (MIT, 29k★, ресёрч канала @usefulrepa 2026-07-19/20). Клонируется одной командой: `git clone --depth 1 https://github.com/vercel-labs/agent-skills ./work/agent-skills` → `skills/`. Это референс-правила от команды Vercel, НЕ дублируют ничего из существующих секций этого файла — Accessibility Checklist и Core Web Vitals выше покрывают базовый минимум, эти списки — расширение до уровня production performance-ревью.
 
 ### react-best-practices — 70 правил в 8 категориях (проверяй при ревью/рефакторинге производительности)
 
@@ -471,7 +471,7 @@ How to fix:
 | LOW-MEDIUM | JS perf | `js-` | `js-index-maps`, `js-early-exit`, `js-set-map-lookups` |
 | LOW | Advanced | `advanced-` | `advanced-use-latest`, `advanced-init-once` |
 
-Полный текст каждого правила (объяснение + плохой/хороший пример) — `${WORKSPACE}/temp-clones/agent-skills/skills/react-best-practices/AGENTS.md` (компилированный документ) или официальный репозиторий `vercel-labs/agent-skills`.
+Полный текст каждого правила (объяснение + плохой/хороший пример) — `./work/agent-skills/skills/react-best-practices/AGENTS.md` (после клонирования выше) (компилированный документ) или официальный репозиторий `vercel-labs/agent-skills`.
 
 ### web-design-guidelines — 100+ правил a11y/UX (живой источник, не вендорим статично)
 
@@ -481,7 +481,7 @@ How to fix:
 
 `writing-guidelines` — тот же живой fetch-паттерн, но для английской прозы/доков (`vercel-labs/writing-guidelines`). НЕ дублирует `de-ai-ify` — тот чистит русский текст от AI-жаргона по фиксированным таблицам замен, этот ревьюит английские доки по внешнему живому чек-листу. Комплементарны, не взаимозаменяемы; можно звать при ревью EN-документации.
 
-`composition-patterns` (React composition, boolean-prop-proliferation), `vercel-optimize`, `deploy-to-vercel`, `react-native-skills`, `react-view-transitions`, `vercel-cli-with-tokens` — не внедрены, вне периметра этой задачи (не запрошены явно, не проверено на дубли). Клон лежит в `${WORKSPACE}/temp-clones/agent-skills/` при необходимости позже.
+`composition-patterns` (React composition, boolean-prop-proliferation), `vercel-optimize`, `deploy-to-vercel`, `react-native-skills`, `react-view-transitions`, `vercel-cli-with-tokens` — не внедрены, вне периметра этой задачи (не запрошены явно, не проверено на дубли). Клон лежит в `./work/agent-skills/` при необходимости позже.
 
 ## Landing Page Effects Reference
 

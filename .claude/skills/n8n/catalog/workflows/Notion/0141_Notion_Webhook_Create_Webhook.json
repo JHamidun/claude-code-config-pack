@@ -30,7 +30,7 @@
     {
       "name": "Sign Up",
       "type": "n8n-nodes-base.webhook",
-      "notes": "Example Input Data: {\"name\":\"John Doe\",\"email\":\"doe.j@northeastern.edu\"}",
+      "notes": "Example Input Data: {\"name\":\"John Doe\",\"email\":\"REPLACE_ME@example.com\"}",
       "position": [
         720,
         130

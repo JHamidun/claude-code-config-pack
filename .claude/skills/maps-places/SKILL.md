@@ -116,7 +116,7 @@ python ~/.claude/tools/places_search.py reverse_geocode --lat 55.7558 --lon 37.6
 6. **Mapbox требует карту при signup** ($0 charge на free tier, но карта нужна для активации)
 7. **Foursquare** — best signup via Google OAuth (избегает CAPTCHAs); требует прочитать Terms+Privacy перед Sign Up
 8. **OCM требует User-Agent** в headers, иначе 403
-9. **Nominatim User-Agent обязателен**, polite policy 1 req/sec — иначе блокирует
+9. **Nominatim User-Agent обязателен**, polite policy 1 req/sec — иначе блокирует. Контакт для него — `NOMINATIM_CONTACT` в `~/.claude/.credentials.master.env`; без него скрипт работает, но предупреждает в stderr (общий дефолтный адрес Nominatim банит целиком)
 10. **Overpass timeout default 180s** — всегда `[timeout:25]`. `out center` для way/relation
 11. **Merge tolerance 0.0005° (~50м)** — Google и Yandex могут давать одно место с >50м разницы
 12. **Yandex Геокодер 403** — `YANDEX_GEOSEARCH_API_KEY` подключён только к Geosearch, для Geocoder API нужно «Привязать к API» в кабинете
@@ -124,7 +124,7 @@ python ~/.claude/tools/places_search.py reverse_geocode --lat 55.7558 --lon 37.6
 
 ## Связано
 
-- `~/.claude/projects/C--Users-youruser/memory/maps-api-setup-2026-05-28.md` — история ключей
+- `~/.claude/templates/.credentials.master.env.example` — какие ключи включают каких провайдеров (раздел «Карты и геоданные»); Airbnb — `APIFY_API_TOKEN`
 - `~/.claude/tools/places_search.py` — основной CLI (shim к скиллу)
 - отдельный навык под Яндекс (в пак не входит) — Метрика/Директ/Диск (не карты)
 - Skill `apify-scraping` — для Airbnb actor

@@ -12,6 +12,13 @@ description: "Диаграмма PNG/JPG → редактируемый DrawIO X
 > **Локальная установка:** `~/Edit-Banana/`
 > **venv:** `~/Edit-Banana/.venv/` (Python 3.11, uv)
 
+> ⚠️ **Пути в примерах ниже записаны в Windows-раскладке venv.** Интерпретатор внутри
+> venv лежит по-разному: Windows — `.venv/Scripts/python.exe`, macOS и Linux —
+> `.venv/bin/python`. Везде дальше по файлу читай `Scripts/python.exe` как
+> `bin/python`, если ты не на Windows; иначе получишь `No such file or directory` при
+> полностью собранном venv и пойдёшь переустанавливать то, что уже стоит.
+> Обёртка `scripts/edit-banana.sh` обе раскладки проверяет сама.
+
 ## Что делает
 
 Превращает статичные изображения диаграмм/таблиц/формул в редактируемые
@@ -120,25 +127,36 @@ Output XML
 - 160 элементов в итоговом DrawIO XML (287 KB)
 - Время: ~3 мин на дискретной видеокарте
 
-## Установка (что уже сделано)
+## Установка (один раз, до первого запуска)
 
-- [x] Git clone `BIT-DataLab/Edit-Banana` → `~/Edit-Banana`
-- [x] Python 3.11 venv через uv → `.venv/`
-- [x] PyTorch + CUDA (GPU stack) (your GPU)
-- [x] Base requirements (fastapi, opencv, scikit-image, pytesseract)
-- [x] SAM3 библиотека (facebook/sam3 clone + pip install -e)
-- [x] BPE vocab → `models/bpe_simple_vocab_16e6.txt.gz`
-- [x] PaddleOCR (paddlepaddle 3.2.2 + paddleocr)
-- [x] `config/config.yaml` с Gemini 2.5 Flash + PaddleOCR
-- [ ] **SAM3 веса** (`models/sam3_ms/sam3.pt`, ~4 GB) — качается с ModelScope, см. ниже
-- [ ] Tesseract (опционально, сейчас используется PaddleOCR)
+Пак несёт только этот навык-инструкцию; сам Edit-Banana ставится с GitHub.
+`~/Edit-Banana` — просто договорённость о месте: положишь в другое — подставляй
+свой путь во всех командах ниже.
+
+```bash
+git clone https://github.com/BIT-DataLab/Edit-Banana ~/Edit-Banana
+cd ~/Edit-Banana
+uv venv --python 3.11 .venv          # Windows: .venv/Scripts/, *nix: .venv/bin/
+uv pip install --python .venv -r requirements.txt
+uv pip install --python .venv torch --index-url https://download.pytorch.org/whl/cu121
+git clone https://github.com/facebookresearch/sam3 && uv pip install --python .venv -e sam3
+uv pip install --python .venv paddlepaddle==3.2.2 paddleocr
+cp config/config.example.yaml config/config.yaml   # вписать GOOGLE_API_KEY и ocr.engine
+```
+
+Отдельно докачать:
+
+- [ ] **BPE vocab** → `models/bpe_simple_vocab_16e6.txt.gz`
+- [ ] **SAM3 веса** (`models/sam3_ms/sam3.pt`, ~4 GB) — с ModelScope, см. ниже
+- [ ] Tesseract — опционально, по умолчанию работает PaddleOCR
 
 ### Если SAM3 веса не докачались
 
 ```bash
 ~/Edit-Banana/.venv/Scripts/python.exe -c "
+import os
 from modelscope import snapshot_download
-snapshot_download('facebook/sam3', cache_dir='${HOME}/Edit-Banana/models_ms_cache', allow_patterns=['sam3.pt'])
+snapshot_download('facebook/sam3', cache_dir=os.path.expanduser('~/Edit-Banana/models_ms_cache'), allow_patterns=['sam3.pt'])
 "
 # → переместить файл в models/sam3_ms/sam3.pt
 mv ~/Edit-Banana/models_ms_cache/facebook/sam3/sam3.pt ~/Edit-Banana/models/sam3_ms/
@@ -162,12 +180,12 @@ winget install UB-Mannheim.TesseractOCR
 
 **Pix2Text** (распознавание формул → LaTeX):
 ```bash
-~/AppData/Local/Programs/Python/Python313/Scripts/uv.exe pip install --python ~/Edit-Banana/.venv/Scripts/python.exe pix2text onnxruntime-gpu
+uv pip install --python ~/Edit-Banana/.venv pix2text onnxruntime-gpu
 ```
 
 **RMBG** (удаление фона у иконок):
 ```bash
-~/AppData/Local/Programs/Python/Python313/Scripts/uv.exe pip install --python ~/Edit-Banana/.venv/Scripts/python.exe onnxruntime modelscope
+uv pip install --python ~/Edit-Banana/.venv onnxruntime modelscope
 cd ~/Edit-Banana && .venv/Scripts/python.exe scripts/setup_rmbg.py
 ```
 
@@ -177,7 +195,7 @@ cd ~/Edit-Banana && .venv/Scripts/python.exe scripts/setup_rmbg.py
 |--------|---------|---------|
 | `no kernel image is available` | GPU arch mismatch | Upgrade PyTorch или `device: "cpu"` в config |
 | `Model file not found at sam3.pt` | Веса не скачались | См. "Если SAM3 веса не докачались" |
-| `PaddleOCR inference failed` | Баг в paddlepaddle 3.3.0+ | Использовать 3.2.2 (уже установлено) |
+| `PaddleOCR inference failed` | Баг в paddlepaddle 3.3.0+ | Поставить ровно 3.2.2 |
 | `Gemini API error 403` | Неправильный ключ | Проверить `GOOGLE_API_KEY` в `.credentials.master.env` |
 | `GatedRepoError` на HF | SAM3 закрыт на HuggingFace | Использовать ModelScope (уже в настройках) |
 

@@ -49,7 +49,7 @@ hf soul-id create --name X --soul-2 --image f1..f5                            # 
 ```
 
 ## Аудио (router/hf или свои ключи)
-TTS: ElevenLabs (свой голос, id в `YOUR_ELEVENLABS_VOICE_ID`) ИЛИ hf voices (60, voices.json). Музыка: ElevenLabs Music / Lyria 2.
+TTS: ElevenLabs (свой голос, id в `$ELEVENLABS_VOICE_ID_RU` — берётся на https://elevenlabs.io/app/voice-lab) ИЛИ hf voices (60, voices.json). Музыка: ElevenLabs Music / Lyria 2.
 Микс: `assemble.py audio_duck video music out` (sidechaincompress) → `loudnorm -14`.
 
 ## Дефолты (проверенные значения)

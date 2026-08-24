@@ -149,7 +149,7 @@
       ],
       "webhookId": "ed0f09b9-4b16-4bf1-af47-208f1e8e3761",
       "parameters": {
-        "sendTo": "aiix.space.noreply@gmail.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
         "options": {},
         "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",

@@ -308,7 +308,7 @@
       ],
       "webhookId": "8c4cf2db-e22b-46e6-b27a-c03044bd38dc",
       "parameters": {
-        "sendTo": "oleg@n8n.io",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "=Greetings 👋,\nHope you're doing well! Here's your digest for this week's episode of Philoshopy This! \n\n<h2>🎙 Episode Summary</h2>\n{{ $json.summary }}\n\n<h2>💡 Topics Discussed</h2>\n{{ $json.topics.join('\\n') }}\n\n<h2>❓ Questions to Ponder</h2>\n{{ $json.questions.join('\\n') }}",
         "options": {},
         "subject": "Podcast Digest"

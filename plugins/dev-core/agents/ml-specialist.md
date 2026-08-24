@@ -60,26 +60,26 @@ import mlflow.pytorch
 import wandb
 ```
 
-## MCP Servers
+## Current docs (Context7)
 
-Context7 is REQUIRED before writing PyTorch or Transformers code. APIs change across versions and training patterns have known pitfalls.
+Context7 is REQUIRED before writing PyTorch or Transformers code: APIs change
+across versions and training patterns have known version-specific pitfalls.
 
-```text
-Step 1 — Resolve library:
-  mcp__plugin_context7_context7__resolve-library-id
-  query: "pytorch" | "transformers" | "scikit-learn" | "mlflow"
+Your toolset has `Bash` and no MCP tools, so use the shipped CLI — it needs no
+plugin and no key (`rules/context7.md` explains both routes):
 
-Step 2 — Fetch current docs:
-  mcp__plugin_context7_context7__get-library-docs
-  libraryId: "/pytorch/pytorch"
-  topic: "training loop" | "DataLoader" | "mixed precision"
+```bash
+# Step 1 — resolve the library id
+python ~/.claude/tools/context7_docs.py search pytorch
+python ~/.claude/tools/context7_docs.py search transformers
 
-  libraryId: "/huggingface/transformers"
-  topic: "Trainer" | "LoRA fine-tuning" | "tokenizer"
-
-Step 3 — Write code using fetched docs.
-         PyTorch and Transformers have significant version-specific behavior.
+# Step 2 — fetch docs for the area you are about to touch
+python ~/.claude/tools/context7_docs.py docs /pytorch/pytorch --topic "mixed precision" --max-chars 8000
+python ~/.claude/tools/context7_docs.py docs /huggingface/transformers --topic "Trainer" --max-chars 8000
 ```
+
+Step 3 — write code from the fetched docs. If the lookup fails, say so instead
+of pretending the API was verified.
 
 ## Instructions
 

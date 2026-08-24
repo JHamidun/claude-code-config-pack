@@ -53,11 +53,11 @@ curl "https://api.openchargemap.io/v3/referencedata/?key=$OPENCHARGEMAP_API_KEY"
   "UsageType": {"ID": 4, "Title": "Public", "IsPayAtLocation": false, "IsMembershipRequired": false, "IsAccessKeyRequired": false},
   "AddressInfo": {
     "ID": 124567,
-    "Title": "Sample Beach Beach Resort",
-    "AddressLine1": "Av. Beira Mar",
+    "Title": "Sample Beach Resort",
+    "AddressLine1": "Av. Atlântica",
     "Town": "Sample City",
-    "StateOrProvince": "PE",
-    "Postcode": "54522-000",
+    "StateOrProvince": "RJ",
+    "Postcode": "22070-000",
     "CountryID": 33,
     "Country": {"ID": 33, "Title": "Brazil", "ISOCode": "BR"},
     "Latitude": -22.971,
@@ -157,8 +157,8 @@ curl "https://api.openchargemap.io/v3/referencedata/?key=$OPENCHARGEMAP_API_KEY"
 
 - **«найди зарядки рядом»** команда в maps-places skill
 - EV-роадтрип Miami → your region: маршрут + зарядки на пути
-- Конкурентный анализ EV-инфраструктуры в Sample State для landing
-- Mapping EV-зарядок для Tilda-блока «инфраструктура Sample District»
+- Конкурентный анализ EV-инфраструктуры по региону для лендинга
+- Mapping EV-зарядок под блок «инфраструктура района» на сайте
 
 ## Документация
 

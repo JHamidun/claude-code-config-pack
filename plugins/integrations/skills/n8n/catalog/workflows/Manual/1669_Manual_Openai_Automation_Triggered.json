@@ -220,7 +220,7 @@
         320
       ],
       "parameters": {
-        "sendTo": "teds.tech.talks@gmail.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "={{ $json.data }}",
         "options": {
           "appendAttribution": false

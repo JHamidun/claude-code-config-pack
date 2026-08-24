@@ -232,7 +232,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "lFlHMbYfTkSZ2HupBHDggMucIq38GQ5QICPstDPVdaHVxn9afY983qnS"
+              "value": "YOUR_API_TOKEN"
             },
             {
               "name": "content",

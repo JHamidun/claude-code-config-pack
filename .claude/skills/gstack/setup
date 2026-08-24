@@ -6,6 +6,28 @@ GSTACK_DIR="$(cd "$(dirname "$0")" && pwd)"
 SKILLS_DIR="$(dirname "$GSTACK_DIR")"
 BROWSE_BIN="$GSTACK_DIR/browse/dist/browse"
 
+# --- Bun. Не «желательно», а единственный способ собрать browse ------------------------
+# package.json собирает бинарь через `bun build --compile` — у npm такой команды нет,
+# и готового `browse/dist/browse` в паке не лежит (он платформозависимый). Без этой
+# проверки первое, что увидит человек, — `setup: line 32: bun: command not found`,
+# и он пойдёт чинить bash. Bun не приезжает ни с одной ОС и не ставится вместе с node.
+if ! command -v bun >/dev/null 2>&1; then
+  cat >&2 <<'EOF'
+gstack setup: не найден bun — собрать браузер browse нечем.
+
+  Почему именно он: сборка идёт командой `bun build --compile`, у npm аналога нет,
+  а готовый бинарь в пак не кладётся (он свой под каждую ОС).
+
+  Поставь:
+    macOS / Linux :  curl -fsSL https://bun.sh/install | bash
+    Windows       :  powershell -c "irm bun.sh/install.ps1 | iex"
+    (или)            brew install oven-sh/bun/bun
+
+  Затем открой НОВЫЙ терминал (bun дописывает себя в PATH) и повтори этот setup.
+EOF
+  exit 1
+fi
+
 ensure_playwright_browser() {
   (
     cd "$GSTACK_DIR"

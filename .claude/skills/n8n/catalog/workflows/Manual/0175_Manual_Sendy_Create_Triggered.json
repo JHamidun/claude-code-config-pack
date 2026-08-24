@@ -22,7 +22,7 @@
         300
       ],
       "parameters": {
-        "email": "harshil@n8n.io",
+        "email": "REPLACE_ME@example.com",
         "listId": "2",
         "additionalFields": {
           "name": "Harshil"
@@ -44,12 +44,12 @@
       ],
       "parameters": {
         "title": "Welcome to n8n",
-        "replyTo": "docs@n8n.io",
+        "replyTo": "REPLACE_ME@example.com",
         "subject": "Welcome to n8n",
         "fromName": "n8n",
         "htmlText": "<body>\n  <p>Hey!</p>\n  <p>Welcome to n8n!</p>\n</body>",
         "resource": "campaign",
-        "fromEmail": "docs@n8n.io",
+        "fromEmail": "REPLACE_ME@example.com",
         "sendCampaign": true,
         "additionalFields": {
           "listIds": "2"

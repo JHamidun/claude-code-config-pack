@@ -63,7 +63,7 @@ apiKey=$HERE_API_KEY"
     "language": "ru",
     "resultType": "place",
     "address": {
-      "label": "Мaroseyka St 15, Moscow 101000, Russia",
+      "label": "Maroseyka St 15, Moscow 101000, Russia",
       "countryCode": "RUS",
       "countryName": "Russia",
       "city": "Moscow",

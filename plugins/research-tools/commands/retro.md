@@ -36,5 +36,5 @@ argument-hint: [sprint number / project name]
 - What, Why, Who, When, How
 
 ### 6. Documentation
-Создай retro document через **docx skill**
+Создай retro document в Markdown; нужен .docx — собери через `python-docx` (пример: `skills/seo-machine-ru/scripts/build_report_docx.py`)
 

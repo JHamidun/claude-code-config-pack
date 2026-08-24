@@ -135,7 +135,7 @@ const CASES = [
   {
     name: 'исполнитель psql -c со сносом базы',
     expect: 'block',
-    cmd: `psql -U postgres -c '${DROP} DATABASE flame_prod;'`,
+    cmd: `psql -U postgres -c '${DROP} DATABASE acme_prod;'`,
   },
   {
     name: 'опасное после безобидного через &&',

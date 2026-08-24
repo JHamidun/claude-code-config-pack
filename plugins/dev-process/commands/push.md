@@ -1,35 +1,53 @@
 ---
-description: Automated release management with version bumping and dual changelog generation
+description: Релиз вручную по шагам — bump версии, два чейнджлога, тег и пуш. Скрипта-автомата нет.
 argument-hint: "[patch|minor|major] [-m message]"
 ---
 
-Execute the release automation script with auto-confirmation for Claude Code.
+# /push — релиз
 
-**Features:**
-- Auto-syncs package.json versions with latest git tag (prevents version conflicts)
-- Analyzes commits since last release
-- Auto-detects version bump type from conventional commits
-- **Generates dual changelogs:**
-  - `CHANGELOG.md` - Technical format (Keep a Changelog) for developers
-  - `RELEASE_NOTES.md` - User-facing format with friendly language for marketing
-- Updates all package.json files
-- Creates git tag and pushes to GitHub
-- Full rollback support on errors
-- **Custom commit message** for uncommitted changes via `--message` / `-m` flag
+**Автоматизации нет.** Команда раньше вызывала `bash .claude/scripts/release.sh` в
+корне проекта. Такого файла в паке нет — ни в `~/.claude/scripts/`, ни где-либо ещё
+(проверяется: `ls ~/.claude/scripts/release.sh`). Всё, что перечислено ниже, делается
+руками по шагам — либо навыком `changelog-generator`, который закрывает пункты 2-3 и
+умеет `gh release`.
 
-**Generated RELEASE_NOTES.md format:**
-- Friendly scope names (auth → Authentication, db → Database)
-- Emojis for visual clarity (✨ Features, 🐛 Fixes, 🔒 Security)
-- Skips technical commits (chore, ci, docs) not relevant to users
-- Ready to copy for announcements, app stores, emails
+Обещание без файла хуже прямого «не автоматизировано»: по нему идут и упираются в
+`bash: .claude/scripts/release.sh: No such file or directory`. На Windows без Git Bash
+до этой строки дело даже не дойдёт — оболочка сначала не найдёт `bash`, и человек
+решит, что дело в нём.
 
-**Tip:** Use `-m` with `feat:` or `fix:` prefix to include your changes in RELEASE_NOTES:
-```bash
-/push patch -m "feat(worker): add worker readiness pre-flight system"
-```
+## Шаги
 
-**Usage:**
+1. **Синхронизировать версию с последним тегом** — иначе `package.json` и
+   `git tag` разъезжаются, и следующий bump считается от неверной базы.
+   ```bash
+   git describe --tags --abbrev=0
+   ```
+2. **Собрать коммиты с прошлого релиза** и определить тип bump'а по conventional
+   commits: `feat:` → minor, `fix:` → patch, `BREAKING CHANGE`/`!` → major.
+   Аргумент `patch|minor|major` перебивает автоопределение.
+   ```bash
+   git log $(git describe --tags --abbrev=0)..HEAD --oneline
+   ```
+3. **Два чейнджлога** — у них разные читатели, поэтому и файлов два:
+   - `CHANGELOG.md` — формат Keep a Changelog, для разработчиков, все коммиты.
+   - `RELEASE_NOTES.md` — для людей: человеческие имена скоупов
+     (auth → Authentication, db → Database), эмодзи по разделам
+     (✨ Features, 🐛 Fixes, 🔒 Security), без `chore`/`ci`/`docs`.
+4. **Проставить версию** во всех `package.json` монорепо (не только в корневом).
+5. **Тег и пуш**:
+   ```bash
+   git tag -a vX.Y.Z -m "release: vX.Y.Z" && git push --follow-tags
+   ```
 
-# Navigate to project root first
-PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
-cd "$PROJECT_ROOT" && bash .claude/scripts/release.sh $ARGUMENTS --yes
+## Откат
+
+Автоматического rollback тоже нет. Если релиз испорчен до пуша — `git tag -d vX.Y.Z`
+и `git reset` на релизный коммит. После пуша тег не переписывать: выпускать
+следующий патч, иначе у тех, кто уже подтянул тег, останется другое содержимое.
+
+## Что стоит сделать перед релизом
+
+Незакоммиченное — отдельным коммитом с осмысленным префиксом, чтобы оно попало в
+`RELEASE_NOTES.md`: `feat(worker): add worker readiness pre-flight system`.
+Коммит без `feat:`/`fix:` в пользовательский чейнджлог не попадёт.

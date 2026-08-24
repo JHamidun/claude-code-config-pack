@@ -37,7 +37,7 @@ curl -X POST "https://demandapi.booking.com/3.1/hotels/search" \
   -u "$BOOKING_AFFILIATE_ID:$BOOKING_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "city_ids": [-647693],
+    "city_ids": [-1234567],
     "checkin": "2026-07-01",
     "checkout": "2026-07-08",
     "guests": {"adults": 2, "children": []},
@@ -59,10 +59,10 @@ curl -X POST "https://demandapi.booking.com/3.1/hotels/details" \
 {
   "data": [{
     "hotel_id": 1234567,
-    "name": "Beach Class Internacional Resort",
-    "address": "Av. Beira Mar, 1000",
+    "name": "Sample Beach Resort",
+    "address": "Av. Atlântica, 1000",
     "city": "Sample City",
-    "city_id": 647693,
+    "city_id": 1234567,
     "country": "BR",
     "country_trans": "Brasil",
     "latitude": -22.971,
@@ -85,7 +85,7 @@ curl -X POST "https://demandapi.booking.com/3.1/hotels/details" \
     "distances": [{"to": "city center", "value": 5.2, "unit": "km"}],
     "free_cancellation": true,
     "breakfast_included": true,
-    "url": "https://www.booking.com/hotel/br/beach-class.html?aid=YOUR_AID"
+    "url": "https://www.booking.com/hotel/br/sample-beach-resort.html?aid=YOUR_AID"
   }],
   "meta": {
     "next_page": null,
@@ -126,7 +126,7 @@ curl -X POST "https://demandapi.booking.com/3.1/hotels/details" \
 
 ```bash
 # В нашем skill apify-scraping
-curl -X POST "https://api.apify.com/v2/acts/voyager~booking-scraper/runs?token=$APIFY_API_KEY" \
+curl -X POST "https://api.apify.com/v2/acts/voyager~booking-scraper/runs?token=$APIFY_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "search": "Sample Beach, Brazil",
@@ -139,7 +139,7 @@ curl -X POST "https://api.apify.com/v2/acts/voyager~booking-scraper/runs?token=$
   }'
 ```
 
-Цена: **~$5 за 1000 listings**. Для Sample District = $1-2.
+Цена: **~$5 за 1000 listings**. Для одного района = $1-2.
 
 ### RapidAPI booking-com15
 
@@ -147,7 +147,7 @@ curl -X POST "https://api.apify.com/v2/acts/voyager~booking-scraper/runs?token=$
 
 ```bash
 curl "https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?\
-dest_id=-647693&\
+dest_id=-1234567&\
 search_type=CITY&\
 arrival_date=2026-07-01&\
 departure_date=2026-07-08&\
@@ -160,7 +160,7 @@ adults=2" \
 
 1. **Approval требует домен с трафиком** — фриланс/personal sites обычно reject
 2. **REST + GraphQL варианты** — Booking рекомендует GraphQL, REST in maintenance
-3. **`city_ids` — internal Booking ID** (отрицательные числа: `-647693` = Sample City) — Lookup через `common/locations`
+3. **`city_ids` — internal Booking ID** (отрицательные числа — города) — узнать ID через `common/locations` lookup
 4. **Currency conversion** на стороне Booking — указывай `currency` в request
 5. **Photos URLs** обрезаны до 200×200 thumbnail, для бóльших — replace `square60` → `square240` в URL
 6. **`aid` обязателен в deeplinks** — без него комиссия теряется

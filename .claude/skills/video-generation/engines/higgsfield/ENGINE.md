@@ -73,6 +73,9 @@ python assemble.py platform_export raw.mp4 final_reels.mp4
 ```bash
 HF="./bin/hf"                     # вендорский Go-бинарь, в репозитории его НЕТ (*.exe в .gitignore).
                                   # Взять релиз github.com/higgsfield-ai/cli (v0.1.40+) и положить в bin/
+                                  # На Windows файл называется bin/hf.exe: HF="./bin/hf.exe"
+                                  # scripts/router.py ищет оба имени сам и в ошибке печатает то,
+                                  # которое ждёт ИМЕННО эта ОС — не ходи искать .exe на маке.
 "$HF" account status              # своя учётная запись и её тариф
 "$HF" auth login                  # только если "Session expired" (device flow)
 "$HF" model list --json           # live-каталог (51). schema: "$HF" model get <jst> --json

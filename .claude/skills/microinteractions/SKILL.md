@@ -195,4 +195,4 @@ function toast(msg, ms = 2500) {
 
 ## Legacy reference
 
-Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-microinteractions.md`. Секции там: 1. Skeleton loader, 2. Hover effects, 3. Scroll-reveal (intersection observer), 4. Click ripple (Material-style), 5. Number ticker, 6. Pulse (attention), prefers-reduced-motion, Антипаттерны.
+Прежняя расширенная версия скилла сохранена целиком в `references/legacy-microinteractions.md`. Секции там: 1. Skeleton loader, 2. Hover effects, 3. Scroll-reveal (intersection observer), 4. Click ripple (Material-style), 5. Number ticker, 6. Pulse (attention), prefers-reduced-motion, Антипаттерны.

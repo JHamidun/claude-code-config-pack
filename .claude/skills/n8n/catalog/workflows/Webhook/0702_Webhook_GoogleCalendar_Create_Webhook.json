@@ -772,8 +772,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "angel@n8n.io",
-          "cachedResultName": "angel@n8n.io"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "resource": "calendar"
       },
@@ -800,8 +800,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "angel@n8n.io",
-          "cachedResultName": "angel@n8n.io"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "additionalFields": {
           "summary": "=TechFin Enterprise Customer Success Meeting with {{ $('Extract Gcal Data').item.json.query.name }}",

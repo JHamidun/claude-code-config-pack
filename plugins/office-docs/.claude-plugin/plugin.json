@@ -3,7 +3,7 @@
   "name": "office-docs",
   "displayName": "Office Documents",
   "version": "0.1.0",
-  "description": "DOCX, XLSX, PDF, EPUB, CSV analysis, file conversion & organization.",
+  "description": "XLSX, PDF, EPUB, CSV analysis, file conversion & organization.",
   "author": {
     "name": "Zhemal Khamidun",
     "url": "https://github.com/JHamidun"

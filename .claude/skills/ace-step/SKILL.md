@@ -1,6 +1,6 @@
 ---
 name: ace-step
-description: "AI-музыка локально (ACE-Step 1.5, на своей видеокарте), CLI scripts/generate.py. Триггеры: «сгенерируй музыку», «сделай трек», «напиши песню». НЕ Suno→suno."
+description: "AI-музыка локально (ACE-Step 1.5, на своей видеокарте), CLI scripts/generate.py. Триггеры: «сгенерируй музыку», «сделай трек», «напиши песню». Всё локально, без облачных сервисов."
 ---
 
 # ACE-Step: AI Music Generation
@@ -60,7 +60,10 @@ cd ~/your-ace-step && uv run python ~/.claude/skills/ace-step/scripts/generate.p
 
 ## Output
 
-- Files saved to `~/Music/ace-step/`
+- Files saved to the user's Music folder, subdirectory `ace-step/`. The script prints the
+  resolved absolute path on every run — read it, do not assume `~/Music`.
+- On a localized Linux the folder is named «Музыка»/«Musique», not `Music`: the path is
+  taken from `xdg-user-dir MUSIC`. Override with `ACE_STEP_OUTPUT_DIR=/where/you/want`.
 - Format: WAV (lossless)
 - First run downloads model weights (~15-25 GB total from HuggingFace)
 

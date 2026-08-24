@@ -33,7 +33,7 @@ To access Anthropic's official brand identity and style resources, use this skil
 
 - **Headings**: Poppins (with Arial fallback)
 - **Body Text**: Lora (with Georgia fallback)
-- **Note**: Fonts should be pre-installed in your environment for best results
+- **Note**: Fonts should be pre-installed in your environment for best results. Both are free (SIL Open Font License) and ship from Google Fonts — `fonts.google.com/specimen/Poppins` and `fonts.google.com/specimen/Lora`. Without them the fallbacks below apply and nothing breaks.
 
 ## Features
 

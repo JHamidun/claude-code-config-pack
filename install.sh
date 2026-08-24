@@ -11,8 +11,8 @@
 #   add-missing (ПО УМОЛЧАНИЮ) — докладываем ТОЛЬКО отсутствующие файлы; всё, что уже
 #                                 есть у тебя (любой версии), не трогаем вообще.
 #   repair (--repair)          — перезаписываем НАШИ базовые файлы свежими.
-# preserve-list (ключи, память, история чатов, tg-сессия, settings.local.json, ~/CLAUDE.md)
-# защищён в ОБОИХ режимах, включая --repair.
+# preserve-list (ключи, память, история чатов, tg-сессия, settings.local.json,
+# ~/.claude/CLAUDE.md) защищён в ОБОИХ режимах, включая --repair.
 #
 # Полная копия-бэкап ~/.claude делается ПЕРВОЙ операцией и ПО УМОЛЧАНИЮ. Это сейф-нет,
 # а НЕ единственная копия: неполный бэкап (занятый файл) = предупреждение, не остановка,
@@ -34,9 +34,13 @@ Usage: ./install.sh [--repair] [--no-backup] [--skip-deps] [--dry-run]
   (без флагов)   добавить только НЕДОСТАЮЩИЕ файлы; существующее не трогать.
                  Резервная копия ~/.claude делается автоматически (копия, не перенос).
   --repair       перезаписать НАШИ базовые файлы свежими. Пользовательское
-                 (ключи, память, история, settings.local.json, ~/CLAUDE.md) всё равно не трогается.
+                 (ключи, память, история, settings.local.json, ~/.claude/CLAUDE.md) не трогается.
   --no-backup    не делать резервную копию ~/.claude (НЕ рекомендуется).
-  --skip-deps    не ставить Python-зависимости (pip install --user -r requirements.txt).
+  --skip-deps    пропустить ОБА шага доводки: pip install --user -r requirements.txt
+                 И setup_runtime.py (браузер Playwright, маркетплейсы плагинов,
+                 node_modules для dev-browser и gstack). Файлы всё равно копируются,
+                 но пак останется наполовину заряженным, пока не запустишь вручную:
+                 python3 ~/.claude/scripts/setup_runtime.py
   --dry-run      только показать, что будет сделано; ничего не менять.
 
 Удаление: ./uninstall.sh (удаляет только то, что положил этот установщик).
@@ -54,9 +58,9 @@ for arg in "$@"; do
             echo "ПРИМЕЧАНИЕ: --backup больше не нужен — резервная копия делается по умолчанию"
             echo "            и теперь это КОПИЯ, а не перенос ~/.claude." ;;
         --force)
-            echo "ОШИБКА: --force удалён. Раньше он затирал ~/CLAUDE.md без спроса." >&2
+            echo "ОШИБКА: --force удалён. Раньше он затирал навигационный хаб без спроса." >&2
             echo "        Если нужно обновить наши базовые файлы — ./install.sh --repair" >&2
-            echo "        (~/CLAUDE.md всё равно не перезаписывается: это твой файл)." >&2
+            echo "        (~/.claude/CLAUDE.md всё равно не перезаписывается: это твой файл)." >&2
             exit 2 ;;
         *)
             echo "ОШИБКА: неизвестный аргумент: $arg" >&2; usage >&2; exit 2 ;;
@@ -66,9 +70,23 @@ done
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC_CLAUDE="$HERE/.claude"
 SRC_CLAUDE_MD="$HERE/CLAUDE.md"
-SRC_ENV_TEMPLATE="$HERE/.credentials.template.env"
+# Полный каталог переменных — один файл, и он в templates/. В корне пака лежит
+# .credentials.template.env, но это НЕ список ключей: после переезда там записка о новом
+# адресе. Установщик копировал именно её в ~/.claude/.credentials.master.env — человек
+# открывал свой файл ключей и находил в нём объявление о переезде, а список имён
+# переменных не был достижим ниоткуда.
+SRC_ENV_TEMPLATE="$SRC_CLAUDE/templates/.credentials.master.env.example"
 DST_CLAUDE="$HOME/.claude"
-DST_CLAUDE_MD="$HOME/CLAUDE.md"
+# Навигационный хаб кладём в ПОЛЬЗОВАТЕЛЬСКУЮ память Claude Code — это ~/.claude/CLAUDE.md.
+# Только она читается всегда, где бы ни лежал проект. Прежний адрес ~/CLAUDE.md — это
+# ПРОЕКТНАЯ память: CLI поднимается от рабочего каталога вверх и подхватывает такой файл,
+# только если проект лежит ВНУТРИ домашнего каталога. На Windows проект всегда снаружи
+# C:\Users\<имя>, на mac/Linux — как повезёт. Внешне пак выглядел установленным, а модель
+# не знала, что навыки существуют, и на «сделай ролик» писала ffmpeg руками.
+DST_CLAUDE_MD="$DST_CLAUDE/CLAUDE.md"
+LEGACY_CLAUDE_MD="$HOME/CLAUDE.md"        # адрес прежних версий пака — см. блок 4
+DST_SETTINGS="$DST_CLAUDE/settings.json"  # в нём ${HOME} материализуется в блоке 5b
+DST_MCP_JSON="$DST_CLAUDE/mcp.json"
 DST_ENV="$DST_CLAUDE/.credentials.master.env"
 MANIFEST="$DST_CLAUDE/.ccpack-manifest.txt"
 
@@ -98,6 +116,13 @@ hm_is_preserved() {
     case "$1" in
         rules/user-profile.md) return 0 ;;
     esac
+    # Навигационный хаб ~/.claude/CLAUDE.md — тоже твой файл: в него дописывают свои
+    # заметки. Кладём его вручную (блок 4) и только если его нет. Якорь ОБЯЗАТЕЛЕН: в паке
+    # есть свои skills/gstack/CLAUDE.md и skills/n8n/catalog/CLAUDE.md — по голому имени
+    # они перестали бы раскладываться.
+    case "$1" in
+        CLAUDE.md) return 0 ;;
+    esac
     # Каталоги пользовательских данных сверяем ТОЛЬКО на первом уровне ~/.claude ($1 идёт
     # от корня .claude). Без якоря имя совпадало на любой глубине, и собственный каталог
     # пака templates/memory/ молча не раскладывался: файлы, которые пак ОБЯЗАН положить,
@@ -114,6 +139,7 @@ PRESERVE_RSYNC=(
     --exclude='chats.db*' --exclude='tg_session.session*'
     --exclude=.ccpack-manifest.txt
     --exclude=/rules/user-profile.md
+    --exclude=/CLAUDE.md
     # Ведущий слэш якорит правило к корню передачи (~/.claude). Без него rsync режет
     # каталог с таким именем на ЛЮБОЙ глубине — и templates/memory/ из пака не доезжал.
     --exclude=/memory/ --exclude=/projects/ --exclude=/todos/ --exclude=/shell-snapshots/
@@ -282,8 +308,23 @@ if [ "$DRY" -eq 1 ]; then
     else
         echo "[dry-run] WOULD: перезаписать в $DST_CLAUDE наши базовые файлы; пользовательское (preserve-list) не трогать"
     fi
-    [ -f "$DST_CLAUDE_MD" ] && echo "[dry-run] ~/CLAUDE.md уже есть — НЕ трогаю (твой файл)" || echo "[dry-run] WOULD: создать ~/CLAUDE.md (сейчас его нет)"
-    [ -f "$DST_ENV" ] && echo "[dry-run] ~/.claude/.credentials.master.env уже есть — НЕ трогаю" || echo "[dry-run] WOULD: создать .credentials.master.env из шаблона"
+    [ -f "$DST_CLAUDE_MD" ] && echo "[dry-run] ~/.claude/CLAUDE.md уже есть — НЕ трогаю (твой файл)" || echo "[dry-run] WOULD: создать ~/.claude/CLAUDE.md — навигационный хаб (сейчас его нет)"
+    if grep -qF '${HOME}' "$SRC_CLAUDE/settings.json" 2>/dev/null; then
+        if [ ! -e "$DST_SETTINGS" ] || [ "$MODE" = "repair" ]; then
+            echo "[dry-run] WOULD: заменить \${HOME} в ~/.claude/settings.json на абсолютный путь ($HOME)"
+        else
+            echo "[dry-run] ~/.claude/settings.json твой — не трогаю; \${HOME} в нём (если есть) останется"
+        fi
+    fi
+    if [ -f "$DST_ENV" ]; then
+        echo "[dry-run] ~/.claude/.credentials.master.env уже есть — НЕ трогаю"
+    elif [ -f "$SRC_ENV_TEMPLATE" ]; then
+        echo "[dry-run] WOULD: создать .credentials.master.env из .claude/templates/.credentials.master.env.example"
+    else
+        # План обязан показывать и отказ тоже: иначе «WOULD: создать» обещает файл,
+        # которого установщику неоткуда взять.
+        echo "[dry-run] ВНИМАНИЕ: шаблона ключей нет ($SRC_ENV_TEMPLATE) — .credentials.master.env создан НЕ будет"
+    fi
     report_links "[dry-run] "
     # Про жёсткие ссылки честно предупреждаем ЗАРАНЕЕ: в --repair такой файл будет
     # переписан как новый, и связь между двумя именами разорвётся. Данные не пропадут
@@ -302,7 +343,20 @@ if [ "$DRY" -eq 1 ]; then
         [ "$DRY_HL" -gt 0 ] && echo "[dry-run] файлов с несколькими жёсткими ссылками: $DRY_HL"
     fi
     echo "[dry-run] WOULD: записать список разложенного в $MANIFEST"
-    [ "$SKIP_DEPS" -eq 1 ] || echo "[dry-run] WOULD: pip install --user -r requirements.txt"
+    if [ "$SKIP_DEPS" -eq 1 ]; then
+        echo "[dry-run] --skip-deps: pip и доводка рантайма пропускаются целиком"
+        echo "[dry-run]   (браузер Playwright, маркетплейсы плагинов, node_modules останутся неустановленными)"
+    else
+        echo "[dry-run] WOULD: pip install --user -r requirements.txt"
+        # Про сеть надо сказать ЗАРАНЕЕ. План, который молчит про ~150 МБ загрузки,
+        # обнаруживается человеком в момент загрузки — на мобильном интернете или
+        # в поезде это уже поздно.
+        echo "[dry-run] WOULD: python3 ~/.claude/scripts/setup_runtime.py — доводка рантайма, ходит в сеть:"
+        echo "[dry-run]   • npx playwright install chromium — около 150 МБ загрузки, самая долгая часть"
+        echo "[dry-run]   • claude plugin marketplace add … — клонирование объявленных маркетплейсов"
+        echo "[dry-run]   • npm install для skills/dev-browser и skills/gstack"
+        echo "[dry-run]   Пропустить всё это: --skip-deps (потом можно запустить вручную)"
+    fi
     echo "[dry-run] Изменений не внесено."
     exit 0
 fi
@@ -564,6 +618,11 @@ if [ "$MODE" = "repair" ]; then
     scan_hardlinks || : > "$HARDLINKS"
 fi
 
+# Снимаем ДО копирования: был ли settings.json/mcp.json твоим ещё до нас. От этого зависит,
+# имеем ли мы право трогать в них пути (блок 5b). Твой файл не правим — только предупреждаем.
+SETTINGS_PREEXISTED=0; [ -e "$DST_SETTINGS" ] && SETTINGS_PREEXISTED=1
+MCPJSON_PREEXISTED=0;  [ -e "$DST_MCP_JSON" ] && MCPJSON_PREEXISTED=1
+
 if [ "$MODE" = "add-missing" ]; then
     echo "Добавляю только НЕДОСТАЮЩИЕ файлы конфига (существующее сохраняю)..."
     if command -v rsync >/dev/null 2>&1 && [ "$RSYNC_SAFE" -eq 1 ]; then
@@ -572,7 +631,7 @@ if [ "$MODE" = "add-missing" ]; then
         hm_copy "$SRC_CLAUDE" "$DST_CLAUDE" missing || COPY_FAILED=1
     fi
 else
-    echo "Режим --repair: перезаписываю НАШИ базовые файлы свежими (ключи, память, история, settings.local.json, ~/CLAUDE.md не трогаю)..."
+    echo "Режим --repair: перезаписываю НАШИ базовые файлы свежими (ключи, память, история, settings.local.json, ~/.claude/CLAUDE.md не трогаю)..."
     echo "  ВНИМАНИЕ: если ты правил файл, имя которого совпадает с файлом пака (например,"
     echo "  skills/<имя>/SKILL.md), в этом режиме он будет заменён нашей версией. Прежняя"
     echo "  версия — в резервной копии выше. Нужно сохранить свои правки — жми Ctrl+C и"
@@ -584,6 +643,34 @@ else
     fi
 fi
 [ "$COPY_FAILED" -eq 1 ] && echo "ВНИМАНИЕ: часть файлов скопировать не удалось (см. вывод выше)."
+
+# --- 3b. право на запуск для точек входа ------------------------------------------------
+# В git флаг «исполняемый» лежит в индексе, и `git clone` его донесёт. Но пак приезжает не
+# только клоном: zip с GitHub этот бит не хранит вовсе, а копия через Windows-машину теряет
+# его на файловой системе без прав. rsync -a доносит ровно то, что нашёл в источнике, —
+# значит без этого шага `./setup`, `./server.sh`, `bin/gstack-update-check` встретят
+# «Permission denied» ИЛИ (что хуже, см. gstack) промолчат под `|| true`.
+# Ставим бит на месте назначения, а не полагаемся на источник. Список — то, что реально
+# запускают как программу: *.sh, всё в каталогах bin/, `setup` навыка gstack и его
+# bun-скрипты. Каталог bin/ целиком: библиотеки внутри лишний бит не портит.
+if [ "${DRY:-0}" -ne 1 ] && [ -d "$DST_CLAUDE" ]; then
+    CHMOD_FAILED=0
+    find "$DST_CLAUDE" -type f -name '*.sh'  -exec chmod +x {} + 2>/dev/null || CHMOD_FAILED=1
+    find "$DST_CLAUDE" -type f -path '*/bin/*' -exec chmod +x {} + 2>/dev/null || CHMOD_FAILED=1
+    find "$DST_CLAUDE" -type f -path '*/gstack/setup' -exec chmod +x {} + 2>/dev/null || CHMOD_FAILED=1
+    find "$DST_CLAUDE" -type f -path '*/gstack/scripts/*.ts' -exec chmod +x {} + 2>/dev/null || CHMOD_FAILED=1
+    # Проверяем по факту, а не по коду возврата find: берём заведомо существующую точку
+    # входа и смотрим, исполняемая ли она. Промолчать здесь нельзя — «нет прав на запуск»
+    # человек диагностирует часами, потому что скрипт лежит на месте и выглядит целым.
+    CHMOD_PROBE="$DST_CLAUDE/skills/dev-browser/server.sh"
+    if [ -f "$CHMOD_PROBE" ] && [ ! -x "$CHMOD_PROBE" ]; then CHMOD_FAILED=1; fi
+    if [ "$CHMOD_FAILED" -eq 1 ]; then
+        echo "ВНИМАНИЕ: не удалось выставить право на запуск части файлов в ~/.claude."
+        echo "  Симптом дальше: 'Permission denied' на ./setup, ./server.sh, bin/*."
+        echo "  Почини вручную:  find ~/.claude -name '*.sh' -exec chmod +x {} +"
+        echo "                   find ~/.claude -path '*/bin/*' -type f -exec chmod +x {} +"
+    fi
+fi
 
 # --- отчёт про расщеплённые жёсткие ссылки ----------------------------------------------
 # Говорим только про те файлы, которые реально перезаписывали: у файла было два имени,
@@ -616,15 +703,32 @@ if [ "$MODE" = "repair" ] && [ -s "$HARDLINKS" ] && [ -s "$SRC_LIST" ]; then
     fi
 fi
 
-# --- 4. ~/CLAUDE.md — только если его нет (это ТВОЙ файл) --------------------------------
+# --- 4. ~/.claude/CLAUDE.md — навигационный хаб, только если его нет (это ТВОЙ файл) -----
+# Это пользовательская память Claude Code: единственный файл, который CLI читает при любом
+# рабочем каталоге. Из него модель узнаёт, что навыки, правила и команды пака существуют.
+# Из merge он исключён (preserve-list), поэтому кладём вручную — как анкету.
 CLAUDE_MD_ADDED=0
 if [ -f "$SRC_CLAUDE_MD" ]; then
-    if [ -e "$DST_CLAUDE_MD" ] || [ -L "$DST_CLAUDE_MD" ]; then
-        echo "~/CLAUDE.md уже есть — НЕ трогаю (твои личные инструкции). Наш вариант: $SRC_CLAUDE_MD"
+    if hm_dst_link_in_path "CLAUDE.md"; then
+        # Сам файл ещё не создан, но ~/.claude (или он сам) — ссылка наружу: писать сквозь неё
+        # нельзя, затрём чужую цель.
+        echo "CLAUDE.md пропущен: ~/.claude/$LINK_HIT — ссылка, во внешнюю цель не пишу."
+    elif [ -e "$DST_CLAUDE_MD" ] || [ -L "$DST_CLAUDE_MD" ]; then
+        echo "~/.claude/CLAUDE.md уже есть — НЕ трогаю (твои личные инструкции). Наш вариант: $SRC_CLAUDE_MD"
     else
-        if cp "$SRC_CLAUDE_MD" "$DST_CLAUDE_MD"; then CLAUDE_MD_ADDED=1; echo "Создан ~/CLAUDE.md"
-        else COPY_FAILED=1; echo "ВНИМАНИЕ: не удалось скопировать ~/CLAUDE.md."; fi
+        mkdir -p "$DST_CLAUDE" 2>/dev/null || :
+        if cp "$SRC_CLAUDE_MD" "$DST_CLAUDE_MD"; then CLAUDE_MD_ADDED=1; echo "Создан ~/.claude/CLAUDE.md — навигация по конфигу (её читает Claude Code)"
+        else COPY_FAILED=1; echo "ВНИМАНИЕ: не удалось скопировать ~/.claude/CLAUDE.md."; fi
     fi
+fi
+# Прежние версии пака клали хаб в ~/CLAUDE.md. Это ПРОЕКТНАЯ память: она читается, только
+# когда работаешь ВНУТРИ домашнего каталога, то есть у большинства не читается никогда.
+# Файл твой — не удаляем. Но молчать нельзя: пока он лежит, при работе внутри домашнего
+# каталога один и тот же текст грузится дважды.
+if [ -f "$LEGACY_CLAUDE_MD" ] && grep -qF 'SKILLS-FIRST' "$LEGACY_CLAUDE_MD" 2>/dev/null; then
+    echo "ПРИМЕЧАНИЕ: в ~/CLAUDE.md лежит наш хаб от прежней версии установщика — адрес сменился."
+    echo "  Рабочий адрес теперь ~/.claude/CLAUDE.md (его Claude Code читает всегда)."
+    echo "  Старый файл можно удалить вручную — сам не трогаю."
 fi
 
 # --- 4b. rules/user-profile.md — только если его нет (это ТВОЯ анкета) -------------------
@@ -648,11 +752,106 @@ if [ -f "$SRC_CLAUDE/rules/user-profile.md" ]; then
 fi
 
 # --- 5. credentials — только если ключей ещё нет ----------------------------------------
-if [ -f "$SRC_ENV_TEMPLATE" ] && [ ! -e "$DST_ENV" ]; then
-    if cp "$SRC_ENV_TEMPLATE" "$DST_ENV"; then echo "Создан $DST_ENV — ключи НЕ нужны: всё работает по подписке Claude. Трогай только если включаешь опциональную платную фичу."
-    else COPY_FAILED=1; echo "ВНИМАНИЕ: не удалось создать $DST_ENV."; fi
-elif [ -e "$DST_ENV" ]; then
+if [ -e "$DST_ENV" ]; then
     echo "$DST_ENV уже есть — НЕ трогаю."
+elif [ -f "$SRC_ENV_TEMPLATE" ]; then
+    if cp "$SRC_ENV_TEMPLATE" "$DST_ENV"; then echo "Создан $DST_ENV из templates/.credentials.master.env.example — ключи НЕ нужны: всё работает по подписке Claude. Трогай только если включаешь опциональную платную фичу."
+    else COPY_FAILED=1; echo "ВНИМАНИЕ: не удалось создать $DST_ENV."; fi
+else
+    # Молчать здесь нельзя: без этого файла у человека нет НИ ОДНОГО достижимого
+    # списка имён переменных, а установка при этом выглядит успешной.
+    COPY_FAILED=1
+    echo "ВНИМАНИЕ: шаблона ключей нет ($SRC_ENV_TEMPLATE) — $DST_ENV не создан."
+    echo "  Список имён переменных смотри в .claude/templates/.credentials.master.env.example в клоне."
+fi
+
+# --- 5b. ${HOME} в settings.json -> абсолютный путь --------------------------------------
+# В паке пути к хукам, статус-строке и MCP записаны как ${HOME}/.claude/... Разворачивают
+# эту запись ТРИ разных механизма, и ни один не работает одинаково на трёх системах:
+#   • hooks[].command и statusLine.command CLI отдаёт ШЕЛЛУ. На Windows это Git Bash; без
+#     Git for Windows хук не запускается вовсе, а с "shell":"powershell" ${HOME} пусто;
+#   • mcpServers[].args подставляет САМ CLI по своему окружению (process.env). У процесса
+#     CLI на Windows переменной HOME нет — сервер не поднимается вообще.
+# Отказ тихий: защитного хука нет, статус-строки нет, MCP нет — и ни одной ошибки на экране.
+# Поэтому пишем то, что одинаково работает везде: абсолютный путь. Прямые слэши годятся и
+# для node, и для python, и для Windows, и в JSON их не надо экранировать.
+HOME_ABS="$HOME"
+case "$HOME_ABS" in */) HOME_ABS="${HOME_ABS%/}" ;; esac
+# Этот файл — для macOS/Linux, но запускают его и из Git Bash на Windows. Там $HOME — это
+# MSYS-путь вида /c/Users/имя: шелл при вызове native-программы переводит его сам, а вот
+# CLI, подставляющий mcpServers[].args, ничего не переводит — python получил бы путь,
+# которого в Windows нет. cygpath -m даёт C:/Users/имя: годится и шеллу, и CLI, и JSON.
+if command -v cygpath >/dev/null 2>&1; then
+    HOME_WIN="$(cygpath -m "$HOME_ABS" 2>/dev/null || printf '')"
+    [ -n "$HOME_WIN" ] && HOME_ABS="$HOME_WIN"
+fi
+# JSON-безопасная форма: обратный слэш удваиваем, кавычку экранируем (на *nix обычно не
+# нужно, но домашний каталог с такими символами не должен ломать файл настроек).
+HOME_JSON="$(printf '%s' "$HOME_ABS" | sed 's/\\/\\\\/g; s/"/\\"/g')"
+DST_CLAUDE_ABS="$HOME_ABS/.claude"   # тот же каталог, но в записи, попавшей в settings.json
+
+hm_materialize_home() {   # $1 = файл; литерал ${HOME} -> абсолютный путь. 0 = ок/нечего делать
+    local f="$1" tmp json_ok
+    [ -f "$f" ] || return 0
+    grep -qF '${HOME}' "$f" 2>/dev/null || return 0
+    tmp="$f.ccpk-mat"
+    # Замена по индексу, а не регуляркой: путь может содержать &, |, \ — в sed это спецсимволы.
+    # Значение передаём через ENVIRON, а не через -v: awk обрабатывает в -v escape-последовательности
+    # и схлопнул бы \\ обратно в \, испортив JSON.
+    if ! HM_REPL="$HOME_JSON" awk '
+            BEGIN { repl = ENVIRON["HM_REPL"] }
+            {
+                line = $0; out = ""
+                while ((i = index(line, "${HOME}")) > 0) {
+                    out = out substr(line, 1, i - 1) repl
+                    line = substr(line, i + 7)
+                }
+                print out line
+            }' "$f" > "$tmp" 2>/dev/null || [ ! -s "$tmp" ]; then
+        rm -f "$tmp" 2>/dev/null
+        echo "ВНИМАНИЕ: не удалось подставить абсолютные пути в $f — файл не тронут."
+        return 1
+    fi
+    # Проверяем, что получился валидный JSON. Нет ни python3, ни node — не переписываем
+    # вслепую, а честно говорим: молча испортить файл настроек хуже, чем не чинить.
+    json_ok=unknown
+    if command -v python3 >/dev/null 2>&1; then
+        if python3 -c 'import json,sys; json.load(open(sys.argv[1], encoding="utf-8"))' "$tmp" >/dev/null 2>&1
+        then json_ok=yes; else json_ok=no; fi
+    elif command -v node >/dev/null 2>&1; then
+        if node -e 'JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"))' "$tmp" >/dev/null 2>&1
+        then json_ok=yes; else json_ok=no; fi
+    fi
+    if [ "$json_ok" = "no" ]; then
+        rm -f "$tmp" 2>/dev/null
+        echo "ВНИМАНИЕ: после подстановки путей $f перестал быть корректным JSON — оставил как было."
+        return 1
+    fi
+    if mv -f "$tmp" "$f" 2>/dev/null; then
+        [ "$json_ok" = "unknown" ] && echo "  (проверить JSON нечем — ни python3, ни node; файл записан как есть)"
+        return 0
+    fi
+    rm -f "$tmp" 2>/dev/null
+    echo "ВНИМАНИЕ: не удалось записать $f с абсолютными путями."
+    return 1
+}
+
+if [ "$SETTINGS_PREEXISTED" -eq 0 ] || [ "$MODE" = "repair" ]; then
+    if grep -qF '${HOME}' "$DST_SETTINGS" 2>/dev/null; then
+        if hm_materialize_home "$DST_SETTINGS"; then
+            echo "Пути в settings.json (хуки, статус-строка, MCP) записаны как $HOME_ABS/.claude/..."
+        else
+            COPY_FAILED=1
+        fi
+    fi
+elif [ -f "$DST_SETTINGS" ] && grep -qF '${HOME}' "$DST_SETTINGS" 2>/dev/null; then
+    echo "ВНИМАНИЕ: в твоём ~/.claude/settings.json пути записаны через \${HOME}."
+    echo "  Твой файл я не трогаю. Но на Windows такая запись молча отключает защитный хук,"
+    echo "  статус-строку и MCP: у процесса Claude Code переменной HOME нет."
+    echo "  Замени \${HOME} на $HOME_ABS вручную — или запусти ./install.sh --repair."
+fi
+if [ "$MCPJSON_PREEXISTED" -eq 0 ] || [ "$MODE" = "repair" ]; then
+    hm_materialize_home "$DST_MCP_JSON" || :
 fi
 
 # --- 6. Манифест: РОВНО то, что положили мы ---------------------------------------------
@@ -666,7 +865,7 @@ if [ "$MANIFEST_OK" -eq 1 ]; then
         "$PRE_LIST" "$PREV_LIST" "$SRC_LIST" > "$OURS_LIST" 2>/dev/null || MANIFEST_OK=0
 fi
 if [ "$MANIFEST_OK" -eq 1 ]; then
-    [ "$CLAUDE_MD_ADDED" -eq 1 ] && printf 'CLAUDE.md\n' >> "$OURS_LIST"
+    [ "$CLAUDE_MD_ADDED" -eq 1 ] && printf '.claude/CLAUDE.md\n' >> "$OURS_LIST"
     # Анкету пишем в список разложенного, только если её создали МЫ (её не было). Тогда
     # uninstall уберёт нетронутый шаблон, а заполненную анкету оставит: размер/дата разойдутся.
     [ "$USER_PROFILE_ADDED" -eq 1 ] && printf '.claude/rules/user-profile.md\n' >> "$OURS_LIST"
@@ -747,14 +946,124 @@ if [ "$MANIFEST_OK" -eq 1 ]; then
     fi
 fi
 
-# --- 7. Python-зависимости (по желанию) --------------------------------------------------
+# --- 7. Python-зависимости (обязательные, не «по желанию») --------------------------------
+# Раньше здесь стоял один `pip install --user`, а при отказе печаталось «на работу конфига
+# не влияет». Это была неправда: от Python зависят ~46 навыков и весь ~/.claude/tools/ —
+# без библиотек они падают ModuleNotFoundError, и связь с установкой уже не видна.
+#
+# Отказ на современных системах — норма, а не редкость. PEP 668 (macOS/Homebrew,
+# Debian 12+, Ubuntu 23.04+, Fedora 38+, Arch) помечает интерпретатор
+# «externally-managed», и pip отклоняет ЛЮБОЙ install, включая --user.
+#
+# Лестница: обычный --user  ->  --user --break-system-packages  ->  честный отказ.
+# Почему именно --break-system-packages, а не venv: инструменты пака вызывают голый
+# `python3 скрипт.py`, и библиотеки из venv им не видны, пока venv не активирован.
+# Флаг снимает ТОЛЬКО проверку PEP 668; вместе с --user пакеты всё равно едут в
+# ~/.local/..., каталоги системного пакетного менеджера не трогаются.
+py_have_module() { python3 -c "import $1" >/dev/null 2>&1; }
+
 if [ "$SKIP_DEPS" -ne 1 ] && [ -f "$HERE/requirements.txt" ]; then
-    if command -v python3 >/dev/null 2>&1; then
-        echo "Ставлю Python-зависимости (--user)... (пропустить: --skip-deps)"
-        python3 -m pip install --user --upgrade pip >/dev/null 2>&1 || :
-        python3 -m pip install --user -r "$HERE/requirements.txt" || echo "Python-зависимости не поставились — пропускаю (на работу конфига не влияет)."
+    if ! command -v python3 >/dev/null 2>&1; then
+        echo
+        echo "ВНИМАНИЕ: python3 не найден — Python-зависимости НЕ установлены."
+        echo "  От Python зависят ~46 навыков и все CLI из $DST_CLAUDE/tools/ — без него они не работают."
+        echo "  macOS:  brew install python3        Debian/Ubuntu:  sudo apt install python3 python3-pip"
+        echo "  Затем повтори установку — или доставь вручную:"
+        echo "    python3 -m pip install --user -r \"$HERE/requirements.txt\""
+    elif ! python3 -m pip --version >/dev/null 2>&1; then
+        echo
+        echo "ВНИМАНИЕ: python3 есть, а модуля pip нет — Python-зависимости НЕ установлены."
+        echo "  Это НЕ косметика: ~46 навыков и все CLI из $DST_CLAUDE/tools/ будут падать ModuleNotFoundError."
+        echo "  Debian/Ubuntu:  sudo apt install python3-pip"
+        echo "  Иначе:          python3 -m ensurepip --user --upgrade"
+        echo "  Затем:          python3 -m pip install --user -r \"$HERE/requirements.txt\""
     else
-        echo "python3 не найден — Python-зависимости пропущены."
+        # Externally-managed определяем по факту, а не по названию дистрибутива.
+        PEP668=0
+        if [ -f "$(python3 -c 'import sysconfig;print(sysconfig.get_path("stdlib"))' 2>/dev/null)/EXTERNALLY-MANAGED" ]; then
+            PEP668=1
+        fi
+
+        echo "Ставлю Python-зависимости (--user)... (пропустить: --skip-deps)"
+        [ "$PEP668" -eq 1 ] && echo "  (интерпретатор помечен externally-managed по PEP 668 — учитываю это)"
+        python3 -m pip install --user --upgrade pip >/dev/null 2>&1 || :
+
+        DEPS_OK=0
+        if [ "$PEP668" -eq 0 ]; then
+            python3 -m pip install --user -r "$HERE/requirements.txt" && DEPS_OK=1
+        fi
+        if [ "$DEPS_OK" -ne 1 ]; then
+            if [ "$PEP668" -eq 1 ]; then
+                echo "  Среда externally-managed: ставлю в ~/.local с --break-system-packages."
+            else
+                echo "  Обычная установка не прошла — пробую с --break-system-packages (в ~/.local)."
+            fi
+            python3 -m pip install --user --break-system-packages -r "$HERE/requirements.txt" && DEPS_OK=1
+        fi
+
+        # Проверяем РЕЗУЛЬТАТ, а не код возврата: pip умеет отчитаться об успехе,
+        # когда пакеты уехали туда, откуда их не видно (user-site отключён).
+        if [ "$DEPS_OK" -eq 1 ] && ! py_have_module requests; then
+            DEPS_OK=0
+            echo "  pip отчитался об успехе, но 'import requests' не проходит — считаю это провалом."
+        fi
+
+        # Пакетная установка — всё или ничего: pip сначала решает весь граф, и ОДИН
+        # пакет без колеса под эту платформу оставляет без библиотек все остальные.
+        # Поэтому добиваем по одному: пусть не приедет один, а не тридцать восемь.
+        if [ "$DEPS_OK" -ne 1 ]; then
+            echo "  Пакетная установка не прошла — ставлю по одному, чтобы уцелело максимум."
+            FAILED_PKGS=""
+            while IFS= read -r line; do
+                pkg="${line%%#*}"
+                pkg="$(printf '%s' "$pkg" | tr -d '[:space:]')"
+                [ -z "$pkg" ] && continue
+                python3 -m pip install --user --break-system-packages "$pkg" >/dev/null 2>&1 \
+                    || FAILED_PKGS="$FAILED_PKGS $pkg"
+            done < "$HERE/requirements.txt"
+            if py_have_module requests; then
+                if [ -n "$FAILED_PKGS" ]; then
+                    echo "  Базовое встало. НЕ установилось (навыки, которым это нужно, работать не будут):"
+                    for p in $FAILED_PKGS; do echo "      $p"; done
+                    DEPS_OK=2
+                else
+                    DEPS_OK=1
+                fi
+            fi
+        fi
+
+        if [ "$DEPS_OK" -ge 1 ]; then
+            if [ "$DEPS_OK" -eq 1 ]; then
+                echo "Python-зависимости на месте (проверено импортом)."
+            else
+                echo "Python-зависимости встали ЧАСТИЧНО (список выше проверен импортом)."
+                echo "  Навыки, которым хватает установленного, работают; остальным доставь недостающее вручную."
+            fi
+            if ! printf '%s' ":$PATH:" | grep -q ":$HOME/.local/bin:"; then
+                echo "  Замечание: $HOME/.local/bin нет в PATH — консольные команды из пакетов"
+                echo "  не будут находиться по имени. Добавь в ~/.zshrc или ~/.bashrc:"
+                echo "    export PATH=\"\$HOME/.local/bin:\$PATH\""
+            fi
+        else
+            echo
+            echo "ВНИМАНИЕ: Python-зависимости НЕ установлены."
+            echo "  Это НЕ косметика и НЕ «не влияет»: без них ~46 навыков и все CLI из"
+            echo "  $DST_CLAUDE/tools/ будут падать с 'ModuleNotFoundError'."
+            echo "  Конфиг разложен, но работать будет неполно. Рабочие пути, любой на выбор:"
+            echo
+            echo "  1) в свой каталог пользователя (рекомендуется — пак зовёт голый python3):"
+            echo "       python3 -m pip install --user --break-system-packages -r \"$HERE/requirements.txt\""
+            echo "  2) системным пакетным менеджером, если он знает эти пакеты:"
+            echo "       Debian/Ubuntu:  sudo apt install python3-requests python3-pil python3-yaml"
+            echo "       macOS:          brew install python-requests"
+            echo "  3) отдельным окружением — тогда его нужно поставить в PATH ПЕРЕД запуском claude,"
+            echo "     иначе навыки его не увидят:"
+            echo "       python3 -m venv ~/.claude-venv"
+            echo "       ~/.claude-venv/bin/pip install -r \"$HERE/requirements.txt\""
+            echo "       export PATH=\"\$HOME/.claude-venv/bin:\$PATH\"   # добавь в ~/.zshrc или ~/.bashrc"
+            echo
+            echo "  Проверка, что помогло:  python3 -c 'import requests, PIL, yaml; print(\"ok\")'"
+        fi
     fi
 fi
 
@@ -781,6 +1090,98 @@ if [ "$SKIP_DEPS" -ne 1 ] && [ -f "$DST_CLAUDE/scripts/setup_runtime.py" ]; then
         echo "python3 не найден — рантайм не доведён. После установки Python запусти:"
         echo "  python3 ~/.claude/scripts/setup_runtime.py"
     fi
+elif [ "$SKIP_DEPS" -eq 1 ]; then
+    # --skip-deps гасит и этот шаг тоже. Пока об этом молчали, флаг читался как
+    # «не ставить pip-пакеты», а выключал заодно браузер (42 навыка), маркетплейсы
+    # плагинов и node_modules — и человек узнавал об этом только по отказу навыка.
+    echo
+    echo "--skip-deps: рантайм НЕ доведён. Не сделано:"
+    echo "  • браузер Playwright (~150 МБ) — от него зависят 42 навыка;"
+    echo "  • маркетплейсы плагинов (объявлено 33 плагина);"
+    echo "  • node_modules для dev-browser и gstack."
+    echo "Доделать в любой момент: python3 ~/.claude/scripts/setup_runtime.py"
+fi
+
+# --- 7c. Проверка ПОСЛЕ установки --------------------------------------------------------
+# Скопировали ≠ работает. Самый дорогой отказ этого пака — тихий: файлы на месте, «ГОТОВО»
+# на экране, а хаб не читается или защитный хук не запускается. Понять это в бою нельзя:
+# модель просто не знает, что навыки есть. Поэтому проверяем ровно то, без чего пак мёртв.
+VERIFY_FAILED=0
+echo
+echo "Проверяю установленное..."
+
+# 1) навигационный хаб — единственный файл, из которого модель узнаёт про навыки
+if [ ! -f "$DST_CLAUDE_MD" ]; then
+    echo "  ✗ НЕТ $DST_CLAUDE_MD — Claude Code не увидит НИ ОДНОГО навыка пака."
+    echo "    Положи его вручную:  cp \"$SRC_CLAUDE_MD\" \"$DST_CLAUDE_MD\""
+    VERIFY_FAILED=1
+elif [ ! -s "$DST_CLAUDE_MD" ]; then
+    echo "  ✗ $DST_CLAUDE_MD пустой (0 байт) — это то же самое, что его нет."
+    VERIFY_FAILED=1
+elif ! head -c 1 "$DST_CLAUDE_MD" >/dev/null 2>&1; then
+    echo "  ✗ $DST_CLAUDE_MD не читается (права доступа?)."
+    VERIFY_FAILED=1
+else
+    echo "  ✓ ~/.claude/CLAUDE.md на месте и читается ($(wc -c < "$DST_CLAUDE_MD" | tr -d ' ') байт)"
+    grep -qF 'SKILLS-FIRST' "$DST_CLAUDE_MD" 2>/dev/null || \
+        echo "    (в нём не наш хаб, а твой текст — так и задумано: свой файл мы не перезаписываем)"
+fi
+
+# 2) settings.json: пути должны быть абсолютными, а файлы по ним — существовать
+if [ ! -f "$DST_SETTINGS" ]; then
+    echo "  ✗ НЕТ $DST_SETTINGS — хуки, статус-строка и MCP не настроены."
+    VERIFY_FAILED=1
+else
+    if grep -qF '${HOME}' "$DST_SETTINGS" 2>/dev/null; then
+        echo "  ✗ в settings.json остались пути через \${HOME}: на Windows это молча отключает"
+        echo "    защитный хук, статус-строку и MCP. Почини: ./install.sh --repair"
+        VERIFY_FAILED=1
+    else
+        echo "  ✓ пути в settings.json абсолютные"
+    fi
+    # Файлы, на которые settings.json ссылается: хуки, статус-строка, python-MCP.
+    # tr режет строку по кавычкам (в т.ч. по экранированным \" внутри command), поэтому
+    # хвостовые обратные слэши снимаем.
+    REFS="$TMPD/settings_refs.txt"; : > "$REFS"
+    # Два префикса, потому что под Git Bash $HOME — это /c/Users/имя, а в файл настроек
+    # записан C:/Users/имя (см. cygpath в блоке 5b). Искать только по одному — значит
+    # молча ничего не найти и напечатать «проверено» ни по чему.
+    tr '"' '\n' < "$DST_SETTINGS" 2>/dev/null | sed 's/\\*$//' \
+        | grep -F -e "$DST_CLAUDE/" -e "$DST_CLAUDE_ABS/" 2>/dev/null | grep -E '\.(js|py)$' 2>/dev/null \
+        | sort -u > "$REFS" 2>/dev/null || : > "$REFS"
+    REF_MISS=0; REF_N=0
+    while IFS= read -r ref; do
+        [ -n "$ref" ] || continue
+        REF_N=$((REF_N+1))
+        [ -f "$ref" ] && continue
+        echo "  ✗ файл, на который ссылается settings.json, не найден: $ref"
+        REF_MISS=$((REF_MISS+1))
+    done < "$REFS"
+    if [ "$REF_MISS" -gt 0 ]; then
+        VERIFY_FAILED=1
+    elif [ "$REF_N" -gt 0 ]; then
+        echo "  ✓ файлы хуков/статус-строки/MCP на месте ($REF_N шт.)"
+    else
+        # Ноль найденных путей — это не «всё хорошо», а «проверять было нечего»: либо в
+        # settings.json нет ни одного нашего хука, либо разбор строки не сработал.
+        # Промолчать здесь означало бы выдать пустую проверку за пройденную.
+        echo "  ! в settings.json не нашлось ни одной ссылки на файл внутри ~/.claude —"
+        echo "    проверять нечего. Если защитный хук и статус-строка нужны, сверь файл вручную."
+    fi
+fi
+
+# 3) node: на нём написаны защитный хук и статус-строка
+if command -v node >/dev/null 2>&1; then
+    echo "  ✓ node есть ($(command -v node))"
+else
+    echo "  ! node не найден в PATH — защитный хук guard.js и статус-строка не запустятся."
+    echo "    Поставь Node.js (nodejs.org). Остальной конфиг от этого не страдает."
+fi
+
+if [ "$VERIFY_FAILED" -eq 1 ]; then
+    echo
+    echo "ПРОВЕРКА НЕ ПРОШЛА — см. строки со знаком ✗ выше."
+    echo "  Файлы разложены, но в таком виде пак работает НЕ полностью."
 fi
 
 # --- 8. Честный итог ---------------------------------------------------------------------
@@ -794,7 +1195,7 @@ else
     else echo "ГОТОВО: наши базовые файлы обновлены, пользовательские данные на месте."; fi
 fi
 echo "Сохранено без изменений: ключи (.credentials.*), MEMORY.md, memory/, projects/ (история сессий),"
-echo "  todos/, shell-snapshots/, chats.db*, tg_session.session*, settings.local.json, ~/CLAUDE.md."
+echo "  todos/, shell-snapshots/, chats.db*, tg_session.session*, settings.local.json, ~/.claude/CLAUDE.md."
 [ "$BACKUP" -eq 1 ] && [ -n "${BACKUP_DIR:-}" ] && [ -d "${BACKUP_DIR:-/nonexistent}" ] && echo "Резервная копия: $BACKUP_DIR (храним 3 последние)."
 echo "Откат: ./uninstall.sh — удалит только то, что положил этот установщик."
 echo "Дальше: заполни $DST_CLAUDE/rules/user-profile.md -> запусти 'claude'. API-ключи не требуются."
@@ -811,4 +1212,8 @@ if [ -f "$DST_CLAUDE/scripts/setup_runtime.py" ] && command -v python3 >/dev/nul
     fi
 fi
 [ "$COPY_FAILED" -eq 1 ] && exit 1
+# Проверка выше нашла неработающее — это не «предупреждение на всякий случай», а факт:
+# хаб не читается или хук не запустится. Возвращаем ненулевой код, чтобы отказ было видно
+# и человеку, и любому скрипту-обёртке.
+[ "${VERIFY_FAILED:-0}" -eq 1 ] && exit 1
 exit 0

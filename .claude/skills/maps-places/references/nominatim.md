@@ -13,17 +13,19 @@
 
 ## Авторизация
 
-Ключа нет. **Обязателен** заголовок `User-Agent` с описанием приложения и контактом, иначе блокировка. Polite policy: **max 1 req/sec**.
+Ключа нет. **Обязателен** заголовок `User-Agent` с описанием приложения и **своим рабочим контактом** (email или URL), иначе блокировка. Polite policy: **max 1 req/sec**.
+
+`places_search.py` берёт контакт из `NOMINATIM_CONTACT` в `~/.claude/.credentials.master.env`; без него он работает, но пишет предупреждение в stderr. Подставлять чужой или общий адрес нельзя: Nominatim банит по User-Agent целиком, и у всех, кто оставил дефолт, поиск отвалится разом.
 
 ## Примеры
 
 ```bash
 # Forward
-curl -A "maps-places-skill/1.0 (your-email@gmail.com)" \
+curl -A "maps-places-skill/1.0 ($NOMINATIM_CONTACT)" \
   "https://nominatim.openstreetmap.org/search?q=Sample+District,+Sample+City&format=json&limit=5&addressdetails=1&accept-language=pt-BR,en"
 
 # Reverse
-curl -A "maps-places-skill/1.0 (your-email@gmail.com)" \
+curl -A "maps-places-skill/1.0 ($NOMINATIM_CONTACT)" \
   "https://nominatim.openstreetmap.org/reverse?lat=-22.971&lon=-43.182&format=json&accept-language=pt-BR"
 ```
 
@@ -42,13 +44,13 @@ curl -A "maps-places-skill/1.0 (your-email@gmail.com)" \
     "suburb": "Sample District",
     "city": "Sample City",
     "state": "Sample State",
-    "postcode": "[REDACTED_CEP]",
+    "postcode": "22070-000",
     "country": "Brasil",
     "country_code": "br"
   },
   "boundingbox": ["-22.98", "-22.96", "-43.19", "-43.17"],
   "importance": 0.5,
-  "type": "house"
+  "type": "beach"
 }]
 ```
 
@@ -64,7 +66,7 @@ curl -A "maps-places-skill/1.0 (your-email@gmail.com)" \
 | `extratags` | `1` — wikipedia, opening_hours и др. |
 | `namedetails` | `1` — имена на других языках |
 | `accept-language` | `pt-BR,en` — локаль display_name |
-| `countrycodes` | Ограничить страной: `br,ru` |
+| `countrycodes` | Ограничить страной: `br,us` |
 | `viewbox` | Bbox `lon1,lat1,lon2,lat2` для bias |
 | `bounded` | `1` — strict bbox |
 
@@ -80,7 +82,7 @@ Nominatim — это **геокодинг**, не POI-поиск. Для зап�
 4. `country_code` — нижний регистр ISO (`br`, `ru`), не `BR`
 5. **Поиск адресов хорош, поиск POI — слабый**: «ресторан грузинская кухня» вернёт мусор
 6. Для production >1 req/sec — поднять свой инстанс: `docker run -d -e PBF_URL=... mediagis/nominatim:4.4`
-7. Brazil coverage: отличный в городах, средний на побережье (Sample District — есть)
+7. Покрытие OSM: отличное в крупных городах, среднее в малых населённых пунктах
 8. **Не использовать для адресов-RU с опечатками** — Yandex Геокодер сильнее
 
 ## Документация

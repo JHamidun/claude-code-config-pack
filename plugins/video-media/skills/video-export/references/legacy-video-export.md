@@ -137,7 +137,7 @@ GIF size mistakes:
 ffmpeg -i out.mp4 -i music.mp3 -c:v copy -c:a aac -b:a 192k -shortest out-with-audio.mp4
 ```
 
-`-shortest` — обрежется по кратчайшему трекy. Без `-shortest` — видео loops пока музыка играет.
+`-shortest` — обрежется по кратчайшему треку. Без `-shortest` — видео loops пока музыка играет.
 
 ## Loop seamless
 

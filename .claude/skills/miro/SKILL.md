@@ -25,10 +25,11 @@ description: "Доски Miro: MCP (чтение/саммари, layout-DSL, д�
 
 ## Путь 1 — MCP (основной)
 
-Сервер уже подключён в `~/.claude/settings.json`:
+Конфиг сервера едет вместе с паком — в `~/.claude/settings.json` → `mcpServers`:
 ```json
 "miro": { "type": "http", "url": "https://mcp.miro.com/" }
 ```
+Не видишь `miro` в выводе `/mcp` — значит блок не доехал: допиши его туда сам и перезапусти сессию.
 
 **Авторизация** (один раз): `/mcp` в сессии → выбрать miro → войти в браузере → выбрать команду.
 Из терминала: `claude mcp login miro`. Сбросить: `claude mcp logout miro`.
@@ -52,7 +53,7 @@ Enterprise — выключен, нужен админ (Admin settings → Apps 
 1. **Одна команда за раз.** Авторизация строго 1:1 — ты подключён ровно к одной команде Miro, и это состояние общее для ВСЕХ MCP-клиентов сразу. Авторизовался в другую команду — предыдущая отвалилась. Доска из чужой команды → «access denied».
 2. **Доски сами не находятся.** В каждом запросе давай **полный URL доски**. `board_search_boards` ищет только внутри авторизованной команды.
 3. **AI-кредиты жрёт ровно один инструмент** — `context_get`. Остальные 30 не тратят кредиты, но **тратят дневную квоту**. На Free одна болтливая сессия сборки доски выест все 100 вызовов.
-4. **Не ставь плагин Miro поверх этого конфига.** Плагин + ручной сервер = две OAuth-сессии и дублирующиеся инструменты. Сейчас стоит ручной конфиг, плагина нет — так и оставь.
+4. **Не ставь плагин Miro поверх этого конфига.** Плагин + ручной сервер = две OAuth-сессии и дублирующиеся инструменты. Пак везёт ручной конфиг — держи что-то одно: либо этот блок в `settings.json`, либо плагин.
 5. **Устаревшие имена в старых блогах:** `table_create_new` → `table_create`, `draft_doc_new` → `doc_create`, `create_diagram` → `diagram_create`, `code_widget_list` → `code_widget_list_items`.
 6. **Раскладка с первого раза редко идеальна.** Говори явно, куда класть («в пустое место справа»), иначе агент положит поверх существующего. Один артефакт за запрос, не вся доска одним вызовом.
 
@@ -78,7 +79,8 @@ python ~/.claude/tools/miro_client.py connect <board_id> --from <item_id> --to <
 python ~/.claude/tools/miro_client.py bulk <board_id> --file items.json
 ```
 
-**Токен** — `MIRO_ACCESS_TOKEN` в `~/.claude/.credentials.master.env`.
+**Токен** — `MIRO_ACCESS_TOKEN` в `~/.claude/.credentials.master.env`
+(шаблон: `~/.claude/templates/.credentials.master.env.example`).
 Получение (5 минут, без Enterprise): miro.com → Settings → **Your apps** → Create new app →
 галочку «Expire user authorization token» **НЕ ставить** (иначе токен живёт 60 минут) →
 Permissions: `boards:read` + `boards:write` → внизу страницы **«Install app and get OAuth token»** → выбрать команду.

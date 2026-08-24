@@ -26,7 +26,7 @@ description: "Claude по подписке как OpenAI API (/v1/chat/completio
 - Нужен диалог с состоянием на стороне сервера (заголовок `X-Session-Id`).
 
 Не использовать: когда достаточно `python claude_cli.py "prompt"`; когда нужен агент с
-тулзами/памятью/кроном (это Hermes → agent-builder tooling).
+тулзами/памятью/кроном (это Hermes → `autonomous-agent-creator`).
 
 ## Установка / настройка
 
@@ -127,12 +127,13 @@ for chunk in c.chat.completions.create(model="haiku", stream=True,
 1. **`ANTHROPIC_API_KEY` + `ANTHROPIC_CUSTOM_HEADERS` из `.credentials.master.env` ломают CLI.**
    Симптом: `API Error: Invalid header name: '{"anthropic-beta"'`, HTTP 502. Причина: `load_env()`
    тянет весь файл в окружение, а дочерний `claude` его наследует. Сервер вырезает `ANTHROPIC_*`
-   (+ `CLAUDE_CODE_USE_BEDROCK/YOUR_SERVER`, `CLAUDE_CODE_SESSION_ID`, `CLAUDE_CODE_CHILD_SESSION`).
+   (+ `CLAUDE_CODE_USE_BEDROCK/VERTEX`, `CLAUDE_CODE_SESSION_ID`, `CLAUDE_CODE_CHILD_SESSION`).
    Побочный эффект того же фикса: биллинг гарантированно идёт по подписке, а не по API-ключу.
    Ломать защиту только осознанно: `--inherit-anthropic-env`.
-2. **`claude_cli.py` (существующая обёртка) шлёт несуществующие флаги.** `--system` и `--max-tokens`
-   в `claude` 2.1.207 нет: правильные — `--system-prompt` (замена) / `--append-system-prompt`
-   (добавка), лимита токенов флагом нет. Отсюда взято только обнаружение CLI, а не сборка argv.
+2. **Флаги `--system` и `--max-tokens` в `claude` 2.1.207 не существуют.** Правильные —
+   `--system-prompt` (замена) / `--append-system-prompt` (добавка); лимита токенов флагом нет
+   вообще, длину задавай в промпте. Обёртка `~/.claude/tools/claude_cli.py` этой ошибкой болела
+   и была починена; сервер всё равно берёт оттуда только обнаружение CLI, а не сборку argv.
 3. **Windows: `claude` резолвится в `claude.CMD`.** `CreateProcess` не запускает `.cmd` напрямую —
    сервер сам оборачивает в `cmd.exe /c`.
 4. **Стрим требует трёх флагов сразу:** `--output-format stream-json --include-partial-messages --verbose`.

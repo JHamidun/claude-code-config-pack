@@ -1,7 +1,7 @@
 # OpenAI Privacy Filter — condensed model card
 
 Source: https://huggingface.co/openai/privacy-filter · https://github.com/openai/privacy-filter
-Local repo clone: `${WORKSPACE}/privacy-filter-opf` (docs: README, FINETUNING, OUTPUT_SCHEMAS, EVAL_AND_OUTPUT_MODES).
+Upstream: https://github.com/openai/privacy-filter — там же README, FINETUNING, OUTPUT_SCHEMAS, EVAL_AND_OUTPUT_MODES. Клонируется в `./work/privacy-filter-opf` (см. SKILL.md).
 
 ## What it is
 

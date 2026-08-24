@@ -379,11 +379,11 @@
         "text": "=",
         "options": {},
         "subject": "=Nová cena - {{$node[\"initItem\"].json[\"slug\"]}} - {{$node[\"getActualPrice\"].json[\"price\"]}} {{$node[\"initItem\"].json[\"currency\"]}}",
-        "toEmail": "sthosstudio@gmail.com",
-        "fromEmail": "hostovecky@weyou.sk"
+        "toEmail": "REPLACE_ME@example.com",
+        "fromEmail": "REPLACE_ME@example.com"
       },
       "credentials": {
-        "smtp": "hostovecky@weyou.sk"
+        "smtp": "REPLACE_ME@example.com"
       },
       "typeVersion": 1,
       "id": "node-6df8bbdd"
@@ -400,11 +400,11 @@
         "text": "=",
         "options": {},
         "subject": "={{$node[\"initItem\"].json[\"slug\"]}} - Getting price issue.",
-        "toEmail": "sthosstudio@gmail.com",
-        "fromEmail": "hostovecky@weyou.sk"
+        "toEmail": "REPLACE_ME@example.com",
+        "fromEmail": "REPLACE_ME@example.com"
       },
       "credentials": {
-        "smtp": "hostovecky@weyou.sk"
+        "smtp": "REPLACE_ME@example.com"
       },
       "typeVersion": 1,
       "id": "node-ca4f72c2"

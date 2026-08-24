@@ -17,7 +17,12 @@ export const meta = {
 // системе, приходит сюда константами и через args, а читают и пишут только агенты.
 
 const SK = '~/.claude/skills';
-const WORK = String((args && args.workdir) || '~/Videos/video-factory/run');
+// Значение по умолчанию намеренно НЕ содержит `~/Videos`: на локализованном Linux
+// такого каталога нет — папка называется «Видео»/`Vídeos`, а `mkdir -p ~/Videos`
+// ошибки не даст, он молча создаст второй каталог рядом, и готовый ролик окажется не
+// там, где человек его ищет. Хочешь класть в системную «Видео» — передай workdir
+// абсолютным путём, например из `xdg-user-dir VIDEOS`.
+const WORK = String((args && args.workdir) || '~/video-factory/run');
 const ENVELOPE = WORK + '/production.json';
 const BRIEF = String((args && args.brief) || 'ролик без описания — восстанови задачу из контекста');
 const SECONDS = Number((args && args.seconds) || 35);

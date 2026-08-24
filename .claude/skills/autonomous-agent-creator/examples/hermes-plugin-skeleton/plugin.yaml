@@ -1,0 +1,8 @@
+name: my-plugin
+version: "1.0.0"
+description: "Description of what this plugin does"
+provides_tools:
+  - tool_one
+  - tool_two
+requires_env:
+  - DATABASE_URL

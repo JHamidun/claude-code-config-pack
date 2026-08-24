@@ -198,7 +198,7 @@ Strategy / Competitors / CRM / Marketing / Sales / Operations / Product / Templa
 | Скрапинг | Apify | skill `apify-scraping` |
 | Image-gen | Gemini Image / Nano Banana | Google AI Studio ключ или fal.ai proxy |
 | База данных | Supabase + Notion | внешние / MCP |
-| Каталог сервисов | ~88 сервисов по категориям | `references/ai-tools-catalog.md` |
+| Каталог сервисов | инструменты по категориям + чем закрыт навыком пака | `references/ai-tools-catalog.md` |
 
 ## Cross-links
 

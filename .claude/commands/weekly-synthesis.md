@@ -21,11 +21,11 @@ python ~/.claude/tools/vector_memory.py search "session" --limit 20
 ```
 Extract: key decisions, errors fixed, tools discovered.
 
-### 3. Subagent Logs
+### 3. Subagent Logs (optional — the pack does not create this log itself)
 ```bash
-powershell -c "Get-Content $env:USERPROFILE\.claude\logs\subagents.log | Select-Object -Last 50"
+powershell -c "if (Test-Path $env:USERPROFILE\.claude\logs\subagents.log) { Get-Content $env:USERPROFILE\.claude\logs\subagents.log | Select-Object -Last 50 } else { 'no subagent log - skipping' }"
 ```
-Extract: which agents were used, frequency, patterns.
+Extract (if present): which agents were used, frequency, patterns.
 
 ### 4. Session Files
 ```bash

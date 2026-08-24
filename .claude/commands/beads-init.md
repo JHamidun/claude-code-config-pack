@@ -37,52 +37,55 @@ npm install -g @beads/bd
 brew install steveyegge/tap/beads
 ```
 
-## Configuration Selection
-
-Ask user to choose configuration:
-
-1. **base** - Minimal setup, good for getting started
-2. **full** - All features enabled (recommended for production)
-3. **stealth** - Local-only mode, no auto-push to remote
+Beads stores its state in `.beads/` inside the repo and syncs through git, so run
+everything below from the repository root (`git rev-parse --show-toplevel`).
 
 ## Project Prefix
 
-Ask user for their issue prefix (3-8 characters, lowercase):
-- Should be short project name
+Ask the user for their issue prefix (3-8 characters, lowercase):
+- Should be a short project name
 - All issues will be `PREFIX-xxx`
 - Examples: `myapp`, `web`, `api`, `proj`
 
 ## Initialization Steps
 
-1. **Initialize Beads**:
-```bash
-bd init
-```
+> **This pack ships no `.beads-templates/` directory** — no config presets, no
+> formula files, no PRIME template. Earlier versions of this command told you to
+> `cp` from there and failed on the first step. `bd init` writes its own config,
+> and Beads brings its own formulas, so nothing needs copying.
 
-2. **Copy configuration** (based on user choice):
-```bash
-cp .beads-templates/config/{chosen}.yaml .beads/config.yaml
-```
+1. **Initialize Beads** — this creates `.beads/` with a default config:
+   ```bash
+   bd init
+   ```
 
-3. **Update issue-prefix** in config.yaml with user's chosen prefix
+2. **Set the issue prefix** in the generated `.beads/config.yaml`. Read the file
+   first (`bd init` may already have prompted for it), then edit `issue-prefix`
+   in place. Do not overwrite the whole file — you would lose whatever else
+   `bd init` put there for this version of the CLI.
 
-4. **Copy formulas**:
-```bash
-mkdir -p .beads/formulas
-cp .beads-templates/formulas/*.toml .beads/formulas/
-```
+3. **Decide on auto-push** while you are in the config. Local-only ("stealth")
+   work means turning the auto-push/remote-sync option off; leaving it on means
+   `bd sync` will push. Pick deliberately — this decides whether teammates see
+   your issues.
 
-5. **Copy PRIME template**:
-```bash
-cp .beads-templates/PRIME.template.md .beads/PRIME.md
-```
+4. **Check what formulas the CLI already gives you** before writing any:
+   ```bash
+   bd formula list
+   ```
+   Formulas are Beads' own workflow templates (`bd mol wisp <name>`,
+   `bd patrol run <name>`). If the one you want is not listed, author it as a
+   `.toml` under `.beads/formulas/` — there is nothing in this pack to copy from.
 
-6. **Update PRIME.md** - replace `{{PREFIX}}` and `{{PROJECT_NAME}}`
+5. **Initial sync**:
+   ```bash
+   bd sync
+   ```
 
-7. **Initial sync**:
-```bash
-bd sync
-```
+6. **Commit the result** so the tracker exists for everyone else on the repo:
+   ```bash
+   git add .beads && git commit -m "chore: init beads issue tracking"
+   ```
 
 ## Post-Setup Instructions
 
@@ -92,7 +95,6 @@ After initialization, display:
 ## Beads Initialized!
 
 **Prefix**: {PREFIX}
-**Config**: {CONFIG_TYPE}
 
 ### Quick Start
 
@@ -110,30 +112,31 @@ After initialization, display:
 
 ### Session Workflow
 
-START:  bd prime → bd ready
-WORK:   bd update → work → bd close → /push patch
-END:    bd sync → git push
+START:  bd prime -> bd ready
+WORK:   bd update -> work -> bd close -> git commit -m "... ({PREFIX}-xxx)"
+END:    bd sync -> git push
 
 ### Documentation
 
 - Quick reference: .claude/docs/beads-quickstart.md
-- Templates: .beads-templates/README.md
+- Skill (commands, workflows, decision matrix): .claude/skills/beads/
 - Official docs: https://github.com/steveyegge/beads
 
 ### Next Steps
 
 - [ ] Review .beads/config.yaml and customize directory-labels
 - [ ] Create REF: issues for project knowledge (optional)
-- [ ] Run /speckit.tobeads after generating tasks.md
 ```
 
 ## Troubleshooting
 
-If bd init fails:
-- Check if .beads/ already exists
-- Try: `rm -rf .beads && bd init`
+If `bd init` fails:
+- Check whether `.beads/` already exists — that is the usual cause
+- Only then: `rm -rf .beads && bd init`. This destroys local issue state that
+  has not been `bd sync`ed, so run `bd sync` first if the directory has anything
+  in it you care about.
 
-If daemon doesn't start:
+If the daemon does not start:
 - Check logs: `cat .beads/daemon.log`
 - Restart: `bd daemon restart`
 
@@ -141,3 +144,24 @@ If daemon doesn't start:
 
 ```
 User: /beads-init
+
+Claude: bd version
+        -> bd version 0.x.y
+
+Claude: What prefix should issues use? (3-8 chars, lowercase)
+User:   web
+
+Claude: bd init
+        -> created .beads/
+
+Claude: [reads .beads/config.yaml, sets issue-prefix: web]
+        [asks: auto-push on sync, or local-only?]
+
+Claude: bd formula list
+        -> shows the workflow templates this CLI version ships
+
+Claude: bd sync && git add .beads && git commit -m "chore: init beads issue tracking"
+
+        Beads initialized. First task:
+        bd create "Setup project" -t chore -p 3
+```

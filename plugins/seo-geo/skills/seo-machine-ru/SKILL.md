@@ -5,21 +5,21 @@ metadata:
   version: 1.1.0
   updated: 2026-06-03
   ported_from: TheCraigHewitt/seomachine (+ marketingskills ai-seo/seo-audit/programmatic-seo/competitors)
-  reuses: yandex, tilda, yourname-marketing-context, competitive-analysis
+  reuses: yandex, tilda, competitive-analysis
 ---
 
 # SEO / GEO / AEO машина (RU)
 
 Полный конвейер производства SEO-контента под российский поиск и AI-выдачу. Портирован с `seomachine`, но все внешние интеграции заменены на твой стек: данные тянутся скиллом `yandex` (Метрика/Вебмастер/Wordstat), публикация — скиллом `tilda`. Аналитические модули переписаны под русский (морфология, читаемость, anti-AI на русском).
 
-**Перед любой задачей** прочитай контекст продукта: вызови `yourname-marketing-context` → `skills/yourname-marketing-context/references/business.md` (или `personal-brand.md` для блога пользователя) и `skills/yourname-marketing-context/references/ru-localization.md`.
+**Перед любой задачей** прочитай `~/.claude/business-context.md` — разделы «Продукт», «ICP», «Позиционирование и запреты». Пишешь для личного блога, а не для продукта — читай вместо этого `~/.claude/author-profile.md`. Обоих файлов нет — заведи из `~/.claude/templates/`.
 
 ## Когда использовать
 
 - Семантическое ядро / кластеры под Яндекс (`research`, `cluster`).
 - Написание и оптимизация лонгрида (`write`, `optimize`, `rewrite`).
 - Аудит существующей страницы («почему не в топе»).
-- GEO/AEO: попасть в ответы Яндекс Нейро / Alice / (regional LLM B) / ChatGPT / Perplexity.
+- GEO/AEO: попасть в ответы Яндекс Нейро / Alice / GigaChat / ChatGPT / Perplexity.
 - Лендинг под конверсию + CRO-аудит (связка с кластером `*-cro-ru`).
 - Размещение в каталогах для ссылок и цитируемости (RU-каталоги).
 
@@ -65,7 +65,7 @@ metadata:
 - **Wordstat / частотность / Вебмастер-позиции / Метрика-трафик** → скилл `yandex`. Как именно — `references/data-yandex-tilda.md`.
 - **Публикация поста/лендинга** → скилл `tilda`.
 - **Конкуренты** → `competitive-analysis` / `similarweb-analytics`.
-- **Метрики YourProduct** (что докрутить) → `product-analytics`.
+- **Метрики своего продукта** (что докрутить) → `performance-analytics`; сами цифры — в своей веб-аналитике (Метрика/GA).
 
 `opportunity_scorer.py` ест JSON-массив ключей с полями `{keyword, volume, position, intent, competition, cluster_size}` — собери его из вывода Wordstat/Вебмастера через скилл `yandex`.
 
@@ -94,8 +94,8 @@ Bind только на `127.0.0.1` — не открывать наружу. П�
 - Формат ответа: `{query, meta, results: [{rank, type, title, url, snippet, domain, position, engine, ...}], serp_features, pagination}`.
 
 **Гоча — Яндекс/Google требуют прокси:**
-- Прямое подключение (`proxy_used: "direct"`) с текущего IP стабильно ловит капчу/rate-limit на Yandex и Google — это не «частые запросы», блок был и на первом запросе, и через 40с. Скорее всего IP не РФ (ваш регион) — Яндекс агрессивно капчит нероссийские IP, Google банит по репутации подсети.
-- **Фикс (не сделан, нужны кредды прокси):** `docker run ... karust/openserp:latest serve -a 0.0.0.0 -p 7000 --proxy http://user:pass@host:port` (флаг `-x/--proxy` форсит прокси на все движки) или `--2captcha_key <key>` для автоrешения капчи. Для Яндекса нужен именно **РФ-прокси** (резидентский/датацентровый в РФ-подсети).
+- Прямое подключение (`proxy_used: "direct"`) стабильно ловит капчу/rate-limit на Yandex и Google — это не «частые запросы»: блок прилетает и на первом запросе, и через 40 с. Причина обычно в самом IP — Яндекс агрессивно капчит нероссийские адреса, Google банит по репутации подсети.
+- **Фикс (нужен свой прокси, в пак он не входит):** `docker run ... karust/openserp:latest serve -a 0.0.0.0 -p 7000 --proxy http://user:pass@host:port` (флаг `-x/--proxy` форсит прокси на все движки) или `--2captcha_key <key>` для авторешения капчи. Для Яндекса нужен именно **РФ-прокси** (резидентский/датацентровый в РФ-подсети).
 - Пока прокси не настроен — **для Яндекс-выдачи продолжай использовать связку из скилла `yandex`** (internal API `getTable` с залогиненного браузера, см. `references/wordstat-real-recipe.md`) — это отдельный, уже рабочий механизм (не через openserp).
 - DuckDuckGo/Bing прокси не требуют — бери их через openserp уже сейчас для конкурентного парсинга без кредитов.
 - Если позже настроишь прокси и снимешь капчу — обнови эту секцию (`captcha_detected`/`blocked` должны уйти).
@@ -111,8 +111,8 @@ Bind только на `127.0.0.1` — не открывать наружу. П�
 Связанные скиллы (НЕ дублировать — границы):
 
 - **`yandex-direct-pro-ru`** → `skills/yandex-direct-pro-ru/references/semantics-wordstat.md` — те же операторы и маски, но **семантика для платной рекламы** (Директ): минус-слова, структура аккаунта, объявления Поиск/РСЯ, UTM.
-- **`ai-seo-agent-pipeline`** — программатическая массовая генерация сотен страниц по собранному ядру (n8n + Perplexity, метод эксперт). Это ядро питает его конвейер.
-- **`geo-aeo-ru`** — видимость и измерение цитируемости бренда в LLM-ответах ((regional LLM B)/(regional LLM A)/ChatGPT/Perplexity); информационные запросы из ядра идут в AEO (см. `references/aeo-geo.md`).
+- **`ai-seo-agent-pipeline`** — программатическая массовая генерация сотен страниц по собранному ядру (n8n + Perplexity). Это ядро питает его конвейер.
+- **`geo-aeo-ru`** — видимость и измерение цитируемости бренда в LLM-ответах (GigaChat/YandexGPT/ChatGPT/Perplexity); информационные запросы из ядра идут в AEO (см. `references/aeo-geo.md`).
 
 ## References (читать по необходимости)
 
@@ -120,7 +120,7 @@ Bind только на `127.0.0.1` — не открывать наружу. П�
 |------|-------|
 | `references/workflow.md` | пошаговый сценарий каждой фазы |
 | `references/agents-checklists.md` | 11 аналитических ролей (seo-optimizer, meta-creator, internal-linker, keyword-mapper, editor, cro-analyst, headline-generator, cluster-strategist и др.) как RU-чеклисты |
-| `references/aeo-geo.md` | оптимизация под AI-выдачу: Яндекс Нейро/Alice/(regional LLM B)/ChatGPT/Perplexity + аудит цитирований + RU-каталоги для размещения |
+| `references/aeo-geo.md` | оптимизация под AI-выдачу: Яндекс Нейро/Alice/GigaChat/ChatGPT/Perplexity + аудит цитирований + RU-каталоги для размещения |
 | `references/seo-guidelines-ru.md` | пороги: объём, плотность (с леммами), длины мета под Яндекс, читаемость |
 | `references/data-yandex-tilda.md` | как тянуть данные через `yandex` и публиковать через `tilda` |
 | `references/wordstat-real-recipe.md` | **рабочий** съём реальных частот Wordstat (internal API getTable, логин, анти-завис браузера, suggest); Direct API заблокирован (error 58) |
@@ -130,20 +130,36 @@ Bind только на `127.0.0.1` — не открывать наружу. П�
 
 ## Context (заполнить под проект — `context/`)
 
+Три файла едут **пустыми шаблонами** — это не забытые заготовки, а входные данные
+навыка. Пока они не заполнены, `references/workflow.md` (шаг 1) и роли из
+`references/agents-checklists.md` работают вслепую.
+
 - `context/target-keywords.md` — ядро по кластерам (пиллар/кластер/лонг-тейл + интент + текущие позиции).
 - `context/internal-links-map.md` — карта страниц для перелинковки.
 - `context/ai-citation-targets.md` — где хотим цитироваться (RU-поверхности).
-- Бренд-голос и конкуренты — НЕ дублировать: брать из `yourname-marketing-context` и `competitive-analysis`.
+- Бренд-голос и конкуренты — НЕ дублировать: брать из `~/.claude/business-context.md`, `~/.claude/voice-sample.md` и `competitive-analysis`.
 
-## Примеры (`examples/`)
+## Артефакты прогона (`examples/` в комплект не входит)
 
-- `examples/your-product/` — полный реальный прогон (тема YourProduct, июнь 2026): `keywords.json` (с реальными объёмами Wordstat), `research/brief-*.md` + `research/cluster-*.md`, `drafts/*.md` (статья 96/100) + `*.schema.json` (FAQPage+Article), `build_docx.py` (богатый генератор Word с резюме/картой рынка) и готовый `*.docx`. Брать как образец структуры артефактов и как шаблон отчёта для маркетолога.
+Готовый пример прогона был на реальном клиентском проекте и в раздачу не поехал.
+Структура, которую конвейер должен произвести, — такая (сложи её в `examples/<свой-проект>/`,
+первый же прогон и станет твоим образцом):
+
+```
+examples/<проект>/
+  keywords.json          # ядро с реальными частотами Wordstat (scripts/wordstat_fetch.py)
+  research/brief-*.md    # бриф по теме
+  research/cluster-*.md  # разбор по каждому кластеру
+  drafts/*.md            # тексты статей (оценка — scripts/content_scorer.py, цель 90+/100)
+  drafts/*.schema.json   # JSON-LD: FAQPage + Article (см. skill schema-markup-ru)
+  report.docx            # отчёт маркетологу (scripts/build_report_docx.py)
+```
 
 ## Реальный опыт (changelog/уроки)
 
 - **v1.2 (2026-07-20):** добавлена секция «Яндекс/Google SERP локально (openserp)» — self-hosted альтернатива SerpAPI (Docker, `127.0.0.1:7000`). DuckDuckGo/Bing работают из коробки; Yandex/Google требуют прокси (капча/rate-limit подтверждены curl-тестом, не решено — нет кредов прокси). До прокси Яндекс-выдачу продолжай брать через уже рабочий механизм скилла `yandex` (internal API `getTable`).
-- **v1.1 (2026-06-03):** добавлен рабочий путь к реальному Wordstat (`references/wordstat-real-recipe.md`, `scripts/wordstat_fetch.py`, `scripts/wordstat_browser_snippet.js`), упаковщик в Word (`scripts/build_report_docx.py`), пример `examples/your-product/`.
-- **Wordstat:** Direct API заблокирован (`error 58` — нужен одобренный доступ к Директ API). Реальный способ — internal API `POST /wordstat/api/getTable` с залогиненного браузера (куки сами, CSRF не нужен). Креды Яндекса в `.credentials.master.env` (`YANDEX_EMAIL/PASSWORD`), 2FA проходит владелец, сессия в профиле playwright/chrome-devtools сохраняется.
+- **v1.1 (2026-06-03):** добавлен рабочий путь к реальному Wordstat (`references/wordstat-real-recipe.md`, `scripts/wordstat_fetch.py`, `scripts/wordstat_browser_snippet.js`), упаковщик в Word (`scripts/build_report_docx.py`).
+- **Wordstat:** Direct API заблокирован (`error 58` — нужен одобренный доступ к Директ API). Реальный способ — internal API `POST /wordstat/api/getTable` с залогиненного браузера (куки сами, CSRF не нужен). Креды Яндекса — свои, в `.credentials.master.env` (`YANDEX_EMAIL`/`YANDEX_PASSWORD`); 2FA проходишь руками один раз, дальше сессия живёт в профиле playwright/chrome-devtools.
 - **Объёмы:** оценочные тиры (из ширины suggest) завышают в 5–10× — всегда снимать реальный Wordstat перед приоритизацией. Точные коммерческие лонг-тейлы часто = 0–3 показа: страницы под конверсию/AEO, не под трафик.
 - **Фикс `content_scrubber.py`:** дефис-нормализация `--`→`—` ломала `---` (frontmatter) и `|---|` (таблицы) → мета не парсилась, таблицы исчезали. Теперь структурные строки пропускаются (`_is_structural`).
 - **Фикс `yandex_api.py wordstat`:** Direct API v4 требует UTF-8-body (`json.dumps(...ensure_ascii=False).encode()`), иначе `error 501`.

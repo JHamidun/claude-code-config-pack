@@ -69,7 +69,8 @@ Custom модель — всегда `OPENWIKI_MODEL_ID`. Дефолт онбо�
 
 ## CI: авто-PR с обновлением доков
 
-Скопировать шаблон под свой провайдер Git (лежат в клоне `${WORKSPACE}/temp-clones/openwiki/examples/`):
+Скопировать шаблон под свой провайдер Git — они лежат в `examples/` upstream-репозитория
+(`git clone --depth 1 https://github.com/langchain-ai/openwiki ./work/openwiki`):
 - GitHub Actions → `.github/workflows/openwiki-update.yml`
 - GitLab CI → `.gitlab-ci.yml` (или include)
 - Bitbucket → `bitbucket-pipelines.yml` + расписание custom-pipeline
@@ -93,4 +94,4 @@ GitHub-шаблон (суть): по cron (напр. `0 9 * * *`) ставит N
 - **Personal mode** (`openwiki personal`) — локальный «второй мозг» в `~/.openwiki/wiki` из коннекторов (Git, Notion, Gmail, X, Web Search[Tavily], HN). Если у тебя уже есть своя система персональной памяти — personal mode будет её дублировать; основной сценарий этого скилла — code mode.
 - **Регион/прокси**: code mode прокси не требует, если LLM-API доступны из твоего региона; Tavily нужен только для web-search в personal mode.
 - **Приватность**: телеметрия по умолчанию ON (анонимная — без контента/путей/имён репо/промптов), но всё равно вырубать через env. Перед пушем openwiki/ в публичный репо — прогнать `leak-scan`.
-- Клон для справки: `${WORKSPACE}/temp-clones/openwiki/` (README + examples/).
+- Справка: https://github.com/langchain-ai/openwiki (README + `examples/`); локально — `./work/openwiki` после клонирования выше.

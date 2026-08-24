@@ -208,4 +208,4 @@ with zipfile.ZipFile(out, 'a') as z:
 - Включать background-color body как «слой» → дублируется на каждый slide
 - Не fix'ить overflow text → text frame обрезает на edit'е
 - Использовать non-pixel units (em, rem, %) → extraction врут координаты, всё съезжает
-- Не testить открыв реальный PPTX в PowerPoint → могут быть rendering quirks
+- Не тестить открыв реальный PPTX в PowerPoint → могут быть rendering quirks

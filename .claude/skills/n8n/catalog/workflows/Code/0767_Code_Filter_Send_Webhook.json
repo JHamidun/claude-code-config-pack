@@ -648,7 +648,7 @@
         "color": 7,
         "width": 740,
         "height": 580,
-        "content": "# Author\n![Solomon]({{ $env.WEBHOOK_URL }}\n### Solomon\nFreelance consultant from your region, specializing in automations and data analysis. I work with select clients, addressing their toughest projects.\n\nCurrently running the [Scrapes community]({{ $env.WEBHOOK_URL }} with Simon 💪\n\nFor business inquiries, email me at automations.solomon@gmail.com\nOr message me on [Telegram]({{ $env.WEBHOOK_URL }} for a faster response.\n\n## Check out my other templates\n### 👉 {{ $env.WEBHOOK_URL }}\n"
+        "content": "# Author\n![Solomon]({{ $env.WEBHOOK_URL }}\n### Solomon\nFreelance consultant from your region, specializing in automations and data analysis. I work with select clients, addressing their toughest projects.\n\nCurrently running the [Scrapes community]({{ $env.WEBHOOK_URL }} with Simon 💪\n\nFor business inquiries, email me at REPLACE_ME@example.com\nOr message me on [Telegram]({{ $env.WEBHOOK_URL }} for a faster response.\n\n## Check out my other templates\n### 👉 {{ $env.WEBHOOK_URL }}\n"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."

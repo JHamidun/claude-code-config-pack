@@ -156,7 +156,7 @@ answer absorption.
 structured local pages, Reddit 21%. Любит традиционный SEO, GBP completeness, structured data,
 position-1 organic.
 
-**(regional LLM B) / (regional LLM A)** → отдельный файл `russian-llm.md`.
+**GigaChat / YandexGPT** → отдельный файл `russian-llm.md`.
 
 ## Источники
 

@@ -99,7 +99,7 @@ out tags;'
 2. **`out center`** — без него `way`/`relation` без координат, только список node-id
 3. **Response 100MB+** на больших bbox — разбивай на меньшие квадраты
 4. **Rate limit** — `429`/`503` тихо. Ротируй между `overpass-api.de` и `kumi.systems`
-5. **Brazil OSM** — местами полнее Google в районе Sample District/побережья (community контрибы)
+5. **OSM** местами полнее Google в небольших районах — там, где силён community-вклад
 6. **Координаты в `(south,west,north,east)`** — `(lat1,lon1,lat2,lon2)`, **не** bbox lon-first
 7. **CSV-out** для excel-импорта: `out:csv(name,phone,::lat,::lon)`
 8. **`area[...]` синтаксис** — сначала `(area.a)` → потом `area_id = id + 3600000000`
@@ -107,7 +107,7 @@ out tags;'
 
 ## Use cases для User
 
-- Все resorts/hostels в Sample District одним запросом без квот
+- Все resorts/hostels в выбранном районе одним запросом без квот
 - Все кафе/рестораны рядом с venue для travel-контента
 - EV-зарядки на маршруте Miami → your region для роадтрипа
 

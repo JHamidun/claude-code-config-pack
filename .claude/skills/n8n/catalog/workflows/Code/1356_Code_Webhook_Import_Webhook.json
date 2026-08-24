@@ -12,7 +12,7 @@
     "priority": "high",
     "environment": "production"
   },
-  "name": "Your CRM Task Form Widget Application Workflow example with Webhook Integration",
+  "name": "Bitrix24 Task Form Widget Application Workflow example with Webhook Integration",
   "tags": [
     "automation",
     "n8n",
@@ -23,7 +23,7 @@
   "nodes": [
     {
       "id": "cb30a147-2965-4b45-8974-12fea1eac96d",
-      "name": "Your CRM Handler",
+      "name": "Bitrix24 Handler",
       "type": "n8n-nodes-base.webhook",
       "position": [
         -800,
@@ -539,7 +539,7 @@
   ],
   "active": true,
   "pinData": {
-    "Your CRM Handler": [
+    "Bitrix24 Handler": [
       {
         "json": {
           "body": {
@@ -1117,6 +1117,6 @@
       ]
     }
   },
-  "description": "Automated workflow: Your CRM Task Form Widget Application Workflow example with Webhook Integration. This workflow processes data and performs automated tasks.",
-  "notes": "Excellent quality workflow: Your CRM Task Form Widget Application Workflow example with Webhook Integration. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+  "description": "Automated workflow: Bitrix24 Task Form Widget Application Workflow example with Webhook Integration. This workflow processes data and performs automated tasks.",
+  "notes": "Excellent quality workflow: Bitrix24 Task Form Widget Application Workflow example with Webhook Integration. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
 }

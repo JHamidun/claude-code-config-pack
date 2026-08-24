@@ -23,6 +23,17 @@
     python config_links.py --fix-hints        # что и где править
 """
 from __future__ import annotations
+# UTF-8 на выход. Консоль Windows по умолчанию cp1251/cp866/cp1252, и первый же
+# не-ASCII символ (кириллица, →, ✓) валит процесс UnicodeEncodeError — обычно на
+# --help, то есть ДО любой полезной работы. errors="replace" оставляет вывод
+# читаемым, если терминал всё же не UTF-8.
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 import argparse
 import json
@@ -66,9 +77,12 @@ def text_files() -> list[pathlib.Path]:
         if d.exists():
             out += list(d.rglob("*.md"))
     out += [p for p in (C / "skills").glob("*/SKILL.md")]
-    root_md = C.parent / "CLAUDE.md"
-    if root_md.exists():
-        out.append(root_md)
+    # Навигационный хаб. Рабочий адрес — C/"CLAUDE.md" (пользовательская память Claude Code);
+    # C.parent/"CLAUDE.md" — прежний адрес пака (проектная память), у кого-то он ещё лежит.
+    # Берём оба, если оба есть: пропустить хаб = не проверить ссылки самого важного файла.
+    for md in (C / "CLAUDE.md", C.parent / "CLAUDE.md"):
+        if md.exists():
+            out.append(md)
     return out
 
 

@@ -3,7 +3,7 @@
   "name": "social-posting",
   "displayName": "Messaging & Posting",
   "version": "0.1.0",
-  "description": "Publish to Telegram channels via bot, message over WhatsApp, send SMS (Twilio), work with any IMAP/SMTP mailbox.",
+  "description": "Publish to Telegram channels via bot, send SMS (Twilio), work with any IMAP/SMTP mailbox.",
   "author": {
     "name": "Zhemal Khamidun",
     "url": "https://github.com/JHamidun"

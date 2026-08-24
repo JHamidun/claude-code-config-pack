@@ -172,34 +172,34 @@
         "json": {
           "id": "1903f41a3a4813f4",
           "to": {
-            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Mihai Farcas</span> &lt;<a href=\"mailto:farcasmihai91@gmail.com\" class=\"mp_address_email\">farcasmihai91@gmail.com</a>&gt;</span>",
-            "text": "\"Mihai Farcas\" <farcasmihai91@gmail.com>",
+            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Mihai Farcas</span> &lt;<a href=\"mailto:REPLACE_ME@example.com\" class=\"mp_address_email\">REPLACE_ME@example.com</a>&gt;</span>",
+            "text": "\"Mihai Farcas\" <REPLACE_ME@example.com>",
             "value": [
               {
                 "name": "Mihai Farcas",
-                "address": "farcasmihai91@gmail.com"
+                "address": "REPLACE_ME@example.com"
               }
             ]
           },
           "date": "2024-06-22T09:23:01.000Z",
           "from": {
-            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Mihai Farcas</span> &lt;<a href=\"mailto:contact@mihai.ltd\" class=\"mp_address_email\">contact@mihai.ltd</a>&gt;</span>",
-            "text": "\"Mihai Farcas\" <contact@mihai.ltd>",
+            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Mihai Farcas</span> &lt;<a href=\"mailto:REPLACE_ME@example.com\" class=\"mp_address_email\">REPLACE_ME@example.com</a>&gt;</span>",
+            "text": "\"Mihai Farcas\" <REPLACE_ME@example.com>",
             "value": [
               {
                 "name": "Mihai Farcas",
-                "address": "contact@mihai.ltd"
+                "address": "REPLACE_ME@example.com"
               }
             ]
           },
           "html": "<div dir=\"ltr\"><p>Dear Alex,</p><p>I hope this email finds you well.</p><p>My name is Mihai Farcas, and I&#39;m the Procurement Manager at Innovative Solutions Inc. We are a leading provider of cutting-edge technological solutions for businesses across various industries.</p><p>I&#39;m reaching out to you today to express our strong interest in your company&#39;s CloudConnect Pro platform. We&#39;ve been thoroughly impressed by its capabilities in cloud integration, data management, and overall flexibility. Our research indicates that it could be an excellent fit for our clients&#39; needs, particularly in the areas of streamlining workflows and enhancing data accessibility.</p><p>We are currently exploring the possibility of incorporating CloudConnect Pro into our upcoming projects. To this end, we would appreciate it if you could provide us with detailed information on pricing, implementation options, and support services for enterprise-level deployments.  Additionally, any case studies or testimonials from companies similar to ours would be most welcome.</p><p>Given the urgency of our projects, a prompt response would be greatly appreciated. We are eager to learn more about how CloudConnect Pro can contribute to our success and look forward to the possibility of a mutually beneficial partnership.</p><p>Thank you for your time and consideration.</p><p><br></p><p>Sincerely,</p><p>Mihai Farcas</p><p>Procurement Manager</p><p>Innovative Solutions Inc.</p></div>\n",
           "text": "Dear Alex,\n\nI hope this email finds you well.\n\nMy name is Mihai Farcas, and I'm the Procurement Manager at Innovative\nSolutions Inc. We are a leading provider of cutting-edge technological\nsolutions for businesses across various industries.\n\nI'm reaching out to you today to express our strong interest in your\ncompany's CloudConnect Pro platform. We've been thoroughly impressed by its\ncapabilities in cloud integration, data management, and overall\nflexibility. Our research indicates that it could be an excellent fit for\nour clients' needs, particularly in the areas of streamlining workflows and\nenhancing data accessibility.\n\nWe are currently exploring the possibility of incorporating CloudConnect\nPro into our upcoming projects. To this end, we would appreciate it if you\ncould provide us with detailed information on pricing, implementation\noptions, and support services for enterprise-level deployments.\nAdditionally, any case studies or testimonials from companies similar to\nours would be most welcome.\n\nGiven the urgency of our projects, a prompt response would be greatly\nappreciated. We are eager to learn more about how CloudConnect Pro can\ncontribute to our success and look forward to the possibility of a mutually\nbeneficial partnership.\n\nThank you for your time and consideration.\n\n\nSincerely,\n\nMihai Farcas\n\nProcurement Manager\n\nInnovative Solutions Inc.\n",
           "headers": {
-            "to": "To: Mihai Farcas <farcasmihai91@gmail.com>",
+            "to": "To: Mihai Farcas <REPLACE_ME@example.com>",
             "date": "Date: Sat, 22 Jun 2024 12:23:01 +0300",
-            "from": "From: Mihai Farcas <contact@mihai.ltd>",
+            "from": "From: Mihai Farcas <REPLACE_ME@example.com>",
             "subject": "Subject: Urgent Inquiry for CloudConnect Pro Integration",
-            "message-id": "Message-ID: <CAGDzDQR5BWWjU40G26dg4AZuiMKZ5b0GtdUyn-2FbfMFs2yJwg@mail.gmail.com>",
+            "message-id": "Message-ID: <REPLACE_ME@example.com>",
             "content-type": "Content-Type: multipart/alternative; boundary=\"00000000000064dc5b061b7718a6\"",
             "mime-version": "MIME-Version: 1.0"
           },
@@ -211,7 +211,7 @@
             "INBOX"
           ],
           "threadId": "1903f3f36f29657c",
-          "messageId": "<CAGDzDQR5BWWjU40G26dg4AZuiMKZ5b0GtdUyn-2FbfMFs2yJwg@mail.gmail.com>",
+          "messageId": "<REPLACE_ME@example.com>",
           "textAsHtml": "<p>Dear Alex,</p><p>I hope this email finds you well.</p><p>My name is Mihai Farcas, and I&apos;m the Procurement Manager at Innovative<br/>Solutions Inc. We are a leading provider of cutting-edge technological<br/>solutions for businesses across various industries.</p><p>I&apos;m reaching out to you today to express our strong interest in your<br/>company&apos;s CloudConnect Pro platform. We&apos;ve been thoroughly impressed by its<br/>capabilities in cloud integration, data management, and overall<br/>flexibility. Our research indicates that it could be an excellent fit for<br/>our clients&apos; needs, particularly in the areas of streamlining workflows and<br/>enhancing data accessibility.</p><p>We are currently exploring the possibility of incorporating CloudConnect<br/>Pro into our upcoming projects. To this end, we would appreciate it if you<br/>could provide us with detailed information on pricing, implementation<br/>options, and support services for enterprise-level deployments.<br/>Additionally, any case studies or testimonials from companies similar to<br/>ours would be most welcome.</p><p>Given the urgency of our projects, a prompt response would be greatly<br/>appreciated. We are eager to learn more about how CloudConnect Pro can<br/>contribute to our success and look forward to the possibility of a mutually<br/>beneficial partnership.</p><p>Thank you for your time and consideration.</p><p>Sincerely,</p><p>Mihai Farcas</p><p>Procurement Manager</p><p>Innovative Solutions Inc.</p>",
           "sizeEstimate": 3554
         }

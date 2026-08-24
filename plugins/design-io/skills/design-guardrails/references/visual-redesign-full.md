@@ -2,7 +2,7 @@
 
 > **Источник:** https://github.com/Yu-369/VibeCurb (298 stars на момент ресёрча 2026-07-20, канал @usefulrepa)
 > **Лицензия:** MIT (Copyright (c) 2026 Yu-369)
-> **Клонировано:** 2026-07-20 в `${WORKSPACE}/temp-clones/vibecurb/skills/visual-redesign/SKILL.md`
+> **Источник:** сторонний навык `visual-redesign` (снят 2026-07-20). Полный текст ниже — клон для сверки не нужен.
 > **Статус:** дословный вендоринг — полный справочник (Sacred vs Slop хирургия существующего React-кода, 5 фаз + Post-Op чек-листы).
 > Компактная выжимка → `../SKILL.md` (design-guardrails).
 

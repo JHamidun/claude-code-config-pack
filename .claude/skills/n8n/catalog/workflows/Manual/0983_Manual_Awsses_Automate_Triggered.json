@@ -22,7 +22,7 @@
       "parameters": {
         "body": "This is a sample message body in an email\n",
         "subject": "n8n Rocks",
-        "fromEmail": "n8n@n8n.io",
+        "fromEmail": "REPLACE_ME@example.com",
         "toAddresses": [
           "user@example.com",
           "user2@example.com"

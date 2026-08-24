@@ -1,10 +1,10 @@
 # Workflow — пошаговые сценарии фаз
 
-> Сценарии портированы из команд seomachine (`/research`, `/write`, `/cluster`, `/optimize`, `/landing-*`), адаптированы под Яндекс+Tilda+RU. Везде сначала читай контекст из `yourname-marketing-context`.
+> Сценарии портированы из команд seomachine (`/research`, `/write`, `/cluster`, `/optimize`, `/landing-*`), адаптированы под Яндекс+Tilda+RU. Везде сначала читай `~/.claude/business-context.md`.
 
 ## research — бриф под тему
 
-1. Прочитать `context/target-keywords.md` + `yourname-marketing-context`.
+1. Прочитать `context/target-keywords.md` + `~/.claude/business-context.md`.
 2. Через скилл `yandex` (Wordstat): собрать частотность по теме, расширения, вопросы (что/как/почему).
 3. Через `yandex` (Вебмастер): текущие позиции своих страниц по теме.
 4. Топ-10 Яндекса по главному ключу (WebSearch/WebFetch или dev-browser) → выписать: интент, формат, объём конкурентов, структуру, что покрыто/не покрыто (гэпы).
@@ -22,7 +22,7 @@
 
 ## write — написание статьи
 
-1. Бриф + контекст-голос (`yourname-marketing-context`; для блога пользователя — `personal-brand.md` + соответствующий writing-скилл).
+1. Бриф + контекст-голос (`~/.claude/business-context.md`; для личного блога — `~/.claude/author-profile.md` + соответствующий writing-скилл).
 2. Структура: **прямой ответ в первых 2-3 предложениях** (критично для AEO), затем раскрытие по H2.
 3. Писать 1500-3000 слов: мини-истории, конкретика и цифры, списки/таблицы (сканируемость + AEO), контекстные CTA. Соблюдать `seo-guidelines-ru.md`.
 4. Роли после черновика: `seo-optimizer`, `meta-creator`, `internal-linker`, `keyword-mapper` (agents-checklists.md).

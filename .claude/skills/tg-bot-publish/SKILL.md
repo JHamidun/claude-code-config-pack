@@ -23,9 +23,20 @@ keywords: telegram bot api, tg_bot.py, sendRichMessage, пост в канал �
 
 ## Токены
 
-`--token` принимает сам токен (`123:ABC…`) ИЛИ имя бота из `~/.claude/.credentials.master.env`
-(`BOT_TOKEN_*`, `TELEGRAM_BOT_TOKEN_*`, `*_TELEGRAM_BOT_TOKEN`).
-Живые на 2026-06: **ACADEMY, COMPANY_SALES, DEMO3, YOUR_LEADGEN_BOT**. Отозваны (401): DEMO5, FINANCE.
+`--token` принимает сам токен (`123:ABC…`) ИЛИ **своё короткое имя бота**, которое резолвится
+из `~/.claude/.credentials.master.env` (шаблон: `~/.claude/templates/.credentials.master.env.example`).
+Имя ищется в четырёх видах: `BOT_TOKEN_<ИМЯ>`, `TELEGRAM_BOT_TOKEN_<ИМЯ>`,
+`<ИМЯ>_TELEGRAM_BOT_TOKEN`, `<ИМЯ>`. Никакого встроенного реестра ботов нет — имя придумываешь ты:
+
+```bash
+# в ~/.claude/.credentials.master.env
+BOT_TOKEN_MYBOT=123456:AAH…            # → --token MYBOT
+BOT_TOKEN_SALESBOT=987654:AAG…         # → --token SALESBOT
+```
+
+Несколько ботов держи под разными именами: у бота-админа канала и бота для личек обычно
+разные права, и перепутанный токен даёт не ошибку, а пост не в тот канал.
+Проверка перед первой отправкой — `me`: отвечает именем бота, значит токен резолвится.
 
 Глобальный `--dry-run` печатает payload и НЕ отправляет — всегда проверяй им перед боевой отправкой.
 
@@ -33,28 +44,28 @@ keywords: telegram bot api, tg_bot.py, sendRichMessage, пост в канал �
 
 ```bash
 # проверить токен
-python tg_bot.py --token ACADEMY me
+python ~/.claude/tools/tg_bot.py --token MYBOT me
 
 # ── ПОСТ В КАНАЛ (бот-админ) ──
 # текст + форматирование + раскрывающийся блок + кнопка-переход на пост
-python tg_bot.py --token ACADEMY send --to @yourchannel \
+python ~/.claude/tools/tg_bot.py --token MYBOT send --to @yourchannel \
   --text "<b>Заголовок</b>
 <blockquote expandable>скрытый длинный текст</blockquote>" \
   --btn "Открыть пост|https://t.me/your_username/123" --pin
 
 # фото-пост, спойлер, подпись над фото, две кнопки в ряд
-python tg_bot.py --token ACADEMY send --to @yourchannel --photo cover.jpg \
+python ~/.claude/tools/tg_bot.py --token MYBOT send --to @yourchannel --photo cover.jpg \
   --text "Подпись" --spoiler --caption-above \
   --btn-row "Сайт|https://your-domain.com ;; Промокод|copy:AI2026"
 
 # ── RICH-ПОСТ (Bot API 10.1): таблицы / заголовки / картинки в посте ──
-python tg_bot.py --token ACADEMY rich --to @yourchannel --md-file post.md
+python ~/.claude/tools/tg_bot.py --token MYBOT rich --to @yourchannel --md-file post.md
 # (rich_message = {"markdown": "..."} — Telegram сам парсит markdown в блоки)
 
 # ── ПОДПИСЧИКУ В ЛИЧКУ / РАССЫЛКА ──
-python tg_bot.py --token COMPANY_SALES send --to 123456789 --text "Личное сообщение"
-python tg_bot.py --token COMPANY_SALES updates --out subs.txt          # собрать chat_id
-python tg_bot.py --token COMPANY_SALES --dry-run broadcast --to-file subs.txt \
+python ~/.claude/tools/tg_bot.py --token SALESBOT send --to 123456789 --text "Личное сообщение"
+python ~/.claude/tools/tg_bot.py --token SALESBOT updates --out subs.txt   # собрать chat_id
+python ~/.claude/tools/tg_bot.py --token SALESBOT --dry-run broadcast --to-file subs.txt \
   --text "<b>Анонс</b> 👇" --btn "Регистрация|https://your-domain.com/conf"
 ```
 
@@ -76,7 +87,7 @@ python tg_bot.py --token COMPANY_SALES --dry-run broadcast --to-file subs.txt \
 | Live-хендлеры (нужен свежий `*_query_id` из `listen`/webhook) | `answer-inline answer-webapp answer-shipping answer-precheckout answer-guest answer-joinreq-query join-webapp save-kbd-button msg-draft edit-live-loc stop-live-loc` |
 | Rich-стриминг/inline | `rich-draft prep-inline` |
 
-`python tg_bot.py --help` — полный список; у каждой подкоманды свой `--help`.
+`python ~/.claude/tools/tg_bot.py --help` — полный список; у каждой подкоманды свой `--help`.
 Большинство команд из реестра — обёртки над одним методом Bot API; структурные параметры передаются JSON-аргументом (`--stickers '[...]'`, `--content '{...}'`, `--results '[...]'`).
 
 ## Форматирование (HTML, по умолчанию в `send`)
@@ -98,13 +109,15 @@ python tg_bot.py --token COMPANY_SALES --dry-run broadcast --to-file subs.txt \
 
 ## Справочники (progressive disclosure)
 
-- **`~/.claude/tools/TG_BOT_API_REFERENCE.md`** — разведка возможностей и полный справочник Bot API: что доступно one-shot vs нужен живой бот, форматирование, кнопки, рассылка, rich, новинки 2025-2026 по версиям, полный список 62 команд.
-- **`~/.claude/tools/TG_BOT_API_REFERENCE.md`** — детальный справочник всех 173 методов Bot API (назначение, версия, все параметры, что возвращает, грабли). Сюда смотреть когда нужен точный параметр метода или метод вне CLI.
+- **`~/.claude/tools/TG_BOT_API_REFERENCE.md`** (~270 КБ) — детальный справочник всех **173 методов**
+  Bot API: назначение, версия, все параметры, что возвращает, грабли; у каждого метода помечено,
+  покрыт ли он CLI-командой. Сюда смотреть, когда нужен точный параметр метода.
+  Читать выборочно (`grep -n "<метод>"` → нужный раздел), а не целиком: файл в контекст не влезет.
 
 ## Границы (что НЕ через этот навык)
 
 - Текст/копирайтинг поста → [[tg-post]] (потом опубликовать готовое — этим навыком).
 - Разработка интерактивного бота с нуля (handlers, scenes, deploy) → `telegram-bot-toolkit`.
 - Чтение истории, парсинг участников, действия от ЛИЧНОГО аккаунта → `~/.claude/tools/tg_client.py` (Telethon, user-API — кнопки слать НЕ может).
-- Публикация через сторонний сервис SocialPublisher → `socialpublisher-post`.
+- Публикация через сторонний планировщик соцсетей (сразу в несколько площадок, отложка) → `postiz`, `publora-post`.
 - Вне скоупа CLI (есть в REFERENCE, но не зашиты): создание стикер-сетов, бизнес-аккаунты, passport, forum-топики CRUD, live-хендлеры платежей/inline.

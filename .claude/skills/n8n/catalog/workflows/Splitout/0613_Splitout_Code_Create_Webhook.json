@@ -169,7 +169,7 @@
       "credentials": {
         "openAiApi": {
           "id": "t5MoHQt5nn0nWWnw",
-          "name": "OpenAi Account (darryn@optimus01.co.za)"
+          "name": "OpenAi Account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1.4,
@@ -216,7 +216,7 @@
       "credentials": {
         "nocoDbApiToken": {
           "id": "5PYJKB4ihzHtKLqx",
-          "name": "NocoDB Account (darryn@optimus01.co.za)"
+          "name": "NocoDB Account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 3,
@@ -249,7 +249,7 @@
       "credentials": {
         "slackOAuth2Api": {
           "id": "xkCA23zAF89RcovP",
-          "name": "Slack Account (OAuth)  (darryn@optimus01.co.za)"
+          "name": "Slack Account (OAuth)  (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 2.2,
@@ -274,7 +274,7 @@
       "credentials": {
         "nocoDbApiToken": {
           "id": "5PYJKB4ihzHtKLqx",
-          "name": "NocoDB Account (darryn@optimus01.co.za)"
+          "name": "NocoDB Account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 3,
@@ -561,7 +561,7 @@
       "credentials": {
         "airtableOAuth2Api": {
           "id": "goKNRHmMmQG5kexN",
-          "name": "Airtable Account (darryn@optimus01.co.za)"
+          "name": "Airtable Account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 2.1,
@@ -595,7 +595,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "G62pZQANOhZoAYVs",
-          "name": "Google Sheets Account (darryn@optimus01.co.za)"
+          "name": "Google Sheets Account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 4.5,
@@ -637,7 +637,7 @@
       "credentials": {
         "nocoDbApiToken": {
           "id": "5PYJKB4ihzHtKLqx",
-          "name": "NocoDB Account (darryn@optimus01.co.za)"
+          "name": "NocoDB Account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 3,

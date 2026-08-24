@@ -254,8 +254,8 @@
           "appendAttribution": false
         },
         "subject": "=Erro -  {{ $(\"Error Trigger\").item.json.workflow.name }}",
-        "toEmail": "davimesquita@gmail.com",
-        "fromEmail": "suporte@ideias.casa",
+        "toEmail": "REPLACE_ME@example.com",
+        "fromEmail": "REPLACE_ME@example.com",
         "emailFormat": "text"
       },
       "credentials": {
@@ -283,8 +283,8 @@
           "appendAttribution": false
         },
         "subject": "=Erro -  {{ $(\"Error Trigger\").item.json.workflow.name }}",
-        "toEmail": "davimesquita@gmail.com",
-        "fromEmail": "contato@ideias.casa",
+        "toEmail": "REPLACE_ME@example.com",
+        "fromEmail": "REPLACE_ME@example.com",
         "emailFormat": "text"
       },
       "credentials": {

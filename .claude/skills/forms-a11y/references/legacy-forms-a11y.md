@@ -39,7 +39,7 @@ when_to_use: В прототипе/интерфейсе есть form-fields —
 - `inputmode` — клавиатура mobile (email, numeric, tel, url, search)
 - `required` — нативная валидация
 - `aria-describedby` — связка с error message
-- `aria-invalid` — toggleв JS при ошибке
+- `aria-invalid` — переключаем в JS при ошибке
 
 ## Полная таблица типов
 

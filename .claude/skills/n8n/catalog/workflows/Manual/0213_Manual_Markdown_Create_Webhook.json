@@ -91,7 +91,7 @@
       "credentials": {
         "smtp": {
           "id": "{{ $credentials.smtp.id }}",
-          "name": "info@stats.consult"
+          "name": "REPLACE_ME@example.com"
         }
       },
       "typeVersion": 1,

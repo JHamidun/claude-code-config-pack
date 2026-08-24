@@ -229,7 +229,7 @@
       ],
       "webhookId": "8afe9499-f75c-4bd2-91cc-1d581133cc5a",
       "parameters": {
-        "sendTo": "thomas@pollup.net",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "The Trello comment for {{ $env.WEBHOOK_URL }} has been update. \nPlease check.",
         "options": {},
         "subject": "Update for Trello done",

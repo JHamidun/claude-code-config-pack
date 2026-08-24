@@ -623,7 +623,7 @@
       ],
       "webhookId": "85e72ad7-effa-4445-911b-90e5f13efa41",
       "parameters": {
-        "sendTo": "logigreenbot@logistics.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "=<h2>📦 Delivery Confirmation</h2>\n\n<p><b>Shipment Number:</b> {{ $json.shipmentNumber }}</p>\n\n<p>📍 <b>Delivery Location:</b><br>\nLat: <code>{{ $json.gpsLatitude }}</code><br>\nLong: <code>{{ $json.gpsLongitude }}</code>\n</p>\n\n<p>⏳ <b>Delivery Time:</b> {{ $json.deliveryTime }}</p>\n\n<p>🖼️ <b>Shipment Photo:</b><br>\n<img src=\"{{ $json.publicImageLink }}\" width=\"400\">\n</p>\n\n<p>✅ This shipment has been successfully delivered by {{ $('Switch Command').item.json.message.chat.first_name }} (Driver ID: {{ $('Switch Command').item.json.message.chat.username }}).</p>\n",
         "options": {
           "senderName": "LogiGreenTrack Solution",

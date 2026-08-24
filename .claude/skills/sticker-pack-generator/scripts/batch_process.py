@@ -8,12 +8,12 @@ Usage:
 import sys, io, os, argparse, time, traceback
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', line_buffering=True)
 
-import cuda_init  # noqa: F401
-import torch
-from rembg import new_session
-from sam2.build_sam import build_sam2_video_predictor
-
-from process_one import process, DEFAULT_CHECKPOINT, DEFAULT_CONFIG
+# Тяжёлый стек (torch / rembg / sam2) здесь не импортируется: его подтягивает
+# process_one._load_deps() в момент реальной работы и с внятным отказом вместо
+# голого `ModuleNotFoundError: No module named 'sam2'` — sam2 на PyPI нет вовсе,
+# и pip на такое отвечает «No matching distribution», уводя диагноз в сторону.
+# Побочно: благодаря этому у скрипта работает `--help`.
+from process_one import process, DEFAULT_CHECKPOINT, DEFAULT_CONFIG, check_alpha_encoder
 
 
 def main():
@@ -26,6 +26,14 @@ def main():
     ap.add_argument('--checkpoint', default=DEFAULT_CHECKPOINT)
     ap.add_argument('--config', default=DEFAULT_CONFIG)
     args = ap.parse_args()
+
+    # Preflight до цикла: без кодировщика VP9-alpha провалится КАЖДЫЙ файл, причём
+    # каждый — после полного прогона SAM2. Один внятный отказ здесь дешевле тридцати
+    # одинаковых трейсбеков внизу.
+    ok, info = check_alpha_encoder()
+    if not ok:
+        raise SystemExit(f'[sticker-pack-generator] {info}')
+    print(f'alpha_encoder: {info}')
 
     os.makedirs(args.out_dir, exist_ok=True)
     mp4s = sorted(f for f in os.listdir(args.mp4_dir) if f.lower().endswith('.mp4'))

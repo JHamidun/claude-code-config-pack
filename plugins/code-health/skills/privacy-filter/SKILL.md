@@ -22,16 +22,17 @@ a cloud LLM (Claude/GPT). Optionally re-identify the LLM's answer afterwards.
 `account_number` · `private_address` · `private_email` · `private_person` ·
 `private_phone` · `private_url` · `private_date` · `secret`
 
-## Setup state (this machine)
+## Setup (once)
 
-Already installed and verified:
-- Package `opf` installed editable from `${WORKSPACE}/privacy-filter-opf` (official repo).
-- Checkpoint at `~/.opf/privacy_filter` (2.7 GB). transformers + ONNX formats also cached
-  under `~/.cache/huggingface/hub/models--openai--privacy-filter`.
-- Wrapper: `scripts/privacy_filter.py`.
+```bash
+git clone https://github.com/openai/privacy-filter ./work/privacy-filter-opf
+pip install -e ./work/privacy-filter-opf
+```
 
-Fresh machine: `pip install -e ${WORKSPACE}/privacy-filter-opf` then first run auto-downloads
-the checkpoint from `openai/privacy-filter` to `~/.opf/privacy_filter`.
+First run auto-downloads the checkpoint (2.7 GB) from `openai/privacy-filter` to
+`~/.opf/privacy_filter`; transformers + ONNX formats land in
+`~/.cache/huggingface/hub/models--openai--privacy-filter`.
+Wrapper shipped with this skill: `scripts/privacy_filter.py`.
 
 > CRITICAL (Windows / no-Triton): the MoE kernels default to a Triton path on CUDA and
 > crash with `ModuleNotFoundError: triton`. The wrapper sets `OPF_MOE_TRITON=0`

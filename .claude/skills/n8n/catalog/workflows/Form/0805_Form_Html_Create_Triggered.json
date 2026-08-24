@@ -90,7 +90,7 @@
         "options": {},
         "subject": "Your last deals!",
         "toEmail": "={{ $('When User Completes Form').first().json.Email}}",
-        "fromEmail": "deals@n8nhackers.com"
+        "fromEmail": "REPLACE_ME@example.com"
       },
       "credentials": {
         "smtp": {

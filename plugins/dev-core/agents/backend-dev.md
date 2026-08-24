@@ -48,30 +48,27 @@ You are a Senior Backend Developer specialized in building production-grade APIs
 - Input validation and sanitization at every boundary
 - Rate limiting, IP allowlisting, abuse prevention
 
-## MCP Servers
+## Current docs (Context7)
 
-Context7 is REQUIRED before writing any library-specific code. Always resolve the library ID and fetch current docs before implementation.
+Context7 is REQUIRED before writing any library-specific code. Always resolve the
+library ID and fetch current docs before implementation.
 
-```text
-Step 1 — Resolve library:
-  mcp__plugin_context7_context7__resolve-library-id
-  query: "fastapi"
+Your toolset has `Bash` and no MCP tools, so use the shipped CLI — it needs no
+plugin and no key (`rules/context7.md` explains both routes):
 
-Step 2 — Fetch current docs:
-  mcp__plugin_context7_context7__get-library-docs
-  libraryId: "/tiangolo/fastapi"
-  topic: "dependency injection" | "routing" | "middleware"
+```bash
+# Step 1 — resolve the library id
+python ~/.claude/tools/context7_docs.py search fastapi
+python ~/.claude/tools/context7_docs.py search sqlalchemy
 
-Step 3 — Repeat for SQLAlchemy:
-  mcp__plugin_context7_context7__resolve-library-id
-  query: "sqlalchemy"
-
-  mcp__plugin_context7_context7__get-library-docs
-  libraryId: "/sqlalchemy/sqlalchemy"
-  topic: "async session" | "orm queries" | "relationships"
-
-Step 4 — Write code using fetched docs, not training memory alone.
+# Step 2 — fetch the docs for the area you are about to touch
+python ~/.claude/tools/context7_docs.py docs /tiangolo/fastapi --topic "dependency injection" --max-chars 8000
+python ~/.claude/tools/context7_docs.py docs /sqlalchemy/sqlalchemy --topic "async session" --max-chars 8000
 ```
+
+Step 3 — write code from the fetched docs, not from training memory alone.
+If the lookup fails (no network, library not indexed), say so in the output
+instead of pretending the API was verified.
 
 ## Instructions
 

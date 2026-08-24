@@ -1,7 +1,8 @@
 # Skills
 
-> Reusable skill definitions that agents and commands reference. 287 skills total
-> (77 with executable code, 210 prompt-based). The tables below are a curated
+> Reusable skill definitions that agents and commands reference. 314 skills total
+> (85 with executable code, 229 prompt-only; snapshot 2026-08-23 —
+> `CLAUDE_CONFIG_DIR="$PWD/.claude" python .claude/scripts/config_lint.py` recounts). The tables below are a curated
 > subset — full list: `ls ~/.claude/skills/` or `skills/CATALOG.md`.
 
 ## AI Models

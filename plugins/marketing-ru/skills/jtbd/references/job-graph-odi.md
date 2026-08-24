@@ -131,4 +131,4 @@ low:   написать сценарий          ← micro job, вынужде�
 
 Один и тот же продукт, **три разные работы** → три разных messaging и три разных оффера. Демографически это могут быть «сотрудники крупных компаний 30–45», что ничего не объясняет.
 
-> Готовые Job Stories под эти сегменты — в `references/job-stories-library.md`. Синтез интервью в сегменты — `user-research-synthesis`. Перед сегментацией под пользователя — `yourname-marketing-context`.
+> Готовые Job Stories под эти сегменты — в `references/job-stories-library.md`. Синтез интервью в сегменты — `user-research-synthesis`. Перед сегментацией под свой продукт — `~/.claude/business-context.md` (раздел «ICP»).

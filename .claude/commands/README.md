@@ -151,3 +151,33 @@
 | `/test-frontend` | Frontend testing with Playwright |
 | `/kimi-reasoning` | (см. AI) Kimi K2 reasoning |
 | `/gsd:*` | Get Shit Done workflow family (57 commands, `gsd/`) |
+
+## Third-party: команды, производные от knowledge-work-plugins
+
+Источник: <https://github.com/anthropics/knowledge-work-plugins>,
+лицензия **Apache License 2.0** (проверено 23.08.2026). Полный текст —
+`LICENSE-knowledge-work.txt` в этом же каталоге.
+
+У команды нет собственного каталога, поэтому лицензия и опись лежат
+здесь, рядом с самими файлами команд.
+
+Все перечисленные файлы **изменены** относительно первоисточника:
+переписаны под формат слэш-команд, часть текста заменена русской.
+Колонка «совпадение» — доля общего текста после снятия шапок
+(difflib.SequenceMatcher по нормализованному телу).
+
+| Команда | Первоисточник | Совпадение |
+|---|---|---|
+| `sprint-planning-pm.md` | `product-management/skills/sprint-planning` | 0.99 |
+| `email-sequence.md` | `marketing/skills/email-sequence` | 0.67 |
+| `call-summary.md` | `sales/skills/call-summary` | 0.64 |
+| `seo-audit.md` | `marketing/skills/seo-audit` | 0.62 |
+| `pipeline-review.md` | `sales/skills/pipeline-review` | 0.60 |
+| `forecast.md` | `sales/skills/forecast` | 0.58 |
+| `draft-content.md` | `marketing/skills/draft-content` | 0.54 |
+| `synthesize-research.md` | `product-management/skills/synthesize-research` | 0.46 |
+| `write-spec.md` | `product-management/skills/write-spec` | 0.44 |
+| `brand-review.md` | `marketing/skills/brand-review` | 0.42 |
+| `performance-report.md` | `marketing/skills/performance-report` | 0.41 |
+| `campaign-plan.md` | `marketing/skills/campaign-plan` | 0.36 |
+| `competitive-brief.md` | `product-management/skills/competitive-brief` | 0.29 |

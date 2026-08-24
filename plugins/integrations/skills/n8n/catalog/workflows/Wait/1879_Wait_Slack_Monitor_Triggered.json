@@ -102,7 +102,7 @@
       ],
       "webhookId": "8db2d0be-4071-431a-8c8b-28bbe3dd80a2",
       "parameters": {
-        "sendTo": "dataplusminuss@gmail.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "=<h3>New Lead Received!</h3> \n<ul>   \n<li><strong>Name:</strong> {{ $json['Name Surname'] }}</li>   \n<li><strong>Email:</strong> {{ $json['E-Mail'] }}</li>   \n<li><strong>Phone:</strong> {{$json[\"Phone\"]}}</li>   \n<li><strong>Interest Level:</strong> {{ $json['  Interest Level  '] }}</li>   \n<li><strong>Source:</strong> {{ $json['  Lead Source  '] }}</li> \n</ul> \n<p><strong>Notes:</strong> {{ $json['Notes '] }}</p>",
         "options": {},
         "subject": "=📩 New Lead Received: {{ $json['Name Surname'] }}"
@@ -210,7 +210,7 @@
       ],
       "webhookId": "a6650ad1-7597-4b36-98f6-59e770de9166",
       "parameters": {
-        "sendTo": "dataplusminuss@gmail.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "=<h3>🔔 The following lead has not been followed up yet! 🔥 Interest level is hot </h3>\n<ul>\n  <li><strong>Name:</strong> {{ $json['Name Surname'] }}</li>\n  <li><strong>Email:</strong> {{ $json['E-Mail'] }}</li>\n  <li><strong>Interest Level:</strong> {{ $json['  Interest Level  '] }}</li>\n</ul>\n<p><strong>Please follow up and update the spreadsheet ✅</p>\n\n",
         "options": {
           "senderName": "N_01_tester"

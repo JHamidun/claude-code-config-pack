@@ -1,4 +1,4 @@
-"""Channel avatar concepts for @yourchannel from a real photo of YourFirstName.
+"""Channel avatar concepts from YOUR OWN reference photo.
 
 SELF-CONTAINED: telethon NOT needed. Uses PIL + requests + gpt-image-2 (OPENAI_API_KEY from
 ~/.claude/.credentials.master.env). Face likeness is preserved via the /v1/images/edits endpoint
@@ -19,7 +19,10 @@ USAGE
     <photo.jpg>  reference photo (e.g. ./photo.jpg)
     concepts     comma list (default: brand,showcards,rim,circle,symbols) or 'all'
     out_dir      default ./avatars
-  env AVATAR_PHOTO can be used instead of argv[1].
+  env AVATAR_PHOTO      reference photo, instead of argv[1]
+  env AVATAR_PROP       one sentence describing your channel's prop/scene (default: frying pan)
+  env AVATAR_FACE_NOTE  optional hint about your look ("wearing glasses") — the likeness itself
+                        comes from the photo, no appearance is hardcoded here
 Set the chosen avatar via Telethon separately (UploadProfilePhoto / EditPhoto) — not here.
 """
 import sys, io, os, base64, requests
@@ -35,29 +38,38 @@ def _key():
     return open(CRED, encoding='utf-8').read().split('OPENAI_API_KEY=')[1].split('\n')[0].strip()
 
 
-FACE = ("Keep the SAME man's face from the reference photo EXACTLY (35yo, short dark hair, "
-        "neat dark beard, warm friendly smile).")
-IISH = (" He is a cheerful host holding a small frying pan; inside the pan a sunny-side-up egg "
-        "whose yolk is a glowing blue AI brain / neural orb with faint circuit lines — 'cooking AI'.")
+# Внешность НЕ описывается словами: likeness держит сама референсная фотография
+# (эндпоинт /v1/images/edits получает её файлом). Словесный портрет здесь был бы
+# описанием конкретного человека — чужой студент получил бы чужое лицо.
+# Нужна подсказка модели («в очках», «седая борода») — env AVATAR_FACE_NOTE.
+_NOTE = os.environ.get('AVATAR_FACE_NOTE', '').strip()
+FACE = ("Keep the SAME face from the reference photo EXACTLY — same features, same hair, "
+        "same skin tone, same age, same expression."
+        + (f" {_NOTE}" if _NOTE else ""))
+# Сюжетный реквизит канала. Свой — через env AVATAR_PROP (одно предложение).
+PROP = os.environ.get(
+    'AVATAR_PROP',
+    " The subject is a cheerful host holding a small frying pan; inside the pan a sunny-side-up egg"
+    " whose yolk is a glowing blue AI brain / neural orb with faint circuit lines — 'cooking AI'.")
 BG = " Deep navy background with faint glowing cyan circuit-board traces. Premium, clean, editorial. NO text."
 
 CONCEPTS = {
-    'showcards': f"Square Telegram channel avatar, centered. {FACE}{IISH}{BG}",
-    'rim': f"Square Telegram channel avatar, centered. {FACE}{IISH} A bright cyan-blue RIM LIGHT "
-           f"traces the CONTOUR of his body, shoulders and head — a glowing silhouette edge-light "
-           f"against the dark navy. No circle, no ring.{BG}",
-    'circle': f"Square Telegram channel avatar, centered. {FACE}{IISH} The whole portrait sits inside "
+    'showcards': f"Square Telegram channel avatar, centered. {FACE}{PROP}{BG}",
+    'rim': f"Square Telegram channel avatar, centered. {FACE}{PROP} A bright cyan-blue RIM LIGHT "
+           f"traces the CONTOUR of the subject's body, shoulders and head — a glowing silhouette "
+           f"edge-light against the dark navy. No circle, no ring.{BG}",
+    'circle': f"Square Telegram channel avatar, centered. {FACE}{PROP} The whole portrait sits inside "
               f"a soft LUMINOUS GLOWING CIRCLE of cyan-blue light (a radiant halo disc behind and "
-              f"around him), against the deep navy.{BG}",
-    'symbols': f"Square Telegram channel avatar, centered. {FACE}{IISH} Floating around and above his "
-               f"head: small glowing holographic code symbols — a greater-than sign, square brackets, "
-               f"curly braces, angle brackets and slashes — in bright cyan and electric blue, like "
-               f"sparks of code (these few symbols are the ONLY text/glyphs).{BG}",
+              f"around the subject), against the deep navy.{BG}",
+    'symbols': f"Square Telegram channel avatar, centered. {FACE}{PROP} Floating around and above the "
+               f"subject's head: small glowing holographic code symbols — a greater-than sign, square "
+               f"brackets, curly braces, angle brackets and slashes — in bright cyan and electric blue, "
+               f"like sparks of code (these few symbols are the ONLY text/glyphs).{BG}",
     'char3d': f"Square channel avatar, head and shoulders, centered. A glossy photorealistic 3D "
-              f"character portrait based on the SAME man from the reference ({FACE}) Pixar-quality "
+              f"character portrait of the SAME person from the reference ({FACE}) Pixar-quality "
               f"stylized 3D render, deep navy background with electric-blue and bright cyan rim light, "
               f"soft studio shadows. Premium, clean. No text.",
-    'tech': f"Square channel avatar, centered. Cinematic portrait of the SAME man from the reference "
+    'tech': f"Square channel avatar, centered. Cinematic portrait of the SAME person from the reference "
             f"photo ({FACE}) confident friendly expression, deep navy background with subtle cyan "
             f"circuit-light glow and soft bokeh, premium tech brand vibe. No text.",
 }

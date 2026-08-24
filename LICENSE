@@ -22,19 +22,100 @@ SOFTWARE.
 
 ---
 
-Third-party material keeps its own license file next to the code — read that
-file before redistributing the directory in question. Notably:
+THIRD-PARTY MATERIAL
+====================
 
-- `.claude/skills/video-shotcraft/` — Apache License 2.0. Background music was
-  removed (provenance undocumented); the remaining sound effects ship with the
-  upstream `ATTRIBUTION.md`.
-- `.claude/skills/gstack/`, `.claude/skills/last30days/` — see LICENSE inside.
-- `.claude/skills/{docx,pdf,pptx,xlsx}/` and their copies under
-  `plugins/office-docs/skills/{docx,pdf,xlsx}/` and
-  `plugins/presentations/skills/pptx/` — Anthropic's own terms, see each
-  `LICENSE.txt`. Those terms are restrictive: they forbid retaining copies
-  outside Anthropic's Services, derivative works, and distribution to third
-  parties. The MIT grant above does NOT extend to them.
-- `get-shit-done/` — adapted from Get Shit Done, originally by TÂCHES, now at
-  https://github.com/open-gsd.
-- Plugins adapted from Anthropic's knowledge-work-plugins carry `UPSTREAM.md`.
+Not everything in this repository was written for it. Every borrowed directory
+keeps the upstream licence text next to its code, plus an UPSTREAM.md or NOTICE
+saying where it came from and what was changed. MIT and Apache-2.0 both require
+those files to travel with the copy: if you redistribute a skill folder, take
+its licence file with it.
+
+The list below was generated from the working tree on 2026-08-23, and every
+upstream licence was verified against its source repository over the network on
+the same day.
+
+MIT
+---
+
+  .claude/get-shit-done/           Copyright (c) 2026 Open GSD
+      Get Shit Done, originally by TACHES, now community-maintained at
+      https://github.com/open-gsd/get-shit-done-redux
+
+  .claude/skills/gstack/           Copyright (c) 2026 Garry Tan
+  .claude/skills/last30days/       Copyright (c) 2026 Matt Van Horn
+      https://github.com/mvanhorn/last30days-skill @ 249c7a4
+  .claude/skills/ru-text/          Copyright (c) 2026 Arseniy Kamyshev
+      https://github.com/talkstream/ru-text @ bbab21f
+  .claude/skills/design-taste/     Copyright (c) 2026 Leonxlnx
+      https://github.com/Leonxlnx/taste-skill
+  .claude/skills/n8n/catalog/      Copyright (c) 2025 Zie619
+      https://github.com/Zie619/n8n-workflows
+  .claude/skills/sharing-skills/   Copyright (c) 2025 Jesse Vincent
+      Superpowers, https://github.com/obra/superpowers
+  .claude/skills/watch-video/      Copyright (c) 2026 Bradley Bonanno
+      https://github.com/bradautomates/claude-video (mechanics only, no code)
+  .claude/skills/seo-machine-ru/   Copyright (c) 2025 Castos (original
+                                   development) + SEO Machine Contributors
+      https://github.com/TheCraigHewitt/seomachine
+
+  Eighteen marketing skills ported from
+  https://github.com/coreyhaines31/marketingskills, Copyright (c) 2025 Corey
+  Haines. Each carries LICENSE-upstream.txt:
+
+      churn-prevention-ru, competitive-analysis-mktg, draft-outreach,
+      form-cro-ru, free-tools-lead-magnets-ru, launch-strategy-ru,
+      marketing-loops-ru, marketing-psychology-ru, offers-ru,
+      onboarding-cro-ru, page-cro-ru, paywall-cro-ru, popup-cro-ru,
+      pr-outreach-ru, pricing-strategy-ru, referrals-ru, sales-enablement-ru,
+      schema-markup-ru
+
+Apache License 2.0
+------------------
+
+  .claude/skills/video-shotcraft/  Copyright 2026 Wei Yihao
+      The sound effects in template/public/audio/ are under the Mixkit Sound
+      Effects Free License. The file-by-file source list lives in that folder's
+      ATTRIBUTION.md; all eleven files were verified byte-for-byte against
+      Mixkit on 2026-08-23.
+
+  Ten skills from https://github.com/anthropics/skills, Copyright 2026
+  Anthropic, PBC. Each carries LICENSE.txt and a NOTICE listing the files
+  changed, as section 4(b) requires:
+
+      algorithmic-art, brand-guidelines, canvas-design, internal-comms,
+      mcp-builder, skill-creator, slack-gif-creator, theme-factory,
+      web-artifacts-builder, webapp-testing
+
+  Three plugins adapted from
+  https://github.com/anthropics/knowledge-work-plugins (marketing, product,
+  sales). That repository is Apache-2.0, not MIT; each plugin carries
+  UPSTREAM.md.
+
+Licence not established - read before redistributing
+----------------------------------------------------
+
+  .claude/skills/doc-coauthoring/  see its UPSTREAM.md
+      Upstream ships no licence file for this one skill, while its eighteen
+      siblings in the same repository do. No grant is asserted here.
+
+  .claude/skills/building-an-exo/  see its ATTRIBUTION.md
+      The frameworks are the authors' intellectual property by the skill's own
+      words. An earlier metadata claim of "MIT" had no source behind it and was
+      removed rather than kept.
+
+Deliberately NOT in this repository
+-----------------------------------
+
+  Anthropic's document skills (docx, pdf, pptx, xlsx). Their licence forbids
+  retaining copies outside Anthropic's Services, creating derivative works, and
+  distribution to third parties; the upstream README calls them
+  "source-available, not open source". They were removed - see
+  _dropped-2026-08-22/office-skills-anthropic-proprietary/README.md. Skills
+  bearing those four names in .claude/skills/ are written from scratch for this
+  pack and are covered by the MIT grant above.
+
+  Remotion (used by video-shotcraft and the overlay recipes) is BUSL and is not
+  vendored: package.json declares it, npm install fetches it, and the licence
+  reaches you directly from its author. Free below $1M ARR - measured against
+  YOUR revenue, not anyone else's.

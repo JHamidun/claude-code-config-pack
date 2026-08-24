@@ -191,7 +191,7 @@
             "={{ $json.to }}"
           ],
           "firstName": "Mutasem",
-          "fromEmail": "mutasem@n8n.io"
+          "fromEmail": "REPLACE_ME@example.com"
         },
         "resource": "engagement",
         "authentication": "{{ $credentials.oAuth2 }}",

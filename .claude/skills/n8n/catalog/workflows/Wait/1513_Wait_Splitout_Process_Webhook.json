@@ -127,7 +127,7 @@
         "simple": false,
         "filters": {
           "q": "has:attachment",
-          "sender": "invoices@paypal.com"
+          "sender": "REPLACE_ME@example.com"
         },
         "options": {
           "downloadAttachments": true

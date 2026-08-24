@@ -55,7 +55,7 @@
       "credentials": {
         "openAiApi": {
           "id": "Qp9mop4DylpfqiTH",
-          "name": "OpenAI (avirago@avirago.pl)"
+          "name": "OpenAI (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1,
@@ -134,7 +134,7 @@
       "credentials": {
         "supabaseApi": {
           "id": "TZeFGe5qO3z7X5Zk",
-          "name": "Supabase (workfloows@gmail.com)"
+          "name": "Supabase (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1,
@@ -215,7 +215,7 @@
       "credentials": {
         "supabaseApi": {
           "id": "TZeFGe5qO3z7X5Zk",
-          "name": "Supabase (workfloows@gmail.com)"
+          "name": "Supabase (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1,

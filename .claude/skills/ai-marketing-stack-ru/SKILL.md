@@ -5,7 +5,7 @@ metadata:
   version: 2.0.0
   updated: 2026-07-22
   source: "Конспект публичных практик vibe-coding и AI-операционок для маркетинга ([эксперт-практик] «Cursor как сотрудник», community-кейсы замены подрядчиков, публичный каталог AI-сервисов)"
-  reuses: agent-builder tooling, n8n, perplexity, apify-scraping
+  reuses: autonomous-agent-creator, n8n, perplexity, apify-scraping
 ---
 
 # AI Marketing Stack RU — AI-сотрудник маркетолога
@@ -23,7 +23,7 @@ use-case** автоматизации и **выдать артефакт** (scaf
 - «Мы платим подрядчику за X — можно ли заменить его vibe-coding'ом?» → сценарий C (расчёт экономики + план замены).
 - «Какие AI-сервисы взять для дизайна/копирайта/скрапинга?» → подбор из каталога (`references/ai-tools-catalog.md`).
 
-**НЕ этот скилл:** продакшн Telegram-бот с деплоем и cron → agent-builder tooling; production-оркестрация пайплайнов → `n8n`; AI-видео конвейер → `ai-creative-factory-ru` / `video-generation`.
+**НЕ этот скилл:** продакшн Telegram-бот с деплоем и cron → `autonomous-agent-creator`; production-оркестрация пайплайнов → `n8n`; AI-видео конвейер → `ai-creative-factory-ru` / `video-generation`.
 
 ## Метод в двух словах
 
@@ -198,11 +198,11 @@ Strategy / Competitors / CRM / Marketing / Sales / Operations / Product / Templa
 | Скрапинг | Apify | skill `apify-scraping` |
 | Image-gen | Gemini Image / Nano Banana | Google AI Studio ключ или fal.ai proxy |
 | База данных | Supabase + Notion | внешние / MCP |
-| Каталог сервисов | ~88 сервисов по категориям | `references/ai-tools-catalog.md` |
+| Каталог сервисов | инструменты по категориям + чем закрыт навыком пака | `references/ai-tools-catalog.md` |
 
 ## Cross-links
 
-- **agent-builder tooling** — продакшн-бот (Telegram, деплой, cron, клиент). Здесь — IDE-сотрудник, не боты.
+- **`autonomous-agent-creator`** — продакшн-бот (Telegram, деплой, cron, клиент). Здесь — IDE-сотрудник, не боты.
 - **`n8n`** — production-оркестрация; vibe-coding здесь = ad-hoc инструменты «за сессию».
 - **`perplexity`** — research-движок для use-case #1.
 - **`apify-scraping`** — парсинг конкурентов и контента.

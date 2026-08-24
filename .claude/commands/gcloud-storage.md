@@ -24,13 +24,14 @@ argument-hint: "[buckets | list <bucket> | upload <bucket> <file> | download <bu
 
 1. **Загрузи credentials:**
 ```python
+import os
 import json
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 import io
 
-with open('${HOME}/.claude/google_oauth_token.json', 'r') as f:
+with open(os.path.expanduser('~/.claude/google_oauth_token.json'), 'r') as f:
     token_data = json.load(f)
 creds = Credentials.from_authorized_user_info(token_data)
 storage = build('storage', 'v1', credentials=creds)
@@ -57,7 +58,8 @@ for obj in objects.get('items', []):
 
 4. **Загрузить файл:**
 ```python
-media = MediaFileUpload('${HOME}/report.pdf', mimetype='application/pdf')
+import os
+media = MediaFileUpload(os.path.expanduser('~/report.pdf'), mimetype='application/pdf')
 obj = storage.objects().insert(
     bucket='my-bucket',
     name='reports/report-2026-03.pdf',
@@ -68,8 +70,9 @@ print(f"Загружен: {obj['name']} ({obj['size']} bytes)")
 
 5. **Скачать файл:**
 ```python
+import os
 request = storage.objects().get_media(bucket='my-bucket', object='reports/report.pdf')
-fh = io.FileIO('${HOME}/Downloads/report.pdf', 'wb')
+fh = io.FileIO(os.path.expanduser('~/Downloads/report.pdf'), 'wb')
 downloader = MediaIoBaseDownload(fh, request)
 done = False
 while not done:
@@ -89,6 +92,7 @@ pip install google-cloud-storage
 ```
 
 ```python
+import os
 from google.cloud import storage as gcs
 
 client = gcs.Client(project='your-gcp-project-id', credentials=creds)
@@ -100,11 +104,11 @@ for bucket in client.list_buckets():
 # Загрузка
 bucket = client.bucket('my-bucket')
 blob = bucket.blob('uploads/file.txt')
-blob.upload_from_filename('${HOME}/file.txt')
+blob.upload_from_filename(os.path.expanduser('~/file.txt'))
 
 # Скачивание
 blob = bucket.blob('uploads/file.txt')
-blob.download_to_filename('${HOME}/Downloads/file.txt')
+blob.download_to_filename(os.path.expanduser('~/Downloads/file.txt'))
 
 # Signed URL (временная ссылка, 1 час)
 from datetime import timedelta

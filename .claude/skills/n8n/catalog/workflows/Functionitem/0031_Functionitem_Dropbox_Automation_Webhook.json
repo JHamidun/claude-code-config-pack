@@ -21,7 +21,7 @@
         580
       ],
       "parameters": {
-        "functionCode": "item.website = \"https://uproc.io\";\nitem.email = \"miquel@uproc.io\";\n\nreturn item;"
+        "functionCode": "item.website = \"https://uproc.io\";\nitem.email = \"REPLACE_ME@example.com\";\n\nreturn item;"
       },
       "typeVersion": 1,
       "id": "node-d947873b"
@@ -36,7 +36,7 @@
       "parameters": {
         "body": "=Hi,\n<br><br>\nThese are your screenshots:<br>\n<table border=\"0\">\n<tr>\n<th>Simple screenshot</th><th>Fullpage screenshot</th>\n<tr>\n<td style=\"vertical-align: top; text-align: center\"><img src=\"{{$node[\"Generate Screenshot\"].json[\"message\"][\"result\"]}}\" width=\"320\"></td>\n<td style=\"vertical-align: top; text-align: center\"><img src=\"{{$node[\"Generate FullPage\"].json[\"message\"][\"result\"]}}\" width=\"320\"></td>\n</tr>\n</table>\n<br><br>\nThank you!",
         "subject": "Your screenshots!",
-        "fromEmail": "miquel@uproc.io",
+        "fromEmail": "REPLACE_ME@example.com",
         "isBodyHtml": true,
         "toAddresses": [
           "={{$node[\"Create Web + Email Item\"].json[\"email\"]}}"

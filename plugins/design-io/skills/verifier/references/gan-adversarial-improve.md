@@ -88,5 +88,5 @@ export GEMINI_API_KEY=...   # или GOOGLE_API_KEY (у нас есть)
 python3 improve.py --artifact path/to/file.md --tag v1 --max-iterations 8 [--criteria rubric.md]
 # результат на ветке improve/<tag>; git diff main improve/v1 -- <file>
 ```
-Клон: `${WORKSPACE}/temp-clones/auto-improve/`. Из вашего региона Gemini API доступен (тот же GOOGLE_API_KEY,
+Донор паттерна — публичный репозиторий `auto-improve`; клонируй в `./work/auto-improve`, если нужен исходный код. Из вашего региона Gemini API доступен (тот же GOOGLE_API_KEY,
 что и для image-моделей). Но для нас ценность — паттерн, а не тул: гоняем на Claude-подписке за 0 токенов API.

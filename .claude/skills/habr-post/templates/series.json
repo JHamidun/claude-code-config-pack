@@ -1,0 +1,31 @@
+{
+  "_readme": [
+    "Реестр серий статей. Writer вместо [текст](#) пишет [текст](series:slug),",
+    "publisher резолвит slug в url. status=draft оставляет series:slug нерезолвленным",
+    "и блокирует публикацию — видно, что нужен живой URL.",
+    "Ниже один пример-серия. Удали его и заведи свои; поля обязательны все."
+  ],
+  "series": [
+    {
+      "id": "example-series-2026",
+      "title": "Название серии",
+      "description": "О чём серия в одном предложении: что читатель получит, пройдя все статьи.",
+      "articles": [
+        {
+          "slug": "part-one",
+          "title": "Первая статья серии",
+          "url": "",
+          "status": "draft",
+          "length": "long"
+        },
+        {
+          "slug": "part-two",
+          "title": "Вторая статья серии",
+          "url": "https://habr.com/ru/articles/000000/",
+          "status": "published",
+          "length": "medium"
+        }
+      ]
+    }
+  ]
+}

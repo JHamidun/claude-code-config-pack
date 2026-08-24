@@ -27,7 +27,7 @@ from deepgram import DeepgramClient, PrerecordedOptions
 import os
 from dotenv import load_dotenv
 
-load_dotenv('${HOME}/.claude/.credentials.master.env')
+load_dotenv(os.path.expanduser('~/.claude/.credentials.master.env'))
 client = DeepgramClient(os.getenv('DEEPGRAM_API_KEY'))
 
 # From file

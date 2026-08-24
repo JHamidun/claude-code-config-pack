@@ -39,9 +39,17 @@ MinerU — VLM+OCR парсер документов в Markdown/JSON для RAG
 
 ```bash
 # 1. Отдельный venv (uv быстрее)
-python -m venv ${HOME}/.claude/mcps/mineru/.venv
-${HOME}/.claude/mcps/mineru/.venv/Scripts/python.exe -m pip install --upgrade pip uv
-${HOME}/.claude/mcps/mineru/.venv/Scripts/python.exe -m uv pip install -U "mineru[all]"
+VENV=${HOME}/.claude/mcps/mineru/.venv
+python -m venv "$VENV"
+
+# Интерпретатор внутри venv называется по-разному: Windows кладёт его в
+# Scripts/python.exe, macOS и Linux — в bin/python. Жёстко записанный
+# Scripts/python.exe давал на *nix «No such file or directory» сразу после
+# успешно созданного venv. Берём тот, который есть:
+PY="$VENV/bin/python"; [ -x "$PY" ] || PY="$VENV/Scripts/python.exe"
+
+"$PY" -m pip install --upgrade pip uv
+"$PY" -m uv pip install -U "mineru[all]"
 
 # 2. Источник весов. Из вашего региона HuggingFace доступен напрямую → предпочтителен.
 #    ModelScope (CN) может тормозить/резаться — брать только если HF недоступен.
@@ -56,8 +64,10 @@ Offline/локальные веса и точная конфигурация: ht
 ## Запуск (CLI)
 
 ```bash
-PY=${HOME}/.claude/mcps/mineru/.venv/Scripts/python.exe
-MINERU=${HOME}/.claude/mcps/mineru/.venv/Scripts/mineru
+VENV=${HOME}/.claude/mcps/mineru/.venv
+# Windows: Scripts/…(.exe) · macOS и Linux: bin/… — берём существующее
+PY="$VENV/bin/python";  [ -x "$PY" ]     || PY="$VENV/Scripts/python.exe"
+MINERU="$VENV/bin/mineru"; [ -x "$MINERU" ] || MINERU="$VENV/Scripts/mineru.exe"
 
 # CPU-режим (без GPU, для цифровых PDF со слоем текста или когда GPU занят):
 "$MINERU" -p input.pdf -o out_dir/ -b pipeline

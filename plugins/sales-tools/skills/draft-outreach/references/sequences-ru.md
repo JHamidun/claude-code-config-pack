@@ -70,4 +70,4 @@
 
 ## Учёт в CRM
 
-Каждое касание и реакцию фиксируй в CRM: `crm` (`crm.activity.add`) и/или academy-CRM `yourname-sales-postgres` (стадии new→interested→qualified→zoom_scheduled). Канал, дата, статус. Это вход лида в воронку (`revops-ru`): ответил положительно → MQL → SQL; горячий enterprise → `handoff_to_user`.
+Каждое касание и реакцию фиксируй там, где ведёшь лиды: активность в CRM (в Битрикс24 — `crm.activity.add`) и/или запись в своей продуктовой БД. Канал, дата, статус. Это вход лида в воронку (`revops-ru`): ответил положительно → MQL → SQL; горячий enterprise → `handoff_to_user`.

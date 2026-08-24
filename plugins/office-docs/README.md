@@ -1,6 +1,6 @@
 # Office Documents
 
-> DOCX, XLSX, PDF, EPUB, CSV analysis, file conversion & organization.
+> XLSX, PDF, EPUB, CSV analysis, file conversion & organization.
 
 Part of the **[hamidun marketplace](../../README.md)**.
 
@@ -9,7 +9,6 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | Skill | What it does |
 |-------|--------------|
 | `csv-analysis` | Анализ CSV и Excel: статистика, графики, трансформации, выводы. |
-| `docx` | Word-документы .docx: создание, правка, tracked changes, комментарии. |
 | `epub-tools` | EPUB: чтение, поиск по главам, сборка из Markdown (ebooklib). |
 | `file-converter` | Конвертация файлов локально: Word↔PDF, Excel→CSV, что угодно→Markdown (markitdown). |
 | `file-organizer` | Раскладка файлов по контексту, типу и дате с автоматизацией. |

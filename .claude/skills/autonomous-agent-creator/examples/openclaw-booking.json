@@ -1,0 +1,87 @@
+{
+  "auth": {
+    "order": { "openai": ["openai-api"] },
+    "profiles": {
+      "openai-api": {
+        "provider": "openai",
+        "mode": "api_key"
+      }
+    }
+  },
+  "gateway": {
+    "mode": "local",
+    "bind": "loopback",
+    "auth": { "mode": "token", "token": "REPLACE_WITH_RANDOM_TOKEN" },
+    "controlUi": { "enabled": true, "allowInsecureAuth": true }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "REPLACE_WITH_TOKEN",
+      "dmPolicy": "open",
+      "allowFrom": ["*"],
+      "groups": {
+        "*": { "requireMention": true }
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "openai/gpt-5.2",
+        "fallbacks": ["openai/gpt-5-mini"]
+      },
+      "systemPrompt": "You are a booking assistant. Help users schedule, reschedule, and cancel appointments. Always confirm date, time, and service before booking. Use memory_search to check existing bookings and avoid conflicts."
+    }
+  },
+  "skills": {
+    "load": {
+      "extraDirs": ["/home/node/.openclaw/skills"]
+    }
+  },
+  "cron": {
+    "enabled": true,
+    "jobs": [
+      {
+        "name": "booking-reminder",
+        "enabled": true,
+        "schedule": {
+          "kind": "cron",
+          "expr": "0 9 * * *",
+          "tz": "Europe/Moscow"
+        },
+        "sessionTarget": "main",
+        "wakeMode": "now",
+        "payload": {
+          "kind": "agentTurn",
+          "message": "Check today's bookings. Send reminders for sessions within 2 hours. Format: time, client name, service.",
+          "toolsAllow": ["memory_search"]
+        },
+        "delivery": {
+          "mode": "announce",
+          "channel": "telegram"
+        }
+      },
+      {
+        "name": "end-of-day-summary",
+        "enabled": true,
+        "schedule": {
+          "kind": "cron",
+          "expr": "0 20 * * *",
+          "tz": "Europe/Moscow"
+        },
+        "sessionTarget": "isolated",
+        "wakeMode": "now",
+        "payload": {
+          "kind": "agentTurn",
+          "message": "Summarize today's completed bookings and tomorrow's schedule. Include total sessions and any cancellations.",
+          "toolsAllow": ["memory_search"]
+        },
+        "delivery": {
+          "mode": "announce",
+          "channel": "telegram"
+        }
+      }
+    ]
+  }
+}

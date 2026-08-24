@@ -12,7 +12,9 @@ metadata:
 
 Research first, then draft. This skill never sends generic outreach - it always researches the prospect first to personalize the message. Works standalone with web search, supercharged when you connect your tools.
 
-> **RU B2B mode:** For Russian-market cold outreach (продажа AI-воркшопов + консалтинга + B2B-когорт academy корп-ЛПР), jump to **«RU B2B Cold Outreach»** below. It ports the cold-email frameworks/sequences/personalization to the RU market (русский язык, корп-ЛПР, каналы email + LinkedIn + Telegram). Before drafting, read product context: заведи собственный навык-контекст продукта (business: персоны, боли, дифференциаторы; offerings: продукты и CTA; funnel: механика воронки и CRM) и читай его первым — в паке такой навык не поставляется, без него персонализация повиснет в воздухе.
+> **RU B2B mode:** For Russian-market cold outreach (продажа AI-воркшопов + консалтинга + B2B-когорт academy корп-ЛПР), jump to **«RU B2B Cold Outreach»** below. It ports the cold-email frameworks/sequences/personalization to the RU market (русский язык, корп-ЛПР, каналы email + LinkedIn + Telegram). Before drafting, read product context: `~/.claude/business-context.md` — разделы «ICP» (персоны, боли), «Продукт» (дифференциаторы), «Цены» (что предлагаем и по чём), «Воронка» и «Учёт и аналитика» (куда класть лид). Файла нет — заведи из `~/.claude/templates/business-context.md`; без него персонализация повиснет в воздухе.
+
+---
 
 ## Connectors (Optional)
 
@@ -26,127 +28,42 @@ Research first, then draft. This skill never sends generic outreach - it always 
 
 ---
 
-## How It Works
-
-```
-+------------------------------------------------------------------+
-|                      DRAFT OUTREACH                               |
-|                                                                   |
-|  Step 1: RESEARCH (always happens first)                         |
-|  - Web search (default)                                           |
-|  - + Enrichment (if enrichment tools connected)                  |
-|  - + CRM (if CRM connected)                                      |
-|                                                                   |
-|  Step 2: DRAFT (based on research)                               |
-|  - Personalized opening (from research)                          |
-|  - Relevant hook (their priorities)                              |
-|  - Clear CTA                                                      |
-|                                                                   |
-|  Step 3: DELIVER (based on connectors)                           |
-|  - Email draft (if email connected)                              |
-|  - Copy for LinkedIn (always)                                    |
-|  - Output to user (always)                                        |
-+------------------------------------------------------------------+
-```
-
----
-
 ## Output Format
 
 ```markdown
 # Outreach Draft: [Person] @ [Company]
-**Generated:** [Date] | **Research Sources:** [Web, Enrichment, CRM]
-
----
+**Research Sources:** [Web / Enrichment / CRM]
 
 ## Research Summary
-
-**Target:** [Name], [Title] at [Company]
-**Hook:** [Why reaching out now - the personalized angle]
-**Goal:** [What you want from this outreach]
-
----
+Target: [имя, роль, компания] | Hook: [почему пишем именно сейчас] | Goal: [что хотим]
 
 ## Email Draft
+To: [email или пометка «найти»] | Subject: [персонализированная тема]
+[тело письма]
+Subject alternatives: 2 варианта
 
-**To:** [email if known, or "find email" note]
-**Subject:** [Personalized subject line]
-
----
-
-[Email body]
-
----
-
-**Subject Line Alternatives:**
-1. [Option 2]
-2. [Option 3]
-
----
-
-## LinkedIn Message (if no email)
-
-**Connection Request (< 300 chars):**
-[Short, no-pitch connection request]
-
-**Follow-up Message (after connected):**
-[Value-first message]
-
----
+## LinkedIn Message (если email нет)
+Connection request (<300 символов, без питча) + follow-up после коннекта
 
 ## Why This Approach
+| Элемент | На каком факте research'а построен |
+| Opening / Hook / Proof / CTA | ... |
 
-| Element | Based On |
-|---------|----------|
-| Opening | [Research finding that makes it personal] |
-| Hook | [Their priority/pain point] |
-| Proof | [Relevant customer story] |
-| CTA | [Low-friction ask] |
-
----
-
-## Email Draft Status
-
-[Draft created - check email]
-[Email not connected - copy email above]
-[No email found - use LinkedIn approach]
-
----
-
-## Follow-up Sequence (Optional)
-
-**Day 3 - Follow-up 1:**
-[Short, new angle]
-
-**Day 7 - Follow-up 2:**
-[Different value prop]
-
-**Day 14 - Break-up:**
-[Final attempt]
+## Follow-up Sequence
+День 3 — новый угол · День 7 — другой value prop · День 14 — breakup
 ```
+
+Блок **Why This Approach** обязателен: он заставляет привязать каждый элемент письма к
+конкретной находке. Без него персонализация незаметно съезжает в общие слова, и письмо
+превращается в шаблон, который отличается от массовой рассылки только именем в шапке.
 
 ---
 
 ## Execution Flow
 
-### Step 1: Parse Request
+### 1. Research — всегда до драфта
 
-```
-Input patterns:
-- "draft outreach to John Smith at Acme" → Person + company
-- "write cold email to Acme's CTO" → Role + company
-- "reach out to sarah@acme.com" → Email provided
-- "LinkedIn message to [LinkedIn URL]" → Profile provided
-```
-
-### Step 2: Research First (Always)
-
-**Use research-prospect skill internally:**
-```
-1. Web search for company + person
-2. If Enrichment connected: Get verified contact info, background
-3. If CRM connected: Check for prior relationship
-```
+Web search (по умолчанию) + enrichment/CRM, если подключены.
 
 **Must find before drafting:**
 - Who they are (title, background)
@@ -154,7 +71,10 @@ Input patterns:
 - Recent news or trigger
 - Personalization hook
 
-### Step 3: Identify Hook
+Ни одного триггера не нашлось — не пиши шаблон «на всякий случай». Скажи, чего не хватает,
+и предложи либо другой канал, либо другого адресата в той же компании.
+
+### 2. Identify Hook
 
 ```
 Priority order for hooks:
@@ -165,7 +85,7 @@ Priority order for hooks:
 5. Role-based pain point → Least personal but still relevant
 ```
 
-### Step 4: Draft Message
+### 3. Draft
 
 **Email Structure (AIDA):**
 ```
@@ -182,113 +102,16 @@ SUBJECT: [Personalized, <50 chars, no spam words]
 [Signature]
 ```
 
-**LinkedIn Connection Request (<300 chars):**
-```
-Hi [Name], [Mutual connection/shared interest/genuine compliment].
-Would love to connect. [No pitch]
-```
+**LinkedIn.** Connection request — жёсткий лимит **300 символов**, общий знакомый или
+конкретный интерес, **без питча**: заявка с оффером внутри режется чаще, чем принимается.
+Follow-up шлётся только ПОСЛЕ коннекта: сначала value (наблюдение, статья, инсайт), потом
+мягкий переход к цели, в конце вопрос, а не предложение.
 
-**LinkedIn Follow-up Message:**
-```
-Thanks for connecting! [Value-first: insight, article, observation]
+### 4. Deliver
 
-[Soft transition to why you reached out]
-
-[Question, not pitch]
-```
-
-### Step 5: Create Email Draft
-
-```
-If email connector available:
-1. Create draft with to, subject, body
-2. Return draft link
-3. Note: "Draft created - review and send"
-
-If not available:
-1. Output email text
-2. Note: "Copy to your email client"
-```
-
----
-
-## Capability by Connector
-
-| Capability | Web Only | + Enrichment | + CRM | + Email |
-|------------|----------|--------------|-------|---------|
-| Personalized opening | Basic | Deep | With history | Same |
-| Verified email | No | Yes | Yes | Yes |
-| Background details | Public only | Full | Full | Full |
-| Prior relationship | No | No | Yes | Yes |
-| Auto-create draft | No | No | No | Yes |
-
----
-
-## Message Templates by Scenario
-
-### Cold Outreach (No Prior Relationship)
-
-```
-Subject: [Their initiative] + [your angle]
-
-Hi [Name],
-
-[Personal hook based on research - news, content, mutual connection].
-
-[1 sentence on their likely challenge based on role/company].
-
-[Brief proof: "We helped [Similar Company] achieve [Result]".]
-
-Worth a 15-min call to see if relevant?
-
-[Signature]
-```
-
-### Warm Outreach (Have Met / Mutual Connection)
-
-```
-Subject: Following up from [context]
-
-Hi [Name],
-
-[Reference to how you know them / who connected you].
-
-[Why reaching out now - their trigger].
-
-[Specific value you can offer].
-
-[CTA]
-```
-
-### Re-Engagement (Went Dark)
-
-```
-Subject: [Short, curiosity-driven]
-
-Hi [Name],
-
-[Acknowledge time passed without being guilt-trippy].
-
-[New reason to reconnect - their news or your news].
-
-[Simple question to re-open dialogue].
-
-[Signature]
-```
-
-### Post-Event Follow-up
-
-```
-Subject: Great meeting you at [Event]
-
-Hi [Name],
-
-[Specific memory from conversation].
-
-[Value-add: article, intro, resource related to what you discussed].
-
-[Soft CTA for next conversation].
-```
+Email-коннектор подключён → создать **черновик** (to/subject/body), вернуть ссылку и
+сказать «review and send». Отправлять самому нельзя: адресат живой человек, и цена ошибки
+в холодном касании — сожжённый контакт. Коннектора нет → выдать текст письма для копирования.
 
 ---
 
@@ -299,20 +122,8 @@ Hi [Name],
 3. **Short paragraphs** — 2-3 sentences max per paragraph. White space is your friend.
 4. **Simple lists** — If listing items, use plain dashes. No fancy formatting.
 
-**Good:**
-```
-Here's what I can share:
-- Case study from a similar company
-- 15-min intro call this week
-- Quick demo if helpful
-```
-
-**Bad:**
-```
-**What I Can Offer:**
-- **Case study** from a similar company
-- **Intro call** this week
-```
+**Good:** `- Case study from a similar company`
+**Bad:** `- **Case study** from a similar company`
 
 ---
 
@@ -361,90 +172,11 @@ IF warm intro possible:
 
 ---
 
-## Company Configuration [CUSTOMIZE]
+## Настройки аутрича (заполнить один раз)
 
-```markdown
-## Outreach Settings
-
-- My name: [Your Name]
-- My title: [Your Title]
-- My company: [Company Name]
-- Value prop: [One sentence - what you help with]
-
-## Signature
-[Your preferred email signature]
-
-## Proof Points
-- [Customer 1]: [Result]
-- [Customer 2]: [Result]
-- [Customer 3]: [Result]
-
-## CTA Options
-- Default: "Worth a 15-min call?"
-- Softer: "Open to learning more?"
-- Specific: "Can I send over a quick demo?"
-
-## Tone
-- [Professional / Casual / Direct]
-- Industry-specific language: [Yes/No]
-```
-
----
-
-## Example
-
-**Input:** "draft outreach to the Head of Engineering at Example Co"
-
-**Research finds:**
-- Name: Example Person
-- Recent news: Notion launched AI features
-- Hiring: 5 ML engineer roles open
-- Background: Ex-Facebook, Stanford CS
-
-**Output:**
-
-```markdown
-# Outreach Draft: Example Person @ Notion
-
-## Research Summary
-**Target:** Example Person, Head of Engineering at Example Co
-**Hook:** They're scaling AI features and hiring ML talent
-**Goal:** Intro call about AI infrastructure
-
----
-
-## Email Draft
-
-**To:** example@example.com
-**Subject:** Notion's AI scaling + a thought
-
----
-
-Hi David,
-
-Saw Notion's AI rollout is gaining serious traction - congrats.
-With 5 ML roles open, seems like you're scaling fast.
-
-Curious how you're thinking about inference infrastructure
-as usage grows. We helped [Similar Company] cut their AI
-serving costs 40% while improving latency.
-
-Worth a 15-min call to see if relevant to your roadmap?
-
-Best,
-[Name]
-
----
-
-**Subject Alternatives:**
-1. Notion AI + scaling question
-2. Quick thought on Notion's ML hiring
-
----
-
-## Email Draft Status
-Draft created - check email
-```
+Имя, должность, компания, value prop, подпись, пруф-поинты, варианты CTA и тон —
+шаблон в **`references/outreach-config-template.md`**. Заполнить перед первым письмом:
+без пруф-поинтов блок Desire в AIDA нечем закрыть, и письмо остаётся обещанием без основания.
 
 ---
 
@@ -454,7 +186,7 @@ Draft created - check email
 
 ## Перед написанием
 
-1. Прочитай контекст продукта из своего навыка-контекста (в паке не поставляется — заведи собственный): персоны, боли, дифференциаторы; офферы (воркшоп/консалтинг/academy B2B, CTA = бесплатная консультация); воронка и CRM (`yourname-sales-postgres`, handoff_to_user, дыры воронки).
+1. **Прочитай `~/.claude/business-context.md`** — разделы «ICP» (персоны, боль их словами, триггер покупки), «Продукт» (чем отличаешься и что альтернативы делают лучше — это половина работы с возражениями), «Воронка» (какой CTA у касания) и «Учёт и аналитика» (куда записывать касание). Файла нет — заведи из `~/.claude/templates/business-context.md`. Без него письмо получится «про нас», а не про адресата: пруфы придётся выдумать, а выдуманный пруф в холодном письме — это конец переписки.
 2. Собери сигналы по компании/ЛПР — делегируй скиллу `lead-research` (RU-источники: Контур.Фокус, Rusprofile, СПАРК, HH, сайт). Не выдумывай факты.
 3. Определи: кому пишешь (роль из персон), что хочешь (цель касания → консультация/воркшоп), value под его роль, пруф ([ваша роль] / [N корп-клиентов] / [N материалов] / [корп-кейс]), сигнал «почему сейчас».
 
@@ -486,10 +218,10 @@ Channel-mix под топов: **email → LinkedIn → (опц.) Telegram**, ч
 | Отправка email / черновик | `gmail`, `outlook` |
 | LinkedIn касания | `linkedin` |
 | Бронь созвона / диагностики | `zoom` (бесплатная консультация) |
-| Контакты/история сделки, запись касания | API твоей CRM (Битрикс24/amoCRM/HubSpot) + academy CRM `yourname-sales-postgres` |
+| Контакты/история сделки, запись касания | API твоей CRM (Битрикс24/amoCRM/HubSpot) — какая у тебя, смотри `~/.claude/business-context.md` → «Учёт и аналитика» |
 | Контент для ТГ | свой пайплайн постинга (в паке не поставляется) |
 
-После касания — **зафиксируй активность в CRM**: контакт, канал, дата, реакция. Записывай в свою CRM (в Битрикс24 это метод `crm.activity.add`) и/или в academy-CRM `yourname-sales-postgres` (стадии new→interested→qualified→zoom_scheduled). Горячий enterprise эскалируется через `handoff_to_user`. Это вход в воронку (см. `revops-ru`).
+После касания — **зафиксируй активность в CRM**: контакт, канал, дата, реакция. Записывай в свою CRM (в Битрикс24 это метод `crm.activity.add`, в amoCRM — примечание к сделке) и/или в свою продуктовую БД, если лиды живут там. Горячий enterprise эскалируется через `handoff_to_user`. Это вход в воронку (см. `revops-ru`).
 
 ## References (RU)
 
@@ -515,4 +247,4 @@ Channel-mix под топов: **email → LinkedIn → (опц.) Telegram**, ч
 - [ ] Один ясный CTA с низким трением (бесплатная консультация/диагностика)?
 - [ ] Нет канцелярита, хайпа («революционный»), AI-следов («надеюсь, письмо застало вас»)?
 - [ ] Факты (соцпруф: [ваша роль] / [N корп-клиентов] / [N материалов] / [корп-кейсы]) сверены с `business.md`, не выдуманы?
-- [ ] Касание записано в CRM (твоя CRM / `yourname-sales-postgres`)?
+- [ ] Касание записано там, где ты ведёшь лиды (CRM или таблица — раздел «Учёт и аналитика» в `business-context.md`)?

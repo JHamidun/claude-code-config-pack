@@ -366,7 +366,7 @@
       "parameters": {
         "url": "{{ $env.API_BASE_URL }}",
         "method": "POST",
-        "jsonBody": "={\n  \"timeMin\": \"{timeMin}\",\n  \"timeMax\": \"{timeMax}\",\n  \"timeZone\": \"Europe/Berlin\",\n  \"groupExpansionMax\": 20,\n  \"calendarExpansionMax\": 10,\n  \"items\": [\n    {\n      \"id\": \"max@n8n.io\"\n    }\n  ]\n}",
+        "jsonBody": "={\n  \"timeMin\": \"{timeMin}\",\n  \"timeMax\": \"{timeMax}\",\n  \"timeZone\": \"Europe/Berlin\",\n  \"groupExpansionMax\": 20,\n  \"calendarExpansionMax\": 10,\n  \"items\": [\n    {\n      \"id\": \"REPLACE_ME@example.com\"\n    }\n  ]\n}",
         "sendBody": true,
         "specifyBody": "json",
         "authentication": "{{ $credentials.predefinedCredentialType }}",
@@ -509,7 +509,7 @@
       "parameters": {
         "url": "{{ $env.API_BASE_URL }}",
         "method": "POST",
-        "jsonBody": "={\n  \"summary\": \"Appointment with {userName}\",\n  \"start\": {\n    \"dateTime\": \"{startTime}\",\n    \"timeZone\": \"Europe/Berlin\"\n  },\n  \"end\": {\n    \"dateTime\": \"{endTime}\",\n    \"timeZone\": \"Europe/Berlin\"\n  },\n  \"attendees\": [\n    {\"email\": \"max@n8n.io\"},\n    {\"email\": \"{userEmail}\"}\n  ]\n}",
+        "jsonBody": "={\n  \"summary\": \"Appointment with {userName}\",\n  \"start\": {\n    \"dateTime\": \"{startTime}\",\n    \"timeZone\": \"Europe/Berlin\"\n  },\n  \"end\": {\n    \"dateTime\": \"{endTime}\",\n    \"timeZone\": \"Europe/Berlin\"\n  },\n  \"attendees\": [\n    {\"email\": \"REPLACE_ME@example.com\"},\n    {\"email\": \"{userEmail}\"}\n  ]\n}",
         "sendBody": true,
         "specifyBody": "json",
         "authentication": "{{ $credentials.predefinedCredentialType }}",

@@ -1,6 +1,6 @@
 """Lyria 2 (Vertex AI) — instrumental music generation with multi-sample crossfade.
 
-your-server Predict endpoint requires OAuth2 service account, NOT API key.
+Vertex AI Predict endpoint requires OAuth2 service account, NOT API key.
 API key returns 401 UNAUTHENTICATED immediately.
 
 GOTCHA: `seed` is incompatible with `sample_count > 1`. Including both → 400.
@@ -8,7 +8,7 @@ Each sample is fixed-length ~30s 48 kHz stereo WAV. For longer BGM, request N
 samples and crossfade them with ffmpeg acrossfade (chained pairwise for 3+).
 
 Env vars (~/.claude/.credentials.master.env):
-    GOOGLE_CLOUD_PROJECT_ID        — your-server project ID
+    GOOGLE_CLOUD_PROJECT_ID        — Google Cloud project ID (Vertex AI)
     GOOGLE_SERVICE_ACCOUNT_KEY_PATH — absolute path to service-account.json
 
 CLI:

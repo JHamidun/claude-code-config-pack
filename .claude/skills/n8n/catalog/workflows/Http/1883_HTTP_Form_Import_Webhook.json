@@ -139,7 +139,7 @@
         320
       ],
       "parameters": {
-        "sendTo": "contact@nonocode.fr",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "Good morning,  \n\nPlease find your invoice.  \n\nSincerely,",
         "options": {
           "attachmentsUi": {

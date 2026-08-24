@@ -1,6 +1,6 @@
 # Design Process
 
-> Design taste, orchestration, critique, comparison, frontend presets, project init.
+> Design taste, orchestration, critique, comparison, frontend presets, cookbook.
 
 Part of the **[hamidun marketplace](../../README.md)**.
 
@@ -17,8 +17,6 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `design-taste` | Quantitative taste control for landings and redesigns — three 1-10 scales (variance, motion, density) plus an AI-tells scanner. |
 | `frontend-design` | Five ready aesthetic presets for projects with no design system — a fast starting style. |
 | `license-check` | Check licenses of fonts, images, icons, and npm packages in an artifact (avoid GPL fonts or Getty images). |
-| `open-design` | Open-source alternative to Claude Design — a local design tool with many skills, design systems, and AI-agent support. |
-| `project-init` | Interactive wizard to scaffold a design project — name, artifact type, target platform, brand, and output format. |
 | `questions-protocol` | When and how to ask clarifying questions before a design task, so you don't have to rebuild it. |
 | `states-checklist` | Per-screen state checklist — empty, loading, error, success, disabled, partial-data, no-permission, offline. |
 

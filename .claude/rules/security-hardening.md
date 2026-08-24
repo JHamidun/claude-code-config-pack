@@ -25,7 +25,17 @@
 
 ## Permission Boundaries
 
-- Security agents (security-engineer, security-scanner) have READ-ONLY tools
+- Security agents never patch the code they audit: no `Edit`, ever.
+  - `security-engineer` — `Read, Glob, Grep`, report goes back in the reply, no file.
+  - `pentest-engineer` — has `Bash`, and active recon is allowed **only after the
+    authorization gate in the agent passes**: target named by the owner, no state
+    change, responsible disclosure.
+  - `health/workers/security-scanner` — `Write` **only** on its own
+    `security-scan-report.md`. Its partner `vulnerability-fixer` picks that file up
+    from disk, not from the scanner's reply text, so a blanket `Write` ban breaks
+    the pair silently: scan runs, no file, fixer finds nothing to fix, no error.
+  - Fixes are the fixer's job (`vulnerability-fixer` or `senior-developer`), never
+    the scanner's.
 - Актуальный режим и списки — `settings.json` → `permissions` (defaultMode, allow/deny/ask) и `/context`
 - MCP servers should use least-privilege API tokens
 - Scope OAuth grants to minimum required permissions

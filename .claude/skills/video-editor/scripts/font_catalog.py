@@ -22,21 +22,80 @@
 Каталог кладётся рядом со скриптом (fonts_catalog.json) и переиспользуется.
 """
 from __future__ import annotations
+# UTF-8 на выход. Консоль Windows по умолчанию cp1251/cp866/cp1252, и первый же
+# не-ASCII символ (кириллица, →, ✓) валит процесс UnicodeEncodeError — обычно на
+# --help, то есть ДО любой полезной работы. errors="replace" оставляет вывод
+# читаемым, если терминал всё же не UTF-8.
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 import argparse
 import json
+import os
 import pathlib
+import platform
 import sys
 
 HERE = pathlib.Path(__file__).parent
 CATALOG = HERE / "fonts_catalog.json"
 
-SEARCH_DIRS = [
-    pathlib.Path(r"C:\Windows\Fonts"),
-    pathlib.Path.home() / "AppData/Local/Microsoft/Windows/Fonts",
-    HERE.parent / "assets" / "fonts",                       # свои, докачанные
-    pathlib.Path.home() / ".claude/skills/video-shotcraft/assets/fonts",
-]
+# Корень навыков пака: .../skills/video-editor/scripts -> .../skills
+SKILLS_ROOT = HERE.parent.parent
+
+
+def _system_font_dirs() -> list[pathlib.Path]:
+    """Системные каталоги шрифтов текущей ОС.
+
+    Раньше здесь были только два windows-пути: на mac и Linux ни один из них не
+    существует, scan() молча возвращал пустой список и писал пустой каталог.
+    """
+    home = pathlib.Path.home()
+    sysname = platform.system()
+    if sysname == "Windows":
+        local = os.environ.get("LOCALAPPDATA") or str(home / "AppData/Local")
+        return [
+            pathlib.Path(os.environ.get("SystemRoot", r"C:\Windows")) / "Fonts",
+            pathlib.Path(local) / "Microsoft/Windows/Fonts",
+        ]
+    if sysname == "Darwin":
+        return [
+            pathlib.Path("/System/Library/Fonts"),
+            pathlib.Path("/System/Library/Fonts/Supplemental"),
+            pathlib.Path("/Library/Fonts"),
+            home / "Library/Fonts",
+        ]
+    # Linux и прочие *nix: XDG + классика
+    dirs = [
+        pathlib.Path("/usr/share/fonts"),
+        pathlib.Path("/usr/local/share/fonts"),
+        home / ".local/share/fonts",
+        home / ".fonts",
+    ]
+    xdg = os.environ.get("XDG_DATA_HOME")
+    if xdg:
+        dirs.insert(2, pathlib.Path(xdg) / "fonts")
+    return dirs
+
+
+def _bundled_font_dirs() -> list[pathlib.Path]:
+    """Шрифты, которые лежат в самом паке — они есть на любой ОС.
+
+    canvas-design/canvas-fonts — 60 своих .ttf под OFL; раньше их не видела ни одна
+    ветка поиска, хотя лежат они в двух каталогах отсюда.
+    """
+    return [
+        HERE.parent / "assets" / "fonts",                    # свои, докачанные
+        SKILLS_ROOT / "canvas-design" / "canvas-fonts",
+        SKILLS_ROOT / "video-shotcraft" / "assets" / "fonts",
+    ]
+
+
+SEARCH_DIRS = _bundled_font_dirs() + _system_font_dirs()
 
 # Пробы покрытия: если нет хотя бы одного символа из набора — алфавит считается непокрытым.
 PROBES = {
@@ -136,16 +195,36 @@ def describe(path: pathlib.Path, font) -> dict | None:
     }
 
 
-def scan() -> list[dict]:
+def _font_files(d: pathlib.Path):
+    """Файлы шрифтов в каталоге, включая вложенные.
+
+    На Linux шрифты лежат по подпапкам (/usr/share/fonts/truetype/dejavu/…),
+    поэтому плоского iterdir() мало.
+    """
+    try:
+        return sorted(p for p in d.rglob("*")
+                      if p.suffix.lower() in (".ttf", ".otf", ".ttc") and p.is_file())
+    except (OSError, PermissionError):
+        return []
+
+
+def scan() -> tuple[list[dict], list[dict]]:
+    """Возвращает (записи каталога, отчёт по каталогам поиска).
+
+    Отчёт нужен, чтобы пустой результат можно было объяснить: какие каталоги
+    искали, какие из них вообще существуют, сколько файлов в каждом нашлось.
+    """
     from fontTools.ttLib import TTFont, TTCollection
 
     out, seen = [], set()
+    report: list[dict] = []
     for d in SEARCH_DIRS:
         if not d.is_dir():
+            report.append({"dir": str(d), "exists": False, "files": 0, "parsed": 0})
             continue
-        for f in sorted(d.iterdir()):
-            if f.suffix.lower() not in (".ttf", ".otf", ".ttc"):
-                continue
+        files = _font_files(d)
+        before = len(out)
+        for f in files:
             key = f.name.lower()
             if key in seen:
                 continue
@@ -170,13 +249,39 @@ def scan() -> list[dict]:
                     fo.close()
                 except Exception:
                     pass
-    return out
+        report.append({"dir": str(d), "exists": True,
+                       "files": len(files), "parsed": len(out) - before})
+    return out, report
+
+
+def _explain_empty(report: list[dict]) -> str:
+    """Человеческое объяснение пустого каталога — вместо тихого exit 0."""
+    lines = [f"  {'есть ' if r['exists'] else 'НЕТ  '} {r['dir']}"
+             + (f"   файлов: {r['files']}, разобрано: {r['parsed']}" if r["exists"] else "")
+             for r in report]
+    found_any = any(r["exists"] for r in report)
+    tail = ("Ни один каталог поиска не существует на этой машине."
+            if not found_any else
+            "Каталоги есть, но ни один файл шрифта не разобрался — проверь fontTools.")
+    return ("шрифтов не найдено ВООБЩЕ — это не «нет шрифта под роль», а пустой поиск.\n"
+            + "\n".join(lines) + "\n" + tail
+            + f"\nСвои шрифты пака: {SKILLS_ROOT / 'canvas-design' / 'canvas-fonts'}")
 
 
 def load() -> list[dict]:
     if not CATALOG.exists():
         raise SystemExit(f"каталога нет — сначала: python {pathlib.Path(__file__).name} scan")
-    return json.loads(CATALOG.read_text(encoding="utf-8"))
+    try:
+        recs = json.loads(CATALOG.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        raise SystemExit(f"каталог {CATALOG} битый ({e}) — пересобери: "
+                         f"python {pathlib.Path(__file__).name} scan")
+    if not recs:
+        raise SystemExit(
+            f"каталог {CATALOG} пуст — в нём НОЛЬ шрифтов.\n"
+            "Это не «нет шрифта под роль»: искать не в чем. "
+            f"Пересобери: python {pathlib.Path(__file__).name} scan")
+    return recs
 
 
 def matches(rec: dict, role: str, cyrillic: bool) -> bool:
@@ -234,12 +339,19 @@ def main() -> int:
     a = ap.parse_args()
 
     if a.cmd == "scan":
-        recs = scan()
+        recs, report = scan()
+        if not recs:
+            # Громкий отказ: пустой каталог НЕ пишем — иначе pick соврёт про роль.
+            print(_explain_empty(report), file=sys.stderr)
+            return 2
         CATALOG.write_text(json.dumps(recs, ensure_ascii=False, indent=1), encoding="utf-8")
         cyr = sum(r["cyrillic"] for r in recs)
         print(f"  разобрано начертаний: {len(recs)}   с кириллицей: {cyr}   "
               f"вариативных: {sum(r['variable'] for r in recs)}")
         print(f"  каталог: {CATALOG}")
+        if not cyr:
+            print("  ВНИМАНИЕ: ни одного шрифта с кириллицей — subtitles дадут "
+                  "пустые квадраты. Докачай: python fetch_fonts.py", file=sys.stderr)
         return 0
 
     recs = load()
@@ -273,7 +385,14 @@ def main() -> int:
     if a.cmd == "pick":
         pool = [r for r in recs if matches(r, a.role, a.cyrillic)]
         if not pool:
-            raise SystemExit(f"под роль {a.role} ничего не нашлось — ослабь условия или докачай шрифты")
+            # Разделяем два разных отказа: «шрифтов мало» и «нужной кириллицы нет».
+            cyr = sum(r["cyrillic"] for r in recs)
+            why = (f"в каталоге {len(recs)} начертаний, с кириллицей {cyr}")
+            if a.cyrillic and not cyr:
+                why += " — кириллических нет ни одного, отсюда и пусто"
+            raise SystemExit(f"под роль {a.role} ничего не нашлось ({why}).\n"
+                             f"Ослабь условия, докачай шрифты (python fetch_fonts.py) "
+                             f"или пересобери каталог: python {pathlib.Path(__file__).name} scan")
         best = max(pool, key=lambda r: score(r, a.role))
         print(best["file"])
         return 0

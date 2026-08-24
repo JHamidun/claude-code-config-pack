@@ -62,7 +62,14 @@ templates/gh-pull.sh https://github.com/owner/repo/tree/main/src/theme
 # → выкачает все файлы из этой папки в ./gh-import/owner-repo/src/theme/
 ```
 
-Использует только `curl` и `jq`.
+Использует `curl` и `jq`. **`jq` не входит ни в macOS, ни в Windows, ни в базовый
+Debian** — скрипт проверяет его первым делом и печатает команду установки под твою
+систему (`brew install jq` · `sudo apt install -y jq` · `winget install jqlang.jq`).
+Без этой проверки обход дерева заканчивался пустыми папками и словом «Готово».
+
+Приватная репа или упор в лимит запросов (60/час без токена) — задай
+`GITHUB_TOKEN`; скрипт сам подскажет это по коду ответа. Скачано 0 файлов —
+это ошибка и ненулевой код возврата, а не успех.
 
 ## После импорта
 
@@ -79,4 +86,4 @@ templates/gh-pull.sh https://github.com/owner/repo/tree/main/src/theme
 
 ## Legacy reference
 
-Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-github-import.md`. Секции там: Использование, Что искать в существующем проекте, Output: project-context.md, Stack, Tokens (use these names), Components (use these instead of building new), Conventions, Routes, Что НЕ копировать, Multi-repo контекст, Антипаттерны.
+Прежняя расширенная версия скилла сохранена целиком в `references/legacy-github-import.md`. Секции там: Использование, Что искать в существующем проекте, Output: project-context.md, Stack, Tokens (use these names), Components (use these instead of building new), Conventions, Routes, Что НЕ копировать, Multi-repo контекст, Антипаттерны.

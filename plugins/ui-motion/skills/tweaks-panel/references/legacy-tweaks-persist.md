@@ -100,7 +100,7 @@ node scripts/save-tokens-server.js
 
 ## Sidecar JSON (без overwrite tokens.css)
 
-Для osторожных юзеров — не переписывать tokens.css, а сохранять отдельно:
+Для осторожных юзеров — не переписывать tokens.css, а сохранять отдельно:
 
 ```
 .tweaks/

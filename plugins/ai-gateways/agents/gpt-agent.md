@@ -44,7 +44,7 @@ generation, or cross-model validation with a second perspective.
 
 - **OpenAI API Key**: From `.credentials.master.env`, gateway handles it internally
 - **Codex OAuth**: Auto-refreshed token for codex models, managed by gateway
-- **Start local**: `cd ${WORKSPACE}/projects/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200`
+- **Start local**: `cd ./work/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200   # свой локальный gateway; пак его не несёт`
 - **Health check**: `curl -s http://localhost:GATEWAY_PORT/health | python -m json.tool`
 
 If gateway is down, start it first. Never proceed without confirming the gateway is running.
@@ -320,7 +320,7 @@ Always prefix responses with the model used:
 ```bash
 curl -s --max-time 3 http://localhost:GATEWAY_PORT/health
 # If no response:
-cd ${WORKSPACE}/projects/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200 &
+cd ./work/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200   # свой локальный gateway; пак его не несёт &
 ```
 
 Report to user if gateway cannot be started. Do not silently fail.

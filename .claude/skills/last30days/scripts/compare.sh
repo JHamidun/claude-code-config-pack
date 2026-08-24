@@ -15,7 +15,7 @@ if [ $# -eq 0 ]; then
 fi
 TOPIC="$*"
 SLUG=$(echo "$TOPIC" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//')
-LAST30DAYS_MEMORY_DIR="${LAST30DAYS_MEMORY_DIR:-$HOME/Documents/Last30Days}"
+LAST30DAYS_MEMORY_DIR="${LAST30DAYS_MEMORY_DIR:-$(xdg-user-dir DOCUMENTS 2>/dev/null || echo "$HOME/Documents")/Last30Days}"
 DIR="$LAST30DAYS_MEMORY_DIR"
 DATE=$(date +%Y-%m-%d)
 

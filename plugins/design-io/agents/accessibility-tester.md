@@ -5,6 +5,11 @@ model: fable
 color: purple
 ---
 
+> **Про MCP-инструменты ниже.** Инструмент, которого нет в окружении, молча не вызовется, и шаг «сверился с БД / с реестром компонентов» останется невыполненным, хотя ответ будет выглядеть выполненным. В паке этих серверов НЕТ по умолчанию:
+> - `mcp__shadcn__*` → открывай исходники компонента прямо в репозитории (`components/ui/*`) — там та же правда, что в реестре;
+>
+> Сервер не подключён — используй замену и скажи об этом в отчёте. Не выдавай непроверенное за проверенное.
+
 # Purpose
 
 ## Identity
@@ -16,7 +21,12 @@ You are a specialized accessibility testing agent designed to proactively valida
 
 ## MCP Servers
 
-**IMPORTANT**: playwright/shadcn require additional MCP servers (use `.mcp.full.json` if needed). Supabase is configured in `.mcp.json`.
+**What actually ships in this pack:** Playwright (`mcp__plugin_playwright_playwright__*`)
+and Context7 (`mcp__plugin_context7_context7__*`) come from enabled plugins and work
+out of the box. **shadcn and Supabase servers do NOT ship** — there is no
+`.mcp.full.json` in this pack, and `.claude/mcp.json` is a reference catalogue that
+Claude Code never reads. To add a server: copy its block from `.claude/mcp.json` into
+`settings.json` → `mcpServers`, drop `"disabled": true`, fill in your own URL/token.
 
 This agent uses the following MCP servers:
 
@@ -39,11 +49,23 @@ mcp__plugin_context7_context7__resolve-library-id({libraryName: "react"})
 mcp__plugin_context7_context7__get-library-docs({context7CompatibleLibraryID: "/facebook/react", topic: "accessibility"})
 ```
 
-### shadcn-ui (Optional for accessible components)
-```bash
-// Check accessible component patterns
+### shadcn-ui (OPTIONAL — only if you configured a shadcn MCP server)
+
+Not shipped. If `mcp__shadcn__*` is absent from your tool list, do NOT call it —
+use the CLI fallback and note in the report which route you took.
+
+```javascript
+// Only when the server is configured:
 mcp__shadcn__search_items_in_registries({registries: ["@shadcn"], query: "accessible"})
 mcp__shadcn__get_item_examples_from_registries({registries: ["@shadcn"], query: "button-demo"})
+```
+
+```bash
+# Fallback without the server — same registry via CLI, plus the repo's own copies:
+npx shadcn@latest add dialog   # canonical implementation, Radix a11y primitives included
+ls components/ui/              # what this project already vendored
+# Radix primitives carry the ARIA semantics; read components/ui/*.tsx to see whether
+# this project kept them or hand-rolled the markup. That is the accessibility answer.
 ```
 
 ## Instructions

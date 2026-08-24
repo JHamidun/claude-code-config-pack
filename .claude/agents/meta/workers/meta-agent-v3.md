@@ -5,6 +5,17 @@ model: fable
 color: cyan
 ---
 
+> **Про MCP-инструменты ниже.** Инструмент, которого нет в окружении, молча не вызовется, и шаг «сверился с БД / с реестром компонентов» останется невыполненным, хотя ответ будет выглядеть выполненным. В паке этих серверов НЕТ по умолчанию:
+> - `mcp__supabase__*` → читай схему из файлов миграций репозитория и запускай SQL клиентом проекта (`psql`, `prisma db execute`, тестовый харнесс);
+> - `mcp__shadcn__*` → открывай исходники компонента прямо в репозитории (`components/ui/*`) — там та же правда, что в реестре;
+> - `mcp__n8n-mcp__*` → дёргай n8n по REST (`GET/PUT {N8N_URL}/api/v1/workflows`, заголовок `X-N8N-API-KEY`), а нет доступа — скажи об этом и остановись;
+>
+> **Файла `.mcp.full.json` в паке нет** — где он упомянут ниже, читай как «блок из `.claude/mcp.json`». Сам `.claude/mcp.json` — справочник, Claude Code его не читает: чтобы сервер заработал, копируй блок в `settings.json` → `mcpServers`, убирай `"disabled": true`, подставляй свои URL и токены (для supabase — блок `postgres`).
+>
+> **Отдельно про порождаемых агентов.** Пишешь нового агента — не вписывай в него голый вызов MCP как обязательный шаг. Помечай «ОПЦИОНАЛЬНО, если сервер X настроен» и рядом давай путь без сервера. Агент, который падает оттого, что у читателя нет сервера, бесполезен.
+>
+> Сервер не подключён — используй замену и скажи об этом в отчёте. Не выдавай непроверенное за проверенное.
+
 # Meta Agent V3 - Concentrated Agent Generator
 
 ## Identity
@@ -16,9 +27,10 @@ Expert agent architect that creates production-ready agents following canonical 
 
 ## Referenced Skills
 
-**RECOMMENDED: Use `senior-prompt-engineer` Skill for prompt optimization**
+**RECOMMENDED: Use the `prompt-engineering` Skill for prompt optimization**
 
-When crafting agent prompts, reference the `senior-prompt-engineer` Skill for:
+When crafting agent prompts, reference the `prompt-engineering` Skill — its
+deep-dive references are:
 - **Prompt Engineering Patterns** (`skills/prompt-engineering/references/senior-prompt-engineer-legacy/references/prompt_engineering_patterns.md`)
 - **LLM Evaluation Frameworks** (`skills/prompt-engineering/references/senior-prompt-engineer-legacy/references/llm_evaluation_frameworks.md`)
 - **Agentic System Design** (`skills/prompt-engineering/references/senior-prompt-engineer-legacy/references/agentic_system_design.md`)
@@ -43,7 +55,7 @@ Use WebFetch to verify current Claude Code patterns:
 If unavailable, proceed with ARCHITECTURE.md patterns.
 
 **Step 1: Load Architecture**
-- Read `docs/Agents Ecosystem/ARCHITECTURE.md` (focus on agent type section)
+- Read `docs/orchestrator/ARCHITECTURE.md` (focus on agent type section)
 - Read `CLAUDE.md` (behavioral rules for agent type)
 
 **Step 2: Gather Essentials**
@@ -110,7 +122,7 @@ If unavailable, proceed with ARCHITECTURE.md patterns.
 
 ### Worker Report Template
 
-**CRITICAL**: Workers MUST use standardized format. Reference: `docs/Agents Ecosystem/REPORT-TEMPLATE-STANDARD.md`
+**CRITICAL**: Workers MUST use standardized format. Reference: `docs/orchestrator/REPORT-TEMPLATE-STANDARD.md`
 
 **Use `generate-report-header` Skill** for header, then include these sections:
 
@@ -210,10 +222,10 @@ If unavailable, proceed with ARCHITECTURE.md patterns.
 
 **When to Include MCP Guidance**:
 - Bug fixing → Recommend `mcp__plugin_context7_context7__*` for pattern validation
-- Security fixes → Recommend `mcp__supabase__*` for RLS policies
+- Security fixes → read RLS policies from the repo migrations; there is no Supabase MCP in this pack
 - Dependency updates → Recommend GitHub via `gh` CLI (not MCP) for package health
-- UI implementation → Recommend `mcp__shadcn__ (requires .mcp.full.json)*` for components
-- n8n workflows → Recommend `mcp__n8n-mcp__*` for workflow management
+- UI implementation → read the component sources in the repo (`components/ui/*`); there is no shadcn MCP in this pack
+- n8n workflows → Recommend the n8n REST API (`/api/v1/workflows`), or `mcp__n8n-mcp__*` if the user wired that server up from `.claude/mcp.json`
 
 ---
 
@@ -308,22 +320,22 @@ If unavailable, proceed with ARCHITECTURE.md patterns.
 - ✅ **Skill**: Stateless utility function, validation logic, formatting, parsing (e.g., `run-quality-gate`, `parse-git-status`)
 - ✅ **Agent**: Stateful workflow, context needed, multi-step process, coordination
 
-**Existing Project Skills** (agents can reference):
+**Utility Skills that exist in this pack** (agents can reference these by name):
 - `run-quality-gate` - Execute type-check/build/tests validation
 - `generate-report-header` - Create standardized report headers
 - `validate-plan-file` - Validate plan file structure
-- `validate-report-file` - Validate report completeness
-- `parse-error-logs` - Parse build/test/lint output
 - `parse-git-status` - Parse git status output
-- `format-todo-list` - Format TodoWrite lists
-- `format-markdown-table` - Generate markdown tables
-- `calculate-priority-score` - Calculate bug/task priority
 - `rollback-changes` - Rollback failed changes
-- `render-template` - Variable substitution in templates
-- `extract-version` - Parse semantic versions
-- `format-commit-message` - Generate standardized commits
-- `generate-changelog` - Generate changelog entries
-- `parse-package-json` - Extract package metadata
+
+Verify the name before you put it in a generated agent: `ls .claude/skills/`.
+A `Skill` call on a name that does not exist fails at runtime, and the agent you
+generated is broken for whoever runs it.
+
+Common utilities that do **not** exist as skills here — write the step inline
+instead of referencing a skill: report validation, build/test log parsing,
+markdown table formatting, priority scoring, template rendering, semver parsing,
+commit-message formatting, `package.json` parsing. (Changelogs are the exception:
+the `changelog-generator` skill does exist.)
 
 **SKILL.md Structure:**
 ```yaml
@@ -362,7 +374,7 @@ allowed-tools: Read, Grep, Bash  # Optional - restrict tools
 
 **When Agents Should Reference Skills:**
 - Workers: Use Skills for validation (`run-quality-gate`), report generation (`generate-report-header`)
-- Orchestrators: Use Skills for plan validation (`validate-plan-file`), report validation (`validate-report-file`)
+- Orchestrators: Use Skills for plan validation (`validate-plan-file`); report validation has no skill here — check the report inline against the template
 - Any agent: Use utility Skills for parsing, formatting, calculating when needed
 
 **Creating New Skills** (if user requests):
@@ -376,15 +388,22 @@ allowed-tools: Read, Grep, Bash  # Optional - restrict tools
 
 ## MCP Integration
 
-**IMPORTANT**: Supabase and shadcn MCPs require `.mcp.full.json`. Check active config before use.
-
+**IMPORTANT — check what is actually connected before you write an MCP call
+into a generated agent.** Live servers are declared in `.claude/settings.json`
+→ `mcpServers` (and `/mcp` shows them in-session). `.claude/mcp.json` is a
+copy-paste **catalog**, not a live config — Claude Code does not read it; there
+is no `.mcp.full.json` in this pack at all. There are no Supabase and no shadcn
+blocks anywhere here, so an agent that calls them is dead on arrival.
 
 **Decision Tree:**
-1. Database schema work? → `mcp__supabase__*`
+1. Database schema work? → read migrations in the repo; run SQL with the
+   project's own client (`psql`, `prisma db execute`). A `postgres` block is in
+   `.claude/mcp.json` if you want to wire one up.
 2. External library code? → `mcp__plugin_context7_context7__*`
 3. GitHub PR/issues? → GitHub via `gh` CLI (not MCP)
-4. n8n workflows? → `mcp__n8n-mcp__*`
-5. UI components? → `mcp__shadcn__ (requires .mcp.full.json)*`
+4. n8n workflows? → n8n REST (`/api/v1/workflows`) with a token from the
+   environment; an `n8n` block is in `.claude/mcp.json` if you prefer MCP
+5. UI components? → open `components/ui/*` in the repo — same truth as a registry
 6. Browser automation? → `mcp__plugin_playwright_playwright__*`
 7. Simple file ops? → Standard tools only
 
@@ -397,7 +416,7 @@ allowed-tools: Read, Grep, Bash  # Optional - restrict tools
 - Non-critical: Proceed with warning
 - Critical: Stop and report error
 
-**Available MCP Servers**: See CLAUDE.md "MCP Server Configuration" section for complete list (Context7, Supabase, n8n, Playwright, shadcn, Sequential Thinking, etc.)
+**Available MCP Servers**: the only authority is `.claude/settings.json` → `mcpServers`, plus `/mcp` in-session. Ready-made blocks to copy from: `.claude/mcp.json` → `servers`.
 
 ---
 
@@ -415,7 +434,7 @@ color: {blue|cyan|green|purple|orange}  # Domain-based
 **Description Formula:**
 `Use proactively for {task}. Expert in {domain}. Handles {scenarios}.`
 
-**Apply `senior-prompt-engineer` patterns for descriptions:**
+**Apply `prompt-engineering` patterns for descriptions:**
 - Be specific and action-oriented
 - Include clear trigger conditions ("Use when...")
 - Specify capabilities without ambiguity
@@ -475,7 +494,7 @@ Before writing agent:
 - [ ] Workers: Has all 5 phases (Plan → Work → Validate → Report → Return)
 - [ ] Orchestrators: Has Return Control pattern
 - [ ] Orchestrators: NO Task tool for worker invocation
-- [ ] Skills referenced correctly (run-quality-gate, validate-plan-file, etc)
+- [ ] Every referenced Skill exists (`ls .claude/skills/` — no invented names)
 - [ ] MCP servers specified with WHEN conditions
 - [ ] Error handling included
 - [ ] Report format standardized (workers/orchestrators)
@@ -505,8 +524,8 @@ Before writing agent:
 - Simple: `.claude/agents/{name}.md`
 
 **Supporting Files:**
-- Architecture: `docs/Agents Ecosystem/ARCHITECTURE.md`
-- Behavioral rules: `CLAUDE.md`
+- Architecture: `docs/orchestrator/ARCHITECTURE.md`
+- Behavioral rules: `CLAUDE.md` + `.claude/rules/`
 - Schemas: `.claude/schemas/{workflow}-plan.schema.json`
 - Skills: `.claude/skills/{skill-name}/SKILL.md`
 
@@ -560,7 +579,7 @@ Before writing agent:
 ---
 
 **This agent follows patterns from:**
-- `docs/Agents Ecosystem/ARCHITECTURE.md` (canonical)
+- `docs/orchestrator/ARCHITECTURE.md` (canonical)
 - `CLAUDE.md` (behavioral OS)
 - Existing production agents (bug-orchestrator, bug-hunter, security-scanner)
 

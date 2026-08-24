@@ -40,7 +40,7 @@
         }
       },
       "credentials": {
-        "airtableApi": "claudiajanebates@gmail.com"
+        "airtableApi": "REPLACE_ME@example.com"
       },
       "typeVersion": 1,
       "id": "5884d116-03e8-4e38-b6ce-c94df07cb2cd",
@@ -70,7 +70,7 @@
         }
       },
       "credentials": {
-        "mailchimpApi": "claudiajanebates@gmail.com"
+        "mailchimpApi": "REPLACE_ME@example.com"
       },
       "typeVersion": 1,
       "id": "1f5fe389-606d-4841-a057-fb9671fa3feb",

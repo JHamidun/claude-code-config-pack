@@ -335,12 +335,12 @@
         "json": {
           "id": "d61efe63-b350-4436-bccf-936a7e54503b",
           "sender": {
-            "email": "a.sender@gmail.com",
+            "email": "REPLACE_ME@example.com",
             "display_name": "A. Sender"
           },
           "mailbox": {
             "id": "3e51603f-c2cb-4807-bc34-022994b0d149",
-            "email": "john.doe@example.io",
+            "email": "REPLACE_ME@example.com",
             "external_id": null
           },
           "read_at": "2023-09-06T11:49:20.355807Z",
@@ -348,7 +348,7 @@
           "created_at": "2023-09-06T11:49:20.355807Z",
           "recipients": [
             {
-              "email": "john.doe@example.io"
+              "email": "REPLACE_ME@example.com"
             }
           ],
           "replied_at": null,

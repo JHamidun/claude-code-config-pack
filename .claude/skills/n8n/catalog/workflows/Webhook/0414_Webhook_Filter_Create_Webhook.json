@@ -137,7 +137,7 @@
       "credentials": {
         "clearbitApi": {
           "id": "fJAEKGUyTHSl0EpC",
-          "name": "max@n8n.io (use carefully!)"
+          "name": "REPLACE_ME@example.com (use carefully!)"
         }
       },
       "notesInFlow": true,
@@ -158,7 +158,7 @@
       "credentials": {
         "clearbitApi": {
           "id": "fJAEKGUyTHSl0EpC",
-          "name": "max@n8n.io (use carefully!)"
+          "name": "REPLACE_ME@example.com (use carefully!)"
         }
       },
       "typeVersion": 1,

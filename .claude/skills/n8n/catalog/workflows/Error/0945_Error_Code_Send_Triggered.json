@@ -95,13 +95,13 @@
               "id": "968b05dc-f476-4e13-8166-e62005d0f936",
               "name": "CC",
               "type": "string",
-              "value": "theiremail@theiremail.com"
+              "value": "REPLACE_ME@example.com"
             },
             {
               "id": "570663c5-29c0-44fb-9992-908b7cca8136",
               "name": "BCC",
               "type": "string",
-              "value": "theiremail@theiremail.com"
+              "value": "REPLACE_ME@example.com"
             }
           ]
         }

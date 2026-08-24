@@ -95,7 +95,25 @@ function isPersonalPath(p) {
   return PERSONAL_PATHS.some(re => re.test(p));
 }
 
-function checkCritical(content) {
+// Перечисляем ПРОЗУ, а не исполняемое. Первая версия шла от обратного — список
+// исполняемых расширений — и сразу забыла `.sql`: файл миграции выполняет
+// клиент БД, `DROP DATABASE` там боевой. Список исполняемого открыт (`.tf`,
+// `.yml` в CI, `Makefile`, `.psm1`…) и будет забываться дальше; список прозы
+// закрыт и короток. Поэтому исключение — только для форматов, которые не
+// исполняются НИКОГДА.
+const PROSE_EXT = /\.(md|markdown|txt|rst|adoc|org)$/i;
+
+function isProseTarget(filePath) {
+  return PROSE_EXT.test(filePath || '');
+}
+
+function checkCritical(content, filePath) {
+  // Проверка по СЫРОМУ тексту имеет смысл только для того, что исполнится.
+  // Раньше её применяли ко всему подряд, и гард блокировал запись любого файла,
+  // который лишь ЦИТИРУЕТ опасную команду: рунбука, теста, документации — и
+  // отчёта об этой самой поломке. Воспроизведено дважды, один раз
+  // непреднамеренно: гард мешал документировать сам себя.
+  if (filePath !== undefined && isProseTarget(filePath)) return null;
   for (const p of CRITICAL_PATTERNS) {
     if (p.regex.test(content)) return p;
   }
@@ -133,7 +151,7 @@ function runSecurityGuard(data) {
     const content = extractContent(toolName, toolInput);
     if (!content) process.exit(0);
 
-    const critical = checkCritical(content);
+    const critical = checkCritical(content, filePath);
     if (critical) {
       console.error('BLOCKED: ' + critical.message);
       console.error('File: ' + filePath);

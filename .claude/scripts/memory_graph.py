@@ -170,9 +170,9 @@ def canon(kind, name):
 
 
 def _ingest_casebook(con):
-    """Влить _casebook (Layer 2): карточки→case-узлы, clusters/project→project-узлы, +сущности (люди/компании/инструменты).
-    Источники: all_cards_v2.json (исходный кейсбук 856) + cards_db/*.json (догон из chats.db, богаче — с сущностями).
-    Layer 2 переиспользует прошлую масс-экстракцию (761127d1/9182c0aa) + догон дыры покрытия, а не гонит LLM с нуля."""
+    """Влить ~/_casebook (Layer 2, ОПЦИОНАЛЬНО): карточки→case-узлы, clusters/project→project-узлы, +сущности.
+    Источники: all_cards_v2.json + cards_db/*.json (если ведёшь кейсбук разобранных сессий).
+    Каталога нет — слой молча пропускается, граф строится из одного Layer 1 (заметки памяти)."""
     import json, glob
     _load_maps()
     nodes, edges = 0, 0

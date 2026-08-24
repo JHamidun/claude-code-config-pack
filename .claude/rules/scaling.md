@@ -65,7 +65,7 @@ Best for: experimental changes, risky refactors, parallel feature branches.
 |-----------|----------|
 | Reading 10+ files | Use Explore agent (saves main context) |
 | Multiple sequential tasks | /compact between tasks |
-| Long-running session (>50 turns) | /clear and /session-restore |
+| Long-running session (>50 turns) | /clear, предварительно сохранив learnings в память (rules/auto-learning.md) |
 | Parallel features | Git worktrees via /worktree |
 | Large file analysis | Read with offset+limit, not full file |
 | Repetitive operations | Write a script, run once |

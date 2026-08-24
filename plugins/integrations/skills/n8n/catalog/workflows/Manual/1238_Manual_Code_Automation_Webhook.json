@@ -76,7 +76,7 @@
           "parameters": [
             {
               "name": "x-api-key",
-              "value": "72858adea87ad16865d5b0a24c3d9b9f58a6e7b1a8a8a8a0d6b81a9f3a9812f3"
+              "value": "YOUR_API_KEY"
             }
           ]
         }

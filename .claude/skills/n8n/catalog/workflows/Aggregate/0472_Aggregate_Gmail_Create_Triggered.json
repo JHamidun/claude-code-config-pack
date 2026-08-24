@@ -397,51 +397,51 @@
       {
         "id": "1962eb5ee3119d76",
         "to": {
-          "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Workfloows Tutorial</span> &lt;<a href=\"mailto:workfloowstutorial@gmail.com\" class=\"mp_address_email\">workfloowstutorial@gmail.com</a>&gt;</span>",
-          "text": "\"Workfloows Tutorial\" <workfloowstutorial@gmail.com>",
+          "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Workfloows Tutorial</span> &lt;<a href=\"mailto:REPLACE_ME@example.com\" class=\"mp_address_email\">REPLACE_ME@example.com</a>&gt;</span>",
+          "text": "\"Workfloows Tutorial\" <REPLACE_ME@example.com>",
           "value": [
             {
               "name": "Workfloows Tutorial",
-              "address": "workfloowstutorial@gmail.com"
+              "address": "REPLACE_ME@example.com"
             }
           ]
         },
         "date": "2025-04-13T10:33:05.000Z",
         "from": {
-          "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Workfloows</span> &lt;<a href=\"mailto:workfloows@gmail.com\" class=\"mp_address_email\">workfloows@gmail.com</a>&gt;</span>",
-          "text": "\"Workfloows\" <workfloows@gmail.com>",
+          "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Workfloows</span> &lt;<a href=\"mailto:REPLACE_ME@example.com\" class=\"mp_address_email\">REPLACE_ME@example.com</a>&gt;</span>",
+          "text": "\"Workfloows\" <REPLACE_ME@example.com>",
           "value": [
             {
               "name": "Workfloows",
-              "address": "workfloows@gmail.com"
+              "address": "REPLACE_ME@example.com"
             }
           ]
         },
         "html": "<div dir=\"ltr\">Hey! <div><br></div><div>We&#39;d love to cooperate with you - could you please send us your offer? </div><div><br></div><div>Best,</div><div>Oskar</div></div>\n",
         "text": "Hey!\n\nWe'd love to cooperate with you - could you please send us your offer?\n\nBest,\nOskar\n",
         "headers": {
-          "to": "To: Workfloows Tutorial <workfloowstutorial@gmail.com>",
+          "to": "To: Workfloows Tutorial <REPLACE_ME@example.com>",
           "date": "Date: Sun, 13 Apr 2025 12:33:05 +0200",
-          "from": "From: Workfloows <workfloows@gmail.com>",
+          "from": "From: Workfloows <REPLACE_ME@example.com>",
           "subject": "Subject: Inquiry for cooperation",
           "x-gm-gg": "X-Gm-Gg: ASbGncsLoGTllITLV/hYh7p2Re1X0A4Fd5a1uQb58nQ1FCzXrvjCL9BY2H/6U4fN3wn\r\n\tFkTSzNo0PUVLScNsBjkkOdwaqHhHLT+UzxaAtr8LpnucVTxhWbI08sl8lxjJUsHJwsJwIpSaAqX\r\n\tkKKBKUewdQhcwJNh4P22vOalA=",
           "arc-seal": "ARC-Seal: i=1; a=rsa-sha256; t=1744540397; cv=none;\r\n        d=google.com; s=arc-20240605;\r\n        b=BWNyT3FtnssueCPH4di13k++uCiJsB73BRfuQ63N0/+fUQqAvkZRMdN4cZiSCXpLph\r\n         +ag3l4hgkp9yuE66MQjv18vWzMaUsmaj5obHWe+6x6YcPkMRW/y+gNitCD+mftpYsQpz\r\n         nQpkoyZaY3h9o9vmcUUmOPWCWrUysy8y8sOOhht7Tmekzs3tQj+aLyXJNv+j9SCwvsTE\r\n         yd5uisDlrWv1zfpdUZLwNKZuCP+Jtfr01w3QT/zhBCweOccIJaFzfO4s97q8JgUgRrmx\r\n         JkrsGpSWJZKWPDh44mkmHH+bw43omIJKXYTHN9nOO3vGyqBWdGYlE0T9ZhCetHHyBbpS\r\n         b+Mw==",
-          "received": "Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [YOUR_PUBLIC_IP])\r\n        by mx.google.com with SMTPS id 2adb3069b0e04-54c455e2176sor1769457e87.11.2025.04.13.03.33.17\r\n        for <workfloowstutorial@gmail.com>\r\n        (Google Transport Security);\r\n        Sun, 13 Apr 2025 03:33:17 -0700 (PDT)",
-          "message-id": "Message-ID: <CA+sg_9eV=X+LusGnDSP8pDrrYZ8SLn2Maq4CYpLrg=uG=7T7DQ@mail.gmail.com>",
+          "received": "Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [YOUR_PUBLIC_IP])\r\n        by mx.google.com with SMTPS id 2adb3069b0e04-54c455e2176sor1769457e87.11.2025.04.13.03.33.17\r\n        for <REPLACE_ME@example.com>\r\n        (Google Transport Security);\r\n        Sun, 13 Apr 2025 03:33:17 -0700 (PDT)",
+          "message-id": "Message-ID: <CA+sg_9eV=X+LusGnDSP8pDrrYZ8SLn2Maq4CYpLrg=uG=REPLACE_ME@example.com>",
           "x-received": "X-Received: by 2002:a2e:bd88:0:b0:30d:629c:4333 with SMTP id\r\n 38308e7fff4ca-31049aacf9dmr29831171fa.34.1744540396464; Sun, 13 Apr 2025\r\n 03:33:16 -0700 (PDT)",
-          "return-path": "Return-Path: <workfloows@gmail.com>",
+          "return-path": "Return-Path: <REPLACE_ME@example.com>",
           "content-type": "Content-Type: multipart/alternative; boundary=\"000000000000a0b4660632a67692\"",
-          "delivered-to": "Delivered-To: workfloowstutorial@gmail.com",
+          "delivered-to": "Delivered-To: REPLACE_ME@example.com",
           "mime-version": "MIME-Version: 1.0",
-          "received-spf": "Received-SPF: pass (google.com: domain of workfloows@gmail.com designates YOUR_PUBLIC_IP as permitted sender) client-ip=YOUR_PUBLIC_IP;",
+          "received-spf": "Received-SPF: pass (google.com: domain of REPLACE_ME@example.com designates YOUR_PUBLIC_IP as permitted sender) client-ip=YOUR_PUBLIC_IP;",
           "x-gm-features": "X-Gm-Features: ATxdqUEDRqHsd35x8e-h-zd4BcGaOVs83Rpm-BRaGlzjaiGxZMiGfgHEjxn3hNE",
           "dkim-signature": "DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=gmail.com; s=20230601; t=1744540397; x=1745145197; dara=google.com;\r\n        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject\r\n         :date:message-id:reply-to;\r\n        bh=yhyki7Kf5bQNf/8oq2uNTa/y/MoSnhI+j3ZqeBT892s=;\r\n        b=Njlov8RLGs/rZIz07rSJIfn8oQDEXgybU4mJ0ujD8T8m7J4NabveIhdobrrHraaZqN\r\n         iwOZHBn0TTWAbuccHjfU+BBB8FvJ4/jfCXKbWSwPIWHd53P1wuTxvXYgbkXX4A/W675L\r\n         zPSVraK4W1heQDTViCc2MmV5+tH6pbe/52xTOwvx8Xf0WTN1Ku3K/DY8EIsnd0OKdrEn\r\n         ml+/LHhVMmwR5lZtte7mTlYi/c5FG8XO95Nh/Ftl22RpuKl1QPFUdJcx+bEVeUh62uHM\r\n         Bd8pyi0y/LVKIqNtL/DIvpt2+bt9TLm7MB2P61KMUAP75qZCparl2MWLR62c8tW7cFqm\r\n         wPHA==",
           "x-gm-message-state": "X-Gm-Message-State: AOJu0YzGNl9So86XWoTm+y0PO71OilI6ljQ/cHqUDKwYpIrbLMy8ZiCe\r\n\ty2NKHmx051OaBkuEbe2bQD3dl78xO6sJPWWrTXUn1mV9b52v6vaQsLXXkQWx5cKuaw9spNE1dpU\r\n\tzsVB7chkTKdZ5HO31p29RiSug2SJ0AZXS",
           "x-google-smtp-source": "X-Google-Smtp-Source: AGHT+IF6PTdq6zPXbZy1CEUmKyNDSavbnDjbcWp5Y3hfiFlZruW8yABRwE9q5LKSffpes/dVbAryLGt6F27ROQMhWMg=",
           "arc-message-signature": "ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;\r\n        h=to:subject:message-id:date:from:mime-version:dkim-signature;\r\n        bh=yhyki7Kf5bQNf/8oq2uNTa/y/MoSnhI+j3ZqeBT892s=;\r\n        fh=fBYbxd7sNeSi3dX3VeF2+nxOJZdPrQsXgdNq9LWGYGE=;\r\n        b=V70ViYZcIyYaZCIMeEXNv4R6X5fkIYJxel9I6iHuCI2RJLc824inbFBL3Enb/JD8yt\r\n         Sk1iK/RGh+PYMU1FAHeq/uUri2PG1Z9RZc7e7jjLil/nCWpYF91AhFEZE8B7kl5uWKZb\r\n         qA4ASGlYUTJwjoWMpJle0uvlOBksdXIb2Zb5K6kyHe4zlqhHeM6ySiJLEu7bj/eS5TYg\r\n         vnmoySAYAsLH5T/08gj6OwaBWcmqhfMVO8adMkIZe1VZQqC9nKVJJis0I3Hsl9UwhicB\r\n         VDSvEH/KsHrDDqPkSMDHykv1NzBK9cPgQ8cAG4QdgSd3zuEp5uJkxXNycF1NN1cZwRfZ\r\n         eC2A==;\r\n        dara=google.com",
-          "authentication-results": "Authentication-Results: mx.google.com;\r\n       dkim=pass header.i=@gmail.com header.s=20230601 header.b=Njlov8RL;\r\n       spf=pass (google.com: domain of workfloows@gmail.com designates YOUR_PUBLIC_IP as permitted sender) smtp.mailfrom=workfloows@gmail.com;\r\n       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;\r\n       dara=pass header.i=@gmail.com",
+          "authentication-results": "Authentication-Results: mx.google.com;\r\n       dkim=pass header.i=@gmail.com header.s=20230601 header.b=Njlov8RL;\r\n       spf=pass (google.com: domain of REPLACE_ME@example.com designates YOUR_PUBLIC_IP as permitted sender) smtp.mailfrom=REPLACE_ME@example.com;\r\n       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;\r\n       dara=pass header.i=@gmail.com",
           "x-google-dkim-signature": "X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20230601; t=1744540397; x=1745145197;\r\n        h=to:subject:message-id:date:from:mime-version:x-gm-message-state\r\n         :from:to:cc:subject:date:message-id:reply-to;\r\n        bh=yhyki7Kf5bQNf/8oq2uNTa/y/MoSnhI+j3ZqeBT892s=;\r\n        b=o2krTN0ebufVGn92FP/xtW+t8OQ46Jc9sSrWVXrWihY1hBM7C9fEwuF9svkxx3SB8B\r\n         m8qZVS5TIDCv+JkZKK9jpHw3cD09s/YSr7aPP5bAWibx5UhB1/Ki7Kn0hdgt90LS2Kob\r\n         jr7CP8QrrWfftq7zutBxaVoCdBtTrod/TJKDxDr1b3vFaoN/XxGnUeqj8EoAbdTDf859\r\n         5hmRQUODpJaybi3MDmBzStjIh9rlUBLkt4csANAuUZWX1/b28+HAiT7AOdq9ksbROpgi\r\n         h5LedT5dMXPYU6yU0lQ6kk14R6eX6tHQN3AV5I1kCOaaeArC7NvUK5o8mUH2QDKZgWIe\r\n         DR5A==",
-          "arc-authentication-results": "ARC-Authentication-Results: i=1; mx.google.com;\r\n       dkim=pass header.i=@gmail.com header.s=20230601 header.b=Njlov8RL;\r\n       spf=pass (google.com: domain of workfloows@gmail.com designates YOUR_PUBLIC_IP as permitted sender) smtp.mailfrom=workfloows@gmail.com;\r\n       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;\r\n       dara=pass header.i=@gmail.com"
+          "arc-authentication-results": "ARC-Authentication-Results: i=1; mx.google.com;\r\n       dkim=pass header.i=@gmail.com header.s=20230601 header.b=Njlov8RL;\r\n       spf=pass (google.com: domain of REPLACE_ME@example.com designates YOUR_PUBLIC_IP as permitted sender) smtp.mailfrom=REPLACE_ME@example.com;\r\n       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;\r\n       dara=pass header.i=@gmail.com"
         },
         "subject": "Inquiry for cooperation",
         "labelIds": [
@@ -451,7 +451,7 @@
           "INBOX"
         ],
         "threadId": "1962eb5ee3119d76",
-        "messageId": "<CA+sg_9eV=X+LusGnDSP8pDrrYZ8SLn2Maq4CYpLrg=uG=7T7DQ@mail.gmail.com>",
+        "messageId": "<CA+sg_9eV=X+LusGnDSP8pDrrYZ8SLn2Maq4CYpLrg=uG=REPLACE_ME@example.com>",
         "textAsHtml": "<p>Hey!</p><p>We&apos;d love to cooperate with you - could you please send us your offer?</p><p>Best,<br/>Oskar</p>",
         "sizeEstimate": 5849
       }

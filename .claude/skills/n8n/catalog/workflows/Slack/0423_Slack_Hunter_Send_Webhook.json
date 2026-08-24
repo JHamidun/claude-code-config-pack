@@ -244,7 +244,7 @@
       {
         "formMode": "test",
         "submittedAt": "2024-02-22T13:59:54.709Z",
-        "What's your business email?": "jan@n8n.io"
+        "What's your business email?": "REPLACE_ME@example.com"
       }
     ]
   },

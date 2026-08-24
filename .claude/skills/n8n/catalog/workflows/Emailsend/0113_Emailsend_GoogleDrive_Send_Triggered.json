@@ -34,8 +34,8 @@
         "text": "=A file in your Google Drive file folder has been created: {{$json[\"name\"]}}",
         "options": {},
         "subject": "File Update",
-        "toEmail": "mutedjam@n8n.io",
-        "fromEmail": "mutedjam@n8n.io"
+        "toEmail": "REPLACE_ME@example.com",
+        "fromEmail": "REPLACE_ME@example.com"
       },
       "credentials": {
         "smtp": {

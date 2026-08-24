@@ -12,11 +12,36 @@ Expert skill for professional translation using DeepL API - the most accurate ma
 ## API Key
 
 ```bash
-# API ключи: ~/.claude/.credentials.master.env
-# Переменная: DEEPL_API_KEY
-DEEPL_API_KEY=os.getenv('DEEPL_API_KEY')
+# ~/.claude/.credentials.master.env — впиши САМ КЛЮЧ, не код на Python
+DEEPL_API_KEY=ВСТАВЬ_СЮДА_СВОЙ_КЛЮЧ   # https://www.deepl.com/your-account/keys
 DEEPL_API_URL=https://api.deepl.com/v2
 ```
+
+> Строка `DEEPL_API_KEY=os.getenv('DEEPL_API_KEY')` ключ НЕ настраивает: это непустое
+> значение, любая проверка `if not key` сочтёт ключ заданным, запрос уйдёт с этим
+> текстом и вернётся `403` без объяснения. В коде читай ключ через
+> `os.getenv('DEEPL_API_KEY')`, а в файле должен лежать сам ключ. Файл не подгружается
+> сам: `load_dotenv(Path.home()/'.claude'/'.credentials.master.env')`.
+
+<!-- no-key-block -->
+## Ключа нет — что тогда
+
+**Сначала бесплатный тариф.** У DeepL есть план DeepL API Free: 500 000 знаков в
+месяц, ключ выдаётся там же (`https://www.deepl.com/your-account/keys`) и
+оканчивается на `:fx`. Он ходит на **другой** хост:
+
+```bash
+DEEPL_API_KEY=ВАШ_КЛЮЧ:fx
+DEEPL_API_URL=https://api-free.deepl.com/v2      # НЕ api.deepl.com
+```
+
+Ключ Free, отправленный на `api.deepl.com`, отвечает `403 Forbidden` — ошибка про
+доступ, хотя ключ верный, и человек идёт проверять оплату вместо адреса.
+
+**Совсем без ключа:** перевод делает сама модель — просто попроси перевести текст.
+Глоссарии, `formality`, сохранение разметки в `.docx`/`.pptx` при этом теряются;
+если нужен именно перевод документа с сохранением вёрстки — навык `file-converter`
+(вынуть текст) плюс ручная сборка обратно.
 
 ## ВАЖНО: Правильный endpoint
 

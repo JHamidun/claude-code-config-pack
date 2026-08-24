@@ -9,7 +9,7 @@
 |------|-------------|
 | `auto-learning` | Save errors, tools, decisions to memory |
 | `autonomous-mode` | Work autonomously, don't ask permission |
-| `context7` | Always use Context7 MCP for library docs |
+| `context7` | Свежие доки библиотек: скрипт `tools/context7_docs.py` (без ключа и плагина) или плагин Context7 — зови тот, что есть в `tools` агента |
 | `delegation` | Task complexity levels and agent routing |
 | `dont-do` | Forbidden actions and common mistakes |
 | `model-selection` | Which model for which task (decision tree) |

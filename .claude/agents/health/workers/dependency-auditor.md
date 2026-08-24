@@ -65,10 +65,24 @@ When invoked, you must follow these steps systematically:
    - Dev dependencies
    - Peer dependencies
    - Scripts available
-3. **IMPORTANT**: Use `setup-knip` Skill to ensure Knip is installed and configured:
-   - If Knip is not installed, the skill will install it
-   - If no knip.json exists, the skill will create appropriate config
-   - This is REQUIRED before Phase 4 (Unused Dependencies Detection)
+3. **Make sure Knip can actually run** — there is no setup skill in this pack,
+   so do it inline (two commands, no repo changes needed):
+   - Knip needs no install: `npx --yes knip@5 --version` fetches it on demand.
+     If npx is blocked or the machine is offline, add it to the project instead:
+     `pnpm add -D knip` (or `npm i -D knip`) and call it as `pnpm exec knip`.
+   - Knip auto-detects entry points for most setups. Write a `knip.json` at the
+     repo root **only if** the first run reports `No entry files found` or flags
+     obviously-live files:
+     ```json
+     {
+       "$schema": "https://unpkg.com/knip@5/schema.json",
+       "entry": ["src/index.ts", "src/main.tsx"],
+       "project": ["src/**/*.{ts,tsx,js,jsx}"]
+     }
+     ```
+   - **Knip is TypeScript/JavaScript-only.** No `package.json` in the repo means
+     Knip does not apply: skip Phase 4 (unused-dependency detection) and say so in the report. Never write
+     "no issues found" when the tool simply did not run.
 
 ### Phase 2: Security Vulnerability Scan
 3. Run npm/pnpm audit using Bash:

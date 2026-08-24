@@ -110,6 +110,7 @@ if [ -f "$CACHE_FILE" ]; then
   case "$CACHED" in
     UP_TO_DATE*)        CACHE_TTL=60 ;;
     UPGRADE_AVAILABLE*) CACHE_TTL=720 ;;
+    UNAVAILABLE*)       CACHE_TTL=720 ;;  # cannot check — say so at most 2×/day
     *)                  CACHE_TTL=0 ;;  # corrupt → force re-fetch
   esac
 
@@ -133,6 +134,9 @@ if [ -f "$CACHE_FILE" ]; then
           exit 0
         fi
         ;;
+      UNAVAILABLE*)
+        exit 0  # already reported recently — stay quiet until the TTL expires
+        ;;
     esac
   fi
 fi
@@ -140,14 +144,26 @@ fi
 # ─── Step 4: Slow path — fetch remote version ────────────────
 mkdir -p "$STATE_DIR"
 
+# A copy of gstack shipped inside a config pack has no upstream of its own:
+# REMOTE_URL still carries the <owner>/<repo> placeholder. Saying "UP_TO_DATE"
+# in that case is a lie — the check never ran. Say what actually happened.
+case "$REMOTE_URL" in
+  *"<owner>"*|*"<repo>"*|"")
+    echo "UNAVAILABLE $LOCAL no-upstream-url" > "$CACHE_FILE"
+    echo "UPDATE_CHECK_UNAVAILABLE $LOCAL no upstream URL configured — set GSTACK_REMOTE_URL to a raw VERSION file, or turn the check off with: bash \"$GSTACK_DIR/bin/gstack-config\" set update_check false"
+    exit 0
+    ;;
+esac
+
 REMOTE=""
 REMOTE="$(curl -sf --max-time 5 "$REMOTE_URL" 2>/dev/null || true)"
 REMOTE="$(echo "$REMOTE" | tr -d '[:space:]')"
 
 # Validate: must look like a version number (reject HTML error pages)
 if ! echo "$REMOTE" | grep -qE '^[0-9]+\.[0-9.]+$'; then
-  # Invalid or empty response — assume up to date
-  echo "UP_TO_DATE $LOCAL" > "$CACHE_FILE"
+  # Fetch failed or returned junk. This is NOT evidence of being up to date.
+  echo "UNAVAILABLE $LOCAL fetch-failed" > "$CACHE_FILE"
+  echo "UPDATE_CHECK_UNAVAILABLE $LOCAL could not fetch $REMOTE_URL (offline, blocked, or wrong URL)"
   exit 0
 fi
 

@@ -95,8 +95,8 @@ Write to `output_path`:
 
 (Brief list, no quotes — just one-liner per fact)
 
-- Chapter {slug}: Brynjolfsson NBER 31161, 5179 agents, +14% avg
-- Chapter {slug}: Karpathy "vibe coding" Feb 2025 X post
+- Chapter {slug}: {study citation — paper ID, sample size, effect size}
+- Chapter {slug}: {public statement — who, where, when}
 - ...
 
 ## UNKNOWN (requires author confirmation)

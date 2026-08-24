@@ -44,7 +44,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "YNdPYS7HyXbJjy7l",
-          "name": "Gmail account (jkp@kajonkietsuksa.ac.th)"
+          "name": "Gmail account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1.2,
@@ -65,7 +65,7 @@
       "credentials": {
         "googlePalmApi": {
           "id": "ZK3aD9k31PG9XVBd",
-          "name": "Guitar's Gemini (babystoreroom@gmail.com)"
+          "name": "Guitar's Gemini (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1,
@@ -106,7 +106,7 @@
       "credentials": {
         "groqApi": {
           "id": "ssFnosV0K9CllUnY",
-          "name": "(G) Groq account (jkp@kajonkietsuksa.ac.th)"
+          "name": "(G) Groq account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1,
@@ -131,7 +131,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "YNdPYS7HyXbJjy7l",
-          "name": "Gmail account (jkp@kajonkietsuksa.ac.th)"
+          "name": "Gmail account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 2.1,
@@ -257,7 +257,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "YNdPYS7HyXbJjy7l",
-          "name": "Gmail account (jkp@kajonkietsuksa.ac.th)"
+          "name": "Gmail account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 2.1,
@@ -282,7 +282,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "YNdPYS7HyXbJjy7l",
-          "name": "Gmail account (jkp@kajonkietsuksa.ac.th)"
+          "name": "Gmail account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 2.1,
@@ -307,7 +307,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "YNdPYS7HyXbJjy7l",
-          "name": "Gmail account (jkp@kajonkietsuksa.ac.th)"
+          "name": "Gmail account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 2.1,

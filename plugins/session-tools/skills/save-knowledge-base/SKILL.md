@@ -40,7 +40,9 @@ allowed-tools: Bash, Read, Write, Edit, Glob
 
 ### Уровень 1 — Topic-файл (детали)
 
-Создать `~/.claude/projects/C--Users-youruser/memory/<slug>.md`:
+Создать `<memory>/<slug>.md`, где `<memory>` — каталог памяти текущего проекта.
+Имя папки Claude Code кодирует из пути проекта, у каждого своё — определи его один раз:
+`ls -dt ~/.claude/projects/*/memory | head -1`. Дальше по тексту `<memory>` = этот путь.
 
 ```markdown
 ---
@@ -80,7 +82,7 @@ metadata:
 
 ### Уровень 2 — индекс MEMORY.md (auto-loaded)
 
-В `~/.claude/projects/C--Users-youruser/memory/MEMORY.md` найти секцию `## REFERENCE` (или `## TOOLS & SKILLS` для technical, или создать новую) и добавить ОДНУ строку:
+В `<memory>/MEMORY.md` найти секцию `## REFERENCE` (или `## TOOLS & SKILLS` для technical, или создать новую) и добавить ОДНУ строку:
 
 ```markdown
 ### <Название> (<дата YYYY-MM-DD>)
@@ -135,7 +137,7 @@ python ~/.claude/tools/vector_memory.py learn "<длинное описание 
 
 ## Когда нужно ОБНОВЛЯТЬ существующую память
 
-- Если в `~/.claude/projects/C--Users-youruser/memory/` уже есть `<slug>.md` — **обновляем** (Edit), не создаём заново.
+- Если в `<memory>/` уже есть `<slug>.md` — **обновляем** (Edit), не создаём заново.
 - Если в MEMORY.md уже есть строка про эту тему — обновляем дату и факты.
 - В routing.md — проверяем что триггеры не дублируются (если триггер уже есть в другой строке — предупредить).
 - В vector_memory — `learn` создаёт НОВУЮ запись поверх старой (не страшно, search вернёт самую релевантную).
@@ -164,7 +166,7 @@ python ~/.claude/tools/vector_memory.py learn "<длинное описание 
 **Скилл делает:**
 
 1. Read `${HOME}/region-taxes.html` → выделяет ключевые факты: ставки, дедлайны, реквизиты, ссылки на бухгалтерский сервис.
-2. Write `~/.claude/projects/C--Users-youruser/memory/region-taxes-2026.md` с выжимкой.
+2. Write `<memory>/region-taxes-2026.md` с выжимкой.
 3. Edit MEMORY.md → добавить строку в секцию REFERENCE.
 4. Edit routing.md → добавить route «налоги, дедлайны, отчётность, ваш бухгалтерский сервис → читать region-taxes.html».
 5. Bash `vector_memory.py learn "..."` reference.
@@ -176,13 +178,13 @@ python ~/.claude/tools/vector_memory.py learn "<длинное описание 
 ~/.claude/
 ├── rules/
 │   └── routing.md              ← Уровень 3 (жёсткий route)
-└── projects/C--Users-youruser/
+└── projects/<проект>/          ← имя кодируется из пути проекта, у каждого своё
     └── memory/
         ├── MEMORY.md           ← Уровень 2 (индекс, грузится каждую сессию)
         └── <slug>.md           ← Уровень 1 (детали топика)
 
-${WORKSPACE}/tools/
-└── vector_memory.py            ← Уровень 4 (семантический FAISS поиск)
+~/.claude/tools/
+└── vector_memory.py            ← Уровень 4 (семантический FAISS поиск, есть в паке)
 ```
 
 ## Связано

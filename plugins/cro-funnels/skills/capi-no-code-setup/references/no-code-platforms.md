@@ -73,7 +73,7 @@
 **Плюсы:** бесплатно по объёму, данные дома, любая логика; готовые шаблоны в скилле `n8n`.
 **Минусы:** нужен сервер и базовая настройка (но у пользователя уже есть).
 
-> **Worked example пользователя** (academy.your-domain.com): `Оплата ЮKassa → webhook → n8n (your-server) → hash(email/phone)+External ID(user_id)+FBC/FBP → Meta CAPI Purchase + Google Enhanced Conversions → Test Events`. Подробно — `SKILL.md`.
+> **Рабочий пример** (academy.your-domain.com): `Оплата ЮKassa → webhook → n8n (your-server) → hash(email/phone)+External ID(user_id)+FBC/FBP → Meta CAPI Purchase + Google Enhanced Conversions → Test Events`. Подробно — `SKILL.md`.
 
 ---
 

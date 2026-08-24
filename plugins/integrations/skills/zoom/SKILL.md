@@ -21,10 +21,23 @@ Server-to-Server OAuth (no user consent needed).
 ### Credentials (from ~/.claude/.credentials.master.env)
 
 ```
-ZOOM_ACCOUNT_ID=<see ZOOM_S2S_CLAUDE_CODE_YOURNAME_ACCOUNT_ID>
-ZOOM_CLIENT_ID=<see ZOOM_S2S_CLAUDE_CODE_YOURNAME_CLIENT_ID>
-ZOOM_CLIENT_SECRET=<see ZOOM_S2S_CLAUDE_CODE_YOURNAME_CLIENT_SECRET>
+ZOOM_ACCOUNT_ID=
+ZOOM_CLIENT_ID=
+ZOOM_CLIENT_SECRET=
 ```
+
+Шаблон файла — `~/.claude/templates/.credentials.master.env.example`, эти три строки в нём уже есть.
+
+**Откуда взять (10 минут, один раз).** Нужны права **администратора** аккаунта Zoom —
+без них Server-to-Server приложение создать нельзя, и это самая частая причина «не получается».
+
+1. `marketplace.zoom.us` → войти своей учёткой Zoom (браузером; пароль в env-файле не хранить).
+2. **Develop → Build App → Server-to-Server OAuth**.
+3. Имя приложения любое (оно видно только админам аккаунта).
+4. Вкладка **App Credentials** → оттуда Account ID, Client ID, Client Secret → в env-файл.
+5. Вкладка **Scopes** → добавить только нужные (список в конце файла, «Свой аккаунт — что проверить»).
+   Скоупы гранулярные: «дать все» в S2S-приложении нельзя.
+6. Вкладка **Activation** → Activate. Без активации токен выдаётся, а вызовы падают.
 
 ### Get Access Token
 
@@ -228,7 +241,11 @@ zoom_api("GET", "/metrics/meetings", params={"type": "live"})
 
 ## Timezones
 
-Use IANA format: `UTC`, `UTC`, `UTC`, etc.
+Use IANA format: `Europe/Moscow`, `Europe/Berlin`, `America/New_York`, `Asia/Almaty`, `UTC`.
+
+Свой пояс — тот, в котором думают участники, а не тот, в котором стоит сервер: Zoom печатает
+время приглашения именно в `timezone` встречи. Пропустишь поле — возьмётся пояс из профиля
+владельца токена (`GET /users/me` → `timezone`), и встреча уедет на несколько часов.
 
 ## Common Patterns
 
@@ -274,12 +291,30 @@ zoom_api("POST", "/users/me/meetings", json={
 - Heavy: 10 req/sec (POST/PATCH/DELETE)
 - Resource-intensive: 5 req/sec (reports)
 
-## Account Info
+## Свой аккаунт — что проверить
 
-- **Email:** your-email@example.com
-- **Plan:** Zoom Workplace (Licensed, 300 participants, 30h meetings)
-- **PMI:** check via `zoom_api("GET", "/users/me")`
-- **App Name:** Claude Code YourFirstName
-- **Scopes:** ⚠️ granular list, НЕ «все». На 2026-07-03: meeting:{write,read,delete}:meeting:admin, meeting:read:{list_meetings,invitation}:admin, cloud_recording:read:{list_recording_files,list_user_recordings}:admin, user:read (частично) + account/dashboard legacy. Если API вернул `4711 does not contain scopes` — добавь скоуп: marketplace.zoom.us (логин ZOOM_LOGIN_EMAIL/ZOOM_LOGIN_PASSWORD из .credentials.master.env, OTP не спрашивал) → app → Scopes → Add Scopes → поиск по точному id → чекбокс → Done. Активация сохраняется автоматически.
-- **App ID:** YOUR_ZOOM_APP_ID
-- **Marketplace:** https://marketplace.zoom.us/develop/apps/YOUR_ZOOM_APP_ID
+Всё ниже узнаётся из своего же кабинета, наизусть держать не надо.
+
+- **Кто я для API:** `zoom_api("GET", "/users/me")` → email, PMI, `timezone`, тип лицензии.
+  Первый вызов после настройки делай именно этот: он же и проверка креденшелов.
+- **Лимиты тарифа** (сколько участников, сколько длится встреча, есть ли облачная запись)
+  — `marketplace.zoom.us` → Account → Plans. На бесплатном тарифе **облачной записи нет**,
+  и половина рецептов ниже (`cloud_recording:*`, `auto_recording: "cloud"`) молча не сработает.
+- **Ссылка на своё приложение:** `https://marketplace.zoom.us/develop/apps/<app_id>` —
+  app_id виден в адресной строке, когда приложение открыто.
+
+**Скоупы — гранулярные, «выдать все» нельзя.** Минимальный набор под этот навык:
+
+```
+meeting:write:meeting:admin        meeting:read:meeting:admin
+meeting:delete:meeting:admin       meeting:read:list_meetings:admin
+meeting:read:invitation:admin      user:read:user:admin
+cloud_recording:read:list_recording_files:admin
+cloud_recording:read:list_user_recordings:admin
+```
+
+⚠️ **Гоча.** Ответ `4711 does not contain scopes` означает ровно одно: у приложения нет
+нужного скоупа — креденшелы и токен тут ни при чём. Починка: marketplace.zoom.us (вход
+браузером под админом аккаунта) → своё приложение → **Scopes → Add Scopes** → искать
+**по точному id из ошибки**, а не по названию раздела → чекбокс → Done. Изменение
+сохраняется само, переактивация приложения не нужна, новый токен — нужен.

@@ -21,9 +21,9 @@ Route tasks to the best AI model (or multiple models) through AI Gateway v2.
 ### Claude (native in Claude Code, also via gateway)
 | Model | ID | Best for |
 |-------|----|----------|
-| Opus 4.8 | `claude-opus-4-8` | Deep reasoning, architecture, complex analysis (дефолт оркестратора) |
+| Opus 5 | `claude-opus-5` | Deep reasoning, architecture, complex analysis (дефолт оркестратора) |
 | Fable 5 | `claude-fable-5` | Text-субагенты/воркеры (канон, ≤5 одновременно) |
-| Sonnet 4.5 | `claude-sonnet-4-5-20250929` | Most tasks, code gen, balanced |
+| Sonnet 5 | `claude-sonnet-5` | Most tasks, code gen, balanced |
 | Haiku 4.5 | `claude-haiku-4-5-20251001` | Fast classification, simple tasks |
 
 Канон актуальных ID → `config/models.md`.
@@ -52,7 +52,7 @@ Route tasks to the best AI model (or multiple models) through AI Gateway v2.
 
 ```bash
 # Local gateway (start once):
-cd ${WORKSPACE}/projects/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200 &
+cd ./work/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200 &   # свой локальный gateway; пак его не несёт
 
 # Call any model:
 curl -s http://localhost:GATEWAY_PORT/v1/messages \
@@ -71,8 +71,8 @@ Analyze the task and pick the optimal model:
 
 | Task type | Recommended model |
 |-----------|------------------|
-| Complex architecture | Claude Opus 4.8 (native) |
-| Code generation | Claude Sonnet 4.5 (native) |
+| Complex architecture | Claude Opus 5 (native) |
+| Code generation | Claude Sonnet 5 (native) |
 | Quick classification | Claude Haiku 4.5 (native) |
 | Alternative perspective | GPT-5.4 (via gateway) |
 | Code gen (OpenAI) | gpt-5.1-codex (via gateway) |
@@ -107,7 +107,7 @@ Each model does what it's best at:
 
 ```
 1. Gemini 3.1 Pro → summarize large input (2M context)
-2. Claude Opus 4.8 → deep analysis of summary
+2. Claude Opus 5 → deep analysis of summary
 3. GPT-5.4 → format as structured JSON output
 ```
 
@@ -141,7 +141,7 @@ When presenting multi-model results:
 ```
 ## Cross-Model Analysis
 
-### Claude Opus 4.8 (native)
+### Claude Opus 5 (native)
 [result]
 
 ### GPT-5.4 (via Gateway)

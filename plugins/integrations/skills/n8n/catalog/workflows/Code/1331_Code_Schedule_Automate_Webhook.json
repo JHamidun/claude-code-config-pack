@@ -383,7 +383,7 @@
       ],
       "webhookId": "f149c1b5-c028-4dff-9d22-a72951f2ef91",
       "parameters": {
-        "sendTo": "john.n.foster1@gmail.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "={{ $json.response.text }}",
         "options": {},
         "subject": "Pinterest Trends & Suggestions"

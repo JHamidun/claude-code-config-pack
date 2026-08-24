@@ -10,7 +10,7 @@ Drafts a reply to a specific LinkedIn comment. Correctly handles LinkedIn's 2-le
 ## When to use
 
 - User pastes a LinkedIn comment URL (contains `?commentUrn=...`) and says "reply to this"
-- An author (e.g., PublicAuthor3, Author B) replied to the user's comment and the user wants to continue the thread
+- Someone (the post author, or another commenter) replied to the user's comment and the user wants to continue the thread
 - User wants to re-engage a conversation that's gone dormant
 
 ## Input
@@ -73,11 +73,11 @@ Carol's reply doesn't nest under Bob's — it's pinned at level 2 to the same to
 
 > User: "Reply to this: https://www.linkedin.com/feed/update/urn:li:activity:REPLACE_WITH_REAL_COMMENT_ID?commentUrn=urn%3Ali%3Acomment%3A%28activity%3AREPLACE_WITH_REAL_COMMENT_ID%2CREPLACE_WITH_PARENT_COMMENT_ID%29"
 >
-> Skill: parses → post REPLACE_WITH_REAL_COMMENT_ID, comment REPLACE_WITH_PARENT_COMMENT_ID. Fetches thread. Sees: PublicAuthor3's post → Author's comment ("key takeaway") → Engager B's reply ("their personal follow-up question"). Drafts R1 Answer-Their-Question variant. Shows approval card.
+> Skill: parses → post REPLACE_WITH_REAL_COMMENT_ID, comment REPLACE_WITH_PARENT_COMMENT_ID. Fetches thread. Sees: the author's post → your comment ("key takeaway") → another commenter's reply ("their personal follow-up question"). Drafts R1 Answer-Their-Question variant. Shows approval card.
 >
 > User: "post"
 >
-> Skill: react APPRECIATION on Engager B's reply → pause 12s → post reply with parentComment set to Author's original comment URN (the TOP level, not Engager B's reply).
+> Skill: react APPRECIATION on that commenter's reply → pause 12s → post reply with parentComment set to Author's original comment URN (the TOP level, not that commenter's reply).
 
 ## Files
 

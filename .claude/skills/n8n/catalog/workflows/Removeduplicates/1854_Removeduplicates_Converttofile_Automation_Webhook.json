@@ -108,7 +108,7 @@
         "url": "{{ $env.API_BASE_URL }}",
         "method": "POST",
         "options": {},
-        "jsonBody": "={\n  \"sender\": \"support@managedsaasalerts.com\",\n  \"to\": [\n    \"{{ $('Set Date and Form Variables').first().json.Email }}\"\n  ],\n  \"attachments\": [\n    {\n      \"filename\": \"testfile.csv\",\n      \"fileblob\": \"{{ $json.data }}\",\n      \"mimetype\": \"application/csv\"\n    }\n  ],\n  \"subject\": \"Workflow Complete\",\n  \"text_body\": \"{{ $('Set Date and Form Variables').first().json.Name }}, attached is your IP information.\\n\\n\\n\\n\"\n}\n",
+        "jsonBody": "={\n  \"sender\": \"REPLACE_ME@example.com\",\n  \"to\": [\n    \"{{ $('Set Date and Form Variables').first().json.Email }}\"\n  ],\n  \"attachments\": [\n    {\n      \"filename\": \"testfile.csv\",\n      \"fileblob\": \"{{ $json.data }}\",\n      \"mimetype\": \"application/csv\"\n    }\n  ],\n  \"subject\": \"Workflow Complete\",\n  \"text_body\": \"{{ $('Set Date and Form Variables').first().json.Name }}, attached is your IP information.\\n\\n\\n\\n\"\n}\n",
         "sendBody": true,
         "sendHeaders": true,
         "specifyBody": "json",

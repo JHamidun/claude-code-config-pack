@@ -23,11 +23,18 @@ else
   echo "✅ Using Vite $VITE_VERSION (Node 18 compatible)"
 fi
 
-# Detect OS and set sed syntax
+# Detect OS and set sed syntax.
+#
+# ФУНКЦИЯ, а не строка. Раньше здесь стояло SED_INPLACE="sed -i ''", и вызов
+# $SED_INPLACE 'expr' file разбивался оболочкой на три слова: [sed] [-i] [''] —
+# кавычки снимаются ДО подстановки переменной, поэтому третьим аргументом уходят
+# два настоящих апострофа, а не пустая строка. BSD-sed на macOS принимает их за
+# суффикс бэкапа: правка применяется, но рядом появляется файл index.html''
+# и никакой ошибки. Функция передаёт пустой аргумент как пустой аргумент.
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  SED_INPLACE="sed -i ''"
+  sed_inplace() { sed -i '' "$@"; }
 else
-  SED_INPLACE="sed -i"
+  sed_inplace() { sed -i "$@"; }
 fi
 
 # Check if pnpm is installed
@@ -62,8 +69,27 @@ pnpm create vite "$PROJECT_NAME" --template react-ts
 cd "$PROJECT_NAME"
 
 echo "🧹 Cleaning up Vite template..."
-$SED_INPLACE '/<link rel="icon".*vite\.svg/d' index.html
-$SED_INPLACE 's/<title>.*<\/title>/<title>'"$PROJECT_NAME"'<\/title>/' index.html
+sed_inplace '/<link rel="icon".*vite\.svg/d' index.html
+sed_inplace 's/<title>.*<\/title>/<title>'"$PROJECT_NAME"'<\/title>/' index.html
+
+# Проверяем результат, а не код возврата sed: неудачная правка in-place — это как раз
+# тот случай, когда sed завершается успешно, а файл остаётся прежним (или меняется
+# копия рядом). Без этой проверки проект собирается дальше с чужим заголовком и
+# иконкой Vite, и связать это с sed уже не получится.
+if ! grep -qF -- "<title>$PROJECT_NAME</title>" index.html; then
+  echo "❌ index.html: заголовок не подставился — правка in-place не сработала." >&2
+  echo "   Ожидалось: <title>$PROJECT_NAME</title>" >&2
+  echo "   Сейчас в файле: $(grep -o '<title>.*</title>' index.html || echo '<title> не найден')" >&2
+  echo "   Проверь, каким sed располагает система: sed --version (GNU) / man sed (BSD)." >&2
+  exit 1
+fi
+# Осечка in-place оставляет копию с суффиксом (index.html'', index.html-e и т. п.).
+# В свежем проекте Vite таких файлов быть не может, поэтому находка = сигнал.
+for stray in index.html?*; do
+  [ -e "$stray" ] || continue
+  echo "⚠️  Побочный файл от sed: $stray — правка ушла не туда, удаляю." >&2
+  rm -f -- "$stray"
+done
 
 echo "📦 Installing base dependencies..."
 pnpm install

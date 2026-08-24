@@ -16,8 +16,15 @@ triggers:
 
 You are performing a dream — a reflective pass over your memory files AND the Second Brain database. Synthesize what you've learned recently into durable, well-organized memories so that future sessions can orient quickly.
 
-Memory directory: `~/.claude/projects/C--Users-youruser/memory/`
-Second Brain DB: `ваше локальное хранилище памяти`
+Memory directory: `~/.claude/projects/C--Users-<твой-логин>/memory/`
+(имя папки Claude Code кодирует из пути проекта — посмотри `ls ~/.claude/projects/`)
+
+> **Second Brain — отдельный компонент, в пак он НЕ входит.** Это локальная
+> векторная база памяти со своим CLI (`~/.brain/brain_sleeptime.py`) и MCP-сервером
+> `second-brain`. Проверить одной командой: `ls ~/.brain/brain_sleeptime.py`.
+> **Нет — пропускай Фазы 0, 6, 7 целиком:** файловая консолидация (Фазы 1–5)
+> самодостаточна и это законный полный прогон dream. В отчёте так и напиши:
+> «Second Brain не установлен, фазы 0/6/7 пропущены».
 
 **Full v2 regulation** (frontmatter schema, supersede protocol, decay/prune/promote formulas, TOP-INSTINCTS block format): `references/memory-v2.md`. Read it before Phases 2–5.
 
@@ -33,7 +40,7 @@ Second Brain DB: `ваше локальное хранилище памяти`
 
 ---
 
-## Phase 0 — Brain Stats (Before)
+## Phase 0 — Brain Stats (Before) — только если Second Brain установлен
 
 Capture brain state BEFORE consolidation so we can report the delta.
 
@@ -112,9 +119,10 @@ Apply the lifecycle math from `references/memory-v2.md` §3–5:
 
 ---
 
-## Phase 6 — Second Brain Sleeptime
+## Phase 6 — Second Brain Sleeptime — только если Second Brain установлен
 
 After file-based consolidation, run the Second Brain sleeptime pipeline.
+Нет `~/.brain/brain_sleeptime.py` — фаза пропускается, это не ошибка.
 
 ### Run sleeptime via CLI:
 
@@ -150,6 +158,9 @@ This produces data-driven insights: hot entities, frequent memories, contact pat
 ---
 
 ## Phase 7 — Brain Stats (After) + Report
+
+Без Second Brain отчёт состоит из одной секции «File Memory (Phases 1-5)»,
+а секции «Second Brain Sleeptime» и «Brain Stats Delta» опускаются.
 
 1. Call `brain_stats` MCP tool again to capture post-consolidation state
 2. Compare before/after numbers

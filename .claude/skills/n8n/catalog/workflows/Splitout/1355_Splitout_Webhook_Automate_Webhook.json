@@ -12,7 +12,7 @@
     "priority": "high",
     "environment": "production"
   },
-  "name": "Your CRM Open Chanel RAG Chatbot Application Workflow example with Webhook Integration",
+  "name": "Bitrix24 Open Chanel RAG Chatbot Application Workflow example with Webhook Integration",
   "tags": [
     "automation",
     "n8n",
@@ -23,7 +23,7 @@
   "nodes": [
     {
       "id": "dbd7b2c0-2b27-4c23-beb7-eec128da0787",
-      "name": "Your CRM Handler",
+      "name": "Bitrix24 Handler",
       "type": "n8n-nodes-base.webhook",
       "position": [
         -1280,
@@ -1636,6 +1636,6 @@
       ]
     }
   },
-  "description": "Automated workflow: Your CRM Open Chanel RAG Chatbot Application Workflow example with Webhook Integration. This workflow integrates 22 different services: stickyNote, textSplitterRecursiveCharacterTextSplitter, vectorStoreQdrant, chainRetrievalQa, merge. It contains 57 nodes and follows best practices for error handling and security.",
-  "notes": "Excellent quality workflow: Your CRM Open Chanel RAG Chatbot Application Workflow example with Webhook Integration. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+  "description": "Automated workflow: Bitrix24 Open Chanel RAG Chatbot Application Workflow example with Webhook Integration. This workflow integrates 22 different services: stickyNote, textSplitterRecursiveCharacterTextSplitter, vectorStoreQdrant, chainRetrievalQa, merge. It contains 57 nodes and follows best practices for error handling and security.",
+  "notes": "Excellent quality workflow: Bitrix24 Open Chanel RAG Chatbot Application Workflow example with Webhook Integration. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
 }

@@ -479,7 +479,7 @@
           "parameters": [
             {
               "name": "authorization",
-              "value": "Basic YXBpOnNrX2VhNDVmY2YxN2E1NjMxY2I1ZmQxZGVmNjJmZTY3Y2JiYjM3MjQ2N2M="
+              "value": "Basic ${API_KEY_B64}"
             }
           ]
         }

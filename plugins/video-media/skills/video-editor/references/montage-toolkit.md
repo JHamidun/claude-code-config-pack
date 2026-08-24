@@ -3,7 +3,7 @@
 Набор инструментов «как у профи»: динамическая нарезка, beat-sync, виральные субтитры,
 переходы, цветокор, авто-рефрейм, speed ramps, sound design, motion graphics.
 Собран из глубокого ресёрча (полный ландшафт инструментов и ВСЕ рецепты →
-`references/montage-research-report.md`; разбор референс-рилса → `references/reel-teardown-DV08xLPjPOx.md`).
+`references/montage-research-report.md`; разбор референс-рилса → `references/reel-teardown-ui-overlay.md`).
 
 ## Скрипты (video-editor/scripts/ и video-generation/scripts/)
 
@@ -102,4 +102,4 @@ SAFE_W = W−2·70) + WrapStyle 0 (перенос-страховка). Пров�
 - **Kodak LUT** содержал `LUT_3D_INPUT_RANGE` (ffmpeg lut3d не понимает) → `color_grade.py` авто-санирует любой .cube (убирает строку во временную копию).
 - Цвет — ВСЕГДА последним шагом (после монтажа, перед финальным loudnorm).
 - Freesound SFX — лицензии CC пофайлово (для коммерции только CC0/CC-BY).
-- Remotion — BUSL, но бесплатно до $1M ARR (наш случай). См. `video-generation/references/remotion-overlays.md`.
+- Remotion — BUSL: бесплатно до $1M ARR, дальше платная лицензия. Порог считается по ТВОЕЙ выручке — проверь свою, прежде чем брать в коммерческий проект: <https://remotion.dev/license>. См. `video-generation/references/remotion-overlays.md`.

@@ -96,7 +96,7 @@
           "timeMin": "={{$node[\"Get Start & End of day\"].json[\"from\"]}}",
           "singleEvents": true
         },
-        "calendar": "amenendez@threatconnect.com",
+        "calendar": "REPLACE_ME@example.com",
         "operation": "getAll"
       },
       "credentials": {

@@ -594,7 +594,7 @@
             "+1 800-224-6059"
           ],
           "emailAddresses": [
-            "team@leadfeeder.com"
+            "REPLACE_ME@example.com"
           ]
         },
         "tags": [
@@ -765,9 +765,9 @@
             "+1 781-340-4440"
           ],
           "emailAddresses": [
-            "gary@vermints.com",
-            "feedback@vermints.com",
-            "wholesale@vermints.com"
+            "REPLACE_ME@example.com",
+            "REPLACE_ME@example.com",
+            "REPLACE_ME@example.com"
           ]
         },
         "tags": [

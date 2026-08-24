@@ -372,7 +372,12 @@ Content here`;
 **View Coverage:**
 ```bash
 npm run test:coverage
-open coverage/index.html
+
+# open the report — the command differs per OS:
+open coverage/index.html          # macOS
+xdg-open coverage/index.html      # Linux
+start coverage/index.html         # Windows (cmd / PowerShell)
+cmd //c start coverage/index.html # Windows, Git Bash
 ```
 
 ## Test Types

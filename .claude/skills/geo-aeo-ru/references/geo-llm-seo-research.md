@@ -144,15 +144,15 @@ Industry consensus: **GEO и AEO — синонимы на 90%**. Conductor в �
 
 **Удар по трафику**: когда AI Overview показывается, position-1 CTR падает на 34.5%. AIO появляется в 13% queries.
 
-### 2.6 Bing AI / You.com / (regional LLM B) / (regional LLM A)
+### 2.6 Bing AI / You.com / GigaChat / YandexGPT
 
 **Bing AI (Copilot)**: повторяет ChatGPT-логику (та же Bing-инфра).
 
 **You.com**: больше всего напоминает Perplexity, sources показываются inline.
 
-**(regional LLM B)**: обучен на русскоязычных данных, бизнес-ориентирован, экосистема Сбера. **Те же бренды показывают 2–3× разную Share of Voice между (regional LLM B) и Alice/(regional LLM A)** — отдельный мониторинг обязателен.
+**GigaChat**: обучен на русскоязычных данных, бизнес-ориентирован, экосистема банка-вендора. **Те же бренды показывают 2–3× разную Share of Voice между GigaChat и Alice/YandexGPT** — отдельный мониторинг обязателен.
 
-**(regional LLM A)/Alice**: часть Яндекс-экосистемы, использует Яндекс-индекс. К февралю 2026 — новая модель Alice. 12% пользователей нейросетей в РФ выбирают (regional LLM A).
+**YandexGPT/Alice**: часть Яндекс-экосистемы, использует Яндекс-индекс. К февралю 2026 — новая модель Alice. 12% пользователей нейросетей в РФ выбирают YandexGPT.
 
 ### 2.7 Концентрация авторитета: новая монополия
 
@@ -179,7 +179,7 @@ Top источники (Semrush 17M citations study):
 | ChatGPT | Medium | High (default on с GPT-4o+) |
 | Perplexity | Low | Very High (real-time crawl) |
 | Gemini | Medium | High (Google index) |
-| (regional LLM B) | High | Medium |
+| GigaChat | High | Medium |
 
 Вывод: если ты хочешь попасть в Claude — нужно быть в training data (Reddit, Wikipedia, лицензированные источники). Если в Perplexity — нужно быть в его live-crawl (свежий контент, schema, BLUF). ChatGPT — посередине: и то, и то.
 
@@ -380,7 +380,7 @@ E-E-A-T триада в structured data: **Organization + Person + Article**, с
 4. **Problem-aware**: «How do I solve [problem brand solves]?» — самый сильный сигнал товарного фита
 5. **Niche/long-tail**: специфические запросы из реальных юз-кейсов клиентов
 
-Запускать на каждой платформе отдельно (ChatGPT/Claude/Perplexity/Gemini/(regional LLM B)/(regional LLM A) для РФ). 50–100 prompts × 6 платформ = базовый audit.
+Запускать на каждой платформе отдельно (ChatGPT/Claude/Perplexity/Gemini/GigaChat/YandexGPT для РФ). 50–100 prompts × 6 платформ = базовый audit.
 
 ### 4.4 Чек-лист «мой бренд попал в ответ?»
 
@@ -632,7 +632,7 @@ GEO — новая тема, которую курсы только вводят
 - 92% брендов невидимы в ChatGPT (industry)
 - Профессиональные tools (Profound $499/mo) — дороги/непригодны для локальных рынков
 - Если у продукта уже есть API ко всем моделям → он может прогонять prompt-аудит для клиента дёшево
-- Мониторить сразу все релевантные платформы (ChatGPT, Claude, Gemini + локальные модели вроде (regional LLM B)/(regional LLM A)) — сильное УТП на рынке, где западные трекеры не покрывают локальные движки
+- Мониторить сразу все релевантные платформы (ChatGPT, Claude, Gemini + локальные модели вроде GigaChat/YandexGPT) — сильное УТП на рынке, где западные трекеры не покрывают локальные движки
 
 **Продуктовая фича**: «Brand Visibility Dashboard». Клиент вводит бренд + 20 prompts. Система прогоняет каждый prompt по 5–6 платформам, считает Citation Share, отдаёт PDF-отчёт. Цена: [example] 5–15K/мес. Аудитория: SMB-маркетологи, бренд-менеджеры enterprise.
 
@@ -825,9 +825,9 @@ GEO — новая тема, которую курсы только вводят
 
 ### Russian context
 
-- [GeoScout: (regional LLM B) brand recommendations](https://geoscout.pro/en/blog/gigachat-how-it-recommends-brands) — Russian AI brand mentions, 2-3× difference (regional LLM B) vs Alice.
+- [GeoScout: GigaChat brand recommendations](https://geoscout.pro/en/blog/gigachat-how-it-recommends-brands) — Russian AI brand mentions, 2-3× difference GigaChat vs Alice.
 - [TADviser: AI Russia market](https://tadviser.com/index.php/Article:Artificial_Intelligence_(Russian_market)) — overview Russian AI market.
-- [MySummit: (regional LLM A) Review 2026](https://mysummit.school/blog/en/yandexgpt-review-2026/) — Russian AI platform review.
+- [MySummit: YandexGPT Review 2026](https://mysummit.school/blog/en/yandexgpt-review-2026/) — Russian AI platform review.
 - [MySummit: Best AI for Managers Russia 2026](https://mysummit.school/blog/en/best-ai-for-managers-russia-2026/) — 52 моделей, 3300+ оценок.
 
 ### Conductor / industry analysis

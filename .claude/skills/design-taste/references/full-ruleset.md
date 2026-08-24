@@ -1,9 +1,9 @@
 # Vendored source: design-taste-frontend v2 (taste-skill)
 
-> **Источник:** https://github.com/Leonxlnx/taste-skill (65k stars на момент ресёрча 2026-07-19/20, канал @usefulrepa пост 128)
-> **Лицензия:** MIT (Copyright (c) 2026 Leonxlnx)
-> **Клонировано:** 2026-07-20 в `${WORKSPACE}/temp-clones/taste-skill/skills/taste-skill/SKILL.md`
-> **Статус:** дословный вендоринг (verbatim vendor) оригинального файла — полный справочник для глубокого чтения.
+> **Источник:** https://github.com/Leonxlnx/taste-skill (снято 2026-07-20; 65k stars на тот момент)
+> **Лицензия:** MIT, Copyright (c) 2026 Leonxlnx — полный текст едет рядом: `LICENSE-taste-skill.txt`.
+> MIT требует, чтобы этот файл сопровождал любую копию; при выносе `full-ruleset.md` куда-либо забирай его вместе.
+> **Статус:** дословный вендоринг (verbatim vendor) оригинального файла — полный справочник для глубокого чтения. Клон репозитория для сверки не нужен, текст ниже полный.
 > Компактная рабочая версия с дельтой к нашей дизайн-семье → `../SKILL.md` (design-taste, эта же папка на уровень выше).
 > v1 (`taste-skill-v1`, тот же репозиторий) НЕ вендорится — v2 полностью его заменяет по данным апстрима.
 

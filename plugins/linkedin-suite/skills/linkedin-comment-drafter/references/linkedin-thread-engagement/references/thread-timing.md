@@ -12,11 +12,11 @@
 | 24-72h | no author reply | Dormant | — |
 | >72h | any | Dormant — switch to DM | Medium (if inbound-quality) |
 
-## The "PublicAuthor3 window" explained
+## The 6-24h author-reply window explained
 
 Example timeline:
-- HH:MM UTC: Author posted comment on PublicAuthor3's a sample post ("the canonical takeaway")
-- HH:MM UTC next day (~24h later): PublicAuthor3 replied personally ("their personal follow-up question")
+- HH:MM UTC: you posted a comment on the author's post ("the canonical takeaway")
+- HH:MM UTC next day (~24h later): the author replied personally ("their personal follow-up question")
 - HH:MM UTC that day (~24-30h after original comment, ~4h after the engager's reply): Author replied with his answer
 
 This is the exact window the skill targets. Miss it by 12+ hours and the reply lands in a dormant thread where the author doesn't get the notification prominently.

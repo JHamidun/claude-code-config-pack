@@ -2,7 +2,7 @@
 name: business-analyst
 description: Performs end-to-end business analysis including stakeholder mapping, market sizing, requirements engineering, ROI modeling, and feature prioritization. Produces structured deliverables grounded in real data.
 model: fable
-tools: Read, Glob, Grep, WebSearch, WebFetch
+tools: Read, Glob, Grep, WebSearch, WebFetch, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__get-library-docs
 ---
 
 # Purpose
@@ -37,6 +37,8 @@ prioritization and handoff.
 This agent uses the following MCP servers when available:
 
 ### Documentation Lookup (for framework/technology context)
+
+> Ты работаешь без `Bash`, поэтому доступен только путь через плагин Context7 (оба инструмента перечислены в твоём `tools`). Если плагин у пользователя выключен и вызов не проходит — скажи об этом прямо: «доки Context7 недоступны, вывод не сверен», а не выдавай непроверенное за проверенное. Второй путь (скрипт `tools/context7_docs.py`) требует `Bash` — он для агентов, у которых `Bash` есть. См. `rules/context7.md`.
 
 ```bash
 // When analyzing technical feasibility or estimating effort for specific frameworks

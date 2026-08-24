@@ -107,3 +107,11 @@
 | Agent | Description |
 |-------|-------------|
 | `meta-agent-v3` | Creates new Claude Code agents |
+
+## Writing your own
+
+Start from `~/.claude/templates/agent-persona.yaml` — it carries the frontmatter
+shape and the model rule. Keep `model:` an **alias** (`fable` for text workers,
+`opus` for an orchestrator, `haiku` for bulk runs), never a dated ID: a stale ID
+does not fail, it silently serves an older model. `python
+~/.claude/scripts/config_lint.py` prints every file that pins one (section 3.6).

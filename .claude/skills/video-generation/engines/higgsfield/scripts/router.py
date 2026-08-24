@@ -42,7 +42,36 @@ for _stream in (sys.stdout, sys.stderr):
 # Self-contained, relative-within-skill (GitHub-packageable).
 # router.py lives at  video-generation/engines/higgsfield/scripts/router.py
 _HERE = Path(__file__).resolve()
-HF_EXE = _HERE.parent.parent / "bin" / "hf.exe"                       # engines/higgsfield/bin/hf.exe (gitignored — install: npm i -g @higgsfield/cli)
+_HF_BIN_DIR = _HERE.parent.parent / "bin"                             # engines/higgsfield/bin/ (бинарь gitignored)
+
+
+def _hf_exe_path() -> Path:
+    """Путь к вендорскому бинарю hf.
+
+    Имя файла зависит от платформы: на Windows это `hf.exe`, на macOS и Linux —
+    `hf` без расширения (ровно так его называет ENGINE.md:74 — `HF="./bin/hf"`).
+    Захардкоженный `hf.exe` давал на маке и линуксе сообщение «hf.exe not found at …»
+    про файл, которого на этой платформе не бывает: человек шёл искать `.exe`,
+    не находил и решал, что сломан пак.
+
+    Берём то, что реально лежит на диске; если нет ничего — возвращаем ожидаемое
+    для этой ОС имя, чтобы в сообщении об ошибке стоял правильный путь.
+    """
+    native = "hf.exe" if sys.platform == "win32" else "hf"
+    for name in (native, "hf.exe", "hf"):
+        candidate = _HF_BIN_DIR / name
+        if candidate.exists():
+            return candidate
+    return _HF_BIN_DIR / native
+
+
+HF_EXE = _hf_exe_path()
+# Установка вендорского CLI: npm i -g @higgsfield/cli  (или релиз с github.com/higgsfield-ai/cli).
+HF_INSTALL_HINT = (
+    "npm i -g @higgsfield/cli  —  затем положить бинарь в "
+    f"{_HF_BIN_DIR} под именем {'hf.exe' if sys.platform == 'win32' else 'hf'} "
+    "(в репозитории его нет: бинарь вендорский и в .gitignore)"
+)
 RUNWAY_CLIENT = _HERE.parent.parent.parent.parent / "scripts" / "runway_client.py"  # video-generation/scripts/runway_client.py (sibling in same skill)
 # Credentials: env var first (get_token); file is a local fallback, NEVER shipped (.gitignore).
 CREDENTIALS_FILE = Path(os.path.expanduser("~/.claude/.credentials.master.env"))
@@ -491,7 +520,8 @@ def _direct_command_hint(jst: str, r: dict) -> str:
 def _run_hf(jst: str, params: dict, token: str, dry_run: bool = False) -> dict:
     """Invoke hf.exe `generate create <jst> ...`."""
     if not HF_EXE.exists():
-        return {"ok": False, "error": f"hf.exe not found at {HF_EXE}"}
+        return {"ok": False,
+                "error": f"вендорский CLI Higgsfield не найден: {HF_EXE}. Установка: {HF_INSTALL_HINT}"}
     if not token:
         return {"ok": False, "error": "HIGGSFIELD_ACCESS_TOKEN not set (env or credentials file)."}
 

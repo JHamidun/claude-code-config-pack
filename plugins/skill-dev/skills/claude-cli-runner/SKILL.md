@@ -32,7 +32,7 @@ result = claude("Fix spelling: Привет мр")
 result = claude(
     "Review this code for bugs",
     system="You are a senior developer",
-    model="claude-opus-4-8",
+    model="claude-opus-5",
 )
 
 # Async
@@ -51,9 +51,9 @@ ok, cleaned = validate_response(original_text, llm_response)
 
 ## Available Models
 
-- `claude-opus-4-8` — most capable (алиас `opus`)
+- `claude-opus-5` — most capable (алиас `opus`)
 - `claude-fable-5` — канон text-субагентов/воркеров (алиас `fable`, ≤5 одновременно)
-- `claude-sonnet-4-5` — balanced (default)
+- `claude-sonnet-5` — balanced (default)
 - `claude-haiku-4-5` — fastest, cheapest
 
 Канон актуальных ID/алиасов → `config/models.md`.
@@ -68,5 +68,5 @@ Or set `CLAUDE_CLI_PATH` env var to the binary path.
 
 ```bash
 ssh your-server "which claude"  # verify installation
-ssh your-server "claude -p --model claude-sonnet-4-5 'Hello'"  # test
+ssh your-server "claude -p --model claude-sonnet-5 'Hello'"  # test
 ```

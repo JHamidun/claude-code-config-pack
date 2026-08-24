@@ -28,8 +28,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "derekcheungsa@gmail.com",
-          "cachedResultName": "derekcheungsa@gmail.com"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "operation": "getAll"
       },

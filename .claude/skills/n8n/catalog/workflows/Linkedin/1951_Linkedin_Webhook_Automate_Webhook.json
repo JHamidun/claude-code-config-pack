@@ -174,8 +174,8 @@
         "html": "=Dear [Recipient Name],\n\nWe would like to inform you that a new task has been created to address the recent training feedback we received. Below are the details of the task:\n\nTask Title: {{ $json[\"title\"] }}\n\nTask Description:\n{{ $json[\"description\"] }}\n\nTask Status: {{ $json[\"statusName\"] }}\n\nInstructions:\n{{ $json[\"instruction\"] }}\n\nActions Required:\n\n- {{ $json[\"task\"][\"actions\"][0][\"name\"] }}\nDescription:\n{{ $json[\"task\"][\"actions\"][0][\"description\"] }}\n\n- {{ $json[\"task\"][\"actions\"][1][\"name\"] }}\nDescription:\n{{ $json[\"task\"][\"actions\"][1][\"description\"] }}\n\n\nPlease address this task at your earliest convenience to ensure we promptly respond to the feedback and improve our training program accordingly.\n\nIf you have any questions or require further information, please do not hesitate to contact us.\n\nLink : {{ $env.WEBHOOK_URL }}{{ $json[\"code\"] }}\n\nBest regards,",
         "options": {},
         "subject": "New Task Created - Urgent: Training Feedback Requires Immediate Attention",
-        "toEmail": "contact@usertask.io",
-        "fromEmail": "contact@usertask.io"
+        "toEmail": "REPLACE_ME@example.com",
+        "fromEmail": "REPLACE_ME@example.com"
       },
       "credentials": {
         "smtp": {
@@ -206,11 +206,11 @@
           "parameters": [
             {
               "name": "X-API-KEY",
-              "value": "22d1ce6fa3ae7039fe42d3ddf1ba55d8f5ee9e2c2e6b04788144fca080d1e170"
+              "value": "YOUR_API_KEY"
             },
             {
               "name": "X-CLIENT-ID",
-              "value": "f3604b6d2d33af2006ecb0d4910871fa"
+              "value": "YOUR_CLIENT_ID"
             }
           ]
         }
@@ -245,11 +245,11 @@
           "parameters": [
             {
               "name": "X-API-KEY",
-              "value": "22d1ce6fa3ae7039fe42d3ddf1ba55d8f5ee9e2c2e6b04788144fca080d1e170"
+              "value": "YOUR_API_KEY"
             },
             {
               "name": "X-CLIENT-ID",
-              "value": "f3604b6d2d33af2006ecb0d4910871fa"
+              "value": "YOUR_CLIENT_ID"
             }
           ]
         }
@@ -269,8 +269,8 @@
         "html": "=Dear Trainer's and HR Manager's,\n\nWe have received a training feedback rating of 1 star. It is crucial to address this issue promptly.\n\nResponse : {{ $json[\"body\"][\"results\"][0][\"actionName\"] }}\n\nWe recommend scheduling a meeting to discuss the feedback in detail and develop an action plan to improve the training program.\n\nBest regards,",
         "options": {},
         "subject": "Urgent: Training Feedback Requires Immediate Attention",
-        "toEmail": "contact@usertask.io",
-        "fromEmail": "contact@usertask.io"
+        "toEmail": "REPLACE_ME@example.com",
+        "fromEmail": "REPLACE_ME@example.com"
       },
       "credentials": {
         "smtp": {
@@ -293,7 +293,7 @@
         "color": 7,
         "width": 714.7562585267917,
         "height": 593.70786516854,
-        "content": "## UserTask\n**Link** {{ $env.WEBHOOK_URL }} \n\n**Login**\ncontact@usertask.io\n**Password**\nQSDpo2x10?2020"
+        "content": "## UserTask\n**Link** {{ $env.WEBHOOK_URL }} \n\n**Login**\nREPLACE_ME@example.com\n**Password**\nREPLACE_ME"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."
@@ -318,11 +318,11 @@
           "parameters": [
             {
               "name": "X-API-KEY",
-              "value": "22d1ce6fa3ae7039fe42d3ddf1ba55d8f5ee9e2c2e6b04788144fca080d1e170"
+              "value": "YOUR_API_KEY"
             },
             {
               "name": "X-CLIENT-ID",
-              "value": "f3604b6d2d33af2006ecb0d4910871fa"
+              "value": "YOUR_CLIENT_ID"
             }
           ]
         }
@@ -341,8 +341,8 @@
       "parameters": {
         "options": {},
         "subject": "Task Created",
-        "toEmail": "contact@usertask.io",
-        "fromEmail": "contact@usertask.io"
+        "toEmail": "REPLACE_ME@example.com",
+        "fromEmail": "REPLACE_ME@example.com"
       },
       "credentials": {
         "smtp": {
@@ -562,11 +562,11 @@
           "parameters": [
             {
               "name": "X-API-KEY",
-              "value": "22d1ce6fa3ae7039fe42d3ddf1ba55d8f5ee9e2c2e6b04788144fca080d1e170"
+              "value": "YOUR_API_KEY"
             },
             {
               "name": "X-CLIENT-ID",
-              "value": "f3604b6d2d33af2006ecb0d4910871fa"
+              "value": "YOUR_CLIENT_ID"
             }
           ]
         }

@@ -464,7 +464,7 @@
       "parameters": {
         "width": 460,
         "height": 200,
-        "content": "## I'm here to help!\n\nIf you need assistance customizing the model or have feedback to share, please don’t hesitate to reach out. Your thoughts are important to me, and I'm eager to support you in any way I can. \n\n**📩 sinamirshafiee@gmail.com**"
+        "content": "## I'm here to help!\n\nIf you need assistance customizing the model or have feedback to share, please don’t hesitate to reach out. Your thoughts are important to me, and I'm eager to support you in any way I can. \n\n**📩 REPLACE_ME@example.com**"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."

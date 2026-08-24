@@ -158,9 +158,15 @@ SELECT COUNT(*) FROM knowledge k, json_each(k.extra) WHERE json_valid(k.extra); 
 
 ### ATTACH: несколько баз в одном запросе
 
+Путь в `ATTACH` SQLite берёт **буквально**: ни `~`, ни `$HOME`, ни `${HOME}` он не
+разворачивает. Литерал `${HOME}/...` даёт `unable to open database file` — ошибку, которую
+легко прочитать как «базы нет», хотя база на месте. Поэтому путь собирает Python (модуль
+`sqlite3` из stdlib, отдельная программа для этого не нужна) — см. пример ниже.
+
 ```sql
-ATTACH DATABASE 'file:${HOME}/.claude/chats.db?mode=ro'            AS chats;
-ATTACH DATABASE 'file:${HOME}/.claude/memory-graph/graph.db?mode=ro' AS g;
+-- ВПИШИ АБСОЛЮТНЫЙ ПУТЬ вместо <HOME>: /home/имя, /Users/имя, C:/Users/имя
+ATTACH DATABASE 'file:<HOME>/.claude/chats.db?mode=ro'            AS chats;
+ATTACH DATABASE 'file:<HOME>/.claude/memory-graph/graph.db?mode=ro' AS g;
 
 SELECT COUNT(*) FROM chats.sessions;                    -- 75532
 SELECT name FROM g.sqlite_master WHERE type='table';    -- nodes, edges
@@ -171,8 +177,12 @@ PRAGMA database_list;                                   -- что реально
 иначе `unable to open database: file:...?mode=ro` (проверено, легко принять за «файла нет»):
 
 ```python
+import sqlite3
+from pathlib import Path
+
+home = Path.home().as_posix()                 # ← собираем путь, а не пишем ${HOME} в строке
 con = sqlite3.connect(':memory:', uri=True)   # ← uri=True включает URI и для ATTACH
-con.execute("ATTACH DATABASE 'file:.../chats.db?mode=ro' AS chats")
+con.execute(f"ATTACH DATABASE 'file:{home}/.claude/chats.db?mode=ro' AS chats")
 ```
 
 `mode=ro` — обязательная привычка при анализе чужой/рабочей БД: физически запрещает запись.

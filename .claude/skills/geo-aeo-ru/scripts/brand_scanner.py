@@ -13,7 +13,7 @@ Brand mentions коррелируют с AI-видимостью в 3× силь
 Источник: zubair-trabzada/geo-seo-claude (MIT), адаптация для skills/geo-aeo-ru:
 - Windows: python (не python3), UTF-8 stdout;
 - RU-контур: проверка ru.wikipedia в дополнение к en (training-сигнал для
-  (regional LLM B)/(regional LLM A)), в «other platforms» добавлены Habr и vc.ru (главные
+  GigaChat/YandexGPT), в «other platforms» добавлены Habr и vc.ru (главные
   RU-домены цитирования, см. references/russian-llm.md).
 
 Механические проверки — только Wikipedia/Wikidata API (без ключей). Остальные
@@ -134,7 +134,7 @@ def check_wikipedia_presence(brand_name: str) -> dict:
     result["has_wikipedia_page_en"] = en["has_page"]
     result["wikipedia_search_results_en"] = en["search_results"]
 
-    # RU-wiki: training-сигнал для (regional LLM B)/(regional LLM A) + источник ChatGPT на RU-запросах
+    # RU-wiki: training-сигнал для GigaChat/YandexGPT + источник ChatGPT на RU-запросах
     ru = _wiki_api_check(brand_name, "ru")
     result["has_wikipedia_page_ru"] = ru["has_page"]
     result["wikipedia_search_results_ru"] = ru["search_results"]
@@ -198,7 +198,7 @@ def check_other_platforms(brand_name: str) -> dict:
         "Product Hunt": f"https://www.producthunt.com/search?q={quote_plus(brand_name)}",
         "G2": f"https://www.g2.com/search?utf8=&query={quote_plus(brand_name)}",
         "Trustpilot": f"https://www.trustpilot.com/search?query={quote_plus(brand_name)}",
-        # RU-контур: главные цитируемые RU-домены ((regional LLM B) любит RU-инфополе)
+        # RU-контур: главные цитируемые RU-домены (GigaChat любит RU-инфополе)
         "Habr": f"https://habr.com/ru/search/?q={quote_plus(brand_name)}",
         "vc.ru": f"https://vc.ru/search?query={quote_plus(brand_name)}",
         "Otzovik": f"https://otzovik.com/?search_text={quote_plus(brand_name)}",
@@ -220,7 +220,7 @@ def check_other_platforms(brand_name: str) -> dict:
             "Отзывы на G2/Trustpilot; RU — Otzovik/Яндекс.Карты",
             "Crunchbase-профиль для B2B",
             "Open-source вклад на GitHub — авторитет у dev-аудитории",
-            "RU: sustained-присутствие на Habr/vc.ru — training-сигнал для (regional LLM B)",
+            "RU: sustained-присутствие на Habr/vc.ru — training-сигнал для GigaChat",
         ],
     }
 

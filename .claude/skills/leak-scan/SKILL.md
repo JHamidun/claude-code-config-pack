@@ -14,7 +14,7 @@ metadata:
 
 | Направление | Скрипт | Вопрос | Что ловит |
 |-------------|--------|--------|-----------|
-| **ИСХОДЯЩЕЕ** (мои данные наружу) | `scripts/leak_scan.py` | «не утечёт ли что-то личное, если я это опубликую?» | PII, деанон-маркеры (248 паттернов) |
+| **ИСХОДЯЩЕЕ** (мои данные наружу) | `scripts/leak_scan.py` | «не утечёт ли что-то личное, если я это опубликую?» | общие формы секретов + твой личный словарь опознавания |
 | **ВХОДЯЩЕЕ** (чужой код внутрь) | `scripts/skill_injection_scan.py` | «безопасно ли ставить этот скачанный скилл/плагин/агент?» | prompt-injection и тихий захват полномочий |
 
 Оба скрипта — чистый stdlib Python, UTF-8 stdout (Windows-совместимо), **ничего не меняют на диске**. Направления независимы: перед публикацией своего — ИСХОДЯЩЕЕ; перед установкой чужого с GitHub — ВХОДЯЩЕЕ.
@@ -23,7 +23,40 @@ metadata:
 
 ## ИСХОДЯЩЕЕ: PII/деанон перед публикацией (`leak_scan.py`)
 
-Single consolidated scanner (`scripts/leak_scan.py`, 248 patterns) that finds personal-data and deanonymization leaks before anything goes public. Consolidated from `leak_scan_v37.py` (37 audit passes + multi-model review). Pure Python UTF-8 — it exists because of a hard-won lesson.
+Single consolidated scanner (`scripts/leak_scan.py`) that finds personal-data and deanonymization leaks before anything goes public. Pure Python UTF-8 — it exists because of a hard-won lesson.
+
+Паттерны живут в двух слоях, и это принципиально:
+
+| Слой | Где лежит | Что ищет |
+|------|-----------|----------|
+| `GENERIC_PATTERNS` | в самом `leak_scan.py` | формы секретов, ни к кому не привязанные: `sk-ant`, `AIza`, `ghp_`, JWT, токены ботов, SMTP-ключи, форматы телефонов, невидимый Unicode |
+| `IDENTITY_PATTERNS` | **внешний файл, в пак НЕ входит** | твои имена, почты, домены, IP серверов, номера документов, названия клиентов |
+
+Инструмент, который ищет утечки, сам легко становится крупнейшей из них: если личный
+словарь лежит в коде, опубликовать сканер значит опубликовать каталог всего частного
+разом. Поэтому второй слой вынесен наружу.
+
+### Первый запуск: заведи свой словарь (5 минут, один раз)
+
+```bash
+# Windows
+copy "%USERPROFILE%\.claude\skills\leak-scan\scripts\identity.example.json" "%USERPROFILE%\.claude\leak-scan-identity.json"
+# macOS / Linux
+cp ~/.claude/skills/leak-scan/scripts/identity.example.json ~/.claude/leak-scan-identity.json
+```
+
+Открой копию и впиши СВОИ признаки вместо заглушек (`YOURNAME`, `you@example.com`,
+`your-domain.example`, `203.0.113.x`, `Acme Corp`) — по паре `["метка", "регулярка"]`.
+Начни с малого: имя и фамилия во всех падежах, личные почты, домены, IP своих серверов,
+имена клиентов. Дополняй по мере находок.
+
+Скрипт ищет словарь по трём адресам, в порядке убывания приоритета: `$LEAK_SCAN_IDENTITY`
+(путь в переменной окружения) → `~/.claude/leak-scan-identity.json` → `identity.local.json`
+рядом со скиллом. Файл **не коммить** — он по определению личный.
+
+Без словаря сканер продолжает работать, но ловит только общие формы секретов и печатает
+предупреждение в stderr. Молчание при отсутствующем словаре — не «чисто», а «личное не
+проверялось».
 
 ## Critical lesson — why this script, not grep
 
@@ -33,7 +66,7 @@ Single consolidated scanner (`scripts/leak_scan.py`, 248 patterns) that finds pe
 
 Regex alone gives FALSE confidence. A 248-pattern scan once passed a repo "clean" — then a semantic LLM review of the same repo found a real client name in an example, a live API credit-balance, real production resource names, a private multi-account auth gateway, and ToS-grey subscription-bypass tooling. None matched a literal pattern. So ALWAYS run BOTH stages before declaring clean:
 
-**Stage 1 — regex scan** (`scripts/leak_scan.py`): catches literal tells (names, emails, IPs, keys, tokens, known clients, national IDs). Fast, deterministic, exhaustive for what it knows.
+**Stage 1 — regex scan** (`scripts/leak_scan.py`): catches literal tells (names, emails, IPs, keys, tokens, known clients, national IDs). Fast, deterministic, exhaustive for what it knows — but «что оно знает» о тебе задаёт твой `leak-scan-identity.json`, см. выше.
 
 **Stage 2 — semantic review** (LLM): read the actual content (skill bodies, examples, READMEs) and hunt for what regex CANNOT see:
 - **Real proper nouns in examples** — client/company/person names, project codenames, product names (not in the pattern list)
@@ -57,9 +90,19 @@ For a multi-file repo, fan out a few read-only agents over slices of the tree fo
 python ~/.claude/skills/leak-scan/scripts/leak_scan.py <dir-or-file> [--allow SUBSTR ...]
 ```
 
-- `target` — directory (recursive) or single file. Scans text files by extension; skips `.git/` and `_*`-prefixed working files.
+- `target` — directory (recursive) or single file. Scans text files by extension; skips only `.git/` and `__pycache__/`.
 - `--allow SUBSTR` — extra allowlisted substring (repeatable) for project-specific intended strings.
 - Output is forced UTF-8 (safe for Cyrillic on any console).
+
+**Что НЕ проверено — печатается всегда, до вердикта.** Файлы с расширением вне
+списка текстовых перечисляются блоком «НЕ ПРОВЕРЕНО», и тогда «CLEAN» звучит как
+«чисто В ПРОВЕРЕННОЙ ЧАСТИ». Иначе «не смотрел» неотличимо от «посмотрел и не
+нашёл» — на этом уже один раз проехал служебный `.canarybak` со словарём
+детектора внутри.
+
+Файлы с именем на `_` **раньше пропускались, теперь читаются** (имя ничего не
+говорит о содержимом) и лишь помечаются в отчёте отдельной строкой — чтобы было
+видно, что находка пришла из служебного черновика.
 
 **Exit codes:** `0` clean · `1` matches found · `2` target not found.
 
@@ -68,17 +111,22 @@ python ~/.claude/skills/leak-scan/scripts/leak_scan.py <dir-or-file> [--allow SU
 python ~/.claude/skills/leak-scan/scripts/leak_scan.py ./my-public-repo
 ```
 
-## What it catches (248 patterns)
+## What it catches
 
-| Group | Examples |
-|-------|----------|
-| Identity | real names, handles, personal emails, personal domains |
-| Infra | server IPs, internal Docker IPs, gateway/hook ports, hostnames |
-| Clients/brands | your employer, your clients (+ localized forms) |
-| Secrets | `sk-ant`, `sk-proj`, `AIza`, `ghp_`, `xoxb`, `ntn_`, `pplx-`, JWT, Telegram bot tokens |
-| National ID formats | tax/residence IDs, phone (multiple formats) |
-| Deanon fingerprints | timezone, specific hardware model, region defaults, telltale counts, voice IDs |
-| Stego | zero-width characters |
+| Group | Слой | Examples |
+|-------|------|----------|
+| Secrets | generic | `sk-ant`, `sk-proj`, `AIza`, `ghp_`, `xoxb`, `ntn_`, `pplx-`, JWT, Telegram bot tokens, SMTP-ключи |
+| Secrets | generic (добавлено 22.08.2026) | легаси `sk-…48`, `github_pat_`, `gho_/ghu_/ghs_/ghr_`, AWS `AKIA…`, приватные ключи `-----BEGIN … PRIVATE KEY`, Stripe `sk_live_`/`rk_live_`, Telethon StringSession, присваивание вида `api_key = "…"` |
+| Phone / national ID cues | generic | форматы телефонов, слова-маркеры номеров документов |
+| Infra (generic) | generic | внутренние адреса Docker-моста |
+| Stego | generic | zero-width characters |
+| Identity | твой словарь | real names, handles, personal emails, personal domains |
+| Infra (личная) | твой словарь | server IPs, gateway/hook ports, hostnames |
+| Clients/brands | твой словарь | your employer, your clients (+ localized forms) |
+| National IDs (значения) | твой словарь | конкретные номера твоих документов |
+| Deanon fingerprints | твой словарь | timezone, specific hardware model, region defaults, telltale counts, voice IDs |
+
+Строки нижней половины таблицы ищутся, **только если заведён** `leak-scan-identity.json`.
 
 Allowlist covers placeholders (`your-username`, `YOUR_*`, `${HOME}`, `${WORKSPACE}`) and credited public OSS authors (garrytan, obra/Jesse Vincent, mvanhorn, Anthropic, …).
 
@@ -94,7 +142,10 @@ To compare a new build against an already-published baseline, scan both and diff
 
 ## Extending patterns
 
-Patterns and allowlist are inline in `scripts/leak_scan.py` (`LEAK_PATTERNS`, `ALLOWLIST_SUBSTRINGS`). Add new leaks/placeholders there. For one-off intended strings, prefer `--allow` over editing the file.
+- **Личные признаки** (твоё имя, домен, клиент) → в `~/.claude/leak-scan-identity.json`, а НЕ в код скрипта. Иначе сканер снова станет носителем утечки.
+- **Новая форма секрета** (ключ очередного сервиса, чей префикс узнаваем) → `GENERIC_PATTERNS` в `scripts/leak_scan.py`: это безлично и полезно всем.
+- **Ложные срабатывания-плейсхолдеры** → `ALLOWLIST_SUBSTRINGS` там же.
+- **Разовая нарочная строка** → флаг `--allow SUBSTR`, без правки файлов.
 
 ---
 

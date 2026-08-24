@@ -21,7 +21,7 @@
 Готовые коннекторы и **Facebook Conversions** action (хеширует PII сам).
 
 **Сценарий «новый квал-лид → Meta CAPI»:**
-1. **Trigger:** `your CRM / HubSpot / Your CRM → New/Updated Deal` (или Webhook from CRM).
+1. **Trigger:** `amoCRM / HubSpot / Bitrix24 → New/Updated Deal` (или Webhook from CRM).
 2. **Filter:** только если стадия = «Квалифицирован» (Zapier Filter step).
 3. **Action:** `Facebook Conversions → Send Conversion Event`:
    - Event Name: `Lead` (или кастомная);
@@ -73,16 +73,16 @@
 **Плюсы:** бесплатно по объёму, данные дома, любая логика; готовые шаблоны в скилле `n8n`.
 **Минусы:** нужен сервер и базовая настройка (но у пользователя уже есть).
 
-> **Worked example пользователя** (academy.your-domain.com): `Оплата ЮKassa → webhook → n8n (your-server) → hash(email/phone)+External ID(user_id)+FBC/FBP → Meta CAPI Purchase + Google Enhanced Conversions → Test Events`. Подробно — `SKILL.md`.
+> **Рабочий пример** (academy.your-domain.com): `Оплата ЮKassa → webhook → n8n (your-server) → hash(email/phone)+External ID(user_id)+FBC/FBP → Meta CAPI Purchase + Google Enhanced Conversions → Test Events`. Подробно — `SKILL.md`.
 
 ---
 
 ## 4. Albato (российская альтернатива)
 
-RU-аналог Zapier — для клиентов с **РФ-юрлицом** (зарубежная оплата Zapier/Make недоступна из-за санкций). RU-коннекторы CRM: **your CRM, Битрикс24**.
+RU-аналог Zapier — для клиентов с **РФ-юрлицом** (зарубежная оплата Zapier/Make недоступна из-за санкций). RU-коннекторы CRM: **amoCRM, Битрикс24**.
 
-**Сценарий «your CRM смена статуса → Meta CAPI»:**
-1. **Триггер:** your CRM → смена статуса сделки на «Квалифицирован» / «Оплачено».
+**Сценарий «amoCRM: смена статуса → Meta CAPI»:**
+1. **Триггер:** amoCRM → смена статуса сделки на «Квалифицирован» / «Оплачено».
 2. **Обработка:** маппинг полей сделки (email, phone, сумма) в формат CAPI; нормализация.
 3. **Действие:** отправка в Facebook Conversions API (Event Name, Event ID = ID сделки, user_data, value).
 4. **Test Events** проверка.
@@ -99,8 +99,8 @@ RU-аналог Zapier — для клиентов с **РФ-юрлицом** (�
 | CRM | Что есть |
 |-----|----------|
 | **HubSpot** | нативный коннектор к Meta CAPI — события из воронки уходят на сервер Meta автоматически |
-| **your CRM** | интеграции/виджеты передачи статусов сделки в CAPI |
-| **Битрикс24** | вебхуки на смену стадии → no-code слой (n8n/Make/Albato) → CAPI; см. скилл `crm` |
+| **amoCRM** | интеграции/виджеты передачи статусов сделки в CAPI |
+| **Битрикс24** | вебхуки на смену стадии → no-code слой (n8n/Make/Albato) → CAPI; как включить исходящий вебхук — в REST-документации самой Битрикс24 |
 
 > **Когда брать no-code, а не нативный коннектор:** нестандартная логика — фильтр по конкретной стадии, обогащение FBC/FBP из сохранённых cookies, кастомная нормализация полей, отправка сразу в Meta + Google + Яндекс из одного триггера.
 
@@ -123,10 +123,10 @@ RU-аналог Zapier — для клиентов с **РФ-юрлицом** (�
 - гибкий маппинг, дешевле → **Make**;
 - PII дома / 0 за объём / уже есть сервер → **n8n**;
 - РФ-юрлицо, зарубежная оплата недоступна → **Albato**;
-- CRM = HubSpot/your CRM/Битрикс24 со встроенным коннектором → **нативная интеграция**.
+- CRM = HubSpot/amoCRM/Битрикс24 со встроенным коннектором → **нативная интеграция**.
 
 ## Cross-links
 - `meta-capi.md` — 7 параметров, хеширование, Event ID, payload, Test Events.
 - `attribution.md` — офлайн-конверсии и атрибуция поверх собранных событий.
 - `n8n` (скилл) — готовые self-hosted workflow.
-- `crm` (скилл) — вебхуки на смену стадии.
+- Твоя CRM — исходящие вебхуки на смену стадии сделки (есть у Битрикс24, amoCRM, HubSpot; готового навыка в паке нет — настраивается в самой CRM).

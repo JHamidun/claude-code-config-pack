@@ -5,7 +5,7 @@ metadata:
   version: 1.1.0
   updated: 2026-05-29
   ported_from: coreyhaines31/marketingskills (competitors + competitor-profiling references)
-  reuses: yourname-marketing-context, seo-machine-ru, tilda, schema-markup-ru, similarweb-analytics, yandex
+  reuses: seo-machine-ru, tilda, schema-markup-ru, similarweb-analytics, yandex
 ---
 
 # Competitive Analysis Skill
@@ -14,7 +14,7 @@ Frameworks and methodologies for researching competitors, comparing positioning,
 
 ## RU-расширения под ваш бизнес
 
-Для задач под реальный бизнес (AI-консалтинг + воркшопы + ExampleProduct) сначала прочитай `yourname-marketing-context` → `business.md`, затем используй references:
+Для задач под реальный бизнес (AI-консалтинг + воркшопы + ExampleProduct) сначала прочитай `~/.claude/business-context.md` → `business.md`, затем используй references:
 
 - **`references/comparison-pages-ru.md`** — форматы сравнительных / alternative-страниц для SEO + продаж: «ваша академия vs другие курсы по AI», «AI-консультант vs нанять inhouse», «воркшоп vs самообучение», «Concierge vs прямые подписки». Шаблоны секций (TL;DR, цены в ₽, кому подходит, миграция). SEO/публикация — `seo-machine-ru` + `tilda`, FAQ-разметка — `schema-markup-ru`.
 - **`references/competitor-profiling-ru.md`** — профилирование RU-конкурентов в AI-образовании/консалтинге из их URL. Инструменты-замены: Яндекс Wordstat/Вебмастер + `similarweb-analytics` (вместо DataForSEO), otzovik/startpack/CNews/Яндекс Бизнес (вместо G2/Capterra). Шаблон профиля + сводка.

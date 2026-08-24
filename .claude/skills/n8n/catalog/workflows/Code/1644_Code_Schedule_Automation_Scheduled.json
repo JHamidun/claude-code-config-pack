@@ -314,7 +314,7 @@
       ],
       "webhookId": "a9b88615-c7e2-4b56-891a-98f4d6b34220",
       "parameters": {
-        "sendTo": "john@marketingcanopy.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "={{ $json.output }}",
         "options": {},
         "subject": "Google Analytics Metrics Summary Report"

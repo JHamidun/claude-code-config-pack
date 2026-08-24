@@ -32,7 +32,7 @@ argument-hint: [путь к файлу или модулю]
 
 **Выбери формат:**
 - **Markdown** для README
-- **docx skill** для formal specifications
+- **.docx** для formal specifications — `python-docx`, готовый пример: `skills/seo-machine-ru/scripts/build_report_docx.py`
 - **api-documentation skill** для OpenAPI/Swagger
 - **Notion** для team wiki (если Notion MCP настроен)
 
@@ -69,9 +69,9 @@ mycli command --param value
 ## Examples:
 
 ```
-/docs ${WORKSPACE}\backend\api\main.py
-/docs ${WORKSPACE}\telegram-bot\handlers\
-/docs ${WORKSPACE}\frontend\src\components\UserProfile.tsx
+/docs ./backend/api/main.py
+/docs ./telegram-bot/handlers/
+/docs ./frontend/src/components/UserProfile.tsx
 ```
 
 **Создаю документацию! 📖**

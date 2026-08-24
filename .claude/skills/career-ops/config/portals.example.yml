@@ -1,0 +1,275 @@
+# Career-Ops Portal Scanner Configuration
+# Copy to ~/career-ops/portals.yml and customize.
+#
+# Сканеры: hh.ru, LinkedIn, RemoteOK, We Work Remotely, Wellfound, YC,
+#          ai-jobs.net, Adzuna, Hiring Cafe, startup.jobs
+#
+# ⚠️ ВСЕ РОЛИ И ВИЛКИ НИЖЕ — ПРИМЕР, а не рекомендация.
+# Файл заполнен под один сценарий (продуктовое руководство, remote, англо-русский рынок),
+# чтобы было видно, как выглядит рабочая конфигурация целиком. Под свой поиск меняются
+# три вещи, остальное можно оставить:
+#   1. title_filter.positive_*  — как ТВОЮ роль пишут в вакансиях (не как ты себя называешь);
+#   2. queries / what_or у сканеров — те же формулировки в синтаксисе каждого портала;
+#   3. salary_* / min_salary_usd — твоя нижняя граница.
+# Не знаешь формулировок — сначала `/career-ops analyze-skills`: он соберёт частотный
+# словарь требований по роли и покажет, какими словами её ищут работодатели.
+#
+# ⚠️ Роли здесь НЕ совпадают с ролями в `profile.example.yml` (там инженерный сценарий) —
+# это два независимых примера, а не один комплект. После копирования обоих файлов приведи
+# их к одной роли: скоринг вакансий считается от `profile.yml`, а находит их `portals.yml`,
+# и при расхождении сканер будет исправно приносить вакансии, которые оценка забракует.
+
+# ─────────────────────────────────────────────────────────
+# Глобальные title-фильтры (применяются ко всем сканерам)
+# ─────────────────────────────────────────────────────────
+title_filter:
+  positive_en:
+    - "CPO"
+    - "Chief Product"
+    - "VP Product"
+    - "VP of Product"
+    - "Head of Product"
+    - "Head of AI"
+    - "Director of Product"
+    - "AI Product"
+    - "ML Product"
+    - "Product Lead"
+    - "Principal Product"
+    - "Staff Product"
+    - "Senior Product Manager"
+    - "Founding Product"
+    - "Founding PM"
+  positive_ru:
+    - "CPO"
+    - "Chief Product"
+    - "VP Product"
+    - "Директор по продукту"
+    - "Руководитель продукта"
+    - "Head of Product"
+    - "Head of AI"
+    - "AI Product"
+    - "ML Product"
+    - "Продуктовый директор"
+    - "Директор по AI"
+    - "Старший продакт"
+  negative_en:
+    - "Intern"
+    - "Junior"
+    - "Associate Product"
+    - "Marketing"
+    - "Sales Manager"
+    - "Customer Success"
+    - "Engineer"  # исключаем чистые engineering позиции
+  negative_ru:
+    - "Стажёр"
+    - "Junior"
+    - "Младший"
+    - "Ассистент"
+    - "Маркетолог"
+  seniority_boost:
+    # +1 в скоре если title содержит
+    - "Chief"
+    - "VP"
+    - "Head of"
+    - "Director"
+    - "Lead"
+    - "Principal"
+    - "Staff"
+
+# ─────────────────────────────────────────────────────────
+# 1. hh.ru — Russia + CIS market
+# ─────────────────────────────────────────────────────────
+hh:
+  enabled: true
+  base_url: "https://api.hh.ru/vacancies"
+  queries:
+    - text: "CPO OR Chief Product Officer"
+      area: 113  # Russia
+      experience: "moreThan6"
+    - text: "Head of Product OR VP Product"
+      area: 113
+      schedule: "remote"
+    - text: "Директор по продукту AI"
+      area: 113
+    - text: "AI Product Manager OR ML Product"
+      area: 113
+      schedule: "remote"
+
+# ─────────────────────────────────────────────────────────
+# 2. LinkedIn — Global (requires cookies)
+# ─────────────────────────────────────────────────────────
+linkedin:
+  enabled: true
+  cookies_path: "~/.claude/cookies/linkedin.json"
+  queries:
+    - "Chief Product Officer AI remote"
+    - "Head of AI Product"
+    - "VP Product AI startup"
+    - "Founding PM AI"
+  filters:
+    experience: ["Executive", "Director", "Senior"]
+    job_type: ["Full-time"]
+    work_type: ["Remote", "Hybrid"]
+
+# ─────────────────────────────────────────────────────────
+# 3. RemoteOK — JSON API, global remote
+# ─────────────────────────────────────────────────────────
+remoteok:
+  enabled: true
+  base_url: "https://remoteok.com/api"
+  queries:
+    - tags: "product,ai"
+    - tags: "product,senior"
+    - tags: "exec,remote"
+    - tags: "cpo"
+    - tags: "ai,ml,lead"
+
+# ─────────────────────────────────────────────────────────
+# 4. We Work Remotely — RSS feeds
+# ─────────────────────────────────────────────────────────
+wwr:
+  enabled: true
+  feeds:
+    - name: "management_finance"
+      url: "https://weworkremotely.com/categories/remote-management-and-finance-jobs.rss"
+      priority: 1
+    - name: "product"
+      url: "https://weworkremotely.com/categories/remote-product-jobs.rss"
+      priority: 1
+    - name: "programming"
+      url: "https://weworkremotely.com/categories/remote-programming-jobs.rss"
+      priority: 2
+  max_age_days: 14
+
+# ─────────────────────────────────────────────────────────
+# 5. Wellfound — Startups, AI-first
+# ─────────────────────────────────────────────────────────
+wellfound:
+  enabled: true
+  requires_playwright: true
+  cookies_path: "~/.claude/cookies/wellfound.json"  # optional
+  queries:
+    - "https://wellfound.com/jobs?roles=product-manager&remote=true&salary_min=120000"
+    - "https://wellfound.com/jobs?roles=head-of-product&remote=true"
+    - "https://wellfound.com/jobs?roles=vp-of-product&remote=true"
+    - "https://wellfound.com/jobs?roles=chief-product-officer&remote=true"
+    - "https://wellfound.com/jobs?industries=artificial-intelligence&roles=product-manager"
+    - "https://wellfound.com/jobs?industries=machine-learning&roles=product-manager"
+    - "https://wellfound.com/jobs?roles=founding-product-manager"
+  scroll_iterations: 3  # infinite scroll pages to load
+  delay_between_queries_sec: 3  # anti-rate-limit
+
+# ─────────────────────────────────────────────────────────
+# 6. YC Work at a Startup
+# ─────────────────────────────────────────────────────────
+yc:
+  enabled: true
+  requires_playwright: true
+  cookies_path: "~/.claude/cookies/ycombinator.json"  # optional, для work at a startup
+  # Mode A — Work at a Startup (logged in)
+  workatastartup_queries:
+    - "https://www.workatastartup.com/jobs?role_types=product&remote_only=true"
+    - "https://www.workatastartup.com/jobs?role_types=product&salary_min=140000"
+    - "https://www.workatastartup.com/jobs?role_types=eng_management&remote_only=true"
+  # Mode B — YC companies directory (public)
+  directory_queries:
+    - "https://www.ycombinator.com/companies?batch=W26&industry=AI"
+    - "https://www.ycombinator.com/companies?batch=S25&industry=AI"
+    - "https://www.ycombinator.com/companies?batch=W25&industry=Artificial+Intelligence"
+  target_industries:
+    - "AI"
+    - "Artificial Intelligence"
+    - "Machine Learning"
+    - "Developer Tools"
+    - "B2B"
+
+# ─────────────────────────────────────────────────────────
+# 7. ai-jobs.net — Pure AI/ML specialized
+# ─────────────────────────────────────────────────────────
+aijobs:
+  enabled: true
+  base_url: "https://ai-jobs.net"
+  queries:
+    # cat=30 = AI/ML Product Manager, reg=5 = Remote
+    - "https://ai-jobs.net/?cat=30&reg=5"
+    # sen=7 = VP, sen=8 = C-level
+    - "https://ai-jobs.net/?cat=30&sen=7"
+    - "https://ai-jobs.net/?sen=8"
+    # EU region
+    - "https://ai-jobs.net/?cat=30&reg=2&sen=6"
+    # US region
+    - "https://ai-jobs.net/?cat=30&reg=1&sen=6"
+  min_salary_usd: 120000
+
+# ─────────────────────────────────────────────────────────
+# 8. Adzuna — Official API, 16 countries incl. BR + RU
+# ─────────────────────────────────────────────────────────
+adzuna:
+  enabled: true  # нужен свой app_id/app_key: developer.adzuna.com, free tier 250 calls/day
+  app_id_env: "ADZUNA_APP_ID"
+  app_key_env: "ADZUNA_APP_KEY"
+  countries: ["us", "gb", "de", "ca"]  # свой список из 16 поддерживаемых; RU покрыт слабо — для России hh.ru
+  max_calls_per_day: 200  # лимит: 250, оставляем буфер
+  queries:
+    - what_or: "CPO OR \"Head of Product\" OR \"AI Product\""
+      salary_min: 120000
+    - what_or: "VP Product OR \"Director of Product\""
+      salary_min: 140000
+    - what_or: "\"Chief Product Officer\""
+
+# ─────────────────────────────────────────────────────────
+# 9. Hiring Cafe — Remote-first, AI/tech focus
+# ─────────────────────────────────────────────────────────
+hiringcafe:
+  enabled: true
+  requires_playwright: true
+  queries:
+    - url: "https://hiring.cafe/?searchQuery=AI+Product+Manager&locationType=REMOTE"
+      label: "AI Product Remote"
+    - url: "https://hiring.cafe/?searchQuery=Head+of+Product&seniority=senior"
+      label: "Head of Product Senior+"
+    - url: "https://hiring.cafe/?searchQuery=VP+Product&locationType=REMOTE"
+      label: "VP Product Remote"
+    - url: "https://hiring.cafe/?searchQuery=CPO"
+      label: "CPO"
+    - url: "https://hiring.cafe/categories/ai-ml"
+      label: "AI/ML category"
+  scroll_iterations: 3
+
+# ─────────────────────────────────────────────────────────
+# 10. startup.jobs — EU startup board
+# ─────────────────────────────────────────────────────────
+startupjobs:
+  enabled: true
+  requires_playwright: false  # plain HTML, WebFetch достаточно
+  queries:
+    - "https://startup.jobs/?q=product+manager&remote=true"
+    - "https://startup.jobs/?q=head+of+product"
+    - "https://startup.jobs/?q=CPO"
+    - "https://startup.jobs/ai-ml-jobs"
+    - "https://startup.jobs/product-jobs"
+
+# ─────────────────────────────────────────────────────────
+# Gmail Tracking (post-application)
+# ─────────────────────────────────────────────────────────
+gmail_tracking:
+  enabled: true
+  lookback_days: 30
+  # Автообновление статусов только на high-confidence матчах
+  auto_update_confidence: "high"
+  # Medium/low — в review-queue.md для ручного подтверждения
+  detect_inbound_recruiters: true
+  inbound_lookback_days: 7
+
+# ─────────────────────────────────────────────────────────
+# Scanner orchestration
+# ─────────────────────────────────────────────────────────
+orchestration:
+  # Запуск всех сканеров параллельно через subagents
+  parallel: true
+  # Сохранять raw snapshots в data/scan-snapshots/ для дебага
+  save_snapshots: false
+  # Лимит вакансий на сканер (чтобы не забить pipeline.md)
+  max_per_scanner: 50
+  # Автоматический запуск pipeline после scan
+  auto_pipeline: false

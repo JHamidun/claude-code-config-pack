@@ -986,7 +986,7 @@
       "parameters": {
         "width": 460,
         "height": 200,
-        "content": "## Contact me\n- If you need any modification to this workflow\n- if you need some help with this workflow\n- Or if you need any workflow in n8n, Make, or Langchain / Langgraph\n\nWrite to me: [thomas@pollup.net](mailto:thomas@pollup.net)\nCheck out my other templates [here]({{ $env.WEBHOOK_URL }}"
+        "content": "## Contact me\n- If you need any modification to this workflow\n- if you need some help with this workflow\n- Or if you need any workflow in n8n, Make, or Langchain / Langgraph\n\nWrite to me: [REPLACE_ME@example.com](mailto:REPLACE_ME@example.com)\nCheck out my other templates [here]({{ $env.WEBHOOK_URL }}"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."

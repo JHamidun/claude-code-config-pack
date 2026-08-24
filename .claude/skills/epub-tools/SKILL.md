@@ -235,8 +235,9 @@ def _md_to_html(md_text):
 ## Usage Examples
 
 ```python
+import os
 # Analyze a book
-metadata, chapters = epub_summary('${HOME}/books/ai-book.epub')
+metadata, chapters = epub_summary(os.path.expanduser('~/books/ai-book.epub'))
 
 # Read specific chapter
 title, text = get_chapter('book.epub', 3)

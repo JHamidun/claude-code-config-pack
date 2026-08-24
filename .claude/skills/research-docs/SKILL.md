@@ -4,12 +4,26 @@ description: "Document Q&A с визуальными цитатами: парс�
 argument-hint: "[data_directory] [question]"
 disable-model-invocation: true
 allowed-tools: Bash(python *)
-compatibility: Python 3.9+ with `liteparse`, Node 18+ with `@llamaindex/liteparse` (both installed on this machine)
+compatibility: Python 3.9+ with `liteparse` (see Setup below); Node 18+ with `@llamaindex/liteparse` optional
 ---
 
 # Research Docs — Document Q&A with Visual Citations
 
 Parse documents with LiteParse, answer a question using the parsed text, and generate an HTML report with source citations highlighted on page images.
+
+## Setup (один раз)
+
+Движок парсинга в пак не входит — ставится из PyPI:
+
+```bash
+pip install liteparse
+python -c "import liteparse; print(liteparse.__version__)"   # проверка: должно напечатать версию
+```
+
+Без него `generate_report.py` падает на `import liteparse` уже на Step 1 — это не
+поломка скилла, а отсутствующая зависимость. Node-вариант
+(`npm i @llamaindex/liteparse`) нужен, только если парсишь из JS; для этого скилла
+достаточно Python-пакета.
 
 ## Arguments
 
@@ -164,7 +178,10 @@ Tell the user:
 **Команды.** Движок в пак не входит: `git clone https://github.com/VectifyAI/PageIndex ~/.claude/mcps/pageindex`, поднять venv по их README и положить рядом свою обёртку `pi.py` с подкомандами index/list/tree/pages/ask. Ключ берётся из `~/.claude/.credentials.master.env`:
 
 ```bash
-PY=${HOME}/.claude/mcps/pageindex/.venv/Scripts/python.exe
+# Интерпретатор venv лежит по-разному: Windows — Scripts/python.exe,
+# macOS и Linux — bin/python. Берём тот, который реально есть.
+VENV=${HOME}/.claude/mcps/pageindex/.venv
+PY="$VENV/bin/python"; [ -x "$PY" ] || PY="$VENV/Scripts/python.exe"
 PI=${HOME}/.claude/mcps/pageindex/pi.py
 "$PY" "$PI" index /path/to/doc.pdf        # один раз: строит дерево, печатает doc_id (персистится в workspace/)
 "$PY" "$PI" list                          # что уже проиндексировано

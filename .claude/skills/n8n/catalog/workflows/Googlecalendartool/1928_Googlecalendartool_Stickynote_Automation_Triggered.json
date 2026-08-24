@@ -203,7 +203,7 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "3009ae2f09f9ecab6eaa1d36f0b38c099f0e370759cad1c51691f9dc0fbd64fd@group.calendar.google.com",
+          "value": "REPLACE_ME@group.calendar.google.com",
           "cachedResultName": "Prise de rendez vous pour les Medcins "
         },
         "resource": "calendar"
@@ -231,7 +231,7 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "3009ae2f09f9ecab6eaa1d36f0b38c099f0e370759cad1c51691f9dc0fbd64fd@group.calendar.google.com",
+          "value": "REPLACE_ME@group.calendar.google.com",
           "cachedResultName": "Prise de rendez vous pour les Medcins "
         },
         "additionalFields": {}

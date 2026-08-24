@@ -62,7 +62,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "{{ $credentials.gmailOAuth2.id }}",
-          "name": "gmail bart@blendernation.com"
+          "name": "gmail REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2.1,

@@ -326,7 +326,7 @@
       {
         "id": "cus_R4OkhTTT1ebzPl",
         "name": "Test Usershvili",
-        "email": "Birds@Intuit.com",
+        "email": "REPLACE_ME@example.com",
         "phone": null,
         "object": "customer",
         "address": {

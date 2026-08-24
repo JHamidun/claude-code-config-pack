@@ -87,4 +87,4 @@ worker fails → report error, suggest manual intervention, exit workflow.
   workflows, verbatim (formerly the 5 standalone skills).
 - `references/worker-prompts/{bug,cleanup,deps,reuse,security}.md` — detailed
   worker prompts (bug = original; other 4 written at merge time, closing the
-  formerly broken `references/worker-prompts.md` links).
+  links that used to point at a single non-existent worker-prompts file).

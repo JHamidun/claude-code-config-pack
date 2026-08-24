@@ -152,7 +152,7 @@ Ask these to fill gaps in your understanding:
 
 Run **call-follow-up** to:
 - Extract action items
-- Update your CRM
+- Update your CRM record
 - Draft follow-up email
 ```
 

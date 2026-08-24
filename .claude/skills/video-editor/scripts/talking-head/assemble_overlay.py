@@ -27,8 +27,7 @@ from pathlib import Path
 
 BASE = Path(os.environ.get("REEL_DIR") or Path.cwd())
 W, H, FPS = 1080, 1920, 30
-TMP = BASE / "build" / "ov"
-TMP.mkdir(parents=True, exist_ok=True)
+TMP = BASE / "build" / "ov"   # каталог создаётся в main(), не при импорте
 LUT = Path.home() / ".claude/skills/video-generation/luts/_sanitized_Kodak2383_D55.cube"
 
 
@@ -76,6 +75,7 @@ def norm_overlay(idx, ov):
 
 
 def main():
+    TMP.mkdir(parents=True, exist_ok=True)
     cfg = json.loads((BASE / sys.argv[1]).read_text(encoding="utf-8"))
     words = sys.argv[2]
     out = BASE / sys.argv[3]

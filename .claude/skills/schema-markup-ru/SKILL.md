@@ -5,16 +5,18 @@ metadata:
   version: 1.0.0
   updated: 2026-05-29
   ported_from: coreyhaines31/marketingskills (schema)
-  reuses: seo-machine-ru, tilda, yourname-marketing-context
+  reuses: seo-machine-ru, tilda
 ---
 
 # Микроразметка Schema.org / JSON-LD (RU)
 
-Реализация структурированных данных schema.org на сайтах пользователя, чтобы поисковики (Яндекс, Google) лучше понимали контент и показывали расширенные сниппеты, а AI-поверхности (Яндекс.Нейро, Alice, (regional LLM B)) точнее цитировали. Порт `schema` из marketingskills: вокабуляр schema.org международный, адаптированы примеры под реальные сущности (YourFirstName, академия, воркшоп, news, блог) и заметка про Яндекс.
+Реализация структурированных данных schema.org на своих сайтах, чтобы поисковики (Яндекс, Google) лучше понимали контент и показывали расширенные сниппеты, а AI-поверхности (Яндекс.Нейро, Alice, GigaChat) точнее цитировали. Порт `schema` из marketingskills: вокабуляр schema.org международный, адаптированы примеры под реальные сущности (YourFirstName, академия, воркшоп, news, блог) и заметка про Яндекс.
 
-**Перед началом прочитай контекст:** `yourname-marketing-context` — `skills/yourname-marketing-context/references/business.md` (сущности: кто YourFirstName, что за продукты), `skills/yourname-marketing-context/references/offerings.md` (URL и цены). Не выдумывай факты — `[TODO]` уточнять.
+**Перед началом прочитай `~/.claude/business-context.md`** — раздел «Продукт» (какие сущности вообще размечаем: организация, персона, курс, услуга, товар) и раздел «Цены» (суммы и URL страниц). Файла нет — заведи из `~/.claude/templates/business-context.md`.
 
-**AEO/GEO связка:** JSON-LD — один из сильнейших сигналов для попадания в AI-ответы. После разметки сверяйся с `seo-machine-ru` → `skills/seo-machine-ru/references/aeo-geo.md` (цитируемость в Яндекс.Нейро/Alice/(regional LLM B)/ChatGPT/Perplexity).
+Здесь последствие жёстче обычного: разметка обязана совпадать с тем, что видно на странице. Выдуманная цена или несуществующий рейтинг в JSON-LD — это не «неточность», а повод для санкций поисковика. Чего не знаешь — помечай `[TODO]` и уточняй, а не подставляй правдоподобное.
+
+**AEO/GEO связка:** JSON-LD — один из сильнейших сигналов для попадания в AI-ответы. После разметки сверяйся с `seo-machine-ru` → `skills/seo-machine-ru/references/aeo-geo.md` (цитируемость в Яндекс.Нейро/Alice/GigaChat/ChatGPT/Perplexity).
 
 ## Принципы
 
@@ -28,9 +30,9 @@ metadata:
 - Яндекс читает JSON-LD и микроформаты; расширенные сниппеты в выдаче формируются по разметке (товары, организации, FAQ, хлебные крошки, события).
 - Проверка: **Яндекс.Вебмастер → Инструменты → Валидатор микроразметки** (а не только Google Rich Results Test). Дёргать через скилл `yandex` (Вебмастер) либо вручную.
 - Для бизнеса/локалки — карточка в **Яндекс.Бизнес** (отдельно от JSON-LD), но `Organization`/`Person` всё равно ставим на сайт.
-- AI-цитируемость: чёткий `Person` (YourFirstName как эксперт), `Organization`, `FAQPage`, `Course` помогают Яндекс.Нейро/(regional LLM B) понять, кто автор и что за продукт.
+- AI-цитируемость: чёткий `Person` (YourFirstName как эксперт), `Organization`, `FAQPage`, `Course` помогают Яндекс.Нейро/GigaChat понять, кто автор и что за продукт.
 
-## Типы под сайты пользователя
+## Типы под свои сайты
 
 | Тип | Где ставить | Обязательные поля |
 |-----|-------------|-------------------|
@@ -40,7 +42,7 @@ metadata:
 | Course | academy.your-domain.com и страницы треков | name, description, provider |
 | Article | блог, статьи на /media, новости news | headline, image, datePublished, author |
 | FAQPage | лендинги услуг/воркшопа/academy с FAQ | mainEntity (Q&A) |
-| Event | воркшоп, Tech University ConferenceX, вебинар | name, startDate, location |
+| Event | воркшоп, конференция, вебинар | name, startDate, location |
 | BreadcrumbList | любая страница с навигацией/крошками | itemListElement |
 
 Полные JSON-LD примеры под каждую сущность — `references/schema-examples.md`.
@@ -65,16 +67,16 @@ metadata:
 
 Типичные ошибки: нет обязательных полей; даты не в ISO 8601; URL не абсолютные; значения enum неточные (`https://schema.org/InStock`); разметка не совпадает с видимым контентом.
 
-## Реализация на стеке пользователя
+## Реализация под свой стек
 
 - **Tilda** (your-domain.com, лендинги): JSON-LD вставляется в блок T123 (custom HTML) или в настройки страницы (head). Деплой и публикация — через скилл `tilda`. Учти граблины T123 (scope, лимит кода) — см. `tilda`.
-- **news.your-domain.com / academy** (Next.js, Express): рендерить `<script type="application/ld+json">` на сервере (SSR), сериализуя данные в JSON-LD на каждой странице (статья → Article, лендинг → Course/FAQPage).
+- **Свой фронтенд** (Next.js, Express и подобные — блог, медиа, платформа курсов): рендерить `<script type="application/ld+json">` на сервере (SSR), сериализуя данные в JSON-LD на каждой странице (статья → Article, лендинг → Course/FAQPage).
 
 ## Связки
 
 | Нужно | Скилл |
 |------|-------|
-| Контекст сущностей, URL, цены | `yourname-marketing-context` |
+| Контекст сущностей, URL, цены | `~/.claude/business-context.md` (заведи из `templates/`) |
 | AEO/GEO (цитируемость в AI) | `seo-machine-ru` (`skills/seo-machine-ru/references/aeo-geo.md`) |
 | Валидация в Вебмастере | `yandex` |
 | Вставка JSON-LD на Tilda + публикация | `tilda` |
@@ -88,7 +90,7 @@ metadata:
 
 ## Вопросы под задачу
 
-1. Какой тип страницы (главная / обо мне / трек academy / статья / лендинг воркшопа / новость)?
+1. Какой тип страницы (главная / обо мне / курс или его модуль / статья / лендинг услуги / новость)?
 2. Какой rich-результат целевой (FAQ-аккордеон, карточка организации, событие, курс)?
 3. Какие данные есть на странице для заполнения (цены, даты, автор, изображения)?
 4. Есть ли уже разметка (не дублировать)?

@@ -1,6 +1,12 @@
 # 10 LinkedIn Hook Formulas — 2026 Edition
 
-Each formula has a skeleton, why it works, a reference engagement multiplier, and a pointer to a canonical draft file in `${HOME}/p/your-knowledge-base/linkedin/drafts/`.
+Each formula has a skeleton, why it works, and a reference engagement multiplier.
+
+The `Canonical draft: NN-slug.md` line under each formula is a **filename convention for
+your own draft library**, not a file shipped here — the drafts are yours to write. Keep
+them wherever you keep working files (`./work/linkedin/drafts/` next to the project is
+enough): one file per formula, numbered as below, so a finished post can be traced back
+to the hook that produced it.
 
 ---
 

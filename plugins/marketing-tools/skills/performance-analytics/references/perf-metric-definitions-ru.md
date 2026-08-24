@@ -2,7 +2,7 @@
 
 > Источник: экспертная методология (поток N) — «Вводные в performance», «Семантика + Wordstat», «Метрика», full-funnel. Эталонные определения из методологии курса.
 >
-> Это словарь метрик и разметки трафика на русском, под российский performance-стек (Директ/Метрика). Бенчмарки конкретных каналов — в `ad-benchmarks-ru` и `references/benchmarks.md` каждого канального скилла. Когортная воронка целиком — в `full-funnel-analytics-ru`.
+> Это словарь метрик и разметки трафика на русском, под российский performance-стек (Директ/Метрика). Бенчмарки конкретных каналов — в `ad-benchmarks-ru` и в файле `benchmarks.md` внутри папки `references` каждого канального скилла (`vk-ads-pro-ru`, `yandex-direct-pro-ru`, `google-ads-pro-ru`, `telegram-ads-pro-ru`). Когортная воронка целиком — в `full-funnel-analytics-ru`.
 
 ## Дерево метрик (воронка performance)
 

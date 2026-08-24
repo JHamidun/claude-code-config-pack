@@ -110,7 +110,7 @@
       ],
       "webhookId": "215c6c67-612c-4b8d-9849-0b796570003d",
       "parameters": {
-        "sendTo": "swot.ai25@gmail.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "=<h1 style=\"color: #4CAF50;\">📌 Quick Summary of Your Document! ✨</h1>\n<p>\n<h2>📝 Summary:</h2>\n<p>\n{{ $json['response']['text'].replace(\"\\n\", \"<br>\") }}\n<p>\n\n<h3>📅 Date Processed: </h3>\n{{ new Date().toLocaleString('en-GB', { timeZone: 'Africa/Lagos' }) }}\n\n\n\n\n\n    ",
         "options": {
           "senderName": "Swot.AI",

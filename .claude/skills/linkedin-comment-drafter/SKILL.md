@@ -5,7 +5,7 @@ description: "Комменты и ответы в тредах LinkedIn: чер�
 
 # LinkedIn Comment Drafter
 
-Produce conversation-provoking comments on any LinkedIn post from a URL. The skill targets the patterns that actually got author replies in 2026 testing (PublicAuthor3 / PublicAuthor2 patterns) and avoids the thesis-restatement patterns that die with zero engagement.
+Produce conversation-provoking comments on any LinkedIn post from a URL. The skill targets the patterns that actually got author replies in 2026 testing (the missing-piece and specific-objection patterns) and avoids the thesis-restatement patterns that die with zero engagement.
 
 ## When to use
 
@@ -42,7 +42,7 @@ Then waits for user approval. On "post", posts the reaction + comment through wh
 
 ## Templates (see `references/comment-templates.md` for full list)
 
-- **T1 Missing-Piece** (PublicAuthor3 pattern, highest hit rate): `[Name] the [their-thesis] argument misses one piece.. [what-moved]. when [their-condition], the real differentiator is [specific-skill], not [their-focus].`
+- **T1 Missing-Piece** (highest hit rate): `[Name] the [their-thesis] argument misses one piece.. [what-moved]. when [their-condition], the real differentiator is [specific-skill], not [their-focus].`
 - **T2 Answer-the-Closing-Question**: direct answer + one concrete example + why it matters
 - **T3 Data-First**: `half the [population] I see now [behavior]. the [old-assumption] broke around [date]. [new-rule].`
 - **T4 Practitioner Observation**: `when X the system does Y, when X' it does Y'. that's when [outcome] kicks in.`

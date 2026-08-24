@@ -23,7 +23,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "uBcIMfsTtKjexw7I",
-          "name": "Gmail (workfloowstutorial@gmail.com)"
+          "name": "Gmail (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1,
@@ -46,7 +46,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "uBcIMfsTtKjexw7I",
-          "name": "Gmail (workfloowstutorial@gmail.com)"
+          "name": "Gmail (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 2.1,
@@ -90,7 +90,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "uBcIMfsTtKjexw7I",
-          "name": "Gmail (workfloowstutorial@gmail.com)"
+          "name": "Gmail (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 2.1,
@@ -174,7 +174,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "uBcIMfsTtKjexw7I",
-          "name": "Gmail (workfloowstutorial@gmail.com)"
+          "name": "Gmail (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 2.1,
@@ -362,7 +362,7 @@
       "credentials": {
         "openAiApi": {
           "id": "jazew1WAaSRrjcHp",
-          "name": "OpenAI (workfloows@gmail.com)"
+          "name": "OpenAI (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1,

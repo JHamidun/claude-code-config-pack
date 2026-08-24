@@ -1,15 +1,15 @@
-# JSON-LD примеры под сайты пользователя
+# JSON-LD примеры под свои сайты
 
-Готовые блоки. Подставь реальные значения из `yourname-marketing-context` (`offerings.md` — URL, цены). Цены/даты помеченные `[TODO]` — уточнять, не выдумывать. Все URL — абсолютные, даты — ISO 8601.
+Готовые блоки. Подставь реальные значения из `~/.claude/business-context.md` (заводится из `~/.claude/templates/business-context.md`; раздел «Цены» — тарифы и суммы; раздел «Продукт» — название и URL). Цены/даты помеченные `[TODO]` — уточнять, не выдумывать. Все URL — абсолютные, даты — ISO 8601.
 
 ## Содержание
 - Organization (your-domain.com)
 - WebSite + SearchAction (news)
-- Person (YourFirstName — обо мне)
+- Person (владелец сайта — «обо мне»)
 - Course (академия и треки)
 - Article / новость / статья на /media
 - FAQPage (лендинги)
-- Event (воркшоп / Tech University ConferenceX / вебинар)
+- Event (воркшоп / конференция / вебинар)
 - BreadcrumbList
 - @graph (несколько типов)
 - Next.js (SSR-вставка)
@@ -62,7 +62,7 @@ news.your-domain.com — включает sitelinks-поиск.
 
 ## Person
 
-Страница «Обо мне» — YourFirstName как эксперт (сигнал авторитета для Яндекс.Нейро/(regional LLM B)).
+Страница «Обо мне» — ты как эксперт (сигнал авторитета для Яндекс.Нейро и GigaChat).
 
 ```json
 {
@@ -87,11 +87,11 @@ academy.your-domain.com и страницы треков. Ключевая ра�
 {
   "@context": "https://schema.org",
   "@type": "Course",
-  "name": "Claude Code — флагманский трек ExampleProduct",
+  "name": "Claude Code — флагманский трек YourProduct",
   "description": "Практический трек по работе с Claude Code: от основ до production. Мульти-модельный доступ через YourProduct включён.",
   "provider": {
     "@type": "Organization",
-    "name": "ExampleProduct",
+    "name": "YourProduct",
     "sameAs": "https://academy.your-domain.com"
   },
   "url": "https://academy.your-domain.com/tracks/claude-code",
@@ -112,7 +112,7 @@ academy.your-domain.com и страницы треков. Ключевая ра�
 }
 ```
 
-Для подписки academy (Basic/Plus/Pro) разметить как `Course` платформы с несколькими `offers` (X/Y/Z ₽, `priceCurrency: RUB`), упомянуть trial: «7 дней бесплатно» — текстом в `description` (Schema не имеет поля для trial-периода у Offer; для подписок можно `Product` + `Offer` с `eligibleDuration`, но проще — текст).
+Для подписки на платформу (тарифы Basic/Plus/Pro и т.п.) разметить как `Course` платформы с несколькими `offers` (X/Y/Z ₽, `priceCurrency: RUB`), упомянуть trial: «7 дней бесплатно» — текстом в `description` (Schema не имеет поля для trial-периода у Offer; для подписок можно `Product` + `Offer` с `eligibleDuration`, но проще — текст).
 
 ## Article
 
@@ -138,7 +138,7 @@ academy.your-domain.com и страницы треков. Ключевая ра�
 }
 ```
 
-Для статей на /media, которые рерайт чужого оригинала — НЕ ставить `canonical` на оригинал (см. memory yourname-landing), но `author`/`publisher` — YourName, плюс в теле ссылка на первоисточник.
+Для статей на /media, которые рерайт чужого оригинала — НЕ ставить `canonical` на оригинал (иначе весь вес уходит источнику), но `author`/`publisher` — свои, плюс в теле ссылка на первоисточник.
 
 ## FAQPage
 
@@ -152,7 +152,7 @@ academy.your-domain.com и страницы треков. Ключевая ра�
     {
       "@type": "Question",
       "name": "Подходит ли воркшоп, если сотрудники не пользовались нейросетями?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Да. Воркшоп — 100% практика на ваших реальных задачах, стартуем с нуля, доступ к множество моделей включён." }
+      "acceptedAnswer": { "@type": "Answer", "text": "Да. Воркшоп — 100% практика на ваших реальных задачах, стартуем с нуля, доступ к нужным моделям включён." }
     },
     {
       "@type": "Question",
@@ -165,7 +165,7 @@ academy.your-domain.com и страницы треков. Ключевая ра�
 
 ## Event
 
-Воркшоп, Tech University ConferenceX, вебинар. `eventAttendanceMode` для онлайн.
+Воркшоп, конференция, вебинар. `eventAttendanceMode` для онлайн.
 
 ```json
 {
@@ -233,7 +233,7 @@ export default function TrackPage({ track }) {
     "@type": "Course",
     name: track.name,
     description: track.description,
-    provider: { "@type": "Organization", name: "ExampleProduct", sameAs: "https://academy.your-domain.com" },
+    provider: { "@type": "Organization", name: "YourProduct", sameAs: "https://academy.your-domain.com" },
     inLanguage: "ru",
   };
   return (

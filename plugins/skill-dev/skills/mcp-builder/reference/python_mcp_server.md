@@ -135,9 +135,9 @@ class CreateUserInput(BaseModel):
         validate_assignment=True
     )
 
-    name: str = Field(..., description="пользователя full name", min_length=1, max_length=100)
-    email: str = Field(..., description="пользователя email address", pattern=r'^[\w\.-]+@[\w\.-]+\.\w+$')
-    age: int = Field(..., description="пользователя age", ge=0, le=150)
+    name: str = Field(..., description="User's full name", min_length=1, max_length=100)
+    email: str = Field(..., description="User's email address", pattern=r'^[\w\.-]+@[\w\.-]+\.\w+$')
+    age: int = Field(..., description="User's age", ge=0, le=150)
 
     @field_validator('email')
     @classmethod

@@ -19,6 +19,17 @@
     python review_cut.py reel.mp4 -o review/ --tiles 20
 """
 from __future__ import annotations
+# UTF-8 на выход. Консоль Windows по умолчанию cp1251/cp866/cp1252, и первый же
+# не-ASCII символ (кириллица, →, ✓) валит процесс UnicodeEncodeError — обычно на
+# --help, то есть ДО любой полезной работы. errors="replace" оставляет вывод
+# читаемым, если терминал всё же не UTF-8.
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 import argparse
 import json
@@ -106,13 +117,18 @@ def listen(path: pathlib.Path) -> str:
     import json as _json
     import urllib.request
 
+    import os
+
+    # Окружение первым, файл вторым, и файла может не быть — иначе на чужой
+    # машине здесь падал FileNotFoundError вместо мягкого «прослушать нечем».
+    key = os.environ.get("GOOGLE_API_KEY", "").strip()
     env = pathlib.Path.home() / ".claude" / ".credentials.master.env"
-    key = ""
-    for line in env.read_text(encoding="utf-8", errors="replace").splitlines():
-        if line.startswith("GOOGLE_API_KEY="):
-            key = line.split("=", 1)[1].strip()
+    if not key and env.exists():
+        for line in env.read_text(encoding="utf-8", errors="replace").splitlines():
+            if line.startswith("GOOGLE_API_KEY="):
+                key = line.split("=", 1)[1].strip()
     if not key:
-        return "нет ключа для прослушивания"
+        return "нет ключа для прослушивания (GOOGLE_API_KEY)"
 
     body = {"contents": [{"parts": [
         {"inlineData": {"mimeType": "audio/mpeg",

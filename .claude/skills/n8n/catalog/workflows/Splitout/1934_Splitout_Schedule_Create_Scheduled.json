@@ -287,7 +287,7 @@
       ],
       "webhookId": "0de8b6e8-8611-48a9-ba25-1d023698f577",
       "parameters": {
-        "sendTo": "miha.ambroz@n8n.io",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "={{ $json.data }}",
         "options": {},
         "subject": "Weekly tech newsletter"

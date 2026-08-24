@@ -20,7 +20,7 @@ When the user says something like "сделай полный ролик про [
 Parse the user's request to determine:
 - **Topic**: What the video is about (explicit topic or "auto" for trend-based selection)
 - **Format**: Short (15-25s, YouTube Shorts) | Medium (60-90s) | Long (3-10min) — default: Short
-- **Style**: Avatar (HeyGen with YourFirstName) | AI-only (Veo 3.1) | Mixed (avatar + b-roll) — default: Mixed
+- **Style**: Avatar (HeyGen, свой аватар) | AI-only (Veo 3.1) | Mixed (avatar + b-roll) — default: Mixed
 - **Channel**: @YourChannel (default) or custom
 - **Language**: English (default — change in user-profile.md)
 
@@ -114,7 +114,7 @@ For each scene, define:
 {
   "scene_id": 1,
   "type": "A-ROLL | B-ROLL | MIXED",
-  "visual_description": "YourFirstName сидит, жестикулирует, смотрит в камеру",
+  "visual_description": "ведущий сидит, жестикулирует, смотрит в камеру",
   "visual_prompt": "prompt for AI video generation if B-ROLL",
   "voice_text": "Текст который произносится в этой сцене",
   "duration_seconds": 6,
@@ -153,15 +153,24 @@ Read skills:
 Use HeyGen v2 API for avatar scenes:
 
 ```bash
-# Environment
-HEYGEN_API_KEY from ~/.claude/.credentials.master.env
+# Environment — всё из ~/.claude/.credentials.master.env
+HEYGEN_API_KEY
 
-# Avatar IDs
-# 16:9 (horizontal): User_Горизонталь_Сидячий = YOUR_HEYGEN_AVATAR_ID
-# 9:16 (vertical):   User_Вертикаль_Сидячий   = YOUR_HEYGEN_AVATAR_ID
-
-# Voice ID: User_pro = YOUR_HEYGEN_VOICE_ID_1
+# Avatar look_id — СВОЙ, пак не поставляется ни с каким.
+# Горизонтальный и вертикальный аватары обычно СНЯТЫ ОТДЕЛЬНО и имеют РАЗНЫЕ id:
+#   16:9 (horizontal) → $HEYGEN_AVATAR_ID
+#   9:16 (vertical)   → $HEYGEN_AVATAR_ID_9X16   (нет — упади с внятной ошибкой,
+#                                                 НЕ подставляй горизонтальный)
+# Voice id → $HEYGEN_VOICE_ID
+#
+# Где взять свои: app.heygen.com/avatars и app.heygen.com/voices,
+# либо GET /v3/avatars/looks?group_id=<group> и GET /v3/voices.
+# Подробности и проверка supported_api_engines → skills/heygen/SKILL.md.
 ```
+
+Если переменных нет — остановись и скажи пользователю, какие завести и где их взять.
+Аватарные сцены без своего аватара не собираются; альтернатива — предложить
+AI-only режим (Veo), он аватара не требует.
 
 API flow:
 1. POST `https://api.heygen.com/v2/video/generate` with avatar_id, voice_id, script text
@@ -225,20 +234,31 @@ Read skills:
 For B-roll scenes that need narration (not covered by avatar speech):
 
 ```bash
-# ElevenLabs voice: User_Нейтральный_123
-# Voice ID: YOUR_ELEVENLABS_VOICE_ID
-# Model: eleven_multilingual_v2
+# Голос — СВОЙ: $ELEVENLABS_VOICE_ID_RU (~/.claude/.credentials.master.env).
+# Где взять: https://elevenlabs.io/app/voice-lab → свой голос → ID.
+# Ключ: $ELEVENLABS_API_KEY.  Модель: eleven_multilingual_v2.
 ```
 
-Generate clip-by-clip (NOT all at once) to maintain timing control. CLI-обёртки у скилла нет —
-вызывай SDK (`pip install elevenlabs`, ключ `ELEVENLABS_API_KEY`), параметры голоса и гочи в
-`elevenlabs/SKILL.md`:
+Generate clip-by-clip (NOT all at once) to maintain timing control. Готовая CLI-обёртка —
+`skills/video-generation/scripts/elevenlabs_voiceover.py`: она сама берёт голос из
+`ELEVENLABS_VOICE_ID_RU` и внятно объясняет, если переменная не заполнена.
+
+```bash
+# по одному клипу: каталог .txt → каталог .mp3, имена файлов сохраняются
+python ~/.claude/skills/video-generation/scripts/elevenlabs_voiceover.py \
+    clips_txt/ --out audio/ --per-clip
+```
+
+Нужен вызов из кода (свои настройки голоса, нестандартный формат) — параметры и грабли
+в `elevenlabs/SKILL.md`:
+
 ```python
+import os
 from elevenlabs.client import ElevenLabs
 client = ElevenLabs()                      # ELEVENLABS_API_KEY из env
 audio = client.text_to_speech.convert(
     text="SCENE_TEXT",
-    voice_id="YOUR_ELEVENLABS_VOICE_ID",
+    voice_id=os.environ["ELEVENLABS_VOICE_ID_RU"],
     model_id="eleven_multilingual_v2",
     voice_settings={"stability": 0.55, "similarity_boost": 0.80,
                     "style": 0.15, "use_speaker_boost": True})
@@ -254,7 +274,7 @@ Select from local pool or generate:
 # List available tracks
 python ~/.claude/skills/video-editor/video_editor.py music-pool
 ```
-Или сгенерируй трек: скилл `ace-step` (локально, без API) либо `suno`. Короткие звуковые эффекты —
+Или сгенерируй трек: скилл `ace-step` (локально, без API) либо `elevenlabs` Music. Короткие звуковые эффекты —
 ElevenLabs SFX endpoint `client.text_to_sound_effects.convert(text="whoosh transition")`.
 
 Music rules:
@@ -344,7 +364,7 @@ Choose based on availability (in priority order):
 
 Отдельной подкоманды нет — ffmpeg overlay:
 ```bash
-ffmpeg -i final_captioned.mp4 -i ~/Videos/branding/your_logo.png \
+ffmpeg -i final_captioned.mp4 -i "$VIDEOS_DIR/branding/your_logo.png" \
   -filter_complex "[1]format=rgba,colorchannelmixer=aa=0.7[lg];[0][lg]overlay=W-w-40:40" \
   -c:a copy final_branded.mp4
 ```
@@ -459,7 +479,7 @@ If user declines: leave as Private, print reminder.
 
 | User says | Style | Notes |
 |-----------|-------|-------|
-| "с аватаром", "с YourFirstName в кадре", "talking head" | Avatar | All scenes via HeyGen |
+| "с аватаром", "со мной в кадре", "talking head" | Avatar | All scenes via HeyGen |
 | "без аватара", "AI video only", "чисто нейросеть" | AI-only | All scenes via Veo 3.1 |
 | Default (nothing specified) for YourChannel | Mixed | Avatar intro/outro + AI b-roll middle |
 | "микс", "mixed" | Mixed | Explicit mixed mode |
@@ -500,18 +520,28 @@ Every phase has a fallback strategy. Never fail silently.
 
 ## Working Directory
 
-All intermediate files go to `~/Videos/video-factory/{project_name}/`.
+All intermediate files go to `<Videos>/video-factory/{project_name}/`, where `<Videos>` is
+the user's **real** video folder.
 
-Create this directory at start:
+Do not hardcode `~/Videos`. On a localized Linux desktop that folder is called «Видео»,
+`Vídeos`, `Videot`… and `mkdir -p ~/Videos` does not fail — it silently creates a second,
+English-named folder, so the finished clip is not where the person looks for it.
+Resolve it, then print the result:
+
 ```bash
-PROJECT_DIR=~/Videos/video-factory/$(date +%Y%m%d_%H%M%S)_$(echo "TOPIC" | tr ' ' '_' | head -c 30)
-mkdir -p "$PROJECT_DIR"
+VIDEOS_DIR="$(xdg-user-dir VIDEOS 2>/dev/null || echo "$HOME/Videos")"
+PROJECT_DIR="$VIDEOS_DIR/video-factory/$(date +%Y%m%d_%H%M%S)_$(echo "TOPIC" | tr ' ' '_' | head -c 30)"
+mkdir -p "$PROJECT_DIR" || { echo "Не смог создать $PROJECT_DIR — назови это вслух и останови конвейер"; exit 1; }
 cd "$PROJECT_DIR"
+echo "PROJECT_DIR=$PROJECT_DIR"   # обязательно: путь должен попасть в отчёт, а не остаться догадкой
 ```
+
+Report that absolute path in the final answer. "Готово, ролик собран" without the path is
+the failure mode: the file exists, the person cannot find it.
 
 Directory structure after completion:
 ```
-~/Videos/video-factory/20260328_143000_ai_replaces_devs/
+<Videos>/video-factory/20260328_143000_ai_replaces_devs/
   trend_brief.json          # Phase 1 output
   script.json               # Phase 2 output
   reference_01.png          # Phase 3 reference images

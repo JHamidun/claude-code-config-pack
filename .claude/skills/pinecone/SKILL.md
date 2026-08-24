@@ -12,10 +12,33 @@ Expert skill for using Pinecone - the leading vector database for AI application
 ## API Key
 
 ```bash
-# API ключи: ~/.claude/.credentials.master.env
-# Переменная: PINECONE_API_KEY
-PINECONE_API_KEY=os.getenv('PINECONE_API_KEY')
+# ~/.claude/.credentials.master.env — впиши САМ КЛЮЧ, не код на Python
+PINECONE_API_KEY=ВСТАВЬ_СЮДА_СВОЙ_КЛЮЧ   # https://app.pinecone.io/ → API Keys
 ```
+
+> Строка `PINECONE_API_KEY=os.getenv('PINECONE_API_KEY')` ключ НЕ настраивает: это
+> непустое значение, любая проверка `if not key` сочтёт ключ заданным, запрос уйдёт с
+> этим текстом и вернётся `401` без объяснения. В коде читай ключ через
+> `os.getenv('PINECONE_API_KEY')`, а в файле должен лежать сам ключ. Файл не
+> подгружается сам: `load_dotenv(Path.home()/'.claude'/'.credentials.master.env')`.
+
+<!-- no-key-block -->
+## Ключа нет — что тогда
+
+Pinecone — облачный сервис, локального режима у него нет: без `PINECONE_API_KEY`
+навык не работает никак, и `pinecone.Pinecone(api_key=None)` падает на
+`PineconeConfigurationError` ещё до первого запроса.
+
+Векторный поиск в паке закрывается и без него:
+
+| Чем | Где взято | Когда уместно |
+|-----|-----------|---------------|
+| **pgvector** | навык `pgvector-rag` (`psycopg[binary]` в optional) | уже есть PostgreSQL; продовое решение |
+| **Qdrant** | `qdrant-client` в `requirements-optional.txt`, поднимается в Docker одной командой | локально, без облака и без ключа |
+| **Chroma** | `chromadb` там же | быстрый прототип на диске, вообще без сервера |
+
+Раздел «Существующие индексы» ниже описывает индексы конкретного аккаунта — у тебя
+их не будет, это пример структуры, а не то, к чему можно подключиться.
 
 ## Существующие индексы
 

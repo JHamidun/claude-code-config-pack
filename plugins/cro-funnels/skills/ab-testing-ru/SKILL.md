@@ -18,7 +18,7 @@ metadata:
 
 - Спланировать и описать конкретный A/B-тест (гипотеза → выборка → метрики → решение).
 - Прикинуть размер выборки и длительность под реальный трафик страницы/рассылки.
-- Запустить эксперимент по запросу из CRO-скиллов (`page-cro-ru`, `signup-cro-ru`, `onboarding-cro-ru`, `paywall-cro-ru`, `popup-cro-ru`, `form-cro-ru`).
+- Запустить эксперимент по запросу из CRO-скиллов (`page-cro-ru`, `onboarding-cro-ru`, `paywall-cro-ru`, `popup-cro-ru`, `form-cro-ru`).
 - Построить программу роста: бэклог гипотез, ICE-приоритизация, плейбук.
 
 ## Базовые принципы
@@ -146,7 +146,7 @@ metadata:
 | Бенчмарки, метрики каналов | `performance-analytics` |
 | Правки вариантов на странице | `tilda` |
 | Письма для теста | `html-email`, `email-sequence` |
-| CRO-аудит страниц (генерит гипотезы) | `page-cro-ru`, `signup-cro-ru`, `onboarding-cro-ru`, `paywall-cro-ru`, `popup-cro-ru`, `form-cro-ru` |
+| CRO-аудит страниц (генерит гипотезы) | `page-cro-ru`, `onboarding-cro-ru`, `paywall-cro-ru`, `popup-cro-ru`, `form-cro-ru` (формы захвата, включая регистрацию) |
 | Психология вариантов (что тестить) | `marketing-psychology-ru` |
 | ICE-приоритизация гипотез воронки (откуда берутся гипотезы) | `funnel-design-ru` |
 | Настройка целей/стратегий/обучения в контекстной рекламе (для A/B автостратегий) | `yandex-direct-pro-ru` |

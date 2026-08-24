@@ -174,7 +174,7 @@ WORKERS=1 BATCH=3 MODE_PRIMARY=auto MODE_FALLBACK=pro SLEEP=1 \
   python batch_research_template.py /work
 
 # Если хвост всё равно NoneType — это cold entities, не rate limit.
-# Перезапусти с promptом «если данных мало — 50 слов о бизнесе».
+# Перезапусти с промптом «если данных мало — 50 слов о бизнесе».
 ```
 
 ---

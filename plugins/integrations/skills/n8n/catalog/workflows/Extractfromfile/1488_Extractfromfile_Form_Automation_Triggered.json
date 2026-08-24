@@ -1886,7 +1886,7 @@
         },
         "subject": "={{ $json.Subject }}",
         "toEmail": "={{ $json.To }}",
-        "fromEmail": "gatura@bulkbox.co.ke",
+        "fromEmail": "REPLACE_ME@example.com",
         "emailFormat": "text"
       },
       "credentials": {
@@ -1963,8 +1963,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "gaturanjenga@gmail.com",
-          "cachedResultName": "gaturanjenga@gmail.com"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "additionalFields": {
           "location": "=Online"

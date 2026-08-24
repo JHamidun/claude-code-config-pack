@@ -19,7 +19,7 @@
 | Scheduled tasks (higgsclaw cron) | `/schedule` + CronCreate + ScheduleWakeup | ✅ есть |
 | Connectors (Slack/Drive/Notion/Gmail/Figma+30) | MCP-серверы + cloud-MCP подписки + skills | ✅ есть |
 | Virality Predictor (brain_activity) | `hf generate create brain_activity --video` | ✅ есть (через higgsfield skill) |
-| Marketplace (skills/employees, install) | наш skills/ каталог + `skill-creator` + agent-builder tooling | ✅ есть |
+| Marketplace (skills/employees, install) | наш skills/ каталог + `skill-creator` + `autonomous-agent-creator` | ✅ есть |
 | Multi-model routing (Orchestrator picks best) | model-selection.md decision tree + per-agent model | ✅ есть |
 
 ## Что достроить (gaps → задачи)

@@ -9,12 +9,12 @@ You manage the user's long-term memory across four layers. Follow the skill **`m
 
 ## Layers (canon)
 
-1. **File memory (curated)** — `~/.claude/projects/C--Users-youruser/memory/` = `MEMORY.md` index (< 200 lines) + topic files, bi-temporal frontmatter. Long-lived, human-readable decisions.
+1. **File memory (curated)** — `~/.claude/projects/<encoded-project-dir>/memory/` (Claude Code derives the dir name from your project path) = `MEMORY.md` index (< 200 lines) + topic files, bi-temporal frontmatter. Long-lived, human-readable decisions.
 2. **Graph** — `python ~/.claude/scripts/memory_graph.py {stats|neighbors|path|timeline|hubs|search|orphans|dangling|gaps|build}` over `~/.claude/memory-graph/graph.db`. Connections, history, multi-hop.
 3. **Chat full-text** — `python ~/.claude/tools/search_chats.py {search|timeline|get|export|index|learn|knowledge}` over `~/.claude/chats.db` (FTS5+BM25). Recall of past decisions/gotchas.
-4. **Second Brain** — MCP `second-brain` + `python ~/.claude/scripts/memory_brief.py "<topic>"` for worker KNOWN-GOTCHAS blocks. Vectorizer runs ONLY under the guarded runner (`ваше локальное хранилище памяти --start`), never a silent cron.
+4. **Second Brain (optional)** — a semantic layer is NOT shipped in the pack; if you deploy your own, wire it up as an MCP server. What works out of the box: `python ~/.claude/scripts/memory_brief.py "<topic>"` for worker KNOWN-GOTCHAS blocks. A vectorizer, if you add one, runs ONLY under a guarded runner you set up yourself (idle-check wrapper), never a silent cron.
 
-> Deprecated — do NOT use: `vector_memory.py` (ChromaDB), `chat_ingester.py`, `~/.claude/memory/knowledge_base.md`, the `learnings/decisions/preferences/` folder taxonomy.
+> Legacy: `vector_memory.py` (ChromaDB) still backs `/self-learn`, `/weekly-synthesis`, `/plan-my-day` — leave those be, but for NEW writes prefer `search_chats.py learn`. Do NOT use: `chat_ingester.py`, `~/.claude/memory/knowledge_base.md`, the `learnings/decisions/preferences/` folder taxonomy.
 
 ## Core loop
 

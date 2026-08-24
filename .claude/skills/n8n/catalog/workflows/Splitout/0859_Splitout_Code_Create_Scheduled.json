@@ -89,8 +89,8 @@
         "html": "={{ $json.html }}",
         "options": {},
         "subject": "=סקירה ה-AI היומית שלך: {{ $json.date_today }}",
-        "toEmail": "Elay Guez <elay96@gmail.com>",
-        "fromEmail": "Elay's AI Assistant <elayguez@gmail.com>"
+        "toEmail": "Elay Guez <REPLACE_ME@example.com>",
+        "fromEmail": "Elay's AI Assistant <REPLACE_ME@example.com>"
       },
       "credentials": {
         "smtp": {

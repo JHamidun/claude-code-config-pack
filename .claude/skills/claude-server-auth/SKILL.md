@@ -238,15 +238,38 @@ When authenticating multiple accounts sequentially, the browser stays logged int
 
 ## Token Rotation Setup
 
-Rotation script at `/root/.claude-accounts/token-rotator.sh`:
+The rotation script ships with this skill: **`scripts/token-rotator.sh`**. Copy it to the
+server once — it is plain bash + curl, nothing else to install:
+
+The file sits next to this SKILL.md, in `scripts/`. Where that is depends on how you
+installed the pack (`.claude/skills/...` for the full config, the plugin directory for a
+plugin install), so locate it rather than guessing:
+
+```bash
+ROTATOR="$(find ~ -name token-rotator.sh -path '*claude-server-auth*' 2>/dev/null | head -1)"
+scp "$ROTATOR" your-server:/root/.claude-accounts/token-rotator.sh
+ssh your-server "chmod 700 /root/.claude-accounts/token-rotator.sh"
+```
+
+It reads the layout the steps above create — one `token.txt` per account directory — and
+keeps the active pointer in `$ACCOUNTS_DIR/.active`:
+
+```
+/root/.claude-accounts/
+  account-1/token.txt
+  account-2/token.txt
+  .active                 <- written by the script
+```
+
+Different directory? Set `CLAUDE_ACCOUNTS_DIR` (default `/root/.claude-accounts`).
 
 ```bash
 token-rotator.sh status     # show all accounts and which is active
 token-rotator.sh get        # get current token (no rotation)
 token-rotator.sh rotate     # switch to next account
-token-rotator.sh validate   # test current token with haiku
+token-rotator.sh validate   # test current token against the API (exit 0 = works)
 token-rotator.sh get-valid  # get token with auto-failover (tries up to 3)
-token-rotator.sh init       # re-scan account directories
+token-rotator.sh init       # re-scan account directories, fix a dangling pointer
 ```
 
 Usage in projects:
@@ -256,6 +279,10 @@ claude -p "your prompt"
 ```
 
 Auto-failover logic: `get-valid` tries current token → if error → rotates → tries next → up to 3 attempts.
+
+`validate` and `get-valid` probe with a 4-token request to
+`claude-haiku-4-5-20251001` (override with `CLAUDE_VALIDATE_MODEL`); the token itself is
+never printed to stderr, only the account name.
 
 ## OpenClaw Integration
 

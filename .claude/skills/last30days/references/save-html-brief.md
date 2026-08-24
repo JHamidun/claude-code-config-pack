@@ -201,4 +201,4 @@ The engine will try to reuse `~/.config/last30days/last-report.json` for that se
 - **Topic with shell-special characters** (quotes, ampersands): the temp filename uses a slugified version, but the engine receives the raw topic. The `cat <<'SYNTHESIS_EOF'` quoted heredoc form handles arbitrary content without expansion. Your synthesis text can include any character.
 - **Very long synthesis**: no upper bound. The engine handles long markdown bodies. Just paste verbatim.
 - **Synthesis with images or non-ASCII**: emoji and Unicode pass through. Image tags pass through as raw HTML; the renderer doesn't transform them. If you didn't include images in chat, don't add them here.
-- **No `${LAST30DAYS_MEMORY_DIR}` set**: defaults to `~/Documents/Last30Days/` per the SKILL.md `Configuration` section.
+- **No `${LAST30DAYS_MEMORY_DIR}` set**: defaults to the user's real Documents folder + `/Last30Days/` (via `xdg-user-dir DOCUMENTS`, not literally `~/Documents`) per the SKILL.md `Configuration` section.

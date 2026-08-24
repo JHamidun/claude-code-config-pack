@@ -37,7 +37,7 @@
         "limit": 1,
         "simple": false,
         "filters": {
-          "sender": "decodeai@ghost.io"
+          "sender": "REPLACE_ME@example.com"
         },
         "options": {},
         "operation": "getAll"

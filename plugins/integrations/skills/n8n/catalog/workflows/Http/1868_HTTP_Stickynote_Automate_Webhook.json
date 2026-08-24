@@ -70,7 +70,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer /lQWKI4dp71pOMWZu2q18mL8P+zwf9iIOBzUDQOPMqLGMMIg88J6jPcFGfZ2ntsFfaiwCKTEcAsMjliZYXrV5E4lsjioJmv2hS7XYbh8lxmuyz1vXegKwAT66hTIBjQ1zf4l6yKugYNsUmwSYfCSQgdB04t89/1O/w1cDnyilFU="
+              "value": "Bearer YOUR_LINE_CHANNEL_ACCESS_TOKEN"
             }
           ]
         }

@@ -59,11 +59,11 @@
   ```
   + установить `nvidia-cublas-cu12` через pip + `os.add_dll_directory` перед import
 
-### BiRefNet OOM на 32GB your-server server
+### BiRefNet OOM на VPS с 32 ГБ RAM и без GPU
 - **Причина**: BiRefNet требует ~40GB VRAM при batch processing
 - **Фикс**: переехать на локальную машину с дискретной видеокартой
 
-### your-server 3-wide parallel rembg в 30x медленнее single
+### 3-wide parallel rembg на VPS в 30x медленнее single
 - **Причина**: ONNX thread thrashing на vCPU без isolation
 - **Фикс**: либо `--single-thread` ONNX, либо локальная GPU
 

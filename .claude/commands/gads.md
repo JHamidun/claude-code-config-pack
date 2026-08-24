@@ -28,10 +28,11 @@ pip install google-ads
 
 ### 1. Загрузи credentials (Google Ads Client):
 ```python
+import os
 import json
 from google.ads.googleads.client import GoogleAdsClient
 
-with open('${HOME}/.claude/google_oauth_token.json', 'r') as f:
+with open(os.path.expanduser('~/.claude/google_oauth_token.json'), 'r') as f:
     token_data = json.load(f)
 
 # Google Ads требует developer token + login customer ID

@@ -38,7 +38,7 @@ When generating images, you never guess -- you ask clarifying questions when the
 ### Gateway Command (Gemini Image — DEFAULT)
 
 ```bash
-curl -s http://localhost:GATEWAY_PORT/v1/messages \
+curl -s http://localhost:8200/v1/messages \
   -H "Content-Type: application/json" \
   -d '{"model": "gemini-3.1-flash-image-preview", "max_tokens": 8192, "messages": [{"role": "user", "content": "Generate image: YOUR PROMPT"}]}'
 ```
@@ -46,7 +46,7 @@ curl -s http://localhost:GATEWAY_PORT/v1/messages \
 ### Gateway Command (Gemini Pro Image)
 
 ```bash
-curl -s http://localhost:GATEWAY_PORT/v1/messages \
+curl -s http://localhost:8200/v1/messages \
   -H "Content-Type: application/json" \
   -d '{"model": "gemini-3-pro-image-preview", "max_tokens": 8192, "messages": [{"role": "user", "content": "Generate image: YOUR PROMPT"}]}'
 ```

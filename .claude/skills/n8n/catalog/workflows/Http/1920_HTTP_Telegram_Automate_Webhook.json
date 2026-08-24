@@ -95,7 +95,7 @@
         "text": "={{ $json[\"report\"] }}",
         "options": {},
         "subject": "Client Feedback Summary",
-        "toEmail": "team@email.com",
+        "toEmail": "REPLACE_ME@example.com",
         "fromEmail": "your@email.com"
       },
       "typeVersion": 1,

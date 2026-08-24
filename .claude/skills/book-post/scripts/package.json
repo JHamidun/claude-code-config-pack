@@ -1,0 +1,13 @@
+{
+  "name": "book-post-scripts",
+  "version": "0.1.0",
+  "description": "Codex/Claude pipeline for book-post: voice-keeper, proofreader, fact-checker",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "voice": "node voice-pass.js",
+    "proofread": "node proofread.js",
+    "fact-check": "node fact-check.js"
+  },
+  "dependencies": {}
+}

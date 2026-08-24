@@ -56,6 +56,13 @@ Interpretation:
   *"Running in SINGLE-FAMILY (Claude-only) mode — cross-model confirmation is unavailable, so I
   will trust only primary sources verified by Rule C."* Then proceed (the skill still works).
 
+**What running all three families actually costs.** Both cross-checkers run on the CLI's own
+interactive login, and both have a free tier that covers this workload — so the price of a
+full three-family check is **latency, not money**: channels B and C add roughly a minute
+while the external CLIs think. Do not skip them to "save budget" — there is no budget to save.
+(If you did wire up headless API keys instead of interactive login, then metered billing
+applies and the tradeoff is yours to make.)
+
 Optional: save API keys locally (only if the user wants headless auth). Keys live next to the
 skill, on this machine only, and are never bundled when the skill is shared:
 

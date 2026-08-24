@@ -600,7 +600,7 @@
               "id": "ea837d0b-e8d6-4594-9861-550d30f05db0",
               "name": "email",
               "type": "string",
-              "value": "zeerobug@gmail.com"
+              "value": "REPLACE_ME@example.com"
             }
           ]
         }
@@ -651,7 +651,7 @@
                 "operation": "equals"
               },
               "leftValue": "={{ $json.properties.email }}",
-              "rightValue": "=nuno.domingues@toyotacaetano.pt"
+              "rightValue": "=REPLACE_ME@example.com"
             }
           ]
         }
@@ -1388,7 +1388,7 @@
       "parameters": {
         "width": 640,
         "height": 200,
-        "content": "## Contact me\n- If you need any modification to this workflow\n- if you need some help with this workflow\n- Or if you need any workflow in n8n, Make, or Langchain / Langgraph\n\nWrite to me: [thomas@pollup.net](mailto:thomas@pollup.net)"
+        "content": "## Contact me\n- If you need any modification to this workflow\n- if you need some help with this workflow\n- Or if you need any workflow in n8n, Make, or Langchain / Langgraph\n\nWrite to me: [REPLACE_ME@example.com](mailto:REPLACE_ME@example.com)"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."

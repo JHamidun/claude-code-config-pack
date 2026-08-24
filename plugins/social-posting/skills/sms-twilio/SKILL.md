@@ -1,6 +1,6 @@
 ---
 name: sms-twilio
-description: "SMS через Twilio (CLI sms_client.py): bulk с dry-run, статус доставки, баланс. Триггеры: «отправь смс». НЕ WhatsApp → whatsapp-client."
+description: "SMS через Twilio (CLI sms_client.py): bulk с dry-run, статус доставки, баланс. Триггеры: «отправь смс». НЕ Telegram → tg-bot-publish."
 ---
 
 # SMS via Twilio

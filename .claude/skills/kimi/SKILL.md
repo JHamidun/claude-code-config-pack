@@ -330,30 +330,25 @@ Provide test code with assertions."""
 
 ## Agent Integration
 
-Kimi K2 powers these agents in agents.json:
+Готовый агент ровно один — `agents/kimi-algorithm-specialist.md` (алгоритмы, глубокий
+reasoning). Остальные роли (ревью, дебаг, рефакторинг, тесты, перф) закрываются кодом
+из этого файла: свой промпт + вызов `client.chat.completions.create(model=MODEL, …)`.
 
-| Agent | Use Case |
-|-------|----------|
-| `kimi-code-reviewer` | `/kimi-review path/to/file` |
-| `kimi-senior-coder` | Complex implementations |
-| `kimi-refactoring-specialist` | Code improvement |
-| `kimi-algorithm-specialist` | Algorithm design |
-| `kimi-debugging-specialist` | Bug analysis |
-| `kimi-performance-optimizer` | Performance tuning |
-| `kimi-testing-strategist` | Test planning |
+Реестра агентов в `agents.json` в паке нет — это не используемый механизм. Имена
+`kimi-code-reviewer`, `kimi-senior-coder`, `kimi-refactoring-specialist`,
+`kimi-debugging-specialist`, `kimi-performance-optimizer`, `kimi-testing-strategist`
+не резолвятся ни во что — не пытайся их спавнить.
 
 ## Slash Commands
 
 ```bash
-# Code review with Kimi
-/kimi-review path/to/file
-
-# Auto-fix issues
-/kimi-fix path/to/file
-
-# Deep reasoning
+# Deep reasoning — единственная существующая команда
 /kimi-reasoning "complex problem description"
 ```
+
+Команд `/kimi-review` и `/kimi-fix` в системе нет (в `commands/` лежит только
+`kimi-reasoning.md`). Для ревью и фикса — либо агент `code-reviewer` / `/health bugs`,
+либо прямой вызов функций выше.
 
 ## Tips
 

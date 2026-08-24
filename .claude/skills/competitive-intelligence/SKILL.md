@@ -39,18 +39,21 @@ Research your competitors extensively and generate an **interactive HTML battlec
 
 ## Getting Started
 
-When you run this skill, I'll ask for context:
+**Read `~/.claude/business-context.md` first** — sections "Product" (what you sell, how you differ, and honestly what rivals do better), "Positioning" (who you're compared against), and "Pricing". No such file? Create it from `~/.claude/templates/business-context.md` — it's the pack-wide context file, in Russian, and this skill reads the same one.
+
+Without it a battlecard is a list of competitor facts with no "us" column: your reps get a comparison table that never says why we win, and the "what they do better" row — the one that actually survives a live objection — will be blank.
+
+Then confirm or fill in what the file doesn't cover:
 
 **Required:**
-- What company do you work for? (or I'll detect from your email)
-- Who are your main competitors? (1-5 names)
+- Your main competitors (1-5 names) — take them from "Positioning" if they're listed there.
 
 **Optional:**
-- Which competitor do you want to focus on first?
-- Any specific deals where you're competing against them?
+- Which competitor to focus on first?
+- Specific deals where you're competing against them?
 - Pain points you've heard from customers about competitors?
 
-If I already have your seller context from a previous session, I'll confirm and skip the questions.
+Answers that hold across sessions belong in `business-context.md`, not in this chat — otherwise you retype them every time.
 
 ---
 

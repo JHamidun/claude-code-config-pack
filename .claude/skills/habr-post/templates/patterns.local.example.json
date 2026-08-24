@@ -1,0 +1,38 @@
+{
+  "_readme": [
+    "Скопируй в patterns.local.json рядом с security_scan.py (или в ~/.claude/habr-patterns.local.json).",
+    "Этот файл — твой, в общий репозиторий он не едет: в нём адреса и IP.",
+    "public_whitelist — то, что ты публикуешь СОЗНАТЕЛЬНО: сканер перестанет это подсвечивать.",
+    "extra_patterns — регулярки под твою инфраструктуру: IP сервера, пути прод-каталогов,",
+    "внутренние хосты. Общие шаблоны (телефоны, CPF, токены, чужие email) уже встроены в скрипт.",
+    "Экранирование как в JSON: обратный слэш пишется дважды — \\\\b, \\\\d, \\\\."
+  ],
+
+  "public_whitelist": [
+    "me@example.com",
+    "@my_public_handle",
+    "@my_public_bot",
+    "example.com"
+  ],
+
+  "extra_patterns": [
+    {
+      "name": "my_server_ip",
+      "regex": "\\b203\\.0\\.113\\.\\d{1,3}\\b",
+      "severity": "high",
+      "hint": "IP моего сервера. Заменить на <server_ip>."
+    },
+    {
+      "name": "my_prod_paths",
+      "regex": "/opt/(myapp|myworker|mybot)(/[^\\s)\\]]*)?",
+      "severity": "medium",
+      "hint": "Путь прод-каталога. Проверить, нужно ли публиковать."
+    },
+    {
+      "name": "internal_hostname",
+      "regex": "\\b[a-z0-9-]+\\.internal\\.example\\.com\\b",
+      "severity": "medium",
+      "hint": "Внутренний хост. Обобщить."
+    }
+  ]
+}

@@ -19,15 +19,28 @@ ELEVENLABS_API_KEY=os.getenv('ELEVENLABS_API_KEY')
 
 ## Свой голос (клон)
 
-Идентификатор своего голоса держится в окружении, а не в тексте навыка: он привязан
-к конкретному аккаунту и в чужой установке всё равно не сработает.
+**Пак не поставляется ни с каким голосом.** Идентификатор держится в окружении, а не
+в тексте навыка: он привязан к конкретному аккаунту и в чужой установке всё равно не
+сработает — а прописанный в коде чужой id молча уедет в API и вернёт невнятный 404.
 
 ```bash
-ELEVENLABS_VOICE_ID_RU=<идентификатор своего клона>   # в ~/.claude/.credentials.master.env
+ELEVENLABS_VOICE_ID_RU=<YOUR_VOICE_ID>   # в ~/.claude/.credentials.master.env
 ```
 
-Список доступных голосов аккаунта — `GET /v1/voices`; клонированные помечены
-категорией `cloned`. Как подготовить материал для клонирования — `scripts/voice_dataset.py`.
+**Где взять свой:** https://elevenlabs.io/app/voice-lab → свой голос → **ID**
+(кнопка копирования рядом с названием). Программно — `GET /v1/voices`;
+клонированные помечены категорией `cloned`:
+
+```bash
+curl -s https://api.elevenlabs.io/v1/voices -H "xi-api-key: $ELEVENLABS_API_KEY" \
+  | python -c "import sys,json; [print(v['voice_id'], v['category'], v['name']) for v in json.load(sys.stdin)['voices']]"
+```
+
+Голоса ещё нет — сначала обучи клон (`client.voices.ivc.create`, раздел
+«Instant Voice Cloning» ниже); как собрать чистый датасет на 2-3 минуты —
+`scripts/voice_dataset.py`, как вырезать чужие реплики — `scripts/isolate_speaker.py`.
+Не хочешь свой голос — возьми любой стоковый id из каталога ElevenLabs
+(примеры в разделе «EN voices on RU» ниже), всё остальное в навыке работает так же.
 
 > **Локальная альтернатива (экономия кредитов):** для массовой/черновой RU-озвучки, длинных аудиокниг, dictation и офлайн — см. `references/local-voicebox-eval.md` (Voicebox / Chatterbox / Qwen3-TTS на видеокарте с 16 ГБ памяти, без обращений к API). ElevenLabs остаётся каноном для флагманской озвучки, звуковых эффектов и музыки.
 

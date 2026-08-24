@@ -42,13 +42,13 @@ curl -A "maps-places-skill/1.0 (your-email@gmail.com)" \
     "suburb": "Sample District",
     "city": "Sample City",
     "state": "Sample State",
-    "postcode": "[REDACTED_CEP]",
+    "postcode": "22070-000",
     "country": "Brasil",
     "country_code": "br"
   },
   "boundingbox": ["-22.98", "-22.96", "-43.19", "-43.17"],
   "importance": 0.5,
-  "type": "house"
+  "type": "beach"
 }]
 ```
 
@@ -64,7 +64,7 @@ curl -A "maps-places-skill/1.0 (your-email@gmail.com)" \
 | `extratags` | `1` — wikipedia, opening_hours и др. |
 | `namedetails` | `1` — имена на других языках |
 | `accept-language` | `pt-BR,en` — локаль display_name |
-| `countrycodes` | Ограничить страной: `br,ru` |
+| `countrycodes` | Ограничить страной: `br,us` |
 | `viewbox` | Bbox `lon1,lat1,lon2,lat2` для bias |
 | `bounded` | `1` — strict bbox |
 
@@ -80,7 +80,7 @@ Nominatim — это **геокодинг**, не POI-поиск. Для зап�
 4. `country_code` — нижний регистр ISO (`br`, `ru`), не `BR`
 5. **Поиск адресов хорош, поиск POI — слабый**: «ресторан грузинская кухня» вернёт мусор
 6. Для production >1 req/sec — поднять свой инстанс: `docker run -d -e PBF_URL=... mediagis/nominatim:4.4`
-7. Brazil coverage: отличный в городах, средний на побережье (Sample District — есть)
+7. Покрытие OSM: отличное в крупных городах, среднее в малых населённых пунктах
 8. **Не использовать для адресов-RU с опечатками** — Yandex Геокодер сильнее
 
 ## Документация

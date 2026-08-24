@@ -2,7 +2,7 @@
 
 ## §1 — subprocess encoding (CRITICAL)
 
-Bез `encoding='utf-8', errors='replace'` — cp1251 краш на UnicodeDecodeError при чтении ffmpeg stderr с любыми non-ASCII символами:
+Без `encoding='utf-8', errors='replace'` — cp1251 краш на UnicodeDecodeError при чтении ffmpeg stderr с любыми non-ASCII символами:
 
 ```python
 import subprocess
@@ -153,7 +153,7 @@ path = '${HOME}\\.claude\\skills\\video-pipeline'  # OK но громоздко
 path = '${HOME}\.claude'  # SyntaxWarning, fails иногда
 ```
 
-Dля os calls Python принимает оба, для ffmpeg в shell оба работают.
+Для os calls Python принимает оба, для ffmpeg в shell оба работают.
 
 ## §9 — Long path support
 

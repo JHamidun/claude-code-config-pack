@@ -15,6 +15,17 @@ Exit code: 0 if clean, 1 if matches found.
 """
 
 from __future__ import annotations
+# UTF-8 на выход. Консоль Windows по умолчанию cp1251/cp866/cp1252, и первый же
+# не-ASCII символ (кириллица, →, ✓) валит процесс UnicodeEncodeError — обычно на
+# --help, то есть ДО любой полезной работы. errors="replace" оставляет вывод
+# читаемым, если терминал всё же не UTF-8.
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 import json
 import re
@@ -32,6 +43,18 @@ ROOT = Path(_args.target)
 # Общие формы секретов: ключи, токены, подписи. Они не привязаны к человеку —
 # их можно и нужно возить вместе с инструментом.
 GENERIC_PATTERNS: list[tuple[str, str]] = [
+    # Добавлено 22.08.2026 после канареечной проверки: девять форм ключей
+    # проходили сканер насквозь — эталонные строки каждой из них не ловились
+    # ни одним из девятнадцати прежних правил.
+    ('api:sk-legacy'             , '\\bsk-[A-Za-z0-9]{48}\\b'),
+    ('api:github_pat'            , '\\bgithub_pat_[A-Za-z0-9_]{60,}\\b'),
+    ('api:gh-oauth'              , '\\bgh[ousr]_[A-Za-z0-9]{36}\\b'),
+    ('api:aws-akia'              , '\\bAKIA[0-9A-Z]{16}\\b'),
+    ('key:private-pem'           , '-----BEGIN (?:RSA |OPENSSH |EC |DSA |PGP )?PRIVATE KEY'),
+    ('api:stripe-live'           , '\\bsk_live_[A-Za-z0-9]{24,}\\b'),
+    ('api:stripe-restricted'     , '\\brk_live_[A-Za-z0-9]{24,}\\b'),
+    ('sess:telethon-string'      , '(?i)string_session\\s*[:=]\\s*["\\\'][A-Za-z0-9+/=_-]{80,}'),
+    ('key:generic-assign'        , '(?i)\\b(?:api[_-]?key|secret|token|passwd|password)\\s*[:=]\\s*["\\\'][A-Za-z0-9_\\-+/=]{20,}["\\\']'),
     ('api:sk-ant'              , 'sk-ant-api\\d+-[A-Za-z0-9_-]{40,}'),
     ('api:sk-proj'             , 'sk-proj-[A-Za-z0-9_-]{40,}'),
     ('api:google-AIza'         , 'AIza[0-9A-Za-z_-]{35}'),
@@ -223,14 +246,32 @@ def main() -> int:
     matches: dict[str, list[tuple[Path, int, str]]] = {}
     total_files = 0
     total_lines = 0
+    skipped_underscore: list[Path] = []
+    skipped_ext: list[Path] = []
 
     _paths = [ROOT] if ROOT.is_file() else ROOT.rglob("*")
     for path in _paths:
         if not path.is_file():
             continue
-        if ".git" in path.parts or "__pycache__" in path.parts or path.name.startswith("_"):
+        if ".git" in path.parts or "__pycache__" in path.parts:
             continue  # __pycache__/*.pyc — байткод таскает абсолютные пути окружения (деанон-фингерпринт)
+        # Пропуски КОПИМ и печатаем в конце. Раньше файл с именем на `_` и файл
+        # с незнакомым расширением молча выпадали из обхода — и ровно в такую
+        # дыру лёг служебный `.canarybak`, внутри которого лежал словарь
+        # детектора: документы, адрес, телефон, список клиентов. Отчёт при этом
+        # сказал «чисто». «Не смотрел» обязано выглядеть иначе, чем «посмотрел
+        # и не нашёл».
+        if path.name.startswith("_"):
+            # Раньше здесь стоял `continue` — файл не читался вовсе. Канарейка
+            # показала, чем это кончается: подсаженный `_canary_underscore.md`
+            # с шестнадцатью секретами прошёл насквозь и попал лишь в строку
+            # «НЕ ПРОВЕРЕНО». Имя файла ничего не говорит о содержимом, поэтому
+            # теперь такие файлы ПРОВЕРЯЮТСЯ, но помечаются в отчёте отдельно —
+            # чтобы было видно, что находка из служебного черновика.
+            skipped_underscore.append(path)
+            # НЕТ `continue`: файл идёт дальше в проверку.
         if path.suffix.lower() not in TEXT_EXTENSIONS and path.suffix != "":
+            skipped_ext.append(path)
             continue
         try:
             text = path.read_text(encoding="utf-8", errors="ignore")
@@ -255,12 +296,39 @@ def main() -> int:
     print(f"Scanned {total_files} text files, {total_lines} lines.")
     print()
 
-    # Force UTF-8 stdout to avoid Windows cp1251 crash on Cyrillic
+    # Force UTF-8 stdout to avoid Windows cp1251 crash on Cyrillic.
+    # ФЛАШ ОБЯЗАТЕЛЕН: строка «Scanned N text files» печатается ВЫШЕ, в старый
+    # поток, и при подмене без сброса буфера она молча пропадает — в перенаправ-
+    # ленном выводе не оказывалось ни счётчика файлов, ни блока «НЕ ПРОВЕРЕНО».
     import io
+    sys.stdout.flush()
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
+    # Что НЕ смотрели — печатается всегда, до вердикта. «Чисто» без этого списка
+    # неотличимо от «не смотрел».
+    #
+    # 22.08.2026 пропуск по имени на `_` СНЯТ — такие файлы теперь читаются, и
+    # список ниже лишь помечает их происхождение. Настоящим пропуском остался
+    # только отсев по расширению, и формулировка это различает: иначе отчёт
+    # пугал «не проверено» там, где всё проверено, и приучал не верить строке.
+    if skipped_underscore or skipped_ext:
+        if skipped_underscore:
+            print(f"СЛУЖЕБНЫЕ (на «_»): {len(skipped_underscore)} — ПРОВЕРЕНЫ, "
+                  f"помечены для наглядности происхождения находок.")
+        if skipped_ext:
+            print(f"НЕ ПРОВЕРЕНО: {len(skipped_ext)} файлов — расширение вне "
+                  f"списка текстовых.")
+        for p in (skipped_underscore + skipped_ext)[:20]:
+            print(f"    · {p}")
+        if len(skipped_underscore) + len(skipped_ext) > 20:
+            print(f"    … ещё {len(skipped_underscore) + len(skipped_ext) - 20}")
+        print("  Эти файлы всё равно попадут в публикацию, если не закрыты "
+              ".gitignore — проверь их глазами или закрой правилом.\n")
+
     if not matches:
-        print("CLEAN: no leak patterns matched.")
+        print("CLEAN: no leak patterns matched"
+              + (" В ПРОВЕРЕННОЙ ЧАСТИ (см. «НЕ ПРОВЕРЕНО» выше)."
+                 if (skipped_underscore or skipped_ext) else "."))
         return 0
 
     total = sum(len(v) for v in matches.values())

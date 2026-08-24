@@ -51,7 +51,7 @@ ellipsis at text start (continuation)|lower: …и тогда всё стало 
 
 1. First word inside quotation marks capitalized: роман "Война и мир"
 2. Other words follow general rules (lowercase unless proper noun)
-3. Organizations: ООО "Ромашка", ПАО "Газпром"
+3. Organizations: ООО "Ромашка", ПАО "Северный Путь"
 
 ---
 
