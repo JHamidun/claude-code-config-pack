@@ -163,7 +163,7 @@
       ],
       "parameters": {
         "eventId": "={{$node[\"Merge Data\"].json[\"Google Calendar Event ID\"]}}",
-        "calendar": "3ne32v2nlrrd2l3624v5qpg6qk@group.calendar.google.com",
+        "calendar": "REPLACE_ME@group.calendar.google.com",
         "operation": "update",
         "updateFields": {
           "attendees": [
@@ -189,7 +189,7 @@
         "toList": [
           "={{$node[\"Attendee Registrations\"].json[\"And what's your email address?\"]}}"
         ],
-        "message": "=Dear {{$node[\"Attendee Registrations\"].json[\"Great, can we get your full name?\"]}},\n\nWelcome to n8nConf, the world's largest no-code automation conference!\n\nThis email is to confirm your registration to the following sessions:\n- {{$node[\"Attendee Registrations\"].json[\"Which sessions would you like to attend?\"].join('\\n- ')}}\n\nYou should receive Google Calendar invites to these events on your email. Please consult those for the Google Meet joining information.\n\nYou can also interact with the rest of the community via our Mattermost chat. We created an account just for you!\nLook for the channel corresponding to your session to join the discussion!\n\nLogin URL: {{ $env.WEBHOOK_URL }}\nUsername: {{$node[\"Create Account\"].json[\"username\"]}}\nPassword: {{$node[\"Create Account\"].parameter[\"password\"]}}\n\nRemember to change your password immediately after your first login!\n\nIf you have any troubles with joining the event, or using the chat rooms; please feel free to let us know on support@n8nconf.com\n\nWe look forward to your participation!\n\nBest,\nTeam n8n",
+        "message": "=Dear {{$node[\"Attendee Registrations\"].json[\"Great, can we get your full name?\"]}},\n\nWelcome to n8nConf, the world's largest no-code automation conference!\n\nThis email is to confirm your registration to the following sessions:\n- {{$node[\"Attendee Registrations\"].json[\"Which sessions would you like to attend?\"].join('\\n- ')}}\n\nYou should receive Google Calendar invites to these events on your email. Please consult those for the Google Meet joining information.\n\nYou can also interact with the rest of the community via our Mattermost chat. We created an account just for you!\nLook for the channel corresponding to your session to join the discussion!\n\nLogin URL: {{ $env.WEBHOOK_URL }}\nUsername: {{$node[\"Create Account\"].json[\"username\"]}}\nPassword: {{$node[\"Create Account\"].parameter[\"password\"]}}\n\nRemember to change your password immediately after your first login!\n\nIf you have any troubles with joining the event, or using the chat rooms; please feel free to let us know on REPLACE_ME@example.com\n\nWe look forward to your participation!\n\nBest,\nTeam n8n",
         "subject": "Welcome to n8nConf",
         "resource": "message",
         "additionalFields": {}

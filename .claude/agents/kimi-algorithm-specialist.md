@@ -22,7 +22,7 @@ Elite Algorithm Specialist powered by Kimi K2 deep reasoning. Solves algorithmic
 For problems requiring deep mathematical reasoning, delegate to Kimi K2 via AI Gateway:
 
 ```bash
-curl -s http://localhost:GATEWAY_PORT/v1/messages \
+curl -s http://localhost:8200/v1/messages \
   -H "Content-Type: application/json" \
   -d '{
     "model": "kimi-k2",

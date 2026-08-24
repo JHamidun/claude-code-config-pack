@@ -33,12 +33,14 @@ tg_bot.py — полный инструмент Telegram Bot API: ВСЁ, что
   <a href> <blockquote> <blockquote expandable> (раскрывающийся блок!) <tg-emoji>.
 КНОПКИ — см. parse_button(): url / cb: / copy: / app: / switch: / switchcur:
 
-Токен: --token принимает сам токен (123:ABC) ИЛИ имя из ~/.claude/.credentials.master.env
-  (DEMO5, ACADEMY, COMPANY_SALES, FINANCE, LINKEDIN, DEMO3, YOUR_PROJECT, DIGITAL_BUDDY_V3, ...).
+Токен: --token принимает сам токен (123:ABC) ИЛИ своё короткое имя бота, которое ищется
+  в ~/.claude/.credentials.master.env как BOT_TOKEN_<ИМЯ> / TELEGRAM_BOT_TOKEN_<ИМЯ> /
+  <ИМЯ>_TELEGRAM_BOT_TOKEN / <ИМЯ>. Встроенного списка ботов нет — имена придумываешь сам
+  (в примерах ниже: MYBOT — бот-админ канала, SALESBOT — бот для личек и рассылки).
 
 Глобальный флаг --dry-run печатает метод+payload и НИЧЕГО не отправляет (для проверки).
 
-Примеры — внизу файла (EXAMPLES) и в TG_BOT_CAPABILITIES.md.
+Примеры — внизу файла (EXAMPLES) и в TG_BOT_API_REFERENCE.md.
 """
 import argparse
 import json
@@ -97,7 +99,9 @@ def load_token(token_arg: str) -> str:
         if c and c in env and ":" in env[c]:
             return env[c]
     sys.exit(f"❌ Токен не найден для '{token_arg}'. Передай сам токен (123:ABC...) "
-             f"или имя из credentials (DEMO5 / ACADEMY / COMPANY_SALES / FINANCE ...).")
+             f"или заведи строку BOT_TOKEN_{name or '<ИМЯ>'}=<токен> в "
+             f"~/.claude/.credentials.master.env "
+             f"(шаблон: ~/.claude/templates/.credentials.master.env.example).")
 
 
 def _multipart_clean(payload: dict) -> dict:
@@ -1720,56 +1724,56 @@ def main():
 EXAMPLES = """
 Примеры:
   # проверить токен
-  python tg_bot.py --token DEMO5 me
+  python tg_bot.py --token MYBOT me
 
   # ── В КАНАЛ (бот-админ) ──
   # пост с форматированием + раскрывающийся блок + кнопка на пост
-  python tg_bot.py --token DEMO5 send --to @yourchannel \\
+  python tg_bot.py --token MYBOT send --to @yourchannel \\
       --text "<b>Заголовок</b>\\n<blockquote expandable>Длинный текст, скрыт под «показать ещё»</blockquote>" \\
       --btn "Открыть пост|https://t.me/your_username/123" --pin
 
   # фото-пост со спойлером, подпись над фото, две кнопки в ряд
-  python tg_bot.py --token DEMO5 send --to @yourchannel --photo cover.jpg \\
+  python tg_bot.py --token MYBOT send --to @yourchannel --photo cover.jpg \\
       --text "Подпись" --spoiler --caption-above \\
       --btn-row "Сайт|https://your-domain.com ;; Промокод|copy:AI2026"
 
   # видео в канал
-  python tg_bot.py --token DEMO5 send --to @yourchannel --video clip.mp4 --text "Запись"
+  python tg_bot.py --token MYBOT send --to @yourchannel --video clip.mp4 --text "Запись"
 
   # ── RICH-ПОСТ (Bot API 10.1): таблицы / заголовки / код / списки из markdown ──
-  python tg_bot.py --token ACADEMY rich --to @yourchannel --md-file post.md
-  python tg_bot.py --token ACADEMY rich --to 123456789 --md "## Итоги
+  python tg_bot.py --token MYBOT rich --to @yourchannel --md-file post.md
+  python tg_bot.py --token MYBOT rich --to 123456789 --md "## Итоги
 | Метрика | Знач |
 |---|---|
-| MRR | 600K |
+| Заявки | 128 |
 - [x] таблица рендерится нативно" --btn "Подробнее|https://your-domain.com"
 
   # альбом из 3 фото
-  python tg_bot.py --token DEMO5 album --to @yourchannel a.jpg b.jpg c.jpg --text "Галерея"
+  python tg_bot.py --token MYBOT album --to @yourchannel a.jpg b.jpg c.jpg --text "Галерея"
 
   # опрос и викторина
-  python tg_bot.py --token DEMO5 poll --to @yourchannel --question "Идём?" --option Да --option Нет
-  python tg_bot.py --token DEMO5 poll --to @yourchannel --quiz --question "2+2?" \\
+  python tg_bot.py --token MYBOT poll --to @yourchannel --question "Идём?" --option Да --option Нет
+  python tg_bot.py --token MYBOT poll --to @yourchannel --quiz --question "2+2?" \\
       --option 3 --option 4 --correct 1 --explanation "Это четыре"
 
   # ── ПОДПИСЧИКУ В ЛИЧКУ / РАССЫЛКА ──
   # одному подписчику (он должен был нажать /start у бота)
-  python tg_bot.py --token COMPANY_SALES send --to 123456789 --text "Личное сообщение"
+  python tg_bot.py --token SALESBOT send --to 123456789 --text "Личное сообщение"
 
   # собрать chat_id написавших боту
-  python tg_bot.py --token COMPANY_SALES updates --out subs.txt
+  python tg_bot.py --token SALESBOT updates --out subs.txt
 
   # рассылка по сегменту с кнопкой (DRY — проверить без отправки)
-  python tg_bot.py --token COMPANY_SALES --dry-run broadcast --to-file subs.txt \\
+  python tg_bot.py --token SALESBOT --dry-run broadcast --to-file subs.txt \\
       --text "<b>Анонс</b> конференции 👇" --btn "Регистрация|https://your-domain.com/conf"
 
   # ── РЕДАКТИРОВАНИЕ / ИНТЕРАКТИВ ──
   # поменять кнопки у уже опубликованного БОТОМ поста
-  python tg_bot.py --token DEMO5 edit --to @yourchannel --msg-id 123 \\
+  python tg_bot.py --token MYBOT edit --to @yourchannel --msg-id 123 \\
       --btn "Новая ссылка|https://t.me/your_username/130"
 
   # живой бот с раскрывающимся меню (callback-кнопки) для подписчиков
-  python tg_bot.py --token DEMO5 listen
+  python tg_bot.py --token MYBOT listen
 """
 
 if __name__ == "__main__":

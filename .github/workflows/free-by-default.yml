@@ -37,8 +37,21 @@ jobs:
         run: |
           # placeholders must stay commented out: a non-empty placeholder makes
           # every `if not os.getenv(...)` guard think the key is configured
-          if grep -nE '^[A-Za-z0-9_]*(KEY|TOKEN|SECRET|PASSWORD|HASH|SID)[A-Za-z0-9_]*=' .credentials.template.env; then
-            echo "::error::uncommented secret-ish var in .credentials.template.env"
-            exit 1
-          fi
+          # ОБА файла. Полный каталог переменных — .claude/templates/…; в корне после
+          # переезда осталась записка о новом адресе. Пока проверялся только корень,
+          # проверка проходила на файле без единой переменной, а настоящий список
+          # (248 строк) не смотрел никто.
+          fail=0
+          for f in .claude/templates/.credentials.master.env.example .credentials.template.env; do
+            if [ ! -f "$f" ]; then
+              echo "::error::credentials template missing: $f"
+              fail=1
+              continue
+            fi
+            if grep -nE '^[A-Za-z0-9_]*(KEY|TOKEN|SECRET|PASSWORD|HASH|SID)[A-Za-z0-9_]*=' "$f"; then
+              echo "::error::uncommented secret-ish var in $f"
+              fail=1
+            fi
+          done
+          [ "$fail" -eq 0 ] || exit 1
           echo "template OK"

@@ -117,7 +117,7 @@
               "id": "997fe5a1-f601-458d-899c-673dff4acb04",
               "name": "teacher_email",
               "type": "string",
-              "value": "emm.bernard@gmail.com"
+              "value": "REPLACE_ME@example.com"
             }
           ]
         }
@@ -800,7 +800,7 @@
               "after_expiration": null,
               "customer_details": {
                 "name": "Emmanuel Bern",
-                "email": "emm.bernard@gmail.com",
+                "email": "REPLACE_ME@example.com",
                 "phone": null,
                 "address": {
                   "city": "Lausanne",

@@ -116,8 +116,8 @@
         "html": "={{ $json[\"text\"] }}",
         "options": {},
         "subject": "=Invoice for {{ $node[\"Add lines\"].json[\"name\"] }}",
-        "toEmail": "mcolomer@n8nhackers.com",
-        "fromEmail": "mcolomer@n8nhackers.com"
+        "toEmail": "REPLACE_ME@example.com",
+        "fromEmail": "REPLACE_ME@example.com"
       },
       "credentials": {
         "smtp": {
@@ -140,8 +140,8 @@
         "html": "={{ $json[\"text\"] }}",
         "options": {},
         "subject": "New customers",
-        "toEmail": "mcolomer@n8nhackers.com",
-        "fromEmail": "mcolomer@n8nhackers.com"
+        "toEmail": "REPLACE_ME@example.com",
+        "fromEmail": "REPLACE_ME@example.com"
       },
       "credentials": {
         "smtp": {

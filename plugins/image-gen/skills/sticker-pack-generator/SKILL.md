@@ -154,7 +154,7 @@ Pack short_name convention: `<base>_by_<your_bot>`. For emoji packs: `<base>_emo
 |-------------------------------------|-------------------------------------------------|---------------------------------|
 | New static pack                     | `/newpack`                                      | `scripts/upload_static_pack.py` |
 | New animated WebM pack              | `/newvideopack`                                 | `scripts/create_pack.py`        |
-| New custom emoji pack               | `/newemojipack`                                 | `scripts/create_emoji_pack.py` (нет в скилле; есть в `${WORKSPACE}/sticker-pack/scripts/`) |
+| New custom emoji pack               | `/newemojipack`                                 | скрипта нет — заведи пак вручную у @Stickers, дальше `scripts/make_emoji_variant.py` + `scripts/replace_all_custom_emojis.py` |
 | Add stickers to existing pack       | `/addsticker`                                   | `scripts/add_to_pack.py`        |
 | Replace by emoji (preserves slot)   | `/replacesticker` (or `/replaceemoji`)          | `scripts/replace_in_pack.py`    |
 | Delete stickers                     | `/delsticker`                                   | `scripts/clean_pack.py`         |
@@ -200,7 +200,7 @@ Reference setup that works well on a tech channel:
 - Custom picks pulled from the pack (`🔥 ❤️ 🤔 🤯 🎉 🤝 🤩 🤣` — overwrite with your own).
 - Daily story limit is gated by channel **boost level** (level N → ~N stories/day; level 8 → 8). Hitting the cap returns `RPCError 400: BOOSTS_REQUIRED` from `SendStory`. Deleting a sent story does NOT refund the daily slot.
 
-Reactions are configured **once via the @BotFather-less admin UI** (channel → Edit → Reactions → All / Some). Scripted helpers live in `scripts/set_channel_reactions.py` (нет в скилле; есть в `${WORKSPACE}/sticker-pack/scripts/`) (uses `EditChannelReactionsRequest`).
+Reactions are configured **once via the @BotFather-less admin UI** (channel → Edit → Reactions → All / Some). Скрипта-обёртки в паке нет; если нужна автоматизация — это один вызов Telethon `EditChannelReactionsRequest` (база подключения — `scripts/_telethon_base.py`).
 
 ## TGS Lottie dead ends — DO NOT RETRY
 

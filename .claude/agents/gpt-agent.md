@@ -37,15 +37,15 @@ generation, or cross-model validation with a second perspective.
 
 | Environment | Endpoint | Notes |
 |-------------|----------|-------|
-| Local (PC) | `http://localhost:GATEWAY_PORT/v1/messages` | Direct OpenAI API key |
+| Local (PC) | `http://localhost:8200/v1/messages` | Direct OpenAI API key |
 | your-server (Docker) | `http://ai-gateway:GW_PORT/v1/messages` | Internal Docker network |
 
 ### Auth & Startup
 
 - **OpenAI API Key**: From `.credentials.master.env`, gateway handles it internally
 - **Codex OAuth**: Auto-refreshed token for codex models, managed by gateway
-- **Start local**: `cd ${WORKSPACE}/projects/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200`
-- **Health check**: `curl -s http://localhost:GATEWAY_PORT/health | python -m json.tool`
+- **Start local**: `cd ./work/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200   # свой локальный gateway; пак его не несёт`
+- **Health check**: `curl -s http://localhost:8200/health | python -m json.tool`
 
 If gateway is down, start it first. Never proceed without confirming the gateway is running.
 
@@ -239,7 +239,7 @@ GPT-5.1-codex models are specialized for code tasks:
 ### Basic Text Query
 
 ```bash
-curl -s http://localhost:GATEWAY_PORT/v1/messages \
+curl -s http://localhost:8200/v1/messages \
   -H "Content-Type: application/json" --max-time 90 \
   -d '{
     "model": "gpt-5.4",
@@ -251,7 +251,7 @@ curl -s http://localhost:GATEWAY_PORT/v1/messages \
 ### Function Calling
 
 ```bash
-curl -s http://localhost:GATEWAY_PORT/v1/messages \
+curl -s http://localhost:8200/v1/messages \
   -H "Content-Type: application/json" --max-time 60 \
   -d '{
     "model": "gpt-4.1",
@@ -264,7 +264,7 @@ curl -s http://localhost:GATEWAY_PORT/v1/messages \
 ### Structured Output
 
 ```bash
-curl -s http://localhost:GATEWAY_PORT/v1/messages \
+curl -s http://localhost:8200/v1/messages \
   -H "Content-Type: application/json" --max-time 60 \
   -d '{
     "model": "gpt-4.1-mini",
@@ -277,7 +277,7 @@ curl -s http://localhost:GATEWAY_PORT/v1/messages \
 ### Reasoning Model (o4-mini)
 
 ```bash
-curl -s http://localhost:GATEWAY_PORT/v1/messages \
+curl -s http://localhost:8200/v1/messages \
   -H "Content-Type: application/json" --max-time 120 \
   -d '{
     "model": "o4-mini",
@@ -318,9 +318,9 @@ Always prefix responses with the model used:
 ### Gateway Down
 
 ```bash
-curl -s --max-time 3 http://localhost:GATEWAY_PORT/health
+curl -s --max-time 3 http://localhost:8200/health
 # If no response:
-cd ${WORKSPACE}/projects/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200 &
+cd ./work/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200   # свой локальный gateway; пак его не несёт &
 ```
 
 Report to user if gateway cannot be started. Do not silently fail.

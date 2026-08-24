@@ -88,7 +88,7 @@
         "text": "=Hello,\n\nI am emailing you to let you know about a Steam phishing website on your network: {{$node[\"Webhook\"].data[\"query\"][\"q\"]}}.\n\nThank you,\nYour Name Here",
         "ccEmail": "yourCCemail",
         "subject": "={{$node[\"Webhook\"].data[\"query\"][\"q\"]}} - Steam Phishing Website on your network",
-        "toEmail": "security@cloudflare.com",
+        "toEmail": "REPLACE_ME@example.com",
         "fromEmail": "yourFROMemail"
       },
       "credentials": {
@@ -108,7 +108,7 @@
         "text": "=Hello,\n\nI am emailing you to let you know about a Steam phishing website: {{$node[\"Webhook\"].data[\"query\"][\"q\"]}}.\n\nThank you,\nYour Name Here",
         "ccEmail": "yourCCemail",
         "subject": "={{$node[\"Webhook\"].data[\"query\"][\"q\"]}} - Steam Phishing Website",
-        "toEmail": "security@valvesoftware.com",
+        "toEmail": "REPLACE_ME@example.com",
         "fromEmail": "yourFROMemail"
       },
       "credentials": {

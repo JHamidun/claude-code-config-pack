@@ -102,8 +102,8 @@ Generate Excalidraw-compatible JSON for various diagram types.
 ## Из Mermaid
 Есть Mermaid-текст → конверсия: (а) excalidraw.com имеет встроенный «Mermaid to Excalidraw» (через playwright-фронт), либо (б) Cloud MCP Mermaid_Chart для самой Mermaid-диаграммы, если excalidraw-стиль не критичен.
 
-## Визуализация memory-графа (тай-ин с твоим графом)
-Нарисовать связи из `memory_graph.py` (5137 узлов): `python ~/.claude/scripts/memory_graph.py neighbors "<узел>"` (или `path`/`hubs`) → распарси узлы/рёбра → сгенерь Excalidraw (узлы=прямоугольники, рёбра=стрелки с подписью типа связи) → визуальный цикл. Так граф «кто связан с X» становится картинкой.
+## Визуализация memory-графа
+Если ведёшь граф памяти (`skills/graph-memory`), связи из него можно рисовать: `python ~/.claude/scripts/memory_graph.py neighbors "<узел>"` (или `path`/`hubs`) → распарси узлы/рёбра → сгенерь Excalidraw (узлы=прямоугольники, рёбра=стрелки с подписью типа связи) → визуальный цикл. Так граф «кто связан с X» становится картинкой. База едет пустой и наполняется по ходу твоей работы — на свежей установке команда вернёт ноль узлов, и это не поломка.
 
 ## Layout Rules
 

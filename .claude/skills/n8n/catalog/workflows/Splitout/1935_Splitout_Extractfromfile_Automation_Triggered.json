@@ -50,7 +50,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "fegneFqi8XJX3NJH",
-          "name": "Gmail account (hana@hanamizuki.tw)"
+          "name": "Gmail account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1.1,
@@ -85,7 +85,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "fegneFqi8XJX3NJH",
-          "name": "Gmail account (hana@hanamizuki.tw)"
+          "name": "Gmail account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1.1,
@@ -323,7 +323,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "flAcWUeyvdjh7MiW",
-          "name": "Google Sheets account: hana@hanamizuki.tw (GCP: n8n)"
+          "name": "Google Sheets account: REPLACE_ME@example.com (GCP: n8n)"
         }
       },
       "retryOnFail": true,
@@ -592,7 +592,7 @@
                       "operation": "contains"
                     },
                     "leftValue": "={{ $json.from }}",
-                    "rightValue": "service@pxbillrc01.cathaybk.com.tw"
+                    "rightValue": "REPLACE_ME@example.com"
                   }
                 ]
               },
@@ -809,7 +809,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "flAcWUeyvdjh7MiW",
-          "name": "Google Sheets account: hana@hanamizuki.tw (GCP: n8n)"
+          "name": "Google Sheets account: REPLACE_ME@example.com (GCP: n8n)"
         }
       },
       "retryOnFail": true,

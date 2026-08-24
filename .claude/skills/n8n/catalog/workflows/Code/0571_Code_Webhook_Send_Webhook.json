@@ -143,7 +143,7 @@
         520
       ],
       "parameters": {
-        "sendTo": "axelrose20272027@gmail.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "={{ $json.html }}",
         "options": {},
         "subject": "Daily Order Summary"

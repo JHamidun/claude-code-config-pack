@@ -1,6 +1,6 @@
 ---
 name: image-generation
-description: "Промпт-инжиниринг генерации картинок (DALL-E, Midjourney, SD, Gemini) + сюрреализм-пресет Крестинина. Триггеры: «креатив для vk ads», «сюрреализм магритт»."
+description: "Промпт-инжиниринг генерации картинок (DALL-E, Midjourney, SD, Gemini) + авторский сюрреализм-пресет. Триггеры: «креатив для vk ads», «сюрреализм магритт»."
 ---
 
 > ⚠️ **NO-KEY GUARD (обязательно):** этот функционал требует ОПЦИОНАЛЬНОГО стороннего API-ключа. Перед вызовом проверь ключ в `.credentials.master.env`. Если ключ отсутствует, пустой или placeholder (`your_*_api_key`) — **НЕ проси пользователя оплатить счёт, включить биллинг или купить API**. Скажи одной строкой: «Эта функция опциональна и требует свой API-ключ (например, бесплатный ключ на aistudio.google.com); из коробки всё остальное работает по подписке Claude» — и предложи альтернативу или продолжай без неё.
@@ -26,7 +26,8 @@ Expert image prompt engineering for AI image generators (DALL-E 3, Midjourney, S
 - User mentions DALL-E, Midjourney, Stable Diffusion, Gemini image generation
 
 ## Prompt Reference Database
-Load reference prompts from: `${WORKSPACE}/.claude/prompts/image_prompts_reference.json`
+Load reference prompts from: `~/.claude/prompts/image_prompts_reference.json`
+(ships with the pack; video counterpart — `video_prompts_reference.json` alongside)
 
 ## Core Prompt Structure
 

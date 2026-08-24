@@ -1,7 +1,12 @@
 """ElevenLabs voiceover — TTS with cloned-voice presets.
 
-Defaults to YourFirstName voice (`YOUR_ELEVENLABS_VOICE_ID`) + multilingual_v2 tuned for Russian.
-Settings derived from the ConferenceX Tech University video — see references/audio.md.
+The voice is YOURS: this pack ships with no voice id. Put your own into
+`ELEVENLABS_VOICE_ID_RU` in ~/.claude/.credentials.master.env, or pass --voice-id.
+Where to get it: https://elevenlabs.io/app/voice-lab → your voice → ID
+(or `GET https://api.elevenlabs.io/v1/voices`, cloned voices have category="cloned").
+
+Voice settings below are tuned for Russian narration from a cloned voice —
+see references/audio.md §3 for the reasoning.
 
 CLI:
     # One-shot: file in, mp3 out
@@ -21,9 +26,8 @@ load_dotenv(os.path.expanduser("~/.claude/.credentials.master.env"))
 
 from elevenlabs import ElevenLabs, VoiceSettings
 
-# Tuned for believable Russian narration from the YourFirstName clone
-YOURNAME_VOICE_ID = "YOUR_ELEVENLABS_VOICE_ID"
-YOURNAME_SETTINGS = VoiceSettings(
+# Tuned for believable Russian narration from a cloned voice
+CLONE_SETTINGS = VoiceSettings(
     stability=0.55,         # 0.50-0.60 = expressive but not chaotic
     similarity_boost=0.80,  # high = stays close to cloned timbre
     style=0.15,             # low = neutral delivery, no over-acting
@@ -31,6 +35,12 @@ YOURNAME_SETTINGS = VoiceSettings(
 )
 DEFAULT_MODEL = "eleven_multilingual_v2"
 DEFAULT_OUTPUT_FORMAT = "mp3_44100_192"
+
+
+def default_voice_id():
+    """Your own voice id from the environment. Never hardcoded: a literal
+    placeholder here would silently reach the API and fail with an opaque 404."""
+    return os.getenv("ELEVENLABS_VOICE_ID_RU") or os.getenv("ELEVENLABS_VOICE_ID")
 
 
 def synthesize(client: ElevenLabs, text: str, voice_id: str,
@@ -51,13 +61,25 @@ def main() -> int:
     ap.add_argument("--out", required=True, help="Output mp3 path or directory")
     ap.add_argument("--per-clip", action="store_true",
                     help="Treat input as a directory; produce one mp3 per .txt")
-    ap.add_argument("--voice-id", default=YOURNAME_VOICE_ID)
+    ap.add_argument("--voice-id", default=default_voice_id(),
+                    help="ElevenLabs voice id; defaults to $ELEVENLABS_VOICE_ID_RU")
     ap.add_argument("--model", default=DEFAULT_MODEL)
     ap.add_argument("--format", default=DEFAULT_OUTPUT_FORMAT)
     ap.add_argument("--stability", type=float, default=0.55)
     ap.add_argument("--similarity-boost", type=float, default=0.80)
     ap.add_argument("--style", type=float, default=0.15)
     args = ap.parse_args()
+
+    if not args.voice_id:
+        print("No voice id. Set ELEVENLABS_VOICE_ID_RU in "
+              "~/.claude/.credentials.master.env, or pass --voice-id <id>.\n"
+              "Get yours: https://elevenlabs.io/app/voice-lab -> your voice -> ID "
+              "(or GET https://api.elevenlabs.io/v1/voices).", file=sys.stderr)
+        return 2
+    if not os.getenv("ELEVENLABS_API_KEY"):
+        print("ELEVENLABS_API_KEY not set (env or ~/.claude/.credentials.master.env). "
+              "Get one: https://elevenlabs.io/app/settings/api-keys", file=sys.stderr)
+        return 2
 
     client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
     settings = VoiceSettings(

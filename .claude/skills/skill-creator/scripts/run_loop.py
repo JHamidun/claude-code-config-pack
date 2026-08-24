@@ -15,6 +15,13 @@ import time
 import webbrowser
 from pathlib import Path
 
+# Запуск двумя способами, а не одним. Импорт `scripts.*` работает, только когда на
+# sys.path стоит КОРЕНЬ навыка — это даёт `python -m scripts.<имя>` из каталога навыка.
+# Прямой `python scripts/<имя>.py` кладёт на sys.path сам каталог scripts/, и тот же
+# импорт падает `ModuleNotFoundError: No module named 'scripts'` — при папке scripts,
+# лежащей на виду. Добавляем корень навыка сами: тогда обе формы запуска рабочие.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from scripts.generate_report import generate_html
 from scripts.improve_description import improve_description
 from scripts.run_eval import find_project_root, run_eval
@@ -98,6 +105,18 @@ def run_loop(
             model=model,
         )
         eval_elapsed = time.time() - t0
+
+        # Stop instead of "optimizing" against runs that never happened.
+        eval_summary = all_results.get("summary", {})
+        if eval_summary.get("unusable"):
+            broken = [r for r in all_results["results"] if r.get("pass") is None]
+            raise RuntimeError(
+                f"Eval unusable: {eval_summary['unusable']}/{eval_summary.get('total', '?')} "
+                f"queries had no completed run "
+                f"({eval_summary.get('errored_runs', 0)} failed run(s)). "
+                f"First error: {broken[0].get('error') if broken else 'unknown'}. "
+                "Fix `claude -p` before reading any score."
+            )
 
         # Split results back into train/test by matching queries
         train_queries_set = {q["query"] for q in train_set}

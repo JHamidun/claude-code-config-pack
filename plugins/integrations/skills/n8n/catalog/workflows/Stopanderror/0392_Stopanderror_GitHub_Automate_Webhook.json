@@ -174,7 +174,7 @@
             },
             {
               "name": "cookie",
-              "value": "crisp-client%2Fsession%2Fbb1ac897-aa52-4f90-b0e1-e191cb403caf=session_a7a69e83-51f6-4a3b-a101-68fc6d33aca7;"
+              "value": "crisp-client%2Fsession%2FYOUR_WEBSITE_ID=YOUR_SESSION_ID;"
             }
           ]
         }

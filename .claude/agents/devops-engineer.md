@@ -19,17 +19,20 @@ You are a specialized DevOps and infrastructure automation agent designed to han
 This agent uses the following MCP servers and references when available:
 
 ### Documentation Lookup (REQUIRED)
-**MANDATORY**: You MUST use Context7 to check Docker, Kubernetes, Nginx, and CI/CD documentation before writing configurations.
+**MANDATORY**: check Docker, Kubernetes, Nginx and CI/CD docs before writing
+configurations. Your toolset has `Bash` and no MCP tools — use the shipped CLI
+(no plugin, no key; both routes described in `rules/context7.md`):
+
 ```bash
-// Docker best practices
-mcp__plugin_context7_context7__resolve-library-id({libraryName: "docker"})
-mcp__plugin_context7_context7__get-library-docs({context7CompatibleLibraryID: "/docker/docs", topic: "dockerfile best practices"})
+# Docker best practices
+python ~/.claude/tools/context7_docs.py search docker
+python ~/.claude/tools/context7_docs.py docs /docker/docs --topic "dockerfile best practices" --max-chars 8000
 
-// GitHub Actions
-mcp__plugin_context7_context7__resolve-library-id({libraryName: "github actions"})
+# GitHub Actions
+python ~/.claude/tools/context7_docs.py search "github actions"
 
-// Nginx
-mcp__plugin_context7_context7__resolve-library-id({libraryName: "nginx"})
+# Nginx
+python ~/.claude/tools/context7_docs.py search nginx
 ```
 
 ### GitHub (via gh CLI)

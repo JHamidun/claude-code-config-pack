@@ -132,7 +132,7 @@
         "color": 7,
         "width": 880,
         "height": 1220,
-        "content": "## Connect Retell Voice Agents to Custom Functions\n\n## Overview\n- This workflow allows you to **trigger custom logic in n8n directly from Retell's Voice Agent** using [Custom Functions]({{ $env.WEBHOOK_URL }}\n- It captures a POST webhook from Retell every time a Voice Agent reaches a Custom Function node.\n- You can plug in any logic—call an external API, book a meeting, update a CRM, or even return a dynamic response back to the agent.\n\n## Who is it for\nFor builders using [Retell]({{ $env.WEBHOOK_URL }} who want to **extend Voice Agent functionality** with real-time custom workflows or AI-generated responses.\n\n## Prerequisites\n- Have a [Retell AI Account]({{ $env.WEBHOOK_URL }}\n- A Retell agent with a Custom Function node in its conversation flow (see template below)\n- Set your n8n webhook URL in the Custom Function configuration (see \"How to use it\" below)\n- (Optional) Familiarity with [Retell's Custom Function docs]({{ $env.WEBHOOK_URL }}\n- Start a conversation with the agent (text or voice)\n\n## Retell Agent Example\nTo get you started, **[we've prepared a Retell Agent]({{ $env.WEBHOOK_URL }} ready to be imported, that includes the call to this template.\n- Import the agent to your Retell workspace (top-right button [on your agent's page]({{ $env.WEBHOOK_URL }}\n- You will need to modify the function URL in order to call your own instance.\n- This template is a simple hotel agent that calls the custom function to confirm a booking, passing basic formatted data.\n\n## How it works\n- Retell sends a webhook to n8n whenever a Custom Function is triggered during a call (or test chat).\n- The webhook includes:\n    - Full call context (transcript, call ID, etc.)\n    - Parameters defined in the Retell function node\n- You can process this data and return a response string back to the Voice Agent in real-time.\n\n## How to use it\n1. Copy the webhook URL (e.g. `{{ $env.WEBHOOK_URL }}`)\n2. Modify the Retell Custom Function webhook URL (see template description for screenshots)\n    - Edit the function\n    - Modify the URL\n3. Modify the logic in the Set node or replace it with your own custom flow\n4. Deploy and test: Retell will hit your n8n workflow during the conversation\n\n## Extension Ideas\n- Call a third-party API to fetch data (e.g. hotel availability, CRM records)\n- Use an LLM node to generate dynamic responses\n- Trigger a parallel automation (Slack message, calendar invite, etc.)\n\n#### 👉 [Reach out to us](mailto:hello@agentstudio.io) if you're interested in **analyzing your Retell Agent conversations**.\n"
+        "content": "## Connect Retell Voice Agents to Custom Functions\n\n## Overview\n- This workflow allows you to **trigger custom logic in n8n directly from Retell's Voice Agent** using [Custom Functions]({{ $env.WEBHOOK_URL }}\n- It captures a POST webhook from Retell every time a Voice Agent reaches a Custom Function node.\n- You can plug in any logic—call an external API, book a meeting, update a CRM, or even return a dynamic response back to the agent.\n\n## Who is it for\nFor builders using [Retell]({{ $env.WEBHOOK_URL }} who want to **extend Voice Agent functionality** with real-time custom workflows or AI-generated responses.\n\n## Prerequisites\n- Have a [Retell AI Account]({{ $env.WEBHOOK_URL }}\n- A Retell agent with a Custom Function node in its conversation flow (see template below)\n- Set your n8n webhook URL in the Custom Function configuration (see \"How to use it\" below)\n- (Optional) Familiarity with [Retell's Custom Function docs]({{ $env.WEBHOOK_URL }}\n- Start a conversation with the agent (text or voice)\n\n## Retell Agent Example\nTo get you started, **[we've prepared a Retell Agent]({{ $env.WEBHOOK_URL }} ready to be imported, that includes the call to this template.\n- Import the agent to your Retell workspace (top-right button [on your agent's page]({{ $env.WEBHOOK_URL }}\n- You will need to modify the function URL in order to call your own instance.\n- This template is a simple hotel agent that calls the custom function to confirm a booking, passing basic formatted data.\n\n## How it works\n- Retell sends a webhook to n8n whenever a Custom Function is triggered during a call (or test chat).\n- The webhook includes:\n    - Full call context (transcript, call ID, etc.)\n    - Parameters defined in the Retell function node\n- You can process this data and return a response string back to the Voice Agent in real-time.\n\n## How to use it\n1. Copy the webhook URL (e.g. `{{ $env.WEBHOOK_URL }}`)\n2. Modify the Retell Custom Function webhook URL (see template description for screenshots)\n    - Edit the function\n    - Modify the URL\n3. Modify the logic in the Set node or replace it with your own custom flow\n4. Deploy and test: Retell will hit your n8n workflow during the conversation\n\n## Extension Ideas\n- Call a third-party API to fetch data (e.g. hotel availability, CRM records)\n- Use an LLM node to generate dynamic responses\n- Trigger a parallel automation (Slack message, calendar invite, etc.)\n\n#### 👉 [Reach out to us](mailto:REPLACE_ME@example.com) if you're interested in **analyzing your Retell Agent conversations**.\n"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."
@@ -156,7 +156,7 @@
             "latency": {},
             "call_type": "web_call",
             "tool_mocks": [],
-            "transcript": "Agent: \nUser: Hi, I would like to make a reservation for me and my wife on March 29th. We have a budget of 250 euros. Can you help me with that?\nAgent: Good day, and welcome to Agent Studios. I'm Luigi, and I'm here to assist you with your reservation. May I have your name and email address, please?\nUser: My name is Mike Smith, and my email address is mike@yahoo.com.\nAgent: Thank you, Mike. For your stay on March 29th, we have the Deluxe Suite available, which is priced at 190 euros per night. This fits within your budget of 250 euros. Would you like to proceed with booking the Deluxe Suite for one night?\nUser: Yes, that sounds great! Please proceed with the booking for the Deluxe Suite for one night on March 29th.\n",
+            "transcript": "Agent: \nUser: Hi, I would like to make a reservation for me and my wife on March 29th. We have a budget of 250 euros. Can you help me with that?\nAgent: Good day, and welcome to Agent Studios. I'm Luigi, and I'm here to assist you with your reservation. May I have your name and email address, please?\nUser: My name is Mike Smith, and my email address is REPLACE_ME@example.com.\nAgent: Thank you, Mike. For your stay on March 29th, we have the Deluxe Suite available, which is priced at 190 euros per night. This fits within your budget of 250 euros. Would you like to proceed with booking the Deluxe Suite for one night?\nUser: Yes, that sounds great! Please proceed with the booking for the Deluxe Suite for one night on March 29th.\n",
             "transcript_object": [
               {
                 "role": "agent",
@@ -510,11 +510,11 @@
                   },
                   {
                     "end": 3,
-                    "word": "mike@yahoo.com.",
+                    "word": "REPLACE_ME@example.com.",
                     "start": 3
                   }
                 ],
-                "content": "My name is Mike Smith, and my email address is mike@yahoo.com."
+                "content": "My name is Mike Smith, and my email address is REPLACE_ME@example.com."
               },
               {
                 "role": "agent",
@@ -1197,11 +1197,11 @@
                   },
                   {
                     "end": 3,
-                    "word": "mike@yahoo.com.",
+                    "word": "REPLACE_ME@example.com.",
                     "start": 3
                   }
                 ],
-                "content": "My name is Mike Smith, and my email address is mike@yahoo.com."
+                "content": "My name is Mike Smith, and my email address is REPLACE_ME@example.com."
               },
               {
                 "role": "agent",

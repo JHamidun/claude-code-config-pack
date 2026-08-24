@@ -9,7 +9,7 @@ description: "Submagic API: ИИ-субтитры, Magic Brolls/Zooms, Magic Cli
 
 SubtitleService is an AI video platform for short-form content. The REST API (`https://api.submagic.co/v1`) covers caption generation, automatic B-roll insertion, magic zooms, hook titles, silence removal, audio cleanup, Magic Clips (auto-cut from YouTube), social publishing (YouTube/TikTok/Instagram), and user media library.
 
-**Docs:** https://docs.submagic.co — full source at `${HOME}/_submagic_docs.md` (5750 lines, openapi at /api-reference/openapi.json).
+**Docs:** https://docs.submagic.co (openapi at /api-reference/openapi.json). Спека большая (~5750 строк) — качай её в рабочий каталог и читай оттуда, а не по одной странице: `curl -sL https://docs.submagic.co/api-reference/openapi.json -o ./work/submagic-openapi.json`.
 
 ## Auth
 
@@ -377,12 +377,13 @@ result = youtube_to_clips(
 
 SubtitleService provides an MCP server: https://docs.submagic.co/mcp-server.md — Claude Code/Desktop/Cursor compatible. Not configured in `~/.claude/mcp.json` by default; can add for natural-language flows.
 
-## Local references
+## References
 
-- Full docs dump: `${HOME}/_submagic_docs.md` (5750 lines)
-- OpenAPI spec: https://docs.submagic.co/api-reference/openapi.json
-- Pipeline script: `${HOME}/_factory_87_v4_pipeline.py`
-- Memory: `~/.claude/projects/C--Users-youruser/memory/feedback_tg_channel.md` for related context
+- OpenAPI spec (источник истины): https://docs.submagic.co/api-reference/openapi.json
+- Локальный кэш спеки: `./work/submagic-openapi.json` (команда — в Overview)
+- Свой конвейер «видео → субтитры → публикация» собирается навыками пака:
+  `video-editor` (монтаж) → этот навык (субтитры/клипы) → `content-engine` /
+  `tg-bot-publish` (выкладка). Отдельного скрипта-обёртки пак не несёт.
 
 ## Use cases mapped
 

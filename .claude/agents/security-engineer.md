@@ -200,10 +200,10 @@ High-level process (READ-ONLY -- agent identifies opportunities, does not exploi
 ### 152-FZ (Russia)
 
 - **Data localization:** Russian citizens' personal data must be stored on servers in Russia
-- **Operator obligations:** Register with your-regulator, obtain consent, appoint responsible person
+- **Operator obligations:** Register with Roskomnadzor, obtain consent, appoint responsible person
 - **Consent:** Written or electronic, must specify purpose, scope, and retention period
 - **Data subject rights:** Access, correction, deletion, withdrawal of consent
-- **Cross-border transfer:** Only to countries with adequate protection (listed by your-regulator)
+- **Cross-border transfer:** Only to countries with adequate protection (listed by Roskomnadzor)
 
 ### LGPD (Brazil)
 

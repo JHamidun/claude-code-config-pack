@@ -152,7 +152,7 @@ Save test cases to `evals/evals.json`. Don't write assertions yet — just the p
   "evals": [
     {
       "id": 1,
-      "prompt": "пользователя task prompt",
+      "prompt": "User's task prompt",
       "expected_output": "Description of expected result",
       "files": []
     }
@@ -368,7 +368,18 @@ Present the eval set to the user for review using the HTML template:
    - `__EVAL_DATA_PLACEHOLDER__` → the JSON array of eval items (no quotes around it — it's a JS variable assignment)
    - `__SKILL_NAME_PLACEHOLDER__` → the skill's name
    - `__SKILL_DESCRIPTION_PLACEHOLDER__` → the skill's current description
-3. Write to a temp file (e.g., `/tmp/eval_review_<skill-name>.html`) and open it: `open /tmp/eval_review_<skill-name>.html`
+3. Write to a temp file and open it in a browser. Both the temp path and the "open"
+   command differ per OS — `/tmp` does not exist on Windows, and `open` exists only on
+   macOS. One line that works everywhere:
+
+   ```bash
+   python -c "import tempfile,os,webbrowser,sys,shutil; p=os.path.join(tempfile.gettempdir(),'eval_review.html'); shutil.copyfile(sys.argv[1],p); webbrowser.open('file://'+p)" eval_review.html
+   ```
+
+   Or, per platform: `open <file>` (macOS) · `xdg-open <file>` (Linux) ·
+   `start <file>` (Windows cmd/PowerShell) · `cmd //c start <file>` (Git Bash).
+   For the temp directory use `tempfile.gettempdir()` / `$TMPDIR` / `%TEMP%`, not a
+   hardcoded `/tmp`.
 4. The user can edit queries, toggle should-trigger, add/remove entries, then click "Export Eval Set"
 5. The file downloads to `~/Downloads/eval_set.json` — check the Downloads folder for the most recent version in case there are multiple (e.g., `eval_set (1).json`)
 
@@ -378,7 +389,10 @@ This step matters — bad eval queries lead to bad descriptions.
 
 Tell the user: "This will take some time — I'll run the optimization loop in the background and check on it periodically."
 
-Save the eval set to the workspace, then run in the background:
+Save the eval set to the workspace, then run in the background. Both invocation forms work:
+`python -m scripts.run_loop …` from the skill-creator directory, or
+`python /full/path/to/skill-creator/scripts/run_loop.py …` from anywhere — the scripts put
+their own skill root on `sys.path`, so the sibling `scripts.*` imports resolve either way.
 
 ```bash
 python -m scripts.run_loop \

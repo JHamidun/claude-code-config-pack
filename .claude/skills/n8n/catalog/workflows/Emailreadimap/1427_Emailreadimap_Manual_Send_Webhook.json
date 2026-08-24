@@ -35,7 +35,7 @@
       "credentials": {
         "imap": {
           "id": "k31W9oGddl9pMDy4",
-          "name": "IMAP info@n3witalia.com"
+          "name": "IMAP REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2,
@@ -75,7 +75,7 @@
       "credentials": {
         "smtp": {
           "id": "hRjP3XbDiIQqvi7x",
-          "name": "SMTP info@n3witalia.com"
+          "name": "SMTP REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2.1,
@@ -208,7 +208,7 @@
       ],
       "webhookId": "d6dd2e7c-90ea-4b65-9c64-523d2541a054",
       "parameters": {
-        "sendTo": "info@n3w.it",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "=<h3>MESSAGE</h3>\n{{ $('Email Trigger (IMAP)').item.json.textHtml }}\n\n<h3>AI RESPONSE</h3>\n{{ $json.email }}",
         "options": {},
         "subject": "=[Approval Required] {{ $('Email Trigger (IMAP)').item.json.subject }}",

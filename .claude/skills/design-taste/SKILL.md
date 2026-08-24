@@ -5,7 +5,7 @@ description: "Калибровка дизайн-вкуса лендингов: 3
 
 # Design Taste — количественный анти-slop контроль
 
-> Источник механики: **Leonxlnx/taste-skill** (MIT, 65k★, ресёрч канала @usefulrepa 2026-07-19/20). Дословный вендоринг оригинала (v2, `design-taste-frontend`) — `references/full-ruleset.md` (1217 строк, все секции 0-14 + приложения с install-командами и Apple Liquid Glass approximation). Этот файл — рабочая выжимка под нашу дизайн-семью.
+> Источник механики: **Leonxlnx/taste-skill** (MIT, 65k★ на 2026-07-20; текст лицензии — `references/LICENSE-taste-skill.txt`, по условиям MIT он обязан ехать вместе с копией). Дословный вендоринг оригинала (v2, `design-taste-frontend`) — `references/full-ruleset.md` (1217 строк, все секции 0-14 + приложения с install-командами и Apple Liquid Glass approximation). Этот файл — рабочая выжимка под нашу дизайн-семью.
 
 ## Место в семье (не дублирует)
 

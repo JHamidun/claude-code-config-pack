@@ -121,7 +121,7 @@ access_token=$MAPBOX_TOKEN"
 ## Regions / Brazil specifics
 
 - Brazil: **очень хорошее покрытие** в городах (партнёрство с Locus)
-- Sample District: POI хуже Google (мало пользовательских данных), адресный геокодинг отличный
+- Небольшие города и посёлки: POI хуже Google (мало пользовательских данных), адресный геокодинг отличный
 - РФ: средний POI (хуже Yandex/2GIS), адреса decent
 
 ## Регистрация
@@ -146,7 +146,7 @@ Free Pay-as-you-go (PAYG): **100K Search Box / 100K Geocoding / 100K Map Loads**
 7. **Rate limit 600 req/min** на free tier
 8. **`isochrone`** возвращает GeoJSON polygon (зона доезда за N минут)
 9. **`Directions` matrix** ограничен 25×25 точек (625 пар), для больших — Matrix API
-10. **Brazil POI слабее Google** в маленьких локациях — для Sample District в hybrid лучше Google
+10. **POI слабее Google** в маленьких локациях — там в hybrid лучше Google
 11. **`external_ids.foursquare`** — отличная фича для cross-merge с Foursquare
 
 ## Документация

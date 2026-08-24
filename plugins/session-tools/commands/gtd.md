@@ -11,83 +11,104 @@ argument-hint: [today|week|inbox|overdue|project:name|search:query]
 
 ### Step 1: Fetch Tasks from Todoist
 
-В зависимости от аргумента ($ARGUMENTS):
+**Нужен токен.** Todoist → Settings → Integrations → Developer → API token.
+Положи его в окружение как `TODOIST_API_TOKEN` (в паке для этого есть
+`.credentials.master.env`). Нет токена — скажи об этом и остановись, не
+выдумывай задачи.
 
-```python
-from src.actions.tasks.todoist import TodoistClient, TodoistActions
+В паке нет python-клиента к Todoist: ходи в их публичный REST API v1 напрямую.
+Все выборки — один эндпоинт `GET /api/v1/tasks/filter` с языком фильтров
+Todoist в параметре `query`:
 
-todoist = TodoistActions()
+```bash
+TOK="$TODOIST_API_TOKEN"
+API="https://api.todoist.com/api/v1"
 
-# Варианты:
-# today (default) - задачи на сегодня
-# week - задачи на неделю
-# inbox - входящие без проекта
-# overdue - просроченные (URGENT!)
-# project:name - задачи конкретного проекта
-# search:query - поиск по тексту
+fetch() {  # fetch '<todoist filter query>'
+  curl -sS --get "$API/tasks/filter" \
+       -H "Authorization: Bearer $TOK" \
+       --data-urlencode "query=$1" \
+       --data-urlencode "limit=200"
+}
+```
 
-if "$ARGUMENTS" == "today" or "$ARGUMENTS" == "":
-    tasks = todoist.get_daily_digest()
-elif "$ARGUMENTS" == "week":
-    tasks = todoist.client.get_tasks_week()
-elif "$ARGUMENTS" == "inbox":
-    tasks = todoist.client.get_inbox_tasks()
-elif "$ARGUMENTS" == "overdue":
-    tasks = todoist.client.get_overdue_tasks()
-elif "$ARGUMENTS".startswith("project:"):
-    project_name = "$ARGUMENTS".replace("project:", "")
-    tasks = todoist.client.get_tasks_by_project(project_name)
-elif "$ARGUMENTS".startswith("search:"):
-    query = "$ARGUMENTS".replace("search:", "")
-    tasks = todoist.client.search_tasks(query)
+Аргумент `$ARGUMENTS` → фильтр:
+
+| `$ARGUMENTS` | вызов |
+|---|---|
+| пусто или `today` | `fetch 'today \| overdue'` |
+| `week` | `fetch '7 days'` |
+| `inbox` | `fetch '#Inbox'` |
+| `overdue` | `fetch 'overdue'` |
+| `project:NAME` | `fetch '#NAME'` |
+| `search:QUERY` | `fetch 'search: QUERY'` |
+
+Ответ: `{"results": [...], "next_cursor": "..."}`. Если `next_cursor` не `null` —
+дотяни следующую страницу тем же вызовом с `--data-urlencode "cursor=<...>"`,
+иначе часть задач молча потеряется.
+
+Есть и официальный SDK, если предпочитаешь Python: `pip install todoist-api-python`.
+
+Проверить, что токен живой, до всего остального:
+
+```bash
+curl -sS -o /dev/null -w '%{http_code}\n' \
+  -H "Authorization: Bearer $TODOIST_API_TOKEN" \
+  https://api.todoist.com/api/v1/projects
+# 200 — годен; 401 — токен неверный или просрочен
 ```
 
 ### Step 2: Classify Tasks by Type
 
 Категории задач и их workflows:
 
+Шаблоны лежат в `.claude/workflows/` — все десять файлов в паке есть.
+
 | Тип задачи | Keywords | Workflow |
 |------------|----------|----------|
-| **intro** | "intro", "познакомить", "представить", "connect" | `workflows/intro.md` |
-| **cold_outreach** | "cold", "outreach", "написать незнакомому" | `workflows/cold_outreach.md` |
-| **podcast** | "podcast", "подкаст", "interview", "гость" | `workflows/podcast.md` |
-| **content** | "контент", "пост", "статья", "thread", "video" | `workflows/content.md` |
-| **research** | "research", "найти", "изучить", "analyze" | `workflows/research.md` |
-| **meeting_prep** | "подготовка", "prep", "agenda", "встреча" | `workflows/meeting_prep.md` |
-| **follow_up** | "follow up", "напомнить", "проверить статус" | `workflows/follow_up.md` |
-| **coding** | "код", "fix", "implement", "refactor", "bug" | `workflows/coding.md` |
-| **admin** | "оплатить", "заказать", "подписать", "документ" | `workflows/admin.md` |
-| **simple** | (всё остальное) | Выполнить напрямую |
+| **intro** | "intro", "познакомить", "представить", "connect" | `.claude/workflows/intro.md` |
+| **cold_outreach** | "cold", "outreach", "написать незнакомому" | `.claude/workflows/cold_outreach.md` |
+| **podcast** | "podcast", "подкаст", "interview", "гость" | `.claude/workflows/podcast.md` |
+| **content** | "контент", "пост", "статья", "thread", "video" | `.claude/workflows/content.md` |
+| **research** | "research", "найти", "изучить", "analyze" | `.claude/workflows/research.md` |
+| **meeting_prep** | "подготовка", "prep", "agenda", "встреча" | `.claude/workflows/meeting_prep.md` |
+| **follow_up** | "follow up", "напомнить", "проверить статус" | `.claude/workflows/follow_up.md` |
+| **coding** | "код", "fix", "implement", "refactor", "bug" | `.claude/workflows/coding.md` |
+| **admin** | "оплатить", "заказать", "подписать", "документ" | `.claude/workflows/admin.md` |
+| **simple** | (всё остальное) | `.claude/workflows/simple.md` |
 
 ### Step 3: Execute Workflows in Parallel
 
-```python
-# Группируем задачи по типу
-task_groups = classify_tasks(tasks)
+Сгруппируй задачи по типу и на **каждую группу** (не на каждую задачу) спавни
+одного воркера. Одним сообщением — сколько групп, столько вызовов Task: они
+поедут параллельно. Больше 4-5 одновременно не запускай (`rules/models.md`).
 
-# Parallel execution для независимых задач
-for task_type, task_list in task_groups.items():
-    workflow = load_workflow(task_type)
+Прочитай файл воркфлоу сам (Read) и вставь его текст в промпт — воркер не обязан
+знать, где лежат шаблоны:
 
-    # Параллельный запуск агентов для каждой задачи в группе
-    Task(
-        subagent_type="general-purpose",
-        prompt=f"""
-        Выполни workflow '{task_type}' для задач:
-        {json.dumps(task_list, indent=2)}
-
-        Workflow steps:
-        {workflow}
-
-        Для каждой задачи:
-        1. Выполни все шаги workflow
-        2. Отметь прогресс
-        3. Если задача завершена - пометь в Todoist как done
-        """,
-        description=f"GTD: {task_type} tasks",
-        run_in_background=True  # Параллельное выполнение
-    )
 ```
+Task(
+  subagent_type="general-purpose",
+  model="fable",
+  description="GTD: <тип> tasks",
+  prompt="""
+    Выполни workflow '<тип>' для задач ниже.
+
+    ЗАДАЧИ (JSON из Todoist, поля id/content/due/project_id/priority):
+    <...>
+
+    ШАГИ WORKFLOW (текст .claude/workflows/<тип>.md):
+    <...>
+
+    Для каждой задачи: выполни шаги, отметь результат.
+    Закрывать задачу в Todoist САМ НЕ ДОЛЖЕН — верни список id, которые
+    считаешь выполненными, закрытие делает вызывающий (Step 4).
+  """
+)
+```
+
+Закрытие вынесено из воркера намеренно: это необратимое действие в чужом
+аккаунте, и решать его должен один центр, а не пять параллельных агентов.
 
 ### Step 4: Monitor & Report
 
@@ -99,14 +120,31 @@ for task_type, task_list in task_groups.items():
    - Какие заблокированы
    - Время на каждый тип
 
-2. **Update Todoist**:
-   - Пометить completed tasks как done
-   - Добавить комментарии к задачам в прогрессе
-   - Перенести blocked задачи с новым due date
+2. **Update Todoist** — по одному вызову на задачу, тем же токеном:
+
+   ```bash
+   # закрыть выполненную (204 No Content в ответ)
+   curl -sS -X POST "$API/tasks/$ID/close" -H "Authorization: Bearer $TOK"
+
+   # комментарий к задаче в прогрессе
+   curl -sS -X POST "$API/comments" -H "Authorization: Bearer $TOK" \
+        -H "Content-Type: application/json" \
+        -d "{\"task_id\":\"$ID\",\"content\":\"...\"}"
+
+   # перенести заблокированную
+   curl -sS -X POST "$API/tasks/$ID" -H "Authorization: Bearer $TOK" \
+        -H "Content-Type: application/json" \
+        -d '{"due_string":"tomorrow"}'
+   ```
+
+   **Спроси владельца перед первым закрытием в сессии.** Это чужой рабочий
+   список и действие необратимое; `close` на рекуррентной задаче не удаляет её,
+   а сдвигает на следующее повторение — это тоже изменение, которого могли не
+   ждать.
 
 3. **Learning** (опционально):
-   - Сохранить паттерны в Memory MCP
-   - Обновить workflow если найден лучший подход
+   - Сохранить паттерны заметкой в память проекта
+   - Обновить файл воркфлоу в `.claude/workflows/`, если нашёлся лучший подход
 
 ## Workflow Templates
 
@@ -207,26 +245,30 @@ for task_type, task_list in task_groups.items():
 
 ## Integration Points
 
-### Todoist (Primary)
-- Fetch: tasks, projects, labels, comments
-- Update: complete, reschedule, add comments
-- Create: new tasks from workflow outputs
+Обязателен здесь только Todoist. Остальное — «если у тебя это подключено»;
+ничего из этого команда не поднимает сама, и отсутствие любого пункта не повод
+останавливаться.
 
-### Memory MCP (Context)
-- Store: workflow learnings, contact info, past interactions
-- Recall: relevant context для каждой задачи
+### Todoist (Primary, обязателен)
+- Fetch: `GET /api/v1/tasks/filter`, `/projects`, `/labels`, `/comments`
+- Update: `POST /api/v1/tasks/{id}/close`, `POST /api/v1/tasks/{id}`, `POST /api/v1/comments`
+- Create: `POST /api/v1/tasks` — новые задачи из результатов воркфлоу
 
-### Perplexity/AI Search (Research)
-- Deep research для research tasks
-- Company/person lookup для intro tasks
+### Research (опционально)
+- `/deep-research` — если в паке настроен Perplexity
+- Иначе обычный веб-поиск; для company/person lookup в intro-задачах хватает его
 
-### Linear (Work Tasks)
-- Route work-related coding tasks to Linear
-- Sync status between Todoist и Linear
+### Google Calendar (опционально)
+- `/gcalendar` — свободные слоты и создание событий; требует своего OAuth-токена
 
-### Google Calendar
-- Check availability для meeting-related tasks
-- Create calendar events для scheduled outcomes
+### Трекер разработки (опционально)
+- Coding-задачи можно заводить в трекер команды. В паке для этого есть `beads`
+  (git-нативный, ничего внешнего не нужно); Linear/Jira — только если у тебя
+  подключён соответствующий плагин или MCP, в паке их нет.
+
+### Память
+- Выводы сессии сохраняй в память проекта. Отдельного memory-MCP в паке
+  не подключено — пиши заметкой в файл.
 
 ## Пример использования:
 

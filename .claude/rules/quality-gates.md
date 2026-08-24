@@ -76,7 +76,7 @@ A verifier that rubber-stamps weak work undermines everything.
 | **FABRICATED ACTION** («я запустил X») | Был ли реальный tool call за этим заявлением в этом ходе, или это пересказ намерения? |
 | **PHANTOM CITATION** (URL/SHA/цитата) | Видел ли я это РЕАЛЬНО в выводе tool call этой сессии, или подставил по памяти/правдоподобию? |
 
-Makoto не установлен намеренно: конфликт с Co-Authored-By трейлером + ~500мс/вызов на каждом tool call.
+Сторонние hook-инструменты проверки заявлений (например, Makoto) в пак намеренно не включены: конфликт с Co-Authored-By трейлером + ~500мс на каждый tool call.
 
 ## Cross-Model Validation (Advisor Pattern)
 
@@ -105,7 +105,7 @@ For architectural decisions and complex tradeoffs:
 
 ## Adversarial Role Gate (SHARP)
 
-Для дорогих/необратимых артефактов (публикуемые посты, оферы, КП, shipping-код, направления рисёрча) — гейт отдельной ролью **Critic**, оценка SHARP (Sharpness/Horizon/Asymmetry/Resistance/Parsimony, каждая 1-5, /25). **Pass ≥18**; ниже — вернуть автору с 3 самыми жёсткими критиками. Варьирует *позицию* (одна модель ок) — дополняет cross-*model* validation. Дешёвый обратимый вывод НЕ гейтить. См. `skills/agent-builder tooling/references/adversarial-agent-pairs-pattern.md`.
+Для дорогих/необратимых артефактов (публикуемые посты, оферы, КП, shipping-код, направления рисёрча) — гейт отдельной ролью **Critic**, оценка SHARP (Sharpness/Horizon/Asymmetry/Resistance/Parsimony, каждая 1-5, /25). **Pass ≥18**; ниже — вернуть автору с 3 самыми жёсткими критиками. Варьирует *позицию* (одна модель ок) — дополняет cross-*model* validation. Дешёвый обратимый вывод НЕ гейтить. См. `skills/autonomous-agent-creator/references/adversarial-agent-pairs-pattern.md`.
 
 ## YAGNI-иерархия (ponytail)
 

@@ -708,7 +708,7 @@
       ],
       "webhookId": "80d4d964-449a-4599-b2de-bca9c8822bbd",
       "parameters": {
-        "sendTo": "info@alexk1919.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "={{ $json.htmlContent }}",
         "options": {
           "senderName": "Alex Kim"

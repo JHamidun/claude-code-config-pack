@@ -1,5 +1,17 @@
 {
   "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/schemas/mcp.json",
+  "_readme": [
+    "СПРАВОЧНИК, НЕ ЖИВОЙ КОНФИГ. Claude Code этот файл не читает.",
+    "Живые MCP-серверы объявлены в settings.json -> mcpServers. Здесь лежат готовые блоки:",
+    "нашёл нужный, скопировал целиком в settings.json -> mcpServers, убрал \"disabled\": true.",
+    "Отличить от рабочего конфига по структуре нельзя — поэтому написано словами.",
+    "(JSON не поддерживает комментарии, отсюда служебное поле вместо строки с //.)",
+    "ПУТЬ В args: где стоит ${HOME}, впиши свой абсолютный путь целиком.",
+    "Установщик подставляет его только в settings.json и только при установке;",
+    "блок, скопированный отсюда позже, разворачивать некому. На Windows переменной",
+    "HOME обычно нет вовсе (там USERPROFILE), форма пути: C:/Users/ИМЯ/.claude/...",
+    "Сервер с неразвёрнутым путём не поднимается и в /mcp выглядит как ненастроенный."
+  ],
   "servers": {
     "perplexity": {
       "type": "stdio",
@@ -18,7 +30,7 @@
       "type": "stdio",
       "command": "python",
       "args": [
-        "${HOME}\\.claude\\skills\\claude-design\\scripts\\claude_design_mcp.py"
+        "${HOME}/.claude/skills/claude-design/scripts/claude_design_mcp.py"
       ],
       "env": {
         "CLAUDE_DESIGN_COOKIES": "${CLAUDE_DESIGN_COOKIES}",

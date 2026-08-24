@@ -26,11 +26,31 @@ scipy                         # web-assets-generator (cut_avatars)
 # --- search / text ---------------------------------------------------------
 jieba                         # skills/last30days (CJK tokenisation)
 gradio-client                 # skills/ace-step (music generation over a Gradio space)
+                              # И skills/void-video (void_remove.py: Client("sam-motamed/VOID")).
+                              # Подписан был только под ace-step — тот, кто ставил строку по
+                              # названию нужного навыка, void-video не находил здесь вовсе.
 patchright                    # skills/playwright-automation (stealth driver)
 
 # --- vector memory ---------------------------------------------------------
 qdrant-client                 # tools/vector_memory.py
 chromadb                      # tools/vector_memory.py (alternative backend)
+pinecone                      # skills/pinecone (нужен PINECONE_API_KEY; SKILL.md сам говорит поставить)
+psycopg[binary]               # skills/pgvector-rag (SKILL.md сам говорит поставить). Тянет libpq,
+                              # под часть ARM колёс нет — в базовом наборе ронял установку целиком
+
+# --- провайдеры по API-ключу -----------------------------------------------
+# Каждый нужен ровно одному навыку, и тот навык всё равно требует своего ключа,
+# а в своём SKILL.md уже печатает нужную строку pip install.
+replicate                     # skills/replicate      (REPLICATE_API_TOKEN)
+deepgram-sdk                  # skills/deepgram, /transcribe (DEEPGRAM_API_KEY)
+
+# Убраны из requirements.txt как никем не используемые (проверено обходом всех
+# .py по AST + текстовым проходом по .md/.sh/.js — не нашлось ни одного импорта):
+#   markdownify           ни одного упоминания во всём паке
+#   aiohttp               упоминается только как «НЕ нужен» (skills/webhook-receiver)
+#   imageio-ffmpeg        imageio используется только для GIF через Pillow
+#   google-auth-httplib2  приезжает сам с google-api-python-client
+# Возвращать в базовый набор только вместе с кодом, который их импортирует.
 
 # Deliberately absent — no installable PyPI distribution, the owning skill
 # documents its own setup:

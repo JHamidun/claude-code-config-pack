@@ -163,7 +163,7 @@
         540
       ],
       "parameters": {
-        "chatId": "19:3a9ec7df-5b99-4311-9a78-61ac2192da07_449d57c9-64d0-496f-ad07-147a6b388a32@unq.gbl.spaces",
+        "chatId": "19:REPLACE_ME@example.com",
         "message": "=Hey Dispatch Team!, A new {{ $json.ticketType }} has come in.<br><br> <strong>Ticket:</strong> {{ $json.tickets }} <strong>Company: </strong> {{ $json.companyName.name }}",
         "options": {},
         "resource": "chatMessage",

@@ -3,7 +3,7 @@
   "name": "integrations",
   "displayName": "Integrations & DevOps",
   "version": "0.1.0",
-  "description": "n8n, AWS, Telegram bots, Zoom, Pinecone, DeepL, server health, monitoring, Outlook.",
+  "description": "n8n, AWS, Telegram bots, Zoom, Pinecone, DeepL, Home Assistant, webhooks.",
   "author": {
     "name": "Zhemal Khamidun",
     "url": "https://github.com/JHamidun"

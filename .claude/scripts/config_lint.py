@@ -58,17 +58,32 @@ except Exception:
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-# Оба пути были прописаны машиной автора, и при обезличивании превратились в литерал
-# "${HOME}\..." — Python его не разворачивает (на Windows переменной HOME обычно нет
-# вовсе). Инструмент, который CLAUDE.md называет источником правды по счётчикам,
+# Оба пути раньше стояли литералом "${HOME}\..." — Python его не разворачивает
+# (на Windows переменной HOME обычно нет вовсе). Инструмент, который CLAUDE.md
+# называет источником правды по счётчикам,
 # показывал из-за этого ровно нули: каталогов с таким именем не существует, а
 # os.walk по несуществующему пути молча возвращает пустоту, без единой ошибки.
 # Берём домашний каталог у самой системы; CLAUDE_CONFIG_DIR (штатная переменная
 # Claude Code) позволяет посчитать чужую раскладку — например, сам пакет до установки.
 HOME_DIR = os.path.expanduser("~")
 CLAUDE_HOME = os.environ.get("CLAUDE_CONFIG_DIR") or os.path.join(HOME_DIR, ".claude")
-CLAUDE_MD = os.path.join(os.path.dirname(CLAUDE_HOME.rstrip("\\/")) or HOME_DIR,
-                         "CLAUDE.md")
+# Навигационный хаб — это ПОЛЬЗОВАТЕЛЬСКАЯ память Claude Code, ~/.claude/CLAUDE.md.
+# Раньше здесь стоял ~/CLAUDE.md (уровнем выше): это ПРОЕКТНАЯ память, она читается только
+# внутри домашнего каталога, и у большинства такого файла нет вовсе — read_text молча
+# отдавал пустоту, а отчёт печатал нули по «объявленным числам». Старый адрес оставлен
+# запасным: у тех, кто ставил пак прежней версией, хаб всё ещё лежит там.
+def _find_claude_md():
+    primary = os.path.join(CLAUDE_HOME, "CLAUDE.md")
+    if os.path.isfile(primary):
+        return primary
+    legacy = os.path.join(os.path.dirname(CLAUDE_HOME.rstrip("\\/")) or HOME_DIR,
+                          "CLAUDE.md")
+    if os.path.isfile(legacy):
+        return legacy
+    return primary   # предсказуемый путь: отчёт покажет 0, а не упадёт
+
+
+CLAUDE_MD = _find_claude_md()
 SKILLS_DIR = os.path.join(CLAUDE_HOME, "skills")
 AGENTS_DIR = os.path.join(CLAUDE_HOME, "agents")
 COMMANDS_DIR = os.path.join(CLAUDE_HOME, "commands")
@@ -77,8 +92,30 @@ SETTINGS_JSON = os.path.join(CLAUDE_HOME, "settings.json")
 ROUTING_MD = os.path.join(RULES_DIR, "routing.md")
 
 # --- off-book components -----------------------------------------------------
-MEMORY_MD = os.path.join(CLAUDE_HOME, "projects", "C--Users-youruser",
-                         "memory", "MEMORY.md")
+# Имя папки памяти Claude Code кодирует из пути проекта, поэтому оно у каждого
+# своё (C--Users-<логин>). Литерал-плейсхолдер здесь давал ту же тихую нулевую
+# метрику, что и "${HOME}" выше: путь не существует ни у кого, read_text молча
+# отдаёт пустоту. Берём папку с самым свежим индексом — это и есть проект, в
+# котором работают (тот же приём, что в scripts/memory_fit.py).
+def _find_memory_md():
+    root = os.path.join(CLAUDE_HOME, "projects")
+    best, best_mtime = None, -1.0
+    try:
+        for name in os.listdir(root):
+            cand = os.path.join(root, name, "memory", "MEMORY.md")
+            try:
+                mtime = os.path.getmtime(cand)
+            except OSError:
+                continue
+            if mtime > best_mtime:
+                best, best_mtime = cand, mtime
+    except OSError:
+        pass
+    # Ничего не нашли — вернуть предсказуемый путь, чтобы отчёт показал 0, а не упал.
+    return best or os.path.join(root, "default", "memory", "MEMORY.md")
+
+
+MEMORY_MD = _find_memory_md()
 PLUGINS_DIR = os.path.join(CLAUDE_HOME, "plugins")
 INSTALLED_PLUGINS = os.path.join(PLUGINS_DIR, "installed_plugins.json")
 GLOBAL_CONFIG = os.path.join(os.path.expanduser("~"), ".claude.json")
@@ -870,6 +907,63 @@ def print_hygiene(skills):
         print("    %-28s %d ch" % (s["dir"], s["desc_len"]))
 
 
+# ---------------------------------------------------------------------------
+# Model IDs
+# ---------------------------------------------------------------------------
+# Псевдонимы, которые Claude Code разрешает сам в актуальную модель.
+MODEL_ALIASES = {"opus", "fable", "sonnet", "haiku", "inherit", "default"}
+# Прибитый ID вида claude-opus-4-5-20251101.
+PINNED_MODEL_RE = re.compile(r"^claude-[a-z]+[\w.-]*-[\w.-]+$", re.I)
+TEMPLATES_DIR = os.path.join(CLAUDE_HOME, "templates")
+MODELS_MD = os.path.join(CLAUDE_HOME, "config", "models.md")
+
+
+def collect_model_pins():
+    """Файлы, где `model:` прибит датированным ID вместо алиаса.
+
+    Устаревший ID не падает — он молча отдаёт вчерашнюю модель, и по поведению
+    это не отличить. Значит, единственный способ это заметить — вот такая
+    проверка. Смотрим agents/**.md и templates/**.yaml|yml.
+    """
+    pins = []
+    targets = []
+    for base, exts in ((AGENTS_DIR, (".md",)), (TEMPLATES_DIR, (".yaml", ".yml"))):
+        if not os.path.isdir(base):
+            continue
+        for root, _dirs, files in os.walk(base):
+            for fn in sorted(files):
+                if fn.endswith(exts) and fn.lower() != "readme.md":
+                    targets.append(os.path.join(root, fn))
+
+    for p in targets:
+        text = read_text(p)
+        m = re.search(r"^model:[ \t]*(.+?)[ \t]*$", text, re.M)
+        if not m:
+            continue
+        val = _strip_quotes(m.group(1).split("#")[0].strip())
+        if not val or val.lower() in MODEL_ALIASES:
+            continue
+        if PINNED_MODEL_RE.match(val):
+            pins.append((os.path.relpath(p, CLAUDE_HOME), val))
+    return pins
+
+
+def print_model_pins():
+    pins = collect_model_pins()
+    print()
+    print("3.6 PINNED model IDs in agents/ and templates/: %d" % len(pins))
+    if not pins:
+        print("    (все на алиасах opus/fable/haiku — так и надо)")
+        return
+    known = read_text(MODELS_MD)
+    for rel, val in sorted(pins):
+        mark = "" if (known and val in known) else "  <- нет даже в config/models.md"
+        print("    %-46s %s%s" % (rel, val, mark))
+    print("    ! Прибитый ID НЕ падает, когда устаревает — он молча отдаёт")
+    print("      вчерашнюю модель. Замени на алиас (opus / fable / haiku);")
+    print("      точное соответствие алиас -> ID держится в config/models.md.")
+
+
 def cmd_check_select(phrase, skills):
     """Rough selection: score skills & routing rows against phrase tokens."""
     print("=" * 74)
@@ -975,6 +1069,7 @@ def main():
     lint_total = print_tile(enc, skills, agents, rules)
     print_full_picture(enc, lint_total, mcp_cache)
     print_hygiene(skills)
+    print_model_pins()
     print()
     print("Done. (read-only; no config file was modified)")
 

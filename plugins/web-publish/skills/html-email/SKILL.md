@@ -142,6 +142,6 @@ Apple Mail и iOS Mail инвертируют светлые письма. Мо�
 - ❌ Анимированные SVG — большинство клиентов не покажет.
 - ❌ Видео `<video>` — никто не покажет.
 
-## Legacy reference
+## Подробности
 
-Прежняя расширенная версия скилла (дерево @2026-04-30) сохранена целиком в `references/legacy-html-email.md`. Секции там: Что НЕ работает в email, Что работает, Каркас, Правила, Bulletproof button, Mobile responsive, Тестирование, MJML alternative, Антипаттерны.
+Расширенный материал вынесен в `references/legacy-html-email.md` — открывай, когда короткого канона выше не хватает. Секции там: Что НЕ работает в email, Что работает, Каркас, Правила, Bulletproof button, Mobile responsive, Тестирование, MJML alternative, Антипаттерны.

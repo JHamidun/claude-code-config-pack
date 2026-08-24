@@ -39,7 +39,7 @@ Premium-восприятие: глубокий navy, единственный я
 Cream + ink + один акцент. Spacious, читабельный, дружелюбный.
 - **Палитра:** `#F1F3F5` cream фон, `#1B1B1F` ink, `#3a83f6` либо `#3B5BDB` primary
 - **Шрифт:** Manrope / Inter (body), Inter Tight (heading)
-- **Ритм:** spacing kratно 4 (4/8/12/16/24/32/48/64/96), радиусы 8-12, тени почти нет
+- **Ритм:** spacing кратно 4 (4/8/12/16/24/32/48/64/96), радиусы 8-12, тени почти нет
 - **Когда:** edtech, healthcare, mainstream b2c, продукты для России
 
 ### 5. Data-dense

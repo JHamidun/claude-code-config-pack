@@ -264,7 +264,7 @@
     "Hunter": [
       {
         "block": false,
-        "email": "niklas@n8n.io",
+        "email": "REPLACE_ME@example.com",
         "score": 100,
         "regexp": true,
         "result": "deliverable",
@@ -314,7 +314,7 @@
           "familyName": "Hatje"
         },
         "site": null,
-        "email": "niklas@n8n.io",
+        "email": "REPLACE_ME@example.com",
         "fuzzy": false,
         "avatar": null,
         "github": {
@@ -508,7 +508,7 @@
       {
         "formMode": "test",
         "submittedAt": "2024-02-21T18:59:22.964Z",
-        "What's your business email?": "niklas@n8n.io"
+        "What's your business email?": "REPLACE_ME@example.com"
       }
     ]
   },

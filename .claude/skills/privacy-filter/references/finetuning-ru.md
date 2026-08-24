@@ -45,11 +45,11 @@ print(json.dumps({"text": doc["redacted_text_source"], "spans": spans}, ensure_a
 # Set OPF_MOE_TRITON=0 on Windows/CUDA-without-triton
 opf train train.jsonl \
   --validation-dataset validation.jsonl \
-  --output-dir ${WORKSPACE}/opf-ru-ckpt
+  --output-dir ./work/opf-ru-ckpt
 ```
 
 Writes `config.json`, `model.safetensors`, `finetune_summary.json`, `USAGE.txt`.
-Use it via the wrapper: `--checkpoint ${WORKSPACE}/opf-ru-ckpt`.
+Use it via the wrapper: `--checkpoint ./work/opf-ru-ckpt`.
 
 ## Evaluate (measure before/after)
 
@@ -79,7 +79,7 @@ opf train train.jsonl --validation-dataset validation.jsonl \
 
 ## Demo harnesses (in the repo)
 
-`${WORKSPACE}/privacy-filter-opf/examples/scripts/finetuning/`:
+`./work/privacy-filter-opf/examples/scripts/finetuning/` (клон из SKILL.md):
 - `finetune_secret_demo.sh` — retrain a category boundary (account_number → secret).
 - `finetune_custom_label_demo.sh` — teach a brand-new category.
 

@@ -61,10 +61,10 @@ implements a comparable separation, arrived at independently and via a different
 - Their Layer 2 page model is *simpler* than our frontmatter v2 — we already have
   confidence/decay/bi-temporal supersede, which is strictly more expressive than
   "editable page." Adopting their page format would be a downgrade.
-- A literal `.llm-wiki/` directory structure / Obsidian plugin install is not warranted
-  — our memory already has an Obsidian vault (`~/Obsidian/Knowledge-Base/`, separate
-  concern from `~/.claude/projects/*/memory/`) and adding a second wiki mechanism would
-  fragment lookup instead of consolidating it.
+- A literal `.llm-wiki/` directory structure / Obsidian plugin install is not warranted.
+  If you already keep an external knowledge base (Obsidian vault, Notion, a wiki), it is
+  a separate concern from `~/.claude/projects/*/memory/` — adding a second wiki mechanism
+  on top of both would fragment lookup instead of consolidating it.
 
 ## Verdict — pattern noted, not installed
 

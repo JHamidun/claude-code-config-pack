@@ -33,10 +33,11 @@ SETTINGS = os.path.join(CLAUDE, "settings.json")
 CREATED_BY_FLAG = re.compile(r"^--(user-data-dir|output|out|profile|storage|cache|data-dir)$", re.I)
 HOME_CLAUDE = re.compile(r"^\$\{HOME\}[\\/]\.claude[\\/]", re.I)
 HOME_OTHER = re.compile(r"^\$\{HOME\}[\\/](?!\.claude)", re.I)
-# Абсолютный путь к домашнему каталогу КОНКРЕТНОЙ машины: у другого человека такой
-# записи нет. Проверяем по форме пути, а не по чьему-то имени, — иначе проверка
-# работала бы только у одного автора и молчала бы у всех остальных.
-HARDCODED = re.compile(r"^[A-Za-z]:[\\/](Users|Vibecode)[\\/]|^/(Users|home)/", re.I)
+# Абсолютный путь к каталогу КОНКРЕТНОЙ машины: у другого человека такой записи нет.
+# Проверяем по форме пути, а не по чьему-то имени и не по списку известных каталогов, —
+# иначе проверка работала бы только у одного автора и молчала бы у всех остальных.
+# Любая буква диска в начале и любой /Users//home/ — это машина, а не пак.
+HARDCODED = re.compile(r"^[A-Za-z]:[\\/]|^/(Users|home)/", re.I)
 
 
 def check() -> list:

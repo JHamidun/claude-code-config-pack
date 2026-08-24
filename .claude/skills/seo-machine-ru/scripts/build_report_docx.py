@@ -10,7 +10,8 @@ CLI:
         --brief research/brief-x.md --cluster research/cluster-x.md --draft drafts/x.md
 Любой из --brief/--cluster/--draft необязателен. Порядок в документе: brief → cluster → draft.
 
-Конкретный «богатый» пример с резюме/таблицами рынка вручную: examples/your-product/build_docx.py
+Нужен «богатый» отчёт (резюме, таблицы рынка) — собирай его отдельным скриптом на python-docx;
+этот генератор намеренно простой и покрывает brief/cluster/draft.
 Требует: pip install python-docx
 """
 import argparse

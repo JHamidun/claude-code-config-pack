@@ -24,7 +24,7 @@
         "color": 4,
         "width": 1280,
         "height": 320,
-        "content": "=======================================\n            WORKFLOW ASSISTANCE\n=======================================\nFor any questions or support, please contact:\n    Yaron@nofluff.online\n\nExplore more tips and tutorials here:\n   - YouTube: {{ $env.WEBHOOK_URL }}\n   - LinkedIn: {{ $env.WEBHOOK_URL }}\n=======================================\nBright Data Docs: {{ $env.WEBHOOK_URL }}\n"
+        "content": "=======================================\n            WORKFLOW ASSISTANCE\n=======================================\nFor any questions or support, please contact:\n    REPLACE_ME@example.com\n\nExplore more tips and tutorials here:\n   - YouTube: {{ $env.WEBHOOK_URL }}\n   - LinkedIn: {{ $env.WEBHOOK_URL }}\n=======================================\nBright Data Docs: {{ $env.WEBHOOK_URL }}\n"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."
@@ -654,7 +654,7 @@
       ],
       "webhookId": "41184a90-65fd-49a8-b0de-d838b94c790c",
       "parameters": {
-        "sendTo": "yaron.been@gmail.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "=Hey, \n\nWe have analyzed our competitors recent reviews.\nAnalysis data:\n{{ $today }}\n\nHere's a summary:\n{{ $('Basic LLM Chain - Summary of Recent reviews').item.json.text }}\n\nPlease see attached an AI generated 1080x1080 image which you can use in Meta ads.\n\n",
         "options": {
           "attachmentsUi": {

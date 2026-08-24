@@ -1,0 +1,24 @@
+NOTICE — изменения относительно первоисточника
+==============================================
+
+Навык `mcp-builder` взят из <https://github.com/anthropics/skills>
+(каталог `skills/mcp-builder`, ветка `main`, отметка в `SKILL.md`: `anthropics/skills@fa0fa64`) и
+распространяется под Apache License 2.0 — полный текст в `LICENSE.txt` рядом,
+`Copyright 2026 Anthropic, PBC.`
+
+Раздел 4(b) лицензии требует помечать изменённые файлы. Сверка с апстримом
+сделана 23.08.2026 (архив `main`, сравнение побайтно с нормализацией переводов
+строки). Первоисточник не менялся ни в чём, кроме перечисленного:
+
+ИЗМЕНЕНЫ (файлы первоисточника, правленные в этом паке):
+  - SKILL.md
+  - reference/mcp_best_practices.md
+  - reference/node_mcp_server.md
+  - reference/python_mcp_server.md
+
+ДОБАВЛЕНЫ (файлов с такими именами в первоисточнике нет):
+  - reference/agent-tool-design-examples.md
+  - reference/quick-code-examples.md
+
+
+Всё, что не названо выше, совпадает с первоисточником байт в байт.

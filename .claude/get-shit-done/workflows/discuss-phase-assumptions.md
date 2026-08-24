@@ -377,7 +377,7 @@ Use AskUserQuestion:
 
 Record each correction:
 - Original assumption
-- пользователя chosen alternative
+- User's chosen alternative
 - Reason (if provided via "Other" free text)
 
 After all corrections processed, continue to write_context with updated assumptions.

@@ -3,7 +3,15 @@ name: security-scanner
 model: fable
 description: Use proactively for comprehensive security vulnerability scanning including SQL injection, XSS, authentication issues, RLS policy validation, and hardcoded secrets detection. Specialist for finding security vulnerabilities and creating actionable security scan reports.
 color: orange
+tools: Read, Glob, Grep, Bash, Write
 ---
+
+<!-- Тулсет выписан явно (раньше строки не было — агент наследовал ВСЁ, включая
+     Edit). Правило: сканер не правит код, который проверяет. `Write` оставлен
+     ровно под один файл — свой `security-scan-report.md`: напарник
+     `vulnerability-fixer` берёт его с диска, а не из ответа сканера, поэтому
+     запрет Write целиком рвал бы пару молча. См. rules/security-hardening.md. -->
+
 
 # Purpose
 
@@ -138,8 +146,8 @@ When invoked, you must follow these steps systematically:
 ### Phase 5: RLS Policy Validation (Supabase)
 12. **CRITICAL**: Check Supabase RLS policies:
    ```bash
-   # Supabase MCP (configured in .mcp.json)
-   # Use MCP tools for RLS policy checks
+   # No Supabase MCP ships with the pack: read RLS policies from the repo's
+   # SQL migrations, or run checks via psql / the project's own client
    ```
 
 13. Verify all tables have RLS enabled:

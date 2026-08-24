@@ -143,7 +143,7 @@
         "text": "Hi,\n\nThere is a new high value invoice to be paid that you may need to approve.\n\n~ n8n workflow",
         "options": {},
         "subject": "New high value invoice",
-        "toEmail": "finance-manager@company.tld",
+        "toEmail": "REPLACE_ME@example.com",
         "fromEmail": "n8n@noreply.tld",
         "attachments": "attachment_0"
       },

@@ -164,7 +164,7 @@
         "options": {},
         "subject": "=הסקירה היומית של מניית {{ $('AI Agent').item.json.output.stockSymbol }}: {{ $('AI Agent').item.json.output.analysisDate }}",
         "toEmail": "={{ $('On form submission').item.json[\"Email:\"] }}",
-        "fromEmail": "Elay's AI Assistant <elayguez@gmail.com>"
+        "fromEmail": "Elay's AI Assistant <REPLACE_ME@example.com>"
       },
       "credentials": {
         "smtp": {

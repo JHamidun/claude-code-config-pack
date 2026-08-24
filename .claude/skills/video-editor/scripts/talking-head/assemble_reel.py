@@ -28,8 +28,7 @@ from pathlib import Path
 
 BASE = Path(os.environ.get("REEL_DIR") or Path.cwd())
 W, H, FPS = 1080, 1920, 30
-TMP = BASE / "build" / "slots"
-TMP.mkdir(parents=True, exist_ok=True)
+TMP = BASE / "build" / "slots"   # каталог создаётся в main(), не при импорте
 
 # xfade transition mapping (per-cut "trans" -> xfade type, overlap seconds)
 TRANS = {
@@ -195,6 +194,7 @@ def build_audio(spec, vo, vdur, out):
 
 
 def main():
+    TMP.mkdir(parents=True, exist_ok=True)
     tl_path, vo, caps, out = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
     lut = None
     no_cache = "--no-cache" in sys.argv

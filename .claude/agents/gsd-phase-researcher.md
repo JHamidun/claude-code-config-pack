@@ -2,7 +2,7 @@
 name: gsd-phase-researcher
 model: fable
 description: Researches how to implement a phase before planning. Produces RESEARCH.md consumed by gsd-planner. Spawned by /gsd:plan-phase orchestrator.
-tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*, mcp__firecrawl__*, mcp__exa__*
+tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__plugin_context7_context7__*, mcp__firecrawl__*, mcp__exa__*
 color: cyan
 # hooks:
 #   PostToolUse:
@@ -119,8 +119,8 @@ When researching "best library for X": find what the ecosystem actually uses, do
 | 3rd | WebSearch | Ecosystem discovery, community patterns, pitfalls | Needs verification |
 
 **Context7 flow:**
-1. `mcp__context7__resolve-library-id` with libraryName
-2. `mcp__context7__query-docs` with resolved ID + specific query
+1. `mcp__plugin_context7_context7__resolve-library-id` with libraryName
+2. `mcp__plugin_context7_context7__get-library-docs` with resolved ID + specific query
 
 **WebSearch tips:** Always include current year. Use multiple query variations. Cross-verify with authoritative sources.
 

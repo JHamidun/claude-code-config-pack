@@ -122,7 +122,7 @@
         "options": {},
         "subject": "Weekly Update about Notion Tasks",
         "toEmail": "={{ $('Set Workflow vars').item.json.your_email }}",
-        "fromEmail": "n8n@unitize.de"
+        "fromEmail": "REPLACE_ME@example.com"
       },
       "credentials": {
         "smtp": {

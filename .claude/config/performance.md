@@ -30,9 +30,16 @@
 ```json
 "filesystem": {
   "command": "node",
-  "args": ["${HOME}/.claude/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js", "."]
+  "args": ["/home/ИМЯ/.claude/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js", "."]
 }
 ```
+
+Путь пиши **абсолютный, целиком**. В JSON ничто не разворачивает ни `~`, ни `${HOME}`:
+подстановку делает Claude Code, и только для переменных, которые в окружении реально есть,
+а на Windows `HOME` обычно не заведён (есть `USERPROFILE`). Сервер с неразвёрнутым путём не
+поднимается и в логах не кричит — в `/mcp` он выглядит ровно как ненастроенный.
+Свой домашний каталог: `echo $HOME` (bash/zsh) или `echo $env:USERPROFILE` (PowerShell);
+на Windows форма — `C:/Users/ИМЯ/.claude/...` (прямые слэши, node их понимает).
 
 Пакеты перечислены в `~/.claude/package.json`. Без установки всё продолжает
 работать через `npx` — просто дороже.

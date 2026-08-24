@@ -1,6 +1,6 @@
 # Integrations & DevOps
 
-> n8n, AWS, Telegram bots, Zoom, Pinecone, DeepL, server health, monitoring, Outlook.
+> n8n, AWS, Telegram bots, Zoom, Pinecone, DeepL, Home Assistant, webhooks.
 
 Part of the **[hamidun marketplace](../../README.md)**.
 
@@ -16,12 +16,8 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `maps-places` | Places, addresses and geocoding across 11 providers (Google Places, Yandex, 2GIS, HERE, Mapbox, Foursquare, OSM and more). |
 | `n8n` | n8n workflow automation: API, ноды, MCP + локальный каталог 2061 готового воркфлоу. |
 | `pinecone` | Pinecone vector DB (PINECONE_API_KEY): semantic search, RAG; индексы company-<name>-bot и др. |
-| `runbook` | Операционные процедуры флота your-server: «бот молчит», рестарт агента Hermes, крон не отработал. |
-| `server-health` | Проверка сервера по SSH: docker, systemctl, диск, память, логи. |
 | `telegram-bot-toolkit` | Разработка Telegram-ботов: python-telegram-bot, Telethon, деплой; антипаттерн бот-воронки из TG Ads. |
-| `uptime-kuma-ops` | Мониторы Uptime Kuma на your-server через socket.io API: список, добавить, статус. |
 | `webhook-receiver` | Receive webhooks (GitHub, Stripe, GitLab, JIRA, forms) on a local CLI server with HMAC signature validation and a JSONL log. |
-| `yandex-forms` | Create Yandex Forms (surveys, questionnaires) programmatically instead of clicking through every question by hand. |
 | `zoom` | Zoom через Server-to-Server OAuth: создание и правка встреч, записи. |
 
 ### Agents

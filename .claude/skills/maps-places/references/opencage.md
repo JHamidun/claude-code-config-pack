@@ -47,19 +47,19 @@ key=$OPENCAGE_API_KEY"
   "status": {"code": 200, "message": "OK"},
   "total_results": 5,
   "results": [{
-    "formatted": "Sample Beach, Sample City - ST, [REDACTED_CEP], Brasil",
+    "formatted": "Sample Beach, Sample City - ST, 22070-000, Brasil",
     "components": {
       "ISO_3166-1_alpha-2": "BR",
       "ISO_3166-1_alpha-3": "BRA",
       "country": "Brasil",
       "country_code": "br",
       "state": "Sample State",
-      "state_code": "PE",
-      "county": "Microrregião de Suape",
+      "state_code": "ST",
+      "county": "Sample County",
       "city": "Sample City",
       "suburb": "Sample District",
       "road": "Sample Street",
-      "postcode": "[REDACTED_CEP]",
+      "postcode": "22070-000",
       "_type": "residential"
     },
     "geometry": {"lat": -22.9714, "lng": -43.1824},
@@ -74,10 +74,10 @@ key=$OPENCAGE_API_KEY"
         "set": {"apparent": 1717012620, ...}
       },
       "what3words": {"words": "patches.zoomed.example"},
-      "MGRS": "25LDR8829208099",
-      "Maidenhead": "GH71xj",
-      "DMS": {"lat": "8° 18' 18.72'' S", "lng": "34° 56' 51.96'' W"},
-      "Mercator": {"x": -3893415.2, "y": -1149621.6},
+      "MGRS": "23KPQ8213458567",
+      "Maidenhead": "GG87ja",
+      "DMS": {"lat": "22° 58' 17.04'' S", "lng": "43° 10' 56.64'' W"},
+      "Mercator": {"x": -4807131.0, "y": -2626752.6},
       "OSM": {
         "edit_url": "https://www.openstreetmap.org/edit?node=...",
         "url": "https://www.openstreetmap.org/?mlat=-22.9714&mlon=-43.1824"
@@ -112,7 +112,7 @@ key=$OPENCAGE_API_KEY"
 |----------|----------|
 | `q` | Адрес ИЛИ `lat,lon` (lat первая, разделитель `,` или `+`) |
 | `language` | ISO `ru`, `pt`, `en`, `ar`, `zh`... |
-| `countrycode` | ISO2: `br` или `br,ru,de` |
+| `countrycode` | ISO2: `br` или `br,us,de` |
 | `bounds` | `lon_sw,lat_sw,lon_ne,lat_ne` (lon-first!) |
 | `proximity` | `lat,lon` для bias |
 | `no_annotations` | `1` — выключить annotations (быстрее) |

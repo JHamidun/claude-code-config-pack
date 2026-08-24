@@ -1,11 +1,13 @@
 ---
 name: codegraph
-description: "Граф кода: навигация и impact-анализ кодбаз (CLI codegraph, 48 проектов). Триггеры: «кто вызывает», «что затронет изменение». НЕ правка кода."
+description: "Граф кода: навигация и impact-анализ кодбазы (CLI codegraph). Триггеры: «кто вызывает», «что затронет изменение», «трейс вызовов», «blast-radius». НЕ правка кода."
 ---
 
 # codegraph — граф кода для навигации и impact-анализа
 
-Инструмент: **@colbymchenry/codegraph** (публичный npm, установить глобально `npm i -g @colbymchenry/codegraph`). Хранит граф символов/вызовов в `.codegraph/codegraph.db` (SQLite) внутри папки каждого проекта. Индексирует TS/JS(ESM)/Python/PHP/Vue и др. (30+ языков; НЕ Dart, НЕ .sh/.json/.md/.html).
+Инструмент: **@colbymchenry/codegraph** (публичный npm, с паком не едет — ставится глобально: `npm i -g @colbymchenry/codegraph`). Хранит граф символов/вызовов в `.codegraph/codegraph.db` (SQLite) внутри папки каждого проекта. Индексирует TS/JS(ESM)/Python/PHP/Vue и др. (30+ языков; НЕ Dart, НЕ .sh/.json/.md/.html).
+
+Всё описанное ниже снято на **1.4.1** — гочи вроде «не резолвит `@/*` path-alias» привязаны к версии, на свежей проверяй заново (`codegraph --version`).
 
 ## Как ЗАПРОСИТЬ граф (работает из ЛЮБОЙ сессии)
 
@@ -36,7 +38,9 @@ codegraph files                # структура файлов из индек
 Удобно держать графы всех проектов в одной папке-хабе (напр. `~/graphs/<project-name>/`), а не внутри исходников. Тогда `.codegraph` не мусорит в рабочих репозиториях, а `ls ~/graphs/` даёт быструю карту «какие проекты проиндексированы». Для in-place-графа (в самой папке кода) — просто `codegraph init` из корня репо.
 
 ## Ре-синк (код проекта изменился)
-Граф — снапшот. Перед работой обнови исходники в папке графа (напр. `git pull` или `tar`-стрим с сервера; exclude node_modules/.next/dist/generated/__pycache__; на MSYS/Windows — `tar --force-local`) → `codegraph sync` (не re-init; mtime сохраняются). Если файл ломает checkout — полный `codegraph index`, не sync.
+Граф — снапшот. Перед работой обнови исходники в папке графа (напр. `git pull` или `tar`-стрим с сервера) → `codegraph sync` (не re-init; mtime сохраняются). Если файл ломает checkout — полный `codegraph index`, не sync.
+
+**Стандартный exclude при переносе исходников** (иначе граф распухает на чужом коде и генерёнке): `node_modules` `vendor` `.git` `dist` `build` `.next` `__pycache__` `.venv` `venv` `coverage` `*.min.js` `logs` `backups*` `*.db` `*.bak*` и бинарь (png/jpg/pdf/zip). Тащить `tar` **явным списком код-каталогов**, а не `. --exclude=…`: на медленном диске корневой `node_modules` статится бесконечно. На MSYS/Windows — `tar --force-local` (иначе `C:` читается как имя хоста), а ADS-файлы `:Zone.Identifier` ломают checkout — `git rm --cached` их.
 
 ## Построить НОВЫЙ граф (проект без графа)
 `cd <папка-кода>` → `git init -q` (нужен git-репо; проверь, что родительский `.gitignore` не глушит `scripts/` кейс-инсенситивно → 0 files) → `codegraph init`. Проверь `codegraph status` — если property-узлов 10k+ (сгенерированный код `generated/` / бандлы) → удали bloat-каталоги локально + `codegraph index`. Прерванный init (корраптный `.db-wal`) → `rm -rf .codegraph` + заново. Для прод Node-контейнера индексируй ИСХОДНИК на хосте, не компилят в контейнере.

@@ -9,6 +9,10 @@ Pairs with engines/higgsfield/scripts/assemble.py burn_ass.
 
 Pipeline: text -> (vo.mp3 + captions.ass) -> burn onto video.
 
+Голос — ТВОЙ: пак не поставляется ни с каким. Положи свой id в
+`ELEVENLABS_VOICE_ID_RU` (~/.claude/.credentials.master.env) или передай --voice-id.
+Где взять: https://elevenlabs.io/app/voice-lab → свой голос → ID.
+
 USAGE
   python captions_ass.py "текст..." --out-audio vo.mp3 --out-ass captions.ass [--voice-id ID] [--chunk 2] [--style hormozi]
   python captions_ass.py script.txt --out-audio vo.mp3 --out-ass cap.ass        # .txt input
@@ -33,7 +37,6 @@ for _s in (sys.stdout, sys.stderr):
     except (AttributeError, ValueError):
         pass
 
-YOURNAME_VOICE = "YOUR_ELEVENLABS_VOICE_ID"
 DEFAULT_MODEL = "eleven_multilingual_v2"
 CRED = Path(os.path.expanduser("~/.claude/.credentials.master.env"))
 
@@ -45,17 +48,30 @@ STYLES = {  # PlayRes 1080x1920; word-pop bottom-center
 }
 
 
-def _api_key() -> str:
-    k = os.getenv("ELEVENLABS_API_KEY")
-    if not k and CRED.exists():
+def _from_cred(name: str) -> str:
+    """Read NAME from env, falling back to ~/.claude/.credentials.master.env."""
+    v = os.getenv(name)
+    if not v and CRED.exists():
         for line in CRED.read_text(encoding="utf-8", errors="replace").splitlines():
             line = line.strip()
-            if line.startswith("ELEVENLABS_API_KEY="):
-                k = line.split("=", 1)[1].strip().strip('"').strip("'")
+            if line.startswith(name + "="):
+                v = line.split("=", 1)[1].strip().strip('"').strip("'")
                 break
+    return v or ""
+
+
+def _api_key() -> str:
+    k = _from_cred("ELEVENLABS_API_KEY")
     if not k:
-        sys.exit("ELEVENLABS_API_KEY not found (env or ~/.claude/.credentials.master.env)")
+        sys.exit("ELEVENLABS_API_KEY not found (env or ~/.claude/.credentials.master.env). "
+                 "Get one: https://elevenlabs.io/app/settings/api-keys")
     return k
+
+
+def _default_voice_id() -> str:
+    """Your own voice id. Never hardcoded here — a literal placeholder would reach
+    the API as a real value and come back as an opaque 404."""
+    return _from_cred("ELEVENLABS_VOICE_ID_RU") or _from_cred("ELEVENLABS_VOICE_ID")
 
 
 def tts_with_timestamps(text: str, voice_id: str, model: str) -> dict:
@@ -126,13 +142,20 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Auto karaoke captions (ElevenLabs timestamps -> ASS)")
     ap.add_argument("text", help="caption text OR path to .txt")
-    ap.add_argument("--voice-id", default=YOURNAME_VOICE)
+    ap.add_argument("--voice-id", default=_default_voice_id(),
+                    help="ElevenLabs voice id; defaults to $ELEVENLABS_VOICE_ID_RU")
     ap.add_argument("--model", default=DEFAULT_MODEL)
     ap.add_argument("--out-audio", default="vo.mp3")
     ap.add_argument("--out-ass", default="captions.ass")
     ap.add_argument("--chunk", type=int, default=2, help="words per caption pop (1-3)")
     ap.add_argument("--style", default="hormozi", choices=list(STYLES))
     a = ap.parse_args(argv)
+
+    if not a.voice_id:
+        sys.exit("No voice id. Set ELEVENLABS_VOICE_ID_RU in "
+                 "~/.claude/.credentials.master.env, or pass --voice-id <id>.\n"
+                 "Get yours: https://elevenlabs.io/app/voice-lab -> your voice -> ID "
+                 "(or GET https://api.elevenlabs.io/v1/voices).")
 
     text = Path(a.text).read_text(encoding="utf-8").strip() if (len(a.text) < 260 and Path(a.text).exists()) else a.text
     print(f"[..] TTS+timestamps ({len(text)} chars) voice={a.voice_id}")

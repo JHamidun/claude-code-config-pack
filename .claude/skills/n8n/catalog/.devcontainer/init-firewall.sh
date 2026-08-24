@@ -2,6 +2,28 @@
 set -euo pipefail  # Exit on error, undefined vars, and pipeline failures
 IFS=$'\n\t'       # Stricter word splitting
 
+# --- Preflight -------------------------------------------------------------
+# Every tool below is used further down, and a missing one used to surface as a
+# WRONG diagnosis: no jq -> "GitHub API response missing required fields",
+# no aggregate -> zero ranges in the ipset and then "unable to reach github".
+# Name the real cause here, before a single iptables rule is touched.
+missing=()
+for tool in iptables ipset curl jq dig ip aggregate; do
+    command -v "$tool" >/dev/null 2>&1 || missing+=("$tool")
+done
+if [ ${#missing[@]} -gt 0 ]; then
+    # IFS above is \n\t, so ${missing[*]} would join with newlines - join with spaces here.
+    echo "ERROR: missing required tools: $(IFS=' '; echo "${missing[*]}")" >&2
+    echo "  Debian/Ubuntu: apt-get install -y iptables ipset curl jq dnsutils iproute2 iprange" >&2
+    echo "  (dig comes from dnsutils, ip from iproute2, aggregate from iprange)" >&2
+    echo "Refusing to continue: a half-configured firewall looks configured." >&2
+    exit 1
+fi
+if [ "$(id -u)" -ne 0 ]; then
+    echo "ERROR: must run as root - iptables/ipset need CAP_NET_ADMIN" >&2
+    exit 1
+fi
+
 # Flush existing rules and delete existing ipsets
 iptables -F
 iptables -X
@@ -36,19 +58,37 @@ if [ -z "$gh_ranges" ]; then
 fi
 
 if ! echo "$gh_ranges" | jq -e '.web and .api and .git' >/dev/null; then
-    echo "ERROR: GitHub API response missing required fields"
+    echo "ERROR: GitHub API response missing required fields (.web/.api/.git)" >&2
+    echo "  Response starts with: $(echo "$gh_ranges" | head -c 200)" >&2
     exit 1
 fi
 
 echo "Processing GitHub IPs..."
+# Materialise the list first. Exit codes inside a process substitution are not
+# visible to `set -e`/pipefail: an empty stream there silently produced an ipset
+# with zero GitHub ranges and the script sailed on to set policy DROP.
+gh_cidrs=$(echo "$gh_ranges" | jq -r '(.web + .api + .git)[]' | aggregate -q) \
+    || { echo "ERROR: failed to aggregate GitHub CIDR ranges (jq/aggregate)" >&2; exit 1; }
+
+added_ranges=0
 while read -r cidr; do
+    [ -n "$cidr" ] || continue
     if [[ ! "$cidr" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/[0-9]{1,2}$ ]]; then
         echo "ERROR: Invalid CIDR range from GitHub meta: $cidr"
         exit 1
     fi
     echo "Adding GitHub range $cidr"
     ipset add allowed-domains "$cidr"
-done < <(echo "$gh_ranges" | jq -r '(.web + .api + .git)[]' | aggregate -q)
+    added_ranges=$((added_ranges + 1))
+done < <(printf '%s\n' "$gh_cidrs")
+
+if [ "$added_ranges" -eq 0 ]; then
+    echo "ERROR: zero GitHub ranges added to the ipset." >&2
+    echo "  The allow-list would be empty while the policy is DROP -" >&2
+    echo "  that is a firewall that blocks everything, not a configured one." >&2
+    exit 1
+fi
+echo "GitHub ranges added: $added_ranges"
 
 # Resolve and add other allowed domains
 for domain in \

@@ -2,14 +2,14 @@
 
 # Onboarding — First-Time Setup
 
-> Pre-configured Claude Code environment: 172 skills, 49 agents, 109 commands, 35 plugins (+3 disabled), 19 local MCP + 10 cloud MCP servers.
+> Pre-configured Claude Code environment: сотни skills, 75 agents, 156 commands, 33 plugins, MCP-серверы в `settings.json` + справочник `mcp.json`. Точные счётчики не вкапываем — они устаревают молча; актуальные: `python ~/.claude/scripts/config_health.py`.
 
 ---
 
 ## Prerequisites
 
 - **Claude Code CLI** installed and on PATH (`npm install -g @anthropic-ai/claude-code`)
-- **Claude Max subscription** (unlocks Opus 4.6, Sonnet 4.5, Haiku 4.5 — no rate limits)
+- **Claude Max subscription** (unlocks Opus 5, Sonnet 5, Haiku 4.5 — no rate limits)
 - **Git** installed (for version control, PR workflows, commit hooks)
 - **Node.js 18+** (required by CLI and some MCP servers)
 - **Python 3.10+** (required by tools: tg_client, vector_memory, search_chats, etc.)
@@ -20,7 +20,7 @@
 
 1. Copy the example file:
    ```bash
-   cp ~/.claude/.credentials.master.env.example ~/.claude/.credentials.master.env
+   cp ~/.claude/templates/.credentials.master.env.example ~/.claude/.credentials.master.env
    ```
 2. **No API keys are required.** Claude Code runs entirely on your Claude subscription —
    text, code, reasoning, agents, skills all work with ZERO third-party keys. Leave the file as is.
@@ -41,32 +41,26 @@
 
 ```bash
 claude --version          # Confirm CLI is installed
-claude /doctor            # Health check — reports missing deps, broken MCP servers
-claude /status            # Shows loaded rules, active plugins, MCP servers
+claude doctor             # Health check — reports missing deps, broken MCP servers
 ```
 
-Expected: all rules from `~/.claude/rules/` auto-loaded, `filesystem` MCP server active.
+Внутри сессии: `/doctor` — здоровье, `/context` — что загружено, `/mcp` — живые MCP-серверы.
+
+Expected: all rules from `~/.claude/rules/` auto-loaded; MCP `graph-memory`, `filesystem`, `playwright-live1` active.
 
 ---
 
 ## Step 3: Enable MCP Servers
 
-Only `filesystem` and `chrome-devtools` are active by default (in `settings.json`).
+Активно по умолчанию (см. `settings.json` → `mcpServers`): `graph-memory`,
+`filesystem`, `playwright-live1`; рядом выключенные `runway`, `pageindex`, `miro`.
 
-Additional servers live in `mcp.json` — enable as needed:
+`~/.claude/mcp.json` — СПРАВОЧНИК из 17 готовых блоков (postgres, redis,
+brave-search, n8n, puppeteer, playwright, affine, replicate, perplexity,
+elevenlabs, figma-mcp и др.). Claude Code его НЕ читает.
 
-| Server | When to enable |
-|--------|---------------|
-| `postgres` | Working with databases on your server |
-| `redis` | Cache and pub/sub operations |
-| `brave-search` | Web search during research tasks |
-| `n8n` | Workflow automation |
-| `puppeteer` | Browser screenshots and scraping |
-| `affine` | AFFiNE workspace / knowledge base |
-| `replicate` | Running 1000+ AI models |
-| `microsoft-office` | Generating PPTX, XLSX, DOCX files |
-
-To enable: set `"disabled": false` in `~/.claude/mcp.json` for the desired server.
+To enable: скопируй блок из `mcp.json` в `settings.json` → `mcpServers`, убери
+`"disabled": true`, подставь свои URL/токены и АБСОЛЮТНЫЙ путь вместо `${HOME}`.
 
 Test by asking Claude to use a tool from that server (e.g., "search the web for X" after enabling brave-search).
 
@@ -76,7 +70,7 @@ Test by asking Claude to use a tool from that server (e.g., "search the web for 
 
 Run these to confirm everything works end-to-end:
 
-1. **Commands**: type `/help` to see all 109 available slash commands
+1. **Commands**: type `/help` to see all available slash commands
 2. **Basic task**: ask `create a hello world Python script` — tests file writing
 3. **Skill**: try `/deep-research "Claude Code best practices"` — tests research pipeline
 4. **Agent delegation**: ask `review this code` on any file — triggers `code-reviewer` agent
@@ -87,14 +81,16 @@ Run these to confirm everything works end-to-end:
 
 ## Step 5: Key Concepts
 
-| Concept | Count | What it is |
+| Concept | Where | What it is |
 |---------|-------|------------|
-| **Skills** | 172 | Prompt templates in `~/.claude/skills/*/SKILL.md` — enhance Claude's domain expertise |
-| **Agents** | 49 | Specialized subagents (code-reviewer, bug-hunter, test-writer) — auto-delegated by complexity |
-| **Commands** | 109 | Slash commands (`/deploy`, `/translate`, `/gmail`) — shortcuts for common workflows |
-| **Rules** | 23 | Auto-loaded files in `~/.claude/rules/` — guidelines Claude follows every session |
-| **Plugins** | 35 | Community extensions (Figma, Slack, Linear, Telegram) — configured in `settings.json` |
-| **MCP Servers** | 19+10 | 19 local (filesystem, postgres...) + 10 cloud (Airtable, Gmail, Canva...) |
+| **Skills** | `~/.claude/skills/*/SKILL.md` | Prompt templates — enhance Claude's domain expertise |
+| **Agents** | `~/.claude/agents/**` (75) | Specialized subagents (code-reviewer, bug-hunter, test-writer) — auto-delegated by complexity |
+| **Commands** | `~/.claude/commands/**` (156) | Slash commands (`/deploy`, `/translate`, `/gmail`) — shortcuts for common workflows |
+| **Rules** | `~/.claude/rules/` | Auto-loaded files — guidelines Claude follows every session |
+| **Plugins** | `settings.json` → `enabledPlugins` (33) | Community extensions |
+| **MCP Servers** | `settings.json` → `mcpServers` | Живые серверы; `mcp.json` — справочник блоков для копирования |
+
+> Счётчики устаревают молча — сверяй `python ~/.claude/scripts/config_health.py`, а не цифры в документах.
 
 **Routing**: `rules/routing.md` maps natural language triggers to the correct tool. Say "translate this" and it routes to DeepL. Say "deploy" and it routes to the deploy command.
 
@@ -119,7 +115,7 @@ Run these to confirm everything works end-to-end:
 | "API key not found" | Verify `~/.claude/.credentials.master.env` has the key, loaded via `os.getenv()` |
 | "MCP server failed to start" | Check `mcp.json` — ensure env vars are set and `disabled` is `false` |
 | Slow startup (>5s) | Disable unused MCP servers — each one adds cold-start latency |
-| Hook errors / crashes | See `config/rules-ref/hooks.md` — only blocking hooks and beep are active by design |
+| Hook errors / crashes | See `config/rules-ref/hooks.md` — активны только `guard.js` (PreToolUse) и `gsd-check-update.js` (SessionStart), см. settings.json → hooks |
 | Context7 not resolving | Ensure `context7` plugin is enabled in `settings.json` |
 | Telegram tools fail | Run `python ~/.claude/tools/tg_client.py` once to authenticate Telethon session |
 

@@ -8,7 +8,9 @@ description: "Массовое переименование сессий Claude 
 
 ## Что делает
 
-1. Сканирует все JSONL файлы сессий в `~/.claude/projects/C--Users-youruser/`
+1. Сканирует JSONL файлы сессий в `~/.claude/projects/<проект>/`
+   (имя папки Claude Code кодирует из пути проекта — у каждого своё;
+   код ниже находит её сам, хардкодить не нужно)
 2. Фильтрует только пользовательские сессии (не agent-*, не warmup-*)
 3. Извлекает глубокий контекст из каждой сессии:
    - Все user сообщения (до 10)
@@ -28,12 +30,19 @@ description: "Массовое переименование сессий Claude 
 ### Шаг 1: Сканирование и фильтрация
 
 ```python
-import glob
 import json
-import os
+from pathlib import Path
 
-# Найти все сессии
-session_files = glob.glob('${HOME}/.claude/projects/C--Users-youruser/*.jsonl')
+# Каталог сессий: имя папки проекта Claude Code кодирует из его пути
+# (C--Users-<логин>-<проект>), поэтому берём тот проект, где сессии свежее всего.
+PROJECTS = Path.home() / ".claude" / "projects"
+_newest = max(PROJECTS.glob("*/*.jsonl"), key=lambda p: p.stat().st_mtime, default=None)
+if _newest is None:
+    raise SystemExit(f"Сессий не найдено в {PROJECTS}")
+SESSION_DIR = _newest.parent
+print(f"Проект: {SESSION_DIR.name}")
+
+session_files = [str(p) for p in SESSION_DIR.glob("*.jsonl")]
 
 # Фильтровать пользовательские
 user_sessions = []
@@ -49,7 +58,7 @@ print(f"Найдено {len(user_sessions)} пользовательских с�
 
 ```python
 def extract_context(session_id):
-    session_path = f"${HOME}/.claude/projects/C--Users-youruser/{session_id}.jsonl"
+    session_path = SESSION_DIR / f"{session_id}.jsonl"
 
     with open(session_path, 'r', encoding='utf-8') as f:
         lines = f.readlines()
@@ -164,7 +173,7 @@ print(f"Сгенерировано {len(all_titles)} заголовков")
 
 ```python
 def apply_title(session_id, title):
-    session_path = f"${HOME}/.claude/projects/C--Users-youruser/{session_id}.jsonl"
+    session_path = SESSION_DIR / f"{session_id}.jsonl"
 
     with open(session_path, 'r', encoding='utf-8') as f:
         lines = f.readlines()

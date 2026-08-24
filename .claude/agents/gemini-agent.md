@@ -39,13 +39,13 @@ grounding, deep research mode).
 
 | Environment | Endpoint | Notes |
 |-------------|----------|-------|
-| Local (PC) | `http://localhost:GATEWAY_PORT/v1/messages` | Direct Google API key, no proxy |
+| Local (PC) | `http://localhost:8200/v1/messages` | Direct Google API key, no proxy |
 | your-server (Docker) | `http://ai-gateway:GW_PORT/v1/messages` | your AI proxy, 2 Google accounts |
 
 ### Starting the Local Gateway
 
 ```bash
-cd ${WORKSPACE}/projects/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200
+cd ./work/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200   # свой локальный gateway; пак его не несёт
 ```
 
 ### Authentication
@@ -57,7 +57,7 @@ cd ${WORKSPACE}/projects/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicor
 ### Health Check
 
 ```bash
-curl -s http://localhost:GATEWAY_PORT/health | python -m json.tool
+curl -s http://localhost:8200/health | python -m json.tool
 ```
 
 If gateway is down, start it first. Never proceed without confirming the gateway is running.
@@ -265,7 +265,7 @@ content. Understands Google Workspace API patterns.
 ### Basic Text Query
 
 ```bash
-curl -s http://localhost:GATEWAY_PORT/v1/messages \
+curl -s http://localhost:8200/v1/messages \
   -H "Content-Type: application/json" \
   -d '{
     "model": "gemini-3-flash-preview",
@@ -282,7 +282,7 @@ curl -s http://localhost:GATEWAY_PORT/v1/messages \
 # First encode the image
 IMG_B64=$(base64 -w0 /path/to/image.png)
 
-curl -s http://localhost:GATEWAY_PORT/v1/messages \
+curl -s http://localhost:8200/v1/messages \
   -H "Content-Type: application/json" \
   -d "{
     \"model\": \"gemini-3.1-pro-preview\",
@@ -302,7 +302,7 @@ curl -s http://localhost:GATEWAY_PORT/v1/messages \
 ### Structured Output — JSON Mode
 
 ```bash
-curl -s http://localhost:GATEWAY_PORT/v1/messages \
+curl -s http://localhost:8200/v1/messages \
   -H "Content-Type: application/json" \
   -d '{
     "model": "gemini-3-flash-preview",
@@ -320,7 +320,7 @@ curl -s http://localhost:GATEWAY_PORT/v1/messages \
 ### Image Generation
 
 ```bash
-curl -s http://localhost:GATEWAY_PORT/v1/messages \
+curl -s http://localhost:8200/v1/messages \
   -H "Content-Type: application/json" \
   -d '{
     "model": "gemini-3.1-flash-image-preview",
@@ -390,9 +390,9 @@ Include token usage when available:
 
 ```bash
 # Check if gateway is running
-curl -s --max-time 3 http://localhost:GATEWAY_PORT/health
+curl -s --max-time 3 http://localhost:8200/health
 # If no response, start it:
-cd ${WORKSPACE}/projects/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200 &
+cd ./work/ai-gateway && GATEWAY_CONFIG=./config.local.yaml uvicorn app.main:app --port 8200   # свой локальный gateway; пак его не несёт &
 # Wait 3s then retry
 ```
 

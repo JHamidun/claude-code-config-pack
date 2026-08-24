@@ -32,17 +32,24 @@ Usage:
     # List all available styles
     python whiteboard_generator.py styles
 """
+# UTF-8 на выход. Консоль Windows по умолчанию cp1251/cp866/cp1252, и первый же
+# не-ASCII символ (кириллица, →, ✓) валит процесс UnicodeEncodeError — обычно на
+# --help, то есть ДО любой полезной работы. errors="replace" оставляет вывод
+# читаемым, если терминал всё же не UTF-8.
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 import os
 import sys
 import time
 import json
 from pathlib import Path
 
-# Remove conflicting env var before importing SDK
-os.environ.pop('GEMINI_API_KEY', None)
-
 from dotenv import load_dotenv
-load_dotenv(os.path.expanduser("~/.claude/.credentials.master.env"))
 
 from google import genai
 from google.genai import types
@@ -56,7 +63,28 @@ import io
 # NOTE: gemini-3.5-flash is TEXT-ONLY (no image output) — do NOT use it here.
 MODEL = os.getenv("MANUS_SLIDES_MODEL", "gemini-3.1-flash-image-preview")
 
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+# Клиент — лениво, при первом обращении. На верхнем уровне модуля ничего не делаем:
+# импорт не должен ни читать .credentials.master.env, ни менять окружение процесса,
+# ни строить SDK-клиент с чужим ключом.
+_client = None
+
+
+def get_client():
+    """genai-клиент по требованию. Нет ключа — громкий отказ, а не пустой результат."""
+    global _client
+    if _client is None:
+        load_dotenv(os.path.expanduser("~/.claude/.credentials.master.env"))
+        os.environ.pop("GEMINI_API_KEY", None)  # конфликт SDK: нужен GOOGLE_API_KEY
+        api_key = os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            raise SystemExit(
+                "ОТКАЗ: не задан GOOGLE_API_KEY.\n"
+                "  Где взять: aistudio.google.com/apikey\n"
+                "  Как задать: export GOOGLE_API_KEY=... (или строка GOOGLE_API_KEY=... "
+                "в ~/.claude/.credentials.master.env)"
+            )
+        _client = genai.Client(api_key=api_key)
+    return _client
 
 # ============================================================
 # STYLE PRESETS — Visual styles for AI-generated slides
@@ -654,7 +682,7 @@ def generate_slide_image(
 
     for attempt in range(retry_count):
         try:
-            response = client.models.generate_content(
+            response = get_client().models.generate_content(
                 model=MODEL,
                 contents=full_prompt,
                 config=types.GenerateContentConfig(

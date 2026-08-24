@@ -6,8 +6,9 @@ allowed-tools: Bash, Read, Write, WebSearch
 
 # Ad Spy — Competitor Ad Intelligence
 
-> Cross-platform ad monitoring via a 3rd-party scraping API.
-> Key: `SCRAPER_API_KEY` from `~/.claude/.credentials.master.env`
+> Cross-platform ad monitoring via ScrapeCreators (scrapecreators.com) — сторонний платный API,
+> тарифицируется кредитами. Ключ свой: заведи `SCRAPECREATORS_API_KEY` в `~/.claude/.credentials.master.env`.
+> Без ключа работает только ручной путь через Meta Ads Library (см. `references/meta-creative-spy-atria.md`).
 
 ## When to Use
 
@@ -21,7 +22,7 @@ allowed-tools: Bash, Read, Write, WebSearch
 - "spy за Яндекс Директом / VK / Telegram Ads" — российские каналы (см. references)
 - "лучшие креативы конкурентов в FB", "бюджет конкурента", "Atria" — Meta-креативный спай
 
-## Российские каналы и Meta-креативы (экспертные материалы курса)
+## Российские каналы и Meta-креативы
 
 Scraping API хорошо покрывает FB/Google/LinkedIn/Reddit, но российские каналы и
 продвинутый Meta-креативный анализ требуют отдельных инструментов. Подробности — в references:
@@ -36,8 +37,8 @@ Scraping API хорошо покрывает FB/Google/LinkedIn/Reddit, но р�
 ## API Endpoints
 
 ```
-BASE = https://api.your-scraper.example
-AUTH: x-api-key: $SCRAPER_API_KEY
+BASE = https://api.scrapecreators.com
+AUTH: x-api-key: $SCRAPECREATORS_API_KEY
 ```
 
 ### Facebook Ad Library (основной — самый большой объём рекламы)
@@ -77,8 +78,8 @@ AUTH: x-api-key: $SCRAPER_API_KEY
 
 ```bash
 source ~/.claude/.credentials.master.env
-API="https://api.your-scraper.example"
-H="x-api-key: $SCRAPER_API_KEY"
+API="https://api.scrapecreators.com"
+H="x-api-key: $SCRAPECREATORS_API_KEY"
 
 # Find company in Facebook Ad Library
 curl -s "$API/v1/facebook/adLibrary/search/companies?query=COMPETITOR_NAME" -H "$H" | python3 -m json.tool
@@ -88,8 +89,8 @@ curl -s "$API/v1/facebook/adLibrary/search/companies?query=COMPETITOR_NAME" -H "
 
 ```bash
 source ~/.claude/.credentials.master.env
-API="https://api.your-scraper.example"
-H="x-api-key: $SCRAPER_API_KEY"
+API="https://api.scrapecreators.com"
+H="x-api-key: $SCRAPECREATORS_API_KEY"
 
 # Facebook ads
 curl -s "$API/v1/facebook/adLibrary/company/ads?company_id=COMPANY_ID" -H "$H" > /tmp/ads_fb.json &
@@ -152,18 +153,22 @@ Generated: [date] | Sources: Facebook, Google, LinkedIn, Reddit
 ### Step 4: Save report
 
 ```bash
-mkdir -p ~/Documents/Ad-Intel
-# Write report to markdown file with date in filename
+# ~/Documents есть не везде: на локализованном Linux папка называется «Документы»,
+# и mkdir -p ~/Documents молча создаст второй каталог, в который никто не заглядывает.
+DOCS_DIR="$(xdg-user-dir DOCUMENTS 2>/dev/null || echo "$HOME/Documents")"
+OUT="$DOCS_DIR/Ad-Intel"
+mkdir -p "$OUT" || { echo "Не смог создать $OUT — назови это вслух, отчёт писать некуда"; exit 1; }
+echo "Отчёт сохраняю в: $OUT"
+# Write report to markdown file with date in filename inside "$OUT"
 ```
 
-## Use Case: Your Tracker
+## Use Case: постоянный трекер конкурентов
 
-Competitors to monitor:
-- Your-Brand — own brand awareness
-- [Competitor1], [Competitor2], [Competitor3]
+Заведи список один раз и гоняй по нему регулярно: свой бренд (следить, что о нём
+крутят) плюс 3-5 прямых конкурентов. Больше пяти — кредиты кончатся раньше выводов.
 
 ```bash
-# Example: monitor all Your-Brand competitors
+# пример: обойти весь список одним прогоном
 for company in "Comp1" "Comp2" "Comp3" "Comp4"; do
   curl -s "$API/v1/facebook/adLibrary/search/ads?query=$company your-industry" \
     -H "$H" > "/tmp/ads_${company// /_}.json"
@@ -171,10 +176,11 @@ for company in "Comp1" "Comp2" "Comp3" "Comp4"; do
 done
 ```
 
-## Use Case: YourProduct Competitive Intel
+## Use Case: разведка по своей продуктовой категории
 
-AI competitors to monitor:
-- ChatGPT, Claude, Gemini
+Второй список — не прямые конкуренты, а лидеры категории: у них дороже медиа и
+сильнее креативная команда, поэтому хуки видно раньше. Для AI-продуктов это,
+например, ChatGPT, Claude, Gemini.
 
 ## Credit Budget
 
@@ -186,7 +192,7 @@ AI competitors to monitor:
 | Pull LinkedIn ads | 1 |
 | Pull Reddit ads | 1 |
 | **Full competitor audit (4 platforms)** | **5** |
-| **N competitors (Your-Brand scope)** | **~35** |
+| **N конкурентов × полный аудит** | **~5 × N** |
 
 ## Periodic Monitoring
 
@@ -195,7 +201,7 @@ Combine with `/loop` or `/schedule` for recurring checks:
 /loop 24h ad-spy YourCompetitor your-industry
 ```
 
-Or integrate into Your Tracker cron collectors on your-server.
+Либо повесь тот же цикл на крон своего сервера и складывай выдачу в один каталог по датам — накопленная история показывает, что конкурент выключил, а что масштабировал.
 
 ## Если банят: прямой скрап Ad Library в обход API
 

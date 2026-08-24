@@ -40,7 +40,7 @@ ffmpeg -f lavfi -i "anoisesrc=d=10:c=pink:a=0.3" -y noise.mp3
 
 ## Когда что
 - Нужна **быстрая подложка** под короткий ролик / превью → procedural BGM (этот файл).
-- Нужен **настоящий трек/драматургия** (60s+, дуга, узнаваемая музыка) → `suno` (через браузер) или `elevenlabs` Music / Lyria 2 (см. video-generation `skills/video-generation/references/audio.md`).
+- Нужен **настоящий трек/драматургия** (60s+, дуга, узнаваемая музыка) → `elevenlabs` Music / Lyria 2 либо `ace-step` локально (см. video-generation `skills/video-generation/references/audio.md`).
 
 Типовая финальная сборка 9:16, под которую рассчитана эта подложка: blurred-bg overlay + сабы + `amix weights=1.0 0.4`
 (видео + bgm). В нашем пайплайне субтитры делаются ASS-караоке вместо `drawtext` — см. `montage-toolkit.md`.

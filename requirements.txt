@@ -8,50 +8,63 @@ pillow>=10.0
 # Google APIs
 google-api-python-client>=2.100
 google-auth>=2.23
-google-auth-httplib2>=0.1
 google-auth-oauthlib>=1.1
+# google-auth-httplib2 не перечислен намеренно: его никто не импортирует напрямую,
+# а google-api-python-client тянет его сам как свою зависимость.
 
 # Telegram (Telethon-based skills)
 telethon>=1.36
 
 # AI providers
 anthropic>=0.40
-openai>=1.50
+openai>=1.50             # skills/shorts-pipeline (analyze_srt.py), openai-dalle, deepseek,
+                         # kimi, agent-api-server — OpenAI-совместимые клиенты
 google-genai>=0.3
 
 # Browser automation
 playwright>=1.45
 
-# Vector DB / RAG
-psycopg[binary]>=3.2
-pinecone>=3.0
-
 # Office docs
-python-docx>=1.1
+python-docx>=1.1          # навык docx; .docx на выходе (seo-machine-ru/scripts/build_report_docx.py)
 openpyxl>=3.1
 python-pptx>=1.0
 pypdf>=4.3
+pdfplumber>=0.11        # навык pdf: таблицы и координаты слов; pypdf этого не умеет
+
+# Сборка книг и PDF из картинок. Импорты в коде были, а строк здесь не было — на
+# машине, где ставили строго по этому файлу, оба навыка падали ModuleNotFoundError'ом,
+# причём book-polish-pipeline — в самом конце многоминутной сборки.
+ebooklib>=0.18           # skills/book-polish-pipeline (build-book.py: EPUB), epub-tools
+markdown>=3.5            # skills/book-polish-pipeline (build-book.py: md → xhtml для EPUB)
+img2pdf>=0.5             # skills/webinar-to-pdf (generate_presentation_pdf.py, top-level import)
 
 # HTTP / parsing
 httpx>=0.27
 beautifulsoup4>=4.12
 lxml>=5.2
-markdownify>=0.13
 
 # Optional providers
-deepgram-sdk>=3.5
-elevenlabs>=1.5
-replicate>=0.30
+# Именно >=2.0, а не >=1.5: ресурс `client.music` (compose/generate) появился только
+# во второй мажорной версии SDK. На 1.x — а `>=1.5` разрешал поставить, например,
+# 1.59.0 — вызов падал как `AttributeError: 'ElevenLabs' object has no attribute
+# 'music'`: ошибка про несуществующий атрибут, из которой не видно, что дело в версии.
+# Зовут его: video-generation/scripts/elevenlabs_music.py,
+# video-editor/scripts/talking-head/gen_music_sfx.py.
+# Остальное, что пак использует (text_to_speech.convert, text_to_sound_effects.convert),
+# есть и в 1.x, и в 2.x — поднятие нижней границы ничего не ломает.
+elevenlabs>=2.0
 
-# Office docs — XML hardening (skills/docx, skills/pptx: ooxml pack/unpack)
+# Разбор чужого XML (навык docx: чтение правок и комментариев из .docx как zip).
+# Именно defusedxml, а не xml.etree: документ приходит извне, штатный парсер
+# открывает XXE.
 defusedxml>=0.7
 
 # Imaging / frames (cards-creator, slack-gif-creator, sticker-pack-generator,
 # web-assets-generator, video-editor)
 numpy>=1.26
-imageio>=2.34
-imageio-ffmpeg>=0.5
-pdf2image>=1.17          # skills/pdf — needs the poppler binaries on PATH
+imageio>=2.34            # skills/slack-gif-creator (gif_builder.py) — только GIF через Pillow;
+                         # imageio-ffmpeg НЕ нужен, видео через imageio нигде не пишется
+pdf2image>=1.17          # навык pdf (страницы в PNG) — нужны бинарники poppler на PATH
 
 # MCP servers shipped in the pack (claude-design, mcp-builder, video-generation)
 mcp>=1.2
@@ -59,17 +72,17 @@ mcp>=1.2
 # Local automation / diagnostics
 psutil>=5.9              # playwright-automation daemon, n8n catalog monitor
 dnspython>=2.6           # tools/osint_client.py
-qrcode>=7.4              # tools/wa_client.py (WhatsApp pairing)
-aiohttp>=3.9
 tiktoken>=0.7            # honest token counts in config_lint / memory_brief
 PyYAML>=6.0              # skill-creator frontmatter validation
 
 # Data / matching
 pandas>=2.2              # stock-analysis
 yfinance>=0.2            # stock-analysis
-rapidfuzz>=3.9           # lead-enrichment company matching
-phonenumbers>=8.13       # lead-enrichment phone lookup
-pymorphy2>=0.9           # seo-machine-ru (RU morphology)
+# RU morphology: seo-machine-ru, book-mentions-monitor.
+# Именно pymorphy3, а не pymorphy2: последний импортируется, но падает при создании
+# MorphAnalyzer на Python >= 3.11 (inspect.getargspec удалён) — то есть на всех
+# поддерживаемых версиях. Словарь (pymorphy3-dicts-ru) приезжает зависимостью.
+pymorphy3>=2.0
 
 # Local API surface (skills/n8n catalog)
 fastapi>=0.110
@@ -82,7 +95,11 @@ PyJWT>=2.8
 # Приезжают транзитивно с fastapi/python-pptx, но скиллы импортируют их напрямую —
 # при установке без этих «родителей» импорт падал бы на ровном месте.
 pydantic>=2.7            # skills/n8n (модели запросов)
-six>=1.16                # skills/pptx (совместимость внутри ooxml-обвязки)
+# six больше НИКТО не импортирует: обвязка ooxml, ради которой он стоял, уехала
+# вместе с проприетарными офисными навыками (см. корневой LICENSE). Оставлен до
+# общей чистки зависимостей, чтобы не ломать чужую волну; удалять — вместе с
+# остальными неиспользуемыми пакетами.
+six>=1.16
 websockets>=12.0         # tools/ (клиенты с постоянным соединением)
 
 # Fonts (skills/video-editor: fetch_fonts.py / font_catalog.py — импорт без guard,

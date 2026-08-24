@@ -95,7 +95,7 @@
         "color": 6,
         "width": 620,
         "height": 760,
-        "content": "# Author\n![SunGuannan]({{ $env.WEBHOOK_URL }}\n### SunGuannan\nFreelance consultant from China, specializing in automations and data analysis. I work with select clients, addressing their toughest projects.\n\nFor business inquiries, email me at sguann2023@gmail.com.\n"
+        "content": "# Author\n![SunGuannan]({{ $env.WEBHOOK_URL }}\n### SunGuannan\nFreelance consultant from China, specializing in automations and data analysis. I work with select clients, addressing their toughest projects.\n\nFor business inquiries, email me at REPLACE_ME@example.com.\n"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."
@@ -149,8 +149,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "sguann2023@gmail.com",
-          "cachedResultName": "sguann2023@gmail.com"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "operation": "getAll"
       },
@@ -177,8 +177,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "sguann2023@gmail.com",
-          "cachedResultName": "sguann2023@gmail.com"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "additionalFields": {
           "summary": "={{ $fromAI(\"event_title\", \"The event title\", \"string\") }}",
@@ -207,8 +207,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "sguann2023@gmail.com",
-          "cachedResultName": "sguann2023@gmail.com"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "operation": "update",
         "updateFields": {
@@ -241,8 +241,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "sguann2023@gmail.com",
-          "cachedResultName": "sguann2023@gmail.com"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "operation": "delete"
       },

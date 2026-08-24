@@ -760,7 +760,7 @@
     },
     {
       "id": "1355_Splitout_Webhook_Automate_Webhook",
-      "name": "Your CRM Open Chanel RAG Chatbot Application Workflow example with Webhook Integration",
+      "name": "Bitrix24 Open Chanel RAG Chatbot Application Workflow example with Webhook Integration",
       "description": "Complex multi-step automation that orchestrates Executeworkflow, Retrievervectorstore, and Vectorstoreqdrant for data processing. Uses 34 nodes and integrates with 12 services.",
       "filename": "1355_Splitout_Webhook_Automate_Webhook.json",
       "active": 0,
@@ -785,7 +785,7 @@
         "Tech demo",
         "Chatbot",
         "Open Channels",
-        "Your CRM"
+        "Bitrix24"
       ],
       "category": "Business Process Automation",
       "searchable_text": "crm open chanel rag chatbot application workflow example with webhook integration complex multi-step automation that orchestrates executeworkflow, retrievervectorstore, and vectorstoreqdrant for data processing. uses 34 nodes and integrates with 12 services. 1355_splitout_webhook_automate_webhook.json executeworkflow retrievervectorstore vectorstoreqdrant webhook lmchatgooglegemini httprequest embeddingsollama documentdefaultdataloader textsplitterrecursivecharactertextsplitter chainretrievalqa splitout respondtowebhook tech demo chatbot open channels crm",
@@ -13479,7 +13479,7 @@
     },
     {
       "id": "1354_HTTP_Respondtowebhook_Automate_Webhook",
-      "name": "Your CRM Chatbot Application Workflow example with Webhook Integration",
+      "name": "Bitrix24 Chatbot Application Workflow example with Webhook Integration",
       "description": "Webhook-triggered automation that orchestrates Respondtowebhook, Webhook, and Httprequest for data processing. Uses 13 nodes.",
       "filename": "1354_HTTP_Respondtowebhook_Automate_Webhook.json",
       "active": 1,
@@ -13493,7 +13493,7 @@
       ],
       "tags": [
         "Tech demo",
-        "Your CRM",
+        "Bitrix24",
         "Chatbot"
       ],
       "category": "Web Scraping & Data Extraction",
@@ -14459,7 +14459,7 @@
     },
     {
       "id": "1827_HTTP_Respondtowebhook_Automate_Webhook",
-      "name": "Your CRM Chatbot Application Workflow example with Webhook Integration",
+      "name": "Bitrix24 Chatbot Application Workflow example with Webhook Integration",
       "description": "Webhook-triggered automation that orchestrates Respondtowebhook, Webhook, and Httprequest for data processing. Uses 13 nodes.",
       "filename": "1827_HTTP_Respondtowebhook_Automate_Webhook.json",
       "active": 1,
@@ -14473,7 +14473,7 @@
       ],
       "tags": [
         "Tech demo",
-        "Your CRM",
+        "Bitrix24",
         "Chatbot"
       ],
       "category": "Web Scraping & Data Extraction",
@@ -34504,7 +34504,7 @@
     },
     {
       "id": "1356_Code_Webhook_Import_Webhook",
-      "name": "Your CRM Task Form Widget Application Workflow example with Webhook Integration",
+      "name": "Bitrix24 Task Form Widget Application Workflow example with Webhook Integration",
       "description": "Complex multi-step automation that orchestrates Converttofile, Webhook, and Httprequest for data processing. Uses 21 nodes and integrates with 7 services.",
       "filename": "1356_Code_Webhook_Import_Webhook.json",
       "active": 1,

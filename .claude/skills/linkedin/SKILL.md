@@ -104,7 +104,7 @@ curl -s "https://api.your-scraper.example/v1/linkedin/ad?id=AD_ID" \
 3. **Research company:** `/v1/linkedin/company` — контекст о компании
 4. **Check their posts:** `/v1/linkedin/company/posts` — темы для персонализации
 5. **Generate message:** Персонализированный outreach на основе данных
-6. **Track:** Сохранить в CRM (Your CRM skill) или Google Sheets
+6. **Track:** Сохранить в свою CRM (через её API) или Google Sheets
 
 ## Batch Processing
 
@@ -138,7 +138,7 @@ for url in urls:
 | Company research → Outreach | `linkedin` → `account-research` → `draft-outreach` |
 | Competitor monitoring → Analysis | `linkedin` (company posts) → `competitive-analysis` |
 | Ad intelligence → Campaign planning | `linkedin` (ads) → `campaign-planning` |
-| Profile → CRM | `linkedin` → `crm` (create contact/deal) |
+| Profile → CRM | `linkedin` → импорт в твою CRM (создать контакт/сделку через её API) |
 
 ## Safety & Limits
 

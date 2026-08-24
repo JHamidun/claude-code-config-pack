@@ -21,7 +21,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `marketing-psychology-ru` | Marketing psychology and 70+ mental models applied to landings, offers, emails and ads — with concrete rewrite patterns. |
 | `marketing-team-builder-ru` | Hire and structure a marketing team — role map, scorecards, interview kits, and career paths for marketers. |
 | `media-planning-ru` | Strategic media planning — which channel to enter at all, before any ad account is opened; budget split and channel economics. |
-| `ninja-marketing-orchestrator` | Router across the marketing skills — takes a task and drives it to the right playbooks in the right order. |
+| `marketing-orchestrator` | Router across the marketing skills — takes a task and drives it to the right playbooks in the right order. |
 | `offers-ru` | Construct offers — value equation, bonus stack, guarantee, scarcity, risk reversal; productize a service into a high-ticket offer. |
 | `pr-outreach-ru` | Earned media and PR outreach — journalist pitches, newsjacking, media lists, press releases, expert commentary. |
 | `pricing-strategy-ru` | Pricing, packaging and monetization — subscription tiers, price levels, discounts, upsells, and migration of existing customers. |

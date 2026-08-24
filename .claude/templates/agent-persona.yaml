@@ -3,7 +3,16 @@
 
 name: agent-name
 description: Short description of what the agent does
-model: claude-opus-4-5-20251101  # or claude-sonnet-4-5-20250514
+
+# Use an ALIAS, never a dated model ID.
+#   fable  — every text worker (default for a new agent)
+#   opus   — orchestrator / deep reasoning
+#   haiku  — bulk, simple, high-volume runs
+# Why the alias: a dated ID (claude-…-4-5-20251101) does not fail when it goes
+# stale — it silently serves last year's model, and nothing in the output says so.
+# The current mapping alias → exact ID lives in ~/.claude/config/models.md, and
+# `python ~/.claude/scripts/config_lint.py` flags any file that pins one.
+model: fable
 tools:
   - Read
   - Write

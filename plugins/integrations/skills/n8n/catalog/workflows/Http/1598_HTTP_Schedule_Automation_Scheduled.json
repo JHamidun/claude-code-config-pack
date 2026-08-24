@@ -163,7 +163,7 @@
       ],
       "webhookId": "bcf8b4a4-4adf-4e30-a962-683173e5b442",
       "parameters": {
-        "sendTo": "simoroosvelt@gmail.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
         "options": {},
         "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",

@@ -7,6 +7,10 @@ description: "Планирование маркетинговых кампани
 
 Frameworks and guidance for planning, structuring, and executing marketing campaigns.
 
+**Read `~/.claude/business-context.md` first** — sections "Product", "ICP", "Funnel" (current step values), "Channels" (what already works and on what budget) and "Economics" (what a lead and a customer cost you). No such file? Create it from `~/.claude/templates/business-context.md`.
+
+Without it the plan comes out generic: objectives get set against benchmarks instead of your own numbers, and the budget split is guesswork. A campaign plan built on invented baselines cannot be evaluated afterwards — you will not know whether it worked.
+
 ## Campaign Framework: Objective, Audience, Message, Channel, Measure
 
 Every campaign should be built on this five-part framework:

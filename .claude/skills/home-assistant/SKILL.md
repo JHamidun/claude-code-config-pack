@@ -14,9 +14,12 @@ CLI: `python ~/.claude/tools/ha_client.py <command>`.
 - Вызвать любой HA-сервис (`light.turn_on`, `climate.set_temperature`, `media_player.play_media`...).
 - Посмотреть историю состояний сенсора, live-поток событий, конфиг инстанса, комнаты/устройства.
 
-### HA vs Яндекс умный дом (отдельный навык под Яндекс (в пак не входит))
+### HA vs Яндекс умный дом
 
-| Критерий | Home Assistant (этот skill) | Яндекс IoT (отдельный навык под Яндекс (в пак не входит)) |
+Навыка под Яндекс IoT в паке нет — колонка ниже нужна, чтобы понять, туда ли ты
+вообще пришёл, а не чтобы им пользоваться.
+
+| Критерий | Home Assistant (этот skill) | Яндекс IoT |
 |----------|------------------------------|---------------------------|
 | Где живёт | Локально (свой сервер/RPi/Docker), работает без интернета | Облако Яндекса |
 | Устройства | 2000+ интеграций: Zigbee, Z-Wave, MQTT, ESPHome, Xiaomi, и Яндекс-устройства тоже подключаемы | Только устройства, привязанные к аккаунту Яндекса |
@@ -31,10 +34,12 @@ CLI: `python ~/.claude/tools/ha_client.py <command>`.
 1. Нужен работающий HA-инстанс (Home Assistant OS на RPi/mini-PC или Docker:
    `docker run -d --name homeassistant --network=host ghcr.io/home-assistant/home-assistant:stable`).
 2. Токен: HA web UI → профиль (слева внизу) → вкладка Security → Long-lived access tokens → Create Token.
-3. Env-переменные в `~/.claude/.credentials.master.env` (значения заполняет владелец):
+3. Свои значения — в переменные окружения или в свой `~/.claude/.credentials.master.env`
+   (образец — `~/.claude/templates/.credentials.master.env.example`; в репозиторий — никогда):
    - `HA_URL` — базовый URL, например `http://homeassistant.local:8123` или `http://192.168.x.x:8123`
-   - `HA_TOKEN` — long-lived access token
-4. Зависимости: `requests` (REST), `websockets` (events/areas/devices) — обе уже установлены локально (websockets 15.0.1).
+   - `HA_TOKEN` — long-lived access token из шага 2
+4. Зависимости: `pip install requests websockets` — `requests` для REST, `websockets` для
+   `events`/`areas`/`devices`. Проверено на websockets 15.x.
 
 ## Команды
 
@@ -91,7 +96,7 @@ python ~/.claude/tools/ha_client.py states --domain sensor --json
 
 ## Чек-лист
 
-- [ ] `HA_URL` + `HA_TOKEN` в `~/.claude/.credentials.master.env`
+- [ ] `HA_URL` + `HA_TOKEN` заведены в окружении (или в своём `.credentials.master.env`)
 - [ ] `ping` отвечает `API running.`
 - [ ] `states` показывает сущности → entity_id для дальнейших команд брать отсюда
 - [ ] Перед `call` с нестандартным сервисом — проверить его существование в HA (Developer Tools → Services); CLI не валидирует имена сервисов

@@ -2,7 +2,7 @@
 
 > **Источник:** https://github.com/Yu-369/VibeCurb (298 stars на момент ресёрча 2026-07-20, канал @usefulrepa)
 > **Лицензия:** MIT (Copyright (c) 2026 Yu-369)
-> **Клонировано:** 2026-07-20 в `${WORKSPACE}/temp-clones/vibecurb/skills/pixel-perfect/SKILL.md`
+> **Источник:** сторонний навык `pixel-perfect` (снят 2026-07-20). Полный текст ниже — клон для сверки не нужен.
 > **Статус:** дословный вендоринг — полный справочник (7-слойная экстракция скриншот→код + Visual Diff).
 > Компактная выжимка (Visual Diff чек-лист + Sacred/Slop) → `../SKILL.md` (design-guardrails).
 

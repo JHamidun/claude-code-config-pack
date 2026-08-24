@@ -84,8 +84,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "davide.boizza@gmail.com",
-          "cachedResultName": "davide.boizza@gmail.com"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "operation": "getAll"
       },

@@ -351,7 +351,7 @@
       ],
       "webhookId": "a57ca2f7-42dc-4ee9-808d-85455bb7c12f",
       "parameters": {
-        "sendTo": "ranjancse@gmail.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "={{ $json.response.text }}",
         "options": {},
         "subject": "Google Trends Summary"

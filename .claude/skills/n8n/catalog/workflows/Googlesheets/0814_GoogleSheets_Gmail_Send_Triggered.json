@@ -293,7 +293,7 @@
       "parameters": {
         "width": 780,
         "height": 720,
-        "content": "### Test the workflow with this email!\n\n#### How?\n1. Send this email to the Gmail box you set up in your credentials.\n2. Click on Test workflow\n\n### Email\n**Email Subject:** Inbound Order PO45231 – Expected Delivery on 2025-03-27\n\n**Email Body:** \nDear LogiGreen Team,\n\nPlease find below the details of the upcoming inbound order.\n\nPurchase Order: PO45231\nExpected Delivery Date: 27/03/2025\n\nOrder Lines:\n\nSKU: HERM-SHOE-001 — Qty: 120\n\nSKU: HERM-BAG-032 — Qty: 45\n\nSKU: HERM-WATCH-105 — Qty: 30\n\nSKU: HERM-SCARF-018 — Qty: 80\n\nLet us know if you need any additional details.\n\nBest regards,\nSophie Lambert\nAdmin Assistant – Hermas Logistics\n📞 +33 1 23 45 67 89 78 84\n✉️ sophie.lambert@hermas.com\n"
+        "content": "### Test the workflow with this email!\n\n#### How?\n1. Send this email to the Gmail box you set up in your credentials.\n2. Click on Test workflow\n\n### Email\n**Email Subject:** Inbound Order PO45231 – Expected Delivery on 2025-03-27\n\n**Email Body:** \nDear LogiGreen Team,\n\nPlease find below the details of the upcoming inbound order.\n\nPurchase Order: PO45231\nExpected Delivery Date: 27/03/2025\n\nOrder Lines:\n\nSKU: HERM-SHOE-001 — Qty: 120\n\nSKU: HERM-BAG-032 — Qty: 45\n\nSKU: HERM-WATCH-105 — Qty: 30\n\nSKU: HERM-SCARF-018 — Qty: 80\n\nLet us know if you need any additional details.\n\nBest regards,\nSophie Lambert\nAdmin Assistant – Hermas Logistics\n📞 +33 1 23 45 67 89 78 84\n✉️ REPLACE_ME@example.com\n"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."

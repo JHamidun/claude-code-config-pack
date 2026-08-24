@@ -64,7 +64,7 @@ with sync_playwright() as p:
 "claude-design": {
   "type": "stdio",
   "command": "python",
-  "args": ["${HOME}/.claude/skills/claude-design/scripts/claude_design_mcp.py"],
+  "args": ["/home/ИМЯ/.claude/skills/claude-design/scripts/claude_design_mcp.py"],
   "env": {
     "CLAUDE_DESIGN_COOKIES": "${CLAUDE_DESIGN_COOKIES}",
     "CLAUDE_DESIGN_ORG_UUID": "${CLAUDE_DESIGN_ORG_UUID}"
@@ -72,6 +72,11 @@ with sync_playwright() as p:
   "description": "Claude Design (claude.ai/design) — Connect-RPC client. Read/write projects, download ZIP, handoff."
 }
 ```
+
+Путь до скрипта — **абсолютный, целиком**: ни `~`, ни `${HOME}` в JSON никто не разворачивает,
+а `HOME` на Windows обычно не заведён вовсе (там `USERPROFILE`). Неразвёрнутый путь даёт
+`can't open file` в логе MCP, а в `/mcp` сервер выглядит просто отсутствующим.
+Windows-форма: `C:/Users/ИМЯ/.claude/skills/claude-design/scripts/claude_design_mcp.py`.
 
 ## Smoke test
 

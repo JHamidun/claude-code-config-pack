@@ -28,7 +28,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "jlMSfpSUYNYbMUpo",
-          "name": "mr.abizareyhan@gmail.com"
+          "name": "REPLACE_ME@example.com"
         }
       },
       "notesInFlow": true,
@@ -86,7 +86,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "jlMSfpSUYNYbMUpo",
-          "name": "mr.abizareyhan@gmail.com"
+          "name": "REPLACE_ME@example.com"
         }
       },
       "retryOnFail": false,
@@ -408,7 +408,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "jlMSfpSUYNYbMUpo",
-          "name": "mr.abizareyhan@gmail.com"
+          "name": "REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2.1,

@@ -172,7 +172,7 @@ fs.writeFileSync('combined.pdf', await merged.save());
 - `print-styles` — добавляет `@media print` стили для красивой печати
 - `pptx-editable-extractor` — альтернатива если нужен PPTX, не PDF
 - `verifier` — проверяй артефакт перед export
-- `slides` / `standalone-html` — обычно exportим эти
+- `slides` / `standalone-html` — обычно экспортируем эти
 
 ## Антипаттерны
 

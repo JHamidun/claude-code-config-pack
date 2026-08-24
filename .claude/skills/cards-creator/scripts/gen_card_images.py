@@ -24,12 +24,43 @@ import sys
 import io
 import os
 import base64
+from pathlib import Path
 import requests
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
-KEY = open(os.path.expanduser('~/.claude/.credentials.master.env'), encoding='utf-8') \
-    .read().split('OPENAI_API_KEY=')[1].split('\n')[0].strip()
+# Ключ — лениво и с громким отказом. Раньше здесь на верхнем уровне модуля стояло
+# open(...).read().split("OPENAI_API_KEY=")[1]: у того, кто не завёл ключ, простой
+# импорт файла падал с `IndexError: list index out of range` — по такому тексту
+# причину не найти.
+_KEY = None
+
+
+def get_key():
+    """OPENAI_API_KEY: окружение → ~/.claude/.credentials.master.env → внятный отказ."""
+    global _KEY
+    if _KEY is None:
+        key = os.environ.get("OPENAI_API_KEY", "").strip()
+        if not key:
+            cred = Path(os.environ.get("CLAUDE_CREDENTIALS_ENV")
+                        or os.path.expanduser("~/.claude/.credentials.master.env"))
+            if cred.exists():
+                for line in cred.read_text(encoding="utf-8", errors="replace").splitlines():
+                    line = line.strip()
+                    if line.startswith("OPENAI_API_KEY="):
+                        key = line.split("=", 1)[1].strip().strip('"').strip("'")
+                        break
+        if not key:
+            raise SystemExit(
+                "ОТКАЗ: не задан OPENAI_API_KEY.\n"
+                "  Где взять: platform.openai.com/api-keys\n"
+                "  Как задать: export OPENAI_API_KEY=... (или строка OPENAI_API_KEY=... "
+                "в ~/.claude/.credentials.master.env)"
+            )
+        _KEY = key
+    return _KEY
+
+
 MODEL = 'gpt-image-2-2026-04-21'
 
 STYLE = (" Editorial vector illustration in a modern tech-magazine style. "
@@ -50,13 +81,13 @@ def gen(name, scene, out_dir, size='1024x1536', quality='high', ref=None):
     if ref:
         with open(ref, 'rb') as f:
             r = requests.post('https://api.openai.com/v1/images/edits',
-                              headers={'Authorization': f'Bearer {KEY}'},
+                              headers={'Authorization': f'Bearer {get_key()}'},
                               files={'image[]': ('ref.jpg', f.read(), 'image/jpeg')},
                               data={'model': MODEL, 'prompt': prompt, 'size': size,
                                     'quality': quality, 'n': 1}, timeout=300)
     else:
         r = requests.post('https://api.openai.com/v1/images/generations',
-                          headers={'Authorization': f'Bearer {KEY}'},
+                          headers={'Authorization': f'Bearer {get_key()}'},
                           json={'model': MODEL, 'prompt': prompt, 'size': size,
                                 'quality': quality, 'n': 1}, timeout=300)
     if r.status_code != 200:

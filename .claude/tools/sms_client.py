@@ -19,6 +19,17 @@ Usage:
   python sms_client.py numbers
   python sms_client.py receive-webhook
 """
+# UTF-8 на выход. Консоль Windows по умолчанию cp1251/cp866/cp1252, и первый же
+# не-ASCII символ (кириллица, →, ✓) валит процесс UnicodeEncodeError — обычно на
+# --help, то есть ДО любой полезной работы. errors="replace" оставляет вывод
+# читаемым, если терминал всё же не UTF-8.
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 import argparse
 import base64
@@ -354,8 +365,10 @@ a public HTTPS endpoint that Twilio can POST to:
    params with AUTH_TOKEN, base64). Without validation anyone who knows the URL
    can inject fake inbound messages.
 
-Ready-made adapter with signature validation exists in the Hermes gateway
-(sms.py platform adapter) — reuse it instead of writing a new server.""")
+For the server part, reuse ~/.claude/tools/webhook_server.py (skill: webhook-receiver)
+instead of writing one from scratch. Note it does NOT know Twilio's scheme: run it with
+--provider none and validate X-Twilio-Signature yourself (twilio.request_validator.
+RequestValidator, or ~15 lines of hmac-sha1 following step 4).""")
 
 
 # ========== MAIN ==========

@@ -143,7 +143,7 @@
       "credentials": {
         "smtp": {
           "id": "hRjP3XbDiIQqvi7x",
-          "name": "SMTP info@n3witalia.com"
+          "name": "SMTP REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2.1,
@@ -169,7 +169,7 @@
       "credentials": {
         "smtp": {
           "id": "hRjP3XbDiIQqvi7x",
-          "name": "SMTP info@n3witalia.com"
+          "name": "SMTP REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2.1,
@@ -195,7 +195,7 @@
       "credentials": {
         "smtp": {
           "id": "hRjP3XbDiIQqvi7x",
-          "name": "SMTP info@n3witalia.com"
+          "name": "SMTP REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2.1,
@@ -221,7 +221,7 @@
       "credentials": {
         "smtp": {
           "id": "hRjP3XbDiIQqvi7x",
-          "name": "SMTP info@n3witalia.com"
+          "name": "SMTP REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2.1,
@@ -247,7 +247,7 @@
       "credentials": {
         "smtp": {
           "id": "hRjP3XbDiIQqvi7x",
-          "name": "SMTP info@n3witalia.com"
+          "name": "SMTP REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2.1,

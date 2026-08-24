@@ -28,9 +28,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv(os.path.expanduser("~/.claude/.credentials.master.env"))
-os.environ.pop("GEMINI_API_KEY", None)
-
 from google import genai
 from google.genai import types
 
@@ -55,7 +52,28 @@ SOFT_REPLACEMENTS = {
     "dark": "dim",
 }
 
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+# Клиент — лениво, при первом обращении. На верхнем уровне модуля ничего не делаем:
+# импорт не должен ни читать .credentials.master.env, ни менять окружение процесса,
+# ни строить SDK-клиент с чужим ключом.
+_client = None
+
+
+def get_client():
+    """genai-клиент по требованию. Нет ключа — громкий отказ, а не пустой результат."""
+    global _client
+    if _client is None:
+        load_dotenv(os.path.expanduser("~/.claude/.credentials.master.env"))
+        os.environ.pop("GEMINI_API_KEY", None)  # конфликт SDK: нужен GOOGLE_API_KEY
+        api_key = os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            raise SystemExit(
+                "ОТКАЗ: не задан GOOGLE_API_KEY.\n"
+                "  Где взять: aistudio.google.com/apikey\n"
+                "  Как задать: export GOOGLE_API_KEY=... (или строка GOOGLE_API_KEY=... "
+                "в ~/.claude/.credentials.master.env)"
+            )
+        _client = genai.Client(api_key=api_key)
+    return _client
 
 
 def soften(prompt: str) -> str:
@@ -82,7 +100,7 @@ def generate_one(slug: str, prompt: str, keyframe_path: Path, out_dir: Path,
     last_error = None
     for attempt in range(max_retries + 1):
         try:
-            op = client.models.generate_videos(
+            op = get_client().models.generate_videos(
                 model=model,
                 prompt=current,
                 image=image,
@@ -102,7 +120,7 @@ def generate_one(slug: str, prompt: str, keyframe_path: Path, out_dir: Path,
         while not op.done:
             time.sleep(10)
             try:
-                op = client.operations.get(op)
+                op = get_client().operations.get(op)
             except Exception as e:
                 print(f"[WARN] {slug} poll: {e}")
                 time.sleep(5)
@@ -125,7 +143,7 @@ def generate_one(slug: str, prompt: str, keyframe_path: Path, out_dir: Path,
 
         try:
             vid = videos[0]
-            client.files.download(file=vid.video)
+            get_client().files.download(file=vid.video)
             vid.video.save(str(out_path))
             dt = time.time() - t0
             size_mb = out_path.stat().st_size / 1_048_576

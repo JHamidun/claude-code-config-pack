@@ -35,7 +35,7 @@
       "credentials": {
         "imap": {
           "id": "k31W9oGddl9pMDy4",
-          "name": "IMAP info@n3witalia.com"
+          "name": "IMAP REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2,
@@ -100,7 +100,7 @@
       "credentials": {
         "smtp": {
           "id": "hRjP3XbDiIQqvi7x",
-          "name": "SMTP info@n3witalia.com"
+          "name": "SMTP REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2.1,
@@ -620,29 +620,29 @@
     "Email Trigger (IMAP)": [
       {
         "json": {
-          "to": "info@n3witalia.com",
+          "to": "REPLACE_ME@example.com",
           "date": "Wed, 5 Feb 2025 13:38:51 +0100",
-          "from": "n3w Italia <info@n3w.it>",
+          "from": "n3w Italia <REPLACE_ME@example.com>",
           "subject": "Richiesta di informazioni aziendali",
           "metadata": {
             "x-gm-gg": "ASbGncsq6D/oyHjmnpbG4gCUuC0rZNUR8WW4c+LmGMSdGJ1lHkRnKn7b3ngCdndp8NB\tkyDG3unga3kPebzAv1LO7DS6rDMHTWb8F7kZoLijJUGlAy6wqmfX/n4z2DH1uSxp7EsnIP9K9",
             "arc-seal": "i=1; s=arc-2022; d=mailchannels.net; t=1738759167; a=rsa-sha256;\tcv=none;\tb=Fdjl0FQlp2JxGTUy9B6U3UVZDgw2xRK0M9ge2H7QXFuX8Jhy2/eDktsWwyDOuAnebq+pZB\tZmt9/ZWM+VqpfvPc9j4+cpX1HnXkRnyV9HMp0KK1Srpkuc7iimLDX1puMEQP08mC8fBI9n\tYW9JAMVmy55D2xtcOgqQPe6HUsAM8vFfk0y7dv7aV/MMc4tW+lyBddf4BHedDPabmHtog9\tlI9qQB8f5o78KJoJHi9jUfoibHrw7ePCi/XNi1KzfLhkkcvaEhOIg82JgyaTOVuLX4TTpy\t713VrUVQKemdE8AJBgxrUyI8AM/XZDRxF92tDNRD5k+rFxVwZnNg1KzovEUFiw==",
-            "received": "from postfix-inbound-v2-3.inbound.mailchannels.net (inbound-egress-7.mailchannels.net [YOUR_PUBLIC_IP])\t(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)\t key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)\t(No client certificate requested)\tby pdx1-sub0-mail-mx201.dreamhost.com (Postfix) with ESMTPS id 4Yp0DP2WKvz6n5V\tfor <info@n3witalia.com>; Wed,  5 Feb 2025 04:39:33 -0800 (PST)",
-            "message-id": "<CACo-EPti-vvs3198N-KKhAMnm70ppkmGJPkUz3Y483wxAv_z3g@mail.gmail.com>",
+            "received": "from postfix-inbound-v2-3.inbound.mailchannels.net (inbound-egress-7.mailchannels.net [YOUR_PUBLIC_IP])\t(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)\t key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)\t(No client certificate requested)\tby pdx1-sub0-mail-mx201.dreamhost.com (Postfix) with ESMTPS id 4Yp0DP2WKvz6n5V\tfor <REPLACE_ME@example.com>; Wed,  5 Feb 2025 04:39:33 -0800 (PST)",
+            "message-id": "<REPLACE_ME@example.com>",
             "x-received": "by 2002:a05:6820:4ccb:b0:5fa:7e37:e42e with SMTP id 006d021491bc7-5fc479d7b7dmr1800193eaf.3.1738759166233; Wed, 05 Feb 2025 04:39:26 -0800 (PST)",
-            "return-path": "<info@n3w.it>",
+            "return-path": "<REPLACE_ME@example.com>",
             "content-type": "multipart/alternative; boundary=\"000000000000742c2a062d646a8f\"",
-            "delivered-to": "x21967472@pdx1-sub0-mail-mx201.dreamhost.com",
+            "delivered-to": "REPLACE_ME@example.com",
             "mime-version": "1.0",
-            "received-spf": "none (dmarc-service-75b56dd9b6-qz8tf: n3w.it does not provide an SPF record) client-ip=YOUR_PUBLIC_IP; envelope-from=info@n3w.it; helo=mail-oo1-f50.google.com;",
+            "received-spf": "none (dmarc-service-75b56dd9b6-qz8tf: n3w.it does not provide an SPF record) client-ip=YOUR_PUBLIC_IP; envelope-from=REPLACE_ME@example.com; helo=mail-oo1-f50.google.com;",
             "x-message-id": "YDPlyzG1R2Ky6usgMxqEJvf1",
             "x-gm-features": "AWEUYZl838uJdYn-9fUMGZvOqArNBONSW_VOkpWSkn1OYyR-HUtJL8UAJf2I33g",
-            "x-original-to": "info@n3witalia.com",
+            "x-original-to": "REPLACE_ME@example.com",
             "dkim-signature": "v=1; a=rsa-sha256; c=relaxed/relaxed;        d=n3w-it.20230601.gappssmtp.com; s=20230601; t=1738759166; x=1739363966; darn=n3witalia.com;        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject         :date:message-id:reply-to;        bh=2N6Y8wbn3yS/TpkJr2ZQZ3rEEFMq1gc4mSHvPNXonAg=;        b=eH1Dg2CwoWEuiif+VkxoPH8PcgiveMtY7urkbJAXXAEnpmkknbrSX7fLQ/pdfnV2YF         RaDEVEFBYeYde7pra1NhNmQXQfamV6dxTZSoNOVj0DtdOuSZVYC4BQMMQiIk7emERgdx         keDGBtYe2SifOK9QDK4deKKFPaswC7vATsPmBIAnN0MDahaOlsDPbm6aFSR39aK0qEpx         MTylUSCNFx52cTYegrpzMGCRTrCxcHwvpq0gGZo1ol0mlq5WC4sa260qsVEQq566N1wh         ICipbEhLdoX0nryrR67fJ+mq05kfg39gv++0p1aZl3/ahTdLTijPJswPs4phiTUj6fUH         Z3Fg==",
             "x-gm-message-state": "AOJu0YwNwfJ1yYtAsu71S9Oy+BVSQqPDS1EJCni+CLWs7aDwxkFYjxsP\tX0A935B/tHpnOhgJuR8W5FwuKnXSFMZ/xP8TFQz8zBVGw7DYInyaC0lKAxPSbBsLDIFyVj2LYki\tR4sfj6a9YJDaWKE/HYPwbidCOfOV/mZvqJ2ESL5uJgSL0W4FrMJKmondc",
             "x-google-smtp-source": "AGHT+IFsZ2bQKEg+M9ddjCSDXjf2Okz49s6pteuNGyJAkFpjMLwhH4mshXYItB/GVj4r8fUIiAiACRT+QDfae1MMj48=",
             "arc-message-signature": "i=1; a=rsa-sha256; c=relaxed/relaxed; d=mailchannels.net;\ts=arc-2022; t=1738759167;\th=from:from:reply-to:subject:subject:date:date:message-id:message-id:\t to:to:cc:mime-version:mime-version:content-type:content-type:\t dkim-signature; bh=2N6Y8wbn3yS/TpkJr2ZQZ3rEEFMq1gc4mSHvPNXonAg=;\tb=xytHIe/PVvcfCsSYAhcVE9VlTvmbJcVbkpq0oKRt4H0M1VOfZZlsg5ILysJvwLAzrRO7SZ\tDUrh4bw57jqMpcE+Sk5AAcbgBMc6x1G+Wf/2nqnjy0hRCyqtajuUwtFOS3kDM7TKvFOU+/\tMFChI5mg97hb/0loj8DWQ+J24bu4a6YixGDglupW3JYJoDsPWje2oA+mYyiI5tsnRXFEwe\tpku9KlXkPburbm/ASqKbbi1Y9bEOa2vlRwLL3fFontmC+3kgogunW2fjf4YJlFlSaAj/Xb\tZXQiytNgKOJtkBQMvb0AmYMLgBbYdOBVzUkOUTQCP3Wzbuu0zslvl7cS3HkFIg==",
-            "authentication-results": "inbound.mailchannels.net; spf=none smtp.mailfrom=info@n3w.it; dkim=temperror header.d=n3w-it.20230601.gappssmtp.com; dmarc=none; arc=none",
+            "authentication-results": "inbound.mailchannels.net; spf=none smtp.mailfrom=REPLACE_ME@example.com; dkim=temperror header.d=n3w-it.20230601.gappssmtp.com; dmarc=none; arc=none",
             "x-google-dkim-signature": "v=1; a=rsa-sha256; c=relaxed/relaxed;        d=1e100.net; s=20230601; t=1738759166; x=1739363966;        h=to:subject:message-id:date:from:mime-version:x-gm-message-state         :from:to:cc:subject:date:message-id:reply-to;        bh=2N6Y8wbn3yS/TpkJr2ZQZ3rEEFMq1gc4mSHvPNXonAg=;        b=h+GPFjY1knf3xPd+R62zD7JNhs37K+F1qx+6EA3codzYY+yTXSJyTuETXOGVW5r2VK         GOcntvGBdeijxte5RLmN6ZwLjvzePLlJLQVOnY8FICowUbwClQbDW1vXvucD+WaGpnBg         O95TH/8jKWRBU34EZ9kAY5EqtauKSt675WyhVCmmT864BPbVV335d0t9RgJwV86rM9zy         /miMTqpWeDJxDcX4thRlIk19GDc2Wh+5bqFD9kacOAur46RWdwqWaU7T8+5bQmbrKUg5         hqeO8ZDefVV6AyOjSnuLItHcHhlk1PaQ9uOumkRnFQfLUjS08bvLEnJyMA1YrEdo7mCi         tD2Q==",
             "arc-authentication-results": "i=1;\tinbound-rspamd-8684fd6f95-jsctp;\tnone"
           },

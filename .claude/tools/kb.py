@@ -31,7 +31,7 @@ from pathlib import Path
 from typing import Optional
 
 # --- Config ---
-# Пути ниже были прописаны машиной автора и при обезличивании стали литералами
+# Пути ниже раньше стояли литералами
 # "${HOME}/…" и "${WORKSPACE}/…". Python таких подстановок не делает (на Windows
 # переменной HOME обычно нет вовсе), поэтому база заводилась в каталоге со скобками
 # в имени, а транскрипты «не находились» — молча, без единой ошибки. Резолвим сами.
@@ -637,21 +637,30 @@ def ingest_outlook(days=90, force=False):
         print("[ERROR] EXCHANGE_PASSWORD not found in credentials")
         return
 
+    exchange_user = os.getenv("EXCHANGE_USER")
+    exchange_server = os.getenv("EXCHANGE_SERVER")
+    if not exchange_user or not exchange_server:
+        print("[ERROR] EXCHANGE_USER / EXCHANGE_SERVER not set in credentials")
+        print("        Add them to .credentials.master.env, e.g.:")
+        print("        EXCHANGE_USER=you@company.com")
+        print("        EXCHANGE_SERVER=mail.company.com")
+        return
+
     db = get_db()
     start = time.time()
 
     print(f"[INGEST] Outlook: connecting to Exchange...")
     try:
         credentials = Credentials(
-            username="your-work-email@company.com",
+            username=exchange_user,
             password=password,
         )
         config = Configuration(
-            server="mail.company.com",
+            server=exchange_server,
             credentials=credentials,
         )
         account = Account(
-            primary_smtp_address="your-work-email@company.com",
+            primary_smtp_address=exchange_user,
             config=config,
             autodiscover=False,
             access_type=DELEGATE,

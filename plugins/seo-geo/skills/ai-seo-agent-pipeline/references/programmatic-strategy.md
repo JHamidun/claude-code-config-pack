@@ -37,7 +37,7 @@
 | HubSpot AEO-переписка | **+60% citation share, +35pp brand awareness** | — |
 | GEO ≠ SEO | только **12% URL** AI-цитат пересекаются с топ-10 Google | — |
 
-> Эти цифры применять при оптимизации контента под AEO. Сама механика AEO (Нейро/Alice/(regional LLM B)/
+> Эти цифры применять при оптимизации контента под AEO. Сама механика AEO (Нейро/Alice/GigaChat/
 > ChatGPT/Perplexity) детально — в `seo-machine-ru` → `references/aeo-geo.md`.
 
 ---

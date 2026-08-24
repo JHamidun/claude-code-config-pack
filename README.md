@@ -1,6 +1,9 @@
 # Claude Code Configuration Pack
 
-> Depersonalised Claude Code setup. Drop into `~/.claude/`, fill in API keys, run.
+> Depersonalised Claude Code setup. Run the installer (`./install.ps1` / `./install.sh`), then run
+> Claude Code. Copying the folder by hand is **not** equivalent: the installer also places the
+> navigation hub at `~/.claude/CLAUDE.md`, turns `${HOME}` in `settings.json` into a real path, and
+> verifies both afterwards. API keys are optional — the pack works on a Claude subscription alone.
 
 ## Три способа установки
 
@@ -150,12 +153,26 @@ chmod +x install.sh uninstall.sh
    alone, link intact (`robocopy` and `rsync` skip it; only the plain-`cp` fallback used when
    `rsync` is absent rewrites everything). The run reports only links it actually split, and
    `--dry-run --repair` / `-DryRun -Repair` warns about the candidates beforehand.
-5. **Creates `~/CLAUDE.md` only if you don't have one.** An existing one is never overwritten,
-   not even with `--repair`.
-6. **Seeds `~/.claude/.credentials.master.env` from the template only if it does not exist.**
-7. Records everything it placed in `~/.claude/.ccpack-manifest.txt` (that is what makes a clean
+5. **Creates `~/.claude/CLAUDE.md` only if you don't have one.** An existing one is never
+   overwritten, not even with `--repair`. This file is the navigation hub — Claude Code loads it
+   as *user memory*, which is the only memory read no matter where your project lives. (`~/CLAUDE.md`
+   is *project* memory: it is picked up only while you work inside your home directory, so on
+   Windows it is never read at all. Earlier versions of this installer put the hub there.)
+6. **Rewrites `${HOME}` in `~/.claude/settings.json` into an absolute path** — hook, status-line
+   and MCP commands. `${HOME}` is expanded by three different mechanisms (the shell for hooks, the
+   CLI itself for MCP args) and none of them works on Windows, where the variable does not exist.
+7. **Verifies the result and says so out loud** — hub present and readable, no `${HOME}` left in
+   `settings.json`, every file it points at actually on disk, `node` on PATH. A failed check
+   prints `[X]` lines and exits non-zero.
+8. **Seeds `~/.claude/.credentials.master.env` from
+   `.claude/templates/.credentials.master.env.example` — only if it does not exist.** That
+   template is the one complete catalogue of variable names, every one of them commented out.
+   If the template is missing, the installer says so and fails the check rather than leaving
+   you with no reachable list of key names.
+9. Records everything it placed in `~/.claude/.ccpack-manifest.txt` (that is what makes a clean
    uninstall possible).
-8. Optionally installs Python deps — skip with `--skip-deps` / `-SkipDeps`.
+10. Installs Python deps and finishes the runtime (`setup_runtime.py`). `--skip-deps` /
+    `-SkipDeps` turns off **both**, not just pip — see the flag table below.
 
 After installation: launch Claude Code in any project. Plugins auto-download (~30-60s).
 
@@ -170,7 +187,7 @@ After installation: launch Claude Code in any project. Plugins auto-download (~3
 | `todos/`, `shell-snapshots/` | session runtime |
 | `chats.db*` | chat database (incl. `-wal`/`-shm`/`-journal`) |
 | `tg_session.session*` | Telegram client authorization |
-| `~/CLAUDE.md` | your personal instructions |
+| `~/.claude/CLAUDE.md` | the navigation hub — placed only when missing, because you edit it |
 | `rules/user-profile.md` | your profile — name, email, phone. The pack ships a blank template and asks you to fill it in, so it is placed only when missing and never overwritten afterwards |
 
 ### `--repair` / `-Repair`
@@ -187,7 +204,7 @@ without `--repair`.
 |------|-----|
 | `--dry-run` / `-DryRun` | print the plan, change nothing |
 | `--repair` / `-Repair` | refresh our base files (see above) |
-| `--skip-deps` / `-SkipDeps` | don't install Python dependencies |
+| `--skip-deps` / `-SkipDeps` | skip **both** dependency steps: `pip install -r requirements.txt` *and* the runtime finish (`setup_runtime.py` — Playwright browser, plugin marketplaces, `node_modules` for `dev-browser`/`gstack`). Files are still copied; the pack installs but stays half-armed until you run `python ~/.claude/scripts/setup_runtime.py` yourself |
 | `--no-backup` / `-NoBackup` | skip the backup copy (not recommended) |
 
 ## Uninstall / rollback
@@ -207,7 +224,7 @@ It removes a file only if **all** of these hold:
 1. the file is listed in `~/.claude/.ccpack-manifest.txt` — i.e. the installer actually created
    it. A file that already existed under a name the pack also uses is *not* ours and is never
    listed, so it is never removed;
-2. it lives inside `~/.claude` (or it is the `~/CLAUDE.md` we created);
+2. it lives inside `~/.claude` (or it is a `~/CLAUDE.md` left by an older version of the pack);
 3. neither the file **nor any directory above it** is a symlink/junction. If you moved, say,
    `~/.claude/skills` into your own repo and linked it back, nothing under that link is deleted —
    and the uninstaller names every link it skipped for that reason;
@@ -248,11 +265,27 @@ you to enable billing or buy an API plan.
 
 | File | What |
 |------|------|
-| `~/.claude/.credentials.master.env` | Nothing by default. Optional paid features only — uncomment a key if you want that feature |
+| `~/.claude/.credentials.master.env` | Nothing by default. Optional paid features only — uncomment a key if you want that feature. The installer seeds it from `templates/.credentials.master.env.example`, which is the one complete catalogue of variable names |
 | `~/.claude/rules/user-profile.md` | Your name, email, hardware specs |
 | `~/.claude/config/projects-registry.md` | Your project catalog |
 | `~/.claude/config/server-primary.md` | Server IP / SSH config (optional) |
-| `~/CLAUDE.md` | Domain, server IPs, quick links |
+| `~/.claude/CLAUDE.md` | Navigation hub: domain, server IPs, quick links |
+
+Three more files decide whether the pack sounds like **you** rather than like a generic
+"AI expert". They ship as templates in `~/.claude/templates/` and are **not** filled in by
+the installer — copy each one level up and answer the questions inside:
+
+| Template → copy to | What it holds | Who reads it |
+|---|---|---|
+| `templates/author-profile.md` → `~/.claude/author-profile.md` | who is speaking: role, platforms, what you never talk about | every skill that writes in the first person (posts, articles, outreach, comments, PR pitches) |
+| `templates/voice-sample.md` → `~/.claude/voice-sample.md` | 2–3 of your own texts in full — describing a tone in words does not work, the paragraphs do | the same, plus `de-ai-ify` |
+| `templates/business-context.md` → `~/.claude/business-context.md` | product, ICP, prices, funnel, CRM — one place, so the price on the landing page cannot disagree with the price in the email | ~30 marketing skills, which read it first |
+
+Until they are filled in, those skills either keep asking you, or say outright that the data
+is missing. Start with the keys; voice and business context matter only once you get to
+content and marketing. The same map, with more detail, is in
+[`.claude/README.md`](.claude/README.md) — that file also documents what actually sits in
+each directory of `~/.claude`.
 
 Everything else (rules, skills, plugins, agents, commands, hooks, MCP servers) works out of the
 box with no keys at all — **provided the installer finished its last step**.
@@ -273,23 +306,53 @@ python ~/.claude/scripts/setup_runtime.py --check   # what is missing
 python ~/.claude/scripts/setup_runtime.py           # fix it (idempotent)
 ```
 
+### Keeping your transcripts
+
+Claude Code prunes old session transcripts on its own schedule. If you want them kept, there is
+an incremental backup script — it copies `~/.claude/projects` and the `chats.db` search index
+into `~/claude-transcripts-backup` and never deletes anything from that copy:
+
+```bash
+bash "$HOME/.claude/scripts/backup-transcripts.sh"          # macOS / Linux
+```
+
+```powershell
+& "$env:USERPROFILE\.claude\scripts\backup-transcripts.cmd"  # Windows
+```
+
+Run it by hand, or from cron / Task Scheduler (both files carry the one-line schedule recipe in
+their header). Either script prints what failed and exits non-zero, so a backup that copied
+nothing cannot look like a successful one.
+
 ## Inventory
 
-- 287 skills (`~/.claude/skills/`) — 77 with executable code, 210 prompt-based
-- 75 agents (`~/.claude/agents/`) — 58 top-level + 17 workers in `health/`, `meta/`, `testing/`
-- 156 slash commands (`~/.claude/commands/`) — 99 top-level + 57 in `gsd/`
-- 19 auto-loaded rules (`~/.claude/rules/`)
-- 33 plugins (all enabled by default — see `enabledPlugins` in `settings.json`)
-- 15 MCP servers in `settings.json`, **3 enabled by default**: `graph-memory`, `filesystem`
-  and `playwright-live1`.
-  The other 12 are `disabled: true` on purpose — some need your own keys and accounts, some
-  point at infrastructure only the author has, and `playwright-live2..10` are parallel browser
-  profiles that each add ~7 s to session startup.
+Counted from the tree, not from memory. To recount at any moment (and to catch this list
+drifting again):
+
+```bash
+CLAUDE_CONFIG_DIR="$PWD/.claude" python .claude/scripts/config_lint.py | head -20
+```
+
+- 314 skills (`~/.claude/skills/`) — 85 ship executable code, 229 are prompt-only
+- 74 agents (`~/.claude/agents/`) — 57 top-level + 17 workers in `health/`, `meta/`, `testing/`
+- 155 slash commands (`~/.claude/commands/`) — 98 top-level + 57 in `gsd/`
+- 18 auto-loaded rules (`~/.claude/rules/`) + a `README.md` cataloguing them
+- 33 plugins of this pack (`.claude-plugin/marketplace.json`; a 34th entry,
+  `video-media-subdir`, is a reference example of the `git-subdir` source format, not a
+  separate plugin). Separately, `enabledPlugins` in `settings.json` lists 33 **third-party**
+  plugins from other marketplaces — 29 on, 4 off (`linear`, `notion`, `telegram`,
+  `pdf-viewer`, which need accounts you may not have).
+- 6 MCP servers in `settings.json`, **3 enabled**: `graph-memory`, `filesystem`,
+  `playwright-live1`. The other 3 (`runway`, `pageindex`, `miro`) are `disabled: true` because
+  they need your own keys and accounts.
   Enable one by editing `mcpServers` in `~/.claude/settings.json` (that is the file Claude Code
   actually reads). `~/.claude/mcp.json` is a **reference sheet of 17 ready-made blocks**, not
-  live config — copy a block from there into `settings.json`; the file explains this at its top.
-- 7 hook scripts (`~/.claude/hooks/`): 2 guards (`bash-guard`, `security-guard`), 4 GSD, 1 Stop-beep
-- 25 generic Python tools (`~/.claude/tools/`)
+  live config — copy a block from there into `settings.json`. JSON has no comments, so the
+  sheet says this in a `"_readme"` field at the top of the file.
+- 8 hook scripts (`~/.claude/hooks/`), of which **`guard.js` is the one actually wired** —
+  see the next section. Plus `bash-guard.js` and `security-guard.js` kept intact as the
+  sources it was merged from, 4 GSD scripts and 1 Stop-beep.
+- 28 generic Python tools (`~/.claude/tools/`)
 
 ## Permission model — read this before installing
 
@@ -299,17 +362,47 @@ work, and confirming every step defeats it.
 
 Protection does not disappear, it moves:
 
-- **`hooks/bash-guard.js`** inspects every Bash and PowerShell call *before* it runs and exits
-  with code 2 on 43 destructive patterns — `rm -rf` of roots, `DROP DATABASE/TABLE`, `mkfs`,
-  `dd`, force-push to main, `docker rm -f`, `docker compose down -v`, `docker system prune`,
+- **`hooks/guard.js`** — the single `PreToolUse` hook wired in `settings.json`, and the only
+  one. It inspects every Bash and PowerShell call *before* it runs and exits with code 2 on
+  43 destructive patterns — `rm -rf` of roots, `DROP DATABASE/TABLE`, `mkfs`, `dd`,
+  force-push to main, `docker rm -f`, `docker compose down -v`, `docker system prune`,
   `pm2 delete`, `systemctl stop`, `kubectl delete`. It also unwraps `ssh host "…"`,
-  `bash -c "…"` and base64-encoded PowerShell, so hiding a command inside quotes does not help.
-- **`hooks/security-guard.js`** does the same for Write/Edit.
+  `bash -c "…"` and base64-encoded PowerShell, so hiding a command inside quotes does not
+  help. On `Write`/`Edit`/`MultiEdit` it applies the second rule set instead (sensitive paths,
+  `eval()`, `innerHTML=` and friends). Fail-open on any internal error; kill switch
+  `CC_HOOKS_OFF=1` on the Bash branch.
+- **`hooks/bash-guard.js` and `hooks/security-guard.js`** are the two files `guard.js` was
+  merged from, kept verbatim so the merge stays diffable and revertible. They are **not**
+  registered in `settings.json` — running two node processes per tool call cost ~150 ms while
+  the checks themselves take ~3 ms. If you look for the wiring, look for `guard.js`.
+  Tests: `node hooks/bash-guard.test.mjs --guard guard.js` and `node hooks/guard-writeedit.test.mjs`.
 - **`permissions.deny`** stays as the final backstop.
 
-If you would rather be asked, set `permissions.defaultMode` to `"default"` in
-`~/.claude/settings.json` and drop `skipDangerousModePermissionPrompt`. Nothing else depends
-on the bypass mode.
+### If you would rather be asked, changing the mode is not enough
+
+`permissions.allow` is honoured in **every** mode: whatever is listed there is pre-approved
+and never raises a prompt. This config's allow list is deliberately wide — it opens with
+
+```json
+"allow": ["Bash(*)", "PowerShell(*)", "Write(*)", "Edit(*)", "MultiEdit(*)",
+          "Bash(rm *)", "Bash(mv *)", "Bash(chmod *)", "Bash(chown *)",
+          "Bash(curl *)", "Bash(wget *)", ...]
+```
+
+so flipping `defaultMode` to `"default"` on its own buys you nothing: `Bash(*)` already
+matches every command, `rm` included, and you will still not be asked. To actually get
+prompts you have to do both:
+
+1. set `permissions.defaultMode` to `"default"` and drop `skipDangerousModePermissionPrompt`;
+2. **delete the blanket and destructive entries** from `permissions.allow` — at minimum
+   `Bash(*)`, `PowerShell(*)`, `Write(*)`, `Edit(*)`, `MultiEdit(*)`, `Bash(rm *)`,
+   `Bash(mv *)`, `Bash(chmod *)`, `Bash(chown *)`, `Bash(curl *)`, `Bash(wget *)`.
+   What is left (`Bash(git *)`, `Bash(python *)`, the `mcp__*` entries and so on) is narrow
+   enough to keep: those are the calls you would otherwise confirm dozens of times a day.
+
+Keep `permissions.deny` as it is either way — it wins over `allow` and over both modes.
+
+Nothing else in the config depends on the bypass mode.
 
 ## Other defaults
 
@@ -324,8 +417,28 @@ on the bypass mode.
 - Claude Code CLI: `npm install -g @anthropic-ai/claude-code`
 - Claude Max subscription (recommended)
 - Node.js 18+
-- Python 3.10+ (optional, for tools)
+- Python 3.10+ — **not optional**: ~46 skills and every CLI in `~/.claude/tools/` are
+  Python. The interpreter is named differently per OS: Windows installers give you
+  `python` only (`python3` there is a Microsoft Store stub that opens the Store instead
+  of running), macOS 12.3+ and bare Ubuntu give you `python3` only. Use whichever you
+  have; `setup_runtime.py --check` prints which one and how to get the other name.
 - Git
+- **Git Bash — Windows only, and not optional in practice.** Skill bodies carry ~1000 lines
+  of POSIX shell (`2>/dev/null`, `$(...)`, `/tmp/...`, backgrounding with `&`, `nohup`);
+  `cmd.exe` and PowerShell do not run those. It ships with Git for Windows
+  (`winget install Git.Git`). Without it the failure shows up mid-skill, not at install
+  time, and reads like a broken skill rather than a missing shell.
+
+Beyond that, individual skills reach for external programs that ship with **no** OS —
+`bun` (gstack builds its `browse` binary with `bun build --compile`; npm has no
+equivalent and the binary is not shipped), `jq`, `uv`, `pnpm`, `unzip`, `ffmpeg`,
+LibreOffice, poppler. None of them block install; each one takes specific skills down
+with it, and the failure surfaces mid-skill rather than at setup time.
+
+Full list with per-OS install commands: [PREREQUISITES.md](PREREQUISITES.md).
+`python ~/.claude/scripts/setup_runtime.py --check` (or `python3` — whichever name your
+OS has, see above) reports what is missing on your machine, which skills die without it,
+and the install command for your platform.
 
 ## Security
 
@@ -372,7 +485,7 @@ What is checked:
   `.claude/rules/dont-do.md`, `.claude/config/rules-ref/onboarding.md`;
 - the installers' closing lines (`install.sh`, `install.ps1`) — they are the first thing a
   new user reads, and "впиши свои ключи" there undoes every sentence above it;
-- that no secret-ish variable ships uncommented in `.credentials.template.env`
+- that no secret-ish variable ships uncommented in `.claude/templates/.credentials.master.env.example`
   (auto-repaired; a pasted real value is dropped, not preserved as a comment).
 
 Why the template must stay commented: `OPENAI_API_KEY=your_openai_api_key` is a *non-empty*
@@ -384,4 +497,28 @@ placeholder upstream, and the user gets a bare `401` instead of "this feature ne
 
 ## License
 
-MIT.
+**MIT — for everything written for this pack. Not everything here was.**
+Read [`LICENSE`](LICENSE): it has an exceptions section, and the exceptions are
+real, not boilerplate.
+
+The short version:
+
+- Roughly two dozen skills came from other people's repositories. Each keeps the
+  upstream licence text next to its code (`LICENSE`, `LICENSE.txt` or
+  `LICENSE-upstream.txt` inside the skill folder) plus an `UPSTREAM.md` or
+  `NOTICE` saying where it came from and what was changed. Those files are not
+  decoration — MIT and Apache-2.0 both require them to travel with the copy, so
+  keep them if you redistribute.
+- Anthropic's document skills (`docx`, `pdf`, `pptx`, `xlsx`) are **not** in this
+  pack. Their licence forbids distribution to third parties, and the upstream
+  repository says the same in plain words. Skills with those four names exist
+  here, but they are written from scratch for this pack — recipes over `pypdf`,
+  `openpyxl`, `python-pptx`, `python-docx`. See
+  [`_dropped-2026-08-22/office-skills-anthropic-proprietary/README.md`](_dropped-2026-08-22/office-skills-anthropic-proprietary/README.md).
+- Remotion (used by `video-shotcraft` and the overlay recipes) is BUSL and is
+  **not** vendored — `npm install` fetches it, so you get the licence directly.
+  Free below $1M ARR; the threshold is measured against *your* revenue.
+- Every plugin folder under `plugins/` carries a generated `THIRD-PARTY.md`
+  listing exactly which skill inside it is under which licence, and its
+  `plugin.json` `license` field is an SPDX expression computed from that — not a
+  blanket "MIT".

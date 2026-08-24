@@ -5,14 +5,14 @@ metadata:
   version: 1.1.0
   updated: 2026-05-29
   ported_from: coreyhaines31/marketingskills (sales-enablement)
-  reuses: yourname-marketing-context, manus-slides, pptx, crm, draft-outreach, revops-ru, competitive-intelligence, zoom
+  reuses: manus-slides, pptx, draft-outreach, revops-ru, competitive-intelligence, zoom
 ---
 
 # Sales Enablement (RU)
 
 Создание sales-коллатерала, который реально используют продавцы: деки, one-pager'ы, отработка возражений, демо-скрипты, playbook. Порт `sales-enablement` под российский B2B — продажа **AI-воркшопов / AI-консалтинга / B2B-когорт обучающей программы** корп-ЛПР.
 
-**Перед стартом** читай контекст продукта: `yourname-marketing-context` → `references/business.md` (value prop, дифференциаторы, персоны, соцпруф) + `references/offerings.md` (форматы воркшопа/консалтинга/когорт, CTA = бесплатная консультация) + `references/funnel.md`. Конкурентные данные не выдумывай — бери из `competitive-intelligence` / `competitive-analysis`.
+**Перед стартом** читай `~/.claude/business-context.md` — разделы «Продукт» (value prop, отличия), «ICP» (персоны, боль, триггер), «Цены» и «Воронка». Файла нет — заведи из `~/.claude/templates/business-context.md`; без него материалы получатся про абстрактную компанию. Конкурентные данные не выдумывай — бери из `competitive-intelligence` / `competitive-analysis`.
 
 ## Принципы
 
@@ -37,13 +37,13 @@ metadata:
 | Актив | Что внутри | Исполнитель |
 |---|---|---|
 | Питч-дек 10-12 слайдов | story arc problem→proof→next steps | `manus-slides` / `pptx` (рендер); каркас тут |
-| One-pager / leave-behind | проблема→решение→3 дифференциатора→пруф→CTA | `pptx` / `docx` / `pdf-generation` |
+| One-pager / leave-behind | проблема→решение→3 дифференциатора→пруф→CTA | `pptx` / `pdf` (для .docx — `python-docx`, пример в `seo-machine-ru/scripts/build_report_docx.py`) |
 | Возражения | таблица + talk-track | этот скилл (`references/objection-library-ru.md`) |
 | Демо-скрипт / talk-track | бесплатная консультация / презентация воркшопа / эксек | этот скилл (`references/demo-scripts-ru.md`) |
 | Battle-card vs альтернативы | как выигрываем (vs «обучим сами» / вебинар / конкурент-тренер) | `competitive-intelligence` (данные) + каркас тут |
-| CRM-учёт стадий/материалов | привязка к сделке | `crm` / academy-CRM `yourname-sales-postgres` |
+| CRM-учёт стадий/материалов | привязка к сделке | твоя CRM / продуктовая БД (раздел «Учёт и аналитика» в `business-context.md`) |
 
-> Этот скилл = **каркас, копирайт, фреймворки на русском**. Слайды как файлы рендерит `manus-slides`/`pptx`, конкурентные данные даёт `competitive-intelligence`, сделки/материалы хранит `crm` / academy-CRM.
+> Этот скилл = **каркас, копирайт, фреймворки на русском**. Слайды как файлы рендерит `manus-slides`/`pptx`, конкурентные данные даёт `competitive-intelligence`, сделки и материалы хранятся в твоей CRM.
 
 ## Питч-дек: каркас 10-12 слайдов
 

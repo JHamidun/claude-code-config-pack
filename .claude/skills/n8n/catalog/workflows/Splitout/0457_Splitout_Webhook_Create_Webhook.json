@@ -706,7 +706,7 @@
           }
         },
         "respondWith": "text",
-        "responseBody": "<doctype html>\n\t<html lang=\"en\">\n\t\t<head>\n\t\t\t<meta charset=\"utf-8\" />\n\t\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n\t\t\t<title>Chat</title>\n\t\t\t<link\n\t\t\t\thref=\"{{ $env.WEBHOOK_URL }}\"\n\t\t\t\trel=\"stylesheet\"\n\t\t\t/>\n\t\t\t<link href=\"{{ $env.WEBHOOK_URL }}\" rel=\"stylesheet\" />\n\t\t</head>\n\t\t<body>\n\t\t\t<script type=\"module\">\n\t\t\t\timport { createChat } from '{{ $env.WEBHOOK_URL }}';\n\n\t\t\t\t(async function () {\n\t\t\t\t\tcreateChat({\n\t\t\t\t\t\tmode: 'window',\n\t\t\t\t\t\twebhookUrl: '{{ $env.WEBHOOK_URL }}',\n\t\t\t\t\t\tloadPreviousSession: false,\n\t\t\t\t\t\tmetadata: {\n\t\t\t\t\t\t\temail: '352b16c74f73265441c55c37c9c22b04:4a8e614143c9cd31cc7e2389380943f3', // james@brown.com encrypted\n\t\t\t\t\t\t},\n\t\t\t\t\t\twebhookConfig: {\n\t\t\t\t\t\t\theaders: {\n\t\t\t\t\t\t\t\t'Content-Type': 'application/json',\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t});\n\t\t\t\t})();\n\t\t\t</script>\n\n\t\t\t<h1>WooCommerce Agent Example page</h1>\n\t\t\tClick on the bubble in the lower right corner to open the chat.\n\n\t\t</body>\n\t</html>\n</doctype>"
+        "responseBody": "<doctype html>\n\t<html lang=\"en\">\n\t\t<head>\n\t\t\t<meta charset=\"utf-8\" />\n\t\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n\t\t\t<title>Chat</title>\n\t\t\t<link\n\t\t\t\thref=\"{{ $env.WEBHOOK_URL }}\"\n\t\t\t\trel=\"stylesheet\"\n\t\t\t/>\n\t\t\t<link href=\"{{ $env.WEBHOOK_URL }}\" rel=\"stylesheet\" />\n\t\t</head>\n\t\t<body>\n\t\t\t<script type=\"module\">\n\t\t\t\timport { createChat } from '{{ $env.WEBHOOK_URL }}';\n\n\t\t\t\t(async function () {\n\t\t\t\t\tcreateChat({\n\t\t\t\t\t\tmode: 'window',\n\t\t\t\t\t\twebhookUrl: '{{ $env.WEBHOOK_URL }}',\n\t\t\t\t\t\tloadPreviousSession: false,\n\t\t\t\t\t\tmetadata: {\n\t\t\t\t\t\t\temail: '352b16c74f73265441c55c37c9c22b04:4a8e614143c9cd31cc7e2389380943f3', // REPLACE_ME@example.com encrypted\n\t\t\t\t\t\t},\n\t\t\t\t\t\twebhookConfig: {\n\t\t\t\t\t\t\theaders: {\n\t\t\t\t\t\t\t\t'Content-Type': 'application/json',\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t});\n\t\t\t\t})();\n\t\t\t</script>\n\n\t\t\t<h1>WooCommerce Agent Example page</h1>\n\t\t\tClick on the bubble in the lower right corner to open the chat.\n\n\t\t</body>\n\t</html>\n</doctype>"
       },
       "typeVersion": 1,
       "notes": "This respondToWebhook node performs automated tasks as part of the workflow."
@@ -751,7 +751,7 @@
         -840
       ],
       "parameters": {
-        "jsCode": "const crypto = require('crypto');\n\nconst password = 'a random password';\nconst email = 'james@brown.com';\n\n\nfunction encrypt(text, password) {\n  // Generate a secure random initialization vector\n  const iv = crypto.randomBytes(16);\n\n  // Create a key from the password\n  const key = crypto.scryptSync(password, 'salt', 32);\n\n  // Create a cipher\n  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);\n\n  // Encrypt the text\n  let encrypted = cipher.update(text, 'utf8', 'hex');\n  encrypted += cipher.final('hex');\n\n  // Return the IV and the encrypted text\n  return `${iv.toString('hex')}:${encrypted}`;\n}\n\nreturn [\n  {\n    json: {\n      email: encrypt(email, password),\n    }\n  }\n];"
+        "jsCode": "const crypto = require('crypto');\n\nconst password = 'a random password';\nconst email = 'REPLACE_ME@example.com';\n\n\nfunction encrypt(text, password) {\n  // Generate a secure random initialization vector\n  const iv = crypto.randomBytes(16);\n\n  // Create a key from the password\n  const key = crypto.scryptSync(password, 'salt', 32);\n\n  // Create a cipher\n  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);\n\n  // Encrypt the text\n  let encrypted = cipher.update(text, 'utf8', 'hex');\n  encrypted += cipher.final('hex');\n\n  // Return the IV and the encrypted text\n  return `${iv.toString('hex')}:${encrypted}`;\n}\n\nreturn [\n  {\n    json: {\n      email: encrypt(email, password),\n    }\n  }\n];"
       },
       "typeVersion": 2,
       "notes": "This code node performs automated tasks as part of the workflow."
@@ -827,7 +827,7 @@
               "id": "c591fa49-31b3-46e7-8108-2d3ad1fc895b",
               "name": "metadata.email",
               "type": "string",
-              "value": "james@brown.com"
+              "value": "REPLACE_ME@example.com"
             }
           ]
         },

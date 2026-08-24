@@ -125,27 +125,27 @@
   "pinData": {
     "Generate random data": [
       {
-        "email": "Megan.Lueilwitz@yahoo.com",
+        "email": "REPLACE_ME@example.com",
         "confirmed": true
       },
       {
-        "email": "Tommie70@yahoo.com",
+        "email": "REPLACE_ME@example.com",
         "confirmed": true
       },
       {
-        "email": "Joanna.Fisher@yahoo.com",
+        "email": "REPLACE_ME@example.com",
         "confirmed": false
       },
       {
-        "email": "Terrence.Hettinger@yahoo.com",
+        "email": "REPLACE_ME@example.com",
         "confirmed": false
       },
       {
-        "email": "Eddie.Bradtke@hotmail.com",
+        "email": "REPLACE_ME@example.com",
         "confirmed": false
       },
       {
-        "email": "Marcus.Considine64@yahoo.com",
+        "email": "REPLACE_ME@example.com",
         "confirmed": true
       },
       {
@@ -153,15 +153,15 @@
         "confirmed": false
       },
       {
-        "email": "Dominick.Corwin@yahoo.com",
+        "email": "REPLACE_ME@example.com",
         "confirmed": true
       },
       {
-        "email": "Ellen54@yahoo.com",
+        "email": "REPLACE_ME@example.com",
         "confirmed": true
       },
       {
-        "email": "Angel.Hartmann40@hotmail.com",
+        "email": "REPLACE_ME@example.com",
         "confirmed": false
       }
     ]

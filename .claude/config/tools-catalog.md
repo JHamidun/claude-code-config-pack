@@ -21,7 +21,6 @@
 
 ## scripts/
 
-- `build_digests_from_db.py` — build_digests_from_db.py — дайджесты сессий ИЗ chats.db (а не локальных .jsonl).
 - `config_links.py` — Проверка связности конфига: ведут ли ссылки туда, где что-то есть.
 - `config_lint.py` — config_lint.py - Linter for the Claude Code config (Windows 11).
 - `memory_fit.py` — Удержать индекс памяти в пределах, за которыми он молча обрезается.
@@ -36,4 +35,4 @@
 > потому что смотрела туда же, откуда каталог и собирали. Сверить: 
 > `CLAUDE_CONFIG_DIR=<пак>/.claude python .claude/scripts/config_links.py`.
 
-Ещё в паке есть (добавь описание, если пользуешься): `agent_api_server.py`, `email_client.py`, `fix_student_config.py`, `gdrive_client.py`, `gdrive_upload.py`, `ha_client.py`, `kb.py`, `llms_txt.py`, `mascot_hooks_fix.py`, `memory_brief.py`, `miro_client.py`, `osint_client.py`, `perplexity_helper.py`, `places_search.py`, `setup_runtime.py`, `sms_client.py`, `wa_client.py`, `webhook_server.py`.
+Ещё в паке есть (добавь описание, если пользуешься): `agent_api_server.py`, `email_client.py`, `fix_student_config.py`, `gdrive_client.py`, `gdrive_upload.py`, `ha_client.py`, `kb.py`, `llms_txt.py`, `mascot_hooks_fix.py`, `memory_brief.py`, `miro_client.py`, `osint_client.py`, `perplexity_helper.py`, `places_search.py`, `setup_runtime.py`, `sms_client.py`, `webhook_server.py`.

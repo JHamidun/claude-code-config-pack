@@ -30,7 +30,7 @@ PALETTE LOCK (3 hex из 1-го кадра) · ATMOSPHERE LOCK (3-5 слов) ·
 
 ## Звук
 Procedural BGM чистым ffmpeg (локальная подложка под превью) → `video-editor/references/procedural-bgm.md`.
-Настоящий трек → suno / elevenlabs Music / Lyria (см. `audio.md`).
+Настоящий трек → elevenlabs Music / Lyria / локальный ace-step (см. `audio.md`).
 
 ## Провайдер
 Seedance 2.0 доступен и через bundled `engines/higgsfield/bin/hf.exe` — **фолбэк** к Runway-JWT, когда Runway в throttle

@@ -1,6 +1,6 @@
 # Messaging & Posting
 
-> Publish to Telegram channels via bot, message over WhatsApp, send SMS (Twilio), work with any IMAP/SMTP mailbox.
+> Publish to Telegram channels via bot, send SMS (Twilio), work with any IMAP/SMTP mailbox.
 
 Part of the **[hamidun marketplace](../../README.md)**.
 
@@ -11,7 +11,6 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `email-imap` | Generic IMAP/SMTP CLI for any mailbox — read, search, send, and download attachments with no external dependencies. |
 | `sms-twilio` | Send SMS through the Twilio REST API — single and bulk sends with dry-run guards, delivery status, history, balance. |
 | `tg-bot-publish` | Publish and manage in Telegram through a bot (Bot API) — channel posts, rich layout, broadcasts, inline buttons. |
-| `whatsapp-client` | CLI for a personal WhatsApp account over a local Baileys bridge — read chats and history, search, send text and media, groups. |
 
 ## Install
 

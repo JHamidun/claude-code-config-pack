@@ -7,8 +7,8 @@ llms.txt-проверка, sitemap-краул.
 Источник: zubair-trabzada/geo-seo-claude (MIT), адаптация для skills/geo-aeo-ru:
 - Windows: python (не python3), UTF-8 stdout, lxml опционален;
 - RU-контур: в robots-чек добавлены YandexBot/YandexAdditional (Яндекс-индекс
-  питает (regional LLM A)/Алису/Нейро — блокировка = невидимость в русских AI-ответах).
-  У (regional LLM B) публично документированного крауler-UA нет (тренируется на RU-вебе
+  питает YandexGPT/Алису/Нейро — блокировка = невидимость в русских AI-ответах).
+  У GigaChat публично документированного краулер-UA нет (тренируется на RU-вебе
   через общие краулы) — отдельной строки нет сознательно, не выдумываем.
 
 Usage: python fetch_page.py <url> [mode]
@@ -208,7 +208,7 @@ def fetch_robots_txt(url: str, timeout: int = 15) -> dict:
         "Applebot-Extended",
         "FacebookBot",
         "Amazonbot",
-        # RU-контур: Яндекс-индекс питает (regional LLM A)/Алису/Нейро
+        # RU-контур: Яндекс-индекс питает YandexGPT/Алису/Нейро
         "YandexBot",
         "YandexAdditional",
     ]

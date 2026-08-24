@@ -47,7 +47,7 @@ Run any post draft through the 2026 heuristic checklist. Catches AI tells, timin
 13. No first-person sensory detail
 14. Rule-of-three list without receipts
 15. More than 2 hashtags
-16. пользователя own product named more than once
+16. User's own product named more than once
 17. Missing reaction-prompting moment (vulnerability, stakes, question)
 18. Passive voice >10%
 

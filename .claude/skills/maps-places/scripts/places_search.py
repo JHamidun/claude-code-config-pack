@@ -66,11 +66,20 @@ def _http_post(url, payload, headers, timeout=15):
         return json.loads(r.read())
 
 
+# Apify зовёт свой ключ то "API token", то "API key": в кабинете он token, а часть
+# кода исторически читала APIFY_API_KEY. Принимаем оба имени, чтобы навык не падал
+# на верно заполненных кредах с "другим" написанием.
+KEY_ALIASES = {
+    "APIFY_API_TOKEN": ("APIFY_API_TOKEN", "APIFY_API_KEY"),
+}
+
+
 def _require_key(name):
-    key = CREDS.get(name)
-    if not key:
-        raise RuntimeError(f"{name} not in credentials.master.env")
-    return key
+    for candidate in KEY_ALIASES.get(name, (name,)):
+        key = CREDS.get(candidate)
+        if key:
+            return key
+    raise RuntimeError(f"{name} not in ~/.claude/.credentials.master.env")
 
 
 # ---------- Google Places (New) ----------
@@ -283,8 +292,32 @@ def serpapi_maps(query, lat=None, lon=None, zoom=14, limit=20, hl="ru", gl="ru")
 
 # ---------- Nominatim (OpenStreetMap) ----------
 
+_UA_WARNED = False
+
+
 def _user_agent():
-    return "maps-places-skill/1.0 (your-email@gmail.com)"
+    """User-Agent для Nominatim/OCM — им обязателен контакт, иначе блокировка.
+
+    Контакт берётся из NOMINATIM_CONTACT в ~/.claude/.credentials.master.env.
+    Общий плейсхолдер тут не годится: он одинаков у всех, кто поставил пак, и
+    Nominatim рано или поздно забанит его целиком — а выглядеть это будет как
+    «скрипт вдруг перестал искать». Поэтому без своего контакта — предупреждение
+    в stderr, а не тихая работа.
+    """
+    global _UA_WARNED
+    contact = CREDS.get("NOMINATIM_CONTACT")
+    if not contact:
+        if not _UA_WARNED:
+            print(
+                "WARNING: NOMINATIM_CONTACT не задан. Nominatim требует в User-Agent "
+                "рабочий контакт (email или URL) и блокирует за его отсутствие. "
+                "Добавь строку NOMINATIM_CONTACT=твой@email в "
+                "~/.claude/.credentials.master.env.",
+                file=sys.stderr,
+            )
+            _UA_WARNED = True
+        contact = "contact-not-set"
+    return f"maps-places-skill/1.0 ({contact})"
 
 
 def nominatim_search(query, lat=None, lon=None, limit=20, lang="ru,en"):
@@ -633,7 +666,7 @@ def ocm_search(query, lat=None, lon=None, radius_m=20000, limit=50, lang="ru"):
 
 def airbnb_search(query, lat=None, lon=None, limit=20, lang="ru", check_in=None, check_out=None, guests=2):
     """Airbnb listings via Apify actor. Pay-per-result ~$5/1000."""
-    key = _require_key("APIFY_API_KEY")
+    key = _require_key("APIFY_API_TOKEN")
     # Use voyager/airbnb-scraper actor
     actor = "voyager~airbnb-scraper"
     payload = {

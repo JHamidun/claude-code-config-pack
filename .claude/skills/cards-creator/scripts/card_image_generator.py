@@ -25,8 +25,38 @@ import os, sys, io, json, base64, time
 from pathlib import Path
 import requests
 
-CRED = os.path.expanduser("~/.claude/.credentials.master.env")
-KEY = open(CRED, encoding="utf-8").read().split("OPENAI_API_KEY=")[1].split("\n")[0].strip()
+# Ключ — лениво и с громким отказом. Раньше здесь на верхнем уровне модуля стояло
+# open(...).read().split("OPENAI_API_KEY=")[1]: у того, кто не завёл ключ, простой
+# импорт файла падал с `IndexError: list index out of range` — по такому тексту
+# причину не найти.
+_KEY = None
+
+
+def get_key():
+    """OPENAI_API_KEY: окружение → ~/.claude/.credentials.master.env → внятный отказ."""
+    global _KEY
+    if _KEY is None:
+        key = os.environ.get("OPENAI_API_KEY", "").strip()
+        if not key:
+            cred = Path(os.environ.get("CLAUDE_CREDENTIALS_ENV")
+                        or os.path.expanduser("~/.claude/.credentials.master.env"))
+            if cred.exists():
+                for line in cred.read_text(encoding="utf-8", errors="replace").splitlines():
+                    line = line.strip()
+                    if line.startswith("OPENAI_API_KEY="):
+                        key = line.split("=", 1)[1].strip().strip('"').strip("'")
+                        break
+        if not key:
+            raise SystemExit(
+                "ОТКАЗ: не задан OPENAI_API_KEY.\n"
+                "  Где взять: platform.openai.com/api-keys\n"
+                "  Как задать: export OPENAI_API_KEY=... (или строка OPENAI_API_KEY=... "
+                "в ~/.claude/.credentials.master.env)"
+            )
+        _KEY = key
+    return _KEY
+
+
 MODEL = "gpt-image-2-2026-04-21"
 DEFAULT = "photoreal-3d"
 
@@ -115,7 +145,7 @@ def gen_image(subject, out_path, template=DEFAULT, size="1024x1024", quality="hi
     full = build_prompt(subject, template)
     for a in range(retries):
         r = requests.post("https://api.openai.com/v1/images/generations",
-                          headers={"Authorization": f"Bearer {KEY}"},
+                          headers={"Authorization": f"Bearer {get_key()}"},
                           json={"model": MODEL, "prompt": full, "size": size, "quality": quality, "n": 1},
                           timeout=300)
         if r.status_code == 200:

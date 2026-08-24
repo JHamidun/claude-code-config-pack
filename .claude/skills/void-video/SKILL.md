@@ -21,6 +21,20 @@ import os
 HF_TOKEN = os.getenv('HUGGINGFACE_API_KEY')
 ```
 
+<!-- no-key-block -->
+## Токена нет — что тогда
+
+Space `sam-motamed/VOID` живёт на бесплатном тарифе HuggingFace, и **токен для него
+не обязателен**: `HUGGINGFACE_API_KEY` можно не задавать вовсе — клиент подключается
+анонимно. Токен нужен ровно за одним: без него очередь на GPU Zero общая и ожидание
+дольше, а при частых прогонах прилетает `429 Too Many Requests`.
+
+Что произойдёт без токена: обычная работа, просто медленнее. Что произойдёт с
+**неверным** токеном: `401 Unauthorized` от HuggingFace — если появился 401, дело не
+в видео и не в маске, а в строке `HUGGINGFACE_API_KEY`.
+
+Токен берётся бесплатно: `huggingface.co/settings/tokens`, права `read` достаточно.
+
 ## Dependencies
 
 ```bash

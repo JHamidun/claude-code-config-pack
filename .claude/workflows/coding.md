@@ -189,13 +189,13 @@ Keywords: personal, side project, learning, experiment
 /kimi-review src/path/
 
 # Исправить код
-/kimi-fix src/path/file.py
+/kimi-reasoning "почини src/path/file.py: <в чём затык>"
 
 # Analyze архитектуру
 /kimi-reasoning "Architecture analysis of X"
 
 # Generate tests
-Task(subagent_type="qa-engineer", prompt="Write tests for X")
+Task(subagent_type="test-writer", prompt="Write tests for X")
 ```
 
 ### Agent Selection

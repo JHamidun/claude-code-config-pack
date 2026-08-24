@@ -93,9 +93,9 @@
       "parameters": {
         "calendar": {
           "__rl": true,
-          "value": "nateherk88@gmail.com",
+          "value": "REPLACE_ME@example.com",
           "mode": "list",
-          "cachedResultName": "nateherk88@gmail.com"
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "start": "={{ $fromAI(\"eventStart\") }}",
         "end": "={{ $fromAI(\"eventEnd\") }}",
@@ -126,9 +126,9 @@
       "parameters": {
         "calendar": {
           "__rl": true,
-          "value": "nateherk88@gmail.com",
+          "value": "REPLACE_ME@example.com",
           "mode": "list",
-          "cachedResultName": "nateherk88@gmail.com"
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "start": "={{ $fromAI(\"eventStart\") }}",
         "end": "={{ $fromAI(\"eventEnd\") }}",
@@ -158,9 +158,9 @@
         "operation": "getAll",
         "calendar": {
           "__rl": true,
-          "value": "nateherk88@gmail.com",
+          "value": "REPLACE_ME@example.com",
           "mode": "list",
-          "cachedResultName": "nateherk88@gmail.com"
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "timeMin": "={{ $fromAI(\"dayBefore\",\"the day before the date the user requested\") }}",
         "timeMax": "={{ $fromAI(\"dayAfter\",\"the day after the date the user requested\") }}",
@@ -187,9 +187,9 @@
         "operation": "delete",
         "calendar": {
           "__rl": true,
-          "value": "nateherk88@gmail.com",
+          "value": "REPLACE_ME@example.com",
           "mode": "list",
-          "cachedResultName": "nateherk88@gmail.com"
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "eventId": "={{ $fromAI(\"eventID\") }}",
         "options": {}
@@ -215,9 +215,9 @@
         "operation": "update",
         "calendar": {
           "__rl": true,
-          "value": "nateherk88@gmail.com",
+          "value": "REPLACE_ME@example.com",
           "mode": "list",
-          "cachedResultName": "nateherk88@gmail.com"
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "eventId": "={{ $fromAI(\"eventID\") }}",
         "updateFields": {

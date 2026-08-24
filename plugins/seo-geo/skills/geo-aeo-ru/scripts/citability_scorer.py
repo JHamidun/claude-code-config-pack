@@ -223,7 +223,7 @@ def score_passage(text: str, heading: Optional[str] = None) -> dict:
         r"(?:according to|per|from|by)\s+[A-Z]",
         r"(?:по\s+данным|по\s+оценке|согласно)\s+[A-ZА-ЯЁ]",
         r"(?:Gartner|Forrester|McKinsey|Harvard|Stanford|MIT|Google|Microsoft|OpenAI|Anthropic"
-        r"|Сбер|Яндекс|ВШЭ|РАНХиГС|Росстат)",
+        r"|ЦБ\s?РФ|Яндекс|ВШЭ|РАНХиГС|Росстат)",
         r"\([A-ZА-ЯЁ][a-zа-яё]+(?:\s+\d{4})?\)",
     ]
     for pattern in source_patterns:

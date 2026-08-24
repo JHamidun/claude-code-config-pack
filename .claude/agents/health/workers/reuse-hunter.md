@@ -59,10 +59,10 @@ When invoked, you must follow these steps systematically:
 3. Identify shared packages that should be the source of truth:
    - `packages/shared-types/` - TypeScript types and Zod schemas
    - `packages/shared/` - Shared utilities (if exists)
-4. Read `CLAUDE.md` for project-specific conventions on type sharing:
-   - Database types: `packages/shared-types/src/database.types.ts`
-   - Analysis types: `packages/shared-types/src/analysis-result.ts`
-   - Analysis schemas: `packages/shared-types/src/analysis-schemas.ts`
+4. Read `CLAUDE.md` for project-specific conventions on type sharing. If it
+   documents canonical type locations (e.g. a shared-types package like
+   `packages/shared-types/src/database.types.ts`), treat those as SSOT;
+   otherwise derive the canonical location from the monorepo layout.
 
 ### Phase 2: TypeScript Types/Interfaces Detection
 
@@ -100,7 +100,7 @@ When invoked, you must follow these steps systematically:
    ```
 
 9. Categorize Zod schema duplications:
-   - Analysis schemas outside `packages/shared-types/src/analysis-schemas.ts` = HIGH priority
+   - Domain schemas outside the project's canonical schema module = HIGH priority
    - Same schema name in multiple files = HIGH priority
    - Similar schema structure with different names = MEDIUM priority
    - Validation schemas repeated in API routes = MEDIUM priority
@@ -202,10 +202,10 @@ If future versions require modifications, follow the Changes Logging protocol fr
 - Check monorepo best practices for type sharing
 
 **SSOT Pattern Recognition:**
-- `packages/shared-types/` is the canonical location for types
+- The project's shared types package (e.g. `packages/shared-types/`) is the canonical location for types
 - Other packages should re-export, not copy
-- Database types MUST come from `database.types.ts`
-- Analysis schemas MUST come from `analysis-schemas.ts`
+- Database types MUST come from the project's generated DB types module (e.g. `database.types.ts`)
+- Domain schemas MUST come from the project's canonical schema module
 
 **False Positive Prevention:**
 - Test files (*.test.ts, *.spec.ts) - EXCLUDE
@@ -512,9 +512,9 @@ export interface ExampleInterface {
 2. `packages/[package-b]/src/schemas.ts` - 2 HIGH, 1 MEDIUM duplications
 
 ### Canonical Source Files (Should be imported from)
-- `packages/shared-types/src/database.types.ts` - Database types
-- `packages/shared-types/src/analysis-result.ts` - Analysis types
-- `packages/shared-types/src/analysis-schemas.ts` - Zod schemas
+- [project's DB types module] - Database types
+- [project's domain types module] - Domain types
+- [project's canonical schema module] - Zod schemas
 
 ### Clean Files (No Issues)
 - Files with no duplications found: [Count]

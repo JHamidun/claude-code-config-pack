@@ -2,7 +2,7 @@
 
 Each template has a fill-in skeleton, a psychological reason it works, and a real example from the reference library.
 
-## T1 — Missing-Piece (PublicAuthor3 pattern)
+## T1 — Missing-Piece
 
 **Skeleton:**
 ```

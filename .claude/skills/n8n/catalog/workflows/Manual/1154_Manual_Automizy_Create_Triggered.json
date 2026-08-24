@@ -40,7 +40,7 @@
         260
       ],
       "parameters": {
-        "email": "example@n8n.io",
+        "email": "REPLACE_ME@example.com",
         "listId": "={{$node[\"Automizy\"].json[\"id\"]}}",
         "additionalFields": {
           "status": "ACTIVE"

@@ -24,7 +24,7 @@
       "parameters": {
         "end": "2020-06-27T07:00:00.000Z",
         "start": "2020-06-25T07:00:00.000Z",
-        "calendar": "shaligramshraddha@gmail.com",
+        "calendar": "REPLACE_ME@example.com",
         "additionalFields": {}
       },
       "credentials": {

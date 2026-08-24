@@ -11,13 +11,65 @@ Expert skill for using DeepSeek API - advanced coding assistant with 128K contex
 
 ## API Key
 
+Ключ берётся из `~/.claude/.credentials.master.env`. Впиши в него **сам ключ**, а не
+код на Python:
+
 ```bash
-# API ключи: ~/.claude/.credentials.master.env
-# Переменная: DEEPSEEK_API_KEY
-DEEPSEEK_API_KEY=os.getenv('DEEPSEEK_API_KEY')
+# ~/.claude/.credentials.master.env
+DEEPSEEK_API_KEY=sk-ВСТАВЬ_СЮДА_СВОЙ_КЛЮЧ   # получить: https://platform.deepseek.com/api_keys
 DEEPSEEK_BASE_URL=https://api.deepseek.com/v1
 DEEPSEEK_MODEL=deepseek-chat
 ```
+
+Строка вида `DEEPSEEK_API_KEY=os.getenv('DEEPSEEK_API_KEY')` — **не** настройка ключа.
+Это непустая строка: любая проверка `if not key` посчитает ключ заданным, запрос уйдёт
+с этим текстом вместо ключа и вернётся голый `401` без единого намёка на причину. Ровно
+то же относится к оставленной заглушке `your_deepseek_api_key`.
+
+Файл никем не подгружается автоматически — окружение надо наполнить явно:
+
+```python
+import os
+from pathlib import Path
+from dotenv import load_dotenv      # pip install python-dotenv
+
+load_dotenv(Path.home() / '.claude' / '.credentials.master.env')
+
+
+def deepseek_key() -> str:
+    """Ключ DeepSeek или громкий отказ. Молча ходить с мусором вместо ключа нельзя."""
+    key = (os.getenv('DEEPSEEK_API_KEY') or '').strip()
+    if not key:
+        raise RuntimeError(
+            'DEEPSEEK_API_KEY не задан. Впиши ключ в ~/.claude/.credentials.master.env '
+            '(строка DEEPSEEK_API_KEY=sk-...), ключ берётся на '
+            'https://platform.deepseek.com/api_keys'
+        )
+    bogus = key.startswith(('os.getenv', 'your_', '<', '${')) or key in {'sk-', 'CHANGEME'}
+    if bogus or not key.startswith('sk-'):
+        raise RuntimeError(
+            f'DEEPSEEK_API_KEY выглядит не как ключ, а как заглушка: {key[:24]!r}. '
+            'Ключи DeepSeek начинаются с "sk-". Запрос с таким значением вернёт 401 '
+            'без объяснения причины — исправь ~/.claude/.credentials.master.env.'
+        )
+    return key
+```
+
+Вызывай `deepseek_key()` вместо `os.getenv('DEEPSEEK_API_KEY')` во всех примерах ниже:
+проверка `if not key` пропускает и `os.getenv(...)`, и `your_deepseek_api_key`.
+
+### Ловушка `OPENAI_API_KEY` (проверено на openai 2.24.0)
+
+DeepSeek ходит через OpenAI-совместимый SDK, и `OpenAI(api_key=None, …)` **не падает**,
+а молча берёт `OPENAI_API_KEY` из окружения. Два исхода, оба без внятного сообщения:
+
+| Что в окружении | Что происходит |
+|---|---|
+| ни `DEEPSEEK_API_KEY`, ни `OPENAI_API_KEY` | `OpenAIError: The api_key client option must be set … or by setting the **OPENAI_API_KEY** environment variable` — про DeepSeek ни слова, ищешь не там |
+| есть `OPENAI_API_KEY` (а он есть у многих) | клиент создаётся молча и отправляет **чужой ключ OpenAI на api.deepseek.com** → голый `401` без причины. Ключ при этом утёк на сторонний хост |
+
+Поэтому ключ передаётся **явно и только из `deepseek_key()`**, а клиент собирается
+через фабрику ниже — она проверяет, что уехал именно ключ DeepSeek.
 
 ## When to Use DeepSeek
 
@@ -47,14 +99,29 @@ pip install openai  # DeepSeek uses OpenAI-compatible API
 ### Chat Completion
 
 ```python
-from openai import OpenAI
 import os
 
-# DeepSeek uses OpenAI-compatible API
-client = OpenAI(
-    api_key=os.getenv('DEEPSEEK_API_KEY'),
-    base_url=os.getenv('DEEPSEEK_BASE_URL', 'https://api.deepseek.com/v1')
-)
+from openai import AuthenticationError, OpenAI
+
+# DeepSeek uses OpenAI-compatible API.
+# api_key передаём ЯВНО: с api_key=None SDK молча подставит OPENAI_API_KEY
+# и отправит чужой ключ на api.deepseek.com (см. «Ловушка OPENAI_API_KEY»).
+
+
+def deepseek_client() -> OpenAI:
+    key = deepseek_key()                      # громко падает на пустом/заглушечном ключе
+    client = OpenAI(
+        api_key=key,
+        base_url=os.getenv('DEEPSEEK_BASE_URL', 'https://api.deepseek.com/v1'),
+    )
+    if client.api_key != key:                 # страховка от подмены из окружения
+        raise RuntimeError(
+            'клиент собран не с ключом DeepSeek — проверь OPENAI_API_KEY в окружении'
+        )
+    return client
+
+
+client = deepseek_client()
 
 def deepseek_chat(prompt: str, system_prompt: str = None,
                   model: str = "deepseek-chat"):
@@ -72,12 +139,22 @@ def deepseek_chat(prompt: str, system_prompt: str = None,
 
     messages.append({"role": "user", "content": prompt})
 
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        temperature=0.7,
-        max_tokens=4096
-    )
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=0.7,
+            max_tokens=4096
+        )
+    except AuthenticationError as e:
+        # Голый 401 ничего не объясняет — назови, ЧТО именно уехало на сервер.
+        sent = (client.api_key or '')[:8]
+        raise RuntimeError(
+            f'DeepSeek отверг ключ (401). На api.deepseek.com ушёл ключ, '
+            f'начинающийся на {sent!r}. Ключи DeepSeek начинаются с "sk-" и берутся '
+            f'на https://platform.deepseek.com/api_keys; ключ OpenAI здесь не подойдёт. '
+            f'Проверь DEEPSEEK_API_KEY в ~/.claude/.credentials.master.env. Ответ: {e}'
+        ) from e
 
     return response.choices[0].message.content
 ```

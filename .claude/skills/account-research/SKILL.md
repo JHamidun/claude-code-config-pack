@@ -1,6 +1,6 @@
 ---
 name: account-research
-description: "Досье на компанию/человека: веб-поиск + CRM. Триггеры: «что за компания», «пробей контрагента». НЕ соцсети→social-intel; ЕГРЮЛ→lead-enrichment; домен/IP→osint-recon."
+description: "Досье на компанию/человека: веб-поиск + CRM. Триггеры: «что за компания», «пробей контрагента». НЕ соцсети→social-intel; домен/IP→osint-recon."
 ---
 
 # Account Research

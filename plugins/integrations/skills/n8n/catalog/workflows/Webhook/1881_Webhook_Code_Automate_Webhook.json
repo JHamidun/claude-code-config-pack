@@ -691,7 +691,7 @@
       ],
       "webhookId": "d0f8c36a-30b3-4a25-ab02-1837ff6fc14c",
       "parameters": {
-        "sendTo": "lseanlon@gmail.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "={{$json.html}}",
         "options": {},
         "subject": "=seanlon.site - conversation for today  -{{ $today }}"

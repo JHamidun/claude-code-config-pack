@@ -1,0 +1,25 @@
+NOTICE — изменения относительно первоисточника
+==============================================
+
+Навык `skill-creator` взят из <https://github.com/anthropics/skills>
+(каталог `skills/skill-creator`, ветка `main`, отметка в `SKILL.md`: `anthropics/skills@fa0fa64`) и
+распространяется под Apache License 2.0 — полный текст в `LICENSE.txt` рядом,
+`Copyright 2026 Anthropic, PBC.`
+
+Раздел 4(b) лицензии требует помечать изменённые файлы. Сверка с апстримом
+сделана 23.08.2026 (архив `main`, сравнение побайтно с нормализацией переводов
+строки). Первоисточник не менялся ни в чём, кроме перечисленного:
+
+ИЗМЕНЕНЫ (файлы первоисточника, правленные в этом паке):
+  - SKILL.md
+  - references/schemas.md
+  - scripts/run_eval.py
+  - scripts/run_loop.py
+
+ДОБАВЛЕНЫ (файлов с такими именами в первоисточнике нет):
+  - references/evals-pattern.md
+  - references/official-skill-guide.md
+  - scripts/init_skill.py
+
+
+Всё, что не названо выше, совпадает с первоисточником байт в байт.

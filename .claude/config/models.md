@@ -12,10 +12,19 @@
 
 | Алиас | Model ID | Название | Роль |
 |-------|----------|----------|------|
-| `model: "opus"` | `claude-opus-4-8` | Claude Opus 4.8 | **Дефолт оркестратора / основной сессии** |
+| `model: "opus"` | `claude-opus-5` | Claude Opus 5 | **Дефолт оркестратора / основной сессии** |
 | `model: "fable"` | `claude-fable-5` | Fable 5 | **Дефолт ВСЕХ text-субагентов** (см. правило ниже) |
-| `model: "sonnet"` | `claude-sonnet-4-5-20250929` | Claude Sonnet 4.5 | Доступен, но для text-субагентов НЕ дефолт |
+| `model: "sonnet"` | `claude-sonnet-5` | Claude Sonnet 5 | Доступен, но для text-субагентов НЕ дефолт |
 | `model: "haiku"` | `claude-haiku-4-5-20251001` | Claude Haiku 4.5 | Быстрые/простые операции, классификация |
+
+> **Обновлено 22.08.2026.** Было `claude-opus-4-8` и `claude-sonnet-4-5-20250929` —
+> оба устарели. Opus 5 вышел 24.07.2026, Sonnet 5 и Fable 5 — там же.
+>
+> **Урок дороже самой правки.** Таблица отставала на недели, и этого никто не
+> замечал, потому что алиас `opus` продолжал работать. Устаревший идентификатор
+> не падает — он молча отдаёт вчерашнюю модель. Поэтому в остальных файлах пиши
+> **алиас** (`opus`/`fable`/`haiku`), а точные ID держи только здесь и сверяй
+> раз в месяц с тем, что реально отвечает.
 
 ### ⚠️ Правило субагентов (канон из памяти, ОБЯЗАТЕЛЬНОЕ)
 
@@ -37,7 +46,8 @@ Task(subagent_type="general-purpose", model="opus", prompt="...")
 
 | Model ID | Название |
 |----------|----------|
-| `claude-opus-4-6` | Claude Opus 4.6 (04.02.2026; был дефолтом до Opus 4.8) |
+| `claude-opus-4-8` | Claude Opus 4.8 (был дефолтом до Opus 5) |
+| `claude-opus-4-6` | Claude Opus 4.6 (04.02.2026) |
 | `claude-opus-4-5-20251101` | Claude Opus 4.5 |
 | `claude-opus-4-1-20250805` | Claude Opus 4.1 |
 | `claude-opus-4-20250514` | Claude Opus 4 |
@@ -56,7 +66,7 @@ Task(subagent_type="general-purpose", model="opus", prompt="...")
 
 ## Контекст использования
 
-**Claude Code работает на Opus 4.8 через подписку** (не по API).
+**Claude Code работает на Opus 5 через подписку** (не по API).
 Opus закрывает ВСЕ текстовые, кодовые и reasoning задачи внутри Claude Code; text-субагенты — Fable 5.
 
 Внешние модели по API нужны в двух случаях:
@@ -121,7 +131,7 @@ with open("image.jpg", "wb") as f:
 
 | Модель | Когда |
 |--------|-------|
-| `gpt-5.6` (вкл. `-sol`/`-ultra` тиры через Codex CLI по подписке) | Актуальный флагман OpenAI: кросс-валидация, ревью вторым мнением. Гайд промптинга — memory `gpt56-prompting-guide` |
+| `gpt-5.6` (вкл. `-sol`/`-ultra` тиры через Codex CLI по подписке) | Актуальный флагман OpenAI: кросс-валидация, ревью вторым мнением |
 | `gemini-3.1-pro-preview` | 2M контекст, multimodal, Google-экосистема |
 | `o4-mini` / `o3-pro` | Математика, структурный reasoning |
 | Kimi K2 | Алгоритмы, глубокий reasoning |
@@ -135,6 +145,14 @@ with open("image.jpg", "wb") as f:
 
 Когда создаёшь ботов, агентов или автономные системы — выбирай модель по задаче:
 
+> ⚠️ **Строки Anthropic в таблицах ниже — из API-снимка 30.01.2026**, то есть до выхода
+> Opus 4.6/4.8, Opus 5, Sonnet 5 и Fable 5. Они помечены ⚠️. Через `ANTHROPIC_API_KEY`
+> они продолжают отвечать — и в этом опасность: устаревший ID не даёт ошибки, он молча
+> отдаёт вчерашнюю модель. Перед тем как вписать такой ID в бота, сверь его с
+> `GET https://api.anthropic.com/v1/models` и с таблицей подписки Max в начале файла.
+> Внутри самого пака (агенты, шаблоны, Task) полные ID не нужны вовсе — там алиасы
+> `opus` / `fable` / `haiku`.
+
 ### Текст / Чат
 
 | Уровень | Model ID | Провайдер | Env Var |
@@ -142,8 +160,8 @@ with open("image.jpg", "wb") as f:
 | Лучший | `gpt-5.2` | OpenAI | OPENAI_API_KEY |
 | Быстрый | `gpt-5-mini` | OpenAI | OPENAI_API_KEY |
 | Дешёвый | `gpt-5-nano` | OpenAI | OPENAI_API_KEY |
-| Лучший (Anthropic) | `claude-opus-4-5-20251101` | Anthropic | ANTHROPIC_API_KEY |
-| Быстрый (Anthropic) | `claude-sonnet-4-5-20250929` | Anthropic | ANTHROPIC_API_KEY |
+| Лучший (Anthropic) | `claude-opus-4-5-20251101` ⚠️ | Anthropic | ANTHROPIC_API_KEY |
+| Быстрый (Anthropic) | `claude-sonnet-4-5-20250929` ⚠️ | Anthropic | ANTHROPIC_API_KEY |
 | Дешёвый (Anthropic) | `claude-haiku-4-5-20251001` | Anthropic | ANTHROPIC_API_KEY |
 | Лучший (Google) | `gemini-3-pro-preview` | Google | GEMINI_API_KEY |
 | Быстрый (Google) | `gemini-3-flash-preview` | Google | GEMINI_API_KEY |
@@ -196,7 +214,7 @@ with open("image.jpg", "wb") as f:
 
 ## Полный список доступных моделей (из API)
 
-> Снимок от 30.01.2026 — до релизов Opus 4.6 (04.02.2026), Opus 4.8 и Fable 5; актуальные Claude-алиасы — в таблице подписки Max выше.
+> Снимок от 30.01.2026 — до релизов Opus 4.6/4.8, Opus 5, Sonnet 5 и Fable 5; актуальные Claude-алиасы — в таблице подписки Max выше.
 
 ### OpenAI (121 модель) — ключевые
 

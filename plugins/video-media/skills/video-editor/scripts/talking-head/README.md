@@ -19,7 +19,7 @@ export REEL_SRC="/path/to/Telegram Desktop"   # папка с исходными
 | 3c | `trim_glitches.py` | хирургический рез найденных дублей/фрагментов (+ afade на стыках) |
 | 4 | `gemini_plan.py` | пошаговый монтаж-план (face vs broll сегменты по смыслу) |
 | 5 | `broll_runner.py` · `veo_runner.py` | генерация b-roll: Runway Seedance (throttle/recovery) / Veo 3.1 Fast (escape) |
-| 5b | `gen_music_sfx.py` · `gen_suno_music.py` | музыка-бед + SFX (ElevenLabs) / Suno через Playwright |
+| 5b | `gen_music_sfx.py` | музыка-бед + SFX (ElevenLabs). Клиент Suno в пак не входит — он ходил в чужой оплаченный аккаунт по cookie; локальная замена — скилл `ace-step` |
 | 6 | `author_from_plan.py` | раскладка клипов по плану (fx/переходы/SFX) |
 | 7 | `make_captions.py` | караоке word-pop ASS (динамический кегль — не вылезает) |
 | 8 | `assemble_overlay.py` | основа + b-roll поверх окнами + микс + грейд + концовка |

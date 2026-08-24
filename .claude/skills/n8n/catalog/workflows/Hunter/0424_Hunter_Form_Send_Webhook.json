@@ -220,7 +220,7 @@
         160
       ],
       "parameters": {
-        "sendTo": "mutasem@n8n.io",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "=Got a hot lead for you  {{ $json.properties.first_name }} {{ $json.properties.last_name }} from  {{ $json.company.properties.name }} ({{ $json.company.properties.domain }}) based out of {{ $json.company.properties.location.state }}, {{ $json.company.properties.location.country }}.\n\n\n{{ $('Score lead with MadKudu').item.json.properties.customer_fit.top_signals_formatted }}",
         "options": {},
         "subject": "=⭐ Hot lead alert: {{ $json.properties.first_name }} {{ $json.properties.last_name }}",
@@ -258,7 +258,7 @@
       {
         "formMode": "test",
         "submittedAt": "2024-02-22T13:59:54.709Z",
-        "What's your business email?": "jan@n8n.io"
+        "What's your business email?": "REPLACE_ME@example.com"
       }
     ]
   },

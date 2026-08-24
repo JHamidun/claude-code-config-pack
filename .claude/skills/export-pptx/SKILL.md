@@ -71,7 +71,11 @@ console.log('✓', out);
 3. Для каждого объекта вызови соответствующий `slide.addX(...)`.
 4. `pres.writeFile({ fileName })`.
 
-Минимальный экстрактор лежит в `templates/extract-shapes.js`. Это **черновик** — для сложных макетов потребуется ручная подкрутка.
+Готовый экстрактор писать заново не нужно — он лежит в соседнем навыке:
+`../pptx-editable-extractor/templates/extract.mjs` (Playwright, `node extract.mjs <html>
+[--slide-selector "deck-stage > section"] [--width 1920] [--height 1080]` → `slides.json`),
+а сборка из этого JSON — `../pptx-editable-extractor/templates/build_pptx.py`.
+Это **черновик**: для сложных макетов потребуется ручная подкрутка.
 
 ## Что выбирать когда
 

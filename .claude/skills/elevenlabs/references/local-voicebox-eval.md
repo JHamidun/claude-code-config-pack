@@ -4,7 +4,7 @@
 
 ## Вердикт: ДОПОЛНИТЬ (augment), не мигрировать
 
-- **Флагман (клонированный голос, буктрейлеры, продающие шортсы)** → остаётся **ElevenLabs** (`YOUR_ELEVENLABS_VOICE_ID`, точные settings в SKILL.md). Клон уже обучен, тембр отлажен, задержка/надёжность API известны.
+- **Флагман (клонированный голос, буктрейлеры, продающие шортсы)** → остаётся **ElevenLabs** (свой клон из `$ELEVENLABS_VOICE_ID_RU`, точные settings в SKILL.md). Когда клон обучен, тембр отлажен, а задержка и надёжность API известны — менять движок незачем.
 - **Массовая/черновая RU-озвучка, драфты, длинные аудиокниги, dictation, локальный STT** → кандидат на **локальный движок на своей видеокарте** — без расхода кредитов ElevenLabs.
 - НЕ ставить вслепую: это **heavy-job** (тяжёлая установка: multi-GB веса + Bun/Rust/Tauri toolchain) — ведите учёт таких задач в своём реестре тяжёлых работ. Ставить осознанно, когда реально упрётесь в кредиты ElevenLabs или понадобится офлайн/приватная озвучка.
 
@@ -45,8 +45,8 @@ Prereqs: Bun, Rust, Python 3.11+, Tauri prereqs. Веса моделей кач�
 
 ```bash
 # Клон в temp-clones (не в конфиг)
-git clone --depth 1 https://github.com/jamiepine/voicebox.git ${WORKSPACE}/temp-clones/voicebox
-cd ${WORKSPACE}/temp-clones/voicebox
+git clone --depth 1 https://github.com/jamiepine/voicebox.git ./work/voicebox
+cd ./work/voicebox
 just setup   # создаёт Python venv, тянет зависимости
 just dev     # backend (FastAPI) + Tauri app; первый прогон движка докачивает веса
 # MCP-эндпоинт после старта: http://127.0.0.1:17493/mcp  (http/stdio)

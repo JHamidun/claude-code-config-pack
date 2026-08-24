@@ -47,7 +47,7 @@ ffmpeg -y -i audio.mp3 -filter_complex "[0:a]showwaves=s=1920x1080:mode=line:col
 ffmpeg -y -i audio.mp3 -filter_complex "[0:a]showspectrum=s=1920x1080:slide=scroll:scale=log:color=rainbow:legend=1[v]" -map "[v]" -map 0:a -c:v libx264 -crf 20 -c:a copy spectrum.mp4
 ```
 
-## 7. Whisper → SRT/ASS-караоke
+## 7. Whisper → SRT/ASS-караоке
 ```bash
 ffmpeg -y -i input_video.mp4 -vn -acodec pcm_s16le -ar 16000 -ac 1 mono_speech_16k.wav   # моно 16k для ASR
 ```

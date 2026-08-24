@@ -61,7 +61,7 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "a57a3781407f42b1ad7fe24ce76f558dc6c86fea5f349b7fd39747a2294c1654@group.calendar.google.com",
+          "value": "REPLACE_ME@group.calendar.google.com",
           "cachedResultName": "ODONTOLOGIA"
         },
         "operation": "get"
@@ -93,7 +93,7 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "a57a3781407f42b1ad7fe24ce76f558dc6c86fea5f349b7fd39747a2294c1654@group.calendar.google.com",
+          "value": "REPLACE_ME@group.calendar.google.com",
           "cachedResultName": "ODONTOLOGIA"
         },
         "operation": "getAll",
@@ -122,7 +122,7 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "a57a3781407f42b1ad7fe24ce76f558dc6c86fea5f349b7fd39747a2294c1654@group.calendar.google.com",
+          "value": "REPLACE_ME@group.calendar.google.com",
           "cachedResultName": "ODONTOLOGIA"
         },
         "operation": "delete",
@@ -150,7 +150,7 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "a57a3781407f42b1ad7fe24ce76f558dc6c86fea5f349b7fd39747a2294c1654@group.calendar.google.com",
+          "value": "REPLACE_ME@group.calendar.google.com",
           "cachedResultName": "ODONTOLOGIA"
         },
         "operation": "update",
@@ -188,7 +188,7 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "a57a3781407f42b1ad7fe24ce76f558dc6c86fea5f349b7fd39747a2294c1654@group.calendar.google.com",
+          "value": "REPLACE_ME@group.calendar.google.com",
           "cachedResultName": "ODONTOLOGIA"
         },
         "resource": "calendar",
@@ -218,7 +218,7 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "a57a3781407f42b1ad7fe24ce76f558dc6c86fea5f349b7fd39747a2294c1654@group.calendar.google.com",
+          "value": "REPLACE_ME@group.calendar.google.com",
           "cachedResultName": "ODONTOLOGIA"
         },
         "descriptionType": "manual",

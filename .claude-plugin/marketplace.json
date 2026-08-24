@@ -16,7 +16,7 @@
     {
       "name": "design-process",
       "source": "./plugins/design-process",
-      "description": "Design taste, orchestration, critique, comparison, frontend presets, project init."
+      "description": "Design taste, orchestration, critique, comparison, frontend presets, cookbook."
     },
     {
       "name": "prototyping",
@@ -46,7 +46,7 @@
     {
       "name": "office-docs",
       "source": "./plugins/office-docs",
-      "description": "DOCX, XLSX, PDF, EPUB, CSV analysis, file conversion & organization."
+      "description": "XLSX, PDF, EPUB, CSV analysis, file conversion & organization."
     },
     {
       "name": "video-media",
@@ -76,7 +76,7 @@
     {
       "name": "social-posting",
       "source": "./plugins/social-posting",
-      "description": "Publish to Telegram channels via bot, message over WhatsApp, send SMS (Twilio), work with any IMAP/SMTP mailbox."
+      "description": "Publish to Telegram channels via bot, send SMS (Twilio), work with any IMAP/SMTP mailbox."
     },
     {
       "name": "content-writing",
@@ -166,7 +166,7 @@
     {
       "name": "integrations",
       "source": "./plugins/integrations",
-      "description": "n8n, AWS, Telegram bots, Zoom, Pinecone, DeepL, server health, monitoring, Outlook."
+      "description": "n8n, AWS, Telegram bots, Zoom, Pinecone, DeepL, Home Assistant, webhooks."
     },
     {
       "name": "session-tools",

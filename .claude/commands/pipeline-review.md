@@ -396,15 +396,15 @@ avg_push_days = total_days_pushed / push_count
 
 ## Integration
 
-### Your CRM: Pull Pipeline Data
+### Pull pipeline data from your CRM
 
-Use the `crm` skill to automatically pull deal data:
+Use your CRM's REST API to pull deal data automatically (example calls below are Bitrix24; amoCRM/HubSpot have equivalents):
 
 ```bash
 # Pull all deals from a specific pipeline/category
 # Skill: your-crm-skill (custom)
 
-# Key Your CRM CRM methods:
+# Key Bitrix24 REST methods (adapt to your CRM):
 # crm.deal.list     — fetch deals with filters (STAGE_ID, ASSIGNED_BY_ID, etc.)
 # crm.deal.get      — single deal details
 # crm.status.list   — pipeline stages and their semantics
@@ -413,7 +413,7 @@ Use the `crm` skill to automatically pull deal data:
 # crm.timeline.comment.list — deal timeline/history
 ```
 
-**Data mapping (Your CRM -> Pipeline Review):**
+**Data mapping (CRM -> Pipeline Review):**
 
 | Pipeline Review Field | CRM Field |
 |----------------------|----------------|

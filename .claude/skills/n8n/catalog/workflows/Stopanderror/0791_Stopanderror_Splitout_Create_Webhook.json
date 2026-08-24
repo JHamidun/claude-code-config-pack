@@ -382,8 +382,8 @@
           "appendAttribution": false
         },
         "subject": "={{ $json.snippet.channelTitle }}",
-        "toEmail": "My Name <to@email.com>",
-        "fromEmail": "YouTube <from@email.com>"
+        "toEmail": "My Name <REPLACE_ME@example.com>",
+        "fromEmail": "YouTube <REPLACE_ME@example.com>"
       },
       "credentials": {
         "smtp": {

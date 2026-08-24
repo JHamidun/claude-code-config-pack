@@ -108,8 +108,15 @@ def parse_response(text, batch):
 def try_query(prompt, mode):
     """Run pplx-max.py once. Return text or None."""
     try:
+        # sys.executable, а не строка 'python': имя интерпретатора разное на разных ОС.
+        # На macOS 12.3+ бинаря `python` нет вовсе, на Ubuntu 22.04+ — без пакета
+        # python-is-python3. Захардкоженное имя давало `FileNotFoundError: 'python'`,
+        # который здесь ловится общим `except Exception` и превращается в «сущность не
+        # обработалась» — то есть КАЖДЫЙ батч тихо помечался ошибкой запроса, а не
+        # отсутствием интерпретатора. sys.executable всегда указывает на тот Python,
+        # которым запущен этот же скрипт.
         result = subprocess.run(
-            ['python', PPLX_CLI, '--mode', mode, prompt],
+            [sys.executable, PPLX_CLI, '--mode', mode, prompt],
             capture_output=True, text=True, timeout=TIMEOUT,
             encoding='utf-8', errors='replace',
         )

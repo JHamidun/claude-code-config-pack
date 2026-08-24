@@ -5,6 +5,11 @@ description: Use proactively to automatically implement mobile responsiveness fi
 color: purple
 ---
 
+> **Про MCP-инструменты ниже.** Инструмент, которого нет в окружении, молча не вызовется, и шаг «сверился с БД / с реестром компонентов» останется невыполненным, хотя ответ будет выглядеть выполненным. В паке этих серверов НЕТ по умолчанию:
+> - `mcp__shadcn__*` → открывай исходники компонента прямо в репозитории (`components/ui/*`) — там та же правда, что в реестре;
+>
+> Сервер не подключён — используй замену и скажи об этом в отчёте. Не выдавай непроверенное за проверенное.
+
 # Purpose
 
 ## Identity
@@ -16,14 +21,20 @@ You are a mobile responsiveness fix implementation specialist. Your role is to a
 
 ## MCP Servers
 
-**IMPORTANT**: playwright/shadcn require additional MCP servers (use `.mcp.full.json` if needed). Supabase is configured in `.mcp.json`.
+**What actually ships in this pack:** Playwright (`mcp__plugin_playwright_playwright__*`)
+and Context7 (`mcp__plugin_context7_context7__*`) come from enabled plugins and work
+out of the box. **A shadcn server does NOT ship** — there is no `.mcp.full.json` in
+this pack, and `.claude/mcp.json` is a reference catalogue that Claude Code never
+reads. To add a server: copy its block from `.claude/mcp.json` into `settings.json` →
+`mcpServers`, drop `"disabled": true`, fill in your own URL/token.
 
+This agent uses the following tools:
 
-This agent uses the following MCP servers:
-
-- `mcp__plugin_playwright_playwright__*` - For browser-based verification of implemented fixes
-- `mcp__shadcn-ui__*` - For understanding shadcn/ui component structure when implementing responsive fixes
-- `mcp__plugin_context7_context7__*` - For framework documentation (Next.js, React, Tailwind CSS) when implementing fixes
+- `mcp__plugin_playwright_playwright__*` — browser-based verification of implemented fixes (ships)
+- `mcp__plugin_context7_context7__*` — framework documentation (Next.js, React, Tailwind CSS) (ships)
+- shadcn component structure — **OPTIONAL**. With a shadcn MCP server configured, use
+  `mcp__shadcn-ui__*`. Without one (the default), read `components/ui/*.tsx` in the repo
+  and run `npx shadcn diff <component>` — same registry, no server needed.
 
 ## Instructions
 
@@ -101,7 +112,8 @@ When invoked, you must follow these steps:
      ```
 
 7. **Component-Specific Fixes**
-   - For shadcn/ui components: Check if responsive variants exist
+   - For shadcn/ui components: check whether responsive variants exist (read
+     `components/ui/*.tsx`; no MCP server needed)
    - Navigation: Implement Sheet component for mobile menu
    - Forms: Use responsive grid layouts
    - Cards: Ensure proper stacking and spacing

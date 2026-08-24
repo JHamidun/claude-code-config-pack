@@ -50,6 +50,17 @@ Usage:
 Requires: Python 3.9+ (stdlib only) and `claude` on PATH
     (npm install -g @anthropic-ai/claude-code)
 """
+# UTF-8 на выход. Консоль Windows по умолчанию cp1251/cp866/cp1252, и первый же
+# не-ASCII символ (кириллица, →, ✓) валит процесс UnicodeEncodeError — обычно на
+# --help, то есть ДО любой полезной работы. errors="replace" оставляет вывод
+# читаемым, если терминал всё же не UTF-8.
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 import argparse
 import hmac
@@ -115,16 +126,22 @@ LOOPBACK_HOSTS = {"127.0.0.1", "::1", "localhost"}
 _SESSION_NS = uuid.UUID("6f1d9c9e-2f4a-5b8c-9d1e-4a7b3c2d1e0f")
 
 # Models advertised by /v1/models. Aliases are what `claude --model` accepts;
-# full ids come from ~/.claude/config/models.md (owner's canon, 2026-07).
+# full ids must match ~/.claude/config/models.md — that file is the single canon.
+#
+# Prefer the ALIAS when you have a choice. A stale full id does not fail: the CLI
+# accepts it and quietly serves last year's model, and nothing in the response says
+# so. This list already drifted once — it advertised claude-opus-4-8 and
+# claude-sonnet-4-5-20250929 after Opus 5 / Sonnet 5 had shipped, so a client that
+# asked for "the full id" got the older engine and no warning.
 MODELS = [
-    ("opus", "Opus 4.8 — orchestrator-grade reasoning"),
+    ("opus", "Opus 5 — orchestrator-grade reasoning"),
     ("fable", "Fable 5 — default worker engine"),
-    ("sonnet", "Sonnet 4.5"),
+    ("sonnet", "Sonnet 5"),
     ("haiku", "Haiku 4.5 — cheapest/fastest"),
-    ("claude-opus-4-8", "Opus 4.8 (full id)"),
+    ("claude-opus-5", "Opus 5 (full id)"),
     ("claude-fable-5", "Fable 5 (full id)"),
-    ("claude-sonnet-4-5-20250929", "Sonnet 4.5 (full id)"),
-    ("claude-haiku-4-5-20251001", "Haiku 4.5 (full id)"),
+    ("claude-sonnet-5", "Sonnet 5 (full id)"),
+    ("claude-haiku-4-5-20251001", "Haiku 4.5 (full id — dated by Anthropic, not stale)"),
 ]
 MODEL_IDS = {m for m, _ in MODELS}
 
@@ -174,15 +191,17 @@ def cli_argv(cli_path, args):
 
 
 # Env vars that would hijack the CLI away from the Max subscription (or corrupt
-# the request) if inherited by the child.  load_env() pulls the owner's
+# the request) if inherited by the child.  load_env() pulls your
 # .credentials.master.env into this process, and that file contains
 # ANTHROPIC_API_KEY + ANTHROPIC_CUSTOM_HEADERS (JSON), which make `claude -p`
 # fail with `API Error: Invalid header name: '{"anthropic-beta"'` and would bill
 # the API key instead of the subscription.  Verified live 2026-07-25.
+# NB: BEDROCK/VERTEX below are Claude Code's own provider switches (AWS Bedrock,
+# Google Cloud Vertex AI) — they are literal env-var names, not host names.
 _STRIP_ENV_PREFIXES = ("ANTHROPIC_",)
 _STRIP_ENV_EXACT = (
     "CLAUDE_CODE_USE_BEDROCK",
-    "CLAUDE_CODE_USE_YOUR_SERVER",
+    "CLAUDE_CODE_USE_VERTEX",
     "CLAUDE_CODE_SESSION_ID",
     "CLAUDE_CODE_CHILD_SESSION",
 )

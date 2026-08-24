@@ -272,7 +272,7 @@
       "parameters": {
         "subject": "=Business Performance Syncbricks",
         "bodyContent": "={{ $json['Email Output'] }}",
-        "toRecipients": "amjid@amjidali.com",
+        "toRecipients": "REPLACE_ME@example.com",
         "additionalFields": {
           "bodyContentType": "html"
         }
@@ -542,7 +542,7 @@
         "color": 4,
         "width": 675,
         "height": 536,
-        "content": "## Developed by Amjid Ali\n\nThank you for using this workflow template. It has taken me countless hours of hard work, research, and dedication to develop, and I sincerely hope it adds value to your work.\n\nIf you find this template helpful, I kindly ask you to consider supporting my efforts. Your support will help me continue improving and creating more valuable resources.\n\nYou can contribute via PayPal here:\n\n{{ $env.WEBHOOK_URL }}\n\nFor Full Course about ERPNext or Automation using AI follow below link\n\n{{ $env.WEBHOOK_URL }}\n\nAdditionally, when sharing this template, I would greatly appreciate it if you include my original information to ensure proper credit is given.\n\nThank you for your generosity and support!\nEmail : amjid@amjidali.com\n{{ $env.WEBHOOK_URL }}\n{{ $env.WEBHOOK_URL }}\n{{ $env.WEBHOOK_URL }}"
+        "content": "## Developed by Amjid Ali\n\nThank you for using this workflow template. It has taken me countless hours of hard work, research, and dedication to develop, and I sincerely hope it adds value to your work.\n\nIf you find this template helpful, I kindly ask you to consider supporting my efforts. Your support will help me continue improving and creating more valuable resources.\n\nYou can contribute via PayPal here:\n\n{{ $env.WEBHOOK_URL }}\n\nFor Full Course about ERPNext or Automation using AI follow below link\n\n{{ $env.WEBHOOK_URL }}\n\nAdditionally, when sharing this template, I would greatly appreciate it if you include my original information to ensure proper credit is given.\n\nThank you for your generosity and support!\nEmail : REPLACE_ME@example.com\n{{ $env.WEBHOOK_URL }}\n{{ $env.WEBHOOK_URL }}\n{{ $env.WEBHOOK_URL }}"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."

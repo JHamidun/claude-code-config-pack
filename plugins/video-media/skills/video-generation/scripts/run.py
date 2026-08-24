@@ -15,7 +15,7 @@ It REUSES the existing scripts (no duplication):
   model routing  → engines/higgsfield/scripts/router.py   (DIRECT vs hf.exe)
   keyframes      → scripts/nano_banana_keyframes.py        (Nano / Gemini, direct)
   clips          → scripts/runway_client.py (Seedance/Kling $0) | veo_image_to_video.py
-  voiceover      → scripts/elevenlabs_voiceover.py          (YourFirstName voice)
+  voiceover      → scripts/elevenlabs_voiceover.py          (твой голос: $ELEVENLABS_VOICE_ID_RU)
   music          → scripts/lyria_music.py | elevenlabs_music.py
   assembly       → scripts/ffmpeg_assemble.py (VO+music+brand) | engines/.../assemble.py (atoms)
 
@@ -30,7 +30,8 @@ BRIEF schema (JSON) — all optional except brief/story:
     "brief": "premise / story / message",
     "aspect": "9:16|16:9|21:9|1:1",   "platform": "tiktok|reels|youtube|x|generic",
     "duration": 30,                    "palette": ["#0a0a0a","#00e5ff","#ff003c"],
-    "voiceover_text": "...", "voice": "YOUR_ELEVENLABS_VOICE_ID", "music_prompt": "...",
+    "voiceover_text": "...", "voice": "<YOUR_VOICE_ID>",  // опц.; по умолчанию $ELEVENLABS_VOICE_ID_RU
+    "music_prompt": "...",
     "scenes": [ {"prompt": "...", "motion": "slow push-in", "keyframe": "auto|path.png"} ],
     "out_dir": "./out"
   }
@@ -66,6 +67,31 @@ ASPECT_PLATFORM = {
     "tiktok": "9:16", "reels": "9:16", "shorts": "9:16",
     "youtube": "16:9", "x": "16:9", "generic": "16:9",
 }
+
+
+CRED = Path(os.path.expanduser("~/.claude/.credentials.master.env"))
+
+
+def _cred(name: str) -> str:
+    v = os.getenv(name)
+    if not v and CRED.exists():
+        for line in CRED.read_text(encoding="utf-8", errors="replace").splitlines():
+            if line.strip().startswith(name + "="):
+                v = line.split("=", 1)[1].strip().strip('"').strip("'")
+                break
+    return v or ""
+
+
+def _voice_id(b: dict) -> str:
+    """Твой ElevenLabs-голос: из брифа, иначе из окружения / cred-файла. Пак не
+    поставляется ни с каким id — свой берётся в https://elevenlabs.io/app/voice-lab
+    → голос → ID и кладётся в ELEVENLABS_VOICE_ID_RU.
+    Читаем тот же источник, что и elevenlabs_voiceover.py, иначе dry-run план
+    объявлял бы «не настроено» там, где реальный прогон отработает."""
+    v = (b.get("voice") or "").strip()
+    if v.startswith("<") or v.startswith("YOUR_"):   # плейсхолдер из шаблона брифа
+        v = ""
+    return v or _cred("ELEVENLABS_VOICE_ID_RU") or _cred("ELEVENLABS_VOICE_ID")
 
 # --------------------------------------------------------------------------- #
 # 1-2. INTAKE + FLOW SELECT
@@ -140,7 +166,7 @@ def plan_routing(b: dict, prompts: dict) -> dict:
                   "via": clip.get("via"), "command": clip.get("command_hint")},
     }
     if b.get("voiceover_text"):
-        routing["voiceover"] = {"engine": "elevenlabs", "voice": b.get("voice", "YOUR_ELEVENLABS_VOICE_ID")}
+        routing["voiceover"] = {"engine": "elevenlabs", "voice": _voice_id(b) or "<set ELEVENLABS_VOICE_ID_RU>"}
     if b.get("music_prompt"):
         routing["music"] = {"engine": "lyria2 (commercial-safe) | elevenlabs_music (≤30s)"}
     return routing
@@ -251,9 +277,13 @@ def execute(b: dict, plan: dict, assume_yes: bool) -> dict:
     vo_path, music_path = out_dir / "vo.mp3", out_dir / "music.wav"
     if b.get("voiceover_text"):
         (out_dir / "vo.txt").write_text(b["voiceover_text"], encoding="utf-8")
-        results["audio"].append(_run(
-            [sys.executable, str(HERE / "elevenlabs_voiceover.py"), str(out_dir / "vo.txt"),
-             "--out", str(vo_path), "--voice-id", b.get("voice", "YOUR_ELEVENLABS_VOICE_ID")], "voiceover"))
+        vo_cmd = [sys.executable, str(HERE / "elevenlabs_voiceover.py"), str(out_dir / "vo.txt"),
+                  "--out", str(vo_path)]
+        # Голос не передаём, если его нет в брифе: пусть скрипт озвучки сам возьмёт
+        # $ELEVENLABS_VOICE_ID_RU и сам объяснит, если переменная не заполнена.
+        if _voice_id(b):
+            vo_cmd += ["--voice-id", _voice_id(b)]
+        results["audio"].append(_run(vo_cmd, "voiceover"))
     if b.get("music_prompt"):
         results["audio"].append(_run(
             [sys.executable, str(HERE / "lyria_music.py"), b["music_prompt"],

@@ -4,14 +4,14 @@ description: "One-click инсталляторы Windows .exe + macOS .dmg на 
 metadata:
   version: 1.0.0
   updated: 2026-06-23
-  reference-implementation: ${WORKSPACE}/yourname-installer
+  reference-implementation: none (собирается по этому навыку с нуля)
 ---
 
 # Installer Builder
 
 Build a beginner-proof, one-click installer that drops a fully-configured stack onto a clean machine: an Electron GUI with checkbox component selection that silently installs third-party apps (editors, runtimes, CLIs, VPN), deploys a config from GitHub, and installs language deps. Supports **full offline** (everything bundled) or **online bootstrapper** (downloads at install).
 
-A complete, working reference implementation lives at `${WORKSPACE}/yourname-installer` — read its files for exact, current code. This skill is the map + the non-obvious lessons.
+This skill is the map + the non-obvious lessons; готового репозитория-образца пак не несёт. Структура и все нетривиальные куски кода — в `references/blueprint.md`, их хватает, чтобы собрать инсталлятор с нуля.
 
 ## Read first
 

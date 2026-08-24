@@ -21,7 +21,7 @@
         260
       ],
       "parameters": {
-        "sendTo": "nico@n8n.io",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "={{ $json.html }}",
         "options": {
           "appendAttribution": true

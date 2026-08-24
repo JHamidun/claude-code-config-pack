@@ -256,7 +256,7 @@
       "parameters": {
         "width": 400,
         "height": 520,
-        "content": "## Report Delivery\n\nHow to get reports into Google Drive\n\nUse one of the following:\n\n📥 Manual Upload – Download emailed reports and move them to your Drive folder\n\n🤖 Automation – Use n8n to watch Gmail for no-reply@amazon.com, extract attachments, and upload to Drive\n\n💻 Drive Sync Folder – Use a local folder synced to Google Drive with rules for report types\n\nReports must match expected filenames so the flow can identify and classify them."
+        "content": "## Report Delivery\n\nHow to get reports into Google Drive\n\nUse one of the following:\n\n📥 Manual Upload – Download emailed reports and move them to your Drive folder\n\n🤖 Automation – Use n8n to watch Gmail for REPLACE_ME@example.com, extract attachments, and upload to Drive\n\n💻 Drive Sync Folder – Use a local folder synced to Google Drive with rules for report types\n\nReports must match expected filenames so the flow can identify and classify them."
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."

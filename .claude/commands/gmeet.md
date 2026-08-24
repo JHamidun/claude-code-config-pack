@@ -21,11 +21,12 @@ argument-hint: "[create <название> | list | get <space_name>]"
 
 1. **Загрузи credentials:**
 ```python
+import os
 import json
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-with open('${HOME}/.claude/google_oauth_token.json', 'r') as f:
+with open(os.path.expanduser('~/.claude/google_oauth_token.json'), 'r') as f:
     token_data = json.load(f)
 creds = Credentials.from_authorized_user_info(token_data)
 meet = build('meet', 'v2', credentials=creds)

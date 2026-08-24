@@ -49,16 +49,16 @@ curl "https://api.content.tripadvisor.com/api/v1/location/12345678/reviews?key=$
 {
   "data": [{
     "location_id": "12345678",
-    "name": "Beach Class Internacional Resort",
+    "name": "Sample Beach Resort",
     "distance": "0.5",
     "rating": "4.5",
     "address_obj": {
-      "street1": "Av. Beira Mar, 1000",
+      "street1": "Av. Atlântica, 1000",
       "city": "Sample City",
-      "state": "PE",
+      "state": "ST",
       "country": "Brazil",
-      "postalcode": "[REDACTED_CEP]",
-      "address_string": "Av. Beira Mar, 1000, Sample City, ST [REDACTED_CEP], Brazil"
+      "postalcode": "22070-000",
+      "address_string": "Av. Atlântica, 1000, Sample City, ST 22070-000, Brazil"
     },
     "latitude": "-22.971",
     "longitude": "-43.182"
@@ -71,7 +71,7 @@ curl "https://api.content.tripadvisor.com/api/v1/location/12345678/reviews?key=$
 ```json
 {
   "location_id": "12345678",
-  "name": "Beach Class Internacional Resort",
+  "name": "Sample Beach Resort",
   "description": "Luxurious beachfront resort...",
   "web_url": "https://www.tripadvisor.com/Hotel_Review-...",
   "rating": "4.5",
@@ -158,7 +158,7 @@ Free: **5000 req/day** после approval. Beyond — кастомный sales 
 8. **`amenities`** — массив строк на en всегда (нет локализации)
 9. **Photos endpoint** возвращает thumbnail+small+medium+large+original — выбирать нужный размер
 10. **Awards** только для top-rated locations — не all hotels имеют
-11. **Cannot auto-register** — YourFirstNameу нужно подать заявку самому
+11. **Cannot auto-register** — заявку нужно подать самому
 
 ## Альтернатива без approval
 

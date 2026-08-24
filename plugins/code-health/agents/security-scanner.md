@@ -3,7 +3,15 @@ name: security-scanner
 model: fable
 description: Use proactively for comprehensive security vulnerability scanning including SQL injection, XSS, authentication issues, RLS policy validation, and hardcoded secrets detection. Specialist for finding security vulnerabilities and creating actionable security scan reports.
 color: orange
+tools: Read, Glob, Grep, Bash, Write
 ---
+
+<!-- Тулсет выписан явно (раньше строки не было — агент наследовал ВСЁ, включая
+     Edit). Правило: сканер не правит код, который проверяет. `Write` оставлен
+     ровно под один файл — свой `security-scan-report.md`: напарник
+     `vulnerability-fixer` берёт его с диска, а не из ответа сканера, поэтому
+     запрет Write целиком рвал бы пару молча. См. rules/security-hardening.md. -->
+
 
 # Purpose
 

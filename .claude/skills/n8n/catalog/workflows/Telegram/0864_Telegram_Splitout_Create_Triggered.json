@@ -506,7 +506,7 @@
       "parameters": {
         "width": 460,
         "height": 260,
-        "content": "## Contact me\n- If you need any modification to this workflow\n- if you need some help with this workflow\n- Or if you need any workflow in n8n, Make, or Langchain / Langgraph\n\nWrite to me: [thomas@pollup.net](mailto:thomas@pollup.net)\n\nThis a light version of My Meals. I have a working \"Pro\" version with searches in the USDA database for each ingredients that return ALL the Nutrients.\n"
+        "content": "## Contact me\n- If you need any modification to this workflow\n- if you need some help with this workflow\n- Or if you need any workflow in n8n, Make, or Langchain / Langgraph\n\nWrite to me: [REPLACE_ME@example.com](mailto:REPLACE_ME@example.com)\n\nThis a light version of My Meals. I have a working \"Pro\" version with searches in the USDA database for each ingredients that return ALL the Nutrients.\n"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."

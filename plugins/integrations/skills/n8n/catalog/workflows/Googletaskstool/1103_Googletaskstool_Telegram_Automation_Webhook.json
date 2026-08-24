@@ -954,7 +954,7 @@
       ],
       "parameters": {
         "resource": "messages-api",
-        "remoteJid": "5511111111111@s.whatsapp.net",
+        "remoteJid": "REPLACE_ME@example.com",
         "messageText": "={{$fromAI(\"reminder\")}}",
         "instanceName": "instance name",
         "options_message": {}
@@ -979,7 +979,7 @@
               "key": {
                 "id": "05D218BDE5BFC8378B5AA50BA87FDAFE",
                 "fromMe": false,
-                "remoteJid": "5491169701682@s.whatsapp.net"
+                "remoteJid": "REPLACE_ME@example.com"
               },
               "source": "android",
               "status": "DELIVERY_ACK",
@@ -1001,7 +1001,7 @@
             },
             "event": "messages.upsert",
             "apikey": "YOUR_CREDENTIAL_HERE",
-            "sender": "553191282843@s.whatsapp.net",
+            "sender": "REPLACE_ME@example.com",
             "instance": "kore",
             "date_time": "2025-04-24T10:37:35.514Z",
             "server_url": "{{ $env.WEBHOOK_URL }}",

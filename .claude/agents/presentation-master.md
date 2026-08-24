@@ -25,21 +25,21 @@ tools: Read, Write, Edit, Glob, Grep
 - Создание презентаций (HTML, PowerPoint, Gamma)
 - Обучающие программы (training curriculum design)
 - Workshop materials (слайды, handouts, exercises)
-- Conference talks Рё keynotes
+- Conference talks и keynotes
 - Webinar content
 - Training videos scripts
-- Course outlines Рё lesson plans
+- Course outlines и lesson plans
 
 ## Story Arc:
 
 ```
-      в"Њв"Ђв"Ђв"Ђ Climax (main insight)
-     /в"'\
-    / в"' \
-   /  в"'  \
-Setupв"'   Resolution
+      ┌─── Climax (main insight)
+     /│\
+    / │ \
+   /  │  \
+Setup│   Resolution
   ↓  │    ↓
-Problem в†' Solution
+Problem → Solution
 ```
 
 ## Narrative Structure:

@@ -172,7 +172,16 @@ ONBOARDING_FIXES = [
 ]
 
 # --- 3. Credentials template: no live key may ship uncommented -------------
-TEMPLATE = ".credentials.template.env"
+# ДВА файла, а не один, и это принципиально. Полный каталог переменных живёт в
+# .claude/templates/.credentials.master.env.example (248 строк) — именно его копирует
+# установщик и именно его читает человек. В корне остался .credentials.template.env:
+# после переезда там записка о новом адресе, но проверка продолжала смотреть ТОЛЬКО
+# на него — то есть тривиально проходила на файле без единой переменной, пока
+# настоящий список не проверял никто. Проверяем оба: пропавший файл — тоже проблема.
+TEMPLATES = [
+    ".claude/templates/.credentials.master.env.example",
+    ".credentials.template.env",
+]
 SECRETISH = re.compile(r"(KEY|TOKEN|SECRET|PASSWORD|HASH|SID|CREDENTIAL|WEBHOOK)", re.I)
 # what counts as a harmless placeholder worth keeping as a hint comment
 PLACEHOLDERISH = re.compile(
@@ -216,10 +225,14 @@ def check_template():
     placeholder upstream — the user gets a bare 401 instead of "key is not set".
     """
     bad = []
-    for n, line in enumerate(read(TEMPLATE).split("\n"), 1):
-        m = re.match(r"^([A-Za-z0-9_]+)\s*=", line)
-        if m and SECRETISH.search(m.group(1)):
-            bad.append((n, m.group(1)))
+    for rel in TEMPLATES:
+        if not os.path.isfile(os.path.join(ROOT, rel)):
+            bad.append((rel, 0, "<файла нет>"))
+            continue
+        for n, line in enumerate(read(rel).split("\n"), 1):
+            m = re.match(r"^([A-Za-z0-9_]+)\s*=", line)
+            if m and SECRETISH.search(m.group(1)):
+                bad.append((rel, n, m.group(1)))
     return bad
 
 
@@ -237,9 +250,12 @@ def check(verbose=True):
         elif not re.search(probe, read(rel)):
             problems.append("free-by-default policy text missing in %s (probe: %s)" % (rel, probe))
 
-    for n, var in check_template():
-        problems.append("%s:%d — %s ships UNCOMMENTED (placeholder defeats "
-                        "`if not key` guards)" % (TEMPLATE, n, var))
+    for rel, n, var in check_template():
+        if n == 0:
+            problems.append("credentials template missing: " + rel)
+        else:
+            problems.append("%s:%d — %s ships UNCOMMENTED (placeholder defeats "
+                            "`if not key` guards)" % (rel, n, var))
 
     if verbose:
         print("=== FREE-BY-DEFAULT GUARD ===")
@@ -329,18 +345,26 @@ def apply(dry=False):
             write(rel, new)
 
     bad_template = check_template()
-    if bad_template:
-        lines = read(TEMPLATE).split("\n")
-        for n, var in bad_template:
+    by_file = {}
+    for rel, n, var in bad_template:
+        if n == 0:
+            # Отсутствующий файл чинится не здесь: --apply не умеет придумать каталог
+            # переменных. Говорим вслух и оставляем провал проверки.
+            changes.append(("CANNOT FIX — файла нет", rel, "верни его в дерево"))
+            continue
+        by_file.setdefault(rel, []).append((n, var))
+    for rel, items in by_file.items():
+        lines = read(rel).split("\n")
+        for n, var in items:
             raw = lines[n - 1]
             value = raw.split("=", 1)[1].strip()
             # keep an obvious placeholder as a hint; never keep something that
             # looks like a real pasted secret sitting in a public template
             hint = value if PLACEHOLDERISH.match(value) else "value removed by guard"
             lines[n - 1] = "# %s=          # %s" % (var, hint) if hint else "# %s=" % var
-            changes.append(("comment out (was live)", TEMPLATE, "line %d: %s" % (n, var)))
+            changes.append(("comment out (was live)", rel, "line %d: %s" % (n, var)))
         if not dry:
-            write(TEMPLATE, "\n".join(lines))
+            write(rel, "\n".join(lines))
 
     verb = "WOULD CHANGE" if dry else "CHANGED"
     print("=== %s (%d) ===" % (verb, len(changes)))

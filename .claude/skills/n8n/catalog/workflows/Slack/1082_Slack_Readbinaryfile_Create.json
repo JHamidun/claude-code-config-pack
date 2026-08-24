@@ -39,7 +39,7 @@
         "rules": {
           "rules": [
             {
-              "value2": "Louis Litt <louis_litt_1970@yahoo.com>"
+              "value2": "Louis Litt <REPLACE_ME@example.com>"
             }
           ]
         },

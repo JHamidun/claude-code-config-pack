@@ -50,7 +50,7 @@
       "credentials": {
         "slackOAuth2Api": {
           "id": "xkCA23zAF89RcovP",
-          "name": "Slack Account (OAuth)  (darryn@optimus01.co.za)"
+          "name": "Slack Account (OAuth)  (REPLACE_ME@example.com)"
         }
       },
       "executeOnce": false,
@@ -80,7 +80,7 @@
       "credentials": {
         "notionApi": {
           "id": "n1DsMuDcWjPxXlfD",
-          "name": "Notion Account (darryn@optimus01.co.za)"
+          "name": "Notion Account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1,
@@ -123,13 +123,13 @@
               "id": "94663427-c288-446a-96df-ddfc3fe332f0",
               "name": "User 1 Notion Email",
               "type": "string",
-              "value": "darryn@optimus01.co.za"
+              "value": "REPLACE_ME@example.com"
             },
             {
               "id": "bed7739d-640a-43cc-9fb5-4472844ccc09",
               "name": "User 2 Notion Email",
               "type": "string",
-              "value": "cassie@optimus01.com"
+              "value": "REPLACE_ME@example.com"
             }
           ]
         }
@@ -191,7 +191,7 @@
       "credentials": {
         "slackOAuth2Api": {
           "id": "xkCA23zAF89RcovP",
-          "name": "Slack Account (OAuth)  (darryn@optimus01.co.za)"
+          "name": "Slack Account (OAuth)  (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1,
@@ -221,7 +221,7 @@
       "credentials": {
         "slackOAuth2Api": {
           "id": "xkCA23zAF89RcovP",
-          "name": "Slack Account (OAuth)  (darryn@optimus01.co.za)"
+          "name": "Slack Account (OAuth)  (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1,

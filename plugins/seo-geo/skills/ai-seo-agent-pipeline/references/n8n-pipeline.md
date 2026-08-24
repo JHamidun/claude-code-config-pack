@@ -143,7 +143,7 @@
 | B4 | **HTTP Request** | POST в CMS API (WordPress `/wp-json/wp/v2/posts` / Webflow / Tilda Feeds) |
 | B5 | **Postgres / HTTP (Supabase)** | INSERT записи опубликованной статьи |
 
-> Сборка узлов, креды и debи — см. скилл **`n8n`**. Здесь — только специфика SEO-конвейера.
+> Сборка узлов, креды и дебаг — см. скилл **`n8n`**. Здесь — только специфика SEO-конвейера.
 
 ---
 

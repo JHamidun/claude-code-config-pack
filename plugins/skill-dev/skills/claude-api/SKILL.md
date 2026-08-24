@@ -3,500 +3,97 @@ name: claude-api
 description: "Anthropic Claude API (ANTHROPIC_API_KEY) из Python: text, vision, tool use, streaming. Триггеры: «claude api». БЕЗ ключа → claude-cli-runner."
 ---
 
-# Claude API Skill
+# Claude API — из Python по ключу
 
-## Overview
+Оплата идёт по токенам, поэтому решай в первую очередь, нужен ли вообще API:
+подписка Claude Code делает то же самое **бесплатно** через CLI — навык `claude-cli-runner`.
+API берут, когда нужен ключ в чужом окружении (сервер, CI, бот) или программный batch.
 
-Expert skill for using Anthropic Claude API - Claude 4.5 Sonnet, Opus, and Haiku models for text generation, vision, and tool use.
+## Ключ и модели
 
-## API Key
+Ключ читается через `os.getenv('ANTHROPIC_API_KEY')` — и никогда не хардкодится в коде:
+захардкоженный ключ уезжает в репозиторий вместе с файлом.
+
+Своего файла ключей в паке нет — он твой. Заведи один раз:
 
 ```bash
-# Ключ берётся из ~/.claude/.credentials.master.env
-# ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-
-# Models
-CLAUDE_SONNET_MODEL=claude-sonnet-4-5-20250929
-CLAUDE_OPUS_MODEL=claude-opus-4-8
-CLAUDE_HAIKU_MODEL=claude-haiku-4-5-20251001
+cp ~/.claude/templates/.credentials.master.env.example ~/.claude/.credentials.master.env
+# впиши ANTHROPIC_API_KEY=... (ключ берётся на console.anthropic.com)
 ```
 
-## When to Use Claude API
-
-**Best for:**
-- Complex reasoning and analysis
-- Long-form content generation
-- Code generation and review
-- Vision/image analysis
-- Tool use and function calling
-- Projects where subscription isn't available
-
-**Advantages:**
-- 200K context window
-- Advanced reasoning (especially Opus)
-- Excellent instruction following
-- Strong safety and ethics
-- Vision capabilities
-
-## Dependencies
+`.credentials.master.env` уже в `.gitignore` пака — не коммить его и не класть в архив.
+Вариант без файла: обычная переменная окружения `ANTHROPIC_API_KEY` — код её увидит так же.
 
 ```bash
 pip install anthropic
 ```
 
-## Models
-
-| Model | ID | Best For | Context |
-|-------|-----|----------|---------|
-| Claude Opus 4.8 | claude-opus-4-8 | Complex reasoning, research | 1M |
-| Claude Sonnet 4.5 | claude-sonnet-4-5-20250929 | Balanced performance | 200K |
-| Claude Haiku 4.5 | claude-haiku-4-5-20251001 | Fast, cost-effective | 200K |
-| Fable 5 | claude-fable-5 | Text-субагенты (канон воркеров) | 200K |
-
-Канон актуальных ID → `config/models.md`.
-
-## Basic Usage
-
-### Setup Client
-
 ```python
 from anthropic import Anthropic
 import os
-
 client = Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
 ```
 
-### Text Generation
+| Модель | ID | Под что | Контекст |
+|--------|-----|---------|----------|
+| Opus 5 | `claude-opus-5` | сложный reasoning, research | 1M |
+| Sonnet 5 | `claude-sonnet-5` | баланс качество/цена | 200K |
+| Haiku 4.5 | `claude-haiku-4-5-20251001` | быстро и дёшево | 200K |
+| Fable 5 | `claude-fable-5` | text-субагенты | 200K |
+
+ID устаревают быстрее, чем этот файл: **канон → `config/models.md`**, сверяйся там перед запуском.
+
+<!-- no-key-block -->
+## Ключа нет — что тогда
+
+**Это нормальный случай, а не поломка.** Ключ `ANTHROPIC_API_KEY` оплачивается
+отдельно от подписки Claude Code, и большинству он не нужен:
+
+- **навык `claude-cli-runner`** делает то же самое через уже оплаченную подписку —
+  бесплатно, тем же набором моделей. Дефолт для всего, что запускается на своей машине;
+- ключ берут, когда код исполняется **в чужом окружении** (сервер, CI, бот) или нужен
+  Batch API.
+
+Без ключа `Anthropic(api_key=None)` падает так:
+`anthropic.AuthenticationError` либо `TypeError: Could not resolve authentication method`.
+Ни то ни другое не подсказывает «возьми CLI вместо API» — поэтому решай до кода.
+
+## Что ломается, если не знать
+
+- **`max_tokens` обязателен в каждом запросе.** Без него запрос падает — это не «разумный дефолт», а требуемое поле.
+- **Ответ — список блоков.** `message.content[0].text` работает только для чистого текстового ответа. Как только включены tools или thinking, первым блоком может оказаться `tool_use`/`thinking` — перебирай `content` по `block.type`.
+- **Vision берёт PNG, JPEG, GIF, WebP; PDF идёт другим типом блока** (`document`, не `image`).
+- **Схема инструмента — `input_schema`**, а не `parameters` как в OpenAI SDK. Перенос кода один-в-один даст ошибку валидации.
+- **Batch API — минус 50% цены**, но обработка до 24 часов. Для интерактива не годится, для массовых прогонов (разметка, переводы, оценки) — дефолт.
+- **Extended thinking**: `max_tokens` должен быть заметно больше `budget_tokens`, иначе бюджет съест ответ.
+
+## Минимальный вызов
 
 ```python
-def chat(prompt: str, system: str = None, model: str = "claude-sonnet-4-5-20250929"):
-    """
-    Chat with Claude.
-
-    Models (канон → config/models.md):
-        - claude-opus-4-8: Best quality
-        - claude-sonnet-4-5-20250929: Balanced
-        - claude-haiku-4-5-20251001: Fast & cheap
-    """
-    message = client.messages.create(
-        model=model,
-        max_tokens=4096,
-        system=system or "You are a helpful assistant.",
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
-    )
-
-    return message.content[0].text
-
-# Usage
-response = chat("Explain quantum computing", model="claude-sonnet-4-5-20250929")
+msg = client.messages.create(
+    model="claude-sonnet-5",
+    max_tokens=4096,
+    system="You are a helpful assistant.",
+    messages=[{"role": "user", "content": prompt}],
+)
+msg.content[0].text
 ```
 
-### Vision (Image Analysis)
-
-```python
-import base64
-
-def analyze_image(image_path: str, prompt: str):
-    """Analyze image with Claude Vision."""
-
-    with open(image_path, "rb") as f:
-        image_data = base64.standard_b64encode(f.read()).decode("utf-8")
-
-    # Determine media type
-    if image_path.endswith(".png"):
-        media_type = "image/png"
-    elif image_path.endswith(".gif"):
-        media_type = "image/gif"
-    elif image_path.endswith(".webp"):
-        media_type = "image/webp"
-    else:
-        media_type = "image/jpeg"
-
-    message = client.messages.create(
-        model="claude-sonnet-4-5-20250929",
-        max_tokens=1024,
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": media_type,
-                            "data": image_data
-                        }
-                    },
-                    {
-                        "type": "text",
-                        "text": prompt
-                    }
-                ]
-            }
-        ]
-    )
-
-    return message.content[0].text
-```
-
-### Tool Use (Function Calling)
-
-```python
-def with_tools(prompt: str, tools: list):
-    """Use Claude with tools/function calling."""
-
-    message = client.messages.create(
-        model="claude-sonnet-4-5-20250929",
-        max_tokens=1024,
-        tools=tools,
-        messages=[{"role": "user", "content": prompt}]
-    )
-
-    # Check if tool was called
-    for block in message.content:
-        if block.type == "tool_use":
-            return {
-                "tool": block.name,
-                "input": block.input,
-                "id": block.id
-            }
-
-    return message.content[0].text
-
-# Example tool definition
-weather_tool = {
-    "name": "get_weather",
-    "description": "Get weather for a location",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "location": {
-                "type": "string",
-                "description": "City name"
-            }
-        },
-        "required": ["location"]
-    }
-}
-
-result = with_tools("What's the weather in London?", [weather_tool])
-```
-
-### Streaming
-
-```python
-def stream_chat(prompt: str, system: str = None):
-    """Stream response for real-time output."""
-
-    with client.messages.stream(
-        model="claude-sonnet-4-5-20250929",
-        max_tokens=4096,
-        system=system or "You are a helpful assistant.",
-        messages=[{"role": "user", "content": prompt}]
-    ) as stream:
-        for text in stream.text_stream:
-            print(text, end="", flush=True)
-```
-
-### Multi-turn Conversation
-
-```python
-def multi_turn(messages: list, system: str = None):
-    """
-    Multi-turn conversation with message history.
-
-    messages format:
-        [{"role": "user", "content": "..."}, {"role": "assistant", "content": "..."}]
-    """
-    response = client.messages.create(
-        model="claude-sonnet-4-5-20250929",
-        max_tokens=4096,
-        system=system,
-        messages=messages
-    )
-
-    return response.content[0].text
-
-# Usage
-history = []
-history.append({"role": "user", "content": "My name is Alice"})
-response = multi_turn(history)
-history.append({"role": "assistant", "content": response})
-history.append({"role": "user", "content": "What's my name?"})
-response = multi_turn(history)  # "Your name is Alice"
-```
-
-### Extended Thinking (Beta)
-
-```python
-def with_thinking(prompt: str, budget_tokens: int = 10000):
-    """Use extended thinking for complex reasoning."""
-
-    response = client.messages.create(
-        model="claude-sonnet-4-5-20250929",
-        max_tokens=16000,
-        thinking={
-            "type": "enabled",
-            "budget_tokens": budget_tokens
-        },
-        messages=[{"role": "user", "content": prompt}]
-    )
-
-    result = {"thinking": None, "response": None}
-
-    for block in response.content:
-        if block.type == "thinking":
-            result["thinking"] = block.thinking
-        elif block.type == "text":
-            result["response"] = block.text
-
-    return result
-```
-
-## Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| model | string | Model ID |
-| max_tokens | int | Max output tokens (required) |
-| system | string | System prompt |
-| messages | array | Conversation messages |
-| temperature | float | 0-1, randomness |
-| top_p | float | Nucleus sampling |
-| top_k | int | Top-k sampling |
-| tools | array | Function definitions |
-| stream | bool | Enable streaming |
-
-## API Pricing (2025)
-
-| Model | Input | Output |
-|-------|-------|--------|
-| Claude Opus 4.8 | $15/1M tokens | $75/1M tokens |
-| Claude 4.5 Sonnet | $3/1M tokens | $15/1M tokens |
-| Claude 4.5 Haiku | $0.25/1M tokens | $1.25/1M tokens |
-
-## Quick Reference
-
-| Task | Code |
-|------|------|
-| Chat | `client.messages.create(model, max_tokens, messages)` |
-| Vision | Include image block in messages |
-| Tools | Add `tools` parameter |
-| Stream | `client.messages.stream(...)` |
-| Thinking | Add `thinking` parameter |
-
----
-
-## 🔍 Web Search (Built-in)
-
-```python
-def search_and_answer(query: str):
-    """
-    Claude with built-in web search for real-time info.
-
-    Requires server-side implementation via MCP or Claude.ai.
-    """
-    response = client.messages.create(
-        model="claude-sonnet-4-5-20250929",
-        max_tokens=4096,
-        tools=[{
-            "type": "web_search",
-            "name": "web_search"
-        }],
-        messages=[{"role": "user", "content": query}]
-    )
-
-    return response.content[0].text
-```
-
----
-
-## 📄 File & Document Handling
-
-```python
-def analyze_pdf(pdf_path: str, prompt: str):
-    """
-    Analyze PDF document with Claude.
-
-    Uses base64 encoding for document content.
-    """
-    import base64
-
-    with open(pdf_path, "rb") as f:
-        pdf_data = base64.standard_b64encode(f.read()).decode("utf-8")
-
-    message = client.messages.create(
-        model="claude-sonnet-4-5-20250929",
-        max_tokens=4096,
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "document",
-                        "source": {
-                            "type": "base64",
-                            "media_type": "application/pdf",
-                            "data": pdf_data
-                        }
-                    },
-                    {
-                        "type": "text",
-                        "text": prompt
-                    }
-                ]
-            }
-        ]
-    )
-
-    return message.content[0].text
-```
-
----
-
-## 🖥️ Computer Use
-
-```python
-def computer_use_task(task: str, display_size: tuple = (1920, 1080)):
-    """
-    Let Claude control computer for automation tasks.
-
-    Requires computer_use tool and screen access.
-    """
-    response = client.messages.create(
-        model="claude-sonnet-4-5-20250929",
-        max_tokens=4096,
-        tools=[
-            {
-                "type": "computer_20250124",
-                "name": "computer",
-                "display_width_px": display_size[0],
-                "display_height_px": display_size[1]
-            },
-            {
-                "type": "text_editor_20250124",
-                "name": "str_replace_editor"
-            },
-            {
-                "type": "bash_20250124",
-                "name": "bash"
-            }
-        ],
-        messages=[{"role": "user", "content": task}]
-    )
-
-    return response
-```
-
----
-
-## 📦 Batch API (50% Discount)
-
-```python
-def create_batch(requests: list):
-    """
-    Process multiple requests with 50% discount.
-
-    Max 24 hour processing time.
-    """
-    batch = client.messages.batches.create(
-        requests=[
-            {
-                "custom_id": f"request-{i}",
-                "params": {
-                    "model": "claude-sonnet-4-5-20250929",
-                    "max_tokens": 1024,
-                    "messages": [{"role": "user", "content": req}]
-                }
-            }
-            for i, req in enumerate(requests)
-        ]
-    )
-
-    return batch.id
-
-def get_batch_results(batch_id: str):
-    """Get batch results."""
-
-    batch = client.messages.batches.retrieve(batch_id)
-
-    if batch.processing_status == "ended":
-        results = []
-        for result in client.messages.batches.results(batch_id):
-            results.append({
-                "custom_id": result.custom_id,
-                "response": result.result.message.content[0].text
-            })
-        return results
-
-    return {"status": batch.processing_status}
-```
-
----
-
-## 🔧 MCP Integration
-
-```python
-def with_mcp_tools(prompt: str, mcp_server: str):
-    """
-    Use Claude with MCP (Model Context Protocol) tools.
-
-    MCP servers provide external capabilities like:
-    - File system access
-    - Database queries
-    - API integrations
-    - Browser automation
-    """
-    # MCP tools are typically configured at the client level
-    # See Claude Desktop or Claude Code for MCP integration
-
-    # Example: using MCP tools in messages
-    response = client.messages.create(
-        model="claude-sonnet-4-5-20250929",
-        max_tokens=4096,
-        messages=[{"role": "user", "content": prompt}],
-        # MCP tools injected by client
-    )
-
-    return response
-```
-
----
-
-## 🔗 API Endpoints Reference
-
-| Endpoint | Purpose |
-|----------|---------|
-| `messages.create` | Text generation |
-| `messages.stream` | Streaming responses |
-| `messages.batches.create` | Batch processing |
-| `messages.count_tokens` | Token counting |
-| `completions.create` | Legacy completions |
-
----
-
-## 💰 Updated Pricing (2025)
-
-| Model | Input | Output |
-|-------|-------|--------|
-| Claude Opus 4.8 | $15/1M | $75/1M |
-| Claude 4.5 Sonnet | $3/1M | $15/1M |
-| Claude 4.5 Haiku | $0.25/1M | $1.25/1M |
-| Batch API | 50% discount | 50% discount |
-
----
-
-## Tips
-
-1. **Opus** - лучший для сложного reasoning и исследований
-2. **Sonnet** - оптимальный баланс качество/цена
-3. **Haiku** - быстрый и дешевый для простых задач
-4. `max_tokens` обязателен для всех запросов
-5. Vision поддерживает PNG, JPEG, GIF, WebP, PDF
-6. Extended thinking для математики и логики
-7. Используй streaming для длинных ответов
-8. **Batch API** - 50% скидка для массовых операций
-9. **Computer Use** - автоматизация через GUI
-10. **MCP** - расширение через внешние серверы
+Многоходовый диалог — история целиком в `messages` при каждом вызове (API без состояния):
+`[{"role":"user",...},{"role":"assistant",...},{"role":"user",...}]`.
+
+## Цены (2025, $/1M токенов)
+
+| Модель | Input | Output |
+|--------|-------|--------|
+| Opus 5 | $15 | $75 |
+| Sonnet 5 | $3 | $15 |
+| Haiku 4.5 | $0.25 | $1.25 |
+| Batch API | −50% | −50% |
+
+## Справочник
+
+`references/recipes.md` — vision, PDF, tool use, extended thinking, batch, computer use,
+web search, streaming, таблица эндпоинтов. Открывай, когда нужен режим сложнее обычного
+`messages.create`: там точные имена типов блоков и версионные строки тулов
+(`computer_20250124` и подобные), которые не угадываются.

@@ -79,10 +79,10 @@ Lyria 3 доступна через **обычный `GOOGLE_API_KEY`** на т�
 - `models/lyria-3-clip-preview` — short clips (~30s), быстрее
 - `models/lyria-3-pro-preview` — длиннее, выше качество
 
-**Tradeoffs vs Lyria 2 (your-server):**
+**Tradeoffs vs Lyria 2 (Vertex AI):**
 - ✅ Один env var (`GOOGLE_API_KEY`), без service-account JSON
 - ✅ Один и тот же ключ для Veo + Gemini + Lyria + Flash Image
-- ❌ `-preview` модели = **не commercial-safe license**. Для прода — §1 your-server Lyria 2
+- ❌ `-preview` модели = **не commercial-safe license**. Для прода — §1 Vertex AI Lyria 2
 - ❌ Schema другая (`responseModalities: ["AUDIO"]`, не `predict`)
 
 ### Generation
@@ -176,7 +176,7 @@ with open('bgm.mp3', 'wb') as f:
 ### CRITICAL — имена параметров (current SDK)
 
 В установленном SDK правильные имена — **`music_length_ms`**, **`force_instrumental`**, **`model_id='music_v1'`**.
-`length_ms=...` → **`TypeError`** (старая сигнатура, ловит at runtime). Проверено в production (проект [Client], июнь 2026).
+`length_ms=...` → **`TypeError`** (старая сигнатура, ловит at runtime). Проверено в production (проект [Client], 2026).
 
 > Для инструментала `force_instrumental=True` надёжнее, чем «no vocals» в тексте промпта.
 
@@ -217,11 +217,19 @@ seg2 = client.music.compose(
 
 ## §3 — ElevenLabs TTS — production voice IDs
 
-### YourFirstName voice (clone)
+### Свой клонированный голос
+
+`<YOUR_VOICE_ID>` — идентификатор ТВОЕГО голоса; пак не поставляется ни с каким.
+Берётся в кабинете ElevenLabs → Voices → свой голос → **ID**
+(https://elevenlabs.io/app/voice-lab), либо `GET /v1/voices` — клоны помечены
+`category: "cloned"`. Держи его в `ELEVENLABS_VOICE_ID_RU`
+(`~/.claude/.credentials.master.env`), а не в тексте скрипта: скрипты озвучки
+читают именно эту переменную.
 
 ```python
+import os
 audio = client.text_to_speech.convert(
-    voice_id = 'YOUR_HEYGEN_VOICE_ID',  # YourFirstName clone
+    voice_id=os.getenv('ELEVENLABS_VOICE_ID_RU'),   # свой клон, НЕ HeyGen-голос
     text='Сегодня разберём, как…',
     model_id='eleven_multilingual_v2',
     voice_settings={
@@ -243,9 +251,9 @@ audio = client.text_to_speech.convert(
 | George | `JBFqnCBsd6RMkjVDRZzb` | **тёплый рассказчик** — поздравления, трибьюты, award VO | `stability=0.35, similarity=0.85, style=0.35, speaker_boost=True` |
 | Brian | (см. ElevenLabs catalog) | confident male, корпоративные шортсы | — |
 
-Модель: `eleven_multilingual_v2`. На русском тексте дают тембр заметно лучше native RU voices (YourFirstName shortform pattern, подтверждено в production).
+Модель: `eleven_multilingual_v2`. На русском тексте дают тембр заметно лучше native RU voices (подтверждено на коротких вертикальных роликах).
 
-**Выбор тона под жанр:** Matthew = «усталый ветеран» (Amber trailer); **George = тёплый/человечный** (поздравление [Client] — YourFirstName выбрал именно George, не амберовского Matthew). Перед коммитом прогони 2-3 реплики на каждого кандидата по дуге ролика (открытие + кульминация + развязка), не одну фразу.
+**Выбор тона под жанр:** Matthew = «усталый ветеран» (мрачный книжный трейлер); **George = тёплый/человечный** (корпоративное поздравление — там выбрали именно George, не «трейлерного» Matthew). Перед коммитом прогони 2-3 реплики на каждого кандидата по дуге ролика (открытие + кульминация + развязка), не одну фразу.
 
 ### Russian VO — ударения (combining acute U+0301)
 
@@ -278,18 +286,20 @@ text = "Каждая большая история начинается со ш�
 |---|---|
 | Background music под cinematic trailer | **Lyria 2** (commercial-safe license, lush) |
 | Quick BGM под шортс | **ElevenLabs Music** (быстрее, не нужен service account) |
-| **Полный 60s+ оркестровый score с дугой** (шторм→триумф) | **Suno** (см. `suno` skill) — лучшая длинная драматургия, 2 дубля/запрос |
+| **Полный 60s+ оркестровый score с дугой** (шторм→триумф) | ElevenLabs Music / Lyria, либо локальный `ace-step`. Онлайн-Suno в пак не входит: он ходил в чужой оплаченный аккаунт по cookie |
 | **Песня со словами** под ролик | **Suno** (`make_instrumental=False`) — единственный из трёх кто поёт |
-| Voiceover YourFirstName RU | **ElevenLabs TTS** YourFirstName clone settings |
+| Voiceover своим голосом RU | **ElevenLabs TTS** — свой клон (`$ELEVENLABS_VOICE_ID_RU`) + settings из §3 |
 | Voiceover актёрский EN | **ElevenLabs TTS** Matthew Villain или Brian |
 | Voiceover тёплый рассказчик RU (трибьют) | **ElevenLabs TTS** George `JBFqnCBsd6RMkjVDRZzb` |
 | Voiceover «корпоративный» RU | **ElevenLabs TTS** EN voices на RU тексте через `eleven_multilingual_v2` |
 | Кинематографический score для книжного трейлера | **Lyria 2** 2×30s + acrossfade |
-| Лицензионно чистый score для коммерческого ролика | **Lyria 2** (your-server commercial-safe) |
+| Лицензионно чистый score для коммерческого ролика | **Lyria 2** (Vertex AI, commercial-safe) |
 
-## §4b — Suno (длинный score / песня) + климакс-нарезка
+## §4b — Длинный score / песня + климакс-нарезка
 
-Полный headless-клиент Suno (Clerk auth, generate/download без браузера) — в отдельном **`suno` skill**. Здесь — только сборочные уроки (проект [Client]):
+Клиента к Suno в паке нет: он работал через долгоживущую cookie чужого оплаченного
+аккаунта. Уроки ниже сняты на нём, но применимы к любому генератору длинных треков —
+ElevenLabs Music, Lyria, локальный `ace-step`.
 
 - **2 дубля на запрос.** Один и тот же промпт возвращает ДВА независимых рендера, заметно разных (у [Client] дубль 2 имел теплее French-horn/choir, чем дубль 1). Слушай оба, выбирай ухом, а не по порядку.
 - **CDN 403-пока-рендерится.** `https://cdn1.suno.ai/{clip_id}.mp3` отдаёт 403 пока считается (5-10 мин), 200 когда готов. Не падай на 403 — loop с backoff 5-10с до 200.
@@ -307,7 +317,7 @@ if start + WIN > dur: start = max(0, dur - WIN)
 
 ### Narration-only path (без поющих слов) — рекомендуется для трибьютов
 
-Поющий текст рискует исказиться/прозвучать нелепо. Надёжнее: **Suno чистый инструментал** (`make_instrumental=True`, в промпте `instrumental, no vocals`) + отдельный **ElevenLabs TTS** закадр, статический баланс (без sidechain), `loudnorm I=-14`. YourFirstName явно выбрал этот путь: «текст песни не нравится, лучше музыка и закадр как в Хрониках Амбера». Развязывает тайминг музыки и голоса.
+Поющий текст рискует исказиться/прозвучать нелепо. Надёжнее: **Suno чистый инструментал** (`make_instrumental=True`, в промпте `instrumental, no vocals`) + отдельный **ElevenLabs TTS** закадр, статический баланс (без sidechain), `loudnorm I=-14`. На практике заказчик ролика выбрал именно этот путь: «текст песни не нравится, лучше музыка и закадр». Развязывает тайминг музыки и голоса.
 
 ## §5 — Sound effects (ElevenLabs)
 
@@ -333,7 +343,7 @@ ElevenLabs эндпоинт `/v1/text-to-speech/{voice_id}/with-timestamps` во
 import os, json, base64, urllib.request
 
 key = os.environ['ELEVENLABS_API_KEY']
-voice_id = 'YOUR_HEYGEN_VOICE_ID'  # YourFirstName clone
+voice_id = os.environ['ELEVENLABS_VOICE_ID_RU']   # свой клон (ElevenLabs, НЕ HeyGen)
 url = f'https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/with-timestamps'
 
 payload = {

@@ -1,0 +1,34 @@
+{
+  "0HCAhzgS27Y/short_01": {
+    "_key": "0HCAhzgS27Y/short_01",
+    "_srt_path": "<SHORTS_SOURCE>/0HCAhzgS27Y/short_01.srt",
+    "_mp4_path": "<SHORTS_SOURCE>/0HCAhzgS27Y/short_01.mp4",
+    "topic": "Pivot и страх изменений",
+    "gist": "Большинство стартапов умирают не от плохой идеи, а от страха pivot.",
+    "keep": true,
+    "skip_reason": null,
+    "hook_formula": "Contradiction Hook",
+    "hook_3s": "Большинство стартапов умирают не от плохой идеи. Они умирают от страха.",
+    "title": "Стартапы убивает не идея — страх",
+    "description": "Один из главных факторов смерти стартапов — страх развернуть концепцию вовремя.\n\n#стартап #бизнес #мойбренд",
+    "on_screen_text": "СТРАХ УБИВАЕТ СТАРТАПЫ",
+    "loop_close": "...и именно поэтому большинство умирает не от идеи, а от стра-",
+    "tags": "стартап,бизнес,pivot,CustDev,ошибки"
+  },
+  "0HCAhzgS27Y/short_02": {
+    "_key": "0HCAhzgS27Y/short_02",
+    "_srt_path": "<SHORTS_SOURCE>/0HCAhzgS27Y/short_02.srt",
+    "_mp4_path": "<SHORTS_SOURCE>/0HCAhzgS27Y/short_02.mp4",
+    "topic": "Незаконченный hook без контекста",
+    "gist": "Фрагмент вырван из середины — нет начала мысли.",
+    "keep": false,
+    "skip_reason": "SRT обрывается в середине фразы без контекста — нельзя построить hook",
+    "hook_formula": null,
+    "hook_3s": null,
+    "title": null,
+    "description": null,
+    "on_screen_text": null,
+    "loop_close": null,
+    "tags": null
+  }
+}

@@ -265,8 +265,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "philipp@lowcoding.dev",
-          "cachedResultName": "philipp@lowcoding.dev"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "descriptionType": "manual",
         "toolDescription": "=Use tool to create Google Calendar Event. Use this tool only when transcript contains information that call should be scheduled.",

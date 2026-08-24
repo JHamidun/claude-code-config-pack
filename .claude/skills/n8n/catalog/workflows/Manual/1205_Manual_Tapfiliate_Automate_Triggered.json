@@ -54,7 +54,7 @@
         300
       ],
       "parameters": {
-        "email": "n8ndocsburner@gmail.com",
+        "email": "REPLACE_ME@example.com",
         "lastname": "Ryan",
         "firstname": "Jack",
         "additionalFields": {}

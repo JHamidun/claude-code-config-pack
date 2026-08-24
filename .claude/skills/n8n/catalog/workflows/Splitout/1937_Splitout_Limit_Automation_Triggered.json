@@ -512,8 +512,8 @@
         "html": "={{ $json.message.content.content }}",
         "options": {},
         "subject": "Next followup",
-        "toEmail": "miquel@n8nhackers.com",
-        "fromEmail": "miquel@n8nhackers.com"
+        "toEmail": "REPLACE_ME@example.com",
+        "fromEmail": "REPLACE_ME@example.com"
       },
       "credentials": {
         "smtp": {

@@ -206,11 +206,11 @@
           "parameters": [
             {
               "name": "X-API-KEY",
-              "value": "22d1ce6fa3ae7039fe42d3ddf1ba55d8f5ee9e2c2e6b04788144fca080d1e170"
+              "value": "YOUR_API_KEY"
             },
             {
               "name": "X-CLIENT-ID",
-              "value": "f3604b6d2d33af2006ecb0d4910871fa"
+              "value": "YOUR_CLIENT_ID"
             }
           ]
         }
@@ -245,11 +245,11 @@
           "parameters": [
             {
               "name": "X-API-KEY",
-              "value": "22d1ce6fa3ae7039fe42d3ddf1ba55d8f5ee9e2c2e6b04788144fca080d1e170"
+              "value": "YOUR_API_KEY"
             },
             {
               "name": "X-CLIENT-ID",
-              "value": "f3604b6d2d33af2006ecb0d4910871fa"
+              "value": "YOUR_CLIENT_ID"
             }
           ]
         }
@@ -293,7 +293,7 @@
         "color": 7,
         "width": 714.7562585267917,
         "height": 593.70786516854,
-        "content": "## UserTask\n**Link** {{ $env.WEBHOOK_URL }} \n\n**Login**\ncontact@usertask.io\n**Password**\nQSDpo2x10?2020"
+        "content": "## UserTask\n**Link** {{ $env.WEBHOOK_URL }} \n\n**Login**\ncontact@usertask.io\n**Password**\nREPLACE_ME"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."
@@ -318,11 +318,11 @@
           "parameters": [
             {
               "name": "X-API-KEY",
-              "value": "22d1ce6fa3ae7039fe42d3ddf1ba55d8f5ee9e2c2e6b04788144fca080d1e170"
+              "value": "YOUR_API_KEY"
             },
             {
               "name": "X-CLIENT-ID",
-              "value": "f3604b6d2d33af2006ecb0d4910871fa"
+              "value": "YOUR_CLIENT_ID"
             }
           ]
         }
@@ -562,11 +562,11 @@
           "parameters": [
             {
               "name": "X-API-KEY",
-              "value": "22d1ce6fa3ae7039fe42d3ddf1ba55d8f5ee9e2c2e6b04788144fca080d1e170"
+              "value": "YOUR_API_KEY"
             },
             {
               "name": "X-CLIENT-ID",
-              "value": "f3604b6d2d33af2006ecb0d4910871fa"
+              "value": "YOUR_CLIENT_ID"
             }
           ]
         }

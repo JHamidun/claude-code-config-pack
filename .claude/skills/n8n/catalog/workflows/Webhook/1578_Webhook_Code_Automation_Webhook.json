@@ -639,7 +639,7 @@
               "id": "b21efe1c-e5b5-4bb3-bf07-a52859c7a607",
               "name": "ownerEmail",
               "type": "string",
-              "value": "owner@email.com"
+              "value": "REPLACE_ME@example.com"
             },
             {
               "id": "3f0b090c-0b5e-41cb-9841-05b7b8f83126",

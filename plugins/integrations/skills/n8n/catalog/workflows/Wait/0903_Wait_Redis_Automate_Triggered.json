@@ -701,7 +701,7 @@
     "When Executed by Another Workflow": [
       {
         "message": "Mensaje del usuario despues de pasar por el workflow de n8n:\nTexto: ¡Hola! Quiero más información.;\nImagen: ;\nAudio: ;",
-        "context_id": "573058148988@s.whatsapp.net"
+        "context_id": "REPLACE_ME@example.com"
       }
     ]
   },

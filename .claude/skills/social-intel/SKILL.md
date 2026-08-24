@@ -1,6 +1,6 @@
 ---
 name: social-intel
-description: "Досье на человека/компанию по соцсетям (Scraping API). Триггеры: «досье на», «кто этот человек». НЕ домены → osint-recon; ЕГРЮЛ → lead-enrichment."
+description: "Досье на человека/компанию по соцсетям (Scraping API). Триггеры: «досье на», «кто этот человек». НЕ домены → osint-recon; компания по открытым источникам → account-research."
 allowed-tools: Bash, Read, Write, WebSearch
 ---
 
@@ -162,8 +162,14 @@ Generated: [date]
 ### Step 4: Save report
 
 ```bash
-mkdir -p ~/Documents/Social-Intel
-# Write the dossier to a markdown file
+# ~/Documents не существует на локализованном Linux (папка называется «Документы»),
+# а mkdir -p ошибки не даст — он создаст ВТОРОЙ каталог, и досье окажется не там,
+# где его ищут. Берём настоящий путь и печатаем его.
+DOCS_DIR="$(xdg-user-dir DOCUMENTS 2>/dev/null || echo "$HOME/Documents")"
+OUT="$DOCS_DIR/Social-Intel"
+mkdir -p "$OUT" || { echo "Не смог создать $OUT — скажи об этом вслух, не пиши досье в никуда"; exit 1; }
+echo "Досье сохраняю в: $OUT"
+# Write the dossier to a markdown file inside "$OUT"
 ```
 
 ## Workflow: Company Dossier
@@ -191,7 +197,7 @@ Same approach but focus on:
 |-----------|-------|
 | Prepare for call | `call-prep` |
 | Write outreach | `draft-outreach` |
-| Add to CRM | `crm` |
+| Add to CRM | импорт в твою CRM (её API / CSV) |
 | Ad intelligence | `ad-spy` |
 | Deep topic research | `last30days` |
 | Competitive analysis | `competitive-analysis` |
@@ -201,6 +207,7 @@ Same approach but focus on:
 
 - Only public data — no login-required content
 - 1 credit per API call, plan budget before batch operations
-- Store results locally (`~/Documents/Social-Intel/`), not in git
+- Store results locally (`<Documents>/Social-Intel/`, resolved via `xdg-user-dir DOCUMENTS`), not in git;
+  always name the absolute path in the answer
 - Rate limit courtesy: 1s delay between sequential calls
 - Do not use for harassment, stalking, or unauthorized surveillance

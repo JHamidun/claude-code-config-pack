@@ -12,7 +12,7 @@ description: "Google AI API (GOOGLE_API_KEY): Gemini text 2M контекст, e
 > - **[nano-banana-pro](../nano-banana-pro/SKILL.md)** — prompt engineering для Gemini image
 > - **[video-generation](../video-generation/SKILL.md)** — генерация видео (Veo/Sora/Seedance)
 > - **[openai-dalle](../openai-dalle/SKILL.md)** — OpenAI suite: gpt-image-2, Sora, Whisper, TTS
-> - agent-builder tooling/references/gemini-api-models.md` — живой каталог моделей + discovery curl + OpenAI-shim для ботов
+> - **[autonomous-agent-creator](../autonomous-agent-creator/references/gemini-api-models.md)** — живой каталог моделей + discovery curl + OpenAI-shim для ботов
 
 ## Overview
 
@@ -73,7 +73,7 @@ client = genai.Client(api_key=os.getenv('GOOGLE_API_KEY'))
 curl -s "https://generativelanguage.googleapis.com/v1beta/models?key=${GOOGLE_API_KEY}" | python -m json.tool
 ```
 
-Полная таблица (latency/лимиты/прайс/gotchas) — agent-builder tooling/references/gemini-api-models.md`.
+Полная таблица (latency/лимиты/прайс/gotchas) — `autonomous-agent-creator/references/gemini-api-models.md`.
 
 ## Text Generation
 
@@ -305,7 +305,7 @@ base_url: https://generativelanguage.googleapis.com/v1beta/openai
 model:    gemini-3.5-flash        # bare name, без "models/"
 ```
 
-404 → неправильный base_url или модели нет на ключе (прогони discovery). Детали, rate limits (free tier ~1500 req/day), пустой `message {}` при выжранном reasoning-бюджете — в agent-builder tooling/references/gemini-api-models.md`.
+404 → неправильный base_url или модели нет на ключе (прогони discovery). Детали, rate limits (free tier ~1500 req/day), пустой `message {}` при выжранном reasoning-бюджете — в `autonomous-agent-creator/references/gemini-api-models.md`.
 
 ## Генерация картинок/видео — указатели (канон)
 

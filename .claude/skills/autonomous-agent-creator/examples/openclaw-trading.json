@@ -1,0 +1,102 @@
+{
+  "auth": {
+    "order": { "openai": ["openai-api"] },
+    "profiles": {
+      "openai-api": {
+        "provider": "openai",
+        "mode": "api_key"
+      }
+    }
+  },
+  "gateway": {
+    "mode": "local",
+    "bind": "loopback",
+    "auth": { "mode": "token", "token": "REPLACE_WITH_RANDOM_TOKEN" },
+    "controlUi": { "enabled": true, "allowInsecureAuth": true }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "REPLACE_WITH_TOKEN",
+      "dmPolicy": "open",
+      "allowFrom": ["*"]
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "openai/gpt-5.2",
+        "fallbacks": ["openai/gpt-5-mini"]
+      },
+      "systemPrompt": "You are a trading signal assistant. Analyze crypto markets using technical indicators. NEVER give financial advice — present data objectively. Signal format: pair, timeframe, direction, strength (1-5), entry zone, stop loss, take profit levels. Only send signals with strength >= 3."
+    }
+  },
+  "skills": {
+    "load": {
+      "extraDirs": ["/home/node/.openclaw/skills"]
+    }
+  },
+  "cron": {
+    "enabled": true,
+    "jobs": [
+      {
+        "name": "trading-quick",
+        "enabled": true,
+        "schedule": {
+          "kind": "every",
+          "everyMs": 60000
+        },
+        "sessionTarget": "isolated",
+        "payload": {
+          "kind": "agentTurn",
+          "message": "Analyze BTC/USDT and ETH/USDT on 1m timeframe. Check RSI, MACD, volume. Only send if signal strength >= 3. If no signal, respond with empty string.",
+          "toolsAllow": ["web_fetch", "memory_search"]
+        },
+        "delivery": {
+          "mode": "announce",
+          "channel": "telegram",
+          "onlyIfOutput": true
+        }
+      },
+      {
+        "name": "trading-swing",
+        "enabled": true,
+        "schedule": {
+          "kind": "cron",
+          "expr": "*/15 * * * *"
+        },
+        "sessionTarget": "isolated",
+        "payload": {
+          "kind": "agentTurn",
+          "message": "Analyze top-10 USDT pairs on 15m/1h. Look for reversal patterns, divergences, support/resistance breaks. Only send if strength >= 3. Format each signal on a new line.",
+          "toolsAllow": ["web_fetch", "memory_search"]
+        },
+        "delivery": {
+          "mode": "announce",
+          "channel": "telegram",
+          "onlyIfOutput": true
+        }
+      },
+      {
+        "name": "daily-pnl",
+        "enabled": true,
+        "schedule": {
+          "kind": "cron",
+          "expr": "0 23 * * *",
+          "tz": "Europe/Moscow"
+        },
+        "sessionTarget": "main",
+        "wakeMode": "now",
+        "payload": {
+          "kind": "agentTurn",
+          "message": "Review all signals sent today. Calculate win rate and average R:R. Summarize as daily report.",
+          "toolsAllow": ["memory_search", "session_search"]
+        },
+        "delivery": {
+          "mode": "announce",
+          "channel": "telegram"
+        }
+      }
+    ]
+  }
+}

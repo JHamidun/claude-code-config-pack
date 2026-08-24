@@ -1,14 +1,35 @@
-# Context7 AUTO-INVOKE
+# Context7 — актуальные доки библиотек
 
-Когда спрашивают про:
-- Библиотеки/фреймворки (React, FastAPI, Django, etc.)
-- API документацию
-- Генерацию кода с конкретными библиотеками
-- Настройку и конфигурацию
+Когда спрашивают про библиотеки/фреймворки (React, FastAPI, Django…), API,
+конфигурацию или просят написать код под конкретную библиотеку — знания модели
+устарели. Возьми свежие доки, потом пиши код.
 
-Always use the Context7 plugin (`mcp__plugin_context7_context7__*`) for current docs:
-1. `mcp__plugin_context7_context7__resolve-library-id` для библиотеки
-2. `mcp__plugin_context7_context7__get-library-docs` для документации
-3. Только потом отвечай с актуальным кодом
+## Два пути, оба рабочие
 
-Training data may be outdated for library-specific code — Context7 returns current documentation.
+**1. Скрипт (работает всегда, ключ не нужен, MCP не нужен):**
+
+```bash
+python ~/.claude/tools/context7_docs.py search fastapi
+python ~/.claude/tools/context7_docs.py docs /websites/fastapi_tiangolo --topic middleware --max-chars 8000
+```
+
+1. `search <название>` → взять точный id вида `/org/project`;
+2. `docs <id> --topic <тема> --max-chars <N>` → доки;
+3. только потом писать код.
+
+Библиотеки переезжают — скрипт сам идёт по редиректам и печатает цепочку в
+stderr. `--help` покажет остальные флаги (`-p` страница, `-n` число результатов,
+`-o` в файл). Анонимная квота ~200 запросов на окно; свой ключ в
+`CONTEXT7_API_KEY` её поднимает.
+
+**2. Плагин Context7 (если включён):** инструменты
+`mcp__plugin_context7_context7__resolve-library-id` и
+`…__get-library-docs` — та же выдача.
+
+## Какой выбирать
+
+**Субагенту — тот, который есть в его `tools`.** Инструмент, которого нет в
+списке агента, он вызвать не может: шаг просто не выполнится, и это не видно по
+тексту промпта. У агента есть `Bash` — зови скрипт. Нет `Bash`, но плагин в
+`tools` перечислен — зови MCP. Нет ни того ни другого — скажи об этом вместо
+того, чтобы делать вид, что доки проверены.

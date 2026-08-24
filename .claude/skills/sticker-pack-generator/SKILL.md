@@ -80,6 +80,28 @@ ffmpeg yuva420p raw stream  →  Google `alpha_encoder` (VP9 + BlockAdditional)
                           /setreactions in channel admin
 ```
 
+## Setup — what is NOT installed by `requirements.txt`
+
+The animated path needs three things that a plain `pip install -r requirements.txt`
+will not give you. Install them before running `process_one.py` / `batch_process.py`:
+
+| What | Why it is not in `requirements.txt` | Install |
+|------|-------------------------------------|---------|
+| **SAM2** | **No PyPI distribution at all** — `pip install sam2` answers `No matching distribution found`, which reads like a broken pack. It is git-only. | `pip install "git+https://github.com/facebookresearch/sam2.git"` |
+| SAM2 weights | ~160 MB `.pt` checkpoints, never shipped in a config pack | download `sam2.1_hiera_small.pt` from the SAM2 repo → point `SAM2_CHECKPOINT` at it |
+| `torch`, `opencv-python`, `rembg` | heavy/GPU-specific — they live in `requirements-optional.txt` | `pip install torch opencv-python rembg` (CUDA build: pytorch.org/get-started) |
+| `alpha_encoder` | custom C++ build, see Step 2 | build once, set `ALPHA_ENCODER_PATH` |
+
+The scripts import this stack **lazily** and name the missing piece plus its install
+command instead of raising a bare `ModuleNotFoundError: No module named 'sam2'`.
+That also means `python process_one.py --help` works on a machine with none of it
+installed — you can read the arguments before you spend an hour on setup.
+
+If `sam2` is installed but blows up on import with something that is *not* an import
+error (the usual culprit: `antlr4-python3-runtime` at a version `omegaconf` did not
+expect — `Could not deserialize ATN with version 3`), the scripts say so explicitly
+rather than dumping a forty-line traceback from somebody else's package.
+
 ## Step 1 — Mask extraction (SAM2 + rembg UNION + chromakey)
 
 White-on-white characters break both rembg and SAM2 individually.
@@ -108,24 +130,47 @@ Notes:
 
 `ffmpeg -c:v libvpx-vp9 -pix_fmt yuva420p` silently strips alpha when muxing to WebM. Every libvpx build through ffmpeg does this. The ONLY working path is Google's `webm-tools/alpha_encoder` which muxes alpha through Matroska BlockAdditional.
 
-- It is **Linux-only** — run through WSL.
+- It is a **Linux binary**. On macOS and Linux you build and run it directly. **WSL is a Windows-only detour** — there is no `wsl` command on macOS or Linux, and the encoder needs no wrapper there.
 - The upstream `master` branch breaks at low CBR (50 kbps); the well-known patch to `alpha_encoder.cc` restores CBR + `--target-bitrate=50`.
 - Battle-tested config: `--end-usage=cbr --target-bitrate=50 --fps=30/1 --width=512 --height=512`.
 - Output: ~70–90 KB for a 3-sec sticker.
 
 Build path (one-time):
-```
+
+```bash
+# macOS / Linux — build natively:
 git clone <webm-tools-fork-with-patch> ~/webm-tools
 cd ~/webm-tools/alpha_encoder && make
-# binary: ~/webm-tools/alpha_encoder/alpha_encoder
+export ALPHA_ENCODER_PATH=~/webm-tools/alpha_encoder/alpha_encoder
+
+# Windows — build INSIDE WSL (no native Windows build of alpha_encoder exists):
+wsl --install -d Ubuntu-22.04          # reboot required the first time
+wsl -d Ubuntu-22.04 -u root bash -lc '
+  git clone <webm-tools-fork-with-patch> /opt/webm-tools &&
+  cd /opt/webm-tools/alpha_encoder && make'
+# then WSL_DISTRO=Ubuntu-22.04 and ALPHA_ENCODER_PATH=/opt/webm-tools/alpha_encoder/alpha_encoder
 ```
+
+`scripts/process_one.py` and `scripts/batch_process.py` pick the right path by
+platform themselves and **check the encoder before the first frame** — SAM2 runs for
+minutes per clip, so a missing encoder must not surface only at the last step.
+`python process_one.py --help` states which path it will take.
 
 ## Step 3 — Compose into WebM (ffmpeg yuva420p stream → alpha_encoder)
 
-```
+```bash
+# macOS / Linux — no wrapper:
 ffmpeg -y -framerate 30 -i rgba/%04d.png \
   -pix_fmt yuva420p -f rawvideo - \
-  | wsl ~/webm-tools/alpha_encoder/alpha_encoder \
+  | ~/webm-tools/alpha_encoder/alpha_encoder \
+       --width=512 --height=512 --fps=30/1 \
+       --end-usage=cbr --target-bitrate=50 \
+       -o out.webm
+
+# Windows — the same call, routed through WSL:
+ffmpeg -y -framerate 30 -i rgba/%04d.png \
+  -pix_fmt yuva420p -f rawvideo - \
+  | wsl -d Ubuntu-22.04 /opt/webm-tools/alpha_encoder/alpha_encoder \
        --width=512 --height=512 --fps=30/1 \
        --end-usage=cbr --target-bitrate=50 \
        -o out.webm
@@ -154,7 +199,7 @@ Pack short_name convention: `<base>_by_<your_bot>`. For emoji packs: `<base>_emo
 |-------------------------------------|-------------------------------------------------|---------------------------------|
 | New static pack                     | `/newpack`                                      | `scripts/upload_static_pack.py` |
 | New animated WebM pack              | `/newvideopack`                                 | `scripts/create_pack.py`        |
-| New custom emoji pack               | `/newemojipack`                                 | `scripts/create_emoji_pack.py` (нет в скилле; есть в `${WORKSPACE}/sticker-pack/scripts/`) |
+| New custom emoji pack               | `/newemojipack`                                 | скрипта нет — заведи пак вручную у @Stickers, дальше `scripts/make_emoji_variant.py` + `scripts/replace_all_custom_emojis.py` |
 | Add stickers to existing pack       | `/addsticker`                                   | `scripts/add_to_pack.py`        |
 | Replace by emoji (preserves slot)   | `/replacesticker` (or `/replaceemoji`)          | `scripts/replace_in_pack.py`    |
 | Delete stickers                     | `/delsticker`                                   | `scripts/clean_pack.py`         |
@@ -200,7 +245,7 @@ Reference setup that works well on a tech channel:
 - Custom picks pulled from the pack (`🔥 ❤️ 🤔 🤯 🎉 🤝 🤩 🤣` — overwrite with your own).
 - Daily story limit is gated by channel **boost level** (level N → ~N stories/day; level 8 → 8). Hitting the cap returns `RPCError 400: BOOSTS_REQUIRED` from `SendStory`. Deleting a sent story does NOT refund the daily slot.
 
-Reactions are configured **once via the @BotFather-less admin UI** (channel → Edit → Reactions → All / Some). Scripted helpers live in `scripts/set_channel_reactions.py` (нет в скилле; есть в `${WORKSPACE}/sticker-pack/scripts/`) (uses `EditChannelReactionsRequest`).
+Reactions are configured **once via the @BotFather-less admin UI** (channel → Edit → Reactions → All / Some). Скрипта-обёртки в паке нет; если нужна автоматизация — это один вызов Telethon `EditChannelReactionsRequest` (база подключения — `scripts/_telethon_base.py`).
 
 ## TGS Lottie dead ends — DO NOT RETRY
 

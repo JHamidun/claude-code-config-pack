@@ -6,19 +6,48 @@ Reuses broll/state.json; only generates shots missing a downloaded file.
 
 Usage: python veo_runner.py shots_all.json [--model fast|31fast]
 """
+# UTF-8 на выход. Консоль Windows по умолчанию cp1251/cp866/cp1252, и первый же
+# не-ASCII символ (кириллица, →, ✓) валит процесс UnicodeEncodeError — обычно на
+# --help, то есть ДО любой полезной работы. errors="replace" оставляет вывод
+# читаемым, если терминал всё же не UTF-8.
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 import os
 import sys
 import time
 from pathlib import Path
 
-os.environ.pop("GEMINI_API_KEY", None)  # CRITICAL before genai import
 from dotenv import load_dotenv
 
-load_dotenv(Path.home() / ".claude" / ".credentials.master.env")
 import json  # noqa: E402
 
 from google import genai  # noqa: E402
 from google.genai import types  # noqa: E402
+
+
+# Ключ — по требованию, а не при импорте. Раньше на верхнем уровне модуля стояли
+# os.environ.pop("GEMINI_API_KEY") (мутация окружения ЛЮБОГО импортёра) и
+# load_dotenv(...) (чтение файла с ключами), а клиент строился как
+# os.environ["GOOGLE_API_KEY"] — без ключа это KeyError, по которому причину не понять.
+def _google_api_key():
+    """GOOGLE_API_KEY: окружение → ~/.claude/.credentials.master.env → внятный отказ."""
+    if not os.environ.get("GOOGLE_API_KEY"):
+        load_dotenv(Path.home() / ".claude" / ".credentials.master.env")
+    os.environ.pop("GEMINI_API_KEY", None)  # конфликт SDK: приоритет у GOOGLE_API_KEY
+    key = os.environ.get("GOOGLE_API_KEY", "")
+    if not key:
+        raise SystemExit(
+            "ОТКАЗ: не задан GOOGLE_API_KEY.\n"
+            "  Где взять: aistudio.google.com/apikey\n"
+            "  Как задать: export GOOGLE_API_KEY=... (или строка GOOGLE_API_KEY=... "
+            "в ~/.claude/.credentials.master.env)"
+        )
+    return key
 
 BASE = Path(__file__).parent
 MODELS = {
@@ -51,7 +80,7 @@ def main():
     if "--model" in sys.argv:
         global MODEL
         MODEL = MODELS[sys.argv[sys.argv.index("--model") + 1]]
-    client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
+    client = genai.Client(api_key=_google_api_key())
 
     todo = [s for s in shots if not done_file(s["id"]) and s["id"] != "r2_s05a"]
     print(f"Veo {MODEL}: {len(todo)} shots", flush=True)

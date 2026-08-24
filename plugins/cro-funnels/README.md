@@ -10,7 +10,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 |-------|--------------|
 | `ab-testing-ru` | A/B testing and an experiment-driven growth program — hypotheses, sample size, significance, ICE prioritization. |
 | `capi-no-code-setup` | Server-side conversion tracking (Conversions API) with no code — Zapier/n8n/Albato plus CRM, with event dedup. |
-| `form-cro-ru` | Form conversion optimization — consultation requests, lead magnets and contact forms, including consent requirements. |
+| `form-cro-ru` | Form conversion optimization — consultation requests, signup/trial forms, lead magnets and email capture, including consent requirements. |
 | `full-funnel-analytics-ru` | Cohort full-funnel marketing analytics at scale — decide on cohort revenue instead of CPL; predicted LTV and dashboards. |
 | `funnel-design-ru` | Design marketing funnels — a metric tree from CPM to LTV/CAC, eight funnel archetypes, lead grading, callback SLA. |
 | `manychat-funnel-ru` | ManyChat comment-to-DM funnels for Instagram, Facebook and Telegram — keyword triggers, nurture chains, lead handoff. |
@@ -18,7 +18,6 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `page-cro-ru` | CRO for marketing pages — landings, product and home pages: audit and lift visit→lead and trial→paid conversion. |
 | `paywall-cro-ru` | In-app paywalls, upgrade screens, upsells and feature gates — trial→paid conversion and tier upgrades. |
 | `popup-cro-ru` | Popups, modals, overlays, slide-ins and banners — email capture, lead magnets, exit intent, consent handling. |
-| `signup-cro-ru` | Optimize the signup funnel and email capture — reduce friction and raise completion rate step by step. |
 
 ## Install
 

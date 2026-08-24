@@ -23,7 +23,7 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 </available_agent_types>
 
 <context>
-пользователя issue: $ARGUMENTS
+User's issue: $ARGUMENTS
 
 Check for active sessions:
 ```bash

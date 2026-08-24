@@ -132,8 +132,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "milorad.filipovic19@gmail.com",
-          "cachedResultName": "milorad.filipovic19@gmail.com"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "operation": "getAll"
       },
@@ -262,7 +262,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "{{ $credentials.gmailOAuth2.id }}",
-          "name": "mrdosija@gmail.com"
+          "name": "REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2.1,

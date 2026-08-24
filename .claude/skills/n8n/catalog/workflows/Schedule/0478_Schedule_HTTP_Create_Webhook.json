@@ -324,7 +324,7 @@
         720
       ],
       "parameters": {
-        "sendTo": "n8n.ninja@gmail.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "=<h3>Price reduction alert for {{ $('Format Product').item.json[\"name\"] }}</h3>\n\n<p>New price {{ $('Format Product').item.json[\"price\"] }} CHF is bellow {{ $('List Products').item.json[\"price_alert\"] }} CHF</p>\n\nView product: {{ $('List Products').item.json[\"link\"] }}\n\n\n",
         "options": {},
         "subject": "=⚠️ Price Reduction: {{ $('Format Product').item.json.name }}\n"

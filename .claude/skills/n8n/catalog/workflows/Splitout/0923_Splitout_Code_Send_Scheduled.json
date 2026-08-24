@@ -49,7 +49,7 @@
         "channelId": {
           "__rl": true,
           "mode": "id",
-          "value": "=19:NQuQMYvvtC9DcTEQs1Vul1Nm1xIXnRmznAwov7MuNZ81@thread.tacv2"
+          "value": "=19:REPLACE_ME@example.com2"
         },
         "operation": "getAll"
       },
@@ -230,7 +230,7 @@
         "channelId": {
           "__rl": true,
           "mode": "id",
-          "value": "=19:NQuQMYvvtC9DcTEQs1Vul1Nm1xIXnRmznAwov7MuNZ81@thread.tacv2"
+          "value": "=19:REPLACE_ME@example.com2"
         },
         "contentType": "html"
       },

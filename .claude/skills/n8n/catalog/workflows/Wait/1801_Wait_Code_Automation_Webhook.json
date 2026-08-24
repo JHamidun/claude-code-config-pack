@@ -52,7 +52,7 @@
       ],
       "webhookId": "6a510528-22e0-4140-b987-770bb7a138de",
       "parameters": {
-        "sendTo": "tom@sleak.chat",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "={{ $fromAI(\"change\", \"What relevant part has changed on the website?\") }}",
         "options": {
           "appendAttribution": false

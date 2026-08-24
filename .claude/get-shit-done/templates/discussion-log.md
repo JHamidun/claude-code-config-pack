@@ -28,7 +28,7 @@ Template for `.planning/phases/XX-name/{phase_num}-DISCUSSION-LOG.md` — audit 
 | [Option 2] | [Brief description] | ✓ |
 | [Option 3] | [Brief description] | |
 
-**пользователя choice:** [Selected option or verbatim free-text response]
+**User's choice:** [Selected option or verbatim free-text response]
 **Notes:** [Any clarifications or rationale provided during discussion]
 
 ---

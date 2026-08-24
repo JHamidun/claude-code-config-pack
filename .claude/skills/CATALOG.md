@@ -1,6 +1,7 @@
 # Skills Catalog
 
-> 287 skills total: 77 actionable (with executable code) + 210 prompt-based.
+> 314 skills total (срез 2026-08-23). Точное число — `ls ~/.claude/skills/`: этот файл — выборка по
+> категориям и отстаёт от дерева.
 > This catalog lists a categorized subset — per-section counts refer to entries
 > below, not the whole pack. Full list: `ls ~/.claude/skills/`.
 >
@@ -18,6 +19,7 @@
 | javascript-typescript-dev | P | Modern JS/TS, React, Next.js, Node.js development |
 | python-fullstack-dev | P | Django, FastAPI, Flask, data science |
 | database-design | P | Database design, optimization, migrations |
+| pgvector-rag | P | Production RAG on pgvector: chunking, embeddings, idempotent ingest, gotchas |
 | api-documentation | P | API documentation generation |
 | d3-visualization | P | D3.js data visualization |
 | website-creation | P | Full website creation workflow |
@@ -81,6 +83,7 @@
 | d-id | P | D-ID talking head video generation |
 | did | P | D-ID API integration (alternate) |
 | slack-gif-creator | P | GIF creation for Slack |
+| shorts-pipeline | **A** | Webinar cuts → AI-avatar YouTube Shorts (HeyGen + SubMagic + covers), with a spend gate |
 
 ## Audio & Speech (3 skills)
 | Skill | Type | Description |
@@ -89,13 +92,13 @@
 | deepgram | P | Deepgram speech-to-text transcription |
 | youtube-transcript | P | YouTube video transcript extraction |
 
-## Documents & Office (10 skills)
+## Documents & Office (9 skills)
 | Skill | Type | Description |
 |-------|------|-------------|
-| docx | **A** | DOCX creation, editing, analysis with scripts |
-| xlsx | **A** | XLSX/Excel creation and manipulation with scripts |
-| pptx | **A** | PPTX creation, editing, analysis with scripts |
-| pdf | **A** | PDF processing, extraction, manipulation |
+| xlsx | P | Excel .xlsx via openpyxl — create, edit without losing formulas, charts, streaming |
+| pptx | P | PowerPoint .pptx via python-pptx — build, edit, parse, speaker notes |
+| pdf | P | PDF via pypdf/pdfplumber/pdf2image — text, tables, merge/split, forms, render |
+| docx | P | Word .docx via python-docx — build, edit, styles, tracked changes over XML |
 | pdf-generation | P | PDF generation and layout |
 | word-docx | P | Word document creation (prompt-based) |
 | excel-xlsx | P | Excel spreadsheet operations (prompt-based) |
@@ -149,13 +152,13 @@
 | stock-analysis | **A** | Stock market analysis with yfinance |
 | meta-ads-analyzer | P | Meta/Facebook Ads diagnosis |
 | serpapi | P | SerpAPI search results analysis |
+| youtube-analytics | **A** | Own-channel analytics via YouTube Data API v3 (topics, timing, duration, Shorts vs long) |
+| trend-engine | P | Viral detector across platforms (z-score) + topic auto-pick for your channel |
 
-## DevOps & Infrastructure (6 skills)
+## DevOps & Infrastructure (4 skills)
 | Skill | Type | Description |
 |-------|------|-------------|
 | senior-devops | **A** | DevOps with executable infrastructure scripts |
-| server-health | P | Server health monitoring |
-| uptime-kuma-ops | P | Uptime Kuma monitoring operations |
 | aws-skills | P | AWS services (EC2, S3, Lambda, etc.) |
 | claude-server-auth | P | Claude CLI server authorization setup |
 | claude-cli-runner | P | Run Claude CLI without API key |
@@ -192,15 +195,17 @@
 | Skill | Type | Description |
 |-------|------|-------------|
 
-## Writing & Communication (6 skills)
+## Writing & Communication (7 skills)
 | Skill | Type | Description |
 |-------|------|-------------|
+| author-voice | P | Reference pack: anti-AI-tells checklist + non-fiction craft (reads `~/.claude/voice-sample.md`) |
 | de-ai-ify | P | Remove AI jargon, humanize text |
 | internal-comms | P | Weekly status reports |
 | meeting-analyzer | P | Meeting transcript analysis |
 | brainstorming | P | Structured brainstorming sessions |
 | domain-brainstormer | P | Domain name brainstorming |
 | excalidraw-flowchart | P | Excalidraw flowchart and diagram generation |
+| habr-post | **A** | Habr articles: 9-stage editorial pipeline, fact rules, PII scan, .docx + cover |
 
 ## Thinking & Methodology (4 skills)
 | Skill | Type | Description |
@@ -244,6 +249,7 @@
 | Skill | Type | Description |
 |-------|------|-------------|
 | invoice-organizer | P | Invoice organization and tracking |
+| career-ops | **A** | Job search: 10 portal scanners, A-F offer evaluation, ATS PDF, application tracker |
 
 ## File Management (1 skill)
 | Skill | Type | Description |

@@ -1,6 +1,6 @@
 # Blueprint — Electron installer architecture
 
-Canonical code: `${WORKSPACE}/yourname-installer`. Read its files for exact, current implementation. Below = the structure + the non-obvious reusable patterns.
+Ниже — структура и переиспользуемые куски кода целиком: отдельного репозитория-образца пак не несёт, собирай по этому файлу.
 
 ## File layout
 

@@ -27,7 +27,7 @@
         },
         "subject": "Certificate For Course",
         "toEmail": "={{$node[\"SplitInBatches\"].json[\"email\"]}}",
-        "fromEmail": "bhavabhuthi@riseup.net",
+        "fromEmail": "REPLACE_ME@example.com",
         "attachments": "data"
       },
       "credentials": {

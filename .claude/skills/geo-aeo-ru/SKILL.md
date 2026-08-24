@@ -1,6 +1,6 @@
 ---
 name: geo-aeo-ru
-description: "GEO/AEO/LLM SEO — видимость бренда в ответах ChatGPT, Perplexity, (regional LLM A); Citation Share, llms.txt. Триггеры: «попасть в ответы AI». НЕ контент под Яндекс→seo-machine-ru."
+description: "GEO/AEO/LLM SEO — видимость бренда в ответах ChatGPT, Perplexity, YandexGPT; Citation Share, llms.txt. Триггеры: «попасть в ответы AI». НЕ контент под Яндекс→seo-machine-ru."
 metadata:
   version: 1.1.0
   updated: 2026-07-18
@@ -12,7 +12,7 @@ metadata:
 
 Playbook по **Generative Engine Optimization**: как сделать так, чтобы твой бренд/продукт
 появлялся в ответах ChatGPT, Claude, Perplexity, Gemini, Google AI Overviews, а в российском
-контуре — (regional LLM B), (regional LLM A), Яндекс Нейро.
+контуре — GigaChat, YandexGPT, Яндекс Нейро.
 
 Это **не редакционный** и **не программатический** скилл про создание контента. Это
 **стратегия видимости**: измерить, где ты сейчас в AI-ответах, понять как LLM выбирают источники,
@@ -21,6 +21,10 @@ Playbook по **Generative Engine Optimization**: как сделать так, 
 > **Источник истины:** `references/geo-llm-seo-research.md` (локальная копия research'а, все цифры
 > со ссылками на Princeton/Ahrefs/Semrush/Conductor). Цифры в этом скилле — оттуда.
 > **Не выдумывай новых бенчмарков** — если числа нет в research, говори «нет данных».
+
+**Перед началом прочитай `~/.claude/business-context.md`** — разделы «Продукт» (как называется бренд, за какими словами его должны находить), «Позиционирование» (в какой категории хочешь, чтобы тебя искали, и с кем сравнивают) и «ICP» (кто задаёт вопрос модели). Файла нет — заведи из `~/.claude/templates/business-context.md`.
+
+Без него замерять нечего: Citation Share считается по конкретным бренду и категории запросов, и «посмотрим, что ответит модель про AI-обучение вообще» — это не замер, а любопытство. Список конкурентов для сравнения тоже берётся оттуда, иначе окажется, что ты выиграл долю у тех, с кем не пересекаешься.
 
 ---
 
@@ -35,7 +39,7 @@ Playbook по **Generative Engine Optimization**: как сделать так, 
 | Прогон промптов через несколько моделей | `perplexity` / `multi-model-gateway` | инструменты; здесь — методология аудита |
 
 **Этот скилл отвечает на:** «мой бренд вообще видят в AI?», «как измерить?», «как попасть?»,
-«чем (regional LLM B) отличается?». Стратегия и измерение, не текст.
+«чем GigaChat отличается?». Стратегия и измерение, не текст.
 
 ---
 
@@ -99,8 +103,8 @@ GEO и AEO — синонимы на ~90%. GEO про модель, AEO про U
 | **Perplexity** | **Reddit (46.7%)** | BLUF в первых 100 словах, свежесть (×3.2 за 30 дн), schema, inline-citations | Low / Very High |
 | **Claude** | UGC (2-4× выше других), NYT/Atlantic | формальный тон, verifiable claims, престижная журналистика, bullet-points (+30%) | High / Low (off по умолчанию) |
 | **Gemini / AI Overviews** | Google index + Reddit (21%) | традиционный SEO, Google Business Profile, structured data | Medium / High |
-| **(regional LLM B)** | RU-веб, новости | присутствие в RU-инфополе (vc/Habr), бизнес-фокус | High / Medium |
-| **(regional LLM A) / Нейро** | Яндекс-индекс | топ Яндекса + структурированные ответы + FAQ | — |
+| **GigaChat** | RU-веб, новости | присутствие в RU-инфополе (vc/Habr), бизнес-фокус | High / Medium |
+| **YandexGPT / Нейро** | Яндекс-индекс | топ Яндекса + структурированные ответы + FAQ | — |
 
 **Концентрация авторитета:** top-15 доменов = **68% всех AI-цитат** (5W Index 2026). Source
 dominance (Semrush, 17M citations): Reddit 40.1%, Wikipedia 26.3%, YouTube 23.5%.
@@ -150,9 +154,9 @@ robots.txt **allow** для GPTBot/ClaudeBot/PerplexityBot/Google-Extended/CCBot
    - *Problem-aware:* «Как решить [проблему, которую решает бренд]?» — самый сильный сигнал фита
    - *Niche / long-tail:* специфические запросы из реальных юз-кейсов клиентов
 
-2. **Прогнать через 6 платформ:** ChatGPT, Claude, Perplexity, Gemini, (regional LLM B), (regional LLM A)
+2. **Прогнать через 6 платформ:** ChatGPT, Claude, Perplexity, Gemini, GigaChat, YandexGPT
    (+ Яндекс Нейро для РФ). Инструмент — `multi-model-gateway`, `perplexity` или любой
-   агрегатор моделей в одном окне. 50 промптов × 6 платформ = базовый аудит.
+   агрегатор LLM. 50 промптов × 6 платформ = базовый аудит.
 
 3. **Зафиксировать baseline по чеклисту** (для каждого ответа):
    - [ ] Бренд упомянут напрямую? Со ссылкой на оф. сайт?
@@ -206,16 +210,16 @@ python brand_scanner.py "YourBrand" yourbrand.ru
 
 ## Российская специфика (главное отличие этого скилла)
 
-**Западные GEO-тулы (Profound, Otterly, Peec AI, AthenaHQ) НЕ мониторят (regional LLM B) / (regional LLM A) /
+**Западные GEO-тулы (Profound, Otterly, Peec AI, AthenaHQ) НЕ мониторят GigaChat / YandexGPT /
 Яндекс Нейро.** Это слепая зона — и одновременно возможность.
 
-- **(regional LLM B) vs (regional LLM A)/Alice:** одни и те же бренды показывают **2-3× разную Share of Voice**
+- **GigaChat vs YandexGPT/Alice:** одни и те же бренды показывают **2-3× разную Share of Voice**
   между ними (GeoScout). → отдельный мониторинг каждой русской платформы обязателен.
-- **(regional LLM B):** обучен на русскоязычных данных, бизнес-фокус, экосистема Сбера. Любит
+- **GigaChat:** обучен на русскоязычных данных, бизнес-фокус, экосистема банка-вендора. Любит
   присутствие в RU-инфополе (vc.ru, Habr, новости). Training-weight высокий.
-- **(regional LLM A) / Alice / Нейро:** поверх Яндекс-индекса. Оптимизация = классический SEO под Яндекс
+- **YandexGPT / Alice / Нейро:** поверх Яндекс-индекса. Оптимизация = классический SEO под Яндекс
   (см. `seo-machine-ru` + `yandex`) + структурированные ответы + FAQ + recency. 12% пользователей
-  нейросетей в РФ выбирают (regional LLM A).
+  нейросетей в РФ выбирают YandexGPT.
 
 → полный разбор русских LLM + почему западные тулы их не видят + стратегия под русские платформы:
 `references/russian-llm.md`.
@@ -233,14 +237,17 @@ problem-aware запрос («какие есть [категория] для [�
 training data), нет sustained Reddit/Habr presence, нет оригинального исследования как
 citation-магнита. Прогони workflow-аудит выше, найди свой блокер и закрой его.
 
-**(2) GEO-видимость как продуктовая фича или платная услуга.** Тот же движок — «AI Visibility
-Dashboard»: клиент вводит бренд + 20 промптов → прогон по 6 платформам (включая (regional LLM B)/(regional LLM A),
-которых нет у западных тулов) → Citation Share + PDF-отчёт. Уникальная позиция на RU-рынке —
-мониторинг ВСЕХ платформ сразу, а не только западных. Упакуй как SaaS-подписку или как разовый
-аудит-пакет (пример вилки: 5–15K RUB/мес за мониторинг). Продажную обвязку и структуру
-proposal см. в `references/geo-audit-service.md`.
+**(2) Тот же движок можно продавать.** Скрипты из `scripts/` + промпт-аудит по шести платформам
+собираются в услугу «AI Visibility»: клиент называет бренд и 20 промптов → прогон → Citation Share
+и отчёт. На RU-рынке это пока незанято ровно потому, что западные тулы не ходят в
+GigaChat/YandexGPT/Нейро. Структуру коммерческого предложения бери в `sales-enablement-ru`,
+рендер отчёта — в `slides` / `pptx`, цену калибруй через `pricing-strategy-ru`: отдельного
+шаблона КП здесь нет и не нужно.
 
-→ шаблон action-plan P0/P1/P2 с KPI, бюджетом и дедлайнами: `references/action-plan.md`.
+→ План работ на квартал складывай сам: P0 — то, что чинится за неделю (robots, llms.txt, schema),
+P1 — переписывание топ-страниц под цитируемость, P2 — работа на упоминания. По каждому пункту
+заранее запиши метрику из `references/measurement-tools.md` и дату повторного замера, иначе
+результат нечем будет предъявить.
 
 ---
 
@@ -250,9 +257,8 @@ proposal см. в `references/geo-audit-service.md`.
 |------|-------|
 | `references/measurement-tools.md` | метрики SoV/Citation Share, инструменты трекинга с ценами, методология промпт-аудита |
 | `references/tactics.md` | полный список тактик попадания (Princeton +30-40%, distribution, schema, llms.txt, кризис и цифры, разбор каждого движка) |
-| `references/russian-llm.md` | (regional LLM B)/(regional LLM A)/Нейро специфика, почему западные тулы их не видят, стратегия под русские LLM |
-| `references/action-plan.md` | шаблон P0/P1/P2 action plan под свой бренд с KPI и бюджетом |
-| `references/geo-audit-service.md` | GEO-аудит как платная услуга: пакеты, proposal-структура, white-label |
+| `references/russian-llm.md` | GigaChat/YandexGPT/Нейро специфика, почему западные тулы их не видят, стратегия под русские LLM |
+| `references/geo-llm-seo-research.md` | подробный разбор рынка GEO: платформы, исследования, инструменты с ценами |
 
 ## Связки (не дублировать — звать существующее)
 
@@ -268,9 +274,9 @@ proposal см. в `references/geo-audit-service.md`.
   llmstxt_generator / fetch_page / brand_scanner) — порт из zubair-trabzada/geo-seo-claude (MIT,
   9K★) с RU-адаптацией: кириллица-паттерны в скоринге, YandexBot в robots-чеке, ru-wiki +
   Habr/vc.ru в brand-скане, UTF-8 stdout под Windows, lxml опционален. Смок пройден
-  (py_compile + usage). Плюс `references/geo-audit-service.md` — продажная обвязка «GEO-аудит как услуга».
+  (py_compile + usage).
 - **v1.0 (2026-06-22):** создан из research'а по GEO/LLM SEO. Все бенчмарки — из research.
   Отделён от `seo-machine-ru` (контент под Яндекс) и `ai-seo-agent-pipeline` (программатическая
   фабрика): этот скилл — про ИЗМЕРЕНИЕ видимости и СТРАТЕГИЮ попадания в LLM-ответы + российскую специфику.
-- **Главный инсайт для РФ:** западные GEO-тулы не видят (regional LLM B)/(regional LLM A)/Нейро → у любого
+- **Главный инсайт для РФ:** западные GEO-тулы не видят GigaChat/YandexGPT/Нейро → у любого
   RU-бренда есть уникальная возможность для GEO-мониторинга этих платформ.

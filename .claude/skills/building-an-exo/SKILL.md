@@ -3,7 +3,7 @@ name: building-an-exo
 version: 1.3.0
 description: "Справочник ExO 3.0 (OpenExO) для AI-перестройки компании: Intelligence Stack, REWRITE, Edge Twin, DRIVE/SHAPE, MTP. Триггеры: «экспоненциальная организация». НЕ маркетинг/CRO."
 metadata:
-  license: MIT
+  license: "не установлена — см. раздел Attribution и файл ATTRIBUTION.md рядом"
   source: "Salim Ismail — The Organizational Singularity, OS Outline v20 (OpenExO Pro, May 2026); operationalized by Kent Langley"
 ---
 

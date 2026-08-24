@@ -915,7 +915,7 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 | [Option 2] | [Description] | ✓ |
 | [Option 3] | [Description] | |
 
-**пользователя choice:** [Selected option or free-text response]
+**User's choice:** [Selected option or free-text response]
 **Notes:** [Any clarifications, follow-up context, or rationale the user provided]
 
 ---

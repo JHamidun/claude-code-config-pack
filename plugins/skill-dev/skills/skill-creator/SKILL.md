@@ -152,7 +152,7 @@ Save test cases to `evals/evals.json`. Don't write assertions yet — just the p
   "evals": [
     {
       "id": 1,
-      "prompt": "пользователя task prompt",
+      "prompt": "User's task prompt",
       "expected_output": "Description of expected result",
       "files": []
     }

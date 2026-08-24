@@ -26,6 +26,13 @@ Usage:
     # Async support
     result = await claude_async("Explain quantum computing")
 
+Recursion guard:
+    A spawned agent can import this module and spawn again — unbounded nesting.
+    Every spawn carries CLAUDE_CLI_DEPTH into the child; at the limit
+    (CLAUDE_CLI_MAX_DEPTH, default 1) the next spawn raises RecursionGuardError
+    instead of forking another tree. Pass allow_nested=True when the extra level
+    is deliberate.
+
 Install CLI:
     npm install -g @anthropic-ai/claude-code
 """
@@ -69,6 +76,65 @@ def _find_cli() -> str:
     )
 
 
+# ---------------------------------------------------------------------------
+# Recursion guard
+# ---------------------------------------------------------------------------
+# An agent spawned by this wrapper can import this same wrapper and spawn again.
+# Nothing in the CLI stops that: each level is a legitimate-looking process, so the
+# nesting only ends when the machine runs out of RAM or the subscription rate-limits.
+# The child process inherits DEPTH_ENV; if it is already at the limit we refuse to
+# spawn and say why, instead of silently forking another tree.
+
+DEPTH_ENV = "CLAUDE_CLI_DEPTH"
+MAX_DEPTH_ENV = "CLAUDE_CLI_MAX_DEPTH"
+DEFAULT_MAX_DEPTH = 1  # depth 0 = top level; 1 nested child is allowed, its child is not
+
+
+class RecursionGuardError(RuntimeError):
+    """Refused to spawn a nested claude CLI — the nesting limit is already reached."""
+
+
+def current_depth() -> int:
+    """Nesting depth of THIS process (0 = not spawned by claude_cli)."""
+    try:
+        return max(0, int(os.environ.get(DEPTH_ENV, "0")))
+    except ValueError:
+        return 0
+
+
+def max_depth() -> int:
+    try:
+        return max(0, int(os.environ.get(MAX_DEPTH_ENV, DEFAULT_MAX_DEPTH)))
+    except ValueError:
+        return DEFAULT_MAX_DEPTH
+
+
+def check_recursion(allow_nested: bool = False) -> int:
+    """Raise RecursionGuardError if spawning would exceed the nesting limit.
+
+    Returns the depth the child will run at. Set allow_nested=True (or raise
+    CLAUDE_CLI_MAX_DEPTH) only when the extra level is deliberate.
+    """
+    depth = current_depth()
+    limit = max_depth()
+    if not allow_nested and depth >= limit:
+        raise RecursionGuardError(
+            f"refusing to spawn a nested claude CLI: already running at depth {depth} "
+            f"(limit {limit}, env {DEPTH_ENV}={os.environ.get(DEPTH_ENV)!r}).\n"
+            f"  An agent spawning itself recurses without bound.\n"
+            f"  If this nesting is intended: set {MAX_DEPTH_ENV}={depth + 1} "
+            f"or pass allow_nested=True."
+        )
+    return depth + 1
+
+
+def child_env(allow_nested: bool = False, base: Optional[dict] = None) -> dict:
+    """Environment for the spawned CLI, carrying the incremented depth marker."""
+    env = dict(os.environ if base is None else base)
+    env[DEPTH_ENV] = str(check_recursion(allow_nested))
+    return env
+
+
 def claude(
     prompt: str,
     *,
@@ -78,6 +144,7 @@ def claude(
     max_tokens: int = 0,
     temperature: float = 0,
     output_format: str = "text",
+    allow_nested: bool = False,
 ) -> str:
     """Call Claude via CLI. Returns response text.
 
@@ -86,9 +153,11 @@ def claude(
         system: System prompt (optional)
         model: Model name (default: claude-sonnet-4-5)
         timeout: Timeout in seconds (default: 300)
-        max_tokens: Max output tokens (0 = model default)
+        max_tokens: accepted for signature compatibility and IGNORED — the CLI has
+            no output-token flag (see note below). Cap length in the prompt instead.
         temperature: Temperature (0 = deterministic)
         output_format: "text" or "json"
+        allow_nested: Permit one more nesting level (see check_recursion)
 
     Returns:
         Response text from Claude
@@ -97,18 +166,20 @@ def claude(
         FileNotFoundError: If claude CLI is not installed
         TimeoutError: If call exceeds timeout
         RuntimeError: If CLI returns non-zero exit code
+        RecursionGuardError: If already at the nesting limit
     """
     cli = _find_cli()
+    env = child_env(allow_nested)
 
+    # Flag names verified against the CLI, not guessed: the system prompt flag is
+    # --system-prompt (--system does not exist and makes the CLI exit non-zero),
+    # and there is no max-tokens flag at all. Sending the wrong name here turns
+    # every call into "Claude CLI error (exit 1)" with an unhelpful stderr.
     cmd = [cli, "-p", "--model", model, "--output-format", output_format]
     if system:
-        cmd.extend(["--system", system])
-    if max_tokens > 0:
-        cmd.extend(["--max-tokens", str(max_tokens)])
+        cmd.extend(["--system-prompt", system])
 
     full_prompt = prompt
-    if system and "--system" not in cmd:
-        full_prompt = f"{system}\n\n{prompt}"
 
     try:
         proc = subprocess.run(
@@ -117,6 +188,7 @@ def claude(
             capture_output=True,
             text=True,
             timeout=timeout,
+            env=env,
         )
     except subprocess.TimeoutExpired:
         raise TimeoutError(f"Claude CLI timed out after {timeout}s")
@@ -134,6 +206,7 @@ def claude_stream(
     system: str = "",
     model: str = "claude-sonnet-4-5",
     timeout: float = 300.0,
+    allow_nested: bool = False,
 ) -> Iterator[str]:
     """Stream Claude response. Yields text chunks.
 
@@ -142,15 +215,20 @@ def claude_stream(
         system: System prompt (optional)
         model: Model name
         timeout: Timeout in seconds
+        allow_nested: Permit one more nesting level (see check_recursion)
 
     Yields:
         Text chunks as they arrive
     """
     cli = _find_cli()
+    env = child_env(allow_nested)
 
-    cmd = [cli, "-p", "--model", model, "--output-format", "stream-json"]
+    # stream-json needs all three flags together: without --verbose the CLI emits
+    # no stream_event at all and the loop below silently yields nothing.
+    cmd = [cli, "-p", "--model", model, "--output-format", "stream-json",
+           "--include-partial-messages", "--verbose"]
     if system:
-        cmd.extend(["--system", system])
+        cmd.extend(["--system-prompt", system])
 
     proc = subprocess.Popen(
         cmd,
@@ -158,12 +236,14 @@ def claude_stream(
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
+        env=env,
     )
 
     # Send prompt and close stdin
     proc.stdin.write(prompt)
     proc.stdin.close()
 
+    streamed_any = False
     try:
         for line in proc.stdout:
             line = line.strip()
@@ -171,13 +251,25 @@ def claude_stream(
                 continue
             try:
                 event = json.loads(line)
-                if event.get("type") == "assistant" and "content" in event:
+                etype = event.get("type")
+                if etype == "stream_event":
+                    # Partial-message frames. Only text_delta goes out: thinking_delta
+                    # is the model's reasoning and must not reach the caller as answer.
+                    delta = event.get("event", {}).get("delta", {})
+                    if delta.get("type") == "text_delta" and delta.get("text"):
+                        streamed_any = True
+                        yield delta["text"]
+                elif etype == "assistant" and "content" in event:
+                    streamed_any = True
                     yield event["content"]
-                elif event.get("type") == "text":
+                elif etype == "text":
+                    streamed_any = True
                     yield event.get("text", "")
-                elif event.get("type") == "result":
+                elif etype == "result":
+                    # Final aggregate. Emitting it after deltas would duplicate the
+                    # whole answer, so it is only a fallback when nothing streamed.
                     text = event.get("result", "")
-                    if text:
+                    if text and not streamed_any:
                         yield text
             except json.JSONDecodeError:
                 # Plain text fallback
@@ -198,6 +290,7 @@ async def claude_async(
     timeout: float = 300.0,
     max_tokens: int = 0,
     output_format: str = "text",
+    allow_nested: bool = False,
 ) -> str:
     """Async version of claude(). Runs CLI in a thread pool.
 
@@ -213,6 +306,7 @@ async def claude_async(
             timeout=timeout,
             max_tokens=max_tokens,
             output_format=output_format,
+            allow_nested=allow_nested,
         ),
     )
 
@@ -223,6 +317,7 @@ def claude_json(
     system: str = "",
     model: str = "claude-sonnet-4-5",
     timeout: float = 300.0,
+    allow_nested: bool = False,
 ) -> dict:
     """Call Claude and parse response as JSON.
 
@@ -241,6 +336,7 @@ def claude_json(
         model=model,
         timeout=timeout,
         output_format="json",
+        allow_nested=allow_nested,
     )
     return json.loads(raw)
 
@@ -290,31 +386,18 @@ def validate_response(
 
 
 # CLI entrypoint for quick testing
-def _print_usage():
-    print("Usage: python claude_cli.py 'your prompt here' [--model MODEL]")
-    print("Calls the live claude CLI binary (needs Claude Code installed and authenticated).")
-    print(f"CLI path: {CLAUDE_CLI_PATH or 'not found'}")
-
-
 if __name__ == "__main__":
-    argv = sys.argv[1:]
-    if not argv:
-        _print_usage()
+    if len(sys.argv) < 2:
+        print("Usage: python claude_cli.py 'your prompt here' [--model MODEL]")
+        print(f"CLI path: {CLAUDE_CLI_PATH or 'not found'}")
         sys.exit(1)
-    if argv[0] in ("-h", "--help"):
-        _print_usage()
-        sys.exit(0)
-    if argv[0].startswith("-"):
-        print(f"ERROR: expected a prompt as the first argument, got option {argv[0]!r}", file=sys.stderr)
-        _print_usage()
-        sys.exit(2)
 
-    prompt_text = argv[0]
+    prompt_text = sys.argv[1]
     model_name = "claude-sonnet-4-5"
 
-    if "--model" in argv:
-        idx = argv.index("--model")
-        if idx + 1 < len(argv):
-            model_name = argv[idx + 1]
+    if "--model" in sys.argv:
+        idx = sys.argv.index("--model")
+        if idx + 1 < len(sys.argv):
+            model_name = sys.argv[idx + 1]
 
     print(claude(prompt_text, model=model_name))

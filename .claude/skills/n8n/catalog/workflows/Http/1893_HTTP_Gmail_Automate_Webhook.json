@@ -123,7 +123,7 @@
       ],
       "webhookId": "c9455684-b943-41a5-b2d7-adeafb985083",
       "parameters": {
-        "sendTo": "rodrigue.gbadou@gmail.com",
+        "sendTo": "REPLACE_ME@example.com",
         "options": {},
         "subject": "Send Weekly Report by Email"
       },

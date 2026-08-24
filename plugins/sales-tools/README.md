@@ -14,7 +14,6 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `create-an-asset` | Продажные материалы под сделку: лендинг, дек. |
 | `daily-briefing` | Утренний sales-брифинг: встречи, сделки, приоритеты дня. |
 | `draft-outreach` | B2B-аутрич с рисёрчем проспекта: email + LinkedIn + Telegram, цепочки касаний под корп-ЛПР. |
-| `lead-enrichment` | Enrich and qualify B2B leads — match a company list against your CRM, pull firmographics, find decision-makers, score and export. |
 | `lead-research` | Свежий B2B-список лидов по ICP (РФ): discovery → ЛПР → скоринг Hot/Warm/Cold. |
 | `revops-ru` | RevOps across two motions — B2C self-serve (free→trial→paid) and B2B sales-led: data model, handoffs, pipeline hygiene. |
 | `sales-enablement-ru` | Sales collateral for B2B — decks, one-pagers, objection handling and proof material for workshops and consulting. |

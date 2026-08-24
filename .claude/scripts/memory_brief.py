@@ -20,8 +20,23 @@ import sys
 from pathlib import Path
 
 BRAIN_DIR = Path.home() / ".brain"
-MEMORY_MD = (Path.home() / ".claude" / "projects" / "C--Users-youruser"
-             / "memory" / "MEMORY.md")
+
+
+def _memory_md() -> Path:
+    """Индекс памяти этого проекта.
+
+    Claude Code кодирует путь проекта в имя папки (C--Users-<логин>), поэтому
+    оно у каждого своё и захардкодить его нельзя: несуществующий путь тут не
+    падает, а тихо отдаёт пустой блок гоч. Берём папку с самым свежим
+    MEMORY.md — это и есть проект, в котором работают.
+    """
+    root = Path.home() / ".claude" / "projects"
+    cands = sorted(root.glob("*/memory/MEMORY.md"),
+                   key=lambda p: p.stat().st_mtime, reverse=True)
+    return cands[0] if cands else root / "default" / "memory" / "MEMORY.md"
+
+
+MEMORY_MD = _memory_md()
 
 STOPWORDS = {
     "как", "что", "для", "при", "это", "или", "его", "все", "чем", "быть",

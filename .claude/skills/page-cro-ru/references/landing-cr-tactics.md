@@ -43,5 +43,5 @@
 | Полный чек-лист лендинга (8 пунктов + ICE), дерево метрик, выбор ТИПА воронки, «магазин мороженого», «Система 2» | `funnel-design-ru` → `skills/funnel-design-ru/references/leads-landing.md` |
 | Психология: Система 2, FOMO/дефицит, якорение, соцпруф как триггеры | `marketing-psychology-ru` |
 | Логика и упаковка тарифов | `pricing-strategy-ru` |
-| Позиционирование, ICP, регалии, цены, воронка | `yourname-marketing-context` |
+| Позиционирование, ICP, регалии, цены, воронка | `~/.claude/business-context.md` (заведи из `templates/`) |
 | Запуск A/B-теста | `ab-testing-ru` |

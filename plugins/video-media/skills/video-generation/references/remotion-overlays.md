@@ -1,13 +1,18 @@
 # Remotion social-UI overlays (Instagram/Telegram chrome) → composite over b-roll
 
-Главный приём референс-рилса (DV08xLPjPOx): реальный футаж притворяется лентой Instagram /
+Главный приём референс-рилса (см. разбор в `video-editor`): реальный футаж притворяется лентой Instagram /
 перепиской Telegram за счёт **прозрачных UI-оверлеев**. Делаем их кодом (React→video) через
 Remotion, рендерим в **alpha webm**, накладываем ffmpeg-ом.
 
 Проект: `skills/video-generation/remotion-overlays/` (компоненты `InstagramChrome.tsx`,
 `TelegramBubble.tsx`, готовые композиции `InstagramStory` / `TelegramForward`).
 
-> Лицензия Remotion = BUSL: бесплатно для личного/OSS и компаний <$1M ARR (наш случай). Платно от $1M ARR.
+> **Лицензия Remotion — BUSL, и порог считается по ТВОЕЙ выручке, не по чужой.**
+> Бесплатно для личного использования, OSS и компаний с выручкой ниже $1M ARR;
+> от $1M ARR и для части коммерческих сценариев нужна платная лицензия у
+> разработчика. Сам Remotion в пак не вложен — он ставится `npm install` из
+> `package.json`, то есть лицензию получаешь напрямую и на своих условиях.
+> Свериться перед коммерческим использованием: <https://remotion.dev/license>.
 
 ## Установка (один раз)
 

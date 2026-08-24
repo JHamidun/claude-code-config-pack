@@ -47,51 +47,70 @@ argument-hint: "\"<задача>\" [speed|quality|balanced]"
 
 Когда пользователь просит выполнить задачу через Manus:
 
-1. **Используй Python helper** `skills/manus/scripts/manus_helper.py`
-2. **API ключ уже настроен** через переменную окружения `MANUS_API_KEY`
-3. **Выбери режим выполнения:**
-   - `speed` - быстрое выполнение (по умолчанию)
-   - `quality` - качественное выполнение (для сложных задач)
-   - `balanced` - баланс скорости и качества
+1. **Зови CLI хелпера** — он лежит в навыке `manus`, рядом с его `SKILL.md`:
+   `skills/manus/scripts/manus_helper.py` при полной установке пака,
+   `<plugin>/skills/manus/scripts/manus_helper.py` при установке плагином.
+   Не помнишь путь — найди: `find ~ -name manus_helper.py 2>/dev/null | head -1`.
+2. **Нужен ключ** в переменной окружения `MANUS_API_KEY` (Manus → Settings → API).
+   Ключа нет — скажи об этом и остановись, задача не создастся.
+3. **Выбери профиль агента** (`--profile`; это НЕ «режимы speed/quality/balanced»,
+   таких в API v2 нет):
+   - `manus-1.6-lite` — быстро и дёшево
+   - `manus-1.6` — по умолчанию
+   - `manus-1.6-max` — максимальное качество для сложных задач
 
 ### Пример 1: Создать задачу
 
+Хелпер — **модуль с функциями**, класса `ManusClient` в нём нет. Импортировать его
+можно, но `sys.path.append('~/...')` не сработает: Python не раскрывает `~`, да и
+файл лежит в `skills/manus/scripts/`, а не в `tools/`. Раскрывай путь явно:
+
 ```python
-import sys
-sys.path.append('~/.claude/tools')
-from manus_helper import ManusClient
+import sys, pathlib
+# путь до scripts/ навыка manus — подставь свой, если ставил пак плагином
+sys.path.append(str(pathlib.Path.home() / ".claude/skills/manus/scripts"))
+import manus_helper
 
-client = ManusClient()
-
-# Создать задачу
-task = client.create_task(
-    prompt="Проанализируй все письма в Gmail за последнюю неделю и составь summary по проектам",
-    mode="quality"
+# Асинхронно: вернётся сразу, task_id нужен для опроса
+task = manus_helper.create_task(
+    "Проанализируй все письма в Gmail за последнюю неделю и составь summary по проектам",
+    profile="manus-1.6-max",
 )
 
-print(f"Задача создана: {task['id']}")
-print(f"Статус: {task['status']}")
+print(f"Задача создана: {task['task_id']}")
+print(f"Ссылка: {task.get('task_url')}")
 ```
+
+Проще — вообще без импорта, через CLI (раздел «CLI команды» ниже). Он же единственный
+путь, если ставил пак плагином и не хочешь подбирать путь для `sys.path`.
 
 ### Пример 2: Проверить статус задачи
 
 ```python
-# Получить информацию о задаче
-task = client.get_task(task_id="abc123")
+# Статус задачи: running | waiting | stopped (успех) | error
+msgs = manus_helper.list_messages("abc123", limit=10, order="desc")
+answer = manus_helper.latest_answer(msgs)    # последний ответ агента, или None
 
-print(f"Статус: {task['status']}")
-if task['status'] == 'completed':
-    print(f"Результат: {task['result']}")
+detail = manus_helper.task_detail("abc123")  # метаданные задачи
+if answer:
+    print(f"Результат: {answer}")
 ```
 
-### Пример 3: Список задач
+### Пример 3: Дождаться результата одним вызовом
+
+Списка своих задач API v2 не отдаёт, и такой функции в хелпере нет — храни `task_id`
+у себя или смотри задачи в веб-интерфейсе Manus. Зато есть блокирующий `run_task`:
+создаёт задачу и сам опрашивает её до конца.
 
 ```python
-# Получить последние задачи
-tasks = client.list_tasks(limit=10)
+out = manus_helper.run_task(
+    "Проанализируй письма за неделю и составь отчёт",
+    profile="manus-1.6",
+    timeout=1800,   # секунд; по истечении вернётся agent_status="timeout"
+)
 
-for task in tasks:
-    print(f"{task['id']}: {task['status']} - {task['prompt']}")
+print(out["agent_status"])   # stopped | error | waiting | timeout
+print(out["answer"])         # текст ответа, если задача дошла до конца
 ```
 
 ---
@@ -105,15 +124,15 @@ for task in tasks:
 
 **Решение:**
 ```python
-task = client.create_task(
-    prompt="""
+task = manus_helper.create_task(
+    """
     Проанализируй все письма в Gmail за последние 7 дней:
     1. Группируй по проектам
     2. Выдели важные действия (action items)
     3. Определи приоритеты
     4. Составь structured отчёт
     """,
-    mode="quality"
+    profile="manus-1.6-max",
 )
 ```
 
@@ -124,8 +143,8 @@ task = client.create_task(
 
 **Решение:**
 ```python
-task = client.create_task(
-    prompt="""
+task = manus_helper.create_task(
+    """
     1. Получи все задачи из Notion database "Projects"
     2. Для каждой задачи с дедлайном:
        - Создай событие в Google Calendar
@@ -133,7 +152,7 @@ task = client.create_task(
        - Добавь ссылку на Notion в описание
     3. Верни summary созданных событий
     """,
-    mode="balanced"
+    profile="manus-1.6",
 )
 ```
 
@@ -142,19 +161,16 @@ task = client.create_task(
 **Задача:**
 > "Настрой автоматический мониторинг упоминаний компании в Gmail"
 
-**Решение:**
-```python
-# Создать задачу с webhook для уведомлений
-task = client.create_task(
-    prompt="""
-    Каждый день в 9:00:
-    1. Проверяй новые письма в Gmail
-    2. Ищи упоминания компании "YourCompany"
-    3. Если найдены - отправь алерт
-    """,
-    mode="speed",
-    webhook_url="https://your-webhook.com/manus-alerts"
-)
+**Решение.** Расписаний и webhook-колбэков в API v2 нет — задача одноразовая, и
+параметра `webhook_url` у `create_task` не существует. «Каждый день в 9:00» ставится
+снаружи: cron / планировщик Windows / n8n дёргает CLI хелпера по расписанию, а алерт
+шлёт сама задача (Manus умеет писать в Slack и почту) или твой скрипт после ответа.
+
+```bash
+# строка crontab: ежедневно в 9:00, ждать результат и сложить в лог
+0 9 * * * MANUS_API_KEY=... python /path/to/manus_helper.py run \
+  "Проверь новые письма в Gmail, найди упоминания компании X, если найдены — отправь алерт в Slack" \
+  --profile manus-1.6-lite >> /var/log/manus-monitor.log 2>&1
 ```
 
 ---
@@ -167,37 +183,53 @@ task = client.create_task(
 # Установить API ключ
 export MANUS_API_KEY="sk-..."
 
-# Создать задачу
-python skills/manus/scripts/manus_helper.py create "Задача для Manus" --mode quality
+H=skills/manus/scripts/manus_helper.py   # или найди: find ~ -name manus_helper.py
 
-# Проверить статус
-python skills/manus/scripts/manus_helper.py get <task-id>
+# Создать задачу (вернёт task_id и ссылку, выполнения не ждёт)
+python "$H" create "Задача для Manus" --profile manus-1.6-max
+python "$H" create "Задача" --locale ru --title "Отчёт за неделю"
 
-# Список задач
-python skills/manus/scripts/manus_helper.py list --status completed
+# Создать и ДОЖДАТЬСЯ (опрос до конца; коды выхода: 0 ok, 2 упало, 3 таймаут)
+python "$H" run "Задача для Manus" --profile manus-1.6 --timeout 1800 --poll 8
+
+# Статус: running | waiting | stopped | error
+python "$H" status <task-id>
+
+# Сообщения задачи — там же лежит ответ агента
+python "$H" messages <task-id> --limit 20 --order desc
+
+# Ответить задаче, которая ждёт ввода (agent_status=waiting), и остановить
+python "$H" reply <task-id> "Да, продолжай"
+python "$H" stop  <task-id>
 ```
+
+Подкоманд `get` и `list` у хелпера нет: своих задач API v2 не перечисляет.
 
 ---
 
 ## ⚙️ Конфигурация
 
-### API ключ уже настроен:
+### API ключ
 
 ```bash
-MANUS_API_KEY=YOUR_MANUS_API_KEY
+export MANUS_API_KEY="sk-..."        # Manus → Settings → API
 ```
 
-Ключ должен быть в `.env` файле или переменной окружения.
+Ключ берётся ТОЛЬКО из переменной окружения `MANUS_API_KEY` — положи её в свой `.env`
+и экспортируй. В паке ключа нет и быть не может: без него первый же вызов упадёт с
+внятной ошибкой, а не молча.
 
 ---
 
 ## 📊 Best Practices
 
-### 1. Выбор режима:
+### 1. Выбор профиля (`--profile`):
 
-- **speed** - для простых задач (< 5 минут)
-- **balanced** - для средних задач (5-30 минут)
-- **quality** - для сложных задач (> 30 минут)
+- **manus-1.6-lite** — простые задачи, быстро и дёшево
+- **manus-1.6** — по умолчанию, средние задачи
+- **manus-1.6-max** — сложные задачи, где важно качество
+
+Профиль влияет на модель и цену, а не на таймаут: долгую задачу держит `run --timeout`.
 
 ### 2. Формулирование задач:
 
@@ -214,15 +246,21 @@ MANUS_API_KEY=YOUR_MANUS_API_KEY
 Посмотри почту
 ```
 
-### 3. Использование webhooks:
+### 3. Долгие задачи:
 
-Для долгих задач добавь webhook:
-```python
-task = client.create_task(
-    prompt="...",
-    webhook_url="https://n8n.example.com/webhook/manus"
-)
+Webhook-колбэков в API v2 нет. Два рабочих пути:
+
+```bash
+# а) блокирующий опрос — процесс живёт до ответа
+python "$H" run "..." --timeout 3600 --poll 15
+
+# б) создать и отпустить, опрашивать самому (n8n, cron, свой скрипт)
+python "$H" create "..."          # запомни task_id
+python "$H" status <task-id>      # running | waiting | stopped | error
 ```
+
+`agent_status=waiting` значит, что агент задал вопрос — ответь через `reply`, иначе
+задача так и будет стоять.
 
 ---
 
@@ -241,9 +279,11 @@ Manus имеет встроенные connectors:
 
 ## 📚 Документация
 
-- **API Reference:** https://open.manus.ai/docs
-- **Helper код:** `skills/manus/scripts/manus_helper.py`
-- **Полный гайд:** `MANUS_INTEGRATION_GUIDE.md`
+- **API Reference:** https://open.manus.im/docs (API v2; v1 устарел)
+- **Helper код:** `skills/manus/scripts/manus_helper.py` — докстринг в шапке файла
+  перечисляет все команды и коды выхода
+- **Разбор эндпоинтов:** `skills/manus/references/api-v2.md`
+- **Навык целиком:** `skills/manus/SKILL.md`
 
 ---
 

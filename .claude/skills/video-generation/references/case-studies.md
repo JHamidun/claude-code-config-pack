@@ -44,12 +44,12 @@
 - Seedance мутировал глифы → fix через end_frame=first_frame LOCK
 - Cyrillic путь `видео Анимация/` ломал Yandex — пересоздал ASCII `terra-final/`
 - Multipart Yandex дал 0-byte file → raw PUT
-- Один keyframe (Главa 4) потребовал v19 итераций — другие хватило v3-v5
+- Один keyframe (Глава 4) потребовал v19 итераций — другие хватило v3-v5
 
 ### Локальная структура
 
 ```
-${HOME}/Downloads/terra-final/
+./work/<project>/            # напр. ./work/terra-final/
 ├── keyframes/
 │   ├── ch1_v0_grey.jpg            # оригинал ЧБ
 │   ├── ch1_v1_color.png           # gpt-image-2 colorization
@@ -111,23 +111,28 @@ ${HOME}/Downloads/terra-final/
 |---|---|
 | Format | 9:16 1080p |
 | Длительность | 30s |
-| Avatar | HeyGen Avatar V YourFirstName |
+| Avatar | HeyGen Avatar V, свой аватар |
 | Captions | SubMagic EN-only с **обязательной trigger-word чисткой** |
 | Cost | ~$2 (Avatar V $0.0667 × 30s = $2) |
 | Wall-clock | ~45 min |
 
-### HeyGen Avatar V config (YourFirstName preset)
+### HeyGen Avatar V config (пресет под вертикальный шортс)
 
 ```python
-avatar_id = 'YOUR_HEYGEN_AVATAR_ID'
-voice_id = 'YOUR_HEYGEN_VOICE_ID'
+import os
+avatar_id = os.environ['HEYGEN_AVATAR_ID']   # свой аватар, look_id
+voice_id  = os.environ['HEYGEN_VOICE_ID']    # свой голос HeyGen
 engine = 'avatar_v'
 aspect_ratio = '9:16'
 resolution = '1080p'
 # Cost: $0.0667/sec
 ```
 
-Готовая обвязка — `shorts-pipeline-user` skill.
+Аватары и голоса — ТВОИ: пак не поставляется ни с какими. Свои id берутся в
+кабинете HeyGen (https://app.heygen.com/avatars и `/voices`) либо запросами
+`GET /v3/avatars/looks?group_id=<group>` и `GET /v3/voices`; кладутся в
+`HEYGEN_AVATAR_ID` / `HEYGEN_VOICE_ID` в `~/.claude/.credentials.master.env`.
+Полный разбор запроса — `skills/heygen/SKILL.md`.
 
 ### Pitfall — «пайвот» → 🍺
 
@@ -139,11 +144,11 @@ python ~/.claude/skills/shorts-pipeline-user/scripts/trigger_word_check.py scrip
 
 17 RU-триггеров. Замены в скрипте: «разворот концепции», «ротация», «трансформация».
 
-## Case 5 — Client birthday tribute «клиентский трибьют» (июнь 2026)
+## Case 5 — Corporate tribute «видео-трибьют руководителю»
 
-**Бриф:** запоминающееся видео-поздравление юбиляру [Client] (со-основатель изд. группы «Company», CEO Your Company, руководитель User) от команды YourProduct. Эпик с реальным лицом юбиляра + 9 лиц команды.
+**Бриф:** запоминающееся корпоративное видео-поздравление руководителю компании-клиента от команды. Эпик с реальным лицом героя + 9 лиц команды.
 
-**Сюжет:** капитан ведёт корабль сквозь шторм → секретный остров → восхождение на гору из книг → пещера с Александрийской библиотекой → знание возвращается в мир. Юбиляр = капитан/герой, YourFirstName = со-капитан в ансамбле. Пасхалка: пылесос «COMPANY» как святыня среди реликвий (сцена 8).
+**Сюжет:** капитан ведёт корабль сквозь шторм → секретный остров → восхождение на гору → пещера-библиотека → знание возвращается в мир. Герой ролика = капитан, заказчик = со-капитан в ансамбле. Плюс одна внутренняя пасхалка команды (узнаваемый предмет как «реликвия» в одной из сцен).
 
 ### Конфиг
 
@@ -161,19 +166,19 @@ python ~/.claude/skills/shorts-pipeline-user/scripts/trigger_word_check.py scrip
 
 ### Что было трудно и как решилось (ядро уроков)
 
-1. **Лица команды.** Главная боль. Nano держит 1-2 лица, на 3-4 даёт «похожих незнакомцев» / «левых челов» (юзер: «вообще не тот»). Решение: командные кадры (3,6,8,11) переделали в **GPT-Image-2 multi-ref** (`image[]` multipart), 3 варианта/сцена, человек выбрал. Подробно → `keyframes-multiface.md`.
+1. **Лица команды.** Главная боль. Nano держит 1-2 лица, на 3-4 даёт «похожих незнакомцев» — заказчик людей не узнаёт. Решение: командные кадры переделали в **GPT-Image-2 multi-ref** (`image[]` multipart), 3 варианта/сцена, человек выбрал. Подробно → `keyframes-multiface.md`.
 2. **«Постановочное фото».** GPT-Image-2 держит лица, но строит групповое фото в камеру → лечится киношным суффиксом (`candid film still, mid-action, NOT looking at camera, ARRI/Deakins`).
-3. **Hero/ensemble баланс.** YourFirstName: «я со-капитан, но не один; команда тоже должна занимать внимание». Формулировать «hero most prominent, team also prominent as ensemble», не «выделить одного».
+3. **Hero/ensemble баланс.** Заказчик хочет быть заметным, но не единственным — команда тоже должна занимать внимание. Формулировать «hero most prominent, team also prominent as ensemble», не «выделить одного».
 4. **Кредиты Runway.** Сначала credits-mode исчерпал пул → переключили на `exploreMode=True` (бесплатно). Урок: кредит списывается при **отправке**, не скачивании; стоп раннера не «жжёт кадры»; keyframe-картинки независимы от видео-задач; SUCCEEDED-задачи добираются по `task_id`. (Юзер дважды ругался — см. `runway-seedance.md` §12.)
-5. **НЕ глушить чужие задачи.** YourFirstName: «нахрена ты глушишь, кто разрешил?» — никогда не останавливать идущую генерацию без спроса.
-6. **Музыка vs песня.** Сначала думали Suno-песню со словами → YourFirstName: «текст не нравится, лучше музыка + закадр как в Хрониках Амбера». Перешли на инструментал + VO. Длинный Suno-трек обрезали по климаксу (`analyze_cut.py`).
+5. **НЕ глушить чужие задачи.** Никогда не останавливать идущую генерацию без спроса — владелец задач воспринимает это как порчу его работы.
+6. **Музыка vs песня.** Сначала думали Suno-песню со словами → заказчику сгенерированный текст не понравился, выбрали инструментал + закадровый голос. Длинный Suno-трек обрезали по климаксу (`analyze_cut.py`).
 7. **RU-ударение в TTS.** `што́рма` — combining acute U+0301 в тексте; правка `vo_11` на «все до единого». Грабли: print строки с диакритикой упал на cp1251 (см. `windows.md`).
 
 ### Локальная структура
 
 ```
-${HOME}/_tribute_project/
-├── SCENARIO.md                       # раскадровка 12 сцен + титр + пасхалка
+./work/<project>/                     # напр. ./work/tribute/
+├── SCENARIO.md                       # раскадровка 12 сцен + титр
 ├── refs/                             # client_main.jpg, user_hero.jpg, team_*.jpg (10 лиц)
 ├── keyframes/final/sc01-12.png       # утверждённые (микс Nano + GPT-Image-2)
 ├── videos/  videos/_review/          # клипы + все варианты для выбора (НЕ удалять)
@@ -196,7 +201,7 @@ T+0       Брифинг → план shot'ов
 T+0:45    Keyframes (Nano Banana Pro batch 4 concurrent)
 T+1:00    Параллельный fan-out:
             • Veo 3.1 Fast × 3 concurrent (15 secs of video в 1 пас)
-            • ElevenLabs YourFirstName TTS (77s VO)
+            • ElevenLabs TTS своим клоном (77s VO)
             • ElevenLabs Music (30s × 3 sample)
 T+3:00    Finish parallel
 T+3:30    FFmpeg assembly: concat -c copy + amix + loudnorm + brand card

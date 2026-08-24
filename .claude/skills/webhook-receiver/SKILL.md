@@ -14,7 +14,7 @@ description: "Приём вебхуков (GitHub, Stripe, формы) лока�
 - Триггер локального скрипта по внешнему событию (payload на stdin).
 - Проверить/вычислить HMAC-подпись payload'а (`verify`) — например, при отладке чужого интегратора.
 
-**НЕ использовать для:** production-ботов с ответами через LLM (это Hermes webhook-адаптер → skill agent-builder tooling), исходящих сообщений, cron-задач.
+**НЕ использовать для:** production-ботов с ответами через LLM (это отдельный класс — webhook-адаптер внутри агентного фреймворка, см. навык `autonomous-agent-creator`), исходящих сообщений, cron-задач.
 
 ## Установка / настройка
 
@@ -24,7 +24,7 @@ description: "Приём вебхуков (GitHub, Stripe, формы) лока�
 - Конфиг маршрутов: `~/.claude/data/webhooks/routes.json` (создать: `routes --init`)
 - Лог событий: `~/.claude/data/webhooks/YYYY-MM-DD.jsonl`
 
-Секреты — ТОЛЬКО из env (`~/.claude/.credentials.master.env`); в routes.json хранится **имя** переменной (`secret_env`), не значение. Env-переменные (владелец заполняет значения сам, из настроек webhook у провайдера):
+Секреты — ТОЛЬКО из окружения (переменная либо `~/.claude/.credentials.master.env`; шаблон файла — `~/.claude/templates/.credentials.master.env.example`, скопируй и заполни). В routes.json хранится **имя** переменной (`secret_env`), а не значение. Значения берёшь у себя в настройках вебхука на стороне провайдера:
 
 - `WEBHOOK_GITHUB_SECRET` — secret из GitHub → Settings → Webhooks
 - `WEBHOOK_STRIPE_SECRET` — signing secret эндпоинта (`whsec_...`) из Stripe Dashboard → Webhooks
@@ -83,7 +83,7 @@ Action-команда получает: payload на **stdin** (сырые ба�
 
 Сервер слушает 127.0.0.1 — чтобы GitHub/Stripe достучались, нужен туннель:
 
-- **cloudflared** (уже используется в хозяйстве, см. companylegal): `cloudflared tunnel --url http://127.0.0.1:8787` — даст временный `https://*.trycloudflare.com`; постоянный hostname — через named tunnel в Cloudflare Zero Trust.
+- **cloudflared**: `cloudflared tunnel --url http://127.0.0.1:8787` — даст временный `https://*.trycloudflare.com`; постоянный hostname — через named tunnel в Cloudflare Zero Trust (нужен свой домен в Cloudflare).
 - **ngrok**: `ngrok http 8787`.
 
 URL вебхука у провайдера = `https://<туннель>/hooks/<route>`. Настройка туннеля — отдельная задача, скилл её не выполняет.
@@ -103,7 +103,7 @@ URL вебхука у провайдера = `https://<туннель>/hooks/<ro
 ## Чек-лист
 
 - [ ] `routes --init` выполнен, routes.json отредактирован под задачу
-- [ ] Секреты добавлены в `~/.claude/.credentials.master.env` (имена — из `secret_env`)
+- [ ] Секреты добавлены в окружение или в `~/.claude/.credentials.master.env` (имена — из `secret_env`)
 - [ ] `routes` показывает `[set]` у всех секретов
 - [ ] `serve` поднят, `curl http://127.0.0.1:8787/health` отвечает
 - [ ] `test <route>` возвращает HTTP 200, событие видно в `tail`

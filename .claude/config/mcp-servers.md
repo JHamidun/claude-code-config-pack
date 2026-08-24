@@ -14,7 +14,7 @@ MCP-сервер — не дефолт под медиа/генерацию. С�
 | Озвучка/TTS | skill `elevenlabs` | Replicate Riffusion/Bark |
 | Транскрипция | skill `deepgram` | Replicate Whisper |
 | Апскейл | skill `image-enhancer` (Real-ESRGAN) | ручной replicate |
-| Конвертация файлов | skills `file-converter`/`pdf`/`xlsx`/`docx` | файловые MCP |
+| Конвертация файлов | skills `file-converter`/`pdf`/`xlsx`/`pptx` | файловые MCP |
 
 Multi-server пайплайны (research → контент → медиа → публикация) собирай через skills/commands, а не цепочкой MCP-вызовов. Один сервер на задачу.
 
@@ -22,13 +22,13 @@ Multi-server пайплайны (research → контент → медиа → 
 
 | Сервер | Когда нужен |
 | --- | --- |
-| filesystem | Файловые операции вне текущего cwd (${WORKSPACE}, ${HOME}) |
+| filesystem | Файловые операции вне текущего cwd (рабочий каталог проекта, домашний каталог) |
 | second-brain | Семантический поиск по личной памяти/переписке (`brain_search`, remember, contacts) |
 | notebooklm | Подкасты / deep research / quiz из загруженных документов |
 | plaud | Записи и транскрипты диктофона Plaud |
 | google-studio, runway | Медиа-генерация, когда skill-обёртки не хватает |
 | playwright (пул) | Параллельная браузерная работа несколькими сессиями сразу |
-| fns-check | KYC контрагентов РФ по ИНН/ОГРН: лиды (lead-enrichment), тендеры, юрпроверка, [WealthCo] |
+| fns-check | KYC контрагентов РФ по ИНН/ОГРН: квалификация лидов, тендеры, юрпроверка |
 | pageindex | Длинные структурированные PDF: договоры 20+ стр., выписки, годовые отчёты |
 | affine | Документация и база знаний Company |
 | postgres / redis | БД и кеш на your-server |
@@ -49,5 +49,5 @@ Multi-server пайплайны (research → контент → медиа → 
 - ⚠️ pageindex через `npx @pageindex/mcp` — это ОБЛАКО VectifyAI: нужен отдельный PAGEINDEX_API_KEY и документы уходят наружу. Локальный движок работает на OPENAI_API_KEY и данные с машины не выпускает — он и есть основной путь (skill `research-docs`). В пак он не входит (это клон стороннего репозитория со своим venv): `git clone https://github.com/VectifyAI/PageIndex ~/.claude/mcps/pageindex` + venv по их README, свою обёртку `pi.py` (index/tree/pages/ask) написать поверх.
 - Стоимость pay-per-use (учитывай перед массовыми вызовами): dalle ~$0.04–0.12/картинка · elevenlabs ~$0.30/1000 симв · replicate ~$0.0001–0.01/сек · apify $5/мес бесплатно, дальше по факту.
 - Ключи — только через `${VAR_NAME}` из `.credentials.master.env`, никогда plaintext в конфиге.
-- Мёртвые/дублирующие записи вынесены в `mcp.json.archive` (у каждой `_archive_reason`); `.mcp.json` инертен при `enableAllProjectMcpServers=false`.
-- ❌ `${WORKSPACE}/.claude/MCP_SERVERS_GUIDE.md` — архив от 2025-11-30, противоречит канону (DALL-E как основной и т.п.). Не использовать как источник истины.
+- `.mcp.json` инертен при `enableAllProjectMcpServers=false` — это справочник для копирования блоков, а не живой конфиг.
+- ❌ Старые «MCP_SERVERS_GUIDE»-конспекты (архивы 2025 года) противоречат канону — например, называют DALL-E основной моделью картинок. Источник истины по MCP — этот файл плюс `/mcp` в сессии.

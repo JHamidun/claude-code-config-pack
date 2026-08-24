@@ -103,7 +103,7 @@
           "parameters": [
             {
               "name": "User-Agent",
-              "value": "alexk1919 (alex@alexk1919.com)"
+              "value": "alexk1919 (REPLACE_ME@example.com)"
             }
           ]
         }
@@ -133,7 +133,7 @@
           "parameters": [
             {
               "name": "User-Agent",
-              "value": "alexk1919 (alex@alexk1919.com)"
+              "value": "alexk1919 (REPLACE_ME@example.com)"
             }
           ]
         }
@@ -163,7 +163,7 @@
           "parameters": [
             {
               "name": "User-Agent",
-              "value": "alexk1919 (alex@alexk1919.com)"
+              "value": "alexk1919 (REPLACE_ME@example.com)"
             }
           ]
         }

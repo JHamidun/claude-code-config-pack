@@ -33,6 +33,29 @@ NAMED_ARTIST_RE = re.compile(
 )
 
 
+def require_music_api(client) -> None:
+    """Ресурс `music` есть только в SDK 2.x — сказать это прямо, а не через AttributeError.
+
+    `requirements.txt` раньше объявлял `elevenlabs>=1.5`, и на честно установленной
+    1.59.0 вызов падал как `AttributeError: 'ElevenLabs' object has no attribute
+    'music'`. Из такого текста не следует ни «дело в версии», ни «обнови SDK» —
+    человек идёт проверять ключ и имя модели.
+    """
+    if hasattr(client, "music"):
+        return
+    try:
+        from importlib.metadata import version
+        installed = version("elevenlabs")
+    except Exception:  # noqa: BLE001
+        installed = "неизвестна"
+    raise SystemExit(
+        "[elevenlabs_music] в установленном SDK нет ресурса `music`.\n"
+        f"  Установленная версия: {installed}. Music API появился в elevenlabs 2.0.\n"
+        "  Обновить: pip install -U 'elevenlabs>=2.0'\n"
+        "  (в requirements.txt пака нижняя граница уже поднята — это следы старой установки)."
+    )
+
+
 def prompt_guard(prompt: str) -> None:
     if NAMED_ARTIST_RE.search(prompt):
         print("[WARN] prompt contains a named-artist reference pattern.")
@@ -51,7 +74,16 @@ def main() -> int:
 
     prompt_guard(args.prompt)
 
-    client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
+    api_key = os.getenv("ELEVENLABS_API_KEY")
+    if not api_key:
+        raise SystemExit(
+            "[elevenlabs_music] нет ключа ELEVENLABS_API_KEY.\n"
+            "  Положить в ~/.claude/.credentials.master.env строкой "
+            "ELEVENLABS_API_KEY=... (файл подхватывается автоматически, см. верх скрипта)\n"
+            "  или экспортировать в окружение перед запуском."
+        )
+    client = ElevenLabs(api_key=api_key)
+    require_music_api(client)
     t0 = time.time()
     try:
         audio = client.music.compose(

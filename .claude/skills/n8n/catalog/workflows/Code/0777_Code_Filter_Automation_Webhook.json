@@ -39,7 +39,7 @@
       "credentials": {
         "openAiApi": {
           "id": "mrgqM64cM1L88xC6",
-          "name": "octionicsolutions@gmail.com"
+          "name": "REPLACE_ME@example.com"
         }
       },
       "typeVersion": 1,
@@ -916,7 +916,7 @@
       "credentials": {
         "openAiApi": {
           "id": "mrgqM64cM1L88xC6",
-          "name": "octionicsolutions@gmail.com"
+          "name": "REPLACE_ME@example.com"
         }
       },
       "typeVersion": 1,

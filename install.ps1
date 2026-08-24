@@ -10,8 +10,8 @@
 #   add-missing (ПО УМОЛЧАНИЮ) — robocopy /XC /XN /XO: докладываем ТОЛЬКО отсутствующие
 #                                 файлы; всё существующее не трогаем вообще.
 #   repair (-Repair)           — robocopy без /XC /XN /XO: перезаписываем наши базовые файлы.
-# preserve-list (ключи, память, история чатов, tg-сессия, settings.local.json, ~/CLAUDE.md)
-# защищён в ОБОИХ режимах, включая -Repair.
+# preserve-list (ключи, память, история чатов, tg-сессия, settings.local.json,
+# ~\.claude\CLAUDE.md) защищён в ОБОИХ режимах, включая -Repair.
 #
 # Полная копия-бэкап ~/.claude делается ПЕРВОЙ операцией и ПО УМОЛЧАНИЮ. Это сейф-нет,
 # а не единственная копия: неполный бэкап — предупреждение, а не остановка.
@@ -29,9 +29,9 @@ param(
 $ErrorActionPreference = 'Continue'
 
 if ($Force) {
-    Write-Host "ОШИБКА: -Force удалён. Раньше он затирал ~/CLAUDE.md без спроса." -ForegroundColor Red
+    Write-Host "ОШИБКА: -Force удалён. Раньше он затирал навигационный хаб без спроса." -ForegroundColor Red
     Write-Host "        Обновить наши базовые файлы: .\install.ps1 -Repair"
-    Write-Host "        (~/CLAUDE.md всё равно не перезаписывается: это твой файл)."
+    Write-Host "        (~\.claude\CLAUDE.md всё равно не перезаписывается: это твой файл)."
     exit 2
 }
 if ($BackupExisting) {
@@ -42,10 +42,24 @@ if ($BackupExisting) {
 $Here = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Definition }
 $SrcClaude      = Join-Path $Here '.claude'
 $SrcClaudeMd    = Join-Path $Here 'CLAUDE.md'
-$SrcEnvTemplate = Join-Path $Here '.credentials.template.env'
+# Полный каталог переменных — один файл, и он в templates/. В корне пака лежит
+# .credentials.template.env, но это НЕ список ключей: после переезда там записка о новом
+# адресе. Установщик копировал именно её в ~\.claude\.credentials.master.env — человек
+# открывал свой файл ключей и находил в нём объявление о переезде, а список имён
+# переменных не был достижим ниоткуда.
+$SrcEnvTemplate = Join-Path $SrcClaude 'templates\.credentials.master.env.example'
 $Profile_       = $env:USERPROFILE
 $DstClaude      = Join-Path $Profile_ '.claude'
-$DstClaudeMd    = Join-Path $Profile_ 'CLAUDE.md'
+# Навигационный хаб кладём в ПОЛЬЗОВАТЕЛЬСКУЮ память Claude Code — это ~\.claude\CLAUDE.md.
+# Только она читается всегда, где бы ни лежал проект. Прежний адрес ~\CLAUDE.md — это
+# ПРОЕКТНАЯ память: CLI поднимается от рабочего каталога вверх и подхватывает такой файл,
+# только если проект лежит ВНУТРИ профиля. На Windows проект всегда снаружи C:\Users\<имя>,
+# поэтому хаб не читался НИКОГДА: пак выглядел установленным, а модель не знала, что у неё
+# есть навыки, и на «сделай ролик» писала ffmpeg руками.
+$DstClaudeMd    = Join-Path $DstClaude 'CLAUDE.md'
+$LegacyClaudeMd = Join-Path $Profile_ 'CLAUDE.md'          # адрес прежних версий пака
+$DstSettings    = Join-Path $DstClaude 'settings.json'     # ${HOME} в нём материализуем (блок 5b)
+$DstMcpJson     = Join-Path $DstClaude 'mcp.json'
 $DstEnv         = Join-Path $DstClaude '.credentials.master.env'
 $Manifest       = Join-Path $DstClaude '.ccpack-manifest.txt'
 
@@ -71,7 +85,11 @@ $excludeDirs  = @('memory', 'projects', 'todos', 'shell-snapshots')
 $preserveDirNames  = @('memory', 'projects', 'todos', 'shell-snapshots')
 $preserveFileNames = @('.credentials.master.env', '.credentials.json', 'settings.local.json',
                        'MEMORY.md', '.ccpack-manifest.txt')
-$preserveExactPaths = @('rules/user-profile.md')
+# CLAUDE.md здесь — это ~\.claude\CLAUDE.md, навигационный хаб: тоже твой файл, в него
+# дописывают свои заметки. Кладём вручную (блок 4) и только если его нет. Якорь по точному
+# пути ОБЯЗАТЕЛЕН: в паке есть свои skills\gstack\CLAUDE.md и skills\n8n\catalog\CLAUDE.md,
+# по голому имени они перестали бы раскладываться.
+$preserveExactPaths = @('rules/user-profile.md', 'CLAUDE.md')
 
 function Test-Preserved([string]$rel) {
     # $rel — путь относительно .claude, разделитель '/'
@@ -215,7 +233,15 @@ if ($DryRun) {
     }
     if ($Repair) { Write-Host "[dry-run] WOULD: перезаписать наши базовые файлы в $DstClaude; пользовательское (preserve-list) не трогать" }
     else { Write-Host "[dry-run] WOULD: скопировать в $DstClaude ТОЛЬКО недостающие файлы; существующее не трогать" }
-    if (Test-Path -LiteralPath $DstClaudeMd) { Write-Host "[dry-run] ~/CLAUDE.md уже есть — НЕ трогаю (твой файл)" } else { Write-Host "[dry-run] WOULD: создать ~/CLAUDE.md (сейчас его нет)" }
+    if (Test-Path -LiteralPath $DstClaudeMd) { Write-Host "[dry-run] ~\.claude\CLAUDE.md уже есть — НЕ трогаю (твой файл)" } else { Write-Host "[dry-run] WOULD: создать ~\.claude\CLAUDE.md — навигационный хаб (сейчас его нет)" }
+    $srcSettingsDry = Join-Path $SrcClaude 'settings.json'
+    if ((Test-Path -LiteralPath $srcSettingsDry) -and ((Get-Content -LiteralPath $srcSettingsDry -Raw -ErrorAction SilentlyContinue) -like '*${HOME}*')) {
+        if ((-not (Test-Path -LiteralPath $DstSettings)) -or $Repair) {
+            Write-Host "[dry-run] WOULD: заменить `${HOME} в ~\.claude\settings.json на абсолютный путь ($Profile_)"
+        } else {
+            Write-Host "[dry-run] ~\.claude\settings.json твой — не трогаю; `${HOME} в нём (если есть) останется"
+        }
+    }
     if (Test-Path -LiteralPath $DstEnv) { Write-Host "[dry-run] .credentials.master.env уже есть — НЕ трогаю" } else { Write-Host "[dry-run] WOULD: создать .credentials.master.env из шаблона" }
     Show-Links "[dry-run] "
     # Про жёсткие ссылки честно предупреждаем ЗАРАНЕЕ: в -Repair такой файл будет записан
@@ -234,7 +260,19 @@ if ($DryRun) {
         if ($dryHl -gt 0) { Write-Host "[dry-run] файлов с несколькими жёсткими ссылками: $dryHl" }
     }
     Write-Host "[dry-run] WOULD: записать список разложенного в $Manifest"
-    if (-not $SkipDeps) { Write-Host "[dry-run] WOULD: pip install --user -r requirements.txt" }
+    if ($SkipDeps) {
+        Write-Host "[dry-run] -SkipDeps: pip и доводка рантайма пропускаются целиком"
+        Write-Host "[dry-run]   (браузер Playwright, маркетплейсы плагинов, node_modules останутся неустановленными)"
+    } else {
+        Write-Host "[dry-run] WOULD: pip install --user -r requirements.txt"
+        # Про сеть надо сказать ЗАРАНЕЕ. План, который молчит про ~150 МБ загрузки,
+        # обнаруживается человеком в момент загрузки — на мобильном интернете это поздно.
+        Write-Host "[dry-run] WOULD: python ~\.claude\scripts\setup_runtime.py — доводка рантайма, ходит в сеть:"
+        Write-Host "[dry-run]   * npx playwright install chromium — около 150 МБ загрузки, самая долгая часть"
+        Write-Host "[dry-run]   * claude plugin marketplace add ... — клонирование объявленных маркетплейсов"
+        Write-Host "[dry-run]   * npm install для skills\dev-browser и skills\gstack"
+        Write-Host "[dry-run]   Пропустить всё это: -SkipDeps (потом можно запустить вручную)"
+    }
     Write-Host "[dry-run] Изменений не внесено."
     exit 0
 }
@@ -498,9 +536,14 @@ if ($Repair) {
     }
 }
 
+# Снимаем ДО копирования: были ли settings.json / mcp.json твоими ещё до нас. От этого
+# зависит, имеем ли мы право трогать в них пути (блок 5b). Твой файл не правим — предупреждаем.
+$settingsPreexisted = Test-Path -LiteralPath $DstSettings
+$mcpJsonPreexisted  = Test-Path -LiteralPath $DstMcpJson
+
 $copyFailed = $false
 if ($Repair) {
-    Write-Host "Режим -Repair: перезаписываю НАШИ базовые файлы свежими (ключи, память, история, settings.local.json, ~/CLAUDE.md не трогаю)..."
+    Write-Host "Режим -Repair: перезаписываю НАШИ базовые файлы свежими (ключи, память, история, settings.local.json, ~\.claude\CLAUDE.md не трогаю)..."
     Write-Host "  ВНИМАНИЕ: если ты правил файл, имя которого совпадает с файлом пака (например,"
     Write-Host "  skills\<имя>\SKILL.md), в этом режиме он будет заменён нашей версией. Прежняя"
     Write-Host "  версия — в резервной копии выше."
@@ -555,14 +598,37 @@ if ($hardlinkTargets.Count -gt 0) {
     }
 }
 
-# --- 4. ~/CLAUDE.md — только если его нет (это ТВОЙ файл) --------------------------------
+# --- 4. ~\.claude\CLAUDE.md — навигационный хаб, только если его нет (это ТВОЙ файл) -----
+# Пользовательская память Claude Code: единственный файл, который CLI читает при любом
+# рабочем каталоге. Из него модель узнаёт, что навыки, правила и команды пака существуют.
+# Из merge он исключён (preserve-list), поэтому кладём вручную — как анкету.
 $claudeMdAdded = $false
+$claudeMdLink  = Get-LinkAncestor 'CLAUDE.md'
 if (Test-Path -LiteralPath $SrcClaudeMd) {
-    if (Test-Path -LiteralPath $DstClaudeMd) {
-        Write-Host "~/CLAUDE.md уже есть — НЕ трогаю (твои личные инструкции). Наш вариант: $SrcClaudeMd"
+    if ($claudeMdLink) {
+        # Путь ведёт сквозь ссылку наружу — писать туда нельзя, затрём чужую цель.
+        Write-Host "CLAUDE.md пропущен: ~/.claude/$claudeMdLink — ссылка, во внешнюю цель не пишу."
+    } elseif (Test-Path -LiteralPath $DstClaudeMd) {
+        Write-Host "~\.claude\CLAUDE.md уже есть — НЕ трогаю (твои личные инструкции). Наш вариант: $SrcClaudeMd"
     } else {
-        try { Copy-Item -LiteralPath $SrcClaudeMd -Destination $DstClaudeMd -ErrorAction Stop; $claudeMdAdded = $true; Write-Host "Создан ~/CLAUDE.md" }
-        catch { $copyFailed = $true; Write-Host "ВНИМАНИЕ: не удалось скопировать ~/CLAUDE.md ($($_.Exception.Message))." }
+        try {
+            New-Item -ItemType Directory -Force -Path $DstClaude -ErrorAction SilentlyContinue | Out-Null
+            Copy-Item -LiteralPath $SrcClaudeMd -Destination $DstClaudeMd -ErrorAction Stop
+            $claudeMdAdded = $true
+            Write-Host "Создан ~\.claude\CLAUDE.md — навигация по конфигу (её читает Claude Code)"
+        }
+        catch { $copyFailed = $true; Write-Host "ВНИМАНИЕ: не удалось скопировать ~\.claude\CLAUDE.md ($($_.Exception.Message))." }
+    }
+}
+# Прежние версии пака клали хаб в ~\CLAUDE.md. Это ПРОЕКТНАЯ память: читается, только когда
+# работаешь ВНУТРИ профиля, то есть на Windows не читается никогда. Файл твой — не удаляем,
+# но молчать нельзя: он остаётся лежать и вводит в заблуждение («хаб же на месте»).
+if (Test-Path -LiteralPath $LegacyClaudeMd) {
+    $legacyText = Get-Content -LiteralPath $LegacyClaudeMd -Raw -ErrorAction SilentlyContinue
+    if ($legacyText -and $legacyText.Contains('SKILLS-FIRST')) {
+        Write-Host "ПРИМЕЧАНИЕ: в ~\CLAUDE.md лежит наш хаб от прежней версии установщика — адрес сменился."
+        Write-Host "  Рабочий адрес теперь ~\.claude\CLAUDE.md (его Claude Code читает всегда)."
+        Write-Host "  Старый файл можно удалить вручную — сам не трогаю."
     }
 }
 
@@ -590,16 +656,79 @@ if (Test-Path -LiteralPath $srcUserProfile) {
 }
 
 # --- 5. credentials — только если ключей ещё нет ----------------------------------------
-if ((Test-Path -LiteralPath $SrcEnvTemplate) -and -not (Test-Path -LiteralPath $DstEnv)) {
-    try { Copy-Item -LiteralPath $SrcEnvTemplate -Destination $DstEnv -ErrorAction Stop; Write-Host "Создан $DstEnv — ключи НЕ нужны: всё работает по подписке Claude. Трогай только если включаешь опциональную платную фичу." }
-    catch { $copyFailed = $true; Write-Host "ВНИМАНИЕ: не удалось создать $DstEnv." }
-} elseif (Test-Path -LiteralPath $DstEnv) {
+if (Test-Path -LiteralPath $DstEnv) {
     Write-Host "$DstEnv уже есть — НЕ трогаю."
+} elseif (Test-Path -LiteralPath $SrcEnvTemplate) {
+    try { Copy-Item -LiteralPath $SrcEnvTemplate -Destination $DstEnv -ErrorAction Stop; Write-Host "Создан $DstEnv из templates\.credentials.master.env.example — ключи НЕ нужны: всё работает по подписке Claude. Трогай только если включаешь опциональную платную фичу." }
+    catch { $copyFailed = $true; Write-Host "ВНИМАНИЕ: не удалось создать $DstEnv." }
+} else {
+    # Молчать здесь нельзя: без этого файла у человека нет НИ ОДНОГО достижимого
+    # списка имён переменных, а установка при этом выглядит успешной.
+    $copyFailed = $true
+    Write-Host "ВНИМАНИЕ: шаблона ключей нет ($SrcEnvTemplate) — $DstEnv не создан."
+    Write-Host "  Список имён переменных смотри в .claude\templates\.credentials.master.env.example в клоне."
 }
+
+# --- 5b. ${HOME} в settings.json -> абсолютный путь --------------------------------------
+# В паке пути к хукам, статус-строке и MCP записаны как ${HOME}/.claude/... На Windows это
+# не работает, и отказ ТИХИЙ:
+#   • hooks[].command и statusLine.command CLI отдаёт шеллу. По умолчанию это Git Bash —
+#     без Git for Windows хук не запускается вовсе; с "shell":"powershell" ${HOME} пусто,
+#     потому что в PowerShell такой переменной нет (проверено в pwsh 7 и PS 5.1);
+#   • mcpServers[].args подставляет САМ CLI по своему окружению (process.env). У процесса
+#     Claude Code на Windows переменной HOME нет — сервер не поднимается.
+# На экране при этом ни одной ошибки: защитного хука нет, статус-строки нет, MCP нет.
+# Пишем то, что работает одинаково везде: абсолютный путь с прямыми слэшами. Прямые слэши
+# понимают и node, и python, и сам Windows, и в JSON их не надо экранировать.
+$homeFwd = $Profile_.TrimEnd('\', '/') -replace '\\', '/'
+
+function Set-AbsoluteHomePaths([string]$file) {
+    # Возвращает $true, если файл в порядке (или трогать было нечего).
+    if (-not (Test-Path -LiteralPath $file)) { return $true }
+    $raw = Get-Content -LiteralPath $file -Raw -ErrorAction SilentlyContinue
+    if (-not $raw -or -not $raw.Contains('${HOME}')) { return $true }
+    # .Replace(), а не -replace: второй трактует шаблон как регулярку, а ${...} в ней —
+    # ссылка на группу. Подстановка молча превратилась бы в пустую строку.
+    $new = $raw.Replace('${HOME}', $homeFwd)
+    try { $null = $new | ConvertFrom-Json }
+    catch {
+        Write-Host "ВНИМАНИЕ: после подстановки путей $file перестал быть корректным JSON — оставил как было." -ForegroundColor Yellow
+        return $false
+    }
+    try {
+        # UTF-8 БЕЗ BOM: PS 5.1 в Out-File -Encoding utf8 добавляет BOM, а JSON с BOM
+        # часть парсеров не читает.
+        [System.IO.File]::WriteAllText($file, $new, (New-Object System.Text.UTF8Encoding($false)))
+        return $true
+    } catch {
+        Write-Host "ВНИМАНИЕ: не удалось записать $file с абсолютными путями ($($_.Exception.Message))." -ForegroundColor Yellow
+        return $false
+    }
+}
+
+if ((-not $settingsPreexisted) -or $Repair) {
+    $rawSettings = Get-Content -LiteralPath $DstSettings -Raw -ErrorAction SilentlyContinue
+    if ($rawSettings -and $rawSettings.Contains('${HOME}')) {
+        if (Set-AbsoluteHomePaths $DstSettings) {
+            Write-Host "Пути в settings.json (хуки, статус-строка, MCP) записаны как $homeFwd/.claude/..."
+        } else {
+            $copyFailed = $true
+        }
+    }
+} elseif (Test-Path -LiteralPath $DstSettings) {
+    $rawSettings = Get-Content -LiteralPath $DstSettings -Raw -ErrorAction SilentlyContinue
+    if ($rawSettings -and $rawSettings.Contains('${HOME}')) {
+        Write-Host "ВНИМАНИЕ: в твоём ~\.claude\settings.json пути записаны через `${HOME}." -ForegroundColor Yellow
+        Write-Host "  Твой файл я не трогаю. Но на Windows такая запись молча отключает защитный хук,"
+        Write-Host "  статус-строку и MCP: у процесса Claude Code переменной HOME нет."
+        Write-Host "  Замени `${HOME} на $homeFwd вручную — или запусти .\install.ps1 -Repair."
+    }
+}
+if ((-not $mcpJsonPreexisted) -or $Repair) { $null = Set-AbsoluteHomePaths $DstMcpJson }
 
 # --- 6. Манифест: РОВНО то, что положили мы ---------------------------------------------
 if ($manifestOk) {
-    if ($claudeMdAdded) { $ourCandidates.Add('CLAUDE.md') }
+    if ($claudeMdAdded) { $ourCandidates.Add('.claude/CLAUDE.md') }
     if ($userProfileAdded) { $ourCandidates.Add($userProfileRel) }
     $lines = New-Object System.Collections.Generic.List[string]
     $lines.Add('# ccpack manifest v1 - файлы, разложенные your-config-repo')
@@ -673,20 +802,139 @@ if ($manifestOk) {
     }
 }
 
+# --- 6b. Поиск НАСТОЯЩЕГО Python ---------------------------------------------------------
+# На чистой Win11 в PATH выше настоящего интерпретатора лежит заглушка Microsoft Store
+# (%LOCALAPPDATA%\Microsoft\WindowsApps\python.exe). Это не Python, а перехватчик: он
+# открывает магазин приложений и не возвращает управление — установка встаёт намертво,
+# без единого сообщения на экране. Поэтому:
+#   • берём ВСЕ одноимённые команды из PATH (-All), а не первую: заглушка обычно первая,
+#     и без -All фильтр выбросил бы её вместе с ответом «Python не найден»;
+#   • отсеиваем по ПУТИ (WindowsApps), а не по имени;
+#   • добавляем типовые каталоги установки — python.org и winget не всегда правят PATH
+#     текущего процесса;
+#   • проверяем кандидата запуском `--version` и ждём ответа вида «Python 3.x».
+# Та же гоча описана в skills/installer-builder/references/gotchas.md §3.
+function Get-RealPython {
+    $cands = New-Object System.Collections.Generic.List[string]
+    # 1) настоящий python.exe из PATH
+    foreach ($n in @('python', 'python3')) {
+        try {
+            Get-Command $n -All -ErrorAction SilentlyContinue |
+                Where-Object { $_.Path -and $_.Path -notmatch '\\WindowsApps\\' } |
+                ForEach-Object { $cands.Add($_.Path) }
+        } catch { }
+    }
+    # 2) типовые каталоги установки — PATH текущего процесса мог не обновиться
+    $probes = @(
+        (Join-Path $env:LOCALAPPDATA 'Programs\Python'),
+        (Join-Path $env:ProgramFiles 'Python'),
+        'C:\'
+    )
+    foreach ($root in $probes) {
+        if (-not $root) { continue }
+        try {
+            Get-ChildItem -LiteralPath $root -Filter 'Python3*' -Directory -ErrorAction SilentlyContinue |
+                Sort-Object Name -Descending | ForEach-Object {
+                    $exe = Join-Path $_.FullName 'python.exe'
+                    if ([System.IO.File]::Exists($exe)) { $cands.Add($exe) }
+                }
+        } catch { }
+    }
+    # 3) последний резерв — лаунчер py.exe (он ставится вместе с настоящим Python,
+    #    на чистой системе его нет; без установленного Python отсеется проверкой версии)
+    try {
+        Get-Command 'py' -All -ErrorAction SilentlyContinue |
+            Where-Object { $_.Path -and $_.Path -notmatch '\\WindowsApps\\' } |
+            ForEach-Object { $cands.Add($_.Path) }
+    } catch { }
+
+    foreach ($c in $cands) {
+        if ($c -match '\\WindowsApps\\') { continue }
+        try {
+            $out = & $c --version 2>&1 | Out-String
+            if ($out -match 'Python\s+3\.\d') { return $c }
+        } catch { }
+    }
+    return $null
+}
+$PyExe = Get-RealPython
+
 # --- 7. Python-зависимости (по желанию) --------------------------------------------------
 if (-not $SkipDeps) {
     $req = Join-Path $Here 'requirements.txt'
     if (Test-Path -LiteralPath $req) {
-        $py = Get-Command python -ErrorAction SilentlyContinue
-        if (-not $py) { $py = Get-Command python3 -ErrorAction SilentlyContinue }
+        $py = $PyExe
         if ($py) {
             Write-Host "Ставлю Python-зависимости (--user)... (пропустить: -SkipDeps)"
+            $pipOk = $false
             try {
-                & $py.Path -m pip install --user --upgrade pip 2>$null | Out-Null
-                & $py.Path -m pip install --user -r $req
-            } catch { Write-Host "Python-зависимости не поставились — пропускаю (на работу конфига не влияет)." }
+                & $py -m pip install --user --upgrade pip 2>$null | Out-Null
+                & $py -m pip install --user -r $req
+                $pipOk = ($LASTEXITCODE -eq 0)
+            } catch { $pipOk = $false }
             $global:LASTEXITCODE = 0
-        } else { Write-Host "Python не найден — зависимости пропущены." }
+
+            # Проверяем РЕЗУЛЬТАТ, а не код возврата.
+            if ($pipOk) {
+                & $py -c "import requests" 2>$null | Out-Null
+                if ($LASTEXITCODE -ne 0) {
+                    $pipOk = $false
+                    Write-Host "  pip отчитался об успехе, но 'import requests' не проходит — считаю это провалом."
+                }
+                $global:LASTEXITCODE = 0
+            }
+
+            # Пакетная установка — всё или ничего: pip сначала решает весь граф, и ОДИН
+            # пакет без колеса под эту платформу оставляет без библиотек все остальные.
+            # Добиваем по одному: пусть не приедет один, а не тридцать восемь.
+            $failedPkgs = @()
+            if (-not $pipOk) {
+                Write-Host "  Пакетная установка не прошла — ставлю по одному, чтобы уцелело максимум."
+                foreach ($raw in [System.IO.File]::ReadAllLines($req)) {
+                    $pkg = ($raw -split '#')[0].Trim()
+                    if (-not $pkg) { continue }
+                    & $py -m pip install --user $pkg 2>$null | Out-Null
+                    if ($LASTEXITCODE -ne 0) { $failedPkgs += $pkg }
+                    $global:LASTEXITCODE = 0
+                }
+                & $py -c "import requests" 2>$null | Out-Null
+                $baseOk = ($LASTEXITCODE -eq 0)
+                $global:LASTEXITCODE = 0
+                if ($baseOk) {
+                    if ($failedPkgs.Count -gt 0) {
+                        Write-Host "  Базовое встало. НЕ установилось (навыки, которым это нужно, работать не будут):"
+                        foreach ($p in $failedPkgs) { Write-Host "      $p" }
+                        Write-Host "Python-зависимости встали ЧАСТИЧНО (проверено импортом)."
+                    } else {
+                        Write-Host "Python-зависимости на месте (проверено импортом)."
+                    }
+                    $pipOk = $true
+                }
+            } else {
+                Write-Host "Python-зависимости на месте (проверено импортом)."
+            }
+
+            if (-not $pipOk) {
+                # Раньше здесь печаталось «на работу конфига не влияет». Это неправда:
+                # от Python зависят ~46 навыков и весь ~\.claude\tools\ — без библиотек
+                # они падают ModuleNotFoundError, и связь с установкой уже не видна.
+                Write-Host ""
+                Write-Host "ВНИМАНИЕ: Python-зависимости НЕ установлены." -ForegroundColor Yellow
+                Write-Host "  Это НЕ косметика: без них ~46 навыков и все CLI из $DstClaude\tools\"
+                Write-Host "  будут падать с 'ModuleNotFoundError'. Конфиг разложен, но работать будет неполно."
+                Write-Host "  Поставить вручную:"
+                Write-Host "    `"$py`" -m pip install --user -r `"$req`""
+                Write-Host "  Если pip ругается на права или на 'externally-managed-environment':"
+                Write-Host "    `"$py`" -m pip install --user --break-system-packages -r `"$req`""
+            }
+        } else {
+            Write-Host ""
+            Write-Host "ВНИМАНИЕ: Python не найден — зависимости НЕ установлены." -ForegroundColor Yellow
+            Write-Host "  От Python зависят ~46 навыков и все CLI из $DstClaude\tools\ — без него они не работают."
+            Write-Host "  Поставь Python 3 (python.org или 'winget install Python.Python.3.13'),"
+            Write-Host "  открой НОВОЕ окно терминала и запусти установку ещё раз."
+            Write-Host "  Заглушка из Microsoft Store не подходит — нужен настоящий интерпретатор."
+        }
     }
 }
 
@@ -703,17 +951,14 @@ if (-not $SkipDeps) {
 if (-not $SkipDeps) {
     $runtimeScript = Join-Path $DstClaude 'scripts\setup_runtime.py'
     if (Test-Path -LiteralPath $runtimeScript) {
-        # Заглушку Microsoft Store (WindowsApps\python.exe) брать нельзя: она не
-        # интерпретатор, а перехватчик — открывает магазин и не возвращает управление,
-        # то есть установка встала бы намертво без единого сообщения. На чистой Win11
-        # она лежит в PATH выше настоящего Python, поэтому проверяем ПУТЬ, а не имя.
-        $py2 = @(Get-Command python, python3 -ErrorAction SilentlyContinue |
-                 Where-Object { $_.Path -and $_.Path -notmatch '\\WindowsApps\\' }) |
-               Select-Object -First 1
+        # Интерпретатор ищем той же Get-RealPython, что и в блоке 7: заглушку Microsoft
+        # Store (WindowsApps\python.exe) брать нельзя — она не интерпретатор, а перехватчик,
+        # открывает магазин и не возвращает управление.
+        $py2 = $PyExe
         if ($py2) {
             Write-Host ""
             Write-Host "Довожу рантайм (браузер Playwright, маркетплейсы плагинов, node_modules)..."
-            & $py2.Path $runtimeScript
+            & $py2 $runtimeScript
             if ($LASTEXITCODE -ne 0) {
                 Write-Host "Рантайм доехал НЕ полностью. Это не ломает установку — доделать можно в любой момент:"
                 Write-Host "  python `"$runtimeScript`""
@@ -725,6 +970,121 @@ if (-not $SkipDeps) {
             Write-Host "  python `"$runtimeScript`""
         }
     }
+} else {
+    # -SkipDeps гасит и этот шаг тоже. Пока об этом молчали, флаг читался как
+    # «не ставить pip-пакеты», а выключал заодно браузер (42 навыка), маркетплейсы
+    # плагинов и node_modules — и человек узнавал об этом только по отказу навыка.
+    Write-Host ""
+    Write-Host "-SkipDeps: рантайм НЕ доведён. Не сделано:"
+    Write-Host "  * браузер Playwright (~150 МБ) — от него зависят 42 навыка;"
+    Write-Host "  * маркетплейсы плагинов (объявлено 33 плагина);"
+    Write-Host "  * node_modules для dev-browser и gstack."
+    Write-Host "Доделать в любой момент: python `"$(Join-Path $DstClaude 'scripts\setup_runtime.py')`""
+}
+
+# --- 7c. Проверка ПОСЛЕ установки --------------------------------------------------------
+# Скопировали ≠ работает. Самый дорогой отказ этого пака — тихий: файлы на месте, «ГОТОВО»
+# на экране, а хаб не читается или защитный хук не запускается. В бою этого не понять:
+# модель просто не знает, что навыки есть. Проверяем ровно то, без чего пак мёртв.
+$verifyFailed = $false
+Write-Host ""
+Write-Host "Проверяю установленное..."
+
+# 1) навигационный хаб — единственный файл, из которого модель узнаёт про навыки
+$hubItem = Get-Item -LiteralPath $DstClaudeMd -Force -ErrorAction SilentlyContinue
+if (-not $hubItem -or $hubItem.PSIsContainer) {
+    Write-Host "  [X] НЕТ $DstClaudeMd — Claude Code не увидит НИ ОДНОГО навыка пака." -ForegroundColor Red
+    Write-Host "      Положи его вручную:  Copy-Item `"$SrcClaudeMd`" `"$DstClaudeMd`""
+    $verifyFailed = $true
+} elseif ($hubItem.Length -eq 0) {
+    Write-Host "  [X] $DstClaudeMd пустой (0 байт) — это то же самое, что его нет." -ForegroundColor Red
+    $verifyFailed = $true
+} else {
+    $hubText = Get-Content -LiteralPath $DstClaudeMd -Raw -ErrorAction SilentlyContinue
+    if (-not $hubText) {
+        Write-Host "  [X] $DstClaudeMd не читается (права доступа?)." -ForegroundColor Red
+        $verifyFailed = $true
+    } else {
+        Write-Host "  [ok] ~\.claude\CLAUDE.md на месте и читается ($($hubItem.Length) байт)" -ForegroundColor Green
+        if (-not $hubText.Contains('SKILLS-FIRST')) {
+            Write-Host "       (в нём не наш хаб, а твой текст — так и задумано: свой файл мы не перезаписываем)"
+        }
+    }
+}
+
+# 2) settings.json: пути должны быть абсолютными, а файлы по ним — существовать
+if (-not (Test-Path -LiteralPath $DstSettings)) {
+    Write-Host "  [X] НЕТ $DstSettings — хуки, статус-строка и MCP не настроены." -ForegroundColor Red
+    $verifyFailed = $true
+} else {
+    $sTxt = Get-Content -LiteralPath $DstSettings -Raw -ErrorAction SilentlyContinue
+    if ($sTxt -and $sTxt.Contains('${HOME}')) {
+        Write-Host "  [X] в settings.json остались пути через `${HOME}: на Windows это молча отключает" -ForegroundColor Red
+        Write-Host "      защитный хук, статус-строку и MCP. Почини: .\install.ps1 -Repair"
+        $verifyFailed = $true
+    } else {
+        Write-Host "  [ok] пути в settings.json абсолютные" -ForegroundColor Green
+    }
+    # Файлы, на которые settings.json ссылается: хуки, статус-строка, python-MCP.
+    # Ищем по обеим формам записи каталога — со слэшами и с обратными слэшами.
+    $refs = @()
+    if ($sTxt) {
+        # Три формы записи одного каталога: C:/Users/x, C:\Users\x и C:\\Users\\x (в JSON
+        # обратный слэш экранируется). Искать только по одной — значит ничего не найти и
+        # напечатать «проверено» ни по чему.
+        $sep = '(?:/|\\{1,2})'
+        foreach ($pfx in @($homeFwd, ($homeFwd -replace '/', '\'), ($homeFwd -replace '/', '\\'))) {
+            $rx = [regex]::Escape($pfx) + $sep + '\.claude(?:' + $sep + '[^"\\]+)*\.(?:js|py)'
+            foreach ($m in [regex]::Matches($sTxt, $rx)) { $refs += ($m.Value -replace '\\\\', '\') }
+        }
+        $refs = $refs | Sort-Object -Unique
+    }
+    $refMiss = 0
+    foreach ($r in $refs) {
+        if (Test-Path -LiteralPath $r) { continue }
+        Write-Host "  [X] файл, на который ссылается settings.json, не найден: $r" -ForegroundColor Red
+        $refMiss++
+    }
+    if ($refMiss -gt 0) {
+        $verifyFailed = $true
+    } elseif ($refs.Count -gt 0) {
+        Write-Host "  [ok] файлы хуков/статус-строки/MCP на месте ($($refs.Count) шт.)" -ForegroundColor Green
+    } else {
+        # Ноль найденных путей — это не «всё хорошо», а «проверять было нечего».
+        # Промолчать здесь значило бы выдать пустую проверку за пройденную.
+        Write-Host "  [!] в settings.json не нашлось ни одной ссылки на файл внутри ~\.claude —" -ForegroundColor Yellow
+        Write-Host "      проверять нечего. Если защитный хук и статус-строка нужны, сверь файл вручную."
+    }
+}
+
+# 3) node: на нём написаны защитный хук и статус-строка
+$nodeCmd = Get-Command node -ErrorAction SilentlyContinue
+if ($nodeCmd) {
+    Write-Host "  [ok] node есть ($($nodeCmd.Source))" -ForegroundColor Green
+} else {
+    Write-Host "  [!] node не найден в PATH — защитный хук guard.js и статус-строка не запустятся." -ForegroundColor Yellow
+    Write-Host "      Поставь Node.js (nodejs.org). Остальной конфиг от этого не страдает."
+}
+
+# 4) bash: на нём написана ~1000 строк команд внутри навыков
+# Тела навыков пишут POSIX-синтаксисом: 2>/dev/null, $(...), /tmp/..., фоновый & и nohup.
+# В cmd.exe и PowerShell это не выполняется. Claude Code запускает такие команды через
+# Git Bash — если его нет, отказ приходит НЕ здесь, а посреди работы навыка, и выглядит
+# как поломка навыка, а не как отсутствие оболочки. Поэтому говорим сейчас.
+$bashCmd = Get-Command bash -ErrorAction SilentlyContinue
+if ($bashCmd) {
+    Write-Host "  [ok] bash есть ($($bashCmd.Source))" -ForegroundColor Green
+} else {
+    Write-Host "  [!] bash не найден в PATH — POSIX-команды внутри навыков не выполнятся." -ForegroundColor Yellow
+    Write-Host "      Это ~1000 строк в десятках навыков (2>/dev/null, `$(...), /tmp/..., фоновый &)."
+    Write-Host "      Ставится вместе с Git for Windows:  winget install Git.Git"
+    Write-Host "      После установки открой НОВЫЙ терминал — PATH подхватывается только там."
+}
+
+if ($verifyFailed) {
+    Write-Host ""
+    Write-Host "ПРОВЕРКА НЕ ПРОШЛА — см. строки со знаком [X] выше." -ForegroundColor Red
+    Write-Host "  Файлы разложены, но в таком виде пак работает НЕ полностью."
 }
 
 # --- 8. Честный итог ---------------------------------------------------------------------
@@ -738,9 +1098,13 @@ if ($copyFailed) {
     else { Write-Host "ГОТОВО: добавлено недостающее, всё существующее сохранено." -ForegroundColor Green }
 }
 Write-Host "Сохранено без изменений: ключи (.credentials.*), MEMORY.md, memory\, projects\ (история сессий),"
-Write-Host "  todos\, shell-snapshots\, chats.db*, tg_session.session*, settings.local.json, ~\CLAUDE.md."
+Write-Host "  todos\, shell-snapshots\, chats.db*, tg_session.session*, settings.local.json, ~\.claude\CLAUDE.md."
 if ($backupDir) { Write-Host "Резервная копия: $backupDir (храним 3 последние)." }
 Write-Host "Откат: .\uninstall.ps1 — удалит только то, что положил этот установщик."
 Write-Host "Дальше: заполни $DstClaude\rules\user-profile.md  ->  запусти 'claude'. API-ключи не требуются."
 if ($copyFailed) { exit 1 }
+# Проверка выше нашла неработающее — это не «предупреждение на всякий случай», а факт:
+# хаб не читается или хук не запустится. Возвращаем ненулевой код, чтобы отказ было видно
+# и человеку, и любому скрипту-обёртке.
+if ($verifyFailed) { exit 1 }
 exit 0

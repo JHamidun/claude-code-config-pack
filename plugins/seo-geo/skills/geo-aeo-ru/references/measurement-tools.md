@@ -35,13 +35,13 @@
 
 ### Прогон по 6 платформам
 
-ChatGPT / Claude / Perplexity / Gemini / (regional LLM B) / (regional LLM A) (+ Яндекс Нейро для РФ).
+ChatGPT / Claude / Perplexity / Gemini / GigaChat / YandexGPT (+ Яндекс Нейро для РФ).
 **Каждую платформу — отдельно** (логика выбора источников у всех разная).
 
 **50-100 промптов × 6 платформ = базовый audit.**
 
 Инструменты прогона:
-- **YourProduct** — мульти-модельный доступ в одном окне.
+- **Свой агрегатор LLM** (если есть) — прогон через несколько моделей разом.
 - `multi-model-gateway` — кросс-модельный прогон.
 - `perplexity` — для Perplexity-специфики (citations).
 - Свой скрипт на API всех 6 платформ + crontab + Google Sheets/Метрика.
@@ -71,8 +71,8 @@ ChatGPT / Claude / Perplexity / Gemini / (regional LLM B) / (regional LLM A) (+ 
 | **Manual (ChatGPT API + prompt-set + sheet)** | $0-50 | свой prompt audit | solopreneurs, технари |
 
 > ⚠️ **Критично для РФ:** **ни один** западный инструмент (Profound, Otterly, Peec, AthenaHQ)
-> **НЕ мониторит (regional LLM B) / (regional LLM A) / Яндекс Нейро.** Это слепая зона. Для русского контура —
-> только свой prompt-runner или YourProduct. Подробно: `russian-llm.md`.
+> **НЕ мониторит GigaChat / YandexGPT / Яндекс Нейро.** Это слепая зона. Для русского контура —
+> только свой prompt-runner или свой агрегатор LLM. Подробно: `russian-llm.md`.
 
 **Рынок GEO-услуг:** $886M в 2024 → прогноз $7.3B к 2031 (CAGR 34%). Сейчас **92% брендов
 невидимы в ChatGPT** — большой headroom.

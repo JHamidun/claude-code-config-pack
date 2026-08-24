@@ -155,7 +155,10 @@ cloudflared tunnel --url http://localhost:8080
 ## Когда НЕ использовать
 
 - Прототип finalize'нут, экспорт в standalone-html → больше не нужен dev server
-- Артефакт не имеет live итераций (single static cover) → просто `open file`
+- Артефакт не имеет live итераций (single static cover) → просто открыть файл в браузере:
+  `open file` (macOS) · `xdg-open file` (Linux) · `start file` (Windows) ·
+  `cmd //c start file` (Git Bash). Кросс-платформенно:
+  `python -c "import webbrowser,sys; webbrowser.open(sys.argv[1])" file`
 - В CI / headless env → используй verifier, не live-preview
 
 ## Stack

@@ -33,13 +33,13 @@ tools: Read, Write, Edit, Glob, Grep
 ## Story Arc:
 
 ```
-      в"Њв"Ђв"Ђв"Ђ Climax (main insight)
-     /в"'\
-    / в"' \
-   /  в"'  \
-Setupв"'   Resolution
+      ┌─── Climax (main insight)
+     /│\
+    / │ \
+   /  │  \
+Setup│   Resolution
   ↓  │    ↓
-Problem в†' Solution
+Problem → Solution
 ```
 
 ## Narrative Structure:

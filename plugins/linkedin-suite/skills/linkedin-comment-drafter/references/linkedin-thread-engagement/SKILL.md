@@ -1,6 +1,6 @@
 ---
 name: linkedin-thread-engagement
-description: Monitor LinkedIn threads where the user commented for author replies and inbound signals. Use when the user wants to track which of their comments earned personal replies from post authors (the highest-value engagement signal). Flags the 6-24h "PublicAuthor3 window" where author replies are most likely, drafts follow-up responses, and optionally routes to DM. Keywords: thread monitoring, author reply, inbound tracking, comment follow-up, engagement compound.
+description: Monitor LinkedIn threads where the user commented for author replies and inbound signals. Use when the user wants to track which of their comments earned personal replies from post authors (the highest-value engagement signal). Flags the 6-24h author-reply window where author replies are most likely, drafts follow-up responses, and optionally routes to DM. Keywords: thread monitoring, author reply, inbound tracking, comment follow-up, engagement compound.
 ---
 
 # LinkedIn Thread Engagement
@@ -11,11 +11,11 @@ The engagement compounding layer. Tracks which of the user's comments earned aut
 
 - Daily: "What threads need follow-up today?"
 - After posting a batch of comments: "Check back in 6 hours"
-- When an author replied personally (e.g., PublicAuthor3 → Author): "Draft the response"
+- When an author replied personally (e.g., the post author replied to you): "Draft the response"
 
 ## Input
 
-- пользователя LinkedIn profile URL (to pull their recent comments)
+- The user's LinkedIn profile URL (to pull their recent comments)
 - Optional: specific post URL to monitor
 
 ## Output
@@ -24,9 +24,9 @@ The engagement compounding layer. Tracks which of the user's comments earned aut
 
 | Posted | Author | Post | Comment | Reply? | Stage | Action |
 |---|---|---|---|---|---|---|
-| 18h ago | PublicAuthor3 | Sample Co | "key takeaway" | ✅ Engager B replied 14h ago | Warm (6-24h window) | **Reply now** |
-| 22h ago | Dharmesh Shah | HubSpot | "integration depth moat" | No | Cold | Skip |
-| 3h ago | Felix T. | Rezolve | "twin economies" | No | Watch | Check in 3h |
+| 18h ago | Alex M. | legaltech SaaS | "key takeaway" | ✅ author replied 14h ago | Warm (6-24h window) | **Reply now** |
+| 22h ago | Dana R. | CRM vendor | "integration depth moat" | No | Cold | Skip |
+| 3h ago | Priya S. | retail AI | "twin economies" | No | Watch | Check in 3h |
 
 ### For each warm thread
 - Thread preview (last 3 turns)
@@ -48,7 +48,7 @@ The engagement compounding layer. Tracks which of the user's comments earned aut
    - Timestamps (time since user's comment, time since latest reply)
 3. **Classify stage:**
    - **Hot (<6h):** author just replied — respond within 90 min for max thread momentum
-   - **Warm (6-24h):** the PublicAuthor3 window — author replies most happen here
+   - **Warm (6-24h):** the author-reply window — author replies most happen here
    - **Cool (24-72h):** still respondable but lower velocity
    - **Dormant (>72h):** don't reply in thread; consider DM
 4. **Draft responses** for warm threads using `linkedin-reply-handler` (which adapts to the active backend per `lib.active_backend()` — SocialPublisher auto-posts, manual mode returns copy-paste, DIY invokes custom poster).
@@ -57,9 +57,9 @@ The engagement compounding layer. Tracks which of the user's comments earned aut
    - Commenter is in thread self-promoting (your reply shouldn't engage them)
 6. **DM routing:** if thread is dormant but the author engaged meaningfully, draft a DM that references the thread specifically.
 
-## PublicAuthor3 window
+## The 6-24h author-reply window
 
-Named after the real 2026-04 data point: PublicAuthor3 (a sample CEO) replied to Author's comment 20-30h after the original post. This is the sweet spot.
+Typical shape: the post author replies to your comment 20-30h after publishing. This is the sweet spot.
 
 - **0-6h:** 70% of author replies happen here if they're going to happen
 - **6-24h:** ~25% of author replies, but these are higher-quality (author took time to think)
@@ -97,7 +97,7 @@ Low-quality = skip:
 > Input: monitor your-handle profile, last 24h
 
 > Output:
-> - **1 warm thread:** PublicAuthor3 replied 14h ago on a sample post. Current stage: Warm (8-24h). Suggested response ready. Action: post within 2 hours.
+> - **1 warm thread:** the post author replied 14h ago. Current stage: Warm (8-24h). Suggested response ready. Action: post within 2 hours.
 > - 8 cold threads (no author engagement). Skip.
 > - 3 watching threads (<6h old, author may still reply). Check again in 3-6h.
 

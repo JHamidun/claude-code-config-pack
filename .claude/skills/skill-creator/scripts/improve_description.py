@@ -14,6 +14,13 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Запуск двумя способами, а не одним. Импорт `scripts.*` работает, только когда на
+# sys.path стоит КОРЕНЬ навыка — это даёт `python -m scripts.<имя>` из каталога навыка.
+# Прямой `python scripts/<имя>.py` кладёт на sys.path сам каталог scripts/, и тот же
+# импорт падает `ModuleNotFoundError: No module named 'scripts'` — при папке scripts,
+# лежащей на виду. Добавляем корень навыка сами: тогда обе формы запуска рабочие.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from scripts.utils import parse_skill_md
 
 

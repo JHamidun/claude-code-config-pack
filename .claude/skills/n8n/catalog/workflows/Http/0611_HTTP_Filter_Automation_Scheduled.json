@@ -50,7 +50,7 @@
       "credentials": {
         "httpHeaderAuth": {
           "id": "1kwUrzy4cJXZx48R",
-          "name": "Digital Ocean Account (darryn@optimus01.co.za)"
+          "name": "Digital Ocean Account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1,
@@ -74,7 +74,7 @@
       "credentials": {
         "httpHeaderAuth": {
           "id": "1kwUrzy4cJXZx48R",
-          "name": "Digital Ocean Account (darryn@optimus01.co.za)"
+          "name": "Digital Ocean Account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1
@@ -97,7 +97,7 @@
       "credentials": {
         "httpHeaderAuth": {
           "id": "1kwUrzy4cJXZx48R",
-          "name": "Digital Ocean Account (darryn@optimus01.co.za)"
+          "name": "Digital Ocean Account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1
@@ -128,7 +128,7 @@
       "credentials": {
         "httpHeaderAuth": {
           "id": "1kwUrzy4cJXZx48R",
-          "name": "Digital Ocean Account (darryn@optimus01.co.za)"
+          "name": "Digital Ocean Account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1

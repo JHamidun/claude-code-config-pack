@@ -41,7 +41,7 @@
           "string": [
             {
               "name": "body",
-              "value": "Name: Miquel\nEmail: miquel@aprenden8n.com\nSubject: Welcome aboard\nMessage: Hi Miquel!\n\nThank you for your signup!"
+              "value": "Name: Miquel\nEmail: REPLACE_ME@example.com\nSubject: Welcome aboard\nMessage: Hi Miquel!\n\nThank you for your signup!"
             },
             {
               "name": "labels",
