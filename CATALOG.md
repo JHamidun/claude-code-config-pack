@@ -1,7 +1,6 @@
 # Что внутри пака
 
-Собрано по фактическому содержимому репозитория, а не написано руками: цифра в тексте устаревает молча.
-Считается то, что **отслеживается git**, — то есть ровно то, что получает клонирующий. Файлы, лежащие на диске у автора, но исключённые `.gitignore` (личные конфиги, рабочие каталоги), в счёт не идут.
+Собрано генератором `_gen_catalog.py` по фактическому содержимому дерева, а не написано руками: цифра в тексте устаревает молча.
 
 ## Ядро
 
@@ -9,9 +8,9 @@
 
 | | |
 |---|---:|
-| Навыков | 313 |
+| Навыков | 315 |
 | Команд (`/имя`) | 99 |
-| Агентов | 75 |
+| Агентов | 78 |
 | Правил (грузятся каждую сессию) | 19 |
 | Скриптов и инструментов | 45 |
 | Хуков | 11 |
@@ -26,9 +25,9 @@
 
 ### Работа с кодом
 
-**`dev-core`** — Dev Core. 14 навыков, 15 команд, 10 агентов.
+**`dev-core`** — Dev Core. 15 навыков, 15 команд, 10 агентов.
   Python/JS/TS dev, database design, API docs, build fix, git workflow, architecture agents.
-  Внутри: `api-documentation`, `apple-developer`, `beads`, `build-fix`, `changelog-generator`, `codegraph` и ещё 8
+  Внутри: `api-documentation`, `apple-developer`, `autocad-com`, `beads`, `build-fix`, `changelog-generator` и ещё 9
 
 **`skill-dev`** — Skill & Agent Dev. 10 навыков, 5 агентов.
   Author skills/agents/plugins/MCP, prompt engineering, Claude API & CLI.
