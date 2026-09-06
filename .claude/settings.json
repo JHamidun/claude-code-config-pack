@@ -1,10 +1,11 @@
 {
+  "model": "opus",
   "cleanupPeriodDays": 99999,
   "env": {
     "PYTHONUTF8": "1",
     "PYTHONIOENCODING": "utf-8",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "MCP_TIMEOUT": "30000",
+    "MCP_TIMEOUT": "120000",
     "MCP_TOOL_TIMEOUT": "180000",
     "ENABLE_TOOL_SEARCH": "auto",
     "SUPERPOWERS_DISABLE_TELEMETRY": "1",
@@ -285,58 +286,6 @@
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
   "preferredNotifChannel": "terminal_bell",
-  "mcpServers": {
-    "graph-memory": {
-      "command": "python",
-      "args": [
-        "${HOME}/.claude/mcps/graph-memory/server.py"
-      ],
-      "env": {
-        "PYTHONIOENCODING": "utf-8",
-        "PYTHONUTF8": "1"
-      },
-      "disabled": false,
-      "description": "Граф твоей памяти: соседи, пути, хабы, разрывы. Строится из ~/.claude/projects/*/memory/*.md, база создаётся пустой."
-    },
-    "filesystem": {
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "."
-      ],
-      "command": "npx"
-    },
-    "runway": {
-      "type": "stdio",
-      "command": "python",
-      "args": [
-        "-u",
-        "${HOME}/.claude/skills/video-generation/scripts/runway_mcp.py"
-      ],
-      "disabled": true
-    },
-    "playwright-live1": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@0.0.78",
-        "--user-data-dir",
-        "${HOME}/.claude/pw-profiles/live1"
-      ]
-    },
-    "pageindex": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@pageindex/mcp"
-      ],
-      "disabled": true
-    },
-    "miro": {
-      "type": "http",
-      "url": "https://mcp.miro.com/",
-      "disabled": true
-    }
-  },
   "skillListingBudgetFraction": 0.08,
   "skillListingMaxDescChars": 400,
   "autoContinueAtUsageLimit": true,

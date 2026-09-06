@@ -342,13 +342,19 @@ CLAUDE_CONFIG_DIR="$PWD/.claude" python .claude/scripts/config_lint.py | head -2
   separate plugin). Separately, `enabledPlugins` in `settings.json` lists 33 **third-party**
   plugins from other marketplaces — 29 on, 4 off (`linear`, `notion`, `telegram`,
   `pdf-viewer`, which need accounts you may not have).
-- 6 MCP servers in `settings.json`, **3 enabled**: `graph-memory`, `filesystem`,
-  `playwright-live1`. The other 3 (`runway`, `pageindex`, `miro`) are `disabled: true` because
-  they need your own keys and accounts.
-  Enable one by editing `mcpServers` in `~/.claude/settings.json` (that is the file Claude Code
-  actually reads). `~/.claude/mcp.json` is a **reference sheet of 17 ready-made blocks**, not
-  live config — copy a block from there into `settings.json`. JSON has no comments, so the
-  sheet says this in a `"_readme"` field at the top of the file.
+- 6 MCP servers, **3 enabled**: `graph-memory`, `filesystem`, `playwright-live1`. The other 3
+  (`runway`, `pageindex`, `miro`) are `disabled: true` because they need your own keys and
+  accounts.
+  They live in `~/.claude.json`, **not** in `settings.json` — that is the only file Claude Code
+  reads `mcpServers` from. A copy in `settings.json` is ignored silently: no error, no log line,
+  the servers simply never start while looking perfectly configured. The installer merges them
+  in for you (`.claude/scripts/mcp_install.py`, template in `.claude/templates/mcp-servers.json`),
+  and it never overwrites a server of the same name that you configured yourself — it tracks its
+  own entries in `~/.claude/.ccpack-mcp.txt`.
+  Enable one by flipping `disabled` in `~/.claude.json`. `~/.claude/mcp.json` is a **reference
+  sheet of 17 ready-made blocks**, not live config — copy a block from there into
+  `~/.claude.json`. JSON has no comments, so the sheet says this in a `"_readme"` field at the
+  top of the file.
 - 8 hook scripts (`~/.claude/hooks/`), of which **`guard.js` is the one actually wired** —
   see the next section. Plus `bash-guard.js` and `security-guard.js` kept intact as the
   sources it was merged from, 4 GSD scripts and 1 Stop-beep.

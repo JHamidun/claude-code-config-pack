@@ -346,8 +346,13 @@ Sonnet, но ниже раунда 3 при большей цене → **ROLLBA
 Вопрос режима: **какая ячейка (модель, параметры) даёт лучшее качество на доллар и на секунду.**
 
 Сетка (актуальные значения — сверять с `config/models.md`; в sweep.md на начало 2026):
-`model` × `thinking` (off / adaptive; у Haiku «on» = `{"type":"enabled","budget_tokens":4096}`)
-× `effort` (low/medium/high; только у Sonnet/Opus) × trials=3.
+`model` × `thinking` (off / adaptive) × `effort` (low/medium/high/xhigh/max) × trials=3.
+⚠️ Форма `{"type":"enabled","budget_tokens":N}` снята: на Claude 4.7+ она возвращает
+400, копировать её в харнесс нельзя. Ось `thinking=off` доступна не везде —
+на Opus 5 отключение при effort `xhigh`/`max` даёт 400, на Fable 5.1 отключить нельзя
+вовсе, поэтому такие ячейки из сетки просто выпадают.
+Имена уровней effort несравнимы между моделями — свип по effort гонять под каждую
+модель отдельно, а не переносить вывод с одной на другую.
 В примере воркшопа: 2 ячейки Haiku + 6 Sonnet + 6 Opus = 14 на трайл.
 Слать нативные параметры Anthropic; обобщённый `reasoning_effort` LiteLLM мапится в
 легаси-форму и мислейблит ячейки.

@@ -343,6 +343,18 @@ if [ "$DRY" -eq 1 ]; then
         [ "$DRY_HL" -gt 0 ] && echo "[dry-run] файлов с несколькими жёсткими ссылками: $DRY_HL"
     fi
     echo "[dry-run] WOULD: записать список разложенного в $MANIFEST"
+    # План обязан показывать и MCP-шаг: он пишет в ~/.claude.json, файл ВНЕ ~/.claude,
+    # и умолчать о нём — значит обещать, что за пределы каталога установка не выходит.
+    if [ -f "$SRC_CLAUDE/scripts/mcp_install.py" ]; then
+        echo "[dry-run] WOULD: слить MCP-серверы пака в ~/.claude.json (единственный файл, откуда их читает Claude Code):"
+        if command -v python3 >/dev/null 2>&1; then
+            python3 "$SRC_CLAUDE/scripts/mcp_install.py" --dry-run 2>&1 | sed 's/^/[dry-run]   /' || :
+        elif command -v python >/dev/null 2>&1; then
+            python "$SRC_CLAUDE/scripts/mcp_install.py" --dry-run 2>&1 | sed 's/^/[dry-run]   /' || :
+        else
+            echo "[dry-run]   (python не найден — этот шаг будет пропущен)"
+        fi
+    fi
     if [ "$SKIP_DEPS" -eq 1 ]; then
         echo "[dry-run] --skip-deps: pip и доводка рантайма пропускаются целиком"
         echo "[dry-run]   (браузер Playwright, маркетплейсы плагинов, node_modules останутся неустановленными)"
@@ -852,6 +864,27 @@ elif [ -f "$DST_SETTINGS" ] && grep -qF '${HOME}' "$DST_SETTINGS" 2>/dev/null; t
 fi
 if [ "$MCPJSON_PREEXISTED" -eq 0 ] || [ "$MODE" = "repair" ]; then
     hm_materialize_home "$DST_MCP_JSON" || :
+fi
+
+# --- 5c. MCP-серверы -> ~/.claude.json --------------------------------------------------
+# Claude Code читает mcpServers ТОЛЬКО из ~/.claude.json. Пока эта секция лежала в
+# settings.json, серверы выглядели настроенными и не поднимались ни у кого ни разу:
+# движок пропускает её молча, без ошибки и без строки в логе.
+# Слияние делает python-скрипт — один код на macOS и Windows, и он отличает свои
+# серверы от пользовательских по реестру ~/.claude/.ccpack-mcp.txt, поэтому чужую
+# настройку с тем же именем не трогает.
+MCP_INSTALLER="$DST_CLAUDE/scripts/mcp_install.py"
+if [ -f "$MCP_INSTALLER" ]; then
+    PY_EXE=""
+    if command -v python3 >/dev/null 2>&1; then PY_EXE=python3
+    elif command -v python >/dev/null 2>&1; then PY_EXE=python; fi
+    if [ -z "$PY_EXE" ]; then
+        echo "  [!] MCP-серверы не установлены: не найден python (нужен для scripts/mcp_install.py)"
+    elif [ "$MODE" = "repair" ]; then
+        "$PY_EXE" "$MCP_INSTALLER" --repair || echo "  [!] mcp_install.py завершился с ошибкой — проверь ~/.claude.json"
+    else
+        "$PY_EXE" "$MCP_INSTALLER" || echo "  [!] mcp_install.py завершился с ошибкой — проверь ~/.claude.json"
+    fi
 fi
 
 # --- 6. Манифест: РОВНО то, что положили мы ---------------------------------------------

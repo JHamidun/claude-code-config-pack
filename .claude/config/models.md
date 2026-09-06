@@ -13,12 +13,22 @@
 | Алиас | Model ID | Название | Роль |
 |-------|----------|----------|------|
 | `model: "opus"` | `claude-opus-5` | Claude Opus 5 | **Дефолт оркестратора / основной сессии** |
-| `model: "fable"` | `claude-fable-5` | Fable 5 | **Дефолт ВСЕХ text-субагентов** (см. правило ниже) |
+| `model: "fable"` | `claude-fable-5-1` | Claude Fable 5.1 | **Дефолт ВСЕХ text-субагентов**; вышла 01.09.2026 |
 | `model: "sonnet"` | `claude-sonnet-5` | Claude Sonnet 5 | Доступен, но для text-субагентов НЕ дефолт |
 | `model: "haiku"` | `claude-haiku-4-5-20251001` | Claude Haiku 4.5 | Быстрые/простые операции, классификация |
 
-> **Обновлено 22.08.2026.** Было `claude-opus-4-8` и `claude-sonnet-4-5-20250929` —
-> оба устарели. Opus 5 вышел 24.07.2026, Sonnet 5 и Fable 5 — там же.
+> **У современных моделей идентификатор БЕЗ даты — сам ID и есть закреплённый
+> снапшот.** Датированные суффиксы остались только у Haiku 4.5.
+>
+> **Маршрутизация из доков Anthropic:** начинать с **Opus 5** для большинства
+> нагрузок; **Fable 5.1** — «for demanding reasoning and long-horizon agentic
+> work, or when your evals on Claude Opus 5 at higher effort still fall short».
+>
+> **Обновлено 06.09.2026.** Было `claude-fable-5` — она помечена **Legacy** с
+> выходом Fable 5.1 (01.09.2026). Сверено с
+> `platform.claude.com/docs/en/about-claude/models/overview` (домен
+> `docs.claude.com` теперь редиректит туда). Ранее здесь стояли
+> `claude-opus-4-8` и `claude-sonnet-4-5-20250929` — тоже устарели.
 >
 > **Урок дороже самой правки.** Таблица отставала на недели, и этого никто не
 > замечал, потому что алиас `opus` продолжал работать. Устаревший идентификатор
@@ -26,15 +36,19 @@
 > **алиас** (`opus`/`fable`/`haiku`), а точные ID держи только здесь и сверяй
 > раз в месяц с тем, что реально отвечает.
 
-### ⚠️ Правило субагентов (канон из памяти, ОБЯЗАТЕЛЬНОЕ)
+### Правило субагентов
 
-- **ВСЕ text-субагенты — ТОЛЬКО Fable 5** (`model: "fable"`), **≤5 одновременно** (комфортный параллелизм 3-4 в поток, при rate-limit снижай).
+- Дефолт text-воркеров — **Fable 5.1** (`model: "fable"`), числом не ограничивать.
 - Fable упал на лимите → подхватить **Opus** (resume + смена model).
 - Паттерн оркестрации: **Opus — оркестратор, Fable — воркеры** в изолированном контексте; Fable промптить намерениями (цель, не пошагово).
-- Старые дефолты «sonnet для субагентов / haiku для поиска» из rules/model-selection.md — это ФОЛБЭК-логика выбора уровня, но рантайм-дефолт text-воркеров = Fable 5.
+- Старые дефолты «sonnet для субагентов / haiku для поиска» из rules/model-selection.md — это ФОЛБЭК-логика выбора уровня, но рантайм-дефолт text-воркеров = Fable.
+
+⚠️ **Что говорят доки про делегирование.** Ограничивать надо не число воркеров, а
+поводы: «Claude Opus 5 delegates more readily than earlier models», и прямым
+текстом — «**do not use subagents to verify or double-check your own work**».
 
 ```python
-# Fable 5 — дефолт text-субагентов
+# Fable 5.1 — дефолт text-субагентов
 Task(subagent_type="general-purpose", model="fable", prompt="...")
 # Haiku — быстрая модель для простых задач
 Task(subagent_type="general-purpose", model="haiku", prompt="...")
@@ -42,19 +56,30 @@ Task(subagent_type="general-purpose", model="haiku", prompt="...")
 Task(subagent_type="general-purpose", model="opus", prompt="...")
 ```
 
-### Предыдущие версии Claude (доступны через API)
+### Legacy — живые, но старые (вызывать незачем, менять по правой колонке)
 
-| Model ID | Название |
-|----------|----------|
-| `claude-opus-4-8` | Claude Opus 4.8 (был дефолтом до Opus 5) |
-| `claude-opus-4-6` | Claude Opus 4.6 (04.02.2026) |
-| `claude-opus-4-5-20251101` | Claude Opus 4.5 |
-| `claude-opus-4-1-20250805` | Claude Opus 4.1 |
-| `claude-opus-4-20250514` | Claude Opus 4 |
-| `claude-sonnet-4-20250514` | Claude Sonnet 4 |
-| `claude-3-7-sonnet-20250219` | Claude Sonnet 3.7 |
-| `claude-3-5-haiku-20241022` | Claude Haiku 3.5 |
-| `claude-3-haiku-20240307` | Claude Haiku 3 |
+| Model ID | На что менять |
+|----------|---------------|
+| `claude-fable-5` | `claude-fable-5-1` |
+| `claude-opus-4-8` · `claude-opus-4-7` · `claude-opus-4-6` · `claude-opus-4-5-20251101` | `claude-opus-5` |
+| `claude-sonnet-4-6` · `claude-sonnet-4-5-20250929` | `claude-sonnet-5` |
+
+### ⛔ СНЯТЫ — вызов вернёт ошибку
+
+Проверено по `platform.claude.com/docs/en/about-claude/model-deprecations` 06.09.2026.
+Раньше этот список стоял под заголовком «доступны через API» — неверно с февраля.
+
+| Model ID | Снята |
+|----------|-------|
+| `claude-opus-4-1-20250805` | 05.08.2026 |
+| `claude-opus-4-20250514` | 15.06.2026 |
+| `claude-sonnet-4-20250514` | 15.06.2026 |
+| `claude-3-7-sonnet-20250219` | 19.02.2026 |
+| `claude-3-5-sonnet-20240620` · `claude-3-5-sonnet-20241022` | 28.10.2025 |
+| `claude-3-5-haiku-20241022` | 19.02.2026 |
+| `claude-3-haiku-20240307` | 20.04.2026 |
+| `claude-3-opus-20240229` | 05.01.2026 |
+| весь `claude-2.*`, `claude-instant-*` | 21.07.2025 и раньше |
 
 ---
 
@@ -67,7 +92,7 @@ Task(subagent_type="general-purpose", model="opus", prompt="...")
 ## Контекст использования
 
 **Claude Code работает на Opus 5 через подписку** (не по API).
-Opus закрывает ВСЕ текстовые, кодовые и reasoning задачи внутри Claude Code; text-субагенты — Fable 5.
+Opus закрывает текстовые, кодовые и reasoning задачи внутри Claude Code; text-субагенты — Fable 5.1.
 
 Внешние модели по API нужны в двух случаях:
 1. **В Claude Code** — только для того, что Opus не может (медиа, поиск, embeddings)
@@ -145,11 +170,12 @@ with open("image.jpg", "wb") as f:
 
 Когда создаёшь ботов, агентов или автономные системы — выбирай модель по задаче:
 
-> ⚠️ **Строки Anthropic в таблицах ниже — из API-снимка 30.01.2026**, то есть до выхода
-> Opus 4.6/4.8, Opus 5, Sonnet 5 и Fable 5. Они помечены ⚠️. Через `ANTHROPIC_API_KEY`
-> они продолжают отвечать — и в этом опасность: устаревший ID не даёт ошибки, он молча
-> отдаёт вчерашнюю модель. Перед тем как вписать такой ID в бота, сверь его с
-> `GET https://api.anthropic.com/v1/models` и с таблицей подписки Max в начале файла.
+> ⚠️ **Строки Anthropic в таблицах ниже приведены к актуальным ID 06.09.2026.**
+> Прежние (`claude-opus-4-5-20251101`, `claude-sonnet-4-5-20250929`) — из API-снимка
+> 30.01.2026; они продолжают отвечать, и в этом опасность: устаревший ID не даёт
+> ошибки, он молча отдаёт вчерашнюю модель. Перед тем как вписать любой ID в бота,
+> сверь его с `GET https://api.anthropic.com/v1/models` и с таблицей подписки Max
+> в начале файла.
 > Внутри самого пака (агенты, шаблоны, Task) полные ID не нужны вовсе — там алиасы
 > `opus` / `fable` / `haiku`.
 
@@ -160,8 +186,8 @@ with open("image.jpg", "wb") as f:
 | Лучший | `gpt-5.2` | OpenAI | OPENAI_API_KEY |
 | Быстрый | `gpt-5-mini` | OpenAI | OPENAI_API_KEY |
 | Дешёвый | `gpt-5-nano` | OpenAI | OPENAI_API_KEY |
-| Лучший (Anthropic) | `claude-opus-4-5-20251101` ⚠️ | Anthropic | ANTHROPIC_API_KEY |
-| Быстрый (Anthropic) | `claude-sonnet-4-5-20250929` ⚠️ | Anthropic | ANTHROPIC_API_KEY |
+| Лучший (Anthropic) | `claude-opus-5` | Anthropic | ANTHROPIC_API_KEY |
+| Быстрый (Anthropic) | `claude-sonnet-5` | Anthropic | ANTHROPIC_API_KEY |
 | Дешёвый (Anthropic) | `claude-haiku-4-5-20251001` | Anthropic | ANTHROPIC_API_KEY |
 | Лучший (Google) | `gemini-3-pro-preview` | Google | GEMINI_API_KEY |
 | Быстрый (Google) | `gemini-3-flash-preview` | Google | GEMINI_API_KEY |
@@ -238,17 +264,13 @@ codex-mini-latest
 
 ```
 claude-opus-4-5-20251101
-claude-opus-4-1-20250805
-claude-opus-4-20250514
 claude-sonnet-4-5-20250929
-claude-sonnet-4-20250514
 claude-haiku-4-5-20251001
-claude-3-7-sonnet-20250219
-claude-3-5-haiku-20241022
-claude-3-haiku-20240307
 ```
 
-+ после снимка вышли: `claude-opus-4-6`, `claude-opus-4-8`, `claude-fable-5` (подписка Max, см. выше).
++ после снимка вышли: `claude-opus-4-6`, `claude-opus-4-8`, `claude-fable-5`, а затем
+`claude-sonnet-5` (30.06), `claude-opus-5` (24.07) и `claude-fable-5-1` (01.09) — все по подписке Max.
+Снятые из этого снимка удалены 06.09.2026, полный перечень — в разделе «⛔ СНЯТЫ» выше.
 
 ### Google Gemini (47 моделей) — ключевые
 

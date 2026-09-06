@@ -22,7 +22,7 @@ Route tasks to the best AI model (or multiple models) through AI Gateway v2.
 | Model | ID | Best for |
 |-------|----|----------|
 | Opus 5 | `claude-opus-5` | Deep reasoning, architecture, complex analysis (дефолт оркестратора) |
-| Fable 5 | `claude-fable-5` | Text-субагенты/воркеры (канон, ≤5 одновременно) |
+| Fable 5.1 | `claude-fable-5-1` | Text-субагенты/воркеры (канон; `claude-fable-5` — Legacy) |
 | Sonnet 5 | `claude-sonnet-5` | Most tasks, code gen, balanced |
 | Haiku 4.5 | `claude-haiku-4-5-20251001` | Fast classification, simple tasks |
 

@@ -1,0 +1,45 @@
+{
+  "_comment": "Серверы MCP, которые кладёт пак. Устанавливаются скриптом scripts/mcp_install.py в ~/.claude.json — Claude Code читает mcpServers ТОЛЬКО оттуда. Раньше эта секция лежала в settings.json, где движок её не читает вовсе, и серверы не поднимались ни разу. ${HOME} материализуется в абсолютный путь при установке. ⚠️ Флаг \"disabled\": true НЕ РАБОТАЕТ — движок его игнорирует: сервер с ним поднимается и занимает место в системном промпте. Проверено 06.09.2026 на трёх серверах разом. Чтобы выключить сервер, удали его запись целиком, а не помечай флагом. Сервер pageindex убран из шаблона 06.09.2026: пакет умеет ТОЛЬКО OAuth через браузер и ключа из окружения не принимает — при первом же старте открывает вкладки app.pageindex.ai/login пачками. Локальный движок ~/.claude/mcps/pageindex/ (pi.py index/tree/pages/ask) работает на своём ключе и данные с машины не выпускает; он и есть рабочий путь.",
+  "mcpServers": {
+    "graph-memory": {
+      "command": "python",
+      "args": [
+        "${HOME}/.claude/mcps/graph-memory/server.py"
+      ],
+      "env": {
+        "PYTHONIOENCODING": "utf-8",
+        "PYTHONUTF8": "1"
+      },
+      "description": "Граф твоей памяти: соседи, пути, хабы, разрывы. Строится из ~/.claude/projects/*/memory/*.md, база создаётся пустой."
+    },
+    "filesystem": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "."
+      ],
+      "command": "npx"
+    },
+    "runway": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "-u",
+        "${HOME}/.claude/skills/video-generation/scripts/runway_mcp.py"
+      ]
+    },
+    "playwright-live1": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@0.0.78",
+        "--user-data-dir",
+        "${HOME}/.claude/pw-profiles/live1"
+      ]
+    },
+    "miro": {
+      "type": "http",
+      "url": "https://mcp.miro.com/",
+      "description": "Требует интерактивного OAuth (/mcp или claude mcp login miro). Обычный REST-токен он не принимает — отвечает 403."
+    }
+  }
+}

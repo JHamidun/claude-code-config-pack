@@ -47,6 +47,8 @@ C = pathlib.Path.home() / ".claude"
 # Модели, которых больше нет или которые запрещены каноном конфига.
 DEAD_MODELS = re.compile(
     r"\b(gpt-4-turbo|gpt-3\.5|text-davinci|claude-3-opus|claude-3-sonnet|claude-3-haiku|"
+    r"claude-3-5-sonnet|claude-3-5-haiku|claude-3-7-sonnet|claude-opus-4-1|"
+    r"claude-opus-4-20250514|claude-sonnet-4-20250514|"
     r"claude-2|gemini-pro-vision|gemini-1\.5|gemini-2\.0-flash-exp|"
     r"gemini-2\.5-flash-image|dall-e-2|whisper-1)\b", re.I)
 

@@ -59,15 +59,20 @@ for block in msg.content:
         block.name, block.input, block.id   # результат вернуть в следующем сообщении
 ```
 
-## Extended thinking
+## Мышление (adaptive + effort)
 
-Ответ содержит блоки двух типов: `thinking` и `text`. `max_tokens` должен быть заметно
-больше `budget_tokens`, иначе на сам ответ места не остаётся.
+Ответ содержит блоки двух типов: `thinking` и `text`. Объём размышления задаётся
+уровнем `effort` (`low`/`medium`/`high`/`xhigh`/`max`), а не бюджетом токенов.
+
+⚠️ Старая ручная форма снята: `thinking={"type":"enabled"}` и `budget_tokens` на
+Claude 4.7+ возвращают **400**. Отключение (`{"type":"disabled"}`) допустимо только
+при effort ≤ high и не работает на Fable 5.1. `effort` управляет объёмом
+размышления, а не длиной видимого ответа — краткость просить словами.
 
 ```python
 resp = client.messages.create(
     model=MODEL, max_tokens=16000,
-    thinking={"type": "enabled", "budget_tokens": 10000},
+    thinking={"type": "adaptive"}, effort="high",
     messages=[{"role": "user", "content": prompt}],
 )
 thinking = next((b.thinking for b in resp.content if b.type == "thinking"), None)

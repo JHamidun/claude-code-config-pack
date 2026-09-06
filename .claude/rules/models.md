@@ -11,7 +11,7 @@
 
 - **Аутентификация:** Claude Code Max subscription — ВСЕ модели доступны без ограничений (не по API).
 - **Актуальные алиасы:** `opus` (оркестратор/сессия) · `fable` (text-воркеры) · `sonnet` (легаси, не дефолт) · `haiku` (массовое простое). Точные model ID — `config/models.md`.
-- **⚠️ Text-субагенты — ТОЛЬКО Fable 5** (`model: "fable"`), ≤5 одновременно; Fable упал на лимите → подхватить Opus (resume + смена model).
+- **Text-субагенты — Fable 5.1** (`model: "fable"`), числом не ограничивать; Fable упал на лимите → подхватить Opus (resume + смена model).
 - Предыдущие версии Claude — через API, список в `config/models.md`.
 
 ```python

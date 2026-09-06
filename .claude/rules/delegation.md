@@ -1,4 +1,4 @@
-# Уровни сложности и обязательная делегация
+# Делегирование и масштабирование
 
 ## Уровни
 - **Level 0** (делай сам): 1 файл, typo, простой import
@@ -36,7 +36,16 @@ When writing prompts for workers, avoid delegating understanding — delegate wo
 - "I need this to plan implementation — report file paths, line numbers, type signatures."
 - "Quick check before merge — just verify the happy path."
 
-## Standard Delegations (always route to a subagent)
+## Куда какая задача идёт
+
+> Карта, а не приказ делегировать. Тривиальный однофайловый случай (Level 0,
+> меньше 5 вызовов инструментов) делается сам — накладные расходы на спавн там
+> больше самой работы.
+>
+> ⚠️ Порог поднялся: Opus 5 делегирует **охотнее** прежних моделей
+> («delegates more readily than earlier models»), поэтому сдерживать надо не
+> число воркеров, а поводы. И отдельно: **не спавнить субагента, чтобы он
+> перепроверил собственную работу сессии** — доки про это прямо.
 
 | Задача | Субагент | Почему |
 |--------|----------|--------|

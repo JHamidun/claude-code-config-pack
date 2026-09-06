@@ -39,7 +39,7 @@ client = Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
 | Opus 5 | `claude-opus-5` | сложный reasoning, research | 1M |
 | Sonnet 5 | `claude-sonnet-5` | баланс качество/цена | 200K |
 | Haiku 4.5 | `claude-haiku-4-5-20251001` | быстро и дёшево | 200K |
-| Fable 5 | `claude-fable-5` | text-субагенты | 200K |
+| Fable 5.1 | `claude-fable-5-1` | text-субагенты | 200K |
 
 ID устаревают быстрее, чем этот файл: **канон → `config/models.md`**, сверяйся там перед запуском.
 
@@ -65,7 +65,7 @@ ID устаревают быстрее, чем этот файл: **канон �
 - **Vision берёт PNG, JPEG, GIF, WebP; PDF идёт другим типом блока** (`document`, не `image`).
 - **Схема инструмента — `input_schema`**, а не `parameters` как в OpenAI SDK. Перенос кода один-в-один даст ошибку валидации.
 - **Batch API — минус 50% цены**, но обработка до 24 часов. Для интерактива не годится, для массовых прогонов (разметка, переводы, оценки) — дефолт.
-- **Extended thinking**: `max_tokens` должен быть заметно больше `budget_tokens`, иначе бюджет съест ответ.
+- **Мышление задаётся `thinking={"type": "adaptive"}` + `effort`** (`low`/`medium`/`high`/`xhigh`/`max`). Старая ручная форма снята: `budget_tokens` и `thinking={"type":"enabled"}` на Claude 4.7+ возвращают **400**. Отключать мышление (`{"type":"disabled"}`) можно только при effort ≤ high и не на Fable 5.1. `effort` управляет объёмом размышления, а не длиной видимого ответа — краткость просить словами.
 
 ## Минимальный вызов
 

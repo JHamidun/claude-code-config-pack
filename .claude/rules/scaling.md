@@ -72,7 +72,7 @@ Best for: experimental changes, risky refactors, parallel feature branches.
 
 ## Model Selection for Subagents
 
-**Канон: движок ВСЕХ text-воркеров = Fable 5** (`model: "fable"`), ≤5 одновременно (комфорт 3-4).
+**Канон: движок text-воркеров = Fable 5.1** (`model: "fable"`), числом не ограничивать.
 
 | Роль | Модель | Когда |
 |------|--------|-------|

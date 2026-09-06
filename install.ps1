@@ -726,6 +726,31 @@ if ((-not $settingsPreexisted) -or $Repair) {
 }
 if ((-not $mcpJsonPreexisted) -or $Repair) { $null = Set-AbsoluteHomePaths $DstMcpJson }
 
+# --- 5c. MCP-серверы -> ~/.claude.json --------------------------------------------------
+# Claude Code читает mcpServers ТОЛЬКО из ~/.claude.json. Пока эта секция лежала в
+# settings.json, серверы выглядели настроенными и не поднимались ни у кого ни разу:
+# движок пропускает её молча, без ошибки и без строки в логе.
+# Слияние делает python-скрипт — один код на Windows и macOS, и он различает свои
+# серверы от пользовательских по реестру ~/.claude/.ccpack-mcp.txt, поэтому чужую
+# настройку с тем же именем не трогает.
+$mcpInstaller = Join-Path $DstClaude 'scripts\mcp_install.py'
+if (Test-Path -LiteralPath $mcpInstaller) {
+    $pyExe = if (Get-Command python -ErrorAction SilentlyContinue) { 'python' }
+             elseif (Get-Command python3 -ErrorAction SilentlyContinue) { 'python3' } else { $null }
+    if (-not $pyExe) {
+        Write-Host "  [!] MCP-серверы не установлены: не найден python (нужен для scripts\mcp_install.py)" -ForegroundColor Yellow
+    } elseif ($DryRun) {
+        & $pyExe $mcpInstaller --dry-run
+    } else {
+        $mcpArgs = @($mcpInstaller)
+        if ($Repair) { $mcpArgs += '--repair' }
+        & $pyExe @mcpArgs
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "  [!] mcp_install.py вернул код $LASTEXITCODE — проверь ~\.claude.json вручную" -ForegroundColor Yellow
+        }
+    }
+}
+
 # --- 6. Манифест: РОВНО то, что положили мы ---------------------------------------------
 if ($manifestOk) {
     if ($claudeMdAdded) { $ourCandidates.Add('.claude/CLAUDE.md') }

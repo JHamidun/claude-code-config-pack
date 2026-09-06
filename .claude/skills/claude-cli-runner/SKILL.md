@@ -52,7 +52,7 @@ ok, cleaned = validate_response(original_text, llm_response)
 ## Available Models
 
 - `claude-opus-5` — most capable (алиас `opus`)
-- `claude-fable-5` — канон text-субагентов/воркеров (алиас `fable`, ≤5 одновременно)
+- `claude-fable-5-1` — канон text-субагентов/воркеров (алиас `fable`; `claude-fable-5` помечена Legacy)
 - `claude-sonnet-5` — balanced (default)
 - `claude-haiku-4-5` — fastest, cheapest
 

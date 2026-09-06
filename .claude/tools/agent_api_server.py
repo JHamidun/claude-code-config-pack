@@ -135,11 +135,11 @@ _SESSION_NS = uuid.UUID("6f1d9c9e-2f4a-5b8c-9d1e-4a7b3c2d1e0f")
 # asked for "the full id" got the older engine and no warning.
 MODELS = [
     ("opus", "Opus 5 — orchestrator-grade reasoning"),
-    ("fable", "Fable 5 — default worker engine"),
+    ("fable", "Fable 5.1 — default worker engine"),
     ("sonnet", "Sonnet 5"),
     ("haiku", "Haiku 4.5 — cheapest/fastest"),
     ("claude-opus-5", "Opus 5 (full id)"),
-    ("claude-fable-5", "Fable 5 (full id)"),
+    ("claude-fable-5-1", "Fable 5.1 (full id)"),
     ("claude-sonnet-5", "Sonnet 5 (full id)"),
     ("claude-haiku-4-5-20251001", "Haiku 4.5 (full id — dated by Anthropic, not stale)"),
 ]

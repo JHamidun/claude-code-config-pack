@@ -1,21 +1,23 @@
 # Quality Gates
 
-## Обязательные проверки после изменений
+## Внешние гейты после изменений
+
 ```bash
 pnpm type-check   # или npm run type-check
-pnpm build         # production build СТРОЖЕ чем tsc
-pnpm test          # опционально
-pnpm lint          # опционально
+pnpm build        # production build СТРОЖЕ чем tsc — ловит то, что tsc пропускает
+pnpm test
+pnpm lint
 ```
 
-## Systematic Debugging (ОБЯЗАТЕЛЬНО при багах)
-4 фазы:
-1. Root Cause Investigation — воспроизведи, проследи данные
-2. Pattern Analysis — сравни с работающим кодом
-3. Hypothesis Testing — одна гипотеза, минимальное изменение
-4. Implementation — failing test → fix → verify
+Факт среды, ради которого этот блок и стоит: **сборка строже проверки типов**.
+Зелёный `tsc` при красном `build` — обычное дело.
 
-Always find root cause before fixing. If you can't find it — say so honestly, don't guess.
+## Systematic Debugging — при багах
+
+Четыре фазы: воспроизвести и проследить данные → сравнить с работающим кодом →
+одна гипотеза и минимальное изменение → падающий тест, фикс, прогон.
+
+Сперва причина, потом починка. Не нашёл причину — скажи прямо, не угадывай.
 
 ## Prime Directives (inspired by garrytan/gstack)
 
@@ -50,19 +52,26 @@ LLM-generated values (emails, URLs, names) ДОЛЖНЫ валидировать
 
 Добавляй guards: `EMAIL_REGEXP`, `URI.parse`, `.strip`, type/shape checks.
 
-## What Real Verification Looks Like (from Claude Code source)
+## Проверка — это ВНЕШНИЙ оракул, а не второй проход
 
-Verification means **proving the code works**, not confirming it exists.
+Снято 06.09.2026: здесь стоял раздел «What Real Verification Looks Like (from
+Claude Code source)» — семь пунктов о том, как перепроверять собственную работу.
+Доки Opus 5 говорят про такие разделы прямо: «Claude Opus 5 verifies its own work
+without being told to… **remove them** … The same applies to legacy harness
+scaffolding», и отдельно — «**remove these instructions rather than rewriting
+them**». Раздел был подписан как выдержка из харнесса, то есть ровно тот случай.
 
-- Run tests **with the feature enabled** — not just "tests pass"
-- Run typechecks and **investigate errors** — don't dismiss as "unrelated"
-- Be skeptical — if something looks off, dig in
-- **Test independently** — prove the change works, don't rubber-stamp
-- Try **edge cases and error paths** — don't just re-run what the implementation ran
-- **Investigate failures** — don't dismiss as unrelated without evidence
-- For implementation: "Fix the root cause, not the symptom"
+Остаётся различие, которое доки не отменяют:
 
-A verifier that rubber-stamps weak work undermines everything.
+- **Внешний оракул** — запуск тестов, сборка, сканер, линтер, чужой артефакт,
+  ответ сервера. Их результат неизвестен, пока не выполнишь. Это работа, и она
+  обязательна там, где заявляешь результат.
+- **Второй проход по своему тексту** («перечитай, всё ли учёл») информации не
+  добавляет. Не делать.
+
+Отсюда же правило про верификатора: проверять работу **другого** агента — можно и
+нужно; спавнить субагента, чтобы он перечитал твою собственную, — нет
+(доки: «do not use subagents to verify or double-check your own work»).
 
 ## Anti-Claim-Fabrication (self-check перед заявлениями)
 
