@@ -140,15 +140,15 @@ API keys are passed as environment variables: `OPENAI_API_KEY`, `ANTHROPIC_API_K
 |----------|-------|
 | `openai/gpt-4o` | Legacy, still works |
 | `openai/gpt-4o-mini` | Legacy mini |
-| `openai/gpt-5` | GPT-5 base |
-| `openai/gpt-5-mini` | Fast, cheap |
-| `openai/gpt-5-nano` | Fastest, cheapest |
-| `openai/gpt-5.1-codex` | Code-focused |
-| `openai/gpt-5.2` | Latest, best general |
-| `openai/gpt-5.2-codex` | Latest code-focused |
-| `openai/gpt-5.3-codex` | Newest codex |
-| `anthropic/claude-sonnet-4-5` | Balanced Claude |
-| `anthropic/claude-opus-4-6` | Max quality Claude |
+| `openai/gpt-5` | работает, но снимается 11.12.2026 |
+| `openai/gpt-5-mini` | работает, но снимается 11.12.2026 |
+| `openai/gpt-5-nano` | работает, но снимается 11.12.2026 |
+| `openai/gpt-5.1-codex` | ⛔ снята у OpenAI 23.07.2026 |
+| `openai/gpt-5.2` | работает, но снимается 11.12.2026 |
+| `openai/gpt-5.2-codex` | ⛔ снята у OpenAI 23.07.2026 |
+| `openai/gpt-5.3-codex` | ⛔ снята у OpenAI 23.07.2026 |
+| `anthropic/claude-sonnet-5` | Balanced Claude |
+| `anthropic/claude-opus-5` | Max quality Claude |
 | `google/gemini-2.5-flash` | Fast Gemini |
 | `google/gemini-2.5-pro` | Strong Gemini |
 
@@ -268,7 +268,7 @@ Extensions are TypeScript modules placed in `/home/node/.openclaw/extensions/`.
         "schedule": {
           "kind": "cron",
           "expr": "0 9 * * *",
-          "tz": "Europe/Moscow"
+          "tz": "UTC или из окружения"
         },
         "sessionTarget": "isolated",
         "wakeMode": "now",
@@ -291,7 +291,7 @@ Extensions are TypeScript modules placed in `/home/node/.openclaw/extensions/`.
 
 | Kind | Example | Description |
 |------|---------|-------------|
-| `cron` | `{"kind": "cron", "expr": "0 9 * * *", "tz": "Europe/Moscow"}` | Standard cron expression |
+| `cron` | `{"kind": "cron", "expr": "0 9 * * *", "tz": "UTC или из окружения"}` | Standard cron expression |
 | `every` | `{"kind": "every", "everyMs": 60000}` | Every N milliseconds |
 | `at` | `{"kind": "at", "at": "2026-06-01T09:00:00Z"}` | One-shot at specific time |
 

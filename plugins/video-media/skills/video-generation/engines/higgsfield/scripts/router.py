@@ -42,7 +42,36 @@ for _stream in (sys.stdout, sys.stderr):
 # Self-contained, relative-within-skill (GitHub-packageable).
 # router.py lives at  video-generation/engines/higgsfield/scripts/router.py
 _HERE = Path(__file__).resolve()
-HF_EXE = _HERE.parent.parent / "bin" / "hf.exe"                       # engines/higgsfield/bin/hf.exe (gitignored — install: npm i -g @higgsfield/cli)
+_HF_BIN_DIR = _HERE.parent.parent / "bin"                             # engines/higgsfield/bin/ (бинарь gitignored)
+
+
+def _hf_exe_path() -> Path:
+    """Путь к вендорскому бинарю hf.
+
+    Имя файла зависит от платформы: на Windows это `hf.exe`, на macOS и Linux —
+    `hf` без расширения (ровно так его называет ENGINE.md:74 — `HF="./bin/hf"`).
+    Захардкоженный `hf.exe` давал на маке и линуксе сообщение «hf.exe not found at …»
+    про файл, которого на этой платформе не бывает: человек шёл искать `.exe`,
+    не находил и решал, что сломан пак.
+
+    Берём то, что реально лежит на диске; если нет ничего — возвращаем ожидаемое
+    для этой ОС имя, чтобы в сообщении об ошибке стоял правильный путь.
+    """
+    native = "hf.exe" if sys.platform == "win32" else "hf"
+    for name in (native, "hf.exe", "hf"):
+        candidate = _HF_BIN_DIR / name
+        if candidate.exists():
+            return candidate
+    return _HF_BIN_DIR / native
+
+
+HF_EXE = _hf_exe_path()
+# Установка вендорского CLI: npm i -g @higgsfield/cli  (или релиз с github.com/higgsfield-ai/cli).
+HF_INSTALL_HINT = (
+    "npm i -g @higgsfield/cli  —  затем положить бинарь в "
+    f"{_HF_BIN_DIR} под именем {'hf.exe' if sys.platform == 'win32' else 'hf'} "
+    "(в репозитории его нет: бинарь вендорский и в .gitignore)"
+)
 RUNWAY_CLIENT = _HERE.parent.parent.parent.parent / "scripts" / "runway_client.py"  # video-generation/scripts/runway_client.py (sibling in same skill)
 # Credentials: env var first (get_token); file is a local fallback, NEVER shipped (.gitignore).
 CREDENTIALS_FILE = Path(os.path.expanduser("~/.claude/.credentials.master.env"))
@@ -146,22 +175,34 @@ ROUTES: dict[str, dict] = {
         "recipe": "Replicate REPLICATE_API_KEY 'xai/grok-imagine-video' ($0.05-0.14/s, 3-5x cheaper, no xAI key needed).",
     },
     # ===================== 🟢 DIRECT — IMAGE ===============================
+    # Ключи словаря — имена моделей у Higgsfield (jst), их выдумывать нельзя:
+    # по ним ходит `router.py route <jst>` и сам hf.exe. Меняется ТОЛЬКО
+    # direct_id — то, чем мы подменяем HF своим ключом.
     "gpt_image_2": {
         "upstream": "OpenAI GPT-Image-2",
         "access": "direct",
         "via": "openai",
-        "direct_id": "gpt-image-2",
+        # Было "gpt-image-2". Флагман с 08.09.2026 — 2.5 Sunburst; сам
+        # gpt-image-2-2026-04-21 жив, снятие не объявлено, но новый точнее
+        # держит инструкцию и текст на картинке при той же роли.
+        "direct_id": "gpt-image-2.5-sunburst",
         "keep_hf": False,
-        "recipe": "OpenAI OPENAI_API_KEY images.generate / images.edit model='gpt-image-2' "
-                  "($0.006-0.21/img, 3-6x cheaper than HF).",
+        "recipe": "OpenAI OPENAI_API_KEY images.generate / images.edit "
+                  "model='gpt-image-2.5-sunburst' — до 16 референсов, "
+                  "input_fidelity, прозрачный фон, quality до max. "
+                  "Цена токенами: $5/$8 вход, $30 выход за млн.",
     },
     "openai_hazel": {
         "upstream": "OpenAI GPT-Image-1.5 (Hazel)",
         "access": "direct",
         "via": "openai",
-        "direct_id": "gpt-image-1.5",
+        # Было "gpt-image-1.5" — снимается 01.12.2026. Роль этой строки —
+        # «то же, но дешевле и быстрее»; её теперь занимает Flare, у которого
+        # с Sunburst одна цена и одни параметры, разница только в задержке.
+        "direct_id": "gpt-image-2.5-flare",
         "keep_hf": False,
-        "recipe": "OpenAI OPENAI_API_KEY model='gpt-image-1.5' (~-50% vs HF).",
+        "recipe": "OpenAI OPENAI_API_KEY model='gpt-image-2.5-flare' — "
+                  "ниже задержка, годится для пачек.",
     },
     "nano_banana_flash": {
         "upstream": "Google Nano Banana 2",
@@ -491,7 +532,8 @@ def _direct_command_hint(jst: str, r: dict) -> str:
 def _run_hf(jst: str, params: dict, token: str, dry_run: bool = False) -> dict:
     """Invoke hf.exe `generate create <jst> ...`."""
     if not HF_EXE.exists():
-        return {"ok": False, "error": f"hf.exe not found at {HF_EXE}"}
+        return {"ok": False,
+                "error": f"вендорский CLI Higgsfield не найден: {HF_EXE}. Установка: {HF_INSTALL_HINT}"}
     if not token:
         return {"ok": False, "error": "HIGGSFIELD_ACCESS_TOKEN not set (env or credentials file)."}
 

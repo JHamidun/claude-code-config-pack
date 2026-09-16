@@ -45,8 +45,27 @@ _client: RunwayClient | None = None
 
 
 def get_client() -> RunwayClient:
+    """Единственная точка входа во все 13 инструментов — и потому единственное
+    место, где имеет смысл проверять срок токена.
+
+    Зачем: MCP-сервер поднимается нормально, клиент создаётся лениво, и 401
+    прилетает уже внутри чужого пайплайна — там он читается как «сломался
+    Runway», а не «протух ключ». Так и вышло: токен истёк 31.07.2026, а
+    выяснилось это через сорок дней. Проверка offline (разбор exp у JWT),
+    сети не требует и потому работает даже когда всё остальное отдаёт 401.
+    """
     global _client
     if _client is None:
+        st = RunwayClient.token_status()
+        if not st.get("ok"):
+            raise RuntimeError(
+                f"RUNWAY_JWT: {st.get('reason')}"
+                + (f" (истёк {st['expires']})" if st.get("expires") else "")
+                + f"\nКак обновить: {st.get('how_to_refresh', 'см. runway_client.py')}"
+                + "\n⚠️ Обновление токена может НЕ помочь: 22.06.2026 подписка"
+                  " уже падала на free plan, и Runway отказывал и в explore,"
+                  " и в stable. Сперва проверь план в /v1/profile."
+            )
         _client = RunwayClient()
     return _client
 

@@ -1,18 +1,18 @@
 ---
 name: image-generation
-description: "Промпт-инжиниринг генерации картинок (DALL-E, Midjourney, SD, Gemini) + авторский сюрреализм-пресет. Триггеры: «креатив для vk ads», «сюрреализм магритт»."
+description: "Промпт-инжиниринг генерации картинок (Nano Banana, gpt-image-2.5, Midjourney, SD) + сюрреализм-пресет эксперта. Триггеры: «креатив для vk ads», «сюрреализм магритт»."
 ---
 
 > ⚠️ **NO-KEY GUARD (обязательно):** этот функционал требует ОПЦИОНАЛЬНОГО стороннего API-ключа. Перед вызовом проверь ключ в `.credentials.master.env`. Если ключ отсутствует, пустой или placeholder (`your_*_api_key`) — **НЕ проси пользователя оплатить счёт, включить биллинг или купить API**. Скажи одной строкой: «Эта функция опциональна и требует свой API-ключ (например, бесплатный ключ на aistudio.google.com); из коробки всё остальное работает по подписке Claude» — и предложи альтернативу или продолжай без неё.
 
 # Image Generation Skill
 
-Expert image prompt engineering for AI image generators (DALL-E 3, Midjourney, Stable Diffusion, Gemini/Nano Banana Pro).
+Expert image prompt engineering for AI image generators (Gemini/Nano Banana, OpenAI gpt-image-2.5, Midjourney, Stable Diffusion).
 
-> **See Also - Specialized API Skills:**
-> - **[gemini-3-pro](gemini-3-pro.md)** - Full Gemini suite: Imagen 3, Veo 2 video, TTS, Live API, embeddings
-> - **[nano-banana-pro](nano-banana-pro.md)** - Photorealistic portrait templates for Gemini; Gemini-замена DALL-E 3 для сюрреалистичных рекламных пар (без VPN)
-> - **[openai-dalle](openai-dalle.md)** - Full OpenAI suite: DALL-E 3, Sora 2, Whisper, GPT-4o, TTS
+> **See Also - Specialized API Skills** (вызывать по имени через Skill tool, это отдельные навыки в `~/.claude/skills/`, а не файлы этой папки):
+> - Skill `gemini-3-pro` - Google AI API: Gemini text (2M контекст), embeddings, TTS, grounding
+> - Skill `nano-banana-pro` - Photorealistic portrait templates for Gemini; Gemini-замена DALL-E 3 для сюрреалистичных рекламных пар (без VPN)
+> - Skill `openai-dalle` - OpenAI media API: gpt-image-2.5 (edit до 16 референсов, прозрачный фон), транскрипция, TTS, embeddings. Имя каталога историческое: DALL-E снят 12.05.2026, видео у OpenAI закрывается 24.09.2026
 >
 > **See Also - References:**
 > - **[references/vk-ads-surrealism-preset.md](references/vk-ads-surrealism-preset.md)** - пресет «эксперт / Магритт-Дали» для рекламных креативов (несочетаемые пары → сюрреализм)
@@ -23,7 +23,7 @@ Expert image prompt engineering for AI image generators (DALL-E 3, Midjourney, S
 - User asks to create/generate an image
 - User needs help writing image prompts
 - User wants photorealistic or artistic AI images
-- User mentions DALL-E, Midjourney, Stable Diffusion, Gemini image generation
+- User mentions Nano Banana, gpt-image, Midjourney, Stable Diffusion, Gemini image generation (а также DALL-E — но его больше нет, см. ниже)
 
 ## Prompt Reference Database
 Load reference prompts from: `~/.claude/prompts/image_prompts_reference.json`
@@ -136,12 +136,36 @@ preserving face exactly as reference
 }
 ```
 
-### DALL-E 3
-- Natural language prompts work best
-- Be descriptive and specific
-- Include style references
+### OpenAI — `gpt-image-2.5` (⛔ DALL-E мёртв с 12.05.2026)
 
-### Gemini (DEFAULT — always use this)
+`dall-e-2` и `dall-e-3` сняты, вызов вернёт ошибку. Флагман OpenAI с 08.09.2026 —
+`gpt-image-2.5-sunburst`, быстрый близнец — `gpt-image-2.5-flare` (та же цена и
+те же параметры, разница только в задержке).
+
+Промпт под них пишется **не как под DALL-E 3**: тот отрабатывал короткое
+художественное описание и остальное додумывал сам, а 2.5 держится инструкции
+буквально — и потому вознаграждает точность и наказывает недосказанность.
+Лимит промпта поднялся до **32 000 знаков**, так что экономить незачем.
+
+Когда брать OpenAI вместо дефолтного Nano Banana 2:
+
+- нужен **точечный правочный цикл** («убери стул слева, остальное не трогай») —
+  Responses API с `previous_response_id` правит ту же картинку, а не рисует новую;
+- нужна **устойчивая личность на длинной серии** — `input_fidelity: "high"`;
+- нужно **много референсов разом** — до 16 входных картинок на `images.edit`;
+- нужен **прозрачный фон** — `background: "transparent"`, но только с png/webp:
+  на jpeg ошибки не будет, а фон вернётся белым.
+
+Полная вендорская справка — skill `openai-dalle` (имя каталога историческое).
+
+### Gemini — нижние две ступени лестницы
+
+> **Лестница целиком (решение владельца 09.09.2026):**
+> 🥉 NB2 Flash — дёшево и по умолчанию → 🥈 NB Pro — подороже → 🥇 `gpt-image-2.5-sunburst` — лучшее.
+> Раньше здесь стояло «Gemini — DEFAULT, always use this»: это верно только для
+> нижней ступени. Верхняя теперь у OpenAI, и уходить на неё нужно осознанно,
+> а не «когда нужен именно OpenAI».
+
 - **Default model:** `gemini-3.1-flash-image-preview` (Nano Banana 2 — fast, cheap, 4K)
 - **Pro model:** `gemini-3-pro-image-preview` (Nano Banana Pro — higher quality, slower)
 - **API:** `from google import genai` + `GOOGLE_API_KEY`
@@ -258,7 +282,7 @@ body type, clothing, and overall style exactly as in the reference."
 
 1. **Clarify vision**: What style, mood, purpose?
 2. **Identify elements**: Subject, environment, lighting, style
-3. **Choose model**: DALL-E, MJ, SD, or Gemini
+3. **Choose model**: Gemini (дефолт), gpt-image-2.5, MJ или SD
 4. **Build prompt**: Layer details from general to specific
 5. **Add technical params**: Resolution, aspect ratio, model settings
 6. **Craft negatives**: Based on potential issues

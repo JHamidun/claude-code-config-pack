@@ -47,13 +47,30 @@ def telegram_session() -> str:
     return os.path.expanduser(os.environ.get('TELEGRAM_SESSION', './telegram_session'))
 
 
-# ---- OpenAI (gpt-image-2 for static) ----
+# ---- OpenAI (gpt-image-2.5 for static) ----
 def openai_key() -> str:
     return get('OPENAI_API_KEY')
 
 
 def openai_image_model() -> str:
-    return os.environ.get('OPENAI_IMAGE_MODEL', 'gpt-image-1')
+    """Модель статичных стикеров. Было 'gpt-image-1' — снимается 23.10.2026.
+
+    Взят sunburst, а не flare: у них одна цена и одни параметры, разница только
+    в задержке, а здесь важнее точность — пачка из 75 картинок должна остаться
+    одним и тем же персонажем.
+    """
+    return os.environ.get('OPENAI_IMAGE_MODEL', 'gpt-image-2.5-sunburst')
+
+
+def openai_input_fidelity() -> str:
+    """Насколько жёстко держаться исходной картинки при edits.
+
+    Появилось в gpt-image-2.5 и закрывает главную боль этого навыка: раньше
+    идентичность персонажа держалась только текстом CONSTRAINTS, и на длинной
+    пачке маскот всё равно уплывал. 'high' — держать дизайн, 'low' — дать модели
+    перерисовать свободно.
+    """
+    return os.environ.get('OPENAI_INPUT_FIDELITY', 'high')
 
 
 # ---- SAM2 (animated) ----

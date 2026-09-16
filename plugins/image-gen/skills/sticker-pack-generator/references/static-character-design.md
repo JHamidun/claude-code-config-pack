@@ -2,8 +2,8 @@
 
 ## Problem
 
-OpenAI's `gpt-image-2` / `gpt-image-1` generate beautiful one-offs, but if you ask
-for 75 emotions of "the same character", each one drifts:
+OpenAI's image models generate beautiful one-offs, but if you ask for 75 emotions
+of "the same character", each one drifts:
 
 - Eyes shift size/position
 - Outfit details vanish or change colour
@@ -61,13 +61,24 @@ not 75 lookalikes.
 
 ## Cost & timing
 
-For 75 emotions at high quality on `gpt-image-2`:
-- ~$0.15-0.40 per image
-- ~30-60s per image
-- Batch of 75: ~50 min + manual review of ~20 you'll want to regen
+For 75 emotions at high quality on `gpt-image-2.5-sunburst`:
 
-Cheaper alternative: `gpt-image-1` is ~3× cheaper and still good for consistent
-characters via edits API. Quality drop is visible but acceptable for stickers.
+- ~30-60s per image
+- Batch of 75: ~50 min + manual review of the ones you'll want to regen
+
+Cheaper alternative: `gpt-image-2.5-flare` — **same price and same parameters**,
+only lower latency. That is a change from the previous generation, where the
+cheap tier also meant lower quality: 2.5 prices by tokens ($5/$8 in, $30 out per
+million), so the lever is now `quality` (`low`…`max`) and image size, not the
+model you pick.
+
+⛔ `gpt-image-1` is no longer the cheap fallback — it retires 23.10.2026,
+`gpt-image-1.5` on 01.12.2026, and `dall-e-2`/`dall-e-3` died on 12.05.2026.
+
+**What actually fixed the drift** is not the model but `input_fidelity="high"`
+on the edits call (new in 2.5): identity used to rest on the CONSTRAINTS text
+alone, and over a long batch the mascot wandered anyway. The API holds it now —
+see `scripts/gen_emotion.py`.
 
 ## Telegram static sticker requirements (post-gen)
 

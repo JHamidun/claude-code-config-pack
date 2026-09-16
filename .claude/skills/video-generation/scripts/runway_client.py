@@ -5,9 +5,16 @@ runway_client.py — Python client for Runway ML internal web API.
 Auth: JWT from web app localStorage (RW_TOKEN_PLACEHOLDER). Stored in
 ~/.claude/.credentials.master.env as RUNWAY_TOKEN_PLACEHOLDER. Valid ~30 days.
 
+⚠️ Срок жизни токена — не теория: 09.09.2026 весь Runway отвечал 401, потому
+что JWT истёк 31.07.2026 и лежал просроченным 40 дней. Ни один скрипт об этом не
+предупреждал — видно было только по 401. Проверить срок:
+    python runway_client.py token-status
+
+
 Capabilities (no public Runway API key needed — uses paid web subscription):
   - Upload images/videos (3-stage S3 multipart)
-  - Create generation tasks (Seedance 2.0, Gen-4.5, Kling 3.0, etc.)
+  - Create generation tasks (Seedance, Gen-4.5, Kling 3.0, etc.)
+    Seedance version is DISCOVERED from /v1/profile/features, not hardcoded.
   - Poll task status, fetch artifacts (video URLs)
   - Estimate credits cost
   - List sessions, teams, profile
@@ -17,17 +24,18 @@ Usage examples (CLI):
   # Profile / status
   python runway_client.py profile
   python runway_client.py teams
-  python runway_client.py can-start seedance_2
+  python runway_client.py can-start seedance_2_5      # имя фичи спросить: features
 
   # Estimate cost
-  python runway_client.py estimate seedance_2 --duration 5 --aspect 21:9 --resolution 720p
+  python runway_client.py estimate seedance_2_5 --duration 5 --aspect 21:9 --resolution 720p
 
   # Upload an image (returns asset_id and CDN url)
   python runway_client.py upload C:/path/to/frame.jpg
 
-  # Generate a Seedance 2.0 video (start frame keyframe)
+  # Generate a Seedance video (start frame keyframe).
+  # --type можно не задавать: версия берётся из профиля Runway.
   python runway_client.py generate \\
-    --type seedance_2 \\
+    --type seedance_2_5 \\
     --prompt "Eyes slowly open. Subtle head turn." \\
     --image C:/path/to/frame.jpg \\
     --duration 5 --aspect 21:9 --resolution 720p \\
@@ -51,6 +59,7 @@ import os
 import sys
 import io
 import json
+import re
 import time
 import argparse
 import mimetypes
@@ -87,7 +96,18 @@ class RunwayClient:
         self.jwt = jwt or JWT
         self.team_id = team_id or TEAM_ID
         if not self.jwt:
-            raise RuntimeError("Missing RUNWAY_TOKEN_PLACEHOLDER. Run `python runway_client.py extract-jwt` from logged-in browser.")
+            # Здесь советовалась подкоманда `extract-jwt`, которой в этом файле
+            # НЕТ и не было: ни в add_parser, ни в диспетчере. Совет в тексте
+            # ошибки, ведущий в несуществующую команду, хуже отсутствия совета —
+            # человек идёт его выполнять и упирается второй раз.
+            raise RuntimeError(
+                "Нет RUNWAY_JWT. Автоматики обновления не существует, только руками:\n"
+                "  1) залогиниться на app.runwayml.com\n"
+                "  2) DevTools → Console → copy(localStorage.getItem('RW_USER_TOKEN'))\n"
+                "  3) вставить в RUNWAY_JWT в ~/.claude/.credentials.master.env\n"
+                "     (там же RUNWAY_TEAM_ID: "
+                "JSON.parse(localStorage.getItem('rw__lastUsedTeamId')).lastUsedTeamId)\n"
+                "Проверить срок потом: python runway_client.py token-status")
         self.session = requests.Session()
         headers = {
             "Authorization": f"Bearer {self.jwt}",
@@ -132,6 +152,55 @@ class RunwayClient:
     def features(self) -> Dict:
         return self._get("/v1/profile/features")
 
+    # Запасной вариант на случай, если профиль недоступен (истёк токен, сеть).
+    # Явная константа лучше молчаливого падения, но она ВТОРИЧНА: первым
+    # спрашиваем сам Runway, потому что версии Seedance меняются без нас —
+    # 2.0 стояла здесь зашитой, пока не вышла 2.5, и узнали мы об этом от
+    # владельца, а не от кода.
+    SEEDANCE_FALLBACK = "seedance_2_5"
+
+    def seedance_feature(self) -> str:
+        """Имя фичи Seedance у Runway — СПРАШИВАЕМ, а не угадываем.
+
+        Возвращает самую свежую доступную версию: у Runway имена вида
+        `seedance_2`, `seedance_2_5`, и «свежесть» читается по числовому
+        хвосту. Если профиль не ответил — отдаём константу и НЕ молчим об этом.
+        """
+        try:
+            data = self.features()
+        except Exception as e:                       # noqa: BLE001 — причина не важна
+            print(f"  [runway] профиль недоступен ({e.__class__.__name__}), "
+                  f"беру запасное имя {self.SEEDANCE_FALLBACK}", file=sys.stderr)
+            return self.SEEDANCE_FALLBACK
+
+        names = set()
+
+        def collect(node):
+            if isinstance(node, dict):
+                for k, v in node.items():
+                    if isinstance(k, str) and k.startswith("seedance"):
+                        names.add(k)
+                    collect(v)
+            elif isinstance(node, list):
+                for v in node:
+                    collect(v)
+            elif isinstance(node, str) and node.startswith("seedance"):
+                names.add(node)
+
+        collect(data)
+        if not names:
+            print(f"  [runway] в профиле нет ни одной фичи seedance*, "
+                  f"беру запасное имя {self.SEEDANCE_FALLBACK}", file=sys.stderr)
+            return self.SEEDANCE_FALLBACK
+
+        def version(name: str) -> tuple:
+            return tuple(int(x) for x in re.findall(r"\d+", name)) or (0,)
+
+        newest = max(names, key=version)
+        if len(names) > 1:
+            print(f"  [runway] доступны {sorted(names)} → беру {newest}", file=sys.stderr)
+        return newest
+
     def teams(self) -> Dict:
         return self._get("/v1/teams")
 
@@ -139,8 +208,52 @@ class RunwayClient:
         tid = team_id or self.team_id
         return self._get(f"/v1/teams/{tid}/members")
 
-    def can_start_task(self, feature: str = "seedance_2", mode: str = "credits") -> Dict:
+    def can_start_task(self, feature: Optional[str] = None, mode: str = "credits") -> Dict:
+        # Дефолт был "seedance_2" — жёстко и молча устаревал. Спрашиваем профиль.
+        feature = feature or self.seedance_feature()
         return self._get("/v1/tasks/can_start", {"asTeamId": self.team_id, "mode": mode, "feature": feature})
+
+    # ---------- Токен ----------
+
+    @staticmethod
+    def token_status(jwt: Optional[str] = None) -> Dict:
+        """Когда истекает RUNWAY_JWT — БЕЗ обращения к сети.
+
+        Нужно потому, что просроченный токен виден только как 401 в любом
+        вызове, и 401 читается как «сломался Runway», а не «протух ключ».
+        Один раз это стоило сорока дней: токен истёк 31.07.2026, и всё
+        интеграционное направление считалось нерабочим.
+        """
+        import base64
+        import datetime
+
+        tok = jwt or JWT
+        if not tok:
+            return {"ok": False, "reason": "RUNWAY_JWT не задан в .credentials.master.env"}
+        parts = tok.split(".")
+        if len(parts) < 2:
+            return {"ok": False, "reason": "не похоже на JWT (нет трёх частей)"}
+        payload = parts[1] + "=" * (-len(parts[1]) % 4)
+        try:
+            claims = json.loads(base64.urlsafe_b64decode(payload))
+        except Exception as e:                       # noqa: BLE001
+            return {"ok": False, "reason": f"не разобрал payload: {e}"}
+        exp = claims.get("exp")
+        if not exp:
+            return {"ok": True, "reason": "в токене нет поля exp — срок неизвестен"}
+        expires = datetime.datetime.fromtimestamp(exp)
+        left = (expires - datetime.datetime.now()).days
+        return {
+            "ok": left > 0,
+            "expires": expires.strftime("%d.%m.%Y %H:%M"),
+            "days_left": left,
+            "reason": ("действителен" if left > 7 else
+                       f"истекает через {left} дн. — обновить" if left > 0 else
+                       f"ПРОСРОЧЕН на {-left} дн. — все вызовы вернут 401"),
+            "how_to_refresh": ("залогиниться на app.runwayml.com, взять RW_USER_TOKEN "
+                               "из localStorage и положить в RUNWAY_JWT "
+                               "(~/.claude/.credentials.master.env)"),
+        }
 
     # ---------- Cost Estimation ----------
 
@@ -413,8 +526,15 @@ class RunwayClient:
         explore_mode: bool = True,
         wait: bool = True,
         name: Optional[str] = None,
+        feature: Optional[str] = None,
     ) -> Dict:
-        """High-level: upload image(s) + create Seedance 2.0 task. Returns finished task."""
+        """High-level: upload image(s) + create a Seedance task. Returns finished task.
+
+        feature: имя фичи у Runway. По умолчанию НЕ зашито — спрашиваем профиль
+        и берём самую свежую (`seedance_feature()`). Здесь стояло жёсткое
+        "seedance_2", и когда вышла 2.5, код продолжал звать 2.0 без единой
+        ошибки: задача создавалась, просто моделью прошлого поколения.
+        """
         ref_images = []
         if image_path:
             ds = self.upload_file(image_path, "image")
@@ -438,7 +558,7 @@ class RunwayClient:
             "numGenerations": 1,
             "creationSource": "tool-mode",
         }
-        result = self.create_task("seedance_2", options)
+        result = self.create_task(feature or self.seedance_feature(), options)
         task = result.get("task", result)
         if wait:
             task = self.wait_task(task["id"])
@@ -469,6 +589,11 @@ def cmd_profile(args, c):
 
 def cmd_teams(args, c):
     print(json.dumps(c.teams(), indent=2, ensure_ascii=False))
+
+
+def cmd_token_status(args, c):
+    """Не требует живого токена — именно поэтому и работает, когда всё остальное даёт 401."""
+    print(json.dumps(RunwayClient.token_status(), indent=2, ensure_ascii=False))
 
 
 def cmd_features(args, c):
@@ -594,9 +719,11 @@ def main():
     sub.add_parser("profile")
     sub.add_parser("teams")
     sub.add_parser("features")
+    sub.add_parser("token-status", help="когда истекает RUNWAY_JWT (без сети)")
 
     p = sub.add_parser("can-start")
-    p.add_argument("feature", default="seedance_2", nargs="?")
+    # Без аргумента — спросим у профиля свежайшую Seedance, а не подставим 2.0.
+    p.add_argument("feature", default=None, nargs="?")
 
     p = sub.add_parser("estimate")
     p.add_argument("feature")
@@ -643,6 +770,7 @@ def main():
         "profile": cmd_profile,
         "teams": cmd_teams,
         "features": cmd_features,
+        "token-status": cmd_token_status,
         "can-start": cmd_can_start,
         "estimate": cmd_estimate,
         "upload": cmd_upload,

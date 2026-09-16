@@ -8,8 +8,29 @@
 
 Что подключено:
     Veo 3.1 (Google)   — три ветки: полная, быстрая, лёгкая; кадр-в-видео, звук в кадре
-    Sora 2 (OpenAI)    — включая Pro; длиннее и послушнее к сложным сценам
+    Sora 2 (OpenAI)    — ⚠️ УМИРАЕТ 24.09.2026 вместе со всем Videos API, см. ниже
     кадры              — Nano Banana Pro и 3.1 Flash Image, для первого кадра сцены
+
+⚠️ OpenAI закрывает видео целиком. 24.09.2026 выключаются `sora-2`, `sora-2-pro`,
+все датированные снапшоты И сам эндпоинт `/v1/videos`. **Замены у OpenAI нет** —
+это не смена идентификатора, а уход продукта. Ветка sora оставлена до даты и сама
+откажется работать после неё внятным сообщением, а не разбором чужого HTTP 404.
+
+Замена есть, но за пределами этого файла — и это намеренно:
+
+    Veo 3.1          — здесь, `--engine veo` (дефолт). Свой ключ, без подписки.
+    Seedance 2.5     — НЕ здесь: у Runway свой внутренний API со своей
+                       авторизацией, и клиент к нему уже написан —
+                       `runway_client.py`. Второй экземпляр рядом означал бы
+                       две копии, которые чинят по очереди и всегда забывают
+                       одну. Вызов:
+                           python runway_client.py generate --prompt "…" \
+                             --image kadr.png --duration 10 --resolution 720p
+                       Версию модели он спрашивает у Runway сам.
+
+Чем Seedance берёт: **мультикадр из одной генерации** (несколько сцен, ракурсов
+и смен темпа без склейки), до 30 с, до 50 референсов, встроенный звук, правка и
+продление готового видео. Veo так не умеет — он делает одну сцену.
 
 Модели просят по-разному, поэтому разница спрятана внутрь: снаружи одни и те же
 аргументы, а на выходе всегда файл на диске.
@@ -61,6 +82,28 @@ IMAGE = {"pro": "gemini-3-pro-image", "flash": "gemini-3.1-flash-image-preview"}
 
 # Sora принимает не любой размер, а перечень. Просим соотношение — подставляем ближайший.
 SORA_SIZE = {"16:9": "1280x720", "9:16": "720x1280", "1:1": "720x720"}
+
+# День, когда OpenAI выключает Videos API целиком. Держим датой, а не «скоро»:
+# после неё вызов вернёт невнятную ошибку эндпоинта, и без этой проверки полчаса
+# уйдёт на поиск несуществующего бага в своём коде.
+SORA_SHUTDOWN = (2026, 9, 24)
+
+
+def sora_gate(verbose: bool = True) -> None:
+    """Не пускает в мёртвый эндпоинт и предупреждает, пока он ещё жив."""
+    today = time.localtime()
+    now = (today.tm_year, today.tm_mon, today.tm_mday)
+    if now >= SORA_SHUTDOWN:
+        raise SystemExit(
+            "Sora больше нет: OpenAI выключил Videos API и все модели sora-2* "
+            "24.09.2026, замены у него нет вообще.\n"
+            "  Оставшийся путь — Veo: повтори вызов с --engine veo "
+            "(или veo-fast / veo-lite)."
+        )
+    if verbose:
+        left = (SORA_SHUTDOWN[2] - now[2]) + (SORA_SHUTDOWN[1] - now[1]) * 30
+        print(f"  ⚠️ Sora выключается 24.09.2026 (осталось ~{left} дн.), "
+              f"замены у OpenAI не будет — переводи сцены на --engine veo")
 
 
 def creds() -> dict:
@@ -149,6 +192,7 @@ def veo_generate(key: str, model: str, prompt: str, out: pathlib.Path, *,
 
 def sora_generate(key: str, model: str, prompt: str, out: pathlib.Path, *,
                   seconds: int, aspect: str, first_frame: str | None) -> pathlib.Path:
+    sora_gate()
     h = {"Authorization": f"Bearer {key}"}
     body = {"model": model, "prompt": prompt,
             "seconds": str(seconds), "size": SORA_SIZE.get(aspect, "720x1280")}
@@ -216,7 +260,9 @@ def cmd_models(K: dict) -> int:
         so = [m["id"] for m in r.get("data", []) if "sora" in m["id"]]
         print("  OpenAI:")
         for n in so:
-            print(f"    видео    {n}")
+            print(f"    видео    {n}  (выключается 24.09.2026)")
+        if not so:
+            print("    видео    нет — Videos API закрыт 24.09.2026, замены нет")
     return 0
 
 

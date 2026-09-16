@@ -6,13 +6,20 @@ Hard-won findings from building a 60s music video. Read before choosing an i2v /
 
 | Route | Cost | Verdict |
 |---|---|---|
-| **Veo 3.1 Fast via Google API** (`veo-3.1-fast-generate-preview`, `GOOGLE_API_KEY`) | Google budget, ~44-54s/6s-clip | **DEFAULT for i2v motion.** Not Runway credits. Script pattern: `_tribute_project_2/scripts/veo_animate.py` (JPG keyframe → mime `image/jpeg`, aspect 9:16, `duration_seconds`∈{4,6,8}, workers≤3, soften-retry on safety filter). Veo emits native audio → strip with `-an` at assembly. |
-| Runway **Seedance 2.0** (internal API) | **~180 credits / 5s 720p clip** — EXPENSIVE (1000 cr = only 5 clips) | Use sparingly. Quality good but burns credits fast. |
-| Runway **Gen-4** | ~62 cr / 5s (3× cheaper than Seedance) | Cheaper Runway option if you must stay on Runway credits. |
-| Runway **explore mode** (`exploreMode:True`, free on Unlimited) | Free | **THROTTLED to 0% for free users** — sits in queue, unreliable for batches. Don't depend on it. |
+| **Veo 3.1 Fast via Google API** (`veo-3.1-fast-generate-preview`, `GOOGLE_API_KEY`) | Google budget, ~44-54s/6s-clip | **DEFAULT for i2v motion.** Not Runway credits. Script pattern: `_project/scripts/veo_animate.py` (JPG keyframe → mime `image/jpeg`, aspect 9:16, `duration_seconds`∈{4,6,8}, workers≤3, soften-retry on safety filter). Veo emits native audio → strip with `-an` at assembly. |
+| Runway **Seedance 2.5** (internal API; преемник 2.0) | Официальный прайс: **20 / 30 / 68 кредитов за секунду** (480p / 720p / 1080p) → 5 с 720p = **150 кредитов** (1000 cr ≈ 6 клипов). Входное видео добавляет половину ставки за каждую секунду входа | Use sparingly — жжёт кредиты быстро. Замер 06.2026 давал ~180 cr за тот же 5-секундный 720p клип и относился к **2.0**; расхождение с прайсом не разобрано, планировать бюджет по прайсу, сверять по факту. Снята ли 2.0 — Runway нигде не сказал, только что «2.5 — преемник». |
+| Runway **Gen-4** | ~62 cr / 5s | Cheaper Runway option if you must stay on Runway credits (было «3× дешевле Seedance» — по новому прайсу 720p разрыв ≈2,4×). |
+| Runway **explore mode** (`exploreMode:True`) | «Free on Unlimited» — но только пока Unlimited живой | **Сомнение из этой строки подтвердилось, и хуже, чем было записано.** Здесь стояло «THROTTLED to 0% for free users», то есть медленно, но работает. На деле 22.06.2026 подписка свалилась на free plan, и Runway отказывал **и в explore, и в stable** — не троттлинг, а отказ. На 09.09.2026 сверх этого `RUNWAY_JWT` просрочен с 31.07 (40 дней), любой вызов = 401. Не закладывать в пайплайн вообще. |
 | **Ken Burns still** (ffmpeg zoompan) | Free | Last resort; reads as a slideshow in a music video — NOT a substitute for real i2v. |
 
 `gpuCredits` empties silently → fast-mode create returns `400 {"error":"You do not have enough credits"}`. Check `/runway/v1/profile` `gpuCredits` before a batch.
+
+**Порядок проверки Runway перед любым батчем (09.09.2026)** — три ступени, именно в этом порядке:
+1. **План** в `/v1/profile`. Не кредиты, а план: на free Runway отказывает и в explore, и в stable, сколько бы кредитов ни лежало.
+2. **Токен**: `runway_client.py token-status` — offline-проверка срока `RUNWAY_JWT`. Сейчас просрочен с 31.07.2026, всё отдаёт 401. Автообновления нет нигде — только руками, `localStorage` → `RW_USER_TOKEN` на app.runwayml.com.
+3. **Кредиты** `gpuCredits` — уже после первых двух.
+
+Обновить один токен может не помочь: если план не платный, свежий токен упрётся в тот же отказ. Версия Seedance определяется автоматически через `/v1/profile/features`.
 
 ## LIPSYNC (audio→lips) — every hosted route has a wall
 

@@ -22,7 +22,7 @@ Replicate · локальный GPU (rembg/Topaz). НЕТ: xAI, BFL, Topaz, Recr
 | HF jst | Модель | Прямой путь | Цена |
 |---|---|---|---|
 | `gpt_image_2` | OpenAI GPT-Image-2 | **OPENAI_API_KEY** `gpt-image-2` | $0.006-0.21/img — **3-6× дешевле** HF ⭐ |
-| `openai_hazel` | GPT-Image-1.5 (Hazel) | **OPENAI_API_KEY** `gpt-image-1.5` | ~−50% vs HF |
+| `openai_hazel` | GPT-Image-1.5 (Hazel) | **OPENAI_API_KEY** `gpt-image-2.5-flare` | ⚠️ `gpt-image-1.5` снимается 01.12.2026; Flare занял его роль «то же, но быстрее» |
 | `nano_banana_flash` | Nano Banana 2 | **GOOGLE_API_KEY** `gemini-3.1-flash-image-preview` (response_modalities IMAGE,TEXT) | $0.045-0.151/img ≈ HF |
 | `nano_banana_2` | Nano Banana **Pro** | **GOOGLE_API_KEY** `gemini-3-pro-image-preview` | $0.134/img (HF ~$0.068 ≈ 2× дешевле для plain-gen → см. ниже) |
 | `seedream_v4_5` `seedream_v5_lite` | ByteDance Seedream 4.5/5-lite | Replicate `bytedance/seedream-4.5` / `seedream-5-lite` | $0.035-0.05/img ≈ HF |

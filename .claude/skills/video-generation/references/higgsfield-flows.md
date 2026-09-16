@@ -33,5 +33,16 @@ Procedural BGM чистым ffmpeg (локальная подложка под �
 Настоящий трек → elevenlabs Music / Lyria / локальный ace-step (см. `audio.md`).
 
 ## Провайдер
-Seedance 2.0 доступен и через bundled `engines/higgsfield/bin/hf.exe` — **фолбэк** к Runway-JWT, когда Runway в throttle
-(по умолчанию идём через Runway). Расход кредитов hf: 720p 4.5 cr/s (fast 3.5), 1080p 9. Virality-проверка финала: `hf generate create brain_activity --video`.
+Seedance доступен через bundled `engines/higgsfield/bin/hf.exe`.
+
+**Приоритет пересмотрен 09.09.2026.** Раньше здесь стояло: «фолбэк к Runway-JWT, когда Runway в throttle (иначе всегда Runway $0)».
+Это вводило в заблуждение дважды: Runway-путь сейчас закрыт не «иногда», а полностью — `RUNWAY_JWT` истёк 31.07.2026, все вызовы дают 401;
+и «всегда Runway $0» перестало быть правдой ещё 22.06.2026, когда подписка свалилась на free plan и Runway отказал и в explore, и в stable.
+Пока токен и план не восстановлены, **hf.exe — рабочий путь, а не фолбэк**. Восстановление Runway по порядку:
+`runway_client.py token-status` (offline-проверка срока) → план в `/v1/profile` → новый токен руками из `localStorage.RW_USER_TOKEN`
+на app.runwayml.com (автоматики обновления нет нигде). Как только Runway ожил — приоритет возвращается к нему, он дешевле.
+
+Цены hf: 720p 4.5 cr/s (fast 3.5), 1080p 9 — то есть hf платный, и выбор теперь не «$0 против $0», а осознанный расход кредитов.
+Какая версия Seedance стоит за hf.exe (2.0 или 2.5) — не проверено; у Runway версию с недавних пор определяет
+сам `generate_seedance()` через `/v1/profile/features`.
+Virality-проверка финала: `hf generate create brain_activity --video`.

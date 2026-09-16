@@ -58,7 +58,7 @@ Helper: `scripts/gamma_client.py` (correct endpoints, verified against the live 
 | `textOptions.tone` | string | e.g. "professional", ≤ 500 chars |
 | `textOptions.audience` | string | e.g. "executives", ≤ 500 chars |
 | `imageOptions.source` | enum | `aiGenerated`, `webFreeToUseCommercially`, `webFreeToUse`, `noImages`, … |
-| `imageOptions.model` | enum | e.g. `dall-e-3`, `flux-1-pro`, `imagen-3-flash` — (unverified list) |
+| `imageOptions.model` | enum | список моделей — на стороне Gamma, а не OpenAI: не подставляй сюда id из `config/models.md` вслепую. `dall-e-3` из прежнего примера у OpenAI снят 12.05.2026, живёт ли он ещё внутри Gamma — не проверено |
 | `folderIds` | array | ≤ 10 folder ids — (unverified) |
 
 Response: `{ "generationId": "..." }`.

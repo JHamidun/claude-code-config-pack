@@ -12,12 +12,24 @@ Usage:
 
 ENV:
     OPENAI_API_KEY
-    OPENAI_IMAGE_MODEL  (default: gpt-image-1)
+    OPENAI_IMAGE_MODEL     (default: gpt-image-2.5-sunburst)
+    OPENAI_INPUT_FIDELITY  (default: high — держать дизайн персонажа)
 """
+# UTF-8 на выход. Консоль Windows по умолчанию cp1251/cp866/cp1252, и первый же
+# не-ASCII символ (кириллица, →, ✓) валит процесс UnicodeEncodeError — обычно на
+# --help, то есть ДО любой полезной работы. errors="replace" оставляет вывод
+# читаемым, если терминал всё же не UTF-8.
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 import sys, io, os, base64, argparse, requests
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', line_buffering=True)
 
-from _config import openai_key, openai_image_model
+from _config import openai_key, openai_image_model, openai_input_fidelity
 
 
 def gen_emotion(master_path: str, emotion_name: str, change_prompt: str,
@@ -46,6 +58,9 @@ CHANGE FOR THIS EMOTION: {change_prompt}
               'prompt': full_prompt,
               'size': size,
               'quality': quality,
+              # Идентичность персонажа держалась одним текстом CONSTRAINTS и на
+              # длинной пачке всё равно уплывала. С 2.5 её держит сам API.
+              'input_fidelity': openai_input_fidelity(),
               'n': 1},
         timeout=600,
     )

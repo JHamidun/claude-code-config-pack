@@ -27,7 +27,7 @@ description: "Google AI API (GOOGLE_API_KEY): Gemini text 2M контекст, e
 
 ⚠️ **НЕ здесь**: генерация картинок и видео. Канон — `config/models.md`:
 картинки → skill `image-generation` (NB2 `gemini-3.1-flash-image-preview` default / NB2 Lite / NB Pro),
-видео → skill `video-generation` (`veo-3.1-generate-preview`, `sora-2-pro`).
+видео → skill `video-generation` (`veo-3.1-generate-preview`; ⚠️ `sora-2*` и весь Videos API OpenAI выключаются 24.09.2026 без замены).
 Запрещённые модели (gemini-2.0-flash*, gemini-2.5-flash-image, gemini-pro-vision, gemini-1.x) — `rules/dont-do.md`.
 
 ## API Key
@@ -316,7 +316,7 @@ model:    gemini-3.5-flash        # bare name, без "models/"
 | Картинки (default) | `gemini-3.1-flash-image-preview` (NB2) | skill `image-generation` |
 | Картинки (обложки news) | `gemini-3.1-flash-lite-image` (NB2 Lite) | skill `image-generation` |
 | Картинки (флагман) | `gemini-3-pro-image-preview` (NB Pro) | skill `nano-banana-pro` |
-| Видео | `veo-3.1-generate-preview` / `sora-2-pro` | skill `video-generation` |
+| Видео | `veo-3.1-generate-preview` — единственный оставшийся путь | skill `video-generation` |
 
 Ключ для image — `GOOGLE_API_KEY` + `os.environ.pop('GEMINI_API_KEY', None)`; модель отдаёт **JPEG, не PNG**.
 

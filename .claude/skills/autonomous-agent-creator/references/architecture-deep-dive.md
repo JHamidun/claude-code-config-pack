@@ -66,9 +66,7 @@ Risk: ChatGPT subscription has rotating refresh tokens. Any second client (codex
 **Hermes config.yaml (Anthropic direct):**
 ```yaml
 model:
-  default: claude-sonnet-5      # full id, not an alias: the API takes ids only.
-                                # Check it against ~/.claude/config/models.md — a stale
-                                # id returns 200 and last year's model, never an error.
+  default: claude-sonnet-5
   provider: anthropic
   base_url: https://api.anthropic.com
 ```
@@ -83,7 +81,11 @@ Risk: organisation can be disabled overnight (we hit this in May 2026 — single
 }
 ```
 
+> ⚠️ Каталог чужой (образ OpenClaw) — править его нельзя. Но у OpenAI `*-codex` сняты 23.07.2026, а `gpt-5*` и `gpt-5.2` снимаются 11.12.2026:
+> к декабрю живыми останутся только `gpt-4o`/`gpt-4o-mini`. Разбор — skill `openclaw-ops`.
+
 Known models in OpenClaw v2026.2.18: gpt-4o, gpt-4o-mini, gpt-5, gpt-5-mini, gpt-5-nano, gpt-5.1-codex, gpt-5.2, gpt-5.2-codex, gpt-5.3-codex. NOT supported: gpt-5.4+.
+⚠️ Список чужой (каталог образа), но у OpenAI из него `*-codex` сняты 23.07.2026, а `gpt-5*` и `gpt-5.2` снимаются 11.12.2026 — к декабрю на этом образе останутся живыми только `gpt-4o`/`gpt-4o-mini`. Разбор и дата отсечки — skill `openclaw-ops`.
 
 ### Platform Config
 
@@ -142,7 +144,7 @@ Delivery: "origin", "local", "all", "platform:chat_id:thread_id".
 "cron": {
   "jobs": [{
     "name": "daily-check",
-    "schedule": {"kind": "cron", "expr": "0 9 * * *", "tz": "Europe/Moscow"},
+    "schedule": {"kind": "cron", "expr": "0 9 * * *", "tz": "UTC или из окружения"},
     "payload": {"kind": "agentTurn", "message": "Do X", "toolsAllow": ["web_fetch"]},
     "delivery": {"mode": "announce", "channel": "telegram"}
   }]

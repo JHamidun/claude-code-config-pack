@@ -266,7 +266,18 @@ def execute(b: dict, plan: dict, assume_yes: bool) -> dict:
             r = _run(cmd, f"clip_{i:02d}" + (f" retry{attempt}" if attempt else ""))
             if r.get("ok") and out_clip.exists():
                 return r
-            if "429" not in (r.get("err", "") + r.get("out", "")):
+            blob = r.get("err", "") + r.get("out", "")
+            # Фолбэк на Veo случится при любой ошибке — и в этом была проблема:
+            # при мёртвом токене конвейер молча доезжал на Veo, а Runway
+            # считался рабочим ещё сорок дней. Причину надо НАЗЫВАТЬ, а не
+            # прятать за общим «клип не вышел».
+            if "401" in blob or "Unauthorized" in blob:
+                print(f"  ⚠️ clip_{i:02d}: Runway отдал 401 — RUNWAY_JWT мёртв "
+                      f"или подписка на free plan. Проверь: "
+                      f"python runway_client.py token-status. Ухожу на Veo, "
+                      f"но Runway так и останется сломанным.", flush=True)
+                break
+            if "429" not in blob:
                 break
             time.sleep(20 * (attempt + 1))
         return _veo_fallback(i, s, kf, out_clip)  # Runway dead → Veo

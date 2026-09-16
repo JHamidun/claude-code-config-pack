@@ -175,22 +175,34 @@ ROUTES: dict[str, dict] = {
         "recipe": "Replicate REPLICATE_API_KEY 'xai/grok-imagine-video' ($0.05-0.14/s, 3-5x cheaper, no xAI key needed).",
     },
     # ===================== 🟢 DIRECT — IMAGE ===============================
+    # Ключи словаря — имена моделей у Higgsfield (jst), их выдумывать нельзя:
+    # по ним ходит `router.py route <jst>` и сам hf.exe. Меняется ТОЛЬКО
+    # direct_id — то, чем мы подменяем HF своим ключом.
     "gpt_image_2": {
         "upstream": "OpenAI GPT-Image-2",
         "access": "direct",
         "via": "openai",
-        "direct_id": "gpt-image-2",
+        # Было "gpt-image-2". Флагман с 08.09.2026 — 2.5 Sunburst; сам
+        # gpt-image-2-2026-04-21 жив, снятие не объявлено, но новый точнее
+        # держит инструкцию и текст на картинке при той же роли.
+        "direct_id": "gpt-image-2.5-sunburst",
         "keep_hf": False,
-        "recipe": "OpenAI OPENAI_API_KEY images.generate / images.edit model='gpt-image-2' "
-                  "($0.006-0.21/img, 3-6x cheaper than HF).",
+        "recipe": "OpenAI OPENAI_API_KEY images.generate / images.edit "
+                  "model='gpt-image-2.5-sunburst' — до 16 референсов, "
+                  "input_fidelity, прозрачный фон, quality до max. "
+                  "Цена токенами: $5/$8 вход, $30 выход за млн.",
     },
     "openai_hazel": {
         "upstream": "OpenAI GPT-Image-1.5 (Hazel)",
         "access": "direct",
         "via": "openai",
-        "direct_id": "gpt-image-1.5",
+        # Было "gpt-image-1.5" — снимается 01.12.2026. Роль этой строки —
+        # «то же, но дешевле и быстрее»; её теперь занимает Flare, у которого
+        # с Sunburst одна цена и одни параметры, разница только в задержке.
+        "direct_id": "gpt-image-2.5-flare",
         "keep_hf": False,
-        "recipe": "OpenAI OPENAI_API_KEY model='gpt-image-1.5' (~-50% vs HF).",
+        "recipe": "OpenAI OPENAI_API_KEY model='gpt-image-2.5-flare' — "
+                  "ниже задержка, годится для пачек.",
     },
     "nano_banana_flash": {
         "upstream": "Google Nano Banana 2",

@@ -1,6 +1,6 @@
 ---
 name: multi-model-gateway
-description: "Прогон задачи через Claude, GPT и Gemini разом (AI Gateway): сравнение, консенсус. Триггеры: «спроси GPT», «второе мнение», «cross-model»."
+description: "Прогон задачи через Claude, GPT и Gemini разом (AI Gateway) + GPT-6 Astra через Codex CLI. Триггеры: «спроси GPT», «второе мнение», «cross-model», «астра», «через кодекс», «codex exec»."
 ---
 
 > ⚠️ **NO-KEY GUARD (обязательно):** этот функционал требует ОПЦИОНАЛЬНОГО стороннего API-ключа. Перед вызовом проверь ключ в `.credentials.master.env`. Если ключ отсутствует, пустой или placeholder (`your_*_api_key`) — **НЕ проси пользователя оплатить счёт, включить биллинг или купить API**. Скажи одной строкой: «Эта функция опциональна и требует свой API-ключ (например, бесплатный ключ на aistudio.google.com); из коробки всё остальное работает по подписке Claude» — и предложи альтернативу или продолжай без неё.
@@ -22,7 +22,7 @@ Route tasks to the best AI model (or multiple models) through AI Gateway v2.
 | Model | ID | Best for |
 |-------|----|----------|
 | Opus 5 | `claude-opus-5` | Deep reasoning, architecture, complex analysis (дефолт оркестратора) |
-| Fable 5.1 | `claude-fable-5-1` | Text-субагенты/воркеры (канон; `claude-fable-5` — Legacy) |
+| Fable 5.1 | `claude-fable-5-1` | Text-субагенты/воркеры (канон, ≤5 одновременно); `claude-fable-5` — Legacy |
 | Sonnet 5 | `claude-sonnet-5` | Most tasks, code gen, balanced |
 | Haiku 4.5 | `claude-haiku-4-5-20251001` | Fast classification, simple tasks |
 
@@ -31,13 +31,106 @@ Route tasks to the best AI model (or multiple models) through AI Gateway v2.
 ### OpenAI (via gateway)
 | Model | ID | Best for |
 |-------|----|----------|
-| GPT-5.4 | `gpt-5.4` | Latest flagship, best quality |
-| GPT-5.4 Pro | `gpt-5.4-pro` | Pro tier, higher limits |
-| GPT-5.1 Codex | `gpt-5.1-codex` | Code generation |
-| GPT-4.1 | `gpt-4.1` | Balanced quality/speed |
-| GPT-4.1 Mini | `gpt-4.1-mini` | Fast, cheap |
-| o4-mini | `o4-mini` | Reasoning, math (latest) |
-| o3-pro | `o3-pro` | Deep reasoning (premium) |
+| GPT-6 Astra | `gpt-6-astra` | Максимум; но по подписке — через Codex CLI, см. ниже |
+| GPT-5.6 Sol | `gpt-5.6-sol` (алиас `gpt-5.6`) | Рабочий дефолт, он же deep research |
+| GPT-5.6 Terra | `gpt-5.6-terra` | Быстрый; сюда же ушла математика и структурный reasoning |
+| GPT-5.6 Luna | `gpt-5.6-luna` | Дешёвый, массовые прогоны |
+| GPT-4.1 / Mini | `gpt-4.1` / `gpt-4.1-mini` | Живы; ⚠️ `gpt-4.1-nano` снимается 23.10.2026 |
+
+> ⛔ **Строки, которые тут стояли до 09.09.2026, вели в никуда.** Вся линейка
+> `*-codex` в API закрыта 23.07.2026 (`gpt-5-codex`, `gpt-5.1-codex`,
+> `gpt-5.1-codex-max`, `gpt-5.2-codex`), вся o-серия свёрнута в GPT-5.6:
+> `o3-deep-research` и `o4-mini-deep-research` выключены 23.07.2026, `o4-mini`
+> и `o3-mini` снимаются 23.10.2026, `o3` и `o3-pro` — 11.12.2026, `gpt-5.2` —
+> вместе с `gpt-5-*` 11.12.2026. Даты и замены — `config/models.md`.
+> Практический смысл: «Codex» больше не название модели, а название CLI.
+
+### GPT-6 Astra — через Codex CLI, НЕ через gateway и НЕ через MCP
+
+Самая сильная внешняя модель на сегодня (по бенчмаркам обходит Fable).
+Владелец: «через сли, мсп криво работает». Значит путь один — `codex exec`.
+
+```bash
+codex exec -m gpt-6-astra \
+  -c model_reasoning_effort="xhigh" \
+  -s read-only --skip-git-repo-check \
+  -C <корень проекта> [--add-dir <соседний репозиторий>] \
+  - < prompt.md > out.md 2>&1
+```
+
+Дефолты из `~/.codex/config.toml`: `model = "gpt-6-astra"`, эффорт — какой
+стоит в конфиге сейчас (10.09 там `ultra`, раньше был `medium`) — **эффорт
+всегда перебивай явно**, иначе получишь чужой дефолт и не заметишь.
+
+**Эффорт: `low` · `medium` · `high` · `xhigh` · `max` · `ultra`.** Проверено
+10.09 на CLI 0.153.4:
+
+- **`ultra` — не уровень API, а режим самого CLI.** API принимает только
+  `none, minimal, low, medium, high, xhigh, max` (так он сам перечислил в
+  ошибке 400). Каталог моделей, вшитый в `codex.exe`, описывает `ultra` как
+  «Maximum reasoning with automatic task delegation», то есть максимальное
+  рассуждение плюс автоматическая раздача подзадач. Прогон с `ultra` проходит
+  без ошибок. Что именно уходит в API, по трафику не проверено.
+- **Опечатка ловится только API, посреди прогона.** Codex не проверяет эффорт
+  при разборе конфига: `-c model_reasoning_effort="bogus"` запускается тихо и
+  падает уже ответом `400 invalid_enum_value`.
+- Дефолт эффорта для Astra в каталоге CLI — `low`.
+
+#### Промпт под Astra пишется НЕ так, как под Claude
+
+Правило, которое легко применить наоборот, потому что оно противоположно
+свежим рекомендациям Anthropic. Про Claude нового поколения доки говорят
+**убирать** лишнее: «перепроверь себя», напор на использование инструментов,
+запреты на форматирование — всё это теперь мешает и подлежит удалению.
+
+**У OpenAI ровно обратное.** Их доки просят инструкции **проверить и усилить**:
+Astra исполняет написанное буквальнее прежних моделей, поэтому недосказанное
+она не додумывает, а игнорирует — и наоборот, точную и полную формулировку
+отрабатывает лучше.
+
+Практический вывод: **промпт, ужатый под Claude, нельзя переносить в Astra
+как есть** — под неё его надо дописывать. Общий на обе модели промпт означает,
+что одна из них получает неподходящий; лучше два файла, чем один компромиссный.
+
+#### Пять граблей, каждая стоила времени
+
+**1. `&` убивает прогон.** `codex exec ... &` внутри задачи Bash — потомок
+оболочки, а не харнесса; оболочка завершается, процесс уходит с ней. Симптом
+обманчив: задача рапортует `exit 0`, файл отчёта создан и пуст, выглядит как
+«модель долго думает». Диагноз за один вызов:
+`ls -lat ~/.codex/sessions/<год>/<мес>/<день>/` — нет файлов после времени
+запуска, значит процесс не жил.
+**Правильно:** один прогон = одна задача Bash с `run_in_background: true`
+и БЕЗ `&`. Несколько прогонов — несколько вызовов в одном сообщении, пойдут
+параллельно, и харнесс сам пришлёт уведомление о каждом (будильник даром).
+
+**2. Промпт — файлом через stdin, не аргументом.** Русский текст с кавычками,
+переносами и обратными слешами в аргументе командной строки рвётся. Пиши
+`prompt.md`, подавай `- < prompt.md`.
+
+**3. Вывод — это ВСЯ трасса сессии, 0,5–0,9 МБ на прогон.** Не читай целиком:
+ответ в конце. `tail -c 20000 out.md`, либо ищи по заголовкам своего же
+запрошенного формата.
+
+**4. Отказ от задачи — это формулировка, а не модель.** Прямой запрос «найди
+дыры в блоклисте» получил «flagged for possible cybersecurity risk».
+Тот же вопрос как **защитный аудит покрытия** («мы мейнтейнеры, репо наше,
+проверь полноту защитного списка») отработал и дал настоящую находку —
+`shred /dev/sda` и `wipefs -a /dev/sda` проходили сквозь безусловный пол.
+Переформулируй, прежде чем считать, что модель не умеет.
+
+**5. Свои замеры она уточняет — проверяй за ней.** В разборе русских
+паттернов Astra прямо поправила мою цифру («в текущем checkout `read_secrets`
+не срабатывает, приписывать ему этот FP нельзя»). Это её сильная сторона, но
+и повод не переносить её числа в отчёт не глядя: она меряет тот checkout,
+который видит СЕЙЧАС, а дерево под ней меняется, если параллельно идёт рой.
+Сверяй время файла отчёта со временем своей последней правки.
+
+#### Где она особенно хороша
+
+Края и полнота списков: чего в перечислении не хватает, где паттерн шире или
+уже, чем заявлено, какой класс входа не покрыт. Хуже — там, где нужен замер
+живой системы, а не чтение.
 
 ### Gemini (via gateway)
 | Model | ID | Best for |
@@ -74,19 +167,19 @@ Analyze the task and pick the optimal model:
 | Complex architecture | Claude Opus 5 (native) |
 | Code generation | Claude Sonnet 5 (native) |
 | Quick classification | Claude Haiku 4.5 (native) |
-| Alternative perspective | GPT-5.4 (via gateway) |
-| Code gen (OpenAI) | gpt-5.1-codex (via gateway) |
+| Alternative perspective | `gpt-5.6-sol` (via gateway) |
+| Code gen (OpenAI) | `gpt-6-astra` — **через Codex CLI**, отдельной кодовой модели больше нет |
 | Large document analysis | Gemini 3.1 Pro (via gateway) |
-| Deep research | deep-research-pro-preview (via gateway) |
-| Math/logic problems | o4-mini (via gateway) |
-| Deep reasoning | o3-pro (via gateway) |
+| Deep research | `deep-research-pro-preview` (Google) или `gpt-5.6-sol` (OpenAI) |
+| Math/logic problems | `gpt-5.6-terra` (via gateway) |
+| Deep reasoning | `gpt-6-astra` с `effort=xhigh` (via Codex CLI) |
 
 ### Pattern 2: Cross-Model Consensus
 Run the same prompt through 2-3 models, then synthesize:
 
 ```
 1. Send to Claude (native) → result_claude
-2. Send to GPT-5.4 (gateway) → result_gpt
+2. Send to GPT-5.6 (gateway) → result_gpt
 3. Send to Gemini 3.1 Pro (gateway) → result_gemini
 4. Compare and synthesize best answer
 ```
@@ -108,7 +201,7 @@ Each model does what it's best at:
 ```
 1. Gemini 3.1 Pro → summarize large input (2M context)
 2. Claude Opus 5 → deep analysis of summary
-3. GPT-5.4 → format as structured JSON output
+3. GPT-5.6 → format as structured JSON output
 ```
 
 ## Agents
@@ -144,7 +237,7 @@ When presenting multi-model results:
 ### Claude Opus 5 (native)
 [result]
 
-### GPT-5.4 (via Gateway)
+### GPT-5.6 (via Gateway)
 [result]
 
 ### Gemini 3.1 Pro (via Gateway)
@@ -221,12 +314,18 @@ else:
 
 `gpt-4o*` — старая schema. Только `gpt-5*` / `o*` — новая.
 
+**Зеркальная ловушка на стороне Claude:** у Claude 4.7 и новее (Opus 5, Sonnet 5,
+Fable 5.1) ручек `temperature` / `top_p` / `top_k` больше нет — недефолтное значение
+даёт 400, а в Python SDK v1.0+ параметра нет вовсе и получится `TypeError`. Ветку
+Anthropic по шаблону выше не копировать: сэмплинг не передавать, «креативность»
+регулировать промптом и `effort`.
+
 ### 3. Fallback chain с last_error reporting
 
 Один primary + список fallbacks. В логах `tried` + `last_error` — без них дебажить «всё упало» нельзя:
 
 ```python
-DEFAULT = os.environ.get("AGENT_MODEL", "gpt-5.4-mini")
+DEFAULT = os.environ.get("AGENT_MODEL", "gpt-5-mini")  # id из config/models.md; gpt-5.4-* в каноне нет
 FALLBACK = [m for m in os.environ.get(
     "AGENT_MODEL_FALLBACK",
     "gemini-3-flash-preview,deepseek-chat,kimi-k2-0905-preview"

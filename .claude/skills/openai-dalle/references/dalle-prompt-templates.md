@@ -1,7 +1,7 @@
 # DALL-E / gpt-image prompt templates (перенесено из SKILL.md при компактизации 2026-07-19)
 
 > Шаблоны писались под DALL-E 3, работают и для gpt-image-2 (тот же endpoint `images.generate`).
-> Канон: дефолт генерации картинок = NB2 (`config/models.md`, skill `image-generation`) — эти шаблоны для случаев, когда нужен именно OpenAI.
+> Канон: Лестница: NB2 Flash (дёшево, дефолт) → NB Pro (подороже) → `gpt-image-2.5-sunburst` (лучшее). Канон — `config/models.md`. NB2 — дефолт по ЦЕНЕ, а не по качеству — эти шаблоны для случаев, когда нужен именно OpenAI.
 
 ## Хелпер сборки промпта
 
