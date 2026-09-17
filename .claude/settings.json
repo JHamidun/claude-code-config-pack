@@ -244,7 +244,7 @@
     "feature-dev@claude-plugins-official": true,
     "firecrawl@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
-    "github@claude-plugins-official": true,
+    "github@claude-plugins-official": false,
     "greptile@claude-plugins-official": true,
     "linear@claude-plugins-official": false,
     "notion@claude-plugins-official": false,
