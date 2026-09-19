@@ -163,7 +163,7 @@ def soften(prompt):
 
 > ⚠️ **Проверено 09.09.2026: дефолтный путь не работает.** `RUNWAY_JWT` истёк 31.07.2026 и лежит просроченным 40 дней — любой вызов отдаёт 401. Здесь раньше стояло просто «(default)», без оговорок, и это вводило в заблуждение: пайплайн выглядел рабочим из коробки, а на деле падал на первом же запросе.
 >
-> **Снять новый токен может не помочь.** 22.06.2026 подписка уже сваливалась на free plan, и Runway отказывал и в `exploreMode`, и в stable (память `veo31-image-to-video-canon-lock-2026-06-22`). Порядок диагностики: `runway_client.py token-status` (offline-проверка срока, сеть не нужна) → **план** в `/v1/profile` → и только потом новый токен. Автоматики обновления нет нигде: только руками, `localStorage.RW_USER_TOKEN` на app.runwayml.com.
+> **Снять новый токен может не помочь.** 22.06.2026 подписка уже сваливалась на free plan, и Runway отказывал и в `exploreMode`, и в stable (разбор 22.06.2026). Порядок диагностики: `runway_client.py token-status` (offline-проверка срока, сеть не нужна) → **план** в `/v1/profile` → и только потом новый токен. Автоматики обновления нет нигде: только руками, `localStorage.RW_USER_TOKEN` на app.runwayml.com.
 
 **Версия Seedance.** Сам код вызова не менялся — `generate_seedance()` теперь **сам определяет версию** через `/v1/profile/features`, хардкода версии в клиенте нет. Фон: у Seedance 2.0 появилась преемница **Seedance 2.5** (вход текст/картинка/видео/аудио, 4–30 с либо Auto, 480p/720p/1080p, до 50 референсов за генерацию = 30 картинок + 10 видео + 10 аудио, встроенный звук, четыре режима Reference / Keyframe / Edit / Extend, мультикадр из одной генерации). Снята ли 2.0 — Runway нигде не сказал, сказано только «2.5 — преемник 2.0». ⚠️ **API-слаг официальные страницы не называют вовсе** (в справке только имена нод интерфейса), поэтому не подставляй идентификатор вроде `seedance_2_5` руками — полагайся на автоопределение. Режимы, кредиты и грабли → `references/runway-seedance.md`.
 
@@ -214,8 +214,8 @@ Veo её тоже корёжит. Русский текст — **оверлее
 ### HeyGen Avatar V (владелец конфига talking head)
 
 ```python
-# avatar_id=<HEYGEN_AVATAR_ID>
-# voice_id=<HEYGEN_VOICE_ID>
+# avatar_id=<id своего аватара из кабинета HeyGen>
+# voice_id=<id своего голоса из кабинета HeyGen>
 # engine=avatar_v, 9:16, 1080p, $0.0667/sec
 # Готовая обвязка в `shorts-pipeline-владелец конфига` skill
 ```
@@ -309,7 +309,7 @@ from elevenlabs import ElevenLabs
 client = ElevenLabs(api_key=os.getenv('ELEVENLABS_API_KEY'))
 
 audio = client.text_to_speech.convert(
-    voice_id='<ELEVENLABS_VOICE_ID>',  # владелец конфига clone
+    voice_id=os.getenv('ELEVENLABS_VOICE_ID'),  # свой голос: id клона из кабинета ElevenLabs
     text='Сегодня разберём, как…',
     model_id='eleven_multilingual_v2',
     voice_settings={
