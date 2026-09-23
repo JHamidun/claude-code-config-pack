@@ -17,10 +17,23 @@ import argparse
 import json
 import os
 import re
+import stat
 import sys
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from typing import Iterable, Sequence
+
+
+def _is_junction(p: Path) -> bool:
+    """NTFS junction? _is_junction(Path) exists only on Python 3.12+; older ones read the tag."""
+    try:
+        return p.is_junction()
+    except AttributeError:
+        try:
+            tag = getattr(os.lstat(p), "st_reparse_tag", 0)
+        except OSError:
+            return False
+        return tag == getattr(stat, "IO_REPARSE_TAG_MOUNT_POINT", 0xA0000003)
 
 # --------------------------------------------------------------------------- #
 # Лимиты
@@ -406,10 +419,11 @@ def _collect(root: Path, include_vendor: bool, stats: ScanStats) -> tuple[list[P
             sub = here / d
             if d in SKIP_DIRS:
                 continue
-            if sub.is_symlink():
+            # Python 3.13 on Windows: is_symlink() is False for an NTFS junction, and os.walk descends into it.
+            if sub.is_symlink() or _is_junction(sub):
                 findings.append(Finding(
                     _rel(sub, root), 0, "CRITICAL", "fs.symlink",
-                    "каталог — символическая ссылка, содержимое не проверено (может указывать наружу)",
+                    "каталог — символическая ссылка или junction, содержимое не проверено (может указывать наружу)",
                 ))
                 continue
             if d in VENDOR_DIRS and not include_vendor:
@@ -420,7 +434,7 @@ def _collect(root: Path, include_vendor: bool, stats: ScanStats) -> tuple[list[P
 
         for name in filenames:
             p = here / name
-            if p.is_symlink():
+            if p.is_symlink() or _is_junction(p):
                 findings.append(Finding(
                     _rel(p, root), 0, "CRITICAL", "fs.symlink",
                     "файл — символическая ссылка, содержимое не проверено",
@@ -672,7 +686,7 @@ def _scan_mcp(rel: str, raw: str, servers: object, out: list[Finding]) -> None:
                                f"(процесс с моими правами, без песочницы)"))
 
 
-def _scan_package_json(rel: str, raw: str, data: dict, base_dir: Path, out: list[Finding]) -> None:
+def _scan_package_json(rel: str, raw: str, data: dict, base_dir: Path, out: list[Finding], root: Path) -> None:
     scripts = data.get("scripts")
     if not isinstance(scripts, dict):
         return
@@ -685,9 +699,36 @@ def _scan_package_json(rel: str, raw: str, data: dict, base_dir: Path, out: list
         # значение может указывать на локальный скрипт — вскрываем его
         hidden_reason = ""
         for m in re.finditer(r"[\w./\\-]+\.(?:js|cjs|mjs|ts|py|sh|ps1)", value):
-            cand = (base_dir / m.group(0)).resolve()
+            token = m.group(0)
+            boundary = os.path.normpath(os.path.abspath(root if root.is_dir() else root.parent))
+            # Lexical checks only: resolve() on a UNC token would open an SMB session (NTLM leak)
+            # before any boundary test could run.
+            pure = PureWindowsPath(token)
+            joined = os.path.normpath(os.path.join(os.path.abspath(base_dir), token))
+            inside = False
+            if not (pure.drive or pure.root or token.startswith(("\\\\", "//"))):
+                try:
+                    inside = os.path.commonpath([os.path.normcase(joined), os.path.normcase(boundary)]) == os.path.normcase(boundary)
+                except ValueError:  # different drives
+                    inside = False
+            if not inside:
+                out.append(Finding(rel, n, "CRITICAL", "fs.reference_escape",
+                                   "Lifecycle reference escapes the audited target; not opened"))
+                continue
+            # Walk from the boundary down with lstat so no link is ever followed.
+            cur, linked = Path(boundary), False
+            for part in Path(os.path.relpath(joined, boundary)).parts:
+                cur = cur / part
+                if cur.is_symlink() or _is_junction(cur):
+                    linked = True
+                    break
+            if linked:
+                out.append(Finding(rel, n, "CRITICAL", "fs.symlink",
+                                   "Lifecycle reference contains a filesystem link; not opened"))
+                continue
+            cand = Path(joined)
             try:
-                if cand.is_file() and not cand.is_symlink() and cand.stat().st_size < MAX_FILE_BYTES:
+                if cand.is_file() and not cand.is_symlink() and not _is_junction(cand) and cand.stat().st_size < MAX_FILE_BYTES:
                     body = cand.read_bytes().decode("utf-8", errors="replace")
                     if _LIFECYCLE_DANGER.search(body) or _CODE_RULES[2][2].search(body):
                         danger = True
@@ -714,7 +755,7 @@ def _scan_json_file(rel: str, path: Path, raw: str, root: Path) -> list[Finding]
         return out
 
     if name == "package.json":
-        _scan_package_json(rel, raw, data, path.parent, out)
+        _scan_package_json(rel, raw, data, path.parent, out, root)
 
     if name in {"hooks.json", "plugin.json", "settings.json", "settings.local.json"} or "hooks" in data:
         _scan_hooks(rel, raw, data.get("hooks"), out)
@@ -748,8 +789,8 @@ def _scan_json_file(rel: str, path: Path, raw: str, root: Path) -> list[Finding]
 
 def scan(target: Path, include_vendor: bool = False) -> tuple[list[Finding], ScanStats, str]:
     root = target.expanduser()
-    if root.is_symlink():
-        raise ScanError("цель — символическая ссылка; проверять чужой код по ссылке нельзя")
+    if root.is_symlink() or _is_junction(root):
+        raise ScanError("цель — символическая ссылка или junction; проверять чужой код по ссылке нельзя")
     if not root.exists():
         raise ScanError(f"цель не найдена: {_safe(str(root), 200)}")
     root = root.resolve()
@@ -791,7 +832,7 @@ ALL_RULES = [
     "hooks.registered", "hooks.dangerous_command",
     "mcp.server_declared", "mcp.arbitrary_command", "mcp.remote_server",
     "npm.lifecycle_script", "npm.obfuscated_lifecycle",
-    "config.permission_widening", "fs.symlink", "fs.binary_artifact",
+    "config.permission_widening", "fs.symlink", "fs.binary_artifact", "fs.reference_escape",
 ]
 
 

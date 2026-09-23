@@ -209,7 +209,7 @@ python ~/.claude/skills/leak-scan/scripts/skill_injection_scan.py <цель> [о
 python ~/.claude/skills/leak-scan/scripts/skill_injection_scan.py ./downloaded-skill
 ```
 
-### Что ловит (35 правил, severity CRITICAL/WARN/INFO)
+### Что ловит (36 правил, severity CRITICAL/WARN/INFO)
 
 | Группа | Правила | Сигнал |
 |--------|---------|--------|
@@ -222,7 +222,7 @@ python ~/.claude/skills/leak-scan/scripts/skill_injection_scan.py ./downloaded-s
 | **Хуки** (нет у источника) | `hooks.registered`, `hooks.dangerous_command` | плагин регистрирует хук, что выполнится **на каждом** вызове инструмента (matcher `*`) |
 | **MCP** (нет у источника) | `mcp.server_declared`, `mcp.arbitrary_command`, `mcp.remote_server` | `.mcp.json` поднимает сервер с произвольной командой (`bash -c …`) или удалённый хост, куда уходит сессия |
 | **npm lifecycle** (нет у источника) | `npm.lifecycle_script`, `npm.obfuscated_lifecycle` | `postinstall/preinstall`, исполняющий код при `npm install`; вскрывает и локальный скрипт, который тот вызывает (кейс camofox — postinstall маскировал `spawn`) |
-| Файловая система | `fs.symlink`, `fs.binary_artifact` | симлинк (содержимое не проверено, может указывать наружу); исполняемый бинарник без исходников |
+| Файловая система | `fs.symlink`, `fs.binary_artifact`, `fs.reference_escape` | симлинк или NTFS junction (внутрь не заходит, содержимое не проверено, может указывать наружу); исполняемый бинарник без исходников; скрипт из `postinstall`/`preinstall`, путь к которому ведёт за пределы проверяемой папки или через ссылку, — не открывается (граница проверяется по тексту пути, поэтому UNC-путь `\\host\share` не вызывает подключения по SMB) |
 
 ### Как читать результат
 
