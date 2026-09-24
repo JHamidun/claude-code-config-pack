@@ -1,0 +1,5 @@
+# Read by the Codex harness (not the agent); Claude Code reads SKILL.md frontmatter instead.
+interface:
+  display_name: "Sketch Course Video"
+  short_description: "Монтаж уроков со скетч-анимацией и субтитрами"
+  default_prompt: "Используй $sketch-course-video, чтобы собрать урок из раздельных записей со скетч-анимацией и проверить результат."

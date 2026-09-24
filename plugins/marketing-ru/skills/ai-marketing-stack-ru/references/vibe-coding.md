@@ -97,8 +97,8 @@ use-case #6 из Cursor-OS, доведённый до полной замены 
 - **fal.ai** — proxy к Nano Banana / Gemini Image: «сам Claude сказал, что у него
   прямее всех».
 - **Прямой Google AI Studio ключ** — альтернатива с прозрачными ценами.
-- Если у тебя уже есть `local-gateway` (HTTP 127.0.0.1:GATEWAY_PORT, 0 token spend) +
-  `nano-banana-pro` — это предпочтительный путь, не нужен внешний proxy.
+- Свой ключ + навык `nano-banana-pro` / `image-generation` — предпочтительный
+  путь: внешний proxy не нужен, платишь провайдеру напрямую.
 
 ---
 
@@ -113,7 +113,7 @@ use-case #6 из Cursor-OS, доведённый до полной замены 
 | ревизия архитектуры web-приложения | агент `code-reviewer`, агент `software-architect` |
 | прототип с состоянием и формами | `interactive-prototype` |
 
-Если встретишь чужой скилл под ту же задачу — прогони его через `skill-audit` до установки.
+Если встретишь чужой скилл под ту же задачу — прогони его через `skill-manager` (режим «Аудит») до установки.
 
 ---
 
@@ -126,7 +126,7 @@ use-case #6 из Cursor-OS, доведённый до полной замены 
 - Маркетолог становится **оркестратором AI-агентов**, а не исполнителем.
 
 > Когда vibe-coded инструмент перерастает в **продакшн-бот** (Telegram, деплой,
-> cron, клиент) — это agent-builder tooling (Hermes/OpenClaw). Vibe-coding
+> cron, клиент) — это `autonomous-agent-creator`. Vibe-coding
 > здесь = быстрые ad-hoc инструменты «за одну сессию», не production-grade боты.
 
 ---

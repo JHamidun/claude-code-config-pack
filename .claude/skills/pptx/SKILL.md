@@ -208,6 +208,19 @@ soffice --headless --convert-to pdf --outdir out/ deck.pptx
 `/Applications/LibreOffice.app/Contents/MacOS/soffice`, Windows
 `C:\Program Files\LibreOffice\program\soffice.exe`.
 
+Без LibreOffice, на Windows с установленным PowerPoint — `~/.claude/tools/office_render.py`:
+PowerPoint сохраняет PDF, pdftoppm режет его на слайды (`<имя>-pptx-N.png`),
+скрипт отдаёт JSON `{"pdf": ..., "pngs": [...]}`.
+
+```bash
+python ~/.claude/tools/office_render.py deck.pptx --out out/
+```
+
+PowerPoint однооконный. Если он уже открыт или его откроют во время рендера,
+скрипт закрывает только свою презентацию: чужие окна не закрывает, процесс не
+убивает, изменённые настройки (макросы, предупреждения) возвращает. Нужны `pywin32`,
+`psutil` и Poppler (`pdftoppm` в `PATH` или путь в переменной `PDFTOPPM`).
+
 ---
 
 ## Грабли

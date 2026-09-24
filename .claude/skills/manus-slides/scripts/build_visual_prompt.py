@@ -26,7 +26,7 @@
     python build_visual_prompt.py --subject "команда за столом смотрит на график" \\
         --role deliver_payload --light golden_hour --style editorial --aspect 16:9
 
-    python build_visual_prompt.py --subject "герой у сгоревшей машины" --content portrait \\
+    python build_visual_prompt.py --subject "герой у сгоревшей машины" --content portrait_medium \\
         --fov 29 --blocking "стоит в метре от машины, ладонь на капоте" \\
         --gaze "смотрит на собеседника" --facing "корпус развёрнут к камере вполоборота"
 

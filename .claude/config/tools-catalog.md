@@ -12,6 +12,8 @@
 - `gmail_download_attachments.py` — Download PDF attachments from Gmail messages. Usage: python gmail_download_attachments.py <email
 - `gmail_search.py` — Gmail Multi-Account Search Search emails across all authorized Gmail accounts.
 - `gmail_send.py` — Отправка писем через Gmail — то, чего в конфиге не было.
+- `jev_client.py` — Jev (TypeSafe): модель решений вместо LLM — да/нет, выбор из N, оценка по шкале; CLI и модуль.
+- `office_render.py` — DOCX/PPTX/XLSX → PDF → PNG через установленный Microsoft Office (Windows, COM), без LibreOffice; JSON {pdf, pngs}.
 - `prompt_router.py` — Prompt Router — UserPromptSubmit hook script. Reads prompt from stdin JSON, matches keywords fro
 - `search_chats.py` — Claude Code Chat Search — SQLite FTS5 full-text search over session history.
 - `tg_bot.py` — tg_bot.py — полный инструмент Telegram Bot API: ВСЁ, что умеет бот, из CLI.

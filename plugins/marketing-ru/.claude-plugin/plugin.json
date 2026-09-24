@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "marketing-ru",
   "displayName": "Marketing Strategy",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Offers, pricing, positioning, launches, retention, referrals, growth loops, JTBD, PR outreach, marketing team building.",
   "author": {
     "name": "Zhemal Khamidun",

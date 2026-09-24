@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "ai-gateways",
   "displayName": "Multi-Model Gateways",
-  "version": "0.1.0",
-  "description": "Route to GPT, Gemini, Kimi, DeepSeek, Perplexity for cross-model work.",
+  "version": "0.2.0",
+  "description": "Route to GPT, Gemini, Kimi, DeepSeek, Perplexity for cross-model work; Jev decision model for yes/no, choice and scoring.",
   "author": {
     "name": "Zhemal Khamidun",
     "url": "https://github.com/JHamidun"

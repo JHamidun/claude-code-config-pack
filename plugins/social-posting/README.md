@@ -11,6 +11,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `email-imap` | Generic IMAP/SMTP CLI for any mailbox — read, search, send, and download attachments with no external dependencies. |
 | `sms-twilio` | Send SMS through the Twilio REST API — single and bulk sends with dry-run guards, delivery status, history, balance. |
 | `tg-bot-publish` | Publish and manage in Telegram through a bot (Bot API) — channel posts, rich layout, broadcasts, inline buttons. |
+| `use-spark` | Почта, календарь и контакты из Spark через CLI: письма, треды, поиск, свободные слоты, черновики, встречи. |
 
 ## Install
 

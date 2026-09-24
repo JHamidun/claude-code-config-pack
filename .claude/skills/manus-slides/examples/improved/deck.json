@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "title": "Exec-sketch: улучшенный вариант (proof 23.09.2026)",
+  "language": "Russian",
+  "canvas": {
+    "width": 1920,
+    "height": 1080
+  },
+  "branding": [],
+  "slides": [
+    {
+      "id": "light-v4",
+      "title": "Интерфейс тоже меняем словами",
+      "theme": "exec-sketch-light-calm",
+      "text": [],
+      "visual": "Before/after card layout",
+      "art_prompt": "ONE finished 16:9 business teaching slide in Russian. Whole-slide exec-sketch semantic visualization, not an isolated illustration, not a collage of slides. Palette: warm paper #F7F3E8 as the whole background, warm near-black ink #1A1814, ONE marigold yellow #FFC000 (not lemon), quiet secondary #6B6456 for footnotes. Clean condensed Oswald-style typography for massive readable heading and Montserrat-like body labels. Hand-drawn confident slightly imperfect ink diagrams, arrows, illustrative details integrated with words. No physical whiteboard, no room, no chalkboard texture, no 3D, no generic decorative people. Precise Cyrillic. Render exact supplied strings once, no invented text. No logos, no footer (authentic optional logos added separately). All content inside 6% side margins; title begins at 13% canvas height, bottom content ends by 90%; upper 8% is continuous background, never draw an empty box. Visual explanation dominant, each drawing has a meaning.\nACCENT BUDGET. Yellow #FFC000 marks at most two things on this slide: ONE key phrase (in the heading or the takeaway) and the ONE connector or object that carries the active idea. Everything else is ink only. At most ONE small burst of 2-3 emphasis rays on the whole slide, placed at the active idea; no rays around the heading, frames, captions or corners. Section captions are plain ink text without highlighter bars. On a light canvas yellow is only a filled shape with an ink outline or a highlighter behind ink text, never a thin yellow line on paper.\nTYPE HIERARCHY. Three sizes plus a footnote: heading; the instruction or takeaway at about half the heading size; object labels at about a third; an optional footnote at the object-label size in the secondary color with no highlight.\nDRAWING LANGUAGE. Outline-first line drawings; no solid white fills and no filled shape larger than a label, except the ONE active object. Repeated items share an identical structure. No stock pictograms: no mountain-and-sun image placeholders, no random squares, circles or triangles as bullets, no decorative braces. Line weights stay equal on light and dark slides: main contours about 6 px at 1920 px width, details about 3 px, connectors and arrows about 10 px.\nLIGHT warm paper #F7F3E8. Heading \"Интерфейс тоже меняем словами\" in ink; only its last word sits on a yellow highlighter stroke. Conceptual sketch comparison occupying main canvas: left ONE undifferentiated block of cramped wavy text lines inside a single outline, no separators, no icons, under \"Было\". Giant hand-drawn yellow arrow with an ink outline in center; above it a LARGE speech bubble \"Раздели записи на карточки\", the largest text after the heading and the only place with emphasis rays. The before and after captions are plain ink, no highlighter. Right three separated tidy clipping cards under \"Хотим\". One card labels \"Дата\" then \"Текст\" then \"Ссылка\"; the other two repeat exactly the same three rows (calendar icon, text icon, link icon, ruled strokes) without labels, no invented copy. Quiet footnote at the bottom \"Схема желаемого изменения\" in the secondary color, no highlighter, no rays. This is explicitly conceptual before/desired, not false screenshot or evidence. Even gaps between the cards show the spacing; no brackets.",
+      "notes": {
+        "spoken": [
+          "Теперь посмотрим не на новую функцию, а на то, насколько удобно пользоваться тем, что уже получилось. Допустим, записи сохраняются, но показываются сплошным списком. Технически задача решена, а найти нужную мысль среди текста всё равно сложно. Здесь полезно описать конкретное изменение: раздели записи на карточки, отдельно покажи дату, сам текст и ссылку на источник.",
+          "Мы не просим сделать просто красиво. Мы объясняем, что именно должно стать удобнее. После изменения нужно открыть несколько записей и проверить: текст не обрезался, дата видна, ссылка ведёт туда, откуда мы сохранили фрагмент. Если чего-то не хватает, добавляем ещё одно понятное требование. Важно не потерять рабочее сохранение, пока мы меняем внешний вид. На следующем слайде разберём, как это проверить."
+        ],
+        "stage": [
+          "[СЛАЙД] Пример схемы, не реальный интерфейс. Сделать паузу после вывода."
+        ]
+      },
+      "sources": [
+        "Bundled reviewed exec-sketch artwork; illustrative teaching example"
+      ],
+      "draw_order": [
+        "initial object",
+        "connector",
+        "result",
+        "final emphasis"
+      ],
+      "binding": {
+        "image": "media/light-v4-996b94df9336d164.png",
+        "image_sha256": "996b94df9336d164f4a4dacd8dd29dc92c5c05036b6ada912b40edf06281e3eb",
+        "prompt_sha256": "165e80fbe7dcc9ad1199a1bd3dc07dddcb647a117a4d4976f5ea5130b172840b",
+        "art_signature": "f5252cdcb6dbeb8c8b1c85fbd0079f7c73867fc55baa6452cdd8426e488f8fb3",
+        "provider": "gpt-image-2.5-sunburst"
+      },
+      "art_inset": 0.92
+    },
+    {
+      "id": "dark-v4",
+      "title": "После правки проверяем заново",
+      "theme": "exec-sketch-dark-calm",
+      "text": [],
+      "visual": "Retest feedback loop",
+      "art_prompt": "ONE finished 16:9 business teaching slide in Russian. Whole-slide exec-sketch semantic visualization, not an isolated illustration, not a collage of slides. Palette: black background #000000, warm off-white ink #F2EFE6 (not pure white), ONE marigold yellow #FFC000 (not lemon, the same yellow as on light slides), quiet secondary #A8A49A. Clean condensed Oswald-style typography for massive readable heading and Montserrat-like body labels. Hand-drawn confident slightly imperfect ink diagrams, arrows, illustrative details integrated with words. No physical whiteboard, no room, no chalkboard texture, no 3D, no generic decorative people. Precise Cyrillic. Render exact supplied strings once, no invented text. No logos, no footer (authentic optional logos added separately). All content inside 6% side margins; title begins at 13% canvas height, bottom content ends by 90%; upper 8% is continuous background, never draw an empty box. Visual explanation dominant, each drawing has a meaning.\nACCENT BUDGET. Yellow #FFC000 marks at most two things on this slide: ONE key phrase (in the heading or the takeaway) and the ONE connector or object that carries the active idea. Everything else is ink only. At most ONE small burst of 2-3 emphasis rays on the whole slide, placed at the active idea; no rays around the heading, frames, captions or corners. Section captions are plain ink text without highlighter bars. On a light canvas yellow is only a filled shape with an ink outline or a highlighter behind ink text, never a thin yellow line on paper.\nTYPE HIERARCHY. Three sizes plus a footnote: heading; the instruction or takeaway at about half the heading size; object labels at about a third; an optional footnote at the object-label size in the secondary color with no highlight.\nDRAWING LANGUAGE. Outline-first line drawings; no solid white fills and no filled shape larger than a label, except the ONE active object. Repeated items share an identical structure. No stock pictograms: no mountain-and-sun image placeholders, no random squares, circles or triangles as bullets, no decorative braces. Line weights stay equal on light and dark slides: main contours about 6 px at 1920 px width, details about 3 px, connectors and arrows about 10 px.\nBLACK background. Heading \"После правки проверяем заново\". Three large semantic illustrations in a closed oval loop: extension puzzle piece with circular refresh arrow labeled \"Перезагрузить расширение\"; webpage outline with ruled text lines (no image placeholder) and a reload arrow, labeled \"Обновить страницу\"; an outlined quote card (not filled white) entering a clipping card with magnifying glass, labeled \"Сохранить и проверить\". Stages one and two are off-white outline drawings without yellow fill; the puzzle piece is outlined, not filled. Stage-to-stage arrows are off-white. Only stage three (magnifying glass over the saved card) and the return arrow are yellow; the single burst of rays sits at the magnifying glass. Main bottom sentence \"Вид изменился. Сохранение работает?\" In that sentence the first statement is off-white and the question is yellow. A question mark is drawn inside the magnifying glass of stage three, not next to the sentence; no checkmark. Keep flow clean, no boxes enclosing stages.",
+      "notes": {
+        "spoken": [
+          "После правки мы не останавливаемся на сообщении о том, что всё готово. Если меняли расширение, сначала перезагружаем его в браузере, затем обновляем страницу, на которой будем проверять результат. И только после этого повторяем действие пользователя: выделяем текст, сохраняем его и открываем список записей.",
+          "Почему нужен весь этот круг? Иначе можно смотреть на старую версию страницы и решить, что исправление не сработало. А можно увидеть новый интерфейс и не заметить, что сохранение сломалось. Поэтому проверяем две вещи отдельно: внешний вид действительно изменился, а основное действие всё ещё работает. Если обнаружили ошибку, описываем не просто «не работает», а конкретно: что нажали, чего ожидали и что произошло. С этим наблюдением возвращаемся к агенту и делаем следующий небольшой шаг."
+        ],
+        "stage": [
+          "[СЛАЙД] Пример схемы, не реальный интерфейс. Сделать паузу после вывода."
+        ]
+      },
+      "sources": [
+        "Bundled reviewed exec-sketch artwork; illustrative teaching example"
+      ],
+      "draw_order": [
+        "initial object",
+        "connector",
+        "result",
+        "final emphasis"
+      ],
+      "binding": {
+        "image": "media/dark-v4-77880b4ae004caba.png",
+        "image_sha256": "77880b4ae004caba4bf8ac5b8aae4dc1e6c7e4c7e8971a50e62c29012d10c265",
+        "prompt_sha256": "bcc21d62d5c1965d882c1ac01e71ccd302b966420edba2ed80778b484320843c",
+        "art_signature": "241b3631609b151e6085837735bb2860e30a731ba8962d261928859de61600cd",
+        "provider": "gpt-image-2.5-sunburst"
+      },
+      "art_inset": 0.92
+    }
+  ]
+}

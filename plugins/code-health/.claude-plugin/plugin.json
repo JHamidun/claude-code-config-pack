@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "code-health",
   "displayName": "Code Health",
-  "version": "0.1.0",
-  "description": "Bug/cleanup/deps/reuse/security health audits, security audit, threat hunting.",
+  "version": "0.2.0",
+  "description": "Bug/cleanup/deps/reuse/security health audits, security audit, threat hunting, finding and vetting third-party skills before install.",
   "author": {
     "name": "Zhemal Khamidun",
     "url": "https://github.com/JHamidun"

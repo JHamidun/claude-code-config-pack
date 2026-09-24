@@ -12,7 +12,7 @@
 | Инструмент | Назначение | Родной скилл |
 |------------|------------|----------|
 | **Perplexity (API)** | анализ выдачи, citations, summary, чтение сайтов/лендингов; интегрируется в Cursor для анализа конкурентов | `perplexity` |
-| **Gemini / GPT** | разбор контента, видео по сценам, генерация анализа | `local-gateway`, `claude-api` |
+| **Gemini / GPT** | разбор контента, видео по сценам, генерация анализа | `gemini-3-pro`, `claude-api` |
 | **Apify** | парсинг соцсетей, видео и лендингов конкурентов | `apify-scraping` |
 | **Atria** | подписка на конкурентов: активные креативы, хуки, бюджеты, longest-running ads | внешний |
 | **Meta Ads Library** | анализ креативов конкурентов | — |
@@ -41,9 +41,9 @@
 | **Kling / Runway / Pika** | короткие клипы, монтаж | `video-generation` |
 | **Revit AI** | консистентные персонажи без статики | — |
 | **HeyGen / Synthesia** | говорящие аватары | `heygen` |
-| **D-ID** | лица + AI-речь | `did` / `d-id` |
+| **D-ID** | лица + AI-речь | `did` |
 | **ElevenLabs** | голос, эмоции, интонации | `elevenlabs` |
-| **Gemini / GPT** | разбор видео по сценам | `local-gateway` |
+| **Gemini / GPT** | разбор видео по сценам | `gemini-3-pro` |
 
 Форматы: UGC «из жизни», talking-head без съёмки, POV-сцены, lifestyle-
 монологи, promo без продакшна, виртуальные ведущие. Формат: хук → развитие → CTA,
@@ -55,9 +55,9 @@
 
 | Инструмент | Назначение | Родной скилл |
 |------------|------------|----------|
-| **Nano Banana / Gemini Image** | изображения для лендингов и креативов | `nano-banana-pro`, `local-gateway` |
-| **fal.ai** | proxy к Gemini Image для Claude Code | внешний (есть local-gateway) |
-| **Google AI Studio (ключ)** | прямой Gemini-ключ | `local-gateway` |
+| **Nano Banana / Gemini Image** | изображения для лендингов и креативов | `nano-banana-pro`, `image-generation` |
+| **fal.ai** | proxy к Gemini Image для Claude Code | внешний |
+| **Google AI Studio (ключ)** | прямой Gemini-ключ (`GOOGLE_API_KEY`) | `gemini-3-pro` |
 | **Midjourney / DALL-E** | креативы | `image-generation`, `openai-dalle` |
 
 ---
@@ -73,7 +73,7 @@
 | **Apify** | сбор контента с аккаунтов по ключевым словам (Actor для IG) | `apify-scraping` |
 | **trndwtch.com** | платформа трендвотчинга | внешний |
 | **virlo.ai / meedro.com / viralscope.io** | аналоги trndwtch | внешние |
-| **GitHub youruser/ninja_trendwatch** | open-source vibe-coded трендвотчинг (нужен свой Apify-ключ) | референс |
+| **Свой трендвотчер на Apify** | вместо подписки — 100 строк vibe-coded кода: Apify Actor тянет посты 20 аккаунтов, считает z-score вовлечённости. Рецепт — `references/vibe-coding.md`, метод — `trend-engine` | свой скрипт |
 
 ---
 
@@ -92,7 +92,7 @@
 
 | Инструмент | Назначение | Родной скилл |
 |------------|------------|----------|
-| **[AnalyticsCompany]** | сквозная аналитика (от $1k/мес) | `full-funnel-analytics-ru` (методология) |
+| **Платформа сквозной аналитики** (Roistat, Calltouch, CoMagic и аналоги) | сведение рекламных расходов с выручкой из CRM, от $1k/мес | `full-funnel-analytics-ru` (методология) |
 | **Supabase + Notion** | personal DWH «за одну сессию» | внешние / MCP |
 | **Cursor BI-агент** | подключение к метрикам/кабинетам, поиск аномалий | этот скилл (use-case #4) |
 | **LiveDune** | аналитика контента | — |
@@ -112,8 +112,9 @@
 
 ## Принцип выбора инструмента
 
-1. **Сначала смотри родной скилл** (правая колонка) — 0 token spend через
-   `local-gateway`, уже настроено.
+1. **Сначала смотри родной скилл** (правая колонка) — он уже описывает вызов и
+   гочи, тебе остаётся положить свой ключ.
 2. Внешний сервис — только если родного нет и задача разовая.
 3. Подписки на полтора десятка SaaS часто заменяются одним Claude Code.
-4. Для production — agent-builder tooling / `n8n`, не ad-hoc vibe-coding.
+4. Для production — свой агент (`autonomous-agent-creator`) или `n8n`,
+   не ad-hoc vibe-coding.

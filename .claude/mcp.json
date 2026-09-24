@@ -196,6 +196,41 @@
         "APIFY_TOKEN": "${APIFY_API_TOKEN}"
       },
       "description": "Apify web scraping - 1600+ Actors for social media, e-commerce, search engines"
+    },
+    "skillsmp": {
+      "type": "http",
+      "url": "https://skillsmp.com/mcp",
+      "description": "SkillsMP — search the community catalog of Agent Skills (search_skills, get_skill, list_categories). Read-only, no key. Used by skill-manager. Add: claude mcp add --transport http --scope user skillsmp https://skillsmp.com/mcp"
+    },
+    "excalidraw": {
+      "type": "http",
+      "url": "https://mcp.excalidraw.com/mcp",
+      "description": "Excalidraw — diagrams right in the chat (read_me, create_view, save/read_checkpoint). No key. Use the /mcp path: the bare host answers 308. export_to_excalidraw publishes a PUBLIC link — kept in permissions.ask. Add: claude mcp add --transport http --scope user excalidraw https://mcp.excalidraw.com/mcp"
+    },
+    "publora": {
+      "type": "http",
+      "url": "https://mcp.publora.com",
+      "description": "Publora — social publishing + LinkedIn analytics/reactions/comments. Tool list is visible without login, calls need OAuth: /mcp -> publora -> Authenticate. Everything that publishes or deletes is in permissions.ask; get_upload_url/complete_media publish nothing and run without a prompt. Add: claude mcp add --transport http --scope user publora https://mcp.publora.com"
+    },
+    "higgsfield": {
+      "type": "http",
+      "url": "https://mcp.higgsfield.ai/mcp",
+      "description": "Higgsfield — image/video/audio generation (generate_image/video/audio, jobs_wait, media_upload). OAuth: /mcp -> higgsfield -> Authenticate. Without OAuth use the hf CLI of skills/video-generation/engines/higgsfield. Add: claude mcp add --transport http --scope user higgsfield https://mcp.higgsfield.ai/mcp"
+    },
+    "descript": {
+      "type": "http",
+      "url": "https://api.descript.com/v2/mcp",
+      "description": "Descript — cloud video/podcast editing. OAuth: /mcp -> descript -> Authenticate. Add: claude mcp add --transport http --scope user descript https://api.descript.com/v2/mcp"
+    },
+    "lovable": {
+      "type": "http",
+      "url": "https://mcp.lovable.dev/mcp",
+      "description": "Lovable — build websites/apps. OAuth: /mcp -> lovable -> Authenticate. Add: claude mcp add --transport http --scope user lovable https://mcp.lovable.dev/mcp"
+    },
+    "trivago": {
+      "type": "http",
+      "url": "https://mcp.trivago.com/mcp",
+      "description": "trivago — hotel search by destination or radius, destination price trends. No key. Add: claude mcp add --transport http --scope user trivago https://mcp.trivago.com/mcp"
     }
   }
 }

@@ -32,9 +32,57 @@ manifest.json schema:
 """
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
+
+
+# ---------------------------------------------------------------------------
+# Шрифт. Жёсткий "C:/Windows/Fonts/arialbd.ttf" работал только на машине автора:
+# на macOS и Linux такого пути нет, PIL кидает `OSError: cannot open resource`, и
+# бренд-карточка валит сборку ролика на первой же строке текста.
+# Порядок поиска: переменная окружения → системные шрифты трёх ОС → шрифт, который
+# ЕДЕТ В САМОМ ПАКЕ (skills/canvas-design/canvas-fonts, лицензия OFL, кириллица есть).
+# Последний пункт делает скрипт работоспособным даже там, где системных TTF нет вовсе.
+# Не нашли ничего — падаем с объяснением, а не с "cannot open resource".
+# ---------------------------------------------------------------------------
+_SYS_FONTS_BOLD = (
+    "C:/Windows/Fonts/arialbd.ttf", "C:/Windows/Fonts/segoeuib.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+    "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
+    "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+    "/Library/Fonts/Arial Bold.ttf",
+)
+_SYS_FONTS_REG = (
+    "C:/Windows/Fonts/arial.ttf", "C:/Windows/Fonts/segoeui.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+    "/usr/share/fonts/TTF/DejaVuSans.ttf",
+    "/System/Library/Fonts/Supplemental/Arial.ttf",
+    "/Library/Fonts/Arial.ttf",
+)
+
+
+def font_path(bold=True):
+    env = os.environ.get("VIDEO_FONT_BOLD" if bold else "VIDEO_FONT_REGULAR")
+    bundled = (Path(__file__).resolve().parents[2] / "canvas-design" / "canvas-fonts"
+               / ("Montserrat-Bold.ttf" if bold else "Montserrat-Regular.ttf"))
+    tried = []
+    for cand in ([env] if env else []) + list(_SYS_FONTS_BOLD if bold else _SYS_FONTS_REG) + [str(bundled)]:
+        tried.append(cand)
+        if cand and os.path.exists(cand):
+            return cand
+    sys.exit(
+        "Шрифт не найден — брэнд-карточку рисовать нечем.\n"
+        "  Искал: " + "\n         ".join(tried) + "\n"
+        "  Почини одним из двух:\n"
+        "    1) укажи свой TTF:  VIDEO_FONT_%s=/путь/к/шрифту.ttf\n"
+        "    2) поставь системные шрифты: Linux — fonts-dejavu-core или fonts-liberation;\n"
+        "       macOS — шрифты есть всегда, проверь путь выше.\n"
+        "  Запасной шрифт пака должен лежать здесь: %s" % ("BOLD" if bold else "REGULAR", bundled)
+    )
 
 
 def run(cmd: list[str], label: str) -> None:
@@ -141,8 +189,8 @@ def make_brand_card(spec: dict, aspect: str, out_dir: Path) -> Path:
 
     img = Image.new("RGB", (W, H), "black")
     draw = ImageDraw.Draw(img)
-    font_bold = "C:/Windows/Fonts/arialbd.ttf"
-    font_reg = "C:/Windows/Fonts/arial.ttf"
+    font_bold = font_path(bold=True)
+    font_reg = font_path(bold=False)
 
     for ln in spec.get("lines", []):
         text = ln["text"]

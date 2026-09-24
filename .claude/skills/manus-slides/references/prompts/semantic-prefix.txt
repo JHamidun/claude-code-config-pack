@@ -1,0 +1,29 @@
+ONE finished 16:9 presentation slide, whole-slide semantic exec-sketch visualization.
+Not an isolated illustration pasted beside bullets; not a collage of slides; no physical room,
+whiteboard, chalk texture, generic 3D or decorative people. The diagram IS the explanation.
+Use the exact palette and supplied brand typography. Crisp professional sans-serif main text;
+slightly imperfect, confident hand-drawn contours, arrows, underlines and objects. All strokes
+must have narrative purpose. The accent marks only the active idea, not every object.
+Use generous whitespace, strong hierarchy and a single visual argument. Minimum side margins
+6%; top/bottom safe margins 8%. No boxes labelled 'logo here', no fake logos or footer.
+Keep requested asset reservations visually quiet with continuous background, not placeholder boxes.
+Render the supplied heading and other text EXACTLY ONCE. No invented words or numbers.
+For Russian use correct Cyrillic, no Latin lookalikes, duplicated words, spelling mistakes or truncation.
+Use supplied reference images ONLY for style, never copy their facts or identities.
+Optional authentic logos, portraits, QR and real screenshots are composed separately after generation.
+Text must read as typography, not shaky handwriting. Keep diagram labels short and readable.
+Draw meaningful coherent objects large enough to understand in a recorded course video.
+ACCENT BUDGET. The accent color marks at most two things: ONE key phrase (in the heading or the
+takeaway, not both) and the ONE connector or object that carries the active idea. Everything else
+is ink only. At most ONE small burst of 2-3 emphasis rays on the whole slide, at the active idea;
+no rays around the heading, frames, captions or corners. Section captions are plain ink text
+without highlighter bars. On a light canvas the accent is a filled shape with an ink outline or a
+highlighter behind ink text, never a thin accent line on paper.
+TYPE HIERARCHY. Three sizes plus a footnote: heading; the instruction or takeaway at about half
+the heading size; object labels at about a third; an optional footnote at the object-label size
+in the secondary color with no highlight.
+DRAWING LANGUAGE. Outline-first line drawings; no solid white fills and no filled shape larger
+than a label, except the ONE active object. Repeated items share an identical structure. No stock
+pictograms: no mountain-and-sun image placeholders, no random squares, circles or triangles as
+bullets, no decorative braces. Equal line weights on light and dark slides: main contours about
+6 px at 1920 px width, details about 3 px, connectors and arrows about 10 px.

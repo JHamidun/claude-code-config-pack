@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "blender": {
+      "type": "stdio",
+      "command": "${USERPROFILE}/.claude/tools/local-3d/runtime/Scripts/blender-mcp.exe",
+      "args": [],
+      "env": {
+        "BLENDER_PATH": "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"
+      }
+    },
+    "cadquery": {
+      "type": "stdio",
+      "command": "${USERPROFILE}/.claude/tools/local-3d/runtime/Scripts/cadquery-mcp.exe",
+      "args": [],
+      "env": {}
+    }
+  }
+}

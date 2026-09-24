@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "office-docs",
   "displayName": "Office Documents",
-  "version": "0.1.0",
-  "description": "XLSX, PDF, EPUB, CSV analysis, file conversion & organization.",
+  "version": "0.2.0",
+  "description": "DOCX, XLSX, PDF, EPUB, CSV analysis, file conversion & organization.",
   "author": {
     "name": "Zhemal Khamidun",
     "url": "https://github.com/JHamidun"

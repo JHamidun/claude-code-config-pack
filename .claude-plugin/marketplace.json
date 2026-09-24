@@ -46,7 +46,7 @@
     {
       "name": "office-docs",
       "source": "./plugins/office-docs",
-      "description": "XLSX, PDF, EPUB, CSV analysis, file conversion & organization."
+      "description": "DOCX, XLSX, PDF, EPUB, CSV analysis, file conversion & organization."
     },
     {
       "name": "video-media",
@@ -96,7 +96,7 @@
     {
       "name": "code-health",
       "source": "./plugins/code-health",
-      "description": "Bug/cleanup/deps/reuse/security health audits, security audit, threat hunting."
+      "description": "Bug/cleanup/deps/reuse/security health audits, security audit, threat hunting, finding and vetting third-party skills before install."
     },
     {
       "name": "browser-testing",
@@ -156,7 +156,7 @@
     {
       "name": "ai-gateways",
       "source": "./plugins/ai-gateways",
-      "description": "Route to GPT, Gemini, Kimi, DeepSeek, Perplexity for cross-model work."
+      "description": "Route to GPT, Gemini, Kimi, DeepSeek, Perplexity for cross-model work; Jev decision model for yes/no, choice and scoring."
     },
     {
       "name": "google-workspace",

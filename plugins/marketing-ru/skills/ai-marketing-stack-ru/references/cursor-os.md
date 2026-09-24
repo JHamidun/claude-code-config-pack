@@ -203,8 +203,8 @@ Cursor может: искать по Perplexity API, читать сайты/н�
 | Apify | парсинг конкурентов | `apify-scraping` |
 | CRM | CRM-данные | REST API твоей CRM (Битрикс24/amoCRM/HubSpot) |
 | Tilda | публикация лендингов | `tilda` |
-| local-gateway | low-cost LLM/image | `local-gateway` |
+| Gemini / GPT / картинки | дешёвые LLM- и image-вызовы | `gemini-3-pro`, `image-generation`, `openai-dalle` |
 
 > Когда use-case вырастает в **продакшн-бот с деплоем** — переходи на
-> agent-builder tooling (Hermes/OpenClaw). Cursor-OS — для одной команды на
-> одной машине.
+> `autonomous-agent-creator` (агент на своём VPS). Cursor-OS — для одной команды
+> на одной машине.

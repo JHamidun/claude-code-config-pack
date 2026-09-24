@@ -195,7 +195,19 @@
       "PowerShell(*Stop-Computer*)",
       "PowerShell(*Restart-Computer*)"
     ],
-    "ask": [],
+    "ask": [
+      "mcp__excalidraw__export_to_excalidraw",
+      "mcp__publora__create_post",
+      "mcp__publora__update_post",
+      "mcp__publora__delete_post",
+      "mcp__publora__delete_media",
+      "mcp__publora__prune_media_reference",
+      "mcp__publora__linkedin_create_reaction",
+      "mcp__publora__linkedin_delete_reaction",
+      "mcp__publora__linkedin_create_comment",
+      "mcp__publora__linkedin_delete_comment",
+      "mcp__publora__linkedin_create_reshare"
+    ],
     "defaultMode": "bypassPermissions",
     "additionalDirectories": []
   },

@@ -8,11 +8,11 @@
 
 | | |
 |---|---:|
-| Навыков | 315 |
+| Навыков | 318 |
 | Команд (`/имя`) | 99 |
 | Агентов | 78 |
 | Правил (грузятся каждую сессию) | 19 |
-| Скриптов и инструментов | 45 |
+| Скриптов и инструментов | 47 |
 | Хуков | 11 |
 
 **Навык** — инструкция, которую модель подхватывает сама, когда задача подходит под её описание. **Команда** вызывается вручную через `/имя`. **Агент** — отдельный исполнитель со своим контекстом, ему поручают кусок работы целиком. **Правило** читается в начале каждой сессии и задаёт поведение. **Хук** срабатывает на событие, например перед выполнением команды в оболочке.
@@ -33,9 +33,9 @@
   Author skills/agents/plugins/MCP, prompt engineering, Claude API & CLI.
   Внутри: `claude-api`, `claude-cli-runner`, `content-policy`, `context-engineering`, `llm-evals`, `mcp-builder` и ещё 4
 
-**`code-health`** — Code Health. 6 навыков, 6 команд, 12 агентов.
-  Bug/cleanup/deps/reuse/security health audits, security audit, threat hunting.
-  Внутри: `health-inline`, `leak-scan`, `osint-recon`, `privacy-filter`, `security-audit`, `threat-hunting`
+**`code-health`** — Code Health. 8 навыков, 6 команд, 12 агентов.
+  Bug/cleanup/deps/reuse/security health audits, security audit, threat hunting, finding and vetting third-party skills before install.
+  Внутри: `health-inline`, `leak-scan`, `osint-recon`, `privacy-filter`, `security-audit`, `skill-audit` и ещё 2
 
 **`dev-process`** — Dev Process. 5 навыков, 8 команд, 1 агент.
   TDD, systematic debugging, planning, code review, worktrees, parallel agents.
@@ -82,9 +82,9 @@
   Content engine, de-AI text, document interlinking, Telegram posts, RU proofreading.
   Внутри: `author-voice`, `brand-voice`, `content-creation`, `content-engine`, `content-research`, `de-ai-ify` и ещё 3
 
-**`office-docs`** — Office Documents. 7 навыков.
-  XLSX, PDF, EPUB, CSV analysis, file conversion & organization.
-  Внутри: `csv-analysis`, `epub-tools`, `file-converter`, `file-organizer`, `invoice-organizer`, `pdf` и ещё 1
+**`office-docs`** — Office Documents. 8 навыков.
+  DOCX, XLSX, PDF, EPUB, CSV analysis, file conversion & organization.
+  Внутри: `csv-analysis`, `docx`, `epub-tools`, `file-converter`, `file-organizer`, `invoice-organizer` и ещё 2
 
 **`linkedin-suite`** — LinkedIn Suite. 6 навыков.
   Write, humanize, audit, plan LinkedIn posts; profile optimization; comment & reply drafting.
@@ -94,9 +94,9 @@
   Gamma, Manus slides, Marp, native PPTX create/edit/import.
   Внутри: `gamma`, `manus-slides`, `marp-presentations`, `pptx`, `pptx-editable-extractor`, `pptx-import`
 
-**`social-posting`** — Messaging & Posting. 3 навыка.
+**`social-posting`** — Messaging & Posting. 4 навыка.
   Publish to Telegram channels via bot, send SMS (Twilio), work with any IMAP/SMTP mailbox.
-  Внутри: `email-imap`, `sms-twilio`, `tg-bot-publish`
+  Внутри: `email-imap`, `sms-twilio`, `tg-bot-publish`, `use-spark`
 
 
 ### Маркетинг и продажи
@@ -132,7 +132,7 @@
 
 ### Медиа
 
-**`video-media`** — Video Production. 12 навыков, 3 команды, 9 агентов. 15.0 МБ.
+**`video-media`** — Video Production. 13 навыков, 3 команды, 9 агентов. 15.3 МБ.
   8-role production pipeline (brief to QC), generation (Runway), avatars (HeyGen/D-ID), edit, download, export, subtitles, transcripts.
   Внутри: `did`, `heygen`, `submagic`, `video-downloader`, `video-editor`, `video-export` и ещё 6
 
@@ -166,9 +166,9 @@
   Memory search/learn, chat history, daily planning, reviews, model switching, session save/restore.
   Внутри: `away-summary`, `btw`, `dream`, `memory-agent`, `save-knowledge-base`, `self-reflect` и ещё 2
 
-**`ai-gateways`** — Multi-Model Gateways. 5 навыков, 1 команда, 3 агента.
-  Route to GPT, Gemini, Kimi, DeepSeek, Perplexity for cross-model work.
-  Внутри: `deepseek`, `gemini-3-pro`, `kimi`, `multi-model-gateway`, `perplexity`
+**`ai-gateways`** — Multi-Model Gateways. 6 навыков, 1 команда, 3 агента.
+  Route to GPT, Gemini, Kimi, DeepSeek, Perplexity for cross-model work; Jev decision model for yes/no, choice and scoring.
+  Внутри: `deepseek`, `gemini-3-pro`, `jev`, `kimi`, `multi-model-gateway`, `perplexity`
 
 **`google-workspace`** — Google Workspace. 1 навык, 14 команд.
   Gmail, Docs, Sheets, Drive, Calendar, Contacts, Tasks, Meet, Chat, Ads, Analytics.
@@ -183,6 +183,7 @@
 
 - **`design-orchestrator`** — Главный дизайн-скилл: «сделай дизайн/прототип/слайды/лендинг/макет» — любой HTML-артефакт с дизайном; ведёт процесс, подключает design-скиллы
 - **`leak-scan`** — PII/деанон перед публикацией (leak_scan.py) + prompt-injection в чужом скилле (skill_injection_scan.py)
+- **`skill-manager`** — найти навык под задачу и проверить чужой навык или плагин до установки (локальный сканер + NVIDIA SkillSpector, если установлен)
 - **`n8n`** — n8n workflow automation: API, ноды, MCP + локальный каталог 2061 готового воркфлоу
 - **`playwright-automation`** — Playwright: e2e-тесты, скрапинг + демон-браузер bdo.py (параллельные сессии)
 - **`video-editor`** — Видеомонтаж FFmpeg+Python: тишина, субтитры, рефрейм 9:16

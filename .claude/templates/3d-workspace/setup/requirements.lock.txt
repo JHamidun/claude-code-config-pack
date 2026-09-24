@@ -1,0 +1,91 @@
+# Full snapshot of the local-3d runtime (uv venv, CPython 3.12.11, Windows 11, 2026-09-22).
+# The two MCP servers were installed from local checkouts at these exact upstream commits;
+# here they are written as pinned git URLs. blender-mcp additionally needs
+# setup/blender-windows-stdin.patch - the recommended build (SETUP.md) installs
+# dependencies-only.lock.txt first and then the patched checkouts with --no-deps.
+# pywin32 is Windows-only: drop that line on macOS/Linux.
+aiohappyeyeballs==2.7.1
+aiohttp==3.14.3
+aiosignal==1.4.0
+annotated-doc==0.0.5
+annotated-types==0.8.0
+anyio==4.15.1
+attrs==26.1.0
+blender-mcp @ git+https://projects.blender.org/lab/blender_mcp.git@ff54e4d8f6b09502f2f466189cca0e52b4a91643#subdirectory=mcp
+cadquery==2.8.0
+cadquery-mcp @ git+https://github.com/CadQuery/cadquery-contrib.git@06b5e50a87fcf6808859f33d84e224fce675f8d7#subdirectory=mcp-server
+cadquery-ocp==7.9.3.1.1
+cadquery-ocp-proxy==7.9.3.1.1
+casadi==3.8.1
+certifi==2026.7.22
+cffi==2.1.1
+click==8.5.0
+colorama==0.4.6
+contourpy==1.4.0
+cryptography==50.0.1
+cycler==0.12.1
+docutils==0.23
+ezdxf==1.4.4
+fonttools==4.65.0
+frozenlist==1.8.0
+h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
+httpx-sse==0.4.3
+idna==3.20
+iniconfig==2.3.0
+jsonschema==4.26.0
+jsonschema-specifications==2025.9.1
+kiwisolver==1.5.1
+llvmlite==0.49.0
+markdown-it-py==4.2.0
+matplotlib==3.11.2
+mcp==1.30.0
+mdurl==0.1.2
+more-itertools==11.1.0
+msgpack==1.2.2
+multidict==6.9.1
+multimethod==1.12
+nlopt==2.11.0
+numba==0.67.0
+numpy==2.5.3
+packaging==26.3
+pillow==12.3.0
+pluggy==1.6.0
+propcache==0.5.4
+pycparser==3.0
+pydantic==2.13.5
+pydantic-core==2.46.5
+pydantic-settings==2.15.0
+pygments==2.21.0
+pyjwt==2.14.0
+pyparsing==3.3.3
+pytest==9.1.1
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.3
+python-multipart==0.0.32
+pywin32==312
+pyyaml==6.0.3
+referencing==0.37.0
+rich==15.0.0
+rpds-py==2026.6.3
+runtype==0.5.3
+scipy==1.18.1
+shellingham==1.5.4
+six==1.17.0
+sse-starlette==3.4.11
+starlette==1.6.0
+trame==4.0.0
+trame-client==4.1.0
+trame-common==1.2.7
+trame-components==2.5.0
+trame-server==4.0.0
+trame-vtk==2.8.13
+trame-vuetify==3.2.6
+typer==0.27.2
+typing-extensions==4.16.0
+typing-inspection==0.4.4
+uvicorn==0.53.0
+vtk==9.6.2
+wslink==2.5.7
+yarl==1.25.1

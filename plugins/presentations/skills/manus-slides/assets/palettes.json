@@ -1,0 +1,47 @@
+{
+  "exec-sketch-light": {
+    "background": "#F8F5EC",
+    "ink": "#151515",
+    "accent": "#FFC000",
+    "secondary": "#766E5C",
+    "heading": "Crisp condensed Oswald-like sans serif",
+    "body": "Readable Montserrat-like sans serif",
+    "line": "Confident slightly imperfect black pen"
+  },
+  "exec-sketch-dark": {
+    "background": "#000000",
+    "ink": "#FFFFFF",
+    "accent": "#FFC000",
+    "secondary": "#ADADAD",
+    "heading": "Crisp condensed Oswald-like sans serif",
+    "body": "Readable Montserrat-like sans serif",
+    "line": "Confident slightly imperfect white pen, no chalk texture"
+  },
+  "exec-sketch-classic": {
+    "background": "#F1F3F5",
+    "ink": "#0B1021",
+    "accent": "#3B5BDB",
+    "secondary": "#C77B30",
+    "heading": "Crisp bold Manrope/Inter-like sans serif",
+    "body": "Readable neutral sans serif",
+    "line": "Indigo and copper marker diagrams; restrained white cards only when meaningful"
+  },
+  "exec-sketch-light-calm": {
+    "background": "#F7F3E8",
+    "ink": "#1A1814",
+    "accent": "#FFC000",
+    "secondary": "#6B6456",
+    "heading": "Crisp condensed Oswald-like sans serif",
+    "body": "Readable Montserrat-like sans serif",
+    "line": "Confident slightly imperfect warm-black pen"
+  },
+  "exec-sketch-dark-calm": {
+    "background": "#000000",
+    "ink": "#F2EFE6",
+    "accent": "#FFC000",
+    "secondary": "#A8A49A",
+    "heading": "Crisp condensed Oswald-like sans serif",
+    "body": "Readable Montserrat-like sans serif",
+    "line": "Confident slightly imperfect warm off-white pen, no chalk texture"
+  }
+}

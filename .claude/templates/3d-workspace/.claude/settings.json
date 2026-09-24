@@ -1,0 +1,26 @@
+{
+  "env": {
+    "MCP_TIMEOUT": "300000"
+  },
+  "permissions": {
+    "deny": [
+      "mcp__blender__execute_blender_code",
+      "mcp__blender__get_blendfile_summary_datablocks",
+      "mcp__blender__get_blendfile_summary_missing_files",
+      "mcp__blender__get_blendfile_summary_of_linked_libraries",
+      "mcp__blender__get_blendfile_summary_path_info",
+      "mcp__blender__get_blendfile_summary_usage_guess",
+      "mcp__blender__get_object_detail_summary",
+      "mcp__blender__get_objects_summary",
+      "mcp__blender__get_screenshot_of_area_as_image",
+      "mcp__blender__get_screenshot_of_window_as_image",
+      "mcp__blender__get_screenshot_of_window_as_json",
+      "mcp__blender__jump_to_tab_by_name",
+      "mcp__blender__jump_to_tab_by_space_type",
+      "mcp__blender__jump_to_view3d_object_by_name",
+      "mcp__blender__jump_to_view3d_object_data_by_name",
+      "mcp__blender__render_thumbnail_to_path",
+      "mcp__blender__render_viewport_to_path"
+    ]
+  }
+}

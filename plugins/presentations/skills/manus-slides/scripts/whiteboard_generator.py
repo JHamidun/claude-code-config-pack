@@ -2,11 +2,13 @@
 Slide Image Generator — generates presentation slides as AI images via Gemini.
 Uses Gemini Image (gemini-3.1-flash-image-preview / Nano Banana 2) for generation, packages into PPTX.
 
-24 AI styles in 3 tiers:
+32 AI styles in 5 groups:
 - Manus Originals (7):  vinyl, whiteboard, grove, fresco, easel, diorama, chromatic
 - Manus Hybrid (7):     sketch, glamour, amber, arctic, neon, patina, onyx
 - Bonus (10):           chalkboard, notebook, blueprint, glassmorphism, corporate,
                         dark-tech, dashboard, infographic, watercolor, minimal-clean
+- Manus 1.6 themes (6): etching, editorial, pixel, vellum, dossier, sketch-notebook
+- Production (2):       exec-sketch (aliases exec, business-sketch), clean-marker
 
 13 HTML-only styles also available via slide_templates.py (cerulean, cobalt, etc.)
 
@@ -32,31 +34,62 @@ Usage:
     # List all available styles
     python whiteboard_generator.py styles
 """
+# UTF-8 на выход. Консоль Windows по умолчанию cp1251/cp866/cp1252, и первый же
+# не-ASCII символ (кириллица, →, ✓) валит процесс UnicodeEncodeError — обычно на
+# --help, то есть ДО любой полезной работы. errors="replace" оставляет вывод
+# читаемым, если терминал всё же не UTF-8.
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 import os
 import sys
 import time
 import json
 from pathlib import Path
 
-# Remove conflicting env var before importing SDK
-os.environ.pop('GEMINI_API_KEY', None)
-
-from dotenv import load_dotenv
-load_dotenv(os.path.expanduser("~/.claude/.credentials.master.env"))
-
-from google import genai
-from google.genai import types
-from PIL import Image
+from PIL import Image, ImageOps
 import io
 
 # Default image model = Nano Banana 2 (fast, cheap, great Cyrillic). Override for premium decks:
 #   MANUS_SLIDES_MODEL=nano-banana-pro-preview   (Nano Banana Pro — richest detail + best incidental text)
-#   MANUS_SLIDES_MODEL=gemini-3-pro-image        (Nano Banana Pro alias)
+#   MANUS_SLIDES_MODEL=gemini-3-pro-image-preview (Nano Banana Pro, canonical id)
 #   MANUS_SLIDES_MODEL=gemini-3.1-flash-lite-image (Nano Banana 2 Lite — cheaper)
 # NOTE: gemini-3.5-flash is TEXT-ONLY (no image output) — do NOT use it here.
 MODEL = os.getenv("MANUS_SLIDES_MODEL", "gemini-3.1-flash-image-preview")
 
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+# Клиент — лениво, при первом обращении. На верхнем уровне модуля ничего не делаем:
+# импорт не должен ни читать .credentials.master.env, ни менять окружение процесса,
+# ни строить SDK-клиент с чужим ключом. SDK тоже импортируется только здесь, поэтому
+# styles / recommend / pptx / notes-pptx / html работают без google-genai и без ключа.
+_PROVIDER = None
+
+
+def provider_client():
+    """(client, types, api_key) по требованию. Нет ключа — громкий отказ, а не пустой результат."""
+    global _PROVIDER
+    if _PROVIDER is None:
+        try:
+            from dotenv import load_dotenv
+            load_dotenv(os.path.expanduser("~/.claude/.credentials.master.env"))
+        except ImportError:  # python-dotenv необязателен: хватит обычной переменной окружения
+            pass
+        os.environ.pop("GEMINI_API_KEY", None)  # конфликт SDK: нужен GOOGLE_API_KEY
+        api_key = os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            raise SystemExit(
+                "ОТКАЗ: не задан GOOGLE_API_KEY.\n"
+                "  Где взять: aistudio.google.com/apikey\n"
+                "  Как задать: export GOOGLE_API_KEY=... (или строка GOOGLE_API_KEY=... "
+                "в ~/.claude/.credentials.master.env)"
+            )
+        from google import genai
+        from google.genai import types
+        _PROVIDER = (genai.Client(api_key=api_key), types, api_key)
+    return _PROVIDER
 
 # ============================================================
 # STYLE PRESETS — Visual styles for AI-generated slides
@@ -549,6 +582,9 @@ STYLE_CATEGORIES = {
     "Manus 1.6 image themes (prompt presets)": [
         "etching", "editorial", "pixel", "vellum", "dossier", "sketch-notebook",
     ],
+    "Production": [
+        "exec-sketch", "clean-marker",
+    ],
 }
 
 # Manus HTML-only templates (pure CSS/typography, use slide_templates.py for these)
@@ -651,6 +687,7 @@ def generate_slide_image(
     resolved = resolve_style(style)
     style_prefix = STYLES[resolved]
     full_prompt = style_prefix + prompt
+    client, types, api_key = provider_client()
 
     for attempt in range(retry_count):
         try:
@@ -673,7 +710,11 @@ def generate_slide_image(
                 if part.inline_data and part.inline_data.mime_type and part.inline_data.mime_type.startswith("image/"):
                     img = Image.open(io.BytesIO(part.inline_data.data))
                     if img.size != (width, height):
-                        img = img.resize((width, height), Image.LANCZOS)
+                        # Preserve proportions: letterbox with the image's own edge colour
+                        # instead of stretching (a 1:1 answer used to be squashed to 16:9).
+                        rgb = img.convert("RGB")
+                        img = ImageOps.pad(rgb, (width, height), method=Image.Resampling.LANCZOS,
+                                           color=rgb.getpixel((0, 0)))
                     output_path.parent.mkdir(parents=True, exist_ok=True)
                     img.save(str(output_path), "PNG")
                     return True
@@ -683,7 +724,8 @@ def generate_slide_image(
                 time.sleep(3)
 
         except Exception as e:
-            print(f"  [ERR] Attempt {attempt + 1}: {e}")
+            msg = str(e).replace(api_key, "***")[:300]
+            print(f"  [ERR] Attempt {attempt + 1}: {type(e).__name__}: {msg}")
             if attempt < retry_count - 1:
                 time.sleep(5)
 
@@ -829,7 +871,7 @@ document.addEventListener('click',e=>{{e.clientX>innerWidth/2?go(c+1):go(c-1)}})
     return True
 
 
-def regenerate_slide(config_path: str, output_dir: str, slide_id: str, style: str = DEFAULT_STYLE) -> bool:
+def regenerate_slide(config_path: str, output_dir: str, slide_id: str, style: str | None = None) -> bool:
     """Regenerate a single slide from config, then rebuild PPTX + HTML.
 
     Args:
@@ -1009,7 +1051,7 @@ def main():
         config_path = sys.argv[2]
         output_dir = sys.argv[3]
         slide_id = sys.argv[4]
-        style = sys.argv[5] if len(sys.argv) > 5 else DEFAULT_STYLE
+        style = sys.argv[5] if len(sys.argv) > 5 else None   # None = the config's own style, not whiteboard
         ok = regenerate_slide(config_path, output_dir, slide_id, style)
         if not ok:
             sys.exit(1)

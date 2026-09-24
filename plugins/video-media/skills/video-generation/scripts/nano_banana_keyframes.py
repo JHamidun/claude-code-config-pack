@@ -27,10 +27,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv(os.path.expanduser("~/.claude/.credentials.master.env"))
-# Standard env-conflict guard for google-genai SDK
-os.environ.pop("GEMINI_API_KEY", None)
-
 from google import genai
 from google.genai import types
 
@@ -44,7 +40,28 @@ DEFAULT_STYLE = (
 )
 PARALLEL_CAP = 4  # Nano Banana Pro empirical ceiling — see chat session 2026-04-20
 
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+# Клиент — лениво, при первом обращении. На верхнем уровне модуля ничего не делаем:
+# импорт не должен ни читать .credentials.master.env, ни менять окружение процесса,
+# ни строить SDK-клиент с чужим ключом.
+_client = None
+
+
+def get_client():
+    """genai-клиент по требованию. Нет ключа — громкий отказ, а не пустой результат."""
+    global _client
+    if _client is None:
+        load_dotenv(os.path.expanduser("~/.claude/.credentials.master.env"))
+        os.environ.pop("GEMINI_API_KEY", None)  # конфликт SDK: нужен GOOGLE_API_KEY
+        api_key = os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            raise SystemExit(
+                "ОТКАЗ: не задан GOOGLE_API_KEY.\n"
+                "  Где взять: aistudio.google.com/apikey\n"
+                "  Как задать: export GOOGLE_API_KEY=... (или строка GOOGLE_API_KEY=... "
+                "в ~/.claude/.credentials.master.env)"
+            )
+        _client = genai.Client(api_key=api_key)
+    return _client
 
 
 def _extract_image(resp) -> bytes | None:
@@ -72,7 +89,7 @@ def generate_one(slug: str, prompt: str, style: str, out_dir: Path,
     parts.append(f"{style}\n\nSCENE: {prompt}")
 
     try:
-        resp = client.models.generate_content(
+        resp = get_client().models.generate_content(
             model=DEFAULT_MODEL,
             contents=parts,
             config=types.GenerateContentConfig(response_modalities=["IMAGE", "TEXT"]),

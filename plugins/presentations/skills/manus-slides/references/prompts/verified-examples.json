@@ -1,0 +1,18 @@
+[
+  {
+    "id": "light",
+    "title": "Интерфейс тоже меняем словами",
+    "prompt": "ONE finished 16:9 business teaching slide in Russian. Whole-slide exec-sketch semantic visualization, not an isolated illustration, not a collage of slides. School palette: black #000, white, yellow #FFC000, optional warm pale gold on light slides. Clean condensed Oswald-style typography for massive readable heading and Montserrat-like body labels. Hand-drawn confident slightly imperfect ink diagrams, arrows, illustrative details integrated with words. No physical whiteboard, no room, no chalkboard texture, no 3D, no generic decorative people. Precise Cyrillic. Render exact supplied strings once, no invented text. No logos, no footer (authentic optional logos added separately). All content inside 6% side margins; title begins at 13% canvas height, bottom content ends by90%; upper8% is continuous background, never draw an empty box. Visual explanation dominant, each drawing has a meaning.\nLIGHT pale ivory gold #F8F5EC. Heading \"Интерфейс тоже меняем словами\". Conceptual sketch comparison occupying main canvas: left messy three cramped lines symbolizing undifferentiated saved entries under \"Было\". Giant hand-drawn yellow arrow in center with small speech-bubble \"Раздели записи на карточки\". Right three separated tidy clipping cards under \"Хотим\". One card labels \"Дата\" then \"Текст\" then \"Ссылка\"; the other two show abstract black ruled strokes, no invented copy. Small prominent note bottom \"Схема желаемого изменения\". This is explicitly conceptual before/desired, not false screenshot or evidence. Thin sketched brackets emphasize spacing.",
+    "image": "examples/media/light.png",
+    "sha256": "eba6096610d00d086f2136c57ebf1b1d50e36adb7bfa1c475cd276cfc0f27dd7",
+    "provenance": "Original generated slide image; copied unchanged. Prompt branding clause generalized for portability."
+  },
+  {
+    "id": "dark",
+    "title": "После правки проверяем заново",
+    "prompt": "ONE finished 16:9 business teaching slide in Russian. Whole-slide exec-sketch semantic visualization, not an isolated illustration, not a collage of slides. School palette: black #000, white, yellow #FFC000, optional warm pale gold on light slides. Clean condensed Oswald-style typography for massive readable heading and Montserrat-like body labels. Hand-drawn confident slightly imperfect ink diagrams, arrows, illustrative details integrated with words. No physical whiteboard, no room, no chalkboard texture, no 3D, no generic decorative people. Precise Cyrillic. Render exact supplied strings once, no invented text. No logos, no footer (authentic optional logos added separately). All content inside 6% side margins; title begins at 13% canvas height, bottom content ends by90%; upper8% is continuous background, never draw an empty box. Visual explanation dominant, each drawing has a meaning.\nBLACK background. Heading \"После правки проверяем заново\". Three large semantic illustrations in a closed oval loop: extension puzzle piece with circular refresh arrow labeled \"Перезагрузить расширение\"; webpage with reload arrow labeled \"Обновить страницу\"; highlighted quote entering clipping card with magnifying glass labeled \"Сохранить и проверить\". Yellow arrows link stages and return to check. Main bottom sentence \"Вид изменился. Сохранение работает?\" Large question mark next to actual test, not a guaranteed checkmark. Keep flow clean, no boxes enclosing stages.",
+    "image": "examples/media/dark.png",
+    "sha256": "d7829c49193788a71c523a3dc6b1bdb824fdf14b10a3530381538d4def704f50",
+    "provenance": "Original generated slide image; copied unchanged. Prompt branding clause generalized for portability."
+  }
+]

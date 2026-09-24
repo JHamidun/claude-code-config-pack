@@ -273,6 +273,14 @@
 | Анализ встреч | "анализ встречи", "meeting analysis", "action items" | Skill `meeting-analyzer` |
 | OCR восстановление | "OCR", "распознай скан", "garbled text" | Skill `ocr-restore` |
 | PDF обработка | "обработай PDF", "merge PDF", "split PDF", "fill PDF form" | Skill `pdf` |
+| Навыки: найти, проверить, поставить | "найди скилл", "какой навык подходит", "подбери процесс", "проверь скилл перед установкой", "безопасно ли ставить", "скачал с гитхаба скилл/плагин", "проверь на prompt-injection", "чужой скилл/плагин/агент", "установи скилл" | Skill `skill-manager` (поиск по своим навыкам, skills.sh и MCP SkillsMP; проверка локальным сканером leak-scan и, если установлен, NVIDIA SkillSpector; ставит только выбранное). `skill-audit` — указатель сюда |
+| 3D / CAD через MCP | "3д", "cad", "blender", "cadquery", "step", "stl", "рендер модели", "параметрическая деталь" | Шаблон `templates/3d-workspace/` (сборка рантайма — `SETUP.md`): скопировать в папку проекта и открывать Claude там — MCP `cadquery` (мм; render/inspect/get_parameters/export) и `blender` (только `*_for_cli`, GUI-инструменты запрещены), таймаут 300 с; STL в Blender со scale 0.001; `render` отдаёт SVG |
+| Схема Excalidraw в чате | "excalidraw схема", "нарисуй схему в excalidraw" | Сначала Skill `excalidraw-flowchart` (локально); MCP `excalidraw` (read_me/create_view/checkpoints, блок в `mcp.json`). ⚠️ `export_to_excalidraw` публикует по публичной ссылке — стоит ask |
+| Spark-рецепты почты | "разбери почту", "inbox zero", "подготовь встречу по письмам", "отпишись от рассылок", "новые отправители", "что пропустил в отпуске", "разбор уведомлений" | Skill `use-spark` → раздел «Рецепты и персоны» (`references/recipes|personas`, 25+8 из spark-cli-skills 1.3.0). Меняющие рецепты — только с подтверждением, письма не отправляют. ⚠️ `spark skill > SKILL.md` сотрёт индекс — восстановить из `references/INDEX.md` |
+| Higgsfield-рецепты | "пресет higgsfield", "faceless-канал", "UGC-ролик", "обложка через higgsfield", "сайт на higgsfield" | `skills/video-generation/engines/higgsfield/references/mcp-app-skills/README.md` (17 рецептов, нужен MCP `higgsfield` после OAuth). Тратит кредиты |
+| Решение моделью вместо LLM (Jev) | "классифицируй поток", "отранжируй", "выбери из вариантов", "срочно ли письмо", "jev", "typesafe" | Skill `jev` + `python ~/.claude/tools/jev_client.py` (ключ TYPESAFE_API_KEY; OpenRouter — только явно `--route openrouter`) |
+| Отели (trivago) | "найди отель", "отели в", "где остановиться" | MCP `trivago` (без ключа, блок в `mcp.json`) |
+| Видеомонтаж Descript / сайты Lovable / посты Publora (облако) | "descript", "underlord", "lovable", "publora" | MCP `descript`, `lovable`, `publora` (блоки в `mcp.json`) — все ждут OAuth: `claude mcp add …`, затем `/mcp` → Authenticate |
 | PDF генерация | "сгенерируй PDF", "create PDF" | Skill `pdf` (pdf-generation merged 2026-07-18; рецепты в references) |
 | Perplexity | "perplexity", "AI search" | Skill `perplexity` |
 | Pinecone | "pinecone", "vector database", "embeddings" | Skill `pinecone` |
@@ -288,7 +296,8 @@
 | Скачать видео | "скачай видео", "yt-dlp", "download video" | Skill `video-downloader` |
 | Тестирование веб | "протестируй сайт", "webapp test", "test UI" | Skill `webapp-testing` |
 | Создание сайта | "создай сайт", "лендинг", "landing page", "website" | Skill `website-creation` |
-| Word/DOCX | "word", "docx", "документ Word", "tracked changes" | Навык `docx` в пак НЕ входит — его лицензия прямо запрещает передачу третьим лицам. Собрать .docx: `pip install python-docx`, рабочий пример на 300 строк — `skills/seo-machine-ru/scripts/build_report_docx.py` (обложка, нативные стили Word, таблицы). Прочитать/сконвертировать чужой .docx — Skill `file-converter` (markitdown, `pdf_to_docx`, `docx_to_pdf`) |
+| Word/DOCX | "word", "docx", "документ Word", "tracked changes" | Skill `docx` (своя редакция на python-docx: собрать, править, стили, таблицы, правки) |
+| Рендер Office в картинки | "отрендери docx/pptx/xlsx", "как выглядит документ/дек", "визуальная проверка без LibreOffice", "пересчитай формулы и покажи" | Windows + Microsoft Office: `python ~/.claude/tools/office_render.py <file> --out <dir>` (Word/PowerPoint/Excel через COM → PDF → PNG, JSON {pdf, pngs}); иначе LibreOffice `soffice --headless --convert-to pdf` |
 | XLSX | "xlsx", "spreadsheet", "таблица Excel" | Skill `xlsx` |
 | YouTube транскрипт | "транскрипт ютуба", "youtube transcript", "субтитры видео" | Skill `youtube-transcript` |
 | Mermaid диаграммы | "mermaid", "mermaid chart", "рендер mermaid" | Cloud MCP `claude_ai_Mermaid_Chart` (validate_and_render_mermaid_diagram) |

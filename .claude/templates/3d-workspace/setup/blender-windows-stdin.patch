@@ -1,0 +1,12 @@
+diff --git a/mcp/blmcp/tools_helpers/blender_cli.py b/mcp/blmcp/tools_helpers/blender_cli.py
+index 66a4535..51c5634 100644
+--- a/mcp/blmcp/tools_helpers/blender_cli.py
++++ b/mcp/blmcp/tools_helpers/blender_cli.py
+@@ -68,6 +68,7 @@ def run_blender_cli(
+     try:
+         proc = subprocess.run(
+             [blender, "--background", blend_file, "--python-expr", wrapper],
++            stdin=subprocess.DEVNULL,
+             capture_output=True,
+             text=True,
+             timeout=timeout,

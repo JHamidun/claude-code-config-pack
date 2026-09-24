@@ -1,6 +1,6 @@
 # Code Health
 
-> Bug/cleanup/deps/reuse/security health audits, security audit, threat hunting.
+> Bug/cleanup/deps/reuse/security health audits, security audit, threat hunting, finding and vetting third-party skills before install.
 
 Part of the **[hamidun marketplace](../../README.md)**.
 
@@ -13,6 +13,8 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `osint-recon` | Open-source recon on infrastructure and counterparties — IP/ASN, DNS, RDAP whois, BGP, subdomains, exposed ports, CVEs. |
 | `privacy-filter` | Локальный PII-фильтр (OpenAI opf, on-device): обезличить текст перед облачным LLM, обратимая редакция. |
 | `security-audit` | Security-аудит: секреты в коде, pip/npm audit, OWASP Top 10. |
+| `skill-audit` | Заглушка: проверка чужого скилла/плагина до установки переехала в skill-manager, режим «Аудит». |
+| `skill-manager` | Навыки и плагины: найти, подобрать, проверить до установки, поставить. |
 | `threat-hunting` | Threat hunting: правила Sigma, detection engineering. |
 
 ### Agents

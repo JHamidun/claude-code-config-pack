@@ -73,6 +73,9 @@ python assemble.py platform_export raw.mp4 final_reels.mp4
 ```bash
 HF="./bin/hf"                     # вендорский Go-бинарь, в репозитории его НЕТ (*.exe в .gitignore).
                                   # Взять релиз github.com/higgsfield-ai/cli (v0.1.40+) и положить в bin/
+                                  # На Windows файл называется bin/hf.exe: HF="./bin/hf.exe"
+                                  # scripts/router.py ищет оба имени сам и в ошибке печатает то,
+                                  # которое ждёт ИМЕННО эта ОС — не ходи искать .exe на маке.
 "$HF" account status              # своя учётная запись и её тариф
 "$HF" auth login                  # только если "Session expired" (device flow)
 "$HF" model list --json           # live-каталог (51). schema: "$HF" model get <jst> --json
@@ -113,6 +116,7 @@ HF="./bin/hf"                     # вендорский Go-бинарь, в р�
 - **Virality Predictor:** `generate create brain_activity --video <url|path>` → Markdown retention-отчёт.
 - **AI Stylist** (примерка): outfits 206 / poses 11 / backgrounds 11 (UUID) → `references/registries/ai-stylist-*.tsv`.
 - MCP-коннектор (desktop-Claude): `https://mcp.higgsfield.ai/mcp`.
+- **Рецепты под этот MCP** (17 шт. из Codex-приложения Higgsfield 2.1.0: faceless-video, ai-host-video, ugc-*, thumbnail-generation, narrator, subtitles, video-editing, website-builder, youtube-script, ad-multiplier…) → `references/mcp-app-skills/README.md`. Работают только после подключения MCP и OAuth через `/mcp` (`generate_*`, `jobs_wait`, `media_upload`, `get_presets`, `sandbox_exec`); без MCP — только справка, генерация идёт через `hf.exe`. Контент вендора (Higgsfield), источник и версия — в README.
 
 ## Реестры (UUID → `references/registries/`)
 Soul style_id 200 (`soul-styles.tsv`, host cms.higgsfield.ai) · AI-Stylist outfits 206 / poses 11 / backgrounds 11 · TTS voices 60 (`voices.json`) · video-styles 5 · marketing hooks 9/settings 14/avatars 20/ad-formats 42 (`ms_*.json`) · costs (`job-sets-costs.json`) · модели param-схемы (`references/model-params-full.json`). Эндпоинты+метод → `references/registries/registries-LIVE.md`.

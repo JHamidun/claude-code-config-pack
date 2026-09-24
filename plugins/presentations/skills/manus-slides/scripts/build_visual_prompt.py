@@ -26,13 +26,24 @@
     python build_visual_prompt.py --subject "команда за столом смотрит на график" \\
         --role deliver_payload --light golden_hour --style editorial --aspect 16:9
 
-    python build_visual_prompt.py --subject "герой у сгоревшей машины" --content portrait \\
+    python build_visual_prompt.py --subject "герой у сгоревшей машины" --content portrait_medium \\
         --fov 29 --blocking "стоит в метре от машины, ладонь на капоте" \\
         --gaze "смотрит на собеседника" --facing "корпус развёрнут к камере вполоборота"
 
     python build_visual_prompt.py --json shots.json     # пачкой по плану кадров
 """
 from __future__ import annotations
+# UTF-8 на выход. Консоль Windows по умолчанию cp1251/cp866/cp1252, и первый же
+# не-ASCII символ (кириллица, →, ✓) валит процесс UnicodeEncodeError — обычно на
+# --help, то есть ДО любой полезной работы. errors="replace" оставляет вывод
+# читаемым, если терминал всё же не UTF-8.
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 import argparse
 import json

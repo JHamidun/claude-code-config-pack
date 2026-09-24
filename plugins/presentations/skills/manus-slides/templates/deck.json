@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "title": "Название презентации",
+  "language": "Russian",
+  "canvas": {
+    "width": 1920,
+    "height": 1080
+  },
+  "branding": [],
+  "slides": [
+    {
+      "id": "first-slide",
+      "title": "Заголовок с одним тезисом",
+      "theme": "exec-sketch-light-calm",
+      "text": [
+        "Первый шаг",
+        "Второй шаг",
+        "Результат"
+      ],
+      "visual": "Describe the semantic diagram and its arrows, not decorative style.",
+      "notes": {
+        "spoken": [
+          "Замените полноценным первым абзацем выступления.",
+          "Замените примером, объяснением и переходом к следующему слайду."
+        ],
+        "stage": [
+          "[СЛАЙД] Укажите точный момент переключения или демонстрации."
+        ]
+      },
+      "sources": [],
+      "draw_order": []
+    }
+  ]
+}
