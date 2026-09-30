@@ -147,6 +147,27 @@ const CASES = [
     expect: 'block',
     cmd: `ssh deploy@your-server '${rmrf('/etc/nginx')}'`,
   },
+  // 2026-09-30: тело heredoc, которое читает удалённый шелл или SQL-клиент, не сканировалось
+  {
+    name: "ssh host 'bash -s' <<heredoc: снос томов на проде",
+    expect: 'block',
+    cmd: ["ssh your-server 'bash -s' <<'REMOTE'", 'cd /opt/app', 'docker compose down -v', 'REMOTE'].join('\n'),
+  },
+  {
+    name: 'ssh host <<heredoc без команды: удаление корня',
+    expect: 'block',
+    cmd: ['ssh deploy@your-server <<EOF', rmrf(ROOT), 'EOF'].join('\n'),
+  },
+  {
+    name: "cat <<heredoc | ssh host 'sudo bash -s': удаление корня",
+    expect: 'block',
+    cmd: ["cat <<'EOF' | ssh your-server 'sudo bash -s'", rmrf(ROOT), 'EOF'].join('\n'),
+  },
+  {
+    name: 'ssh host psql <<heredoc: снос базы',
+    expect: 'block',
+    cmd: ["ssh your-server 'docker exec -i pg psql -U app' <<'SQL'", `${DROP} DATABASE app;`, 'SQL'].join('\n'),
+  },
   // Дыры, найденные состязательным прогоном 2026-08-18 (субпуть «..» и Mongo):
   {
     name: 'выход наверх от дома через ~/..',
@@ -183,6 +204,16 @@ const CASES = [
     cmd: `node -e "console.log('пример опасного: ${rmrf(ROOT)}')"`,
   },
   { name: 'ssh с безобидной командой', expect: 'allow', cmd: 'ssh your-server "docker ps -a"' },
+  {
+    name: "ssh host 'bash -s' <<heredoc: обычная выкладка",
+    expect: 'allow',
+    cmd: ["ssh your-server 'bash -s' <<'REMOTE'", 'cd /opt/app', 'docker compose ps', 'docker compose up -d app', 'REMOTE'].join('\n'),
+  },
+  {
+    name: "ssh host 'cat > файл' <<heredoc: опасные слова только в данных",
+    expect: 'allow',
+    cmd: ["ssh your-server 'cat > /opt/app/NOTES.md' <<'EOF'", 'Никогда не запускай docker compose down -v на проде.', 'EOF'].join('\n'),
+  },
 
   {
     name: 'скачать-и-исполнить через конвейер',

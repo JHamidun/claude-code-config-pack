@@ -529,6 +529,9 @@ try {
   const SQLCLI_NAME = /\b(?:psql|mysql|mariadb|sqlite3|sqlcmd|clickhouse-client|mongosh|mongo)(?:\.exe)?\b/i;
   const SQLCLI_TRIG = new RegExp(SQLCLI_NAME.source +
     '(?=[^\\n;&|]*(?:\\s(?:-c|-e|-f|--command|--execute|--file|--eval)\\b|<<|["\']))', 'i');
+  // Удалённая команда ssh, которая исполняет свой stdin: шелл (с флагами, под sudo),
+  // sudo -i, su. Только она целиком — `bash script.sh` или `sh -c "…"` сюда не подходят.
+  const SSH_STDIN_SHELL = /^(?:(?:sudo|doas)(?:\s+-[a-zA-Z]+)*\s+)?(?:(?:[\w.~-]*\/)*(?:bash|zsh|dash|ksh|sh)(?:\s+-[a-zA-Z]+)*(?:\s+--)?|-i|su(?:\s+-l?)?(?:\s+root)?)$/i;
   const SHELL_TRIG  = new RegExp(CMDSTART + WRAP + PATHPFX +
     '(?:bash|zsh|dash|ksh|sh|eval)(?:\\.exe)?\\s+(?:(?:-\\S*|--\\S+)\\s+)*(?:-[a-zA-Z]*c[a-zA-Z]*(?:\\s|$|["\'])|<<|["\'])', 'i');
   const INTERP_TRIG = new RegExp(CMDSTART + WRAP + PATHPFX +
@@ -735,6 +738,27 @@ try {
       for (const s of payloads) {
         h = scanCommand(s, depth + 1);
         if (h) return tagHit(h, '@ssh', 'внутри ssh-команды (удалённый хост!)');
+      }
+      // 3b) heredoc, который читает удалённая сторона. `ssh host <<EOF` (без команды —
+      //     stdin читает login-шелл) и `ssh host 'bash -s' <<EOF` исполняют тело как
+      //     команды, `ssh host 'psql …' <<EOF` — как SQL. До 2026-09-30 такие тела не
+      //     сканировались: 'bash -s' лежит в кавычках, SHELL_TRIG его не видит, и
+      //     `docker volume rm` в теле проходил. Данные (`ssh host 'cat > f' <<EOF`)
+      //     по-прежнему не сканируются. Берутся все heredoc строки: так ловится и
+      //     `cat <<EOF | ssh host bash -s`.
+      if (m && t.heredocs.length) {
+        const remote = m[1].split('\n')[0].split('<<')[0].replace(/["']/g, ' ').trim();
+        if (!remote || SSH_STDIN_SHELL.test(remote)) {
+          for (const hd of t.heredocs) {
+            h = scanCommand(hd.body, depth + 1);
+            if (h) return tagHit(h, '@ssh', 'heredoc, который исполняет удалённый шелл');
+          }
+        } else if (SQLCLI_NAME.test(remote)) {
+          for (const hd of t.heredocs) {
+            h = findHit(hd.body);
+            if (h) return tagHit(h, '@ssh', 'heredoc SQL-клиенту на удалённом хосте');
+          }
+        }
       }
     }
 
