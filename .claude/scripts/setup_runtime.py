@@ -119,6 +119,21 @@ OFF_PATH_HINTS = {
     "magick": [
         r"C:\Program Files\ImageMagick*\magick.exe",
     ],
+    # Установщик ставит Node в той же сессии, а PATH его процесса снят ДО установки: без
+    # этих мест npm «не находился», зависимости dev-browser пропускались и доезжали только
+    # вторым запуском (E2E «повторный прогон насорил файлами», 05.10.2026).
+    "node": [
+        r"C:\Program Files\nodejs\node.exe",
+        os.path.expandvars(r"%LOCALAPPDATA%\Programs\nodejs\node.exe"),
+        "/usr/local/bin/node",
+        "/opt/homebrew/bin/node",
+    ],
+    "npm": [
+        r"C:\Program Files\nodejs\npm.cmd",
+        os.path.expandvars(r"%LOCALAPPDATA%\Programs\nodejs\npm.cmd"),
+        "/usr/local/bin/npm",
+        "/opt/homebrew/bin/npm",
+    ],
 }
 
 # Имена-омонимы: на Windows в system32 лежит СВОЙ `convert.exe` — утилита перевода
@@ -285,6 +300,12 @@ def ensure_external_tools() -> bool:
         if found:
             on_path = any(shutil.which(n) == found for n in tool["names"])
             say("✓", f"{shown}" if on_path else f"{shown} (мимо PATH: {found})")
+            if not on_path:
+                # Следующие шаги (npm install, npx playwright) зовут программу по имени —
+                # дописываем её каталог в PATH этого процесса, иначе «нашли» ничего не даёт.
+                folder = str(Path(found).parent)
+                if folder not in os.environ.get("PATH", "").split(os.pathsep):
+                    os.environ["PATH"] = folder + os.pathsep + os.environ.get("PATH", "")
             continue
         fix = tool["install"].get(OS_KEY, "см. PREREQUISITES.md")
         if tool["required"]:
