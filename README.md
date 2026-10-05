@@ -472,8 +472,10 @@ The correct order after any re-sync is:
 #  1. sync .claude/ from wherever you sync it
 python guard_free_by_default.py --dry-run   # 2. see what the sync ate
 python guard_free_by_default.py --apply     # 3. put it back (idempotent)
+python guard_student_defaults.py --apply    # 3b. same for the learner defaults (below)
 python _build_plugins.py                    # 4. propagate .claude/ -> plugins/
 python guard_free_by_default.py --check     # 5. must exit 0
+python guard_student_defaults.py --check    # 5b. must exit 0
 ```
 
 Three independent tripwires, so forgetting step 3 cannot ship:
@@ -500,6 +502,27 @@ placeholder upstream, and the user gets a bare `401` instead of "this feature ne
 
 > `guard_free_by_default.py` is deliberately **not** named `_guard.py` — `.gitignore` excludes
 > `_*.py`, so an underscore name would never reach the repo and CI would fail on a missing file.
+
+### Learner defaults: `guard_student_defaults.py`
+
+The same sync problem, for what a learner sees in the first sessions. The maintainer's machine
+has tokens, logins and a real `python3`, so this noise never shows up there, and a sync of
+`.claude/settings.json` or `.claude/hooks/gsd-statusline.js` (byte-identical to the live copy)
+brings it straight back. The guard owns, and `--apply` restores:
+
+- plugins that need a personal token or login stay **off**: greptile, sourcegraph, coderabbit
+  (plus github, linear, notion, telegram, already off) — otherwise `/mcp` greets every learner
+  with "needs authentication" or a failed server;
+- **hookify** stays off: it runs `python3` on every tool call and prompt, and without a working
+  `python3` (on Windows the Microsoft Store stub) every answer carries a "hook error" line;
+- no permission rule that Claude Code warns about at every start: path rules for
+  `Write`/`MultiEdit`/`NotebookEdit`/`Glob` (only `Edit(path)`/`Read(path)` are ever consulted, so
+  each becomes its twin or is dropped when the twin is listed) and Bash rules that mix `*` with
+  the trailing `:*` (they never match);
+- `CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY=1` in `env` — no "How is Claude doing this session?" survey;
+- the status line shows `контекст NN% — введи /compact, когда Claude закончит` instead of a skull.
+
+Tripwires: the same `pre-commit` hook and `.github/workflows/student-defaults.yml`.
 
 ## License
 

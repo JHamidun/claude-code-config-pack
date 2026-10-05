@@ -1,10 +1,12 @@
 #!/bin/sh
-# Local tripwire for the free-by-default promise.
+# Local tripwire for the free-by-default promise and the learner defaults.
 #
 # The pack's .claude/ tree gets re-synced wholesale from a personal config.
 # A sync overwrites whole files, so it silently deletes the NO-KEY policy that
 # lives inside them — that already happened twice (16 -> 10 -> 0 guard blocks,
-# 2026-07-21 .. 2026-07-31) and shipped to origin/main.
+# 2026-07-21 .. 2026-07-31) and shipped to origin/main. The same sync would
+# bring back token-only plugins, start-up warnings and the status-line skull
+# that guard_student_defaults.py removes.
 #
 # Enable once per clone:
 #     git config core.hooksPath .githooks
@@ -14,7 +16,7 @@
 if command -v python >/dev/null 2>&1; then PY=python
 elif command -v python3 >/dev/null 2>&1; then PY=python3
 else
-  echo "pre-commit: python not found — skipping free-by-default guard" >&2
+  echo "pre-commit: python not found — skipping free-by-default and student-defaults guards" >&2
   exit 0
 fi
 
@@ -26,6 +28,19 @@ COMMIT BLOCKED: the pack would ship demanding a paid third-party API key.
   repair:  python guard_free_by_default.py --apply
   then:    python _build_plugins.py     # propagate .claude/ -> plugins/
   verify:  python guard_free_by_default.py --check
+
+MSG
+  exit 1
+fi
+
+if ! $PY guard_student_defaults.py --check; then
+  cat >&2 <<'MSG'
+
+COMMIT BLOCKED: learners would get token-only plugins, start-up warnings,
+hook errors or the status-line skull back.
+
+  repair:  python guard_student_defaults.py --apply
+  verify:  python guard_student_defaults.py --check
 
 MSG
   exit 1

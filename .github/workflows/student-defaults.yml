@@ -1,0 +1,34 @@
+name: student-defaults guard
+
+# What a learner sees in the first sessions is decided by .claude/settings.json
+# and the status-line script. Both are re-synced wholesale from a personal
+# config, where tokens, logins and a real python3 hide the noise every learner
+# gets: plugins asking for authentication, permission rules that warn at every
+# start, hook errors, the survey, a skull in the status line.
+#
+# guard_student_defaults.py owns those defaults. This job is the tripwire: if a
+# sync brings any of it back, the push fails here instead of shipping.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Learner defaults intact
+        run: python guard_student_defaults.py --check
+
+      - name: Show what a repair would change (only on failure)
+        if: failure()
+        run: |
+          echo "::error::student defaults eroded — run: python guard_student_defaults.py --apply"
+          python guard_student_defaults.py --dry-run || true
