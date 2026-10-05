@@ -132,9 +132,9 @@
 
 ### Медиа
 
-**`video-media`** — Video Production. 13 навыков, 3 команды, 9 агентов. 15.3 МБ.
+**`video-media`** — Video Production. 14 навыков, 3 команды, 9 агентов. 15.3 МБ.
   8-role production pipeline (brief to QC), generation (Runway), avatars (HeyGen/D-ID), edit, download, export, subtitles, transcripts.
-  Внутри: `did`, `heygen`, `submagic`, `video-downloader`, `video-editor`, `video-export` и ещё 6
+  Внутри: `code-cartoon`, `did`, `heygen`, `sketch-course-video`, `submagic`, `video-downloader` и ещё 8
 
 **`image-gen`** — AI Image Generation. 10 навыков, 1 агент.
   Nano Banana, DALL-E, Replicate, enhancement, OCR, stickers, generative art.

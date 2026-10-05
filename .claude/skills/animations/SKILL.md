@@ -1,6 +1,6 @@
 ---
 name: animations
-description: "Таймлайн-анимации в HTML (React): плеер, скраббер, ease. Триггеры: «анимация в HTML», «motion design», «интро», «transitions для презентации»."
+description: "Таймлайн-анимации в HTML (React): плеер, скраббер, ease. Триггеры: «анимация в HTML», «motion design», «интро», «transitions для презентации». НЕ: мультик кодом в MP4 с голосом и звуком→code-cartoon."
 ---
 
 # Animations

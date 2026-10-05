@@ -1,6 +1,6 @@
 ---
 name: sketch-course-video
-description: "Урок или сторис из записи спикера со скетч-анимацией на Remotion: рисунок проявляется по контурам, маркер, хромакей, субтитры. Триггеры: «видеоурок со скетчами», «скетч-ролик из вебинара». НЕ промо→video-shotcraft; рилс с нуля→video-montage."
+description: "Урок или сторис из записи спикера со скетч-анимацией на Remotion: рисунок по контурам, караоке, кружок лица, CTA. Триггеры: «видеоурок со скетчами», «нарежь сторис из записи эфира/занятия». НЕ промо→video-shotcraft; рилс с нуля→video-montage; мультик кодом без записи спикера→code-cartoon."
 metadata:
   version: 1.1.0
   reuses: image-generation, openai-dalle, deepgram, watch-video (all optional)

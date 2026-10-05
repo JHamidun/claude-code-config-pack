@@ -333,7 +333,7 @@ drifting again):
 CLAUDE_CONFIG_DIR="$PWD/.claude" python .claude/scripts/config_lint.py | head -20
 ```
 
-- 314 skills (`~/.claude/skills/`) — 85 ship executable code, 229 are prompt-only
+- 315 skills (`~/.claude/skills/`) — 86 ship executable code, 229 are prompt-only
 - 74 agents (`~/.claude/agents/`) — 57 top-level + 17 workers in `health/`, `meta/`, `testing/`
 - 155 slash commands (`~/.claude/commands/`) — 98 top-level + 57 in `gsd/`
 - 18 auto-loaded rules (`~/.claude/rules/`) + a `README.md` cataloguing them

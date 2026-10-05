@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="UTF-8">
+<!-- Glossy 3D page (three.js r181 as ES modules). Render contract (render/render.py, render/still.py): canvas#cv,
+     window.renderAt(t) — synchronous and deterministic, window.__ready === true after the first frame, window.__failed on a
+     script error, window.CUES (sound cue sheet), global TIMING. Query: ?fmt=land|port  ?pal=<theme from ../pencil/lib.js>.
+     ES modules do not load from file:// — render.py / still.py serve the project root over http on a free port themselves. -->
+<style>
+@font-face{font-family:'Hand';src:url('../fonts/segoepr.ttf')}
+@font-face{font-family:'HandB';src:url('../fonts/segoeprb.ttf')}
+@font-face{font-family:'Code';src:url('../fonts/JetBrainsMono-Regular.ttf')}
+@font-face{font-family:'CodeB';src:url('../fonts/JetBrainsMono-Bold.ttf')}
+@font-face{font-family:'Sans';src:url('../fonts/Manrope-ExtraBold.ttf')}
+@font-face{font-family:'SansM';src:url('../fonts/Manrope-Bold.ttf')}
+html,body{margin:0;background:#000;overflow:hidden}
+#root{position:relative;width:100%;height:100%;overflow:hidden}
+canvas#cv{position:absolute;inset:0;display:block}
+</style>
+<!-- the import map must come before any module script -->
+<script type="importmap">{"imports":{"three":"../vendor/three/three.module.js","three/addons/":"../vendor/three/addons/"}}</script>
+</head><body>
+<div id="root" data-composition-id="main" data-start="0" data-fps="24"><canvas id="cv"></canvas></div>
+<!-- classic scripts, same as the pencil page: TIMING, K (time, seeded random), PEN (pencil), HERO (the hero is drawn with the
+     pencil and shown as a sticker), PAL / LP / LIB from the pencil lib (palette roles, per-format layout values) -->
+<script src="../timing/timing.js"></script>
+<script src="../engine/core.js"></script>
+<script src="../engine/pencil.js"></script>
+<!-- the hero: engine/hero.js (generic template hero) or engine/hero_egg.js (channel mascot) — same HERO.draw API -->
+<script src="../engine/hero.js"></script>
+<script src="../pencil/lib.js"></script>
+<script>
+(function () {
+  // any error (also inside the module, also after a top-level await) marks the page as failed, so still.py / render.py
+  // stop at once with the message instead of waiting for a timeout
+  const fail = msg => { window.__pageError = window.__pageError || msg; window.__failed = true; };
+  window.addEventListener('error', e => fail(`${e.message} (${(e.filename || '').split('/').pop()}:${e.lineno})`));
+  window.addEventListener('unhandledrejection', e => fail('unhandled rejection: ' + (e.reason && e.reason.message || e.reason)));
+  window.__fail = fail;
+  const Q = new URLSearchParams(location.search);
+  window.QS = Q;
+  window.FMT = Q.get('fmt') || 'land';
+  window.CW = FMT === 'port' ? 1080 : 1920; window.CH = FMT === 'port' ? 1920 : 1080;
+  const cv = document.getElementById('cv'); cv.width = CW; cv.height = CH; cv.style.width = CW + 'px'; cv.style.height = CH + 'px';
+  const root = document.getElementById('root'); root.dataset.width = CW; root.dataset.height = CH; root.dataset.duration = TIMING.duration;
+  window.addEventListener('hf-seek', e => window.__ready && window.renderAt(e.detail.time));   // HyperFrames compatibility
+})();
+</script>
+<!-- a missing scenes file or a missing vendor/three file fails the whole module graph: report it and stop -->
+<script type="module" src="scenes3d.js" onerror="console.error('scenes file not found or a module failed to load: scenes3d.js, ../vendor/three/'); window.__fail('module load failed')"></script>
+</body></html>

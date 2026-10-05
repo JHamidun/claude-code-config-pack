@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="UTF-8">
+<!-- Pencil page. Render contract (render/render.py, render/still.py): canvas#cv, global renderAt(t) — synchronous and
+     deterministic, window.__ready === true once fonts are loaded and SETUP() ran, optional window.CUES, global TIMING.
+     Query: ?fmt=land|port  ?scenes=<file> (default scenes.js)  ?pal=<theme from lib.js THEMES>. Opens fine from file://. -->
+<style>
+@font-face{font-family:'Hand';src:url('../fonts/segoepr.ttf')}
+@font-face{font-family:'HandB';src:url('../fonts/segoeprb.ttf')}
+@font-face{font-family:'Code';src:url('../fonts/JetBrainsMono-Regular.ttf')}
+@font-face{font-family:'CodeB';src:url('../fonts/JetBrainsMono-Bold.ttf')}
+@font-face{font-family:'Sans';src:url('../fonts/Manrope-ExtraBold.ttf')}
+html,body{margin:0;background:#000;overflow:hidden}
+#root{position:relative;width:100%;height:100%;overflow:hidden}
+canvas{position:absolute;inset:0;display:block}
+</style></head><body>
+<div id="root" data-composition-id="main" data-start="0" data-fps="24">
+<canvas id="cv"></canvas>
+</div>
+<script src="../timing/timing.js"></script>
+<script src="../engine/core.js"></script>
+<script src="../engine/pencil.js"></script>
+<!-- the hero: engine/hero.js (generic template hero) or engine/hero_egg.js (channel mascot) — same HERO.draw API -->
+<script src="../engine/hero.js"></script>
+<script src="lib.js"></script>
+<script>
+(function () {
+  // bootstrap inside an IIFE: top-level const here would clash with names in the scenes file (shared global scope)
+  // any script error before the start (e.g. «word not in timing» at the top of the scenes file) keeps the page NOT ready,
+  // so still.py / render.py stop with the message instead of rendering an empty canvas
+  window.addEventListener('error', e => { window.__pageError = window.__pageError || `${e.message} (${(e.filename || '').split('/').pop()}:${e.lineno})`; });
+  const Q = new URLSearchParams(location.search);
+  window.QS = Q;
+  window.FMT = Q.get('fmt') || 'land';
+  window.CW = FMT === 'port' ? 1080 : 1920; window.CH = FMT === 'port' ? 1920 : 1080;
+  const cv = document.getElementById('cv'); cv.width = CW; cv.height = CH; cv.style.width = CW + 'px'; cv.style.height = CH + 'px';
+  const root = document.getElementById('root'); root.dataset.width = CW; root.dataset.height = CH; root.dataset.duration = TIMING.duration;
+  window.ctx = cv.getContext('2d');
+  // the scenes file is appended after FMT/CW/CH exist, so LP() works at its top level
+  const sc = document.createElement('script'); sc.src = Q.get('scenes') || 'scenes.js';
+  sc.onerror = () => console.error('scenes file not found: ' + sc.src);
+  const FACES = ['Hand', 'HandB', 'Code', 'CodeB', 'Sans'];
+  // a missing font file is reported as a console error (render.py aborts on it) instead of silently using a serif
+  const loadFace = f => document.fonts.load(`40px '${f}'`, 'АБВабв{}#>')
+    .then(list => { if (!list.length) console.error('font not loaded: ' + f + ' (check ../fonts/)'); })
+    .catch(() => console.error('font not loaded: ' + f + ' (check ../fonts/)'));
+  sc.onload = () => document.fonts.ready
+    .then(() => Promise.all(FACES.map(loadFace)))
+    .then(() => {
+      if (window.__pageError) { console.error('not starting, script error: ' + window.__pageError); window.__failed = true; return; }
+      if (window.SETUP) SETUP();
+      window.__ready = true;
+      renderAt(window.__hfThreeTime || 0);
+    });
+  document.body.appendChild(sc);
+  window.addEventListener('hf-seek', e => window.__ready && renderAt(e.detail.time));   // HyperFrames compatibility
+})();
+</script>
+</body></html>

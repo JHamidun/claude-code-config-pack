@@ -1,6 +1,6 @@
 ---
 name: video-shotcraft
-description: "Промо-ролики продукта на Remotion: 153 рецепта кадров, 2.5D-проходы, шаблон Ink Press. Триггеры: «видео из лендинга», «шоурил». НЕ: футаж→video-editor; reels→video-montage."
+description: "Промо-ролики продукта на Remotion: 152 рецепта кадров, Ink Press. Триггеры: «видео из лендинга», «шоурил». НЕ: футаж→video-editor; reels→video-montage; готовый HTML→video-export; мультик кодом с рисованным героем→code-cartoon."
 ---
 
 ## Навигация (RU) — читать первым
