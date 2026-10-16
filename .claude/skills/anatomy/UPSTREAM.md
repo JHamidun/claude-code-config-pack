@@ -28,10 +28,10 @@ MIT требует, чтобы этот текст сопровождал люб
 Не взято, потому что навыку не нужно: `.github/`, `tests/`, `scripts/*.test.mjs` (они ставят
 пакеты из реестра и запускают Chrome), `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`,
 `.gitattributes`, `.gitignore`, `agents/openai.yaml` (Codex), `evals/evals.json`.
-Собранные страницы больших примеров (`examples/arcade-cabinet`, `raptor-engine`,
-`ripple-tank`, `turning-dial`, до 1,6 МБ каждая) в пак не входят: они пересобираются
-командой `node examples/<имя>/build.mjs`. Страницы `dial-indicator` и `desk-computer`
-оставлены, чтобы пример открывался сразу.
+Собранные страницы всех примеров (в том числе больших: `arcade-cabinet`, `raptor-engine`,
+`ripple-tank`, `turning-dial`, до 1,6 МБ каждая) лежат как в upstream, байт в байт (сверены
+по sha256 со списком файлов ревизии), поэтому любой пример открывается сразу; при желании
+их можно пересобрать командой `node examples/<имя>/build.mjs`.
 
 Что проверено: сетевые обращения скриптов идут только на localhost (протокол отладки Chrome),
 телеметрии нет, ключей и переменных окружения кроме `CHROME_PATH` скрипты не читают.
