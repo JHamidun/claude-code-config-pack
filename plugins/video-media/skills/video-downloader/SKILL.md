@@ -33,6 +33,35 @@ winget install yt-dlp
 yt-dlp -U
 ```
 
+### ffmpeg — обязателен для всего, что качается в хорошем качестве
+
+YouTube отдаёт 1080p и выше **раздельными потоками**: видео без звука + звук без видео.
+Склеивает их не yt-dlp, а ffmpeg. Любой формат со знаком `+` (`bestvideo+bestaudio`,
+`bestvideo[height<=1080]+bestaudio`, `-x --audio-format mp3`) без ffmpeg работать не будет.
+
+И это **тихий** отказ: yt-dlp не падает. Он печатает одну строку предупреждения в общий
+поток, молча берёт единый прогрессивный формат — обычно 360p или 720p — и завершается
+с кодом 0. Файл на месте, «скачано успешно», качество не то. На Windows ffmpeg по
+умолчанию нет, так что это состояние по умолчанию.
+
+Проверь ДО скачивания — команда падает, если ffmpeg нет:
+
+```bash
+ffmpeg -version >/dev/null 2>&1 || { echo "ffmpeg НЕ НАЙДЕН: качество будет ограничено одним прогрессивным потоком (360p/720p), склейка 1080p+ и извлечение аудио не сработают"; exit 1; }
+```
+
+```powershell
+# PowerShell
+if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) { throw "ffmpeg НЕ НАЙДЕН: 1080p+ склеить нечем, yt-dlp молча скачает 360p/720p" }
+```
+
+Установка: `winget install Gyan.FFmpeg` (Windows), `brew install ffmpeg` (macOS),
+`sudo apt install ffmpeg` (Debian/Ubuntu). Если ffmpeg стоит, но не в PATH —
+`yt-dlp --ffmpeg-location "C:\path\to\ffmpeg\bin"`.
+
+Нет возможности поставить ffmpeg — скажи об этом вслух и качай осознанно одним потоком:
+`yt-dlp -f "best[ext=mp4]/best" URL`. Тогда ограничение названо, а не спрятано.
+
 ## Basic Usage
 
 ### Command Line
@@ -57,13 +86,27 @@ yt-dlp -f "bestvideo[height<=720]+bestaudio" URL
 ### Python
 
 ```python
+import shutil
 import yt_dlp
 
 def download_video(url: str, output_path: str = "."):
     """Download video from URL"""
+    fmt = 'bestvideo+bestaudio/best'
+
+    # Без ffmpeg ветка `bestvideo+bestaudio` неисполнима, и yt-dlp тихо
+    # сваливается в `/best` — один прогрессивный поток, 360p/720p, код возврата 0.
+    # Лучше отказать здесь, чем отдать не то качество под видом успеха.
+    if '+' in fmt and not shutil.which('ffmpeg'):
+        raise RuntimeError(
+            "ffmpeg не найден, а формат требует склейки видео+аудио.\n"
+            "Поставь ffmpeg (winget install Gyan.FFmpeg / brew install ffmpeg / "
+            "apt install ffmpeg), либо осознанно запроси один поток: "
+            "format='best[ext=mp4]/best' (тогда качество будет ограничено ~720p)."
+        )
+
     options = {
         'outtmpl': f'{output_path}/%(title)s.%(ext)s',
-        'format': 'bestvideo+bestaudio/best',
+        'format': fmt,
     }
 
     with yt_dlp.YoutubeDL(options) as ydl:
@@ -92,8 +135,11 @@ ID  EXT   RESOLUTION FPS |   FILESIZE   TBR PROTO
 
 ### Format Codes
 
+Каждая строка со знаком `+` требует ffmpeg (см. раздел Installation). Без него
+yt-dlp не падает, а берёт то, что удаётся скачать одним потоком.
+
 ```bash
-# Best video + best audio
+# Best video + best audio  (нужен ffmpeg)
 yt-dlp -f "bestvideo+bestaudio" URL
 
 # Best format under 50MB
@@ -233,7 +279,17 @@ def download_playlist(url: str, output_dir: str):
 
 ```python
 def download_audio(url: str, output_dir: str = ".", format: str = "mp3"):
-    """Download audio only"""
+    """Download audio only. Требует ffmpeg: перекодирует его постпроцессор."""
+    import shutil
+    if not shutil.which('ffmpeg'):
+        # Без ffmpeg постпроцессор не отработает, а исходный webm/m4a останется
+        # лежать под видом результата — «mp3, который не mp3».
+        raise RuntimeError(
+            f"ffmpeg не найден — извлечь {format} невозможно. "
+            "Поставь ffmpeg или скачивай исходную дорожку как есть "
+            "(format='bestaudio', без postprocessors)."
+        )
+
     options = {
         'outtmpl': f'{output_dir}/%(title)s.%(ext)s',
         'format': 'bestaudio/best',
@@ -332,7 +388,36 @@ yt-dlp --write-description URL
 
 ## Config File
 
-Create `~/.config/yt-dlp/config`:
+Конфиг, положенный не туда, **не вызывает ошибки**: yt-dlp просто не находит файл и
+качает с дефолтами. Снаружи это выглядит как «настройки не работают», и понять,
+что дело в пути, по выводу невозможно. Поэтому сначала — где именно он лежит,
+потом — как убедиться, что его подхватили.
+
+**Путь (первый найденный побеждает):**
+
+| ОС | Куда класть |
+|---|---|
+| Linux / macOS | `~/.config/yt-dlp/config` |
+| Windows | `%APPDATA%\yt-dlp\config` (то есть `C:\Users\<имя>\AppData\Roaming\yt-dlp\config`) |
+
+`~/.config/yt-dlp/config` работает и на Windows тоже — yt-dlp сам разворачивает `~`
+и проверяет XDG-каталог первым (проверено на 2026.08.19). Но путь с `~` надо
+**создавать** в оболочке, которая его понимает: PowerShell и Git Bash — да,
+`cmd.exe` — нет, там `mkdir ~\.config\yt-dlp` заведёт настоящую папку с именем `~`
+в текущем каталоге, и конфиг окажется невидим. В cmd бери `%APPDATA%`.
+
+**Проверка, что конфиг подхвачен** — обязательный шаг, а не необязательный:
+
+```bash
+yt-dlp -v --simulate "https://www.youtube.com/watch?v=dQw4w9WgXcQ" 2>&1 | grep "User config"
+```
+
+- строка `[debug] User config "<путь>": ['--restrict-filenames', ...]` — конфиг прочитан,
+  в скобках видно, какие именно опции из него взялись;
+- **пустой вывод** — файла по этому пути нет. Ошибки не будет никогда: это и есть
+  тот случай, когда «всё работает», а настройки не применяются.
+
+Содержимое:
 
 ```
 # Default format

@@ -19,7 +19,9 @@ metadata:
    yt-dlp -f "bv*[height<=720]+ba/b[height<=720]" --write-auto-subs --sub-langs "ru,en" -o "%(id)s.%(ext)s" <URL>
    ```
    Нативные субтитры (`--write-auto-subs`) — бесплатный транскрипт; Whisper/Deepgram — только если субтитров нет.
-2. **Извлечь кадры** ffmpeg по выбранному режиму (ниже), в `scratchpad/<video-id>/frames/`.
+2. **Извлечь кадры** ffmpeg по выбранному режиму (ниже), в `<скретчпад сессии>/<video-id>/frames/`.
+   Скретчпад — это каталог, названный в системном промпте сессии (`…/Temp/claude/<проект>/<сессия>/scratchpad`),
+   а не относительный `scratchpad/`: относительный создаст папку с кадрами там, откуда запустили.
 3. **Ужать кадры** до ширины 512px (лимит-friendly для image-input):
    ```bash
    ffmpeg -i frame.png -vf "scale=512:-2" frame_s.jpg
@@ -40,11 +42,14 @@ metadata:
 Команды ffmpeg:
 
 ```bash
-# efficient — только keyframes
-ffmpeg -skip_frame nokey -i in.mp4 -vsync vfr -frame_pts 1 frames/kf_%04d.png
+# efficient — только keyframes, потолок 50 кадров
+ffmpeg -skip_frame nokey -i in.mp4 -fps_mode vfr -frame_pts 1 -frames:v 50 frames/kf_%04d.png
 
-# balanced / token-burner — по смене сцены (порог 0.3; burner: 0.2 и без head-лимита)
-ffmpeg -i in.mp4 -vf "select='gt(scene,0.3)',showinfo" -vsync vfr frames/sc_%04d.png
+# balanced — смена сцены, порог 0.3, потолок 100 кадров
+ffmpeg -i in.mp4 -vf "select='gt(scene,0.3)',showinfo" -fps_mode vfr -frames:v 100 frames/sc_%04d.png
+
+# token-burner — порог ниже (0.2), без потолка кадров
+ffmpeg -i in.mp4 -vf "select='gt(scene,0.2)',showinfo" -fps_mode vfr frames/sc_%04d.png
 
 # равномерный fallback (нет явных сцен): 1 кадр в N сек, потолок 2 fps
 ffmpeg -i in.mp4 -vf "fps=1/10,scale=512:-2" frames/u_%04d.jpg

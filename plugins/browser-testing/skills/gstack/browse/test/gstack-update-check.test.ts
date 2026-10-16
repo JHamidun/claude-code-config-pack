@@ -165,28 +165,57 @@ describe('gstack-update-check', () => {
   });
 
   // ─── Path G: Invalid remote response ────────────────────────
-  test('treats invalid remote response as up to date', () => {
+  // A junk response means the check did not run. Reporting it as UP_TO_DATE
+  // is a lie that hides a broken update check forever.
+  test('reports an unusable remote response instead of claiming up to date', () => {
     writeFileSync(join(gstackDir, 'VERSION'), '0.3.3\n');
     writeFileSync(join(gstackDir, 'REMOTE_VERSION'), '<html>404 Not Found</html>\n');
 
     const { exitCode, stdout } = run();
     expect(exitCode).toBe(0);
-    expect(stdout).toBe('');
+    expect(stdout).toContain('UPDATE_CHECK_UNAVAILABLE');
     const cache = readFileSync(join(stateDir, 'last-update-check'), 'utf-8');
-    expect(cache).toContain('UP_TO_DATE');
+    expect(cache).toContain('UNAVAILABLE');
+    expect(cache).not.toContain('UP_TO_DATE');
   });
 
   // ─── Path H: Curl fails (bad URL) ──────────────────────────
-  test('exits silently when remote URL is unreachable', () => {
+  test('reports an unreachable remote instead of claiming up to date', () => {
     writeFileSync(join(gstackDir, 'VERSION'), '0.3.3\n');
 
     const { exitCode, stdout } = run({
       GSTACK_REMOTE_URL: 'file:///nonexistent/path/VERSION',
     });
     expect(exitCode).toBe(0);
-    expect(stdout).toBe('');
+    expect(stdout).toContain('UPDATE_CHECK_UNAVAILABLE');
     const cache = readFileSync(join(stateDir, 'last-update-check'), 'utf-8');
-    expect(cache).toContain('UP_TO_DATE');
+    expect(cache).toContain('fetch-failed');
+  });
+
+  // ─── Path H2: Upstream URL never configured (redistributed copy) ──
+  test('says so when the remote URL is still the <owner>/<repo> placeholder', () => {
+    writeFileSync(join(gstackDir, 'VERSION'), '0.3.3\n');
+
+    const { exitCode, stdout } = run({
+      GSTACK_REMOTE_URL: 'https://raw.githubusercontent.com/<owner>/<repo>/main/VERSION',
+    });
+    expect(exitCode).toBe(0);
+    expect(stdout).toContain('UPDATE_CHECK_UNAVAILABLE');
+    expect(stdout).toContain('no upstream URL configured');
+    const cache = readFileSync(join(stateDir, 'last-update-check'), 'utf-8');
+    expect(cache).toContain('no-upstream-url');
+  });
+
+  // ─── Path H3: the "cannot check" notice is rate-limited ─────
+  test('stays quiet while the UNAVAILABLE cache is fresh', () => {
+    writeFileSync(join(gstackDir, 'VERSION'), '0.3.3\n');
+    writeFileSync(join(stateDir, 'last-update-check'), 'UNAVAILABLE 0.3.3 fetch-failed');
+
+    const { exitCode, stdout } = run({
+      GSTACK_REMOTE_URL: 'file:///nonexistent/path/VERSION',
+    });
+    expect(exitCode).toBe(0);
+    expect(stdout).toBe('');
   });
 
   // ─── Path I: Corrupt cache file ─────────────────────────────
@@ -234,9 +263,10 @@ describe('gstack-update-check', () => {
       GSTACK_REMOTE_URL: 'file:///nonexistent/path/VERSION',
     });
     expect(exitCode).toBe(0);
-    // Should write UP_TO_DATE cache (not crash)
+    // Must not crash, and must not pretend the check succeeded
     const cache = readFileSync(join(stateDir, 'last-update-check'), 'utf-8');
-    expect(cache).toContain('UP_TO_DATE');
+    expect(cache).toContain('UNAVAILABLE');
+    expect(stdout).toContain('UPDATE_CHECK_UNAVAILABLE');
   });
 
   test('exits 0 when up to date (not exit 1)', () => {

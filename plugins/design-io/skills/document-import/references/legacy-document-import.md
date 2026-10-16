@@ -81,6 +81,8 @@ for i, slide in enumerate(prs.slides, 1):
 `.sketch` — это zip с JSON внутри:
 ```bash
 unzip source.sketch -d sketch-extracted/
+# нет unzip (Windows: его нет ни в системе, ни в Git Bash) — распаковать Python'ом:
+# python -c "import sys,zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" source.sketch sketch-extracted/
 ls sketch-extracted/pages/    # JSON каждой страницы
 ls sketch-extracted/images/   # PNG ассеты
 ```
@@ -91,9 +93,16 @@ sketchtool list pages source.sketch    # список страниц
 sketchtool export artboards source.sketch --output=exports/   # все артборды как PNG
 ```
 
-На Windows/Linux sketchtool недоступен — fallback: `.sketch` это zip, распаковать и забрать превью:
+На Windows/Linux sketchtool недоступен — fallback: `.sketch` это zip, распаковать и забрать превью.
+На Windows тут же вторая яма: `unzip` там тоже нет — ни в системе, ни в Git Bash.
+Поэтому распаковка идёт Python'ом, который в паке обязателен:
+
 ```bash
+# если unzip есть (macOS, Linux):
 unzip -qo source.sketch -d sketch-extracted/
+# кросс-платформенно, без внешних программ:
+python -c "import sys,zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" source.sketch sketch-extracted/
+
 ls sketch-extracted/previews/ sketch-extracted/images/   # preview.png + PNG-ассеты
 ```
 

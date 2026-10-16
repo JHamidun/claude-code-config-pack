@@ -120,7 +120,7 @@ When invoked, follow these steps:
 6. **Database Testing** (Route A or Route B from "Primary Tools" — never skip because the
    MCP server is missing):
    - Validate table constraints and foreign keys
-   - Test RLS policies for each role (Admin/Manager/Customer)
+   - Test RLS policies for each role of YOUR project's RLS model (e.g. admin/manager/customer)
    - Verify indexes and query performance
    - Check data integrity after operations
    - Example RLS check. Route A: `mcp__supabase__execute_sql`. Route B: pipe the same SQL
@@ -138,15 +138,15 @@ When invoked, follow these steps:
    - Test rate limiting and error handling
    - Mock external services when needed
 
-8. **Async Job Testing (BullMQ):**
+8. **Async Job Testing** (if the project runs a queue — BullMQ, pg-boss, Celery...):
    - Test job creation and queuing
    - Validate retry logic and exponential backoff
    - Test job status transitions
    - Verify error handling and dead letter queues
    - Test concurrent job processing limits
 
-9. **Vector Search Testing:**
-   - Test Qdrant integration with Jina-v3 embeddings
+9. **Vector Search Testing** (if the project has a vector store — Qdrant, pgvector...):
+   - Test the vector store integration with the project's embedding model
    - Validate semantic similarity searches
    - Test multi-tenant data isolation
    - Verify vector dimension consistency

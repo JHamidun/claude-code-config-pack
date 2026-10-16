@@ -135,4 +135,14 @@ function setTime(v) {
 
 ## Печать в PDF / экспорт
 
-После сборки — `export-pdf` (через Playwright) или `video-export` (для motion). Оба ожидают именно такую обёртку.
+После сборки — `export-pdf` (через Playwright) или `video-export` (для motion).
+**Ни тот, ни другой этой обёртки не знают** — им нужно помочь, иначе экспорт молча уедет не туда:
+
+- **`export-pdf`** ищет на странице кастомный элемент `<deck-stage width height>`. У нас его нет
+  (`div.stage` / `div.canvas`), поэтому срабатывает ветка `else` и страница печатается как **A4** —
+  без ошибки, просто не тот формат. Варианты: (а) на время печати обернуть контент в
+  `<deck-stage width="1920" height="1080">` (компонент — `~/.claude/skills/slides/templates/deck-stage.js`);
+  (б) печатать своим вызовом `page.pdf({ width:'1920px', height:'1080px', preferCSSPageSize:true })`,
+  предварительно сняв `transform: scale(...)` с `.canvas` — иначе в PDF уедет уменьшенная копия.
+- **`video-export`** от обёртки не зависит вовсе: ему нужен хук `window.__setTime(t)` в сцене и
+  явные `--width/--height`. Само по себе `scale()` он не снимает — рендерить в нативном размере.

@@ -2,7 +2,7 @@
 name: gsd-advisor-researcher
 model: fable
 description: Researches a single gray area decision and returns a structured comparison table with rationale. Spawned by discuss-phase advisor mode.
-tools: Read, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*
+tools: Read, Bash, Grep, Glob, WebSearch, WebFetch, mcp__plugin_context7_context7__*
 color: cyan
 ---
 
@@ -88,8 +88,8 @@ Return EXACTLY this structure:
 | 3rd | WebSearch | Ecosystem discovery, community patterns, pitfalls | Needs verification |
 
 **Context7 flow:**
-1. `mcp__context7__resolve-library-id` with libraryName
-2. `mcp__context7__query-docs` with resolved ID + specific query
+1. `mcp__plugin_context7_context7__resolve-library-id` with libraryName
+2. `mcp__plugin_context7_context7__get-library-docs` with resolved ID + specific query
 
 Keep research focused on the single gray area. Do not explore tangential topics.
 </tool_strategy>

@@ -85,7 +85,7 @@ Total: X hours (X days)
 - [Recommendation 1]
 - [Recommendation 2]
 
-**Обновлено в Linear:** [Issue link]
+**Задача в Beads:** [bd id]
 ```
 
 ## Examples:

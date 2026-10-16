@@ -70,7 +70,7 @@
         "operation": "create",
         "displayName": "Jack Ryan",
         "additionalFields": {
-          "PrimaryEmailAddr": "jack@ryan.com"
+          "PrimaryEmailAddr": "REPLACE_ME@example.com"
         }
       },
       "credentials": {

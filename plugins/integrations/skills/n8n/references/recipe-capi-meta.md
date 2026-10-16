@@ -18,7 +18,7 @@ n8n — рекомендуемый инструмент для CAPI, когда 
 [Webhook] → [Set: нормализация] → [Crypto: SHA-256] → [HTTP Request: Meta CAPI]
    ↑               ↓                      ↓                       ↓
 CRM-триггер   email lowercase,      хеш em/ph/country/      POST на graph.facebook.com
-(your CRM /     phone только цифры,    zp/external_id;         /<API_VERSION>/<PIXEL_ID>/events
+(amoCRM /       phone только цифры,    zp/external_id;         /<API_VERSION>/<PIXEL_ID>/events
 HubSpot /     country ISO, zip       FBC/FBP НЕ хешируем     → Events Manager → Test Events
 Битрикс24)
 ```
@@ -26,9 +26,9 @@ HubSpot /     country ISO, zip       FBC/FBP НЕ хешируем     → Event
 ### Узел 1 — Webhook (триггер)
 
 `n8n-nodes-base.webhook`, метод POST. CRM шлёт событие на смену стадии / оплату:
-- **your CRM** — webhook на смену статуса сделки (через настройки воронки или digital-pipeline).
+- **amoCRM** — webhook на смену статуса сделки (через настройки воронки или digital-pipeline).
 - **HubSpot** — workflow с действием «Send a webhook» на смену стадии deal.
-- **Битрикс24** — исходящий вебхук `ONCRMDEALUPDATE` на смену стадии (см. скилл `crm`).
+- **Битрикс24** — исходящий вебхук `ONCRMDEALUPDATE` на смену стадии (настраивается в самой Битрикс24, см. её REST-документацию).
 
 Данные приходят в `{{ $json.body }}` (email, phone, сумма, ID сделки, и — если сохранены при заходе на сайт — `fbc`/`fbp` из cookies `_fbc`/`_fbp`).
 
@@ -137,14 +137,14 @@ Test Events
 | **n8n** (этот рецепт) | PII дома, 0 за объём, уже есть сервер | self-hosted, любая логика, хеширование настраиваешь сам |
 | **Zapier** | быстрый старт, не жалко платить | `Facebook Conversions` action **хеширует PII сам**; зарубежная оплата |
 | **Make (Integromat)** | гибкий маппинг, дешевле Zapier | через HTTP/JSON-модуль — полный контроль payload; зарубежный биллинг |
-| **Albato** (RU) | РФ-юрлицо, зарубежная оплата недоступна | RU-биллинг, готовые RU-коннекторы your CRM / Битрикс24 |
-| CRM-нативный коннектор | HubSpot / your CRM со встроенной интеграцией CAPI | проще любого no-code слоя — события уходят из воронки автоматически |
+| **Albato** (RU) | РФ-юрлицо, зарубежная оплата недоступна | RU-биллинг, готовые RU-коннекторы amoCRM / Битрикс24 |
+| CRM-нативный коннектор | HubSpot / amoCRM со встроенной интеграцией CAPI | проще любого no-code слоя — события уходят из воронки автоматически |
 
 Брать no-code (а не нативный коннектор), когда нужна нестандартная логика: фильтр по конкретной стадии, обогащение FBC/FBP из cookies, кастомная нормализация, отправка сразу в Meta + Google + Яндекс из одного триггера.
 
 ## Cross-links
 
 - `capi-no-code-setup` (скилл) — полная методология: зачем server-side, **7 параметров матчинга**, хеширование SHA-256, **Event ID дедупликация**, Test Events, офлайн-конверсии, атрибуция. Эталонный payload — там в `references/meta-capi.md`.
-- `crm` (скилл) — исходящие вебхуки на смену стадии сделки.
+- Твоя CRM — исходящие вебхуки на смену стадии сделки (настраиваются в CRM, не в n8n).
 - `meta-ads-launch-ru` (скилл) — запуск Meta, доступ и оплата из РФ, аукционная логика.
 - `ai-seo-agent-pipeline` (скилл) — другой n8n-рецепт из того же курса: программатическая AI-SEO фабрика (n8n + Perplexity + OpenAI).

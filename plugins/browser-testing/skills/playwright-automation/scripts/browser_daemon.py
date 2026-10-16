@@ -26,10 +26,8 @@ import argparse, json, os, pathlib, sys, time, traceback
 sys.stdout.reconfigure(encoding="utf-8")
 from playwright.sync_api import sync_playwright
 
-BASE = pathlib.Path(__file__).resolve().parent.parent / "profiles"
-BASE.mkdir(exist_ok=True)
+BASE = pathlib.Path(__file__).resolve().parent.parent / "profiles"   # каталоги создаются в main()
 STATE = pathlib.Path(__file__).resolve().parent.parent / "state"
-STATE.mkdir(exist_ok=True)
 
 # --- пороги (совпадают с лестницей camofox-подхода) ---
 TAB_IDLE_SEC = 300        # лишние вкладки закрываются через 5 мин простоя
@@ -102,8 +100,12 @@ def main():
     ap.add_argument("--max-rss-mb", type=int, default=MAX_RSS_MB, help="рестарт браузера при RSS выше, МБ (0 = никогда)")
     a = ap.parse_args()
 
+    # Каталоги создаём здесь, а не при импорте модуля: profiles/ и state/ нужны
+    # только работающему daemon.
+    BASE.mkdir(parents=True, exist_ok=True)
+    STATE.mkdir(parents=True, exist_ok=True)
     profile_dir = BASE / a.profile
-    profile_dir.mkdir(exist_ok=True)
+    profile_dir.mkdir(parents=True, exist_ok=True)
     args = [f"--remote-debugging-port={a.port}", "--disable-blink-features=AutomationControlled",
             "--no-first-run", "--no-default-browser-check"]
     kwargs = dict(user_data_dir=str(profile_dir), headless=a.headless, args=args,

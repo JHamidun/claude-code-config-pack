@@ -8,10 +8,11 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
+| `agent-swarm` | Рой из разных моделей на одну задачу: линзы, опровержение находок, Codex воркером. |
 | `parse-git-status` | Разбор вывода git status в структуру: staged, изменённые, ветка, ahead/behind. |
-| `rollback-changes` | Откат упавшей фазы воркфлоу по changes-log: восстановление файлов, чистка артефактов, отмена команд. |
+| `rollback-changes` | Откат упавшей фазы воркфлоу по changes-log: файлы из бэкапа, revert коммитов, чистка артефактов. |
 | `run-quality-gate` | Прогон quality gate: type-check, build, tests, lint со структурным отчётом. |
-| `scaling-stage` | Letterbox wrapper for fixed-size content (video, posters, fixed mockups) — a deck-stage for non-slides. |
+| `scaling-stage` | Letterbox-обёртка контента фиксированного canvas (1920×1080): вписывается в любой viewport. |
 | `validate-plan-file` | Проверка plan-файлов оркестратора по JSON-схеме до чтения воркерами. |
 
 ### Agents

@@ -350,7 +350,7 @@
       {
         "json": {
           "id": 6,
-          "email_from": "contact@mihai.ltd",
+          "email_from": "REPLACE_ME@example.com",
           "won_status": "won",
           "description": "<p data-last-history-steps=\"1224754175503363,660472183033793\">\nAlex Mason, Procurement Manager at Innovative Solutions Inc., initially expressed strong interest in CloudConnect Pro for upcoming projects. They were impressed with its capabilities in cloud integration, data management, and flexibility. After successful discussions and negotiations, NovaTech Enterprises signed a contract for $19,000 to implement CloudConnect Pro for their enterprise-level needs. Project onboarding and deployment were completed successfully.\n\n<br></p>",
           "contact_name": false,
@@ -360,7 +360,7 @@
       {
         "json": {
           "id": 5,
-          "email_from": "contact@mihai.ltd",
+          "email_from": "REPLACE_ME@example.com",
           "won_status": "pending",
           "description": "<p>Mihai Farcas, Procurement Manager at Innovative Solutions Inc, is interested in incorporating CloudConnect Pro platform into their upcoming projects. They are impressed by its capabilities in cloud integration, data management, and flexibility. They request detailed information on pricing, implementation options, support services, and case studies for enterprise-level deployments. They are eager to learn more and hope for a mutually beneficial partnership. </p>",
           "contact_name": false,

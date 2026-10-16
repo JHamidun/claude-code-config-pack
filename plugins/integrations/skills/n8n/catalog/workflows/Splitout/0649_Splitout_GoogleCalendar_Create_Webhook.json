@@ -103,7 +103,7 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "c_5792bdf04bc395cbcbc6f7b754268245a33779d36640cc80a357711aa2f09a0a@group.calendar.google.com",
+          "value": "REPLACE_ME@group.calendar.google.com",
           "cachedResultName": "n8n-events"
         },
         "operation": "getAll"

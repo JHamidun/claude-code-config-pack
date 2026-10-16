@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "google-workspace",
   "displayName": "Google Workspace",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Gmail, Docs, Sheets, Drive, Calendar, Contacts, Tasks, Meet, Chat, Ads, Analytics.",
   "author": {
     "name": "Zhemal Khamidun",

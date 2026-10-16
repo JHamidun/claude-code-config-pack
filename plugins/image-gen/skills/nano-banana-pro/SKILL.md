@@ -1,21 +1,20 @@
 ---
 name: nano-banana-pro
-description: "Prompt engineering Nano Banana Pro (Gemini Image): реставрация фото, VK-креативы без VPN. Триггеры: «восстанови фото», «шакальная фотка»."
+description: "Prompt engineering Nano Banana Pro (Gemini Image): перерендер и реставрация фото, VK-креативы без VPN. Триггеры: «восстанови фото», «шакальная фотка». НЕ апскейл→image-enhancer."
 ---
 
 > ⚠️ **NO-KEY GUARD (обязательно):** этот функционал требует ОПЦИОНАЛЬНОГО стороннего API-ключа. Перед вызовом проверь ключ в `.credentials.master.env`. Если ключ отсутствует, пустой или placeholder (`your_*_api_key`) — **НЕ проси пользователя оплатить счёт, включить биллинг или купить API**. Скажи одной строкой: «Эта функция опциональна и требует свой API-ключ (например, бесплатный ключ на aistudio.google.com); из коробки всё остальное работает по подписке Claude» — и предложи альтернативу или продолжай без неё.
 
-# Nano Banana Pro / Gemini Image Ultra - Prompt Engineering Guide
+# Nano Banana Pro / Gemini Image Ultra — Prompt Engineering
 
 > **See Also:**
-> - **[image-generation](image-generation.md)** - General prompt engineering for all image generators
-> - **[gemini-3-pro](gemini-3-pro.md)** - Full Gemini suite: Imagen 3, Veo 2, TTS, Live API
-> - **[openai-dalle](openai-dalle.md)** - OpenAI suite: DALL-E 3, Sora 2, Whisper
-> - **[references/vk-ads-creatives.md](references/vk-ads-creatives.md)** - VK Ads сюрреалист-креативы (метод эксперта, Магритт/Дали) через Gemini вместо DALL-E 3 — без VPN из РФ, выше качество
+> - **[image-generation](../image-generation/SKILL.md)** — общий промпт-инжиниринг картинок (камеры/объективы/свет/JSON-формат — там; сводка съёмочных параметров для фотореализма — `references/photo-prompt-catalog.md`)
+> - **[gemini-3-pro](../gemini-3-pro/SKILL.md)** — полный Gemini-стек
+> - **[references/vk-ads-creatives.md](references/vk-ads-creatives.md)** — VK Ads сюрреалист-креативы (метод эксперта, Магритт/Дали) через Gemini вместо DALL-E 3: без VPN из РФ, выше качество
 
 ## Multi-Image Consistency via Reference Chaining (CRITICAL)
 
-Nano Banana Pro / Gemini Image **НЕ сохраняет identity** между separate `generate_content` calls. Каждый вызов = independent generation. Для multi-frame consistency (keyframes для image-to-video, серия иллюстраций, character lock) нужен reference-chaining.
+Nano Banana Pro / Gemini Image **НЕ сохраняет identity** между отдельными `generate_content`-вызовами — каждый вызов независим. Для серий (keyframes под image-to-video, иллюстрации, character lock) нужен reference-chaining.
 
 ### Pattern: forward chaining + periodic re-anchor
 
@@ -33,77 +32,46 @@ CFG = types.GenerateContentConfig(response_modalities=['IMAGE', 'TEXT'])
 def img_part(resp):
     return next(p.inline_data for p in resp.candidates[0].content.parts if p.inline_data)
 
-# Шаг 1: generate первый keyframe
+# Шаг 1: первый keyframe
 resp1 = client.models.generate_content(model=MODEL, config=CFG,
     contents=['Watercolor children illustration of a small figure in a misty forest. 21:9 cinemascope.'])
 img1 = img_part(resp1)
 
-# Шаг 2: feed output back as reference
+# Шаг 2-3: output предыдущего шага как reference
 resp2 = client.models.generate_content(model=MODEL, config=CFG, contents=[
     types.Part.from_bytes(data=img1.data, mime_type='image/png'),
     'Same character, same style. Now standing at edge of glowing river.'
 ])
-img2 = img_part(resp2)
 
-# Шаг 3: chain forward
-resp3 = client.models.generate_content(model=MODEL, config=CFG, contents=[
-    types.Part.from_bytes(data=img2.data, mime_type='image/png'),
-    'Same character, same style. Now kneeling beside ancient glyph stone.'
-])
-img3 = img_part(resp3)
-
-# Шаг 4: RE-ANCHOR к img1 (НЕ к img3), иначе drift
+# Шаг 4: RE-ANCHOR к img1 (НЕ к последнему выходу), иначе drift
 resp4 = client.models.generate_content(model=MODEL, config=CFG, contents=[
     types.Part.from_bytes(data=img1.data, mime_type='image/png'),   # ← anchor!
     'Same character, same style. Now walking through cloud-tops at dawn.'
 ])
 ```
 
-### Drift behaviour
+**Drift:** чистый forward-chaining уплывает после ~4 хопов (1-2 — identity tight; 3-4 — мелкие сдвиги стиля; 5+ — заметный дрейф лица/пропорций). **Re-anchor каждые 3 шага к оригинальному output1** стабилизирует серию.
 
-Forward-chaining alone drifts после ~4 hops:
-- Hop 1-2: identity tight
-- Hop 3-4: minor stylistic shifts
-- Hop 5+: noticeable face / proportion drift
+**Потолок параллелизма: ~4 одновременных `generate_content`.** 5+ = `RESOURCE_EXHAUSTED`. `asyncio.Semaphore(4)`.
 
-**Re-anchor каждые 3 шага к original output1** стабилизирует multi-frame consistency.
+**21:9 cinemascope — нативно**, без post-crop (GPT Image 1.5 упирается в 3:2, кроп теряет композицию). Для cinematic-трейлеров с заданным aspect Nano Banana Pro — единственный mainstream-вариант без crop-loss.
 
-### Parallelism ceiling
+**Reference переносим между провайдерами:** сгенерируй ОДИН раз — reuse через Seedance / Veo / Sora / GPT Image. Для multi-character серии — отдельный reference на каждого персонажа. Keyframing под image-to-video → `video-generation/SKILL.md` Phase 4.
 
-**~4 concurrent `generate_content` calls reliable.** 5+ = `RESOURCE_EXHAUSTED`.
+## Photo Restoration (шакальная фотка → HD)
 
-```python
-import asyncio
-SEM = asyncio.Semaphore(4)
+> **Граница с `image-enhancer` — «восстанови фото» ловят оба навыка, а делают разное.**
+> Различие проходит НЕ по «где ИИ» — в `image-enhancer` тоже есть нейросеть (Real-ESRGAN), — а по
+> тому, **переписывается ли содержание кадра**. Здесь модель **рисует кадр заново**, досочиняя из
+> своего прайора детали, которых в пикселях уже нет: поры кожи, пряди, блики в глазах. Лицо при
+> этом надо УДЕРЖАТЬ промптом — само оно не сохраняется. В `image-enhancer` любой шаг остаётся
+> обработкой сигнала (LANCZOS, denoise, CLAHE, super-resolution): он доращивает те пиксели, что
+> есть, и композицию с лицом не трогает по построению. Правило: **нужны детали, которых в
+> исходнике нет → сюда; надо просто увеличить и почистить имеющееся → `image-enhancer`.**
+> Для документов, юридических и исторических снимков перерендер неуместен: он выдаёт
+> правдоподобное, а не бывшее.
 
-async def gen_one(ref_img, prompt):
-    async with SEM:
-        return await model.generate_content_async([ref_img, prompt])
-```
-
-### 21:9 cinemascope native support
-
-Nano Banana Pro **natively** генерит 21:9 cinemascope без post-crop. GPT Image 1.5 cap = 3:2 (post-crop теряет composition).
-
-Для cinematic trailers с заранее заданным aspect — Nano Banana Pro единственный mainstream option без crop-loss.
-
-```python
-resp = model.generate_content([
-    'Ultra-wide 21:9 cinemascope shot. Photorealistic. The figure walks through misty ruins.'
-])
-```
-
-### Universal pattern: reference image works across providers
-
-Generate ОДИН раз, reuse через Seedance / Veo / Sora / GPT Image. Separate reference per character для multi-character series.
-
-Подробнее по image-to-video использованию keyframes → `video-generation/SKILL.md` Phase 4 (keyframing rules).
-
-## Photo Restoration (Low-Quality → HD)
-
-Use this template to restore old/blurry/compressed photos while preserving identity, pose, and composition. Works best with Nano Banana Pro / Gemini 3 Pro Image.
-
-### Master Template (RU)
+Реставрация старых/размытых/пережатых фото с сохранением идентичности, позы и композиции. Мастер-шаблон (RU) — заполни СУБЪЕКТ и КАДРИРОВАНИЕ:
 
 ```
 ДИРЕКТИВА: Выполнить реставрацию ультра-верности и кинематографический
@@ -141,61 +109,21 @@ Use this template to restore old/blurry/compressed photos while preserving ident
 картины, низкое разрешение, AI-look, uncanny valley.
 ```
 
-### Master Template (EN)
+Английская версия шаблона (формулировки выверены, не переводить на лету) → `references/photo-restoration-en.md`.
 
-```
-DIRECTIVE: Execute ultra-fidelity restoration and cinematic re-render of
-the source image. Primary goal — "Analytical Micro-Detail Reconstruction"
-from the low-quality source.
+### Вариации
 
-SUBJECT: [main subject description]
-CRITICAL: Facial structure, identical expression, and exact pose must
-STRICTLY MATCH the source image. 100% identity fidelity required.
+- **Portrait close-up:** КАДРИРОВАНИЕ → `Close-up (поясной план)`, камера → `135mm f/2.0`.
+- **Full-body:** `Full Body`, камера `35mm f/2.8`, свет `Natural Soft Light`.
+- **Ч/Б → цвет:** добавить `Колоризация: исторически точные цвета эпохи [1950s/1980s/...]` — указание эпохи даёт лучшие цвета, чем generic «восстанови цвета».
+- **Групповое фото:** добавить `Сохранить идентичность КАЖДОГО человека отдельно, без смешения черт`.
 
-RECONSTRUCTED DETAILS:
-- Extreme recovery of natural skin textures (visible pores, micro-wrinkles)
-- Realistic individualized hair strands
-- Crystal-clear eyes with defined catchlights
-- Clean, well-defined edges on clothing and accessories
+### Правила реставрации
 
-SCENE: Exact copy of original composition.
-FRAMING: [Close-up | Medium Shot | Full Body], Rule of Thirds.
-ENVIRONMENT: Reconstruct original background. Increase DOF for subtle
-but clear subject/environment separation. Eliminate artifacts and noise.
-
-TECHNICAL SPECS:
-- CAMERA: 85mm lens, f/1.8 aperture (soft bokeh)
-- LIGHTING: Balanced Cinematic Lighting (Rembrandt), high contrast,
-  preserved shadow detail, precise specular highlights
-- OUTPUT QUALITY: 8K resolution, photoreal textures, ProRes quality,
-  studio clarity, poster-grade realism
-
-REFERENCE: Attached image is the ONLY reference for structure and
-identity. Do not invent features.
-
-NEGATIVE PROMPT: Blur, softness, visual noise, compression artifacts,
-identity change, expression change, pose change, clothing change,
-added objects, repainting, painterly look, low resolution, AI-look,
-uncanny valley.
-```
-
-### Variations
-
-**Portrait close-up:** Change `КАДРИРОВАНИЕ` to `Close-up (поясной план)`, camera to `135mm f/2.0`.
-
-**Full-body restoration:** `Full Body`, camera `35mm f/2.8`, lighting `Natural Soft Light`.
-
-**B&W → Color:** Add `Колоризация: исторически точные цвета эпохи [1950s/1980s/etc.]`.
-
-**Group photo:** Add `Сохранить идентичность КАЖДОГО человека отдельно, без смешения черт`.
-
-### Tips
-
-1. **Always attach the source image** — Nano Banana needs visual reference, not just description
-2. **Specify era for B&W** — "1960s photo" gives better color choices than generic "restore colors"
-3. **Don't over-describe the person** — let the source image dictate features; describe only unchangeable traits (glasses, beard, scar)
-4. **Test with a crop first** — restoration quality varies; try a face-only crop before full image
-5. **Use Ultra model for final** — Nano Banana Pro / Gemini 3 Pro Image, not Flash Image, for max detail
+1. **Всегда прикладывай исходник** — Nano Banana нужен визуальный reference, не описание.
+2. **Не описывай человека подробно** — черты диктует исходник; словами только неизменяемое (очки, борода, шрам). Иначе модель «додумает» лицо по описанию.
+3. **Сначала тест на кропе лица** — качество реставрации плавает; проверь на кропе прежде чем гнать полный кадр.
+4. **Финал — только Pro-моделью** (Nano Banana Pro / Gemini 3 Pro Image), не Flash Image: максимум деталей.
 
 ## Каталог параметров съёмки
 

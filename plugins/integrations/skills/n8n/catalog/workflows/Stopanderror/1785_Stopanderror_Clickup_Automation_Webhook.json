@@ -313,7 +313,7 @@
         "options": {},
         "subject": "={{ $json.subject }}",
         "toEmail": "={{ $json.to }}",
-        "fromEmail": "friedemann.schuetz@posteo.de"
+        "fromEmail": "REPLACE_ME@example.com"
       },
       "credentials": {
         "smtp": {

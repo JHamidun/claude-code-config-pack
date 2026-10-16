@@ -5,7 +5,8 @@ description: "Готовые блоки <link> для пар шрифтов Goog
 
 # Fonts bundle
 
-Готовые сниппеты. Скопируй в `<head>` нужный блок. Все — с `display=swap`, минимальными весами и Cyrillic-subset (где применимо).
+Готовые сниппеты. Скопируй в `<head>` нужный блок. Все — с `display=swap` и минимальными весами.
+**Русский текст — сперва в раздел «Кириллица»:** из перечисленных ниже семейств её несёт только Inter.
 
 ## System stack (без подключений)
 
@@ -47,6 +48,10 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 
 Editorial-направление. Хорошо для лендингов, питчей.
 
+⚠️ Ровно эту пару `content-rules` (`:49-50`) держит в чёрном списке: «Fraunces везде, где нужно
+красиво» + «заглавный display-шрифт + Inter в теле — самая узнаваемая ИИ-пара». Плюс ни одно
+из двух семейств не несёт кириллицу. Брать только осознанно, для латинского макета.
+
 ## Bricolage Grotesque + Inter
 
 ```html
@@ -55,7 +60,8 @@ Editorial-направление. Хорошо для лендингов, пит
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500&display=swap">
 ```
 
-Для современных продуктов с мягкой типографикой.
+Для современных продуктов с мягкой типографикой. ⚠️ Та же оговорка, что и у пары выше:
+«display + Inter в теле» — маркер ИИ-выхлопа по `content-rules:50`, и кириллицы у Bricolage нет.
 
 ## Space Grotesk + Space Mono
 
@@ -99,23 +105,45 @@ Editorial-направление. Хорошо для лендингов, пит
 
 ## Кириллица
 
-Не все Google Fonts поддерживают Cyrillic. Проверенные с кириллицей:
-- Inter ✅
-- DM Sans / DM Serif Display ✅
-- Bricolage Grotesque ✅
-- Outfit ❌
-- Fraunces ❌
-- Space Grotesk / Space Mono ✅
+Не все Google Fonts поддерживают Cyrillic. **Сверено 2026-08-22 двумя источниками**
+(css2 с Chrome-UA + метаданные gwfh) — из наборов, которые предлагает этот навык,
+кириллицу несёт РОВНО ОДИН:
 
-Для не-поддерживаемых добавь fallback:
+| Семейство | Сабсеты по факту | Кириллица |
+| --- | --- | --- |
+| Inter | cyrillic, cyrillic-ext, greek, greek-ext, latin, latin-ext, vietnamese | ✅ |
+| DM Sans · DM Serif Display | latin, latin-ext | ❌ |
+| Bricolage Grotesque | latin, latin-ext, vietnamese | ❌ |
+| Space Grotesk · Space Mono | latin, latin-ext, vietnamese | ❌ |
+| Outfit | latin, latin-ext | ❌ |
+| Fraunces | latin, latin-ext, vietnamese | ❌ |
+
+⚠️ На латинском превью подмена НЕ ВИДНА: русский текст молча уезжает в системный шрифт.
+Поэтому для русских макетов не «добавь fallback», а **бери семейство с кириллицей сразу**.
+
+Проверенные там же кириллические замены под те же роли:
+- sans body/UI: **Inter**, **Manrope**, **Golos Text**, **Onest**, **Commissioner**, **Wix Madefor Display**
+- geometric display (вместо Outfit / Bricolage): **Jost**, **Unbounded**, **Montserrat**
+- serif display (вместо Fraunces / DM Serif Display): **Playfair Display**, **Spectral**, **PT Serif**, **Cormorant**
+- mono (вместо Space Mono): **JetBrains Mono**, **IBM Plex Mono**
+
+Если латинское семейство всё же нужно (логотип, англ. заголовок) — фолбэк обязателен,
+иначе кириллица возьмётся из чего попало:
 ```css
 font-family: 'Outfit', 'Inter', system-ui, sans-serif;
 ```
 
 ## Правила
 
-### 1. Не больше 4 файлов
-Каждый `<link>` к Google Fonts — отдельный запрос. Если просишь 8 весов — это 8 запросов.
+### 1. Одним `<link>`, а не пятью
+Семейства склеиваются через `&family=` — это один запрос за CSS независимо от их числа
+(так и сделано во всех блоках выше). Пять отдельных `<link>` — пять запросов, вот это дорого.
+
+Число скачиваемых woff2 определяют **сабсеты, а не веса**: замер 2026-08-22 на `Inter`
+через css2 — 8 весов дают 56 `@font-face`, но **7 уникальных woff2** (по одному на сабсет),
+ровно столько же, сколько и один вес; браузер тянет только те, чей `unicode-range` встретился
+на странице. Так что «8 весов = 8 запросов» неверно — это вариативный шрифт.
+Веса всё равно держи в узде (правило 4), но по причине из правила 4, а не из-за числа запросов.
 
 ### 2. `display=swap`
 Без него на медленной сети текст невидим до загрузки шрифта. Со swap — рисуется фолбеком, потом подменяется.
@@ -134,8 +162,13 @@ font-family: 'Outfit', 'Inter', system-ui, sans-serif;
 ```
 Ускоряет LCP. Имя файла нужно вытащить из Network-таба.
 
-### 6. Self-hosting (production)
-Для финальных проектов — скачай `.woff2` с `gwfh.mranftl.com`, положи в `/fonts/`, задай `@font-face`. Снимает зависимость от Google.
+### 6. Self-hosting (production) — но НЕ в артефакте
+Для финальных проектов на своём хостинге — скачай `.woff2` с `gwfh.mranftl.com`, положи в `/fonts/`, задай `@font-face`. Снимает зависимость от Google.
+
+⚠️ **В опубликованном артефакте claude.ai этот путь не работает:** CSP пускает только
+`fonts.googleapis.com` + `fonts.gstatic.com`, а `/fonts/inter.woff2` там просто не существует —
+страница одностраничная, своей файловой раздачи у неё нет. В артефакте либо Google Fonts,
+либо шрифт, вшитый в `src: url("data:font/woff2;base64,…")`.
 
 ```css
 @font-face {
@@ -150,7 +183,7 @@ font-family: 'Outfit', 'Inter', system-ui, sans-serif;
 ## Лицензии
 
 - **Все Google Fonts** — Open Font License (OFL) или Apache. Свободны.
-- **Bunny Fonts** (`fonts.bunny.net`) — drop-in замена Google без трекинга.
+- **Bunny Fonts** (`fonts.bunny.net`) — drop-in замена Google без трекинга **на обычном сайте**; в артефакте claude.ai хост заблокирован CSP (см. правило 6).
 - **Adobe Fonts / Typekit** — нужна подписка, не для свободной раздачи.
 - **Commercial foundry fonts** (Söhne, GT America, Tiempos) — лицензия за $$. Не подключай если нет у клиента.
 

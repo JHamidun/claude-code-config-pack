@@ -8,24 +8,24 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `ai-marketing-stack-ru` | AI tooling for marketers (not developers) — treat Cursor/Claude Code as staff, with concrete workflows and guardrails. |
-| `b2b-marketing-ru` | B2B playbook — TOFU/MOFU/BOFU funnel with ICP and intent, cold outreach, content, and pipeline handoff to sales. |
-| `churn-prevention-ru` | Reduce voluntary and involuntary churn — cancel flow, win-back, dunning for failed payments, retention triggers. |
+| `ai-marketing-stack-ru` | Marketing-OS: Cursor как AI-сотрудник маркетолога, vibe-coding вместо подрядчиков. |
+| `b2b-marketing-ru` | B2B playbook: воронка TOFU/MOFU/BOFU, cold outreach, B2B-контент. |
+| `churn-prevention-ru` | Отток подписчиков ExampleProduct: cancel-флоу, save-офферы, dunning (ЮKassa), win-back. |
 | `content-machine-ru` | Операционка контент-фабрики: органика → лиды, 6-шаговый pipeline, «1 формат = 1 агент». |
-| `free-tools-lead-magnets-ru` | Lead magnets and free tools as lead generation (engineering as marketing) — calculators, graders, quizzes, gated content. |
-| `jtbd` | Advanced Jobs To Be Done — segment by the job customers hire the product for: job graph, Forces of Progress, switch interviews. |
-| `launch-strategy-ru` | Launch strategy for a product, course, workshop or community — ORB framework, launch calendar, and channel sequencing. |
-| `market-selection-ru` | Pick a market before launching — business model → country → TAM → competition → entry cost, as one decision chain. |
-| `marketing-loops-ru` | Growth loops and recurring marketing cycles — repeatable workflows that compound instead of one-off campaigns. |
-| `marketing-masterminds-ru` | Work a marketing case mastermind-style — assemble precedents, competing hypotheses, and a decision with tradeoffs. |
-| `marketing-psychology-ru` | Marketing psychology and 70+ mental models applied to landings, offers, emails and ads — with concrete rewrite patterns. |
-| `marketing-team-builder-ru` | Hire and structure a marketing team — role map, scorecards, interview kits, and career paths for marketers. |
-| `media-planning-ru` | Strategic media planning — which channel to enter at all, before any ad account is opened; budget split and channel economics. |
-| `marketing-orchestrator` | Router across the marketing skills — takes a task and drives it to the right playbooks in the right order. |
-| `offers-ru` | Construct offers — value equation, bonus stack, guarantee, scarcity, risk reversal; productize a service into a high-ticket offer. |
-| `pr-outreach-ru` | Earned media and PR outreach — journalist pitches, newsjacking, media lists, press releases, expert commentary. |
-| `pricing-strategy-ru` | Pricing, packaging and monetization — subscription tiers, price levels, discounts, upsells, and migration of existing customers. |
-| `referrals-ru` | Referral, affiliate and ambassador programs — mechanics, rewards, promo codes, deep links, and anti-abuse guards. |
+| `free-tools-lead-magnets-ru` | Лид-магниты и бесплатные тулы: калькуляторы, квизы, чек-листы (engineering as marketing). |
+| `jtbd` | AJTBD и Next Move Theory: работы клиента, сегментация по работам, Forces/Switch Interview, ODI. |
+| `launch-strategy-ru` | Стратегия запусков: когорта, воркшоп, конференция; ORB-фреймворк, RU-поверхности vc.ru/Habr/TG. |
+| `market-selection-ru` | Выбор рынка: страна, TAM, CustDev, 20 вопросов фаундерам. |
+| `marketing-loops-ru` | Маркетинг-петли — воркфлоу по расписанию: SEO-скан, churn-watch. |
+| `marketing-masterminds-ru` | Разбор кейса через прецеденты (7 живых кейсов) и 15 нестандартных тактик → план на неделю. |
+| `marketing-orchestrator` | Навигатор по 23 маркетинг-скиллам: рынок → JTBD → воронка → канал → аналитика. |
+| `marketing-psychology-ru` | 70+ ментальных моделей психологии к лендингу/офферу/письму: правки «было→стало». |
+| `marketing-team-builder-ru` | Найм маркетинг-команды и карьера маркетолога: 35 ролей, план 30/60/90, KPI. |
+| `media-planning-ru` | Выбор рекламного канала ДО настройки: матрица ниша×бюджет→канал. |
+| `offers-ru` | Конструирование офферов: value equation, бонус-стек, risk reversal. |
+| `pr-outreach-ru` | PR-аутрич RU: питчи журналистам, Pressfeed (вместо HARO), newsjacking, пресс-кит. |
+| `pricing-strategy-ru` | Ценообразование и упаковка: тарифы, trial, value metric. |
+| `referrals-ru` | Реферальные и партнёрские программы продукта и контент-бота. |
 
 ## Install
 

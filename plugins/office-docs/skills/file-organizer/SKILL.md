@@ -109,8 +109,11 @@ FILE_TYPES = {
 
 def organize_by_type(source_dir: str, dest_dir: str):
     """Organize files by type"""
-    source = Path(source_dir)
-    dest = Path(dest_dir)
+    # ОБЯЗАТЕЛЬНО .expanduser(): pathlib НЕ раскрывает «~».
+    # Без него Path('~/Downloads').exists() → False, а dest.mkdir(parents=True)
+    # молча создаст в текущей папке буквальный каталог с именем «~».
+    source = Path(source_dir).expanduser()
+    dest = Path(dest_dir).expanduser()
 
     for file in source.iterdir():
         if file.is_file():
@@ -140,8 +143,8 @@ from datetime import datetime
 
 def organize_by_date(source_dir: str, dest_dir: str):
     """Organize files by creation/modification date"""
-    source = Path(source_dir)
-    dest = Path(dest_dir)
+    source = Path(source_dir).expanduser()   # см. про «~» выше
+    dest = Path(dest_dir).expanduser()
 
     for file in source.iterdir():
         if file.is_file():
@@ -187,15 +190,33 @@ def clean_filename(filename: str) -> str:
 
     return name + ext.lower()
 
-def batch_rename(directory: str, pattern: str = None):
-    """Batch rename files"""
-    path = Path(directory)
+def batch_rename(directory: str, glob: str = "*"):
+    """Batch rename files. glob — маска отбора, напр. '*.pdf'."""
+    path = Path(directory).expanduser()
 
-    for i, file in enumerate(sorted(path.iterdir()), 1):
-        if file.is_file():
-            new_name = clean_filename(file.name)
-            file.rename(file.parent / new_name)
-            print(f"Renamed: {file.name} → {new_name}")
+    for file in sorted(path.glob(glob)):
+        if not file.is_file():
+            continue
+
+        new_name = clean_filename(file.name)
+        target = file.parent / new_name
+
+        # Коллизии реальны: 'report v2.pdf' и 'report_v2.pdf' чистятся в одно имя.
+        # Без этой ветки на Windows прогон падает FileExistsError на втором файле
+        # и папка остаётся переименованной наполовину, а на POSIX второй файл
+        # молча перезаписывает первый — потеря данных.
+        if target.exists() and target != file:
+            stem, ext = os.path.splitext(new_name)
+            n = 2
+            while (file.parent / f"{stem}_{n}{ext}").exists():
+                n += 1
+            target = file.parent / f"{stem}_{n}{ext}"
+
+        if target == file:
+            continue
+
+        file.rename(target)
+        print(f"Renamed: {file.name} → {target.name}")
 ```
 
 ### Duplicate Finder
@@ -216,7 +237,7 @@ def find_duplicates(directory: str) -> dict:
     """Find duplicate files"""
     hashes = defaultdict(list)
 
-    for file in Path(directory).rglob('*'):
+    for file in Path(directory).expanduser().rglob('*'):
         if file.is_file():
             file_hash = get_file_hash(file)
             hashes[file_hash].append(file)
@@ -224,18 +245,35 @@ def find_duplicates(directory: str) -> dict:
     # Return only duplicates
     return {h: files for h, files in hashes.items() if len(files) > 1}
 
-def remove_duplicates(directory: str, keep: str = 'first'):
-    """Remove duplicate files, keeping first or newest"""
+def quarantine_duplicates(directory: str, quarantine: str, keep: str = 'first',
+                          dry_run: bool = True):
+    """Убрать дубли в карантинную папку. НЕ удаляет: unlink() необратим,
+    а MD5-совпадение — не доказательство идентичности (размер тут даже не сверяется).
+
+    dry_run=True по умолчанию: сначала печатаем план, глазами смотрим, что уводим,
+    и только потом повторяем вызов с dry_run=False. Так же требует
+    rules/dont-do.md п.10 («НЕ запускай деструктивные команды без подтверждения»)
+    и собственный совет этого файла «Archive, don't delete».
+    """
     duplicates = find_duplicates(directory)
+    qdir = Path(quarantine).expanduser()
 
     for hash_val, files in duplicates.items():
         if keep == 'newest':
             files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
 
-        # Keep first, remove rest
         for file in files[1:]:
-            print(f"Removing duplicate: {file}")
-            file.unlink()
+            if dry_run:
+                print(f"[dry-run] увёл бы в карантин: {file}  (дубль {files[0]})")
+                continue
+            qdir.mkdir(parents=True, exist_ok=True)
+            target = qdir / file.name
+            n = 2
+            while target.exists():
+                target = qdir / f"{file.stem}_{n}{file.suffix}"
+                n += 1
+            shutil.move(str(file), str(target))
+            print(f"В карантин: {file} → {target}")
 ```
 
 ### Watch Folder Automation
@@ -334,14 +372,12 @@ def watch_folder(watch_dir: str, dest_dir: str):
 # create-project.sh
 
 PROJECT_NAME=$1
-mkdir -p "$PROJECT_NAME"/{
-    docs,
-    assets/{images,videos,fonts},
-    src,
-    tests,
-    exports,
-    .archive
-}
+
+# ОДНОЙ СТРОКОЙ, без пробелов и без хвостовых запятых.
+# Brace-expansion не переживает перенос строки: разбитый на строки вариант
+# даёт «docs,: command not found», «syntax error near unexpected token '}'»
+# и rc=2 — mkdir не выполняется вовсе.
+mkdir -p "$PROJECT_NAME"/{docs,assets/{images,videos,fonts},src,tests,exports,.archive}
 
 touch "$PROJECT_NAME/README.md"
 touch "$PROJECT_NAME/.gitignore"

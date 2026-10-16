@@ -1,162 +1,112 @@
 ---
 name: autocad-com
-description: "AutoCAD/GstarCAD/ZWCAD/BricsCAD/nanoCAD из Python через COM: чертежи, размеры, 3D-тела, листы. Симптомы: «RPC недоступен», размер без текста. Только Windows."
+description: "Чертежи из кода: DXF/SVG/PDF без CAD (ГОСТ-лист, штамп, альбом) и живой AutoCAD/nanoCAD по COM. Симптомы: «нужен DWG, а не картинка», «RPC недоступен», штамп с чужим адресом."
 ---
 
-# AutoCAD over COM
+# Чертежи из кода и работа с CAD
 
-## Что нужно до начала
+Три пути, и выбирать надо до первой строки кода:
 
-**Только Windows.** COM/ActiveX — механизм Windows; на macOS и Linux этот навык
-неприменим целиком, а не частично.
+| Путь | Когда | Что на выходе | Где подробно |
+|---|---|---|---|
+| **A. Без CAD** — геометрия считается в Python, лист рисуется в SVG и DXF одной функцией компоновки | по умолчанию: альбом чертежей из данных, повторяемость, сервер без Windows, агент в Telegram | SVG → PNG/PDF (Chromium), DXF R12 (AutoCAD/NanoCAD), XLSX | `references/dxf-from-code.md`, `references/gost-sheet.md`, `references/interior-album.md` |
+| **B. Живой CAD по COM** — Python управляет запущенным AutoCAD/GstarCAD/ZWCAD/BricsCAD/nanoCAD | заказчик работает в своём DWG, нужны 3D-тела, блоки, листы внутри его файла; только Windows и только при установленном CAD | правки в открытом чертеже | `references/com-live-cad.md`, `cookbook.py` |
+| **C. BIM-ветка** — код внутри Revit (pyRevit/Dynamo); код → IFC (`ifcopenshell`) → Revit/ArchiCAD/Renga | заказчик работает в Revit или просит «модель, а не чертежи»; дом с фасадами/разрезами из 3D | RVT с листами, IFC-модель | `references/bim-paths.md` — проверенные факты про pyRevit/Revit API/IFC/ADSK; правило: инструмент заказчика — вводная, а не предмет обсуждения |
 
-```bash
-pip install pywin32 pillow
-```
+Путь B проверяется только на машине, где CAD установлен: без него все пять ProgID дают `CO_E_CLASSSTRING`.
+Ему нужны Windows, `pip install pywin32 pillow` и **запущенный** CAD (не AutoCAD LT — он не ActiveX-сервер);
+проверка связки одной строкой — в начале `references/com-live-cad.md`. Путь A проверен трижды: планы модульных
+зданий, однолинейные схемы КТП с DXF/XLSX/PDF и полный дизайн-проект интерьера на 34 листа (09.2026, ~10 000
+строк, кросс-ревью другой моделью — 25 находок закрыты).
 
-`pywin32` даёт `win32com`, `pythoncom` и `win32gui`; `pillow` нужен только для
-снятия скриншота окна. CAD должен быть **установлен и запущен** — навык
-подключается к работающему приложению, а не поднимает его с нуля.
+## Главный принцип: один источник → все выходы
 
-Проверить связку одной строкой, не открывая редактор:
+Чертёж, спецификация, ведомость, штамп и 3D — проекции **одной модели** в памяти. Числа (площади, объёмы работ,
+количества, номера стен и листов, ссылки «на листе N») считаются кодом из геометрии и никогда не набираются
+руками. Это не эстетика, а единственный способ исключить класс ошибок, которыми полон ручной альбом
+(разбор эталона на 59 листов: три разных адреса в штампах, площадь 404,7 vs 404,4, «на листе .», 13 изделий
+с разными габаритами в спецификации и на чертеже, диапазоны стен ≠ лентам, «Листов» пусто везде).
 
-```bash
-python -c "import win32com.client as c; print(c.GetActiveObject('AutoCAD.Application').Name)"
-```
+Следствие для кода: `Sheet` (SVG) и `DxfCanvas` (DXF) реализуют **один API** (`line rect circle arc path poly
+polygon text set_layer hatch`), функция листа вызывается дважды и геометрия совпадает по определению.
 
-Ошибка здесь читается по тексту — таблица в разделе «Connecting» разбирает три
-разных случая, которые выглядят одинаково.
+## Шишки, которые стоили времени (путь A)
 
-## Overview
-
-Any CAD with the AutoCAD-compatible ActiveX object model is driven the same way
-from Python: `win32com.client` talks to a **running** application, and the drawing
-is built by calling methods on `ModelSpace`. Nothing is installed into the CAD,
-nothing is compiled, and `SECURELOAD` / `TRUSTEDPATHS` never enter the picture
-because no code is loaded inside the application.
-
-**Core principle:** the COM layer lies quietly. Calls return success, variables
-read back the value you set, and the drawing is still wrong. Verify geometry by
-measuring it (`GetBoundingBox`, `Volume`, entity counts), never by reading back
-the setting you just wrote.
-
-## When to Use
-
-- Drawing or editing entities, layers, blocks, dimensions, hatches, 3D solids
-- Building paper-space sheets and viewports
-- Reading a drawing's contents or measuring what is in it
-- Diagnosing why a CAD will not accept an external connection
-
-**Do not use for:** AutoCAD LT — it is not an ActiveX server and cannot be reached
-from another process at all. Its only automation surface is AutoLISP text plus
-`.scr` scripts. Nothing in this skill applies to it.
-
-## Connecting
-
-```python
-import pythoncom, win32com.client
-pythoncom.CoInitialize()
-app = win32com.client.GetActiveObject("AutoCAD.Application")   # already running
-```
-
-`GetActiveObject` attaches to a running instance; `Dispatch` launches one, slowly
-and with focus stealing. Prefer the former, fall back to the latter.
-
-Read the COM error text — it distinguishes three different situations:
-
-| Error text | Meaning |
-|---|---|
-| `Недопустимая строка с указанием класса` (CO_E_CLASSSTRING) | ProgID not registered — the program is not installed |
-| `Операция недоступна` (MK_E_UNAVAILABLE) | Registered, but no instance running |
-| `Ошибка при выполнении приложения-сервера` (CO_E_SERVER_EXEC_FAILURE) | Windows tried to launch it and the process died |
-
-ProgIDs: `AutoCAD.Application` (also versioned, `.26` = 2027), `GstarCAD.Application`,
-`ZWCAD.Application`, `BricscadApp.AcadApplication`, `nanoCAD.Application`.
-
-On the Start tab no document exists — `app.ActiveDocument` raises, so catch it and
-call `app.Documents.Add()`.
-
-## Points and arrays
-
-Every point argument is a VARIANT array of doubles, never a Python list:
-
-```python
-from win32com.client import VARIANT
-
-def pt(x, y, z=0.0):
-    return VARIANT(pythoncom.VT_ARRAY | pythoncom.VT_R8, [float(x), float(y), float(z)])
-```
-
-Polylines take one flat array `[x1, y1, x2, y2, ...]`. Object arrays (hatch
-boundaries) take `VARIANT(pythoncom.VT_ARRAY | pythoncom.VT_DISPATCH, [...])`.
-
-## Quick reference — the failures that cost real time
-
-| Symptom | Cause | Fix |
+| Симптом | Причина | Что делать |
 |---|---|---|
-| Dimension lines drawn, no text or arrows | `SetVariable("DIMSCALE", n)` does not reach entities created through ActiveX | `dim.ScaleFactor = n` on the object, then `doc.Regen(1)` |
-| Mass/filter by colour misses the biggest parts | Boolean resets the result to ByLayer (256) | Identify parts by volume or layer, never by colour after a Boolean |
-| `Сервер RPC недоступен`, AutoCAD gone | Deleted every object in a layout, including its last viewport | Delete only `ObjectName != "AcDbViewport"`; reuse existing viewports |
-| `Ошибка при установке текущего видового экрана` | `ActivePViewport` set before entering model space | `doc.MSpace = True` first, then assign |
-| `PlotToFile` returns True, no file or a 2 KB stub | `BACKGROUNDPLOT` defaults to 2 | Set it to 0; prefer building the PDF outside the CAD |
-| `Недопустимый аргумент type в ZoomScaled` | Wrong enum | 0 absolute, 1 relative, 2 relative-to-paper |
-| `Неоднородное масштабирование невозможно` | Solids accept uniform scaling only — a sphere cannot be squashed into an ellipsoid | Build oval bodies from an elliptical profile: `AddEllipse` → `AddRegion` → `AddExtrudedSolid` |
-| `Неверный ввод` from `AddRegion` | `AddPolyline` makes a 3D polyline, and a region needs a planar curve | Draw the profile as a lightweight polyline in XY, then `Rotate3D` it upright |
-| Drawing extents far larger than the model | `AddRegion`, `AddExtrudedSolid` and `AddRevolvedSolid` do not consume their input | Delete the source curve and the region after creating the solid |
-| `Вызов был отклонен` (RPC_E_CALL_REJECTED) | The application is busy redrawing | Retry the call after a second; it is transient, not an error in the code |
-| Every property suddenly fails with `<unknown>.Name`, `<unknown>.Count` | An unterminated `SendCommand` left the CAD waiting at the command line, which blocks the whole ActiveX interface. It looks exactly like a corrupt pywin32 cache and is not — clearing `gen_py` changes nothing | Send ESC to the window (`WScript.Shell.SendKeys("{ESC}")`), then set visual styles through system variables instead: `VSFACESTYLE=1`, `VSEDGES=2`. Guard with `doc.GetVariable("CMDACTIVE")` |
-| `Вызванный объект был отключен от клиентов` | Read a property of a document after `Close()` | Capture `.Name` before closing |
-| A newly added document has no `ModelSpace` | `Documents.Add()` returns before the document is usable | Retry for a few seconds |
-| Module list shows only `ntdll` + `wow64*` | 64-bit tooling cannot enumerate a 32-bit process | Use `C:\Windows\SysWOW64\WindowsPowerShell\v1.0\powershell.exe` |
-| Window screenshots land ~300 px off | Display scaling above 100 % | `ctypes.windll.user32.SetProcessDPIAware()` before `GetWindowRect` |
-| Screenshot grab fails, or the window "is not found" | Matched windows by title and size; a minimised frame reports a tiny rect and tooltips share the title | Match by owning process id, `ShowWindow(RESTORE)` then `MAXIMIZE`, poll until the rect is big |
-| A property tooltip sits in the middle of the capture | The cursor is hovering over a solid | `SetCursorPos` to a corner before grabbing |
+| Дверь на плане не попадает в проёмы стены помещения, хотя нарисована | проём задан на **осевой** перегородки, ребро помещения — на её **грани**, между ними t/2 = 60…200 мм; допуск 20 мм молча промахивался | допуск сопоставления = t/2 + запас от толщины конкретной стены; валидатор обязан требовать дверь в `walls[].openings` и на **последней** стене обхода |
+| Нумерация стен «по часовой от двери» правильная на бумаге и неверная в коде | тот же промах: дверная стена не находилась и обход начинался с вершины 0 | поймал не глаз, а валидатор; после фикса пришлось перенумеровать 115 ссылок в данных скриптом «старый номер → новый по совпадению рёбер» |
+| Валидатор всегда зелёный | `point_in_polygon(...) or True`; центроид вместо пересечения полигонов; заголовок берётся из реестра, а не из отрисованного SVG; проверяются уже подогнанные секции | каждая проверка обязана иметь **красный прогон**: испортить копию данных и увидеть FAIL. Валидатор без красного прогона ничего не проверяет |
+| DXF «просвечивает»: штриховка отделки видна сквозь фасады | SVG рисует белую маску поверх штриховки; в DXF R12 сплошной заливки нет, маска пропадает | не полагаться на маски: **вырезать** зоны вокруг мебели/проёмов до штриховки, тогда SVG и DXF одинаковы |
+| Ведомость на 100 строк обрезалась при зелёном отчёте | рисовалась только `pages[0]`; XLSX при этом полный | число листов считать **до** нумерации альбома; продолжения — малый штамп; проверять хвост, а не первую страницу |
+| Пагинация зависла | группа + первая высокая строка не влезают → откат индекса → бесконечный цикл | сторож «индекс не продвинулся → raise»; группа-сирота допустима, зависание — нет |
+| Устаревшие листы попали в PDF | `glob("*.svg")` собрал файлы прошлой нумерации при зелёном отчёте | выход = реестр: чистить `svg/png/dxf` при полной сборке, PDF по явному списку, ненулевой код возврата при FAIL |
+| Штриховка в DXF повёрнута не так, как в SVG; крест — одно направление; точки — линии | SVG-паттерн: вертикальная линия + `rotate(θ)`; DXF: сканлайны под углом θ; угол 0 у одного вертикален, у другого горизонтален | DXF-угол = 90 + θ; хранить тип узора (hatch/cross/dots) и рисовать честно; проверять пробой на квадрате 10×10 |
+| `path("… Q …")` в DXF даёт 0 сущностей, дуга `A` — хорда | токенизатор не знал Q, A брал только конечную точку | сплющивать Q на 8 отрезков, A — по endpoint-параметризации SVG (§F.6.5) |
+| Заделки на плане монтажа оранжевые в SVG и синие в DXF | цвет примитива не передавался, работал только цвет слоя | код 62 с ближайшим ACI на каждой сущности |
+| Остров: спецификация 900, чертёж 1200 | чертёж прибавлял свес к D — воспроизвели дефект эталона у себя | D — полный габарит; корпус = D − свес; footprint на плане и все виды из одной геометрии |
+| Развёртки рисуют шкаф иначе, чем мебельный лист (3×600 vs 4×450) | у модуля развёрток свои константы членения | фасады на лентах строить из той же `build_item()`, что и чертёж изделия |
+| Автор данных сослался на номера стен, потом нумерация изменилась | данные писались параллельно с движком | контракт (`docs/SCHEMA.md`) и распечатка модели раньше данных; после смены правил — скрипт перенумерации, не ручная правка |
+| Ревьюер на Codex CLI не может выполнить ни одной команды | `-s workspace-write` на Windows блокирует pwsh («blocked by policy») | `-s danger-full-access` + бэкап движка + `</dev/null` (иначе висит на stdin) |
+| Шрифта ГОСТ 2.304 (ISOCPEUR/GOST type B) может не быть в системе | Chromium берёт следующий установленный в стеке (Arial Narrow / Arial) курсивом | `font-family` со стеком и `@font-face` из `engine/fonts/`, если TTF появится; в DXF стиль `GOSTI` с наклоном 15° и `isocpeur.ttf` по имени — CAD подставит свой |
+| Зелёный прогон, а `album.pdf` старый | полная сборка чистит только `svg/png/dxf`; PDF/XLSX/3D пересобираются только заказанными шагами | для выдачи всегда `--steps svg,png,dxf,pdf,xlsx,3d,validate` с чистого `out/`; число страниц PDF = число листов реестра |
+| Плотные слои (розетки, свет, потолки) «проверены глазами», а символы 2 мм на A2 при 150 dpi нечитаемы | Read целого листа не видит мелочь; воркер отметил «need zoom check» и пошёл дальше | для плотных слоёв рендерить кроп фрагмента (view с крупным масштабом или PNG 300 dpi + обрезка) и смотреть его |
+| Цифры в сопроводительных документах разошлись с прогоном (compare.md: «7 FAIL», прогон: 6) | число написано руками раньше последнего прогона | числа FAIL/PASS/листов в compare/README брать из вывода последнего прогона; ревьюеру давать гейт «сверить документ с прогоном» |
+| «на листе .», «листы —» в примечаниях | номер листа набран руками или модуль ещё не подключён | ссылки только по id листа через реестр (`ctx.no("plan_walls")`, `ctx.range("elev_")`); валидатор ловит шаблон без числа и число вне диапазона |
+| Иерархические позиции «1.1», серия «1.045.9-2.08» ловились как десятичные с точкой | проверка разделителя регэкспом | белый список из данных (позиции, марки линий) + исключение составных обозначений |
+| Формат листа выбран «как в эталоне» и две трети листа пустые | эталон на 35×17 м делали на А3×3; наша квартира 13×9 м | формат `auto`: A3 → A2 → А3×3 по габариту + цепочки + колонка; развёртки А4×3…А4×6 по длине лент |
 
-## Verify by measuring
+Шишки пути B (живой CAD) — в `references/com-live-cad.md`: `DIMSCALE` не доходит до ActiveX-размеров,
+Boolean сбрасывает цвет, удаление последнего viewport роняет AutoCAD, `SendCommand` без `\n` вешает
+весь интерфейс, `PlotToFile` врёт про успех.
 
-```python
-mn, mx = solid.GetBoundingBox()          # returns two 3-tuples
-print(mx[0] - mn[0], mx[1] - mn[1], mx[2] - mn[2])
-print(solid.Volume / 1e6, "litres")
-```
+## Как собирается альбом (путь A, коротко)
 
-Cross-check the volume against a hand calculation before trusting a model. A shell
-built as outer-box minus cavity minus opening must equal the sum of its equivalent
-plates; if it does not, the geometry is wrong regardless of how it looks on screen.
+1. **Контракт данных** (`docs/SCHEMA.md`): мм, Y вверх, полигоны против часовой, перегородки осевой линией с
+   толщиной, проёмы `{wall, at, w, h}`, двери `{"hinge": a|b, "side": left|right}` относительно направления
+   стены — строка `in-left` двусмысленна для стен разного направления. Один JSON-файл — один владелец-модуль.
+2. **Модель** считает производные: площади, обход стен по часовой (дверная стена последняя, группы помещений
+   сквозь), проёмы на рёбрах, объёмы работ по формулам (`calc: "wall:W1"` → длина × высота).
+3. **Реестр альбома**: модули отдают `[SheetDef]` (`id, title[], fmt|auto, scale, small, draw`), реестр нумерует
+   и даёт `ctx.no()/ctx.range()`; модуль, которого нет, заменяется заглушкой — альбом собирается всегда.
+   Частичные данные — контракт на уровне **секции**, не модуля: `lighting/electrics/floors/…` могут отсутствовать
+   на диске (автор пишет параллельно), модуль обязан рисовать лист с тем, что есть, и класть «нет данных: X» в
+   `project["_warnings"]`.
+4. **Холст** — `scaffold/sheet.py`: форматы ГОСТ 2.301, рамка с графами левого поля, штамп формы 3 (185×55) с
+   параметрическими ролями и заполненным «Листов», малый штамп формы 6, размерные цепочки с засечками 45°,
+   таблицы с разбивкой по `max_y`, выноски, `View(scale, ox, oy)` мир → лист.
+5. **Выходы**: SVG → PNG/PDF через headless Chromium (форматы страниц через именованные `@page`), DXF R12
+   полистно, XLSX stdlib, 3D three.js из той же модели.
+6. **Валидатор + красный прогон**, потом **глаза** на каждый PNG против эталонных листов, потом
+   **независимое ревью** другой моделью с внешними гейтами — `references/validation-and-review.md`.
 
-## Commands and language
+Как это делалось роем за ночь и какие роли кому — `references/build-playbook.md`.
 
-`SendCommand` is asynchronous and returns nothing — anything that depends on its
-result must wait, and a following `ZoomExtents` will otherwise run first. Prefix
-commands with `.` and options with `_` so they survive a localised build:
-`doc.SendCommand("._VSCURRENT\n_E\n")`.
+## Порядок работы над новым объектом
 
-## Implementation
+1. Разобрать эталон заказчика полистно **с замерами** (px/мм, ширины колонок, кегли, толщины) и списком его
+   дефектов — это и ТЗ, и аргументы. Замер, а не «похоже».
+2. Написать `SCHEMA.md` и `core.json` объекта; прогнать `model.py` — распечатка стен и проёмов раньше любых
+   рисунков.
+3. Холст и первый лист (обмерный план) самому — задаёт конвенции; остальные модули — воркерам по файлам.
+4. После каждого листа: рендер PNG → Read → сверка с эталоном. «Отрисовалось без ошибок» — не результат.
+5. Валидатор с красным прогоном до того, как отчёт кому-то показан.
+6. Ревью другой моделью с командами-гейтами; находки чинят владельцы модулей.
+7. Наружу — только просматриваемое: PDF-альбом, XLSX, PNG/PDF документов; DXF — отдельным архивом.
 
-`cookbook.py` in this directory holds working helpers: connection with fallback,
-point and object arrays, 3D solid construction with Booleans, cylinders on the X
-and Y axes, dimension creation that is actually visible, paper-space sheets, and
-window capture. Copy what is needed rather than importing it.
+## Что здесь лежит
 
-Отдельно стоит знать про четыре из них — они закрывают ровно те ловушки, что
-описаны выше, и без них таблица симптомов остаётся теорией:
+- `scaffold/` — `sheet.py` (холст SVG+DXF, ГОСТ), `geometry.py` (площади, обход, пересечения), `util.py`
+  (форматтер чисел с запятой — его импортируют sheet/validator), `pdf_export.py`, `render_png.py`, `README.md`
+  (таблица файлов и порядок переноса) — копии из демо-проекта интерьера на 09.09.2026.
+- `cookbook.py` — путь B: подключение, VARIANT-массивы, тела, размеры, листы, скриншот окна.
+- `references/` — подробности по каждому пути и по альбому интерьера.
 
-| Помощник | Закрывает |
-|---|---|
-| `attach_only()` | подключиться, но **не запускать** CAD: пакетный прогон, чужая машина, работа по расписанию. У `connect()` запуск — штатное поведение |
-| `send_command()` | асинхронность `SendCommand`: ждёт по `CMDACTIVE`, пока команда действительно завершится, и снимает зависшую через ESC |
-| `visual_style()` | то же, что `._VSCURRENT`, но системными переменными — не трогает командную строку и потому не может её подвесить |
-| `cad_window()` | поиск окна по идентификатору процесса с разворачиванием и ожиданием настоящего размера, вместо совпадения по заголовку |
+## Связанное
 
-## Common mistakes
-
-- **Trusting a system variable read-back.** `DIMSCALE` reads 50 while entities
-  render at 2.5. Measure the entity, not the variable.
-- **Screenshotting a shaded view on a white background.** Colour 7 is white on
-  dark and black on light; a plan on a white figure can look completely empty
-  while every entity is present. Count entities before concluding anything.
-- **Assuming a colour survives editing.** Only Booleans reset it, which is exactly
-  when it matters most.
-- **Plotting from the CAD.** The PDF drivers plot in the background and fail
-  silently. Generating the sheet with matplotlib from the same data is faster and
-  actually verifiable.
+- `construction-agents` (если навык установлен) — архитектура «код считает — модель говорит», каталог/нормы/валидатор/смета, слой агента.
+- `references/interior-album.md` — разбор эталонного альбома интерьера и состав его листов.
+- Telegram-агент для пути A: инструмент с `required_outputs` и отправкой PNG/DXF/PDF/XLSX; движок гоняется
+  двумя проходами — ядро (SVG/PNG/DXF, успех = код 0 **и** все обязательные файлы на диске), затем пакет
+  документов `pdf,docs` best-effort, чтобы его сбой не блокировал чертёж.
+- Документы для отправки — в PDF (skill `pdf`): Markdown в Telegram не открывается.

@@ -46,7 +46,9 @@ Find curves at [easing.dev](https://easing.dev/) or [easings.co](https://easings
 | Modals, drawers | 200–500ms |
 | Marketing / explanatory | Can be longer |
 
-**Rule: UI animations stay under 300ms.** A 180ms dropdown feels more responsive than a 400ms one. Faster spinners make load feel faster (same actual time). Instant tooltips after the first (skip delay + animation) make a toolbar feel faster.
+**Rule: UI animations stay under 300ms — кроме двух строк таблицы выше.** Модалки и drawer'ы
+(200–500ms) и маркетинговое/объясняющее из-под правила выведены: у них большая поверхность
+и длинный путь. Спорит бюджет с круглыми 300ms — прав бюджет. A 180ms dropdown feels more responsive than a 400ms one. Faster spinners make load feel faster (same actual time). Instant tooltips after the first (skip delay + animation) make a toolbar feel faster.
 
 ## Physicality
 
@@ -86,6 +88,10 @@ CSS **transitions** can be interrupted and retargeted mid-animation; **keyframes
 /* Not interruptible — avoid for dynamic UI */
 @keyframes slideIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
 ```
+
+> Оба сниппета этого раздела показывают **механику** (transition против keyframes), а не
+> бюджет: 400ms взяты, чтобы разница была заметна. Тост — часто появляющийся UI-элемент,
+> его собственный бюджет — из таблицы Duration выше. Не цитировать эти 400ms как норму.
 
 Use `@starting-style` for entry without JS:
 

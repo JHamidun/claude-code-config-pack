@@ -66,7 +66,7 @@
         "text": "={{ $json.text }}",
         "subject": "={{ $json.subject }}",
         "toEmail": "={{ $json.recipient }}",
-        "fromEmail": "sender@email.com",
+        "fromEmail": "REPLACE_ME@example.com",
         "additionalFields": {}
       },
       "credentials": {

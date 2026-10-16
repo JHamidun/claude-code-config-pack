@@ -5,7 +5,12 @@ description: "Sales-батлкарта конкурентов: интеракт�
 
 # Competitive Intelligence
 
-Research your competitors extensively and generate an **interactive HTML battlecard** you can use in deals. The output is a self-contained artifact with clickable competitor tabs and an overall comparison matrix.
+Research your competitors and generate an **interactive HTML battlecard** you can use in deals. The output is a self-contained artifact with clickable competitor tabs and an overall comparison matrix.
+
+> Батлкарта описана в системе дважды: у соседа `competitive-analysis-mktg` есть свой
+> раздел «Battlecard Creation» — схема беднее (нет talk tracks по сценариям и pricing
+> intelligence, зато есть «Landmines to Defuse»). Канон продажной карточки — здесь;
+> тот раздел брать как источник месседжинга и win/loss-тем, а не как второй шаблон.
 
 ## How It Works
 
@@ -39,29 +44,36 @@ Research your competitors extensively and generate an **interactive HTML battlec
 
 ## Getting Started
 
-When you run this skill, I'll ask for context:
+**Read `~/.claude/business-context.md` first** — sections "Product" (what you sell, how you differ, and honestly what rivals do better), "Positioning" (who you're compared against), and "Pricing". No such file? Create it from `~/.claude/templates/business-context.md` — it's the pack-wide context file, in Russian, and this skill reads the same one.
+
+Without it a battlecard is a list of competitor facts with no "us" column: your reps get a comparison table that never says why we win, and the "what they do better" row — the one that actually survives a live objection — will be blank.
+
+Then confirm or fill in what the file doesn't cover:
 
 **Required:**
-- What company do you work for? (or I'll detect from your email)
-- Who are your main competitors? (1-5 names)
+- Your main competitors (1-5 names) — take them from "Positioning" if they're listed there.
 
 **Optional:**
-- Which competitor do you want to focus on first?
-- Any specific deals where you're competing against them?
+- Which competitor to focus on first?
+- Specific deals where you're competing against them?
 - Pain points you've heard from customers about competitors?
 
-If I already have your seller context from a previous session, I'll confirm and skip the questions.
+Answers that hold across sessions belong in `business-context.md`, not in this chat — otherwise you retype them every time.
+Сам контекст в сессию не подставляется: его читают из файла или находят поиском, а кладут туда вручную — как именно, см. Phase 1 в «Execution Flow».
 
 ---
 
 ## Connectors (Optional)
 
-| Connector | What It Adds |
-|-----------|--------------|
-| **CRM** | Win/loss history against each competitor, deal-level competitor tracking |
-| **Docs** | Existing battlecards, product comparison docs, competitive playbooks |
-| **Chat** | Internal chat intel (e.g. Slack) — what your team is hearing from the field |
-| **Transcripts** | Competitor mentions in customer calls, objections raised |
+Абстрактного «коннектора» тут нет — источники в этой системе называются по именам,
+и «connected» означает «этот навык/скрипт отвечает». Проверяется вызовом, не флагом.
+
+| Источник | Чем поднимать | What It Adds |
+|----------|---------------|--------------|
+| **CRM** | MCP-сервер или API вашей CRM; нет доступа — выгрузка сделок файлом (CSV/XLSX → Skill `csv-analysis`) | Win/loss history against each competitor, deal-level competitor tracking |
+| **Docs** | Skill `google-workspace` · vault Obsidian файлами · `~/.claude/tools/gdrive_client.py` | Existing battlecards, product comparison docs, competitive playbooks |
+| **Chat** | `python ~/.claude/tools/tg_client.py` · плагин Slack | Internal chat intel — what your team is hearing from the field |
+| **Transcripts** | Skills `meeting-analyzer` · `use-spark` · команда `/kb` | Competitor mentions in customer calls, objections raised |
 
 > **No connectors?** Web research works great. I'll pull everything from public sources — product pages, pricing, blogs, release notes, reviews, job postings.
 
@@ -208,17 +220,24 @@ If first time:
 1. Ask: "What company do you work for?"
 2. Ask: "What do you sell? (product/service in one line)"
 3. Ask: "Who are your main competitors? (up to 5)"
-4. Store context for future sessions
+4. Сохранить ответы — своего хранилища у навыка НЕТ, само ничего не запомнится:
+   разделы про продукт и позиционирование в `~/.claude/business-context.md`
+   (один файл контекста на весь пак); заметку с триггерами «мои конкуренты», «battlecard»
+   можно положить и в память — Skill `memory-agent` (или `save-knowledge-base`).
+   Не сохранил — ветка «returning user» не наступит никогда.
 
-If returning user:
+If returning user — контекст сначала НАЙТИ, он не подставляется сам:
+прочитай `~/.claude/business-context.md`; там пусто — поищи в прошлых чатах:
+`python ~/.claude/tools/search_chats.py search "конкуренты battlecard <компания>"`
+(пусто и там — работай как first time)
 1. Confirm: "Still at [Company] selling [Product]?"
 2. Ask: "Same competitors, or any new ones to add?"
 ```
 
-### Phase 2: Research Your Company (Always)
+### Phase 2: Research Your Company
 
 ```
-Web searches:
+Angles to cover — search only the ones the brief, CRM or your own docs leave open:
 1. "[Your company] product" — current offerings
 2. "[Your company] pricing" — pricing model
 3. "[Your company] news" — recent announcements (90 days)
@@ -226,10 +245,11 @@ Web searches:
 5. "[Your company] vs [competitor]" — existing comparisons
 ```
 
-### Phase 3: Research Each Competitor (Always)
+### Phase 3: Research Each Competitor
 
 ```
-For each competitor, run:
+Per competitor — the angles below, in the order that matters for this deal. Stop once
+the card has what the seller needs; not every angle earns a search on every competitor:
 1. "[Competitor] product features" — what they offer
 2. "[Competitor] pricing" — how they charge
 3. "[Competitor] news" — recent announcements
@@ -243,21 +263,24 @@ For each competitor, run:
 ### Phase 4: Pull Connected Sources (If Available)
 
 ```
-If CRM connected:
+Источники и чем их поднимать — таблица «Connectors» выше. Ветку пропускать только
+после того, как инструмент вызвали и он не ответил.
+
+CRM (MCP/API вашей CRM или выгрузка сделок):
 1. Query closed-won deals with competitor field = [Competitor]
 2. Query closed-lost deals with competitor field = [Competitor]
 3. Extract win/loss patterns
 
-If docs connected:
+Docs (`google-workspace` / Obsidian / Drive):
 1. Search for "battlecard [competitor]"
 2. Search for "competitive [competitor]"
 3. Pull existing positioning docs
 
-If chat connected:
+Chat (`tg_client.py` / Slack):
 1. Search for "[Competitor]" mentions (last 90 days)
 2. Extract field intel and colleague insights
 
-If transcripts connected:
+Transcripts (`meeting-analyzer` / `use-spark` / `/kb`):
 1. Search calls for "[Competitor]" mentions
 2. Extract objections and customer quotes
 ```

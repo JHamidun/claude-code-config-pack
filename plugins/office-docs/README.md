@@ -9,11 +9,12 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | Skill | What it does |
 |-------|--------------|
 | `csv-analysis` | Анализ CSV и Excel: статистика, графики, трансформации, выводы. |
-| `docx` | Word .docx на python-docx: собрать документ, править существующий, стили и нумерация, таблицы, картинки, колонтитулы, разбор чужого файла, чтение… |
+| `docx` | Word .docx на python-docx: создание, правка, стили, таблицы, tracked changes, комментарии. |
 | `epub-tools` | EPUB: чтение, поиск по главам, сборка из Markdown (ebooklib). |
-| `file-converter` | Конвертация файлов локально: Word↔PDF, Excel→CSV, что угодно→Markdown (markitdown). |
+| `file-converter` | Локальная конвертация форматов: Word↔PDF, Excel→CSV, что угодно→Markdown (markitdown). |
 | `file-organizer` | Раскладка файлов по контексту, типу и дате с автоматизацией. |
 | `invoice-organizer` | Разбор счетов и чеков для налогов и учёта расходов. |
+| `officecli` | Создание и правка .docx/.xlsx/.pptx без Office через CLI officecli: графики, сводные, проверка оформления. |
 | `pdf` | Работа с PDF: извлечение текста и таблиц, создание, merge/split, заполнение форм. |
 | `xlsx` | Excel: создание, правка, анализ .xlsx/.csv с сохранением формул (openpyxl, pandas). |
 

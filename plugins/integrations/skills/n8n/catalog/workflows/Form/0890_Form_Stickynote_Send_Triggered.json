@@ -237,25 +237,25 @@
               "id": "099d5326-3452-47b8-9dc0-acc0e6fd951e",
               "name": "Support Email",
               "type": "string",
-              "value": "support@pollup.net"
+              "value": "REPLACE_ME@example.com"
             },
             {
               "id": "4ed84290-dbf7-47f7-8693-4f95e0c2fd7e",
               "name": "Administrative Email",
               "type": "string",
-              "value": "admin@pollup.net"
+              "value": "REPLACE_ME@example.com"
             },
             {
               "id": "c39edf1f-b8e0-48ca-929c-294bbac52837",
               "name": "Product Email",
               "type": "string",
-              "value": "product@pollup.net"
+              "value": "REPLACE_ME@example.com"
             },
             {
               "id": "614d4a5c-c9f2-4d82-bfcb-cfdcc8a4b07d",
               "name": "Commercial Email",
               "type": "string",
-              "value": "commercial@pollup.net"
+              "value": "REPLACE_ME@example.com"
             }
           ]
         }
@@ -317,7 +317,7 @@
       "parameters": {
         "width": 460,
         "height": 200,
-        "content": "## Contact me\n- If you need any modification to this workflow\n- if you need some help with this workflow\n- Or if you need any workflow in n8n, Make, or Langchain / Langgraph\n\nWrite to me: [thomas@pollup.net](mailto:thomas@pollup.net)"
+        "content": "## Contact me\n- If you need any modification to this workflow\n- if you need some help with this workflow\n- Or if you need any workflow in n8n, Make, or Langchain / Langgraph\n\nWrite to me: [REPLACE_ME@example.com](mailto:REPLACE_ME@example.com)"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."

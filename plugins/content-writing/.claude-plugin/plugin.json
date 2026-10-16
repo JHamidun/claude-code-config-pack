@@ -2,14 +2,14 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "content-writing",
   "displayName": "Content Writing",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Content engine, de-AI text, document interlinking, Telegram posts, RU proofreading.",
   "author": {
     "name": "Zhemal Khamidun",
     "url": "https://github.com/JHamidun"
   },
   "repository": "https://github.com/JHamidun/claude-code-config-pack",
-  "license": "MIT",
+  "license": "MIT AND Apache-2.0",
   "keywords": [
     "content",
     "writing",

@@ -17,6 +17,17 @@ unzip -o file.docx -d docx-out
 # Картинки: docx-out/word/media/*.{png,jpg}
 ```
 
+> **`unzip` есть не везде.** На Windows его нет ни в системе, ни в Git Bash (там
+> только `tar.exe`, а в PowerShell — `Expand-Archive`). Python в паке обязателен, и
+> его `zipfile` делает то же самое на всех трёх ОС — им и распаковывай, если `unzip`
+> не нашёлся:
+>
+> ```bash
+> python -c "import sys,zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" file.docx docx-out
+> ```
+>
+> Готовая обёртка с фолбэком — `templates/extract-doc.sh` (см. «Команды-обёртки» ниже).
+
 Извлечь текст:
 
 ```js
@@ -49,6 +60,8 @@ console.log(collect(j).join(' '));
 
 ```bash
 unzip -o file.pptx -d pptx-out
+# нет unzip (Windows, Git Bash) — тем же Python:
+# python -c "import sys,zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" file.pptx pptx-out
 ls pptx-out/ppt/slides/   # slide1.xml slide2.xml ...
 ls pptx-out/ppt/media/    # image1.png image2.jpeg ...
 ```
@@ -83,14 +96,11 @@ ls pptx-out/ppt/media/    # image1.png image2.jpeg ...
 
 ## Скетч / фото доски / .napkin
 
-Если пользователь кинул фото маркерной доски или скетч от руки — это просто картинка. Не пытайся «распознать» руками. Действия:
-
-1. Открой картинку, прочитай глазами (через свой visual capability).
-2. Опиши вслух: «вижу 3 экрана, на первом форма входа, на втором лента, на третьем настройки».
-3. Спроси у пользователя, всё ли правильно понял.
-4. Дальше — обычный flow.
-
-Если файл `.napkin` — это рисовалка с JSON-данными внутри. Картинка-превью обычно лежит рядом — её и читай.
+Фото маркерной доски, скетч от руки, `.napkin`, экспорт Excalidraw — это картинка,
+а не архив с XML: распаковывать нечего, читать надо глазами. **Работай по `sketch-to-html`** —
+там алгоритм целиком (описать вслух → дождаться подтверждения → wireframe) и разбор
+форматов рисовалок. Здесь лежала укороченная копия этих шагов, и она уже разошлась с
+оригиналом: в ней потерялся шаг «не строй HTML, пока пользователь не согласился».
 
 ## Что использовать после импорта
 
@@ -101,24 +111,23 @@ ls pptx-out/ppt/media/    # image1.png image2.jpeg ...
 
 ## Команды-обёртки
 
-`templates/extract-doc.sh`:
+`templates/extract-doc.sh` — распаковывает docx / pptx / sketch и вынимает текст из PDF:
 
 ```bash
-#!/usr/bin/env bash
-set -e
-file="$1"; out="${2:-extracted}"
-mkdir -p "$out"
-case "${file##*.}" in
-  docx|DOCX) unzip -qo "$file" -d "$out/docx";;
-  pptx|PPTX) unzip -qo "$file" -d "$out/pptx";;
-  pdf|PDF)
-    command -v pdftotext >/dev/null && pdftotext -layout "$file" "$out/text.txt"
-    command -v pdfimages >/dev/null && pdfimages -all "$file" "$out/img" || true
-    ;;
-  *) echo "Не понимаю расширение: $file"; exit 1;;
-esac
-echo "✓ См. $out/"
+bash templates/extract-doc.sh file.docx [out-dir]
 ```
+
+Скрипт сам ищет, чем распаковать: сперва `unzip`, если его нет — `python3`/`python`
+и стандартный `zipfile`. Имя интерпретатора тоже проверяется в обе стороны
+(`python3` нет на Windows, `python` нет на macOS 12.3+ и голой Ubuntu). Если нет ни
+того ни другого — печатает, чего именно не хватает, и выходит с ненулевым кодом,
+а не создаёт пустую папку и «✓».
+
+Для PDF нужен `pdftotext` (пакет poppler); без него скрипт скажет это явно и
+продолжит с остальным, а не отчитается об успехе.
+
+Полный текст — в самом файле `templates/extract-doc.sh`; здесь он намеренно не
+дублируется: копия в документации уже успела разойтись с оригиналом.
 
 ## Legacy reference
 

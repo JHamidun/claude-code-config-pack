@@ -303,7 +303,7 @@ When project management tools are connected:
 | Tool | Action |
 |------|--------|
 | **Linear** | Create issue per action item, assign to team member, set due date, link to project |
-| **Your CRM** | Create task linked to deal, set responsible, set deadline, add to sprint if applicable |
+| **Your CRM** (Bitrix24 / amoCRM / HubSpot — whichever you use) | Create task linked to deal, set responsible, set deadline, add to sprint if applicable |
 
 ### Rules
 

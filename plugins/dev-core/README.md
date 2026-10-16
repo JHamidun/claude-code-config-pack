@@ -9,19 +9,22 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | Skill | What it does |
 |-------|--------------|
 | `api-documentation` | Документация API из кода: OpenAPI/Swagger, Postman, REST/GraphQL/gRPC. |
-| `apple-developer` | Sign (Developer ID) and notarize macOS apps and DMGs without a Mac — the whole cycle from Windows/Linux and CI. |
+| `apple-developer` | Подпись Developer ID и нотаризация macOS dmg без Mac (Windows+CI, notarytool). |
+| `autocad-com` | Чертежи из кода: DXF/SVG/PDF без CAD (ГОСТ-лист, штамп, альбом) и живой AutoCAD/nanoCAD по COM. |
 | `beads` | Beads — git-трекер задач и багов для AI-агентов (команды bd). |
 | `build-fix` | Чинит падающую сборку и ошибки типов минимальными правками до зелёного прогона. |
 | `changelog-generator` | Changelog из git-коммитов: semver, Keep a Changelog, PR/issues через gh, git tag, GitHub Release. |
-| `codegraph` | A code graph for navigation, symbol lookup and impact analysis on large codebases — a replacement for grep-by-hand. |
+| `codegraph` | Граф кода: навигация и impact-анализ кодбазы (CLI codegraph). |
+| `construction-agents` | Агенты-расчётчики для стройки: чертёж, раскладка, проверка по СП, смета-вилка. |
 | `database-design` | Схема БД, миграции, оптимизация запросов: PostgreSQL, MongoDB, Redis; нормализация, индексы. |
 | `deepwiki` | Доки любого GitHub-репо через DeepWiki/gitmcp.io и llms.txt. |
 | `git-workflow` | Git: коммиты, ветки, PR, merge-конфликты, анализ истории. |
-| `installer-builder` | One-click installers (Windows .exe + macOS .dmg) on Electron — component selection, fully offline bundling, CI macOS builds. |
+| `installer-builder` | One-click инсталляторы Windows .exe + macOS .dmg на Electron (без Mac, GitHub Actions). |
 | `javascript-typescript-dev` | Разработка на JS/TS: React, Next.js, Node.js, тесты Jest/Vitest/Playwright. |
 | `manus` | Автономная облачная задача в Manus (REST API v2, manus_helper.py): research, browsing, код. |
-| `openwiki` | Auto-generate and maintain an agent-facing wiki for a codebase, plus documentation PRs in CI (architecture, workflows, AGENTS.md). |
-| `python-fullstack-dev` | Разработка на Python: Django, FastAPI, Flask, data science, тесты, деплой. |
+| `openwiki` | Агентная wiki кодбазы CLI openwiki (langchain-ai) + авто-PR доков в CI: openwiki/, AGENTS.md. |
+| `project-bootstrap` | Заводит большой проект: интервью, спека, git и GitHub, каркас docs, бэклог bd, CI. |
+| `python-fullstack-dev` | Пишет и правит Python: дефолты FastAPI/Django, ruff+mypy, pytest, чеклист N+1 и гонок. |
 
 ### Agents
 

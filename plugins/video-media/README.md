@@ -11,16 +11,17 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `code-cartoon` | Мультик кодом в MP4 с героем, голосом и звуком: цветной карандаш, глянцевое 3D с рисованным героем, мел, стекло, растр, коллаж, частицы, акварель. |
 | `did` | D-ID: говорящая голова из фото + текст или аудио. |
 | `heygen` | HeyGen API v3: AI-аватар видео, digital-twin, lip-sync перевод, Voice Clone. |
-| `sketch-course-video` | Урок или сторис из записи спикера со скетч-анимацией на Remotion: рисунок проявляется по контурам, маркер, хромакей, субтитры. |
+| `hyperframes` | Видео из HTML/GSAP (HyperFrames): титры, моушн, слайды, порт из Remotion. |
+| `sketch-course-video` | Урок или сторис из записи спикера со скетч-анимацией на Remotion: рисунок по контурам, караоке, кружок лица, CTA. |
 | `submagic` | Submagic API: ИИ-субтитры, Magic Brolls/Zooms, Magic Clips (YouTube в нарезку). |
 | `video-downloader` | Скачивание видео с YouTube и других площадок через yt-dlp. |
 | `video-editor` | Видеомонтаж FFmpeg+Python: тишина, субтитры, рефрейм 9:16. |
-| `video-export` | HTML animation → MP4 / GIF via FFmpeg (Playwright record + encode) — social explainers, product demos. |
+| `video-export` | Покадровый рендер готовой HTML-анимации в MP4 или GIF (Playwright + ffmpeg). |
 | `video-generation` | AI-видео хаб: Veo, Seedance 2.5, Runway, Kling. |
-| `video-montage` | Full 9:16 reels production — Whisper subtitles, TTS voiceover, word-accurate sync, pop-up cards, lip-sync, safe zones. |
-| `video-shotcraft` | Промо-ролики продукта на Remotion: 153 рецепта кадров, 2.5D-проходы, шаблон Ink Press. |
-| `void-video` | Netflix VOID — remove objects from video with physics-aware handling via a free HuggingFace Spaces API. |
-| `watch-video` | Let the agent actually watch a video — timestamped frames plus transcript, so it can answer about what is on screen. |
+| `video-montage` | Конвейер ролика ролями: бриф→сценарий→музыка→раскадровка→монтаж; reels 9:16. |
+| `video-shotcraft` | Промо-ролики продукта на Remotion: 152 рецепта кадров, Ink Press. |
+| `void-video` | Netflix VOID: удаление объектов из видео с физикой взаимодействий, HuggingFace Spaces бесплатно. |
+| `watch-video` | Агент «смотрит» видео: кадры с таймкодами + транскрипт. |
 | `youtube-transcript` | Транскрипты роликов YouTube, саммари и разбор содержимого. |
 
 ### Agents

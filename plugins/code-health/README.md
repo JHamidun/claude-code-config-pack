@@ -8,13 +8,14 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `health-inline` | Inline codebase-health orchestration in five modes — bugs, cleanup, dependencies, reuse, security — detect, fix, verify. |
+| `config-health` | Здоровье конфига Claude Code: битые ссылки, вес промпта, лимит памяти, живость MCP. |
+| `health-inline` | Чинит codebase health инлайн: /health bugs\|cleanup\|deps\|reuse\|security — детекция→фикс→верификация. |
 | `leak-scan` | PII/деанон перед публикацией (leak_scan.py) + prompt-injection в чужом скилле (skill_injection_scan.py). |
-| `osint-recon` | Open-source recon on infrastructure and counterparties — IP/ASN, DNS, RDAP whois, BGP, subdomains, exposed ports, CVEs. |
+| `osint-recon` | Разведка инфраструктуры домена/IP CLI osint_client.py: DNS, whois, субдомены, порты/CVE, санкции. |
 | `privacy-filter` | Локальный PII-фильтр (OpenAI opf, on-device): обезличить текст перед облачным LLM, обратимая редакция. |
 | `security-audit` | Security-аудит: секреты в коде, pip/npm audit, OWASP Top 10. |
 | `skill-audit` | Заглушка: проверка чужого скилла/плагина до установки переехала в skill-manager, режим «Аудит». |
-| `skill-manager` | Навыки и плагины: найти, подобрать, проверить до установки, поставить. |
+| `skill-manager` | Навыки и плагины: найти, подобрать, проверить. |
 | `threat-hunting` | Threat hunting: правила Sigma, detection engineering. |
 
 ### Agents

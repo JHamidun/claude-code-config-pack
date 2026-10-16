@@ -20,15 +20,38 @@ try:
 except Exception:
     pass
 
-try:
-    import pymorphy3 as _pymorphy
-    _MORPH = _pymorphy.MorphAnalyzer()
-except Exception:
+# Лемматизатор. Ставится pymorphy3 (requirements.txt); pymorphy2 оставлен только для
+# Python < 3.11 — на 3.11+ он импортируется, но падает при создании MorphAnalyzer:
+# AttributeError: module 'inspect' has no attribute 'getargspec'.
+#
+# Провал здесь НЕ обязан быть тихим. Без лемматизатора «дома», «домами» и «дому»
+# считаются тремя разными словами: частота ключа занижается в разы, вердикты
+# «мало»/«переспам» переворачиваются. Раньше об этом сообщало одно слово fallback
+# в поле JSON, которого человек не читает.
+_MORPH = None
+_MORPH_NAME = "fallback"
+_MORPH_ERRORS = []
+for _mod in ("pymorphy3", "pymorphy2"):
     try:
-        import pymorphy2 as _pymorphy  # legacy; broken on Python >= 3.11 (inspect.getargspec)
+        _pymorphy = __import__(_mod)
         _MORPH = _pymorphy.MorphAnalyzer()
-    except Exception:
-        _MORPH = None
+        _MORPH_NAME = _mod
+        break
+    except Exception as _e:  # noqa: BLE001 — причину сохраняем и показываем
+        _MORPH_ERRORS.append(f"{_mod}: {type(_e).__name__}: {str(_e)[:150]}")
+_MORPH_ERROR = "; ".join(_MORPH_ERRORS)
+
+FALLBACK_WARNING = (
+    "ЛЕММАТИЗАТОР НЕ УСТАНОВЛЕН — числа ниже ЗАНИЖЕНЫ и не годятся для решений.\n"
+    "  Словоформы одного ключа («дома», «домами», «дому») считаются разными словами.\n"
+    f"  Причина: {_MORPH_ERROR or 'pymorphy3 не установлен'}\n"
+    "  Починить: pip install pymorphy3"
+)
+
+if _MORPH is None:
+    # Модуль импортируют как библиотеку (seo_quality_rater_ru.py), поэтому предупреждение
+    # печатается при импорте, а не только в CLI.
+    print("\n[!] " + FALLBACK_WARNING + "\n", file=sys.stderr)
 
 _ENDINGS = ("ами", "ями", "ого", "его", "ому", "ему", "ыми", "ими",
             "ах", "ях", "ам", "ям", "ом", "ем", "ой", "ей", "ую", "юю",
@@ -105,7 +128,15 @@ def analyze(text: str, keywords):
             "distribution_quarters": dist,
             "even": all(d > 0 for d in dist) if cnt else False,
         })
-    return {"total_words": total, "lemmatizer": _pymorphy.__name__ if _MORPH else "fallback", "keywords": out}
+    res = {
+        "total_words": total,
+        "lemmatizer": _MORPH_NAME,
+        "lemmatizer_ok": _MORPH is not None,
+        "keywords": out,
+    }
+    if _MORPH is None:
+        res["warning"] = FALLBACK_WARNING
+    return res
 
 
 def main():
@@ -127,10 +158,17 @@ def main():
     if args.json:
         print(json.dumps(res, ensure_ascii=False, indent=2))
     else:
+        if not res["lemmatizer_ok"]:
+            print("=" * 72)
+            print("[!] " + FALLBACK_WARNING)
+            print("=" * 72 + "\n")
         print(f"Всего слов: {res['total_words']} | лемматизатор: {res['lemmatizer']}\n")
         for k in res["keywords"]:
             print(f"  {k['keyword']!r}: {k['count']}× | {k['density_pct']}% | {k['verdict']} | распр. {k['distribution_quarters']}")
+    # Код возврата 2 = «посчитано, но по деградировавшему алгоритму»: скрипт можно
+    # звать из пайплайна и не принимать эти цифры за настоящие.
+    return 0 if res["lemmatizer_ok"] else 2
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

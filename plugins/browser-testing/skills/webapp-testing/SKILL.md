@@ -1,6 +1,6 @@
 ---
 name: webapp-testing
-description: "Проверка локального веб-фронта через Playwright: UI, скриншоты, консоль. Триггеры: «протестируй сайт», «логи браузера». НЕ e2e-набор→playwright-automation."
+description: "Проверка локального веб-приложения с dev-сервером: UI, скриншоты, консоль. Триггеры: «протестируй сайт». НЕ: готовый файл→verifier; e2e-набор→playwright-automation."
 license: Complete terms in LICENSE.txt
 type: actionable
 ---
@@ -8,6 +8,22 @@ type: actionable
 # Web Application Testing
 
 To test local web applications, write native Python Playwright scripts.
+
+## Where this sits among the pre-delivery checks
+
+Which other checks to run for your artifact type, and in what order, lives in the
+`verifier` skill ("Матрица: тип артефакта → набор проверок"). Start there, or you will
+guess five to eight calls in a row.
+
+All four testing skills drive Playwright and take screenshots, so "test this" fits them
+equally. The input decides. This skill is the one for **an app that has to be started
+first** — `npm run dev`, or a backend plus a frontend — because `scripts/with_server.py`
+brings the servers up and tears them down around the run. The neighbours: `verifier` opens
+**one finished file** (its `verify.mjs` resolves the argument as a file path via
+`pathToFileURL`, so `http://localhost:5173` is not something it can accept);
+`proto-smoketest` takes **a list of scenarios** and answers "does the path still work?";
+`screenshot-test` takes **a baseline image** and answers "did the pixels move?". Running a
+single static HTML file through this skill is pointless — there is no server to manage.
 
 **Helper Scripts Available**:
 - `scripts/with_server.py` - Manages server lifecycle (supports multiple servers)
@@ -49,6 +65,19 @@ python scripts/with_server.py \
   --server "cd frontend && npm run dev" --port 5173 \
   -- python your_automation.py
 ```
+
+**When it refuses (exit code 3): `port already in use before starting anything`.**
+A previous run left a server behind, or something else owns the port. The script
+prints the holding PID and the exact command to stop it. Do that — do **not** work
+around it: a second server cannot bind the port, so the run would silently test the
+*old* code that is still answering. If you deliberately want to test whatever is
+already up, pass `--reuse-running`.
+
+The server's own stdout/stderr is written to a temp log whose path is printed; on a
+failed start its last lines are shown, so "server failed to start" always comes with
+the server's own reason. Cleanup kills the whole process tree (a shell started with
+`cd x && npm run dev` is not the server), then re-probes the port and warns loudly if
+anything is still listening.
 
 To create an automation script, include only Playwright logic (servers are managed automatically):
 ```python

@@ -118,11 +118,15 @@ from patchright.sync_api import sync_playwright
 ### Best-practice конфиг (максимальная невидимость)
 
 ```python
+import os
 from patchright.sync_api import sync_playwright
 
 with sync_playwright() as p:
     ctx = p.chromium.launch_persistent_context(
-        user_data_dir=r"${HOME}\.claude\pw-profiles\stealth1",
+        # expanduser обязателен: Python не разворачивает ни "~", ни "${HOME}" внутри
+        # строки — путь уехал бы в каталог с буквальным именем. Прямые слэши Windows
+        # понимает, поэтому одна форма годится на всех трёх системах.
+        user_data_dir=os.path.expanduser("~/.claude/pw-profiles/stealth1"),
         channel="chrome",     # реальный Chrome (не bundled) -> нет HeadlessChrome в UA
         headless=False,        # для max-стелса; headless=True тоже проходит webdriver-чек
         no_viewport=True,
@@ -292,8 +296,12 @@ venv:   ./work/camoufox-venv
 ```bash
 # установка (она же переустановка)
 python -m venv ./work/camoufox-venv
-./work/camoufox-venv/Scripts/pip install -U "camoufox[geoip]"
-./work/camoufox-venv/Scripts/python.exe -m camoufox fetch
+
+# Раскладка venv разная: Windows — Scripts/, macOS и Linux — bin/
+PY=./work/camoufox-venv/bin/python; [ -x "$PY" ] || PY=./work/camoufox-venv/Scripts/python.exe
+
+"$PY" -m pip install -U "camoufox[geoip]"
+"$PY" -m camoufox fetch
 ```
 
 ```python

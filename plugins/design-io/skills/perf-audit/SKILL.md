@@ -6,6 +6,18 @@ description: "Lighthouse в headless перед публикацией стра�
 
 # Perf audit
 
+## Сначала — что уже есть в сессии
+
+Если подключён MCP `chrome-devtools`, npm ставить не нужно, но подменяет он не всё:
+
+- `lighthouse_audit` (режимы `navigation` / `snapshot`) даёт accessibility, SEO,
+  best-practices и agentic browsing — **без категории performance**;
+- сами Core Web Vitals (LCP, CLS, TBT/INP) снимаются `performance_start_trace` →
+  `performance_stop_trace` → `performance_analyze_insight`.
+
+Скрипт ниже нужен, когда MCP недоступен или нужен один JSON-отчёт со всеми категориями
+сразу (в том числе performance) и exit-код для гейта.
+
 ## Установка
 
 ```bash
@@ -14,7 +26,9 @@ npm i -D lighthouse playwright chrome-launcher
 
 ## Скрипт
 
-`templates/perf.mjs`:
+Готового файла в навыке НЕТ — код ниже надо сохранить самому, например в `perf.mjs`
+рядом с проверяемой страницей (у соседей `verifier`, `live-preview`, `slides` шаблоны
+лежат в `templates/`, здесь такого каталога нет):
 
 ```js
 import lighthouse from 'lighthouse';
@@ -75,7 +89,7 @@ process.exit(cats.performance.score >= 0.8 ? 0 : 1);
 ## Использование
 
 ```bash
-node perf.mjs index.html
+node perf.mjs index.html    # perf.mjs = сохранённый выше код, готового файла в навыке нет
 # → perf-report.json + табличка в консоль
 ```
 

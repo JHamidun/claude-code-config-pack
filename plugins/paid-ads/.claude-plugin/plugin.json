@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "paid-ads",
   "displayName": "Paid Advertising",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Meta, Google, VK, Yandex Direct and Telegram Ads playbooks, performance creative production, benchmark diagnostics.",
   "author": {
     "name": "Zhemal Khamidun",

@@ -1,6 +1,8 @@
-<!-- LEGACY: полное тело скилла 'export-pptx' из старого дерева ~/.claude/tools/claude-code-skills (@2026-04-30).
-     Сохранено при консолидации деревьев design-пака 2026-07-18 (lossless-merge, канон deep-read-before-merge).
-     Актуальный канон — ../SKILL.md; здесь — расширенный материал прежней версии (таблицы, рецепты, антипаттерны). -->
+<!-- Расширенная (прежняя) версия навыка 'export-pptx'. Актуальный канон — ../SKILL.md;
+     здесь расширенный материал прежней версии (таблицы, рецепты, антипаттерны).
+     ⚠ Ни `scripts/export_pptx.py`, ни `scripts/export-png.js` в скилле НЕТ и не было: ниже это подписи к коду,
+     приведённому тут же. Сегодня работают `../templates/pptx-screenshots.mjs` и, для кадров,
+     `~/.claude/skills/export-png/templates/render-png.mjs` (проверено 22.08.2026). -->
 
 ---
 name: export-pptx
@@ -132,12 +134,13 @@ notes_text_frame.text = "Тут заметки для докладчика — �
 
 ```python
 prs.core_properties.title = "ExampleProduct — Pitch Deck"
-prs.core_properties.author = "Your Name"
-prs.core_properties.subject = "Edtech про AI"
+prs.core_properties.author = "Your Name"      # ← подставь СВОЁ имя
+prs.core_properties.subject = "Тема дека"     # ← и свою тему
 prs.core_properties.created = datetime.utcnow()
 ```
 
-Это видно в file properties и в email-attachments превью.
+Это видно в file properties и в email-attachments превью — то есть заглушку
+`Your Name` получатель увидит в свойствах присланного файла. Заполняй до отправки.
 
 ## Антипаттерны
 

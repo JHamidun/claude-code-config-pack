@@ -109,44 +109,26 @@ window.addEventListener('load', () => {
 });
 ```
 
-## Pixel diff (overlay-режим)
+## Pixel diff (overlay-режим) — берётся из screenshot-test
 
-Через Playwright (или html-to-image в браузере):
+Свой pixel-diff здесь не нужен: скрипт `test.mjs` из скилла `screenshot-test` делает ровно это —
+Playwright снимает `fullPage`, `pixelmatch` + `pngjs` считают разницу и пишут подсвеченный PNG.
+Там же стабилизация (отключение анимаций, ожидание шрифтов, скрытие каретки, stub времени),
+без которой diff шумит на антиалиасе и выдаёт ложную разницу.
 
-```js
-// templates/pixel-diff.mjs
-import { chromium } from 'playwright';
-import { PNG } from 'pngjs';
-import pixelmatch from 'pixelmatch';
-import fs from 'node:fs/promises';
-
-const [a, b] = process.argv.slice(2);
-const browser = await chromium.launch();
-const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
-
-async function shoot(file) {
-  const page = await ctx.newPage();
-  await page.goto(`file://${process.cwd()}/${file}`, { waitUntil: 'networkidle' });
-  const buf = await page.screenshot({ fullPage: true });
-  await page.close();
-  return PNG.sync.read(buf);
-}
-
-const imgA = await shoot(a);
-const imgB = await shoot(b);
-await browser.close();
-
-const { width, height } = imgA;
-const diff = new PNG({ width, height });
-const pixels = pixelmatch(imgA.data, imgB.data, diff.data, width, height, { threshold: 0.1 });
-await fs.writeFile('diff.png', PNG.sync.write(diff));
-console.log(`${pixels} pixels differ. → diff.png`);
-```
+Как получить им diff «before vs after»: в `test-screenshots.config.json` указывается **рабочий**
+файл, снимок «до» делается перед правками.
 
 ```bash
-npm i pixelmatch pngjs playwright
-node pixel-diff.mjs before.html after.html
+npm i -D playwright pixelmatch pngjs
+node test.mjs --update   # снять «до» с текущего index.html
+# ...правки...
+node test.mjs            # сравнить «после» → screenshots/diff/<name>.png
 ```
+
+Разница в назначении, а не в коде: `screenshot-test` сравнивает текущее с **сохранённым в репо**
+эталоном и падает в CI, comparison-mode — две произвольные версии разово, руками, перед тем как
+эталон обновлять.
 
 ## DOM tree mode
 
@@ -183,7 +165,7 @@ out.forEach(p => console.log((p.added ? '+' : p.removed ? '-' : ' ') + p.value.s
 2. Делаешь правки.
 3. После → `cp index.html .compare/after.html`.
 4. Открой `.compare/index.html` в браузере → side-by-side.
-5. (опционально) `node pixel-diff.mjs ...` для overlay.
+5. (опционально) overlay-diff — скриптом из `screenshot-test` (см. раздел выше).
 
 ## Ограничения
 

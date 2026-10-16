@@ -360,7 +360,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "{{ $credentials.gmailOAuth2.id }}",
-          "name": "Gmail - milorad@n8n.io"
+          "name": "Gmail - REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2,

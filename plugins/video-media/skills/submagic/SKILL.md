@@ -1,6 +1,6 @@
 ---
 name: submagic
-description: "Submagic API: ИИ-субтитры, Magic Brolls/Zooms, Magic Clips (YouTube в нарезку). Триггеры: «субтитры», «нарежь на клипы»."
+description: "Submagic API: ИИ-субтитры, Magic Brolls/Zooms, Magic Clips (YouTube в нарезку). Триггеры: «субтитры», «нарежь на клипы». НЕ шортсы с аватаром→shorts-pipeline."
 ---
 
 # your subtitle API Skill
@@ -8,6 +8,20 @@ description: "Submagic API: ИИ-субтитры, Magic Brolls/Zooms, Magic Cli
 ## Overview
 
 SubtitleService is an AI video platform for short-form content. The REST API (`https://api.submagic.co/v1`) covers caption generation, automatic B-roll insertion, magic zooms, hook titles, silence removal, audio cleanup, Magic Clips (auto-cut from YouTube), social publishing (YouTube/TikTok/Instagram), and user media library.
+
+> **Whether SubMagic is the right caption tool at all** — that choice lives in ONE place for the
+> whole video cluster: skill `video-editor` → «Выбор субтитров и word-level таймингов» (local
+> WhisperX karaoke vs segment SRT chunks vs Deepgram verbatim vs this cloud API). The rule used to
+> be restated in three skills and drifted apart. This file is the *how*, not the *whether*.
+
+> **Boundary with `shorts-pipeline` — both call SubMagic, and that is not duplication.**
+> This file is the **vendor API reference**: every parameter, Magic Clips, publishing, any video in
+> any language, with the settings still open. `shorts-pipeline` is a **fixed pipeline for your own
+> channel**, where SubMagic is one stage and the choices are already made (your own avatar,
+> Hormozi 2, your own cover, its own state.json, RU track). Tell them apart by the request: **a file
+> or clip handed over — "add captions / cut into clips" → here; "a short with my avatar / cut shorts
+> from the webinar" → `shorts-pipeline`.** The `magicBrolls` default disagreed between the two until
+> 2026-08-20; both now say `False` — see the Gotchas entry below.
 
 **Docs:** https://docs.submagic.co (openapi at /api-reference/openapi.json). Спека большая (~5750 строк) — качай её в рабочий каталог и читай оттуда, а не по одной странице: `curl -sL https://docs.submagic.co/api-reference/openapi.json -o ./work/submagic-openapi.json`.
 
@@ -59,7 +73,7 @@ Body (application/json):
   "presetId": "uuid",                        # OPTIONAL. Saved preset. Cannot combine with templateName/userThemeId/hookTitle/music/items/magicZooms/magicBrolls/magicBrollsPercentage/removeSilencePace/removeBadTakes
   "aiEditTemplate": "kelly|karl|ella",       # OPTIONAL. Full AI edit. Mutually excl. with everything except title/language/videoUrl/webhookUrl/dictionary
   "magicZooms": true,                        # Default false. Auto zoom-in on emphasis
-  "magicBrolls": true,                       # Default false. Auto B-roll insertion
+  "magicBrolls": true,                       # Default false. Auto B-roll insertion. KEEP FALSE on RU — see Gotchas
   "magicBrollsPercentage": 75,               # 0-100. Default 50. Only if magicBrolls=true
   "removeSilencePace": "natural|fast|extra-fast",  # OPTIONAL
                                              #   extra-fast: 0.1-0.2s silence removed
@@ -149,7 +163,7 @@ Statuses:
 
 Magic Clips webhook has extra `clips: [{ clipId, downloadUrl, ... }]`.
 
-## Caption templates (44 как на 2026-05-16)
+## Caption templates (45 — сверено живым `GET /v1/templates` 2026-08-22)
 
 `Matt, Jess, Jack, Nick, Laura, Kelly 2, Claire, Michael, Caleb, Kendrick, Lewis, Doug, Carlos, Luke, Leila, Mark, Sara (default), Daniel, Dan 2, Hormozi 4, Dan, Devin, Tayo, Ella, Tracy, Hormozi 1, Hormozi 2, Hormozi 3, Hormozi 5, Jason, William, Leon, Ali, Beast, Bob, Maya, Karl, Iman, Umi, David, Noah, Gstaad, Malta, Nema, seth`
 
@@ -267,7 +281,11 @@ def create_from_url(video_url: str, title: str, **opts) -> dict:
         'videoUrl': video_url,
         'templateName': opts.pop('templateName', 'Hormozi 2'),
         'magicZooms': opts.pop('magicZooms', True),
-        'magicBrolls': opts.pop('magicBrolls', True),
+        # magicBrolls defaults to False here — same as the API default, and mandatory for RU.
+        # Auto-B-roll picks emoji/GIF by transcribed keywords, so any mis-transcription lands on
+        # screen: «pivot» heard as «пиво» put a 🍺 into a finished short. Opt in explicitly, and
+        # only for content whose transcript you have already checked.
+        'magicBrolls': opts.pop('magicBrolls', False),
         'magicBrollsPercentage': opts.pop('magicBrollsPercentage', 50),
         **opts,
     }
@@ -335,8 +353,8 @@ proj = create_from_url(
     language='ru',
     templateName='Hormozi 2',
     magicZooms=True,
-    magicBrolls=True,
-    magicBrollsPercentage=50,           # user wants 50%
+    magicBrolls=False,                  # RU: keep OFF. See gotcha below — this exact clip
+                                        # ("pivot" → «пиво») is how the 🍺 bug was found.
     removeSilencePace='natural',
     cleanAudio=True,
     hookTitle={'text': 'Как спасти бизнес от краха?', 'template': 'tiktok'},
@@ -365,6 +383,12 @@ result = youtube_to_clips(
 
 - **`Authorization: Bearer` → 404/UNAUTHORIZED.** Must be `x-api-key:`.
 - **`videoUrl` cannot be social media URL** (YouTube/TikTok/Instagram) — use direct CDN/Drive direct link. For YouTube use Magic Clips endpoint instead.
+- **`magicBrolls` stays FALSE on Russian audio.** Auto-B-roll picks emoji/GIF cutaways by
+  transcribed keywords, so a mis-transcription becomes a visible object: «pivot» heard as «пиво»
+  stamped a 🍺 into a finished short. The `dictionary` param does NOT fix this — it only helps
+  recognise NEW words, not repair one already mis-heard, and there is no `PATCH` for caption text,
+  so the only cure is a full re-render from a cleaned script. Turn it on only for content whose
+  transcript you have already read. Full case: `shorts-pipeline/references/gotchas.md` §1–2.
 - **`presetId` cannot combine** with templateName/magicZooms/magicBrolls/etc.
 - **`aiEditTemplate`** restricts you to title/language/videoUrl/webhookUrl/dictionary — everything else ignored.
 - **Items cannot overlap** in time. AI-broll item endTime - startTime ≤ 12 sec.
@@ -375,7 +399,9 @@ result = youtube_to_clips(
 
 ## MCP server option
 
-SubtitleService provides an MCP server: https://docs.submagic.co/mcp-server.md — Claude Code/Desktop/Cursor compatible. Not configured in `~/.claude/mcp.json` by default; can add for natural-language flows.
+SubtitleService provides an MCP server: https://docs.submagic.co/mcp-server.md — Claude Code/Desktop/Cursor compatible. Not connected here by default.
+
+Подключать **не правкой `~/.claude/mcp.json`** — Claude Code этот файл не читает (там VS Code-схема с ключом `servers`); правка в него ничего не включит. Рабочий путь: `claude mcp add …` (user scope пишется в `~/.claude.json`) либо `.mcp.json` в корне проекта, смотреть и выключать — через `/mcp`. Проверка «поднялся ли» — не по конфигу, а по наличию в сессии инструментов `mcp__submagic__*`. Тем же способом проверяется любой сервер: объявление в конфиге ≠ работающий сервер.
 
 ## References
 
@@ -384,13 +410,15 @@ SubtitleService provides an MCP server: https://docs.submagic.co/mcp-server.md �
 - Свой конвейер «видео → субтитры → публикация» собирается навыками пака:
   `video-editor` (монтаж) → этот навык (субтитры/клипы) → `content-engine` /
   `tg-bot-publish` (выкладка). Отдельного скрипта-обёртки пак не несёт.
+- Готовый конвейер «вебинар → шортсы с аватаром», где SubMagic — один из этапов, —
+  навык `shorts-pipeline` (граница между ним и этим файлом описана в начале).
 
 ## Use cases mapped
 
 | Goal | API |
 |---|---|
 | AI captions on existing mp4 | POST /v1/projects/upload + templateName |
-| HeyGen avatar → captioned + B-roll | POST /v1/projects with HeyGen URL + magicZooms/magicBrolls |
+| HeyGen avatar → captioned (+ B-roll only on checked EN transcripts) | POST /v1/projects with HeyGen URL + magicZooms; `magicBrolls` stays false on RU |
 | YouTube webinar → 5-10 viral shorts | POST /v1/projects/magic-clips |
 | Custom B-roll cutaways | POST /v1/projects with `items: [{type:"ai-broll", prompt:..}]` |
 | Add hook title overlay | `hookTitle: {text, template, top, size}` |

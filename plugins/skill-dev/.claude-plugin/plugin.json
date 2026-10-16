@@ -2,14 +2,14 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "skill-dev",
   "displayName": "Skill & Agent Dev",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Author skills/agents/plugins/MCP, prompt engineering, Claude API & CLI.",
   "author": {
     "name": "Zhemal Khamidun",
     "url": "https://github.com/JHamidun"
   },
   "repository": "https://github.com/JHamidun/claude-code-config-pack",
-  "license": "MIT",
+  "license": "MIT AND Apache-2.0",
   "keywords": [
     "skills",
     "agents",

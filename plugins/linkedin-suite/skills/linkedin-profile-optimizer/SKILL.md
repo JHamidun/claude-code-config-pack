@@ -82,6 +82,7 @@ A structured audit + rewrite in this shape:
 - `references/featured-section-playbook.md` — goal-matched content types
 - `references/banner-photo-specs.md` — dimensions, composition, mobile test
 - `references/experience-skills-rules.md` — bullet rewriting + skills strategy + custom URL + recommendations
+- `references/regional-differences.md` — как профиль читается в США / MENA / ЮВА / Латам (фото, обложка, headline, About) + общие элементы и Social Selling Index
 
 ## Related skills
 

@@ -15,11 +15,23 @@
     python mouth_map.py ./poses -o mouth.json --draw check/   # проверить глазами
 """
 from __future__ import annotations
+# UTF-8 на выход. Консоль Windows по умолчанию cp1251/cp866/cp1252, и первый же
+# не-ASCII символ (кириллица, →, ✓) валит процесс UnicodeEncodeError — обычно на
+# --help, то есть ДО любой полезной работы. errors="replace" оставляет вывод
+# читаемым, если терминал всё же не UTF-8.
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 import argparse
 import base64
 import json
 import mimetypes
+import os
 import pathlib
 import sys
 import urllib.error
@@ -42,6 +54,17 @@ cx, cy — центр рта в долях ширины и высоты карт
 
 
 def key() -> str:
+    # Переменная окружения — первый источник: файла ключей может не быть вовсе,
+    # и без этой проверки скрипт падал бы трейсбеком FileNotFoundError.
+    env_key = os.environ.get("GOOGLE_API_KEY", "").strip()
+    if env_key:
+        return env_key
+    if not ENV.exists():
+        raise SystemExit(
+            f"нет GOOGLE_API_KEY: ни в окружении, ни в {ENV}. "
+            "Заведи файл из ~/.claude/templates/.credentials.master.env.example "
+            "или экспортируй переменную."
+        )
     for line in ENV.read_text(encoding="utf-8", errors="replace").splitlines():
         if line.startswith("GOOGLE_API_KEY="):
             return line.split("=", 1)[1].strip()

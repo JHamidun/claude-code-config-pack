@@ -19,18 +19,21 @@ allowed-tools:
 ## Preamble (run first)
 
 ```bash
-_UPD=$(~/.claude/skills/gstack/bin/gstack-update-check 2>/dev/null || .claude/skills/gstack/bin/gstack-update-check 2>/dev/null || true)
+# Call the helpers through bash: they ship without the exec bit, so running
+# them directly is a silent no-op. A failure is reported, never swallowed.
+_GS="$HOME/.claude/skills/gstack"; [ -f "$_GS/bin/gstack-update-check" ] || _GS=".claude/skills/gstack"
+_UPD=$(bash "$_GS/bin/gstack-update-check" 2>&1) || _UPD="UPDATE_CHECK_BROKEN: $_UPD"
 [ -n "$_UPD" ] && echo "$_UPD" || true
 mkdir -p ~/.gstack/sessions
 touch ~/.gstack/sessions/"$PPID"
 _SESSIONS=$(find ~/.gstack/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
 find ~/.gstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_CONTRIB=$(~/.claude/skills/gstack/bin/gstack-config get gstack_contributor 2>/dev/null || true)
+_CONTRIB=$(bash "$_GS/bin/gstack-config" get gstack_contributor 2>/dev/null || true)
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"
 ```
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/gstack/gstack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running gstack v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/gstack/gstack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running gstack v{to} (just updated!)" and continue. If `UPDATE_CHECK_UNAVAILABLE <ver> <reason>` or `UPDATE_CHECK_BROKEN …`: the version check could not run — say so in one line and continue; do not treat it as up to date.
 
 ## AskUserQuestion Format
 
@@ -296,7 +299,7 @@ For each finding: threat, likelihood (High/Med/Low), impact (High/Med/Low), and 
 **STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
 
 ### Section 4: Data Flow & Interaction Edge Cases
-This section traces data through the system and interactions through the UI with adversarial thoroughness.
+This section traces data through the system and interactions through the UI adversarially — hunting the paths that break, not confirming the ones that work.
 
 **Data Flow Tracing:** For every new data flow, produce an ASCII diagram showing:
 ```

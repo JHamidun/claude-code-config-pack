@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="64" viewBox="0 0 400 64" role="img" aria-label="Your Company">
+  <title>Your Company</title>
+  <!-- ЗАГЛУШКА. Замените файл логотипом своей организации (SVG).
+       Правило перекраски: заливка fill="black" на сертификате становится
+       белой (движок подставляет logo_fill темы), любые другие цвета остаются
+       как есть. Обводки (stroke) не перекрашиваются — рисуйте заливками. -->
+  <g fill="black">
+    <path fill-rule="evenodd" d="M14 6H38A14 14 0 0 1 52 20V44A14 14 0 0 1 38 58H14A14 14 0 0 1 0 44V20A14 14 0 0 1 14 6ZM14 11A9 9 0 0 0 5 20V44A9 9 0 0 0 14 53H38A9 9 0 0 0 47 44V20A9 9 0 0 0 38 11Z"/>
+    <path d="M14.5 32.5L18.5 28.5L25 35L35.5 22.5L39.5 26.5L25 43Z"/>
+    <text x="68" y="46" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="700">Your Company</text>
+  </g>
+</svg>

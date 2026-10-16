@@ -8,7 +8,8 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `google-workspace` | Хаб Google Workspace: Docs, Sheets, Gmail (20 ящиков), Drive, Outlook компания; карта скриптов и токенов. |
+| `google-workspace` | Хаб Google Workspace: Docs, Sheets, Gmail, Drive, локальный Outlook; карта скриптов и токенов. |
+| `outlook-desktop` | Локальный Outlook для Windows (COM): письма, ответ в ветке, отложенная отправка, «Исходящие», календарь. |
 
 ### Commands
 

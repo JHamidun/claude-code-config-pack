@@ -8,9 +8,9 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `email-imap` | Generic IMAP/SMTP CLI for any mailbox — read, search, send, and download attachments with no external dependencies. |
-| `sms-twilio` | Send SMS through the Twilio REST API — single and bulk sends with dry-run guards, delivery status, history, balance. |
-| `tg-bot-publish` | Publish and manage in Telegram through a bot (Bot API) — channel posts, rich layout, broadcasts, inline buttons. |
+| `email-imap` | IMAP/SMTP CLI для любого ящика: Яндекс.Почта, Mail.ru, корпоративные. |
+| `sms-twilio` | SMS через Twilio (CLI sms_client.py): bulk с dry-run, статус доставки, баланс. |
+| `tg-bot-publish` | Публикация в Telegram через бота (Bot API, tg_bot.py): посты в канал, рассылка, кнопки. |
 | `use-spark` | Почта, календарь и контакты из Spark через CLI: письма, треды, поиск, свободные слоты, черновики, встречи. |
 
 ## Install

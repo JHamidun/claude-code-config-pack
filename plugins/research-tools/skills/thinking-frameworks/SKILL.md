@@ -91,7 +91,7 @@ IMPORTANT| (interrupts,  | (time wasters, |
 2. Select 1-2 most relevant frameworks
 3. Walk through the framework step by step
 4. Deliver structured analysis with clear conclusions
-5. Optionally save insights via vector_memory
+5. Optionally save insights via `/memory-learn` (skill `memory-agent`)
 
 ## Combination Guide
 

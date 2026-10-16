@@ -12,11 +12,16 @@ Expert skill for creating AI avatar videos, talking heads, and interactive agent
 ## API Key
 
 ```bash
-# API ключи: ~/.claude/.credentials.master.env
-# Переменная: DID_API_KEY
-DID_API_KEY=os.getenv('DID_API_KEY')
+# ~/.claude/.credentials.master.env — впиши САМ КЛЮЧ, не код на Python
+DID_API_KEY=ВСТАВЬ_СЮДА_СВОЙ_КЛЮЧ   # https://studio.d-id.com/account-settings
 DID_API_URL=https://api.d-id.com
 ```
+
+> Строка `DID_API_KEY=os.getenv('DID_API_KEY')` ключ НЕ настраивает: это непустое
+> значение, любая проверка `if not key` сочтёт ключ заданным, запрос уйдёт с этим
+> текстом и вернётся `401` без объяснения. В коде читай ключ через
+> `os.getenv('DID_API_KEY')`, а в файле должен лежать сам ключ. Файл не подгружается
+> сам: `load_dotenv(Path.home()/'.claude'/'.credentials.master.env')`.
 
 ## When to Use D-ID
 

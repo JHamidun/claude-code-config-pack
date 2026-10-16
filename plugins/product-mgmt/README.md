@@ -11,7 +11,7 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `feature-spec` | PRD и спеки фич: user stories, требования, критерии приёмки, метрики. |
 | `metrics-tracking` | Продуктовые метрики: OKR, north star, дашборды, еженедельные разборы. |
 | `roadmap-management` | Продуктовый роадмап: RICE/ICE/MoSCoW, Now/Next/Later, capacity. |
-| `stakeholder-comms` | Апдейты для стейкхолдеров под аудиторию: статусы, отчёты, анонсы, риски. |
+| `stakeholder-comms` | Пишет апдейты стейкхолдерам под аудиторию: статусы, риски ROAM, ADR-решения, фасилитация встреч. |
 | `user-research-synthesis` | Синтез исследований в инсайты: интервью, опросы → темы, персоны; CustDev: респонденты, карта эмпатии. |
 
 ### Agents

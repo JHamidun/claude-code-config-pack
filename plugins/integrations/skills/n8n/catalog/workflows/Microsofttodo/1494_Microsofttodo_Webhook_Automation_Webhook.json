@@ -467,7 +467,7 @@
         "channelId": {
           "__rl": true,
           "mode": "list",
-          "value": "19:c2966307089a4f4b98ca06b5f160999a@thread.tacv2",
+          "value": "19:REPLACE_ME@example.com2",
           "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
           "cachedResultName": "Notes"
         },
@@ -607,7 +607,7 @@
         "channelId": {
           "__rl": true,
           "mode": "list",
-          "value": "19:c2966307089a4f4b98ca06b5f160999a@thread.tacv2",
+          "value": "19:REPLACE_ME@example.com2",
           "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
           "cachedResultName": "Notes"
         },

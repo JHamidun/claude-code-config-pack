@@ -494,7 +494,7 @@
     {
       "name": "Team Creation",
       "type": "n8n-nodes-base.webhook",
-      "notes": "Example Input Data:\n{\"projectIdea\":\"A hub for all things Oasis\",\"projectName\":\"Oasis Hub\",\"teamMembers\":[{\"name\":\"Will Stenzel\",\"email\":\"stenzel.w@northeastern.edu\"},{\"name\":\"Jane Doe\",\"email\":\"doe.j@northeastern.edu\"}]}",
+      "notes": "Example Input Data:\n{\"projectIdea\":\"A hub for all things Oasis\",\"projectName\":\"Oasis Hub\",\"teamMembers\":[{\"name\":\"Will Stenzel\",\"email\":\"REPLACE_ME@example.com\"},{\"name\":\"Jane Doe\",\"email\":\"REPLACE_ME@example.com\"}]}",
       "position": [
         460,
         150

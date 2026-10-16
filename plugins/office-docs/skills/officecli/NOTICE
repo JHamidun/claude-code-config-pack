@@ -1,0 +1,38 @@
+NOTICE — происхождение и изменения относительно первоисточника
+==============================================================
+
+Навык `officecli` взят из <https://github.com/iOfficeAI/OfficeCLI> (файл `SKILL.md` в корне
+репозитория, ветка `main`, отметка `iOfficeAI/OfficeCLI@ea1011d` — последний коммит, менявший
+этот файл, 17.07.2026) и распространяется под Apache License 2.0 — полный текст в `LICENSE.txt`
+рядом. Сам инструмент (бинарник `officecli`) в пак не входит: он ставится отдельно, по инструкции
+в `SKILL.md`, из релизов автора.
+
+Атрибуция из файла NOTICE первоисточника (раздел 4(d) лицензии), дословно:
+
+    OfficeCLI
+    Copyright 2026 OfficeCLI (https://OfficeCLI.AI)
+
+    Created and maintained by goworm.
+
+    This product is licensed under the Apache License, Version 2.0.
+    You may obtain a copy of the License in the LICENSE file or at
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    This NOTICE file is part of the required attribution under
+    Section 4 of the Apache License, Version 2.0. Redistributions
+    of this work, with or without modification, must retain this
+    notice.
+
+Раздел 4(b) лицензии требует помечать изменённые файлы. Сверка с первоисточником сделана
+14.10.2026 (текст `main`, побайтное сравнение после нормализации переводов строки): до правок
+пака копия совпадала с ним полностью. Изменено в паке:
+
+ИЗМЕНЕНЫ (файлы первоисточника, правленные в этом паке):
+  - SKILL.md: шапка (английское описание заменено русским); раздел Install (`curl | bash` и
+    `irm | iex` заменены на «скачать в файл, прочитать, запустить», добавлено описание действий
+    установщика); заметка о происхождении под заголовком; раздел «В паке рядом» в конце.
+
+ДОБАВЛЕНЫ (в первоисточнике таких файлов нет в составе навыка):
+  - NOTICE (этот файл)
+
+Всё, что не названо выше, совпадает с первоисточником байт в байт.

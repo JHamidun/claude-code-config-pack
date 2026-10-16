@@ -429,7 +429,7 @@
           "familyName": "Hatje"
         },
         "site": null,
-        "email": "niklas@n8n.io",
+        "email": "REPLACE_ME@example.com",
         "fuzzy": false,
         "avatar": null,
         "github": {
@@ -624,7 +624,7 @@
         "formMode": "test",
         "submittedAt": "2024-02-21T10:06:56.002Z",
         "What's your role?": "Product",
-        "What's your business email?": "niklas@n8n.io"
+        "What's your business email?": "REPLACE_ME@example.com"
       }
     ]
   },

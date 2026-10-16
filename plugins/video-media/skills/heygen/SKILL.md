@@ -51,63 +51,25 @@ curl -s "https://api.heygen.com/v3/users/me" -H "x-api-key: $HEYGEN_API_KEY"
 > положительном балансе — проверяй ПЕРЕД генерацией: `GET /v3/users/me` →
 > `wallet.remaining_balance`. Иначе получишь отказ уже после сборки сценария.
 
-## Два пути обращения к сервису
+## Единственный поддерживаемый путь — публичный API
 
-| Путь | Base | Auth | Учёт расхода | Когда |
-|---|---|---|---|---|
-| **Публичный API** (этот документ) | `api.heygen.com` | `x-api-key` | кошелёк API | документированный v3; нужен положительный баланс кошелька |
-| **Сессия своей учётной записи** | `api2.heygen.com` | `x-guest-session-token` (cookie) | тариф учётной записи | работа в рамках уже подключённого плана |
+| Путь | Base | Auth | Учёт расхода |
+|---|---|---|---|
+| **Публичный API v3** (этот документ) | `api.heygen.com` | `x-api-key` | кошелёк API |
 
-Что доступно сейчас, видно из `GET /v3/users/me` (баланс кошелька API) и команды
-`quota` веб-клиента (тариф и лимиты учётной записи).
+Что доступно прямо сейчас, видно из `GET /v3/users/me`: `wallet.remaining_balance`.
 
-→ **Работа через сессию учётной записи, клиент без браузера: `references/web-session.md`**
-+ `scripts/heygen_web_client.py`. Креды в `.credentials.master.env`:
-`HEYGEN_WEB_TOKEN` / `HEYGEN_WEB_RAW_TOKEN` / `HEYGEN_WEB_SPACE_ID`.
-
-```bash
-cd ~/.claude/skills/heygen/scripts
-python heygen_web_client.py whoami        # проверка сессии: email заполнен, а не гостевой вход
-python heygen_web_client.py quota         # тариф, доступные функции, расход
-python heygen_web_client.py avatars       # свои группы аватаров
-python heygen_web_client.py agent "Сделай 15-сек видео-интро про YourProduct"     # Video Agent
-python heygen_web_client.py translate "https://my.mp4" "Russian (Russia),Spanish (Spain)" --precision
-python heygen_web_client.py seedance "Man in neon city talks to camera" <look_id> --res 1080p --dur 10
-python heygen_web_client.py avatar-iv ./photo.jpg "Привет!" <voice_id>          # Photo-to-Video (Avatar IV)
-python heygen_web_client.py image "product ad scene" --refs s3://...
-python heygen_web_client.py seedance-list   # poll your jobs; или: status <item_id>
-python heygen_web_client.py call /v1/payment/subscription   # произвольный вызов
-```
-
-**Проверено на практике:** авторизация, все чтения и основные сценарии генерации —
-запрос проходит, задача создаётся, готовый mp4 скачивается.
-
-| Feature | Endpoint (сессия учётной записи) | CLI |
-|---|---|---|
-| AI Studio (talking-head, multi-scene) | `text_draft.create`→`text_draft.save`→`text_draft.generate` | `studio "<script>" <avatar_id> <voice_id>` |
-| Video Agent (prompt→video) | `POST /v1/video_agent/sessions` + `/v2/video_agent/interactive_chat` | `agent "<prompt>"` |
-| Translate | `POST /v3/video_translate.create` | `translate <url> "<lang names>"` |
-| Cinematic (Seedance 2) | `POST /v1/seedance2/submit` | `seedance "<prompt>" <look_id>` |
-| Photo-to-Video (Avatar IV) | `get_upload_photo_url`→PUT→`POST /v1/avatar/video_generate/submit` | `avatar-iv <photo> "<text>" <voice_id>` |
-| Product Placement / Image | `POST /v3/image/generate` | `image "<prompt>"` |
-| AI Video Generator / B-Roll (text→video, без аватара) | `POST /v1/file.ai_generate_element` (provider seedance_2) | `ai-video "<prompt>"` |
-| Upscale to 4K | `file.upload`→`POST /v1/apps/upscale-video` | `upscale <video>` |
-| Face Swap | `POST /v1/face_swap_v2.video.submit` | `face-swap <video_url> <face_url>` |
-| Speech Cleanup (filler removal) | `POST /v1/apps/filler-removal/preview/create` | — (`speech_cleanup_preview`) |
-| Auto Clips | `instant-highlights` (upload + format/caption) | `apps instant-highlights ...` |
-| PPT/PDF → Video | `POST /v1/ent_ppt_pdf_conversion/convert` → AI Studio draft | `ppt <file>` |
-| Batch Mode (scripts×avatars) | `POST /v1/avatar/batch_mode/submit` | `batch_mode(...)` |
-| File upload (любой) | `file.url` → PUT(SSE) → `file.upload` (3 шага) | авто внутри методов |
-| Status / download | `GET /v1/project/items/status` · `/v1/apps/<slug>/{id}/status` · `.check?workflow_id=` | `status <id>` · `download <id> <out> --wait` |
-
-⚠️ **У каждого приложения СВОЙ namespace в API** (слаг в интерфейсе ≠ путь в API:
-Face Swap = `/v1/face_swap_v2.*`, Speech Cleanup = `filler-removal`, B-Roll =
-`/v1/file.ai_generate_element`, Batch = `/v1/avatar/batch_mode/submit`, PPT =
-`/v1/ent_ppt_pdf_conversion/convert`). Угадывать путь по названию раздела
-бесполезно — получишь 404; сверяйся с таблицей. Загрузка файла — 3 шага
-`file.url`→PUT(`x-amz-server-side-encryption:AES256`)→`file.upload`, НЕ multipart.
-Полные тела (сценарный граф AI Studio и каждое приложение) — в
-`references/web-session.md`.
+> **Чего в паке нет и почему.** У веб-приложения HeyGen есть второй, недокументированный
+> контур (`api2.heygen.com`, авторизация по кукам браузерной сессии). Через него доступны
+> функции, которых нет в публичном v3 — AI Studio с multi-scene, Face Swap, PPT→Video,
+> Batch Mode. Описание этого контура и клиент к нему **намеренно не входят в пак**:
+> обращение к внутреннему API скриптом — за пределами условий использования HeyGen,
+> и риск блокировки аккаунта несёт тот, кто это запускает, а не тот, кто раздал конфиг.
+> Нужны эти функции — делай их руками в интерфейсе <https://app.heygen.com> либо пиши
+> в поддержку про доступ к соответствующему плану.
+>
+> На перечень v3 это не влияет: рендер аватара, cinematic, оживление картинки,
+> HyperFrames, lip-sync, перевод, клон голоса и вебхуки — всё ниже и всё документировано.
 
 ## Минимальный вызов v3
 

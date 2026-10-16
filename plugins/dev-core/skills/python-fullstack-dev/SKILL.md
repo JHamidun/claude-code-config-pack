@@ -1,6 +1,6 @@
 ---
 name: python-fullstack-dev
-description: "Разработка на Python: Django, FastAPI, Flask, data science, тесты, деплой. Триггеры: «напиши на питоне», «python-скрипт», «поправь питон-код». НЕ Telegram-бот→telegram-bot-toolkit."
+description: "Пишет и правит Python: дефолты FastAPI/Django, ruff+mypy, pytest, чеклист N+1 и гонок. Триггеры: «напиши на питоне», «поправь питон-код». НЕ Telegram-бот→telegram-bot-toolkit."
 ---
 
 # Python Full-Stack Development
@@ -20,6 +20,10 @@ repo beats any of them individually.
 - **Installer:** `uv` by default (`uv venv`, `uv pip install -r requirements.txt`),
   Poetry when the project already uses it, plain `venv` as the fallback.
 - **Requires-python:** `>=3.11`. Formatters and linters pinned to the same target.
+- **Async SQLAlchemy 2.0 (FastAPI):** `Mapped` / `mapped_column` models and
+  `async_sessionmaker(expire_on_commit=False)`. With the default, attributes expire
+  after `commit()` and the next access tries a lazy load — in async code that raises
+  (`MissingGreenlet`) instead of quietly querying.
 
 ```toml
 [tool.black]
@@ -47,7 +51,8 @@ ruff check . && black --check . && mypy src/ && pytest -q
 ```
 
 Run it before reporting a task done. `pytest -q` alone is not enough — a type error
-that mypy would catch usually survives a green test run.
+that mypy would catch usually survives a green test run. The project-wide gates
+(type-check, build, tests) are in `rules/quality-gates.md`.
 
 ## Pitfalls worth naming
 
@@ -70,6 +75,10 @@ before deciding. `F()` is cheaper but cannot branch on the result; the row lock 
 **Loading a whole table into memory.** `list(User.objects.all())` is fine at 1k rows
 and fatal at 10M. Use `.iterator(chunk_size=1000)` for one-pass processing, or
 `Paginator` when you need stable page boundaries.
+
+**Missing indexes.** Index the fields you filter and sort on; add a composite index
+for pairs that are queried together (for example `(user_id, created_at)`). A query
+that is instant on a dev database can scan the whole table in production.
 
 **Pydantic v1 idioms in a v2 project.** `orm_mode` is now `from_attributes`,
 `@validator` is `@field_validator`, `.dict()` is `.model_dump()`. Check which major
@@ -115,3 +124,8 @@ root on the host).
 `--reload` and bind-mounted source belong in `docker-compose.yml` for local work only;
 shipping them to production means the app restarts on any file write and serves code
 that is not in the image.
+
+## Related skills
+
+Telegram bots → `telegram-bot-toolkit` · DB schema → `database-design` ·
+RAG / embeddings → `pgvector-rag`.

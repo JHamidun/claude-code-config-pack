@@ -23,7 +23,7 @@
       "parameters": {
         "simple": false,
         "filters": {
-          "sender": "ray.thomas@charter.com",
+          "sender": "REPLACE_ME@example.com",
           "readStatus": "unread"
         },
         "options": {

@@ -4,14 +4,52 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
+import sys
 import uuid
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from pathlib import Path
 
 
-DEFAULT_MEMORY_DIR = Path.home() / "Documents" / "Last30Days"
+def _documents_dir() -> Path:
+    """The user's real Documents folder.
+
+    On a localized Linux desktop there is no ``~/Documents``: the folder is called
+    «Документы», ``Dokumente``, ``Documentos``… Writing to ``~/Documents`` anyway does
+    not fail — ``mkdir`` just creates a second, English-named folder next to the real
+    one, and the files end up somewhere the user never looks.
+
+    ``~/.config/user-dirs.dirs`` is the same file ``xdg-user-dir`` reads; parsing it
+    here keeps this a pure, side-effect-free lookup (no subprocess at import time).
+    Set ``LAST30DAYS_MEMORY_DIR`` to override the whole thing.
+    """
+    env = os.environ.get("XDG_DOCUMENTS_DIR")
+    if env:
+        candidate = Path(os.path.expandvars(env)).expanduser()
+        if candidate.is_dir():
+            return candidate
+
+    if sys.platform.startswith("linux"):
+        config = Path.home() / ".config" / "user-dirs.dirs"
+        try:
+            for line in config.read_text(encoding="utf-8", errors="replace").splitlines():
+                line = line.strip()
+                if not line.startswith("XDG_DOCUMENTS_DIR"):
+                    continue
+                value = line.split("=", 1)[1].strip().strip('"')
+                value = value.replace("$HOME", str(Path.home()))
+                candidate = Path(value).expanduser()
+                if candidate.is_dir():
+                    return candidate
+        except OSError:
+            pass
+
+    return Path.home() / "Documents"
+
+
+DEFAULT_MEMORY_DIR = _documents_dir() / "Last30Days"
 DEFAULT_BRIEFS_DIR = Path.home() / ".local" / "share" / "last30days" / "briefs"
 LIBRARY_ID_FILENAME = ".last30days-library-id"
 

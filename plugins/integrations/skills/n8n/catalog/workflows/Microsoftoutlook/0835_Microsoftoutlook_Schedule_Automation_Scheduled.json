@@ -178,7 +178,7 @@
       "parameters": {
         "subject": "Project Cost Missing",
         "bodyContent": "==<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Missing Budgeted Cost Notification</title>\n  <style>\n    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }\n    .email-container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; }\n    .email-header { background-color: #007BFF; color: #ffffff; padding: 20px; text-align: center; font-size: 18px; font-weight: bold; }\n    .email-body { padding: 20px; font-size: 16px; color: #333333; }\n    .email-body strong { color: #007BFF; }\n    .email-footer { padding: 10px 20px; font-size: 14px; color: #555555; text-align: left; }\n  </style>\n</head>\n<body>\n  <div class=\"email-container\">\n    <div class=\"email-header\">\n      {{ $json.default_cost_center }} - Project Data Missing\n    </div>\n    <div class=\"email-body\">\n      Dear {{ $json.default_cost_center }} Team,<br><br>\n      There are <strong>{{ $json.project_count }}</strong> active projects with missing <strong>Budgeted Cost</strong>.<br>\n      Kindly coordinate with the <strong>Accounts Team</strong> to update the missing values for accurate tracking.<br><br>\n      Your timely attention is appreciated.<br><br>\n      Regards,\n    </div>\n    <div class=\"email-footer\">\n      <strong>Amjid Ali</strong><br>\n      Automation Demo – n8n\n    </div>\n  </div>\n</body>\n</html>\n",
-        "toRecipients": "amjid@amjidali.com",
+        "toRecipients": "REPLACE_ME@example.com",
         "additionalFields": {
           "bodyContentType": "html"
         }
@@ -198,7 +198,7 @@
       "parameters": {
         "subject": "Projects Cost Missing",
         "bodyContent": "==<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Missing Budgeted Cost Notification</title>\n  <style>\n    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }\n    .email-container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; }\n    .email-header { background-color: #007BFF; color: #ffffff; padding: 20px; text-align: center; font-size: 18px; font-weight: bold; }\n    .email-body { padding: 20px; font-size: 16px; color: #333333; }\n    .email-body strong { color: #007BFF; }\n    .email-footer { padding: 10px 20px; font-size: 14px; color: #555555; text-align: left; }\n  </style>\n</head>\n<body>\n  <div class=\"email-container\">\n    <div class=\"email-header\">\n      {{ $json.default_cost_center }} - Project Data Missing\n    </div>\n    <div class=\"email-body\">\n      Dear {{ $json.default_cost_center }} Team,<br><br>\n      There are <strong>{{ $json.project_count }}</strong> active projects with missing <strong>Budgeted Cost</strong>.<br>\n      Kindly coordinate with the <strong>Accounts Team</strong> to update the missing values for accurate tracking.<br><br>\n      Your timely attention is appreciated.<br><br>\n      Regards,\n    </div>\n    <div class=\"email-footer\">\n      <strong>Amjid Ali</strong><br>\n      Automation Demo – n8n\n    </div>\n  </div>\n</body>\n</html>\n",
-        "toRecipients": "amjid@amjidali.com",
+        "toRecipients": "REPLACE_ME@example.com",
         "additionalFields": {
           "bodyContentType": "html"
         }
@@ -218,7 +218,7 @@
       "parameters": {
         "subject": "Projects Cost Missing",
         "bodyContent": "==<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Missing Budgeted Cost Notification</title>\n  <style>\n    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }\n    .email-container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; }\n    .email-header { background-color: #007BFF; color: #ffffff; padding: 20px; text-align: center; font-size: 18px; font-weight: bold; }\n    .email-body { padding: 20px; font-size: 16px; color: #333333; }\n    .email-body strong { color: #007BFF; }\n    .email-footer { padding: 10px 20px; font-size: 14px; color: #555555; text-align: left; }\n  </style>\n</head>\n<body>\n  <div class=\"email-container\">\n    <div class=\"email-header\">\n      {{ $json.default_cost_center }} - Project Data Missing\n    </div>\n    <div class=\"email-body\">\n      Dear {{ $json.default_cost_center }} Team,<br><br>\n      There are <strong>{{ $json.project_count }}</strong> active projects with missing <strong>Budgeted Cost</strong>.<br>\n      Kindly coordinate with the <strong>Accounts Team</strong> to update the missing values for accurate tracking.<br><br>\n      Your timely attention is appreciated.<br><br>\n      Regards,\n    </div>\n    <div class=\"email-footer\">\n      <strong>Amjid Ali</strong><br>\n      Automation Demo – n8n\n    </div>\n  </div>\n</body>\n</html>\n",
-        "toRecipients": "amjid@amjidali.com",
+        "toRecipients": "REPLACE_ME@example.com",
         "additionalFields": {
           "bodyContentType": "html"
         }

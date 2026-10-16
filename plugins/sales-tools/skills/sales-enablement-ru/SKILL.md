@@ -5,7 +5,7 @@ metadata:
   version: 1.1.0
   updated: 2026-05-29
   ported_from: coreyhaines31/marketingskills (sales-enablement)
-  reuses: manus-slides, pptx, crm, draft-outreach, revops-ru, competitive-intelligence, zoom
+  reuses: manus-slides, pptx, draft-outreach, revops-ru, competitive-intelligence, zoom
 ---
 
 # Sales Enablement (RU)

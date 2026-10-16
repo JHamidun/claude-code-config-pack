@@ -12,19 +12,26 @@ Source frequencies measured across a corpus of AI-generated vs. human-authored L
 | 🚀 | rocket | 3.28% | Highest-frequency AI emoji. Signals "launch" / "growth" in template fashion | 📦 (box) for shipping, 🛫 (takeoff) for travel, or remove |
 | ✨ | sparkles | 3.11% | "Magic AI" / "transformation" cliché. Almost never appears in human ops content | Remove. No clean substitute |
 | ♻️ | recycling | 2.93% | Used to flag re-shares and "lessons learned" loops. AI overuses for filler | 🔁 (repeat) only if literally about repetition, or remove |
-| 🎯 | target | 2.07% | "Goals" / "objectives" cliché | 📌 (pushpin) for specific items, or remove |
+| 🎯 | target / dart | 2.07% | "Goals" / "objectives" cliché | 📌 (pushpin) for specific items, or remove |
 | 📈 | chart_increasing | 1.89% | "Growth" / "metrics" template signal | Use a real number in plain text instead |
 | 🔑 | key | 1.74% | "Key takeaway" / "key insight" template | Skip the emoji, write the takeaway in plain prose |
-| 🎯 | dart | 1.68% | Same family as target above — both flag templated structure | Same as target |
 | 💪 | muscle | 1.45% | "Strength" / "resilience" platitude | Remove or replace with concrete detail |
 | 🔥 | fire | 1.31% | Borderline — used in human content too, but flagged when clustered with others | Keep if standalone, swap to 🌶️ (chili) or 🥵 (hot face) for variety |
 
 ## Cluster rules
 
-- 1 AI-pattern emoji in isolation: usually fine
-- 2 in one post: borderline — flag in `--strict` mode
-- 3+ in one post: AI-likely — flag in all modes
-- Same emoji 2+ times: repetition tell — flag in all modes
+Таблица выше — **по одной строке на кодпоинт**. 🎯 (U+1F3AF) раньше стояла дважды —
+как `target` 2.07% и как `dart` 1.68%, — из-за чего один и тот же символ получал два разных
+веса, и счёт зависел от того, какую строку взяли первой. Строки сведены в одну, вес взят
+больший (2.07%) как более консервативный. Если добавляешь эмодзи — сверяй кодпоинт,
+а не подпись.
+
+Пороги ниже — **дефолтный режим**; `--strict` и `--lenient` их сдвигают (см. SKILL.md):
+
+- 1 AI-pattern emoji в изоляции: в дефолте нормально; **`--strict` флагует и его**
+- 2 в одном посте: borderline — флагуется в дефолте и в `--strict`, но не в `--lenient`
+- 3+ в одном посте: AI-likely — флагуется во всех режимах
+- Один и тот же эмодзи 2+ раза: repetition tell — флагуется во всех режимах
 
 ## Position rules
 

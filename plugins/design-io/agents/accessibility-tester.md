@@ -304,7 +304,7 @@ When invoked, you must follow these steps systematically:
 
 23. **Use generate-report-header Skill** for standardized header
 
-24. **Create comprehensive accessibility report** following REPORT-TEMPLATE-STANDARD.md:
+24. **Create comprehensive accessibility report** following `docs/orchestrator/REPORT-TEMPLATE-STANDARD.md`:
    - YAML frontmatter with metadata
    - Executive summary with WCAG compliance score
    - Detailed findings by severity with WCAG criteria references

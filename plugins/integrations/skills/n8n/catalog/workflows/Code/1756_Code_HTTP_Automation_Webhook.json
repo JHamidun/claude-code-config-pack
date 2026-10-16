@@ -707,7 +707,7 @@
         "color": 4,
         "width": 460,
         "height": 480,
-        "content": "## Publish To Contentful\n\n- Publishes to Contentful by converting the fields to the appropriate fields for the contentful POST create content API.\n- Converts the article to Rich Text formatting specifically for Contentful by using another AI formatter trained on it's specs.\n\nemail us if you want that flow too: christian@varritech.com"
+        "content": "## Publish To Contentful\n\n- Publishes to Contentful by converting the fields to the appropriate fields for the contentful POST create content API.\n- Converts the article to Rich Text formatting specifically for Contentful by using another AI formatter trained on it's specs.\n\nemail us if you want that flow too: REPLACE_ME@example.com"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."

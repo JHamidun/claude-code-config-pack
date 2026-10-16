@@ -140,7 +140,7 @@ file_path: .bug-detection-plan.json
     "required": ["report-exists", "type-check"],
     "optional": ["tests"]
   },
-  "nextAgent": "bug-hunter",
+  "nextAgent": "general-purpose",
   "timestamp": "2025-10-18T14:00:00Z",
   "metadata": {
     "createdBy": "bug-orchestrator",
@@ -217,7 +217,7 @@ file_path: .dependency-audit-plan.json
   "validation": {
     "required": ["report-exists", "lockfile-valid"]
   },
-  "nextAgent": "dependency-auditor"
+  "nextAgent": "general-purpose"
 }
 ```
 
@@ -287,6 +287,12 @@ file_path: .bug-fixing-plan.json
 - [ ] Handles schema file loading errors
 
 ## Supporting Files
+
+Схемы живут ТОЛЬКО в `.claude/schemas/` — в каталоге навыка их нет и заводить не надо.
+До 22.08.2026 рядом с этим файлом лежала копия `schema.json` (`required: ["phase","config"]`,
+`phase` как **number**), на которую SKILL.md не ссылался ни разу. Она противоречила канону и
+отвергала «Example 1» из этого же файла: `'detection' is not of type 'number'`, тогда как
+`base-plan.schema.json` тот же план принимает. Копия убрана в `_trash-2026-08-22/`.
 
 Located in `.claude/schemas/`:
 - `base-plan.schema.json`: Base schema for all plan files

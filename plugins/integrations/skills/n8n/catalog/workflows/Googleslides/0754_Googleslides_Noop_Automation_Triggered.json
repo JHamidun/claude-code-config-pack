@@ -55,7 +55,7 @@
       "credentials": {
         "googleSheetsTriggerOAuth2Api": {
           "id": "LPj2gg4OdDdyokS7",
-          "name": "Google Sheets (jkp@kajonkietsuksa.ac.th)"
+          "name": "Google Sheets (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 1,
@@ -300,7 +300,7 @@
       "credentials": {
         "googleDriveOAuth2Api": {
           "id": "2k4spLmVESgxckkx",
-          "name": "jkp@kajonkietsuksa.ac.th"
+          "name": "REPLACE_ME@example.com"
         }
       },
       "typeVersion": 3,
@@ -366,7 +366,7 @@
       "credentials": {
         "googleDriveOAuth2Api": {
           "id": "2k4spLmVESgxckkx",
-          "name": "jkp@kajonkietsuksa.ac.th"
+          "name": "REPLACE_ME@example.com"
         }
       },
       "typeVersion": 3,
@@ -398,7 +398,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "qogKxJFIxmrd6rcB",
-          "name": "Gmail account (jkp@kajonkietsuksa.ac.th)"
+          "name": "Gmail account (REPLACE_ME@example.com)"
         }
       },
       "typeVersion": 2.1,

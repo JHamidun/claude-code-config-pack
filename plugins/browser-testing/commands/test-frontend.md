@@ -3,12 +3,12 @@ description: "Тест фронтенда через Playwright MCP: скрин�
 argument-hint: "<url> [screenshot | e2e | layout | accessibility]"
 ---
 
-# /test-frontend - Тестирование фронтенда с Playwright
+# /test-frontend - Тестирование фронтенда
 
-**Назначение:** Автоматизированное тестирование frontend с помощью Playwright MCP - проверка верстки, E2E тесты, скриншоты.
+**Назначение:** Автоматизированное тестирование frontend — проверка вёрстки, E2E тесты, скриншоты, accessibility.
 
 **Когда использовать:**
-- Нужно проверить верстку на разных разрешениях
+- Нужно проверить вёрстку на разных разрешениях
 - Найти баги в UI
 - Сделать screenshot для проверки
 - E2E тестирование user flows
@@ -27,63 +27,59 @@ argument-hint: "<url> [screenshot | e2e | layout | accessibility]"
 
 ---
 
-## Задача для агента
+## Реальные инструменты (выбор пути)
 
-Используй **Playwright MCP server** для автоматизированного тестирования фронтенда.
+| Путь | Когда | Как |
+|------|-------|-----|
+| **Плагин playwright** (MCP, дефолт) | Интерактивная проверка здесь и сейчас | Тулы `mcp__plugin_playwright_playwright__browser_*` — см. шаги ниже |
+| **Skill `webapp-testing`** | Тестирование локального веб-приложения целиком (запуск сервера + прогон) | `Skill(webapp-testing)` |
+| **Skill `playwright-automation`** | Написание постоянных e2e-тестов (spec-файлы), daemon-браузер `bdo.py` для параллельной работы, стелс | `Skill(playwright-automation)` |
+| **chrome-devtools MCP** | Accessibility/SEO аудит одним вызовом | `mcp__chrome-devtools__lighthouse_audit` |
 
-**Шаги:**
+Плагин playwright — синглтон-браузер: если он занят другой сессией, бери daemon-браузер из `playwright-automation` (bdo.py).
 
-### 1. Screenshot Testing
-```python
-# Через Playwright MCP
-await playwright_client.screenshot(
-    url=url,
-    viewports=[
-        {"width": 1920, "height": 1080},  # Desktop
-        {"width": 768, "height": 1024},   # Tablet
-        {"width": 375, "height": 667}     # Mobile
-    ],
-    full_page=True
-)
-```
+## Шаги (через плагин playwright)
+
+### 1. Screenshot Testing — 3 viewport
+
+Для каждого разрешения: desktop 1920×1080, tablet 768×1024, mobile 375×667.
+
+1. `browser_navigate(url)`
+2. `browser_resize(width, height)`
+3. `browser_take_screenshot(fullPage=true, filename="shot_<viewport>.png")`
+4. **Смотреть скриншоты глазами** (Read файла) — вердикт по пикселям, не по коду
 
 ### 2. Layout Testing
-```python
-# Проверка основных элементов
-tests = [
-    "header visible",
-    "navigation menu accessible",
-    "footer present",
-    "responsive design works",
-    "no horizontal scroll on mobile"
-]
 
-for test in tests:
-    result = await playwright_client.test_element(url, test)
-    print(f"✅ {test}" if result else f"❌ {test}")
-```
+1. `browser_navigate(url)` + `browser_resize(...)` на каждом из 3 viewport
+2. `browser_snapshot()` — a11y-дерево: проверь наличие header / nav / footer
+3. Горизонтальный скролл на mobile — через `browser_evaluate`:
+   ```js
+   () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+   ```
+4. Чек-лист: header visible · nav accessible · footer present · responsive works · no horizontal scroll on mobile
 
-### 3. E2E Testing
-```python
-# Типичный user flow
-await playwright_client.run_flow([
-    {"action": "goto", "url": url},
-    {"action": "click", "selector": "#login-button"},
-    {"action": "fill", "selector": "#email", "value": "test@example.com"},
-    {"action": "fill", "selector": "#password", "value": "password123"},
-    {"action": "click", "selector": "#submit"},
-    {"action": "waitForSelector", "selector": "#dashboard"}
-])
-```
+### 3. E2E Testing (user flow)
+
+Типичный флоу логина — снимок → действия по uid/target из снимка:
+
+1. `browser_navigate(url)`
+2. `browser_snapshot()` — найти элементы
+3. `browser_click(target=<login button>)`
+4. `browser_fill_form(fields=[{email...}, {password...}])` — батчем, не по одному
+5. `browser_click(target=<submit>)`
+6. `browser_wait_for(text="Dashboard")` — дождаться результата
+7. `browser_console_messages(level="error")` — JS-ошибки после флоу
+
+Тестовые креды — только тестовые аккаунты, не данные реальных людей.
 
 ### 4. Accessibility Testing
-```python
-# Проверка доступности
-accessibility_report = await playwright_client.check_accessibility(url)
-print(f"Issues found: {len(accessibility_report.violations)}")
-```
 
-**Формат отчета:**
+Одним вызовом: `mcp__chrome-devtools__lighthouse_audit` (mode=navigation, device=desktop и mobile) — accessibility + SEO + best practices score.
+Дополнительно: `browser_snapshot()` — проверка ролей/имён элементов (кнопки без label, картинки без alt).
+
+## Формат отчёта
+
 ```markdown
 ## Frontend Test Report: {url}
 
@@ -96,11 +92,11 @@ print(f"Issues found: {len(accessibility_report.violations)}")
 - ✅ Accessibility score: 92/100
 
 ### Screenshots:
-- Desktop: [screenshot_desktop.png]
-- Mobile: [screenshot_mobile.png]
+- Desktop: [shot_desktop.png]
+- Mobile: [shot_mobile.png]
 
 ### Issues Found:
-1. **Footer misalignment on mobile** (768px width)
+1. **Footer misalignment on mobile** (375px width)
    - Element: footer.main-footer
    - Issue: Right padding overflow
    - Fix: Add `padding-right: 0` for mobile
@@ -113,6 +109,6 @@ print(f"Issues found: {len(accessibility_report.violations)}")
 
 **ВАЖНО:**
 - Всегда тестируй на 3 разрешениях: desktop (1920px), tablet (768px), mobile (375px)
-- Делай full-page screenshots для context
+- Делай full-page screenshots для context и СМОТРИ их глазами
 - Проверяй accessibility (a11y) для production builds
-- Указывай конкретные CSS селекторы для найденных багов
+- Указывай конкретные CSS-селекторы для найденных багов

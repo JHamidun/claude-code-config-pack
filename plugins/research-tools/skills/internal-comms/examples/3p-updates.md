@@ -19,7 +19,7 @@ Whenever possible, try to pull from available sources to get the information you
 - Calendar: non-recurring meetings that have a lot of importance, like product reviews, etc.
 
 
-Try to gather as much context as you can, focusing on the things that covered the time period you're writing for:
+The output is 3-9 sentences, so gather only what those sentences need: pick the one or two sources above that are most likely to hold it, and stop once you can write the update. Scope by time period:
 - Progress: anything between a week ago and today
 - Plans: anything from today to the next week
 - Problems: anything between a week ago and today

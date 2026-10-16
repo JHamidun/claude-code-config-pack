@@ -101,15 +101,20 @@ Inline-кнопки — **только** на preview-сообщениях с д
 ## 4. Markdown → HTML
 
 ```python
+import html
 import re
 
 def md_to_html(text: str) -> str:
+    text = html.escape(text, quote=False)   # &, <, > — иначе Bot API 400 «can't parse entities»
     text = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", text, flags=re.DOTALL)
     text = re.sub(r"__(.+?)__",     r"<i>\1</i>", text, flags=re.DOTALL)
     text = re.sub(r"`([^`\n]+)`",   r"<code>\1</code>", text)
     text = re.sub(r"~~(.+?)~~",     r"<s>\1</s>", text, flags=re.DOTALL)
     return text
 ```
+
+Экранирование идёт **первым**: сырые `<` и `&` из ответа LLM ломают разбор сущностей, а
+теги, которые добавляют замены ниже, экранировать уже нельзя.
 
 Прогонять **только** при `parse_mode=HTML` — иначе двойная конверсия.
 
@@ -159,3 +164,61 @@ docker exec mybot bash -c "echo 12345 >> /data/whitelist.txt"
 ```
 
 В отказе давать контакт: `🚫 Доступ ограничен. Напиши @admin — добавлю.`
+
+## 7. Telethon: поиск реальных каналов (`SearchRequest`)
+
+Tool `discover_channels` для агента. Каналы и группы по ключевому слову ищутся через
+MTProto — это реальные сущности, а не выдумка LLM.
+
+```python
+from telethon.tl.functions.contacts import SearchRequest
+from telethon.tl.types import Channel
+
+async def discover_channels(query: str, limit: int = 15) -> list[dict]:
+    # client — уже авторизованный TelegramClient
+    result = await client(SearchRequest(q=query, limit=limit))
+    out = []
+    for chat in result.chats:
+        if not isinstance(chat, Channel):
+            continue
+        if chat.broadcast or chat.megagroup:
+            out.append({
+                "ref": f"@{chat.username}" if chat.username else str(chat.id),
+                "title": chat.title,
+                "participants": getattr(chat, "participants_count", None),
+                "verified": bool(getattr(chat, "verified", False)),
+                "type": "channel" if chat.broadcast else "group",
+            })
+    out.sort(key=lambda x: x.get("participants") or 0, reverse=True)
+    return out[:limit]
+```
+
+Фильтр `chat.broadcast or chat.megagroup` ловит и каналы, и супергруппы; различать их
+потом по полю `type`.
+
+## 8. FloodWait: ретрай с ожиданием
+
+`SearchRequest` и `iter_messages` под нагрузкой дают `FloodWaitError(seconds=N)`: до
+20 секунд — подождать и повторить, дольше — упасть с человекочитаемой ошибкой.
+
+```python
+import asyncio
+import logging
+from telethon.errors import FloodWaitError
+
+log = logging.getLogger(__name__)
+
+async def with_flood_retry(coro_factory, max_attempts=2):
+    for attempt in range(max_attempts):
+        try:
+            return await coro_factory()
+        except FloodWaitError as e:
+            if e.seconds <= 20 and attempt < max_attempts - 1:
+                log.info("flood wait %ss, retrying", e.seconds)
+                await asyncio.sleep(e.seconds + 1)
+                continue
+            raise RuntimeError(f"Telegram flood-wait: {e.seconds}s — retry later")
+```
+
+Отдельно в system prompt агента: «Call discover_channels AT MOST 2 times per user
+message» — без этого LLM делает по 6 запросов за ход, и flood-wait копится.

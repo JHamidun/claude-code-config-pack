@@ -1468,8 +1468,8 @@
         "html": "={{ $json.output }}",
         "options": {},
         "subject": "Weekly Report: Online Marketing Report",
-        "toEmail": "friedemann.schuetz@ep-reisen.de",
-        "fromEmail": "friedemann.schuetz@posteo.de"
+        "toEmail": "REPLACE_ME@example.com",
+        "fromEmail": "REPLACE_ME@example.com"
       },
       "credentials": {
         "smtp": {

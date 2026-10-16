@@ -10,11 +10,11 @@ Part of the **[hamidun marketplace](../../README.md)**.
 |-------|--------------|
 | `away-summary` | Пересказ «пока тебя не было»: на чём остановились и что сделано в сессии. |
 | `btw` | Быстрый ответ на побочный вопрос — коротко и назад к основной задаче. |
-| `dream` | Консолидация памяти + Second Brain sleeptime: supersede, decay, prune, promote, TOP-INSTINCTS. |
-| `memory-agent` | Router across a layered memory system — picks the right layer (files, graph, vectors, chat history) for the question asked. |
-| `save-knowledge-base` | Persist an instruction or reference into long-term memory across four layers so future sessions retrieve it by trigger. |
+| `dream` | Уборка всей памяти + Second Brain sleeptime: supersede, decay, prune, promote, TOP-INSTINCTS. |
+| `memory-agent` | Оркестратор 4 слоёв памяти: файлы, граф, чаты, семантика. |
+| `save-knowledge-base` | Сохраняет долговременную инструкцию/справочник в 4 уровня памяти под триггеры будущих сессий. |
 | `self-reflect` | Разбор недавних ошибок и паттернов, генерация правок для rules/skills. |
-| `session-mentor` | Local analysis of your Claude Code session history into an HTML report — themes, tool usage, friction points, unused features. |
+| `session-mentor` | Локальный анализ сессий Claude Code → HTML-отчёт «как ты работаешь». |
 | `year-review` | Разбор истории сессий за период: паттерны, продуктивность, инструменты. |
 
 ### Agents

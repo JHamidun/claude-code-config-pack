@@ -13,11 +13,12 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `github-gem-seeker` | Поиск проверенного open source на GitHub вместо кода с нуля. |
 | `last30days` | Что говорят о теме за 30 дней: посты и вовлечённость Reddit, X, YouTube, TikTok, HN, GitHub. |
 | `meta-ads-analyzer` | Диагностика кампаний Meta Ads: Breakdown Effect. |
+| `ozon-shopping` | Ozon глазами покупателя, только чтение: поиск, цены, отзывы с отсевом накрутки. |
 | `reddit-hn` | Поиск мнений и обсуждений по технологиям в Reddit и Hacker News. |
 | `serpapi` | Google Search API через SerpAPI (SERPAPI_API_KEY): выдача, Maps, Shopping, News, YouTube. |
 | `similarweb-analytics` | Трафик чужого сайта по публичным данным SimilarWeb: посещаемость, источники. |
-| `social-intel` | Досье на человека/компанию по соцсетям (Scraping API). |
-| `tiktok-intel` | Аналитика TikTok и Instagram через Scraping API: тренды, инфлюенсеры, демография, TikTok Shop, Reels. |
+| `social-intel` | Досье на человека/компанию по соцсетям (ScraperVendor). |
+| `tiktok-intel` | Аналитика TikTok и Instagram через ScraperVendor: тренды, инфлюенсеры, демография, TikTok Shop, Reels. |
 
 ## Install
 

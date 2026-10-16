@@ -74,7 +74,7 @@ include_templates = true
 include_premium = false
 
 [defaults.model]
-name = "claude-opus-4-7"
+name = "claude-opus-5"
 temperature = 0.3
 
 [environments.quick]
@@ -85,12 +85,12 @@ model.temperature = 0.5
 [environments.deep]
 depth = "deep"
 include_premium = true
-model.name = "claude-opus-4-7"
+model.name = "claude-opus-5"
 model.temperature = 0.2
 
 [environments.workshop]
 depth = "deep"
 include_templates = true
 include_premium = true
-model.name = "claude-opus-4-7"
+model.name = "claude-opus-5"
 model.temperature = 0.25

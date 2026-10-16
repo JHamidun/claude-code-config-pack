@@ -221,7 +221,7 @@
       "credentials": {
         "airtableApi": {
           "id": "{{ $credentials.airtableApi.id }}",
-          "name": "mutedjam@n8n.io"
+          "name": "REPLACE_ME@example.com"
         }
       },
       "typeVersion": 1,

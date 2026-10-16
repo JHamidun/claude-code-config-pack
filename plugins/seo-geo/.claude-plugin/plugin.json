@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "seo-geo",
   "displayName": "SEO & AI Answer Optimization",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "SEO content pipeline, programmatic AI-SEO page generation, schema.org markup, GEO/AEO visibility in ChatGPT, Perplexity and AI Overviews.",
   "author": {
     "name": "Zhemal Khamidun",

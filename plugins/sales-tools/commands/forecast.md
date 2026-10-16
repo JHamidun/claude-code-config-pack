@@ -153,15 +153,15 @@ Gap to Quota = Quota - Closed to Date - Weighted Forecast
 
 ## MCP Integration
 
-### Your CRM (if available)
+### Pulling from a CRM (if you have one)
 
-When Your CRM skill is connected, pull deals automatically instead of CSV:
+When your CRM is reachable by API, pull deals automatically instead of CSV (examples below are Bitrix24 method names):
 
 ```
 1. Fetch open deals through your CRM connector (the method names below are an example of a REST CRM API — adapt them to yours):
    - crm.deal.list with FILTER[CLOSED]=N, FILTER[CATEGORY_ID]=0
    - Fields: TITLE, OPPORTUNITY, STAGE_ID, CLOSEDATE, ASSIGNED_BY_ID, COMPANY_ID
-2. Map Your CRM stages to probabilities:
+2. Map your CRM stages to probabilities:
    - NEW → Discovery (10%)
    - PREPARATION → Qualification (25%)
    - PREPAYMENT_INVOICE → Proposal (50%)
@@ -201,7 +201,7 @@ If no CRM MCP is connected but user has CRM access:
 ```
 Salesforce: Reports → Opportunities → Export to CSV
 HubSpot: Deals → All Deals → Export → CSV
-Your CRM: Deals → Export → CSV
+In most CRMs: Deals → Export → CSV
 Then pass CSV path to the parser above.
 ```
 
@@ -209,7 +209,7 @@ Then pass CSV path to the parser above.
 
 ## Automated Output
 
-After parsing pipeline data (from CSV, Your CRM, or manual input), generate this structured output automatically:
+After parsing pipeline data (from CSV, a CRM export, or manual input), generate this structured output automatically:
 
 ### Forecast Summary Table
 

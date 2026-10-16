@@ -22,22 +22,21 @@ always_consider:
 
 # Граф связей: после X стоит подумать о Y
 edges:
-  design-orchestrator: [questions-protocol, frontend-design, content-rules, design-guide, cookbook, project-init]
+  design-orchestrator: [questions-protocol, frontend-design, content-rules, design-guide, cookbook]
 
   # Процесс
   questions-protocol: [design-orchestrator]
-  project-init: [design-system-create, frontend-design]
   moodboard: [design-system-create, color-system-builder]
 
   # Артефакты
-  slides: [deck-themes, animations, placeholders, content-rules, screen-labels, verifier, export-pdf, export-pptx, pptx-editable-extractor, print-styles]
+  slides: [deck-themes, animations, placeholders, content-rules, screen-labels, verifier, export-pdf, export-pptx, print-styles]
   interactive-prototype: [device-frames, mobile-overlays, tweaks-panel, claude-in-html, microinteractions, states-checklist, forms-a11y, screen-labels, react-pinning, verifier, proto-smoketest, real-data]
   device-frames: [mobile-overlays, interactive-prototype]
   design-canvas: [interactive-prototype, slides, animations]
   animations: [video-export, scaling-stage, verifier]
   wireframe: [slides, interactive-prototype, design-canvas]
   mobile-overlays: [interactive-prototype, microinteractions, device-frames]
-  tweaks-panel: [tweaks-persist, version-snapshots]
+  tweaks-panel: [version-snapshots]
   microinteractions: [animations]
   placeholders: [interactive-prototype, slides]
   comment-injector: [live-preview]
@@ -61,7 +60,7 @@ edges:
   document-import: [slides, interactive-prototype, content-rules, pptx-import]
   sketch-to-html: [wireframe, interactive-prototype]
   brand-extractor: [color-system-builder, type-scale, frontend-design]
-  pptx-import: [slides, pptx-editable-extractor]
+  pptx-import: [slides, export-pptx]
 
   # Качество
   verifier: [a11y-audit, perf-audit, screenshot-test]
@@ -77,8 +76,7 @@ edges:
   standalone-html: [verifier]
   export-pdf: [print-styles, verifier]
   export-png: [verifier]
-  export-pptx: [pptx-editable-extractor, verifier]
-  pptx-editable-extractor: [verifier]
+  export-pptx: [verifier]
   video-export: [animations, verifier]
   print-styles: [export-pdf]
   dev-handoff: [a11y-audit, design-system-create, license-check, standalone-html, design-tokens-w3c]
@@ -86,17 +84,16 @@ edges:
 
   # Расширения преимуществ (нативной web-среды)
   live-preview: [tweaks-panel, comment-injector, version-snapshots]
-  visual-edit: [live-preview, version-snapshots, tweaks-persist]
+  visual-edit: [live-preview, version-snapshots]
   version-snapshots: [live-preview]
-  tweaks-persist: [tweaks-panel, version-snapshots]
 
 # Рецепты cookbook → скиллы
 recipes:
-  pitch-deck:        [questions-protocol, document-import, slides, deck-themes, placeholders, content-rules, verifier, export-pdf, pptx-editable-extractor]
+  pitch-deck:        [questions-protocol, document-import, slides, deck-themes, placeholders, content-rules, verifier, export-pdf, export-pptx]
   mobile-onboarding: [questions-protocol, wireframe, frontend-design, design-system-create, interactive-prototype, device-frames, mobile-overlays, tweaks-panel, states-checklist, claude-in-html, verifier, proto-smoketest]
   design-system:     [questions-protocol, moodboard, frontend-design, color-system-builder, type-scale, design-system-create, component-playground, dark-mode-add, forms-a11y, a11y-audit, dev-handoff]
   saas-landing:      [questions-protocol, wireframe, figma-import, frontend-design, design-canvas, microinteractions, real-data, print-styles, perf-audit, a11y-audit, standalone-html]
   social-explainer:  [questions-protocol, wireframe, frontend-design, animations, placeholders, verifier, video-export]
   email-newsletter:  [questions-protocol, frontend-design, html-email, license-check, verifier]
   pwa-app:           [questions-protocol, frontend-design, design-system-create, interactive-prototype, mobile-overlays, microinteractions, pwa-shell, verifier, proto-smoketest]
-  iterative-design:  [project-init, live-preview, tweaks-panel, tweaks-persist, version-snapshots, visual-edit]
+  iterative-design:  [live-preview, tweaks-panel, version-snapshots, visual-edit]

@@ -238,13 +238,13 @@ import { OrderJobSchema } from '../src/orders/order-job';
 
 describe('OrderJobSchema', () => {
   it('should validate reference-only generation job', () => {
-    const titleOnly = {
+    const referenceOnly = {
       order_reference: 'Test Order',
       styles: { style_1: 'minimalist' },
       generation_mode: 'reference-only',
     };
 
-    const result = OrderJobSchema.safeParse(titleOnly);
+    const result = OrderJobSchema.safeParse(referenceOnly);
     expect(result.success).toBe(true);
   });
 
@@ -520,7 +520,7 @@ describe('fixFieldNames - camelCase to snake_case (REQ-09)', () => {
     const input = { orderReference: 'Test', targetAudience: 'Retail' };
     const result = fixFieldNames(input);
 
-    expect(result).toEqual({ order_reference: 'Test', customer_segment: 'Retail' });
+    expect(result).toEqual({ order_reference: 'Test', target_audience: 'Retail' });
   });
 
   it('should recursively fix nested objects', () => {
@@ -644,7 +644,7 @@ describe('sanitizeOrderStructure - XSS protection', () => {
       shipments: [
         {
           items: [
-            { tags: ['<script>XSS</script>Concept 1', 'Concept 2'] },
+            { tags: ['<script>XSS</script>Tag 1', 'Tag 2'] },
           ],
         },
       ],
@@ -653,7 +653,7 @@ describe('sanitizeOrderStructure - XSS protection', () => {
     const sanitized = sanitizeOrderStructure(order);
 
     expect(sanitized.shipments[0].items[0].tags[0]).not.toContain('<script>');
-    expect(sanitized.shipments[0].items[0].tags[1]).toBe('Concept 2');
+    expect(sanitized.shipments[0].items[0].tags[1]).toBe('Tag 2');
   });
 });
 ```
@@ -766,7 +766,7 @@ describe('generation.tRPC contract tests', () => {
 
 ### Phase 4: Report Generation
 
-Generate test implementation report following REPORT-TEMPLATE-STANDARD.md.
+Generate test implementation report following `docs/orchestrator/REPORT-TEMPLATE-STANDARD.md`.
 
 ### Phase 5: Return Control
 

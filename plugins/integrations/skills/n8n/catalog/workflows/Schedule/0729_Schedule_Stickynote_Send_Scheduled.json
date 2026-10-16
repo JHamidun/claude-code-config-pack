@@ -12,8 +12,8 @@
         "text": "=System resources are above the threshold.\n\nCPU: {{ $json.CPU.toNumber().round(2) }}%\nRAM: {{ $json.RAM.toNumber().round(2) }}%\nDisk: {{ $json.Disk.toNumber().round(2) }}%",
         "options": {},
         "subject": "System Resource Alert",
-        "toEmail": "change@me.com",
-        "fromEmail": "change@me.com"
+        "toEmail": "REPLACE_ME@example.com",
+        "fromEmail": "REPLACE_ME@example.com"
       },
       "credentials": {
         "smtp": {

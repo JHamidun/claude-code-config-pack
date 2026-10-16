@@ -364,7 +364,7 @@ Choose based on availability (in priority order):
 
 Отдельной подкоманды нет — ffmpeg overlay:
 ```bash
-ffmpeg -i final_captioned.mp4 -i ~/Videos/branding/your_logo.png \
+ffmpeg -i final_captioned.mp4 -i "$VIDEOS_DIR/branding/your_logo.png" \
   -filter_complex "[1]format=rgba,colorchannelmixer=aa=0.7[lg];[0][lg]overlay=W-w-40:40" \
   -c:a copy final_branded.mp4
 ```
@@ -520,18 +520,28 @@ Every phase has a fallback strategy. Never fail silently.
 
 ## Working Directory
 
-All intermediate files go to `~/Videos/video-factory/{project_name}/`.
+All intermediate files go to `<Videos>/video-factory/{project_name}/`, where `<Videos>` is
+the user's **real** video folder.
 
-Create this directory at start:
+Do not hardcode `~/Videos`. On a localized Linux desktop that folder is called «Видео»,
+`Vídeos`, `Videot`… and `mkdir -p ~/Videos` does not fail — it silently creates a second,
+English-named folder, so the finished clip is not where the person looks for it.
+Resolve it, then print the result:
+
 ```bash
-PROJECT_DIR=~/Videos/video-factory/$(date +%Y%m%d_%H%M%S)_$(echo "TOPIC" | tr ' ' '_' | head -c 30)
-mkdir -p "$PROJECT_DIR"
+VIDEOS_DIR="$(xdg-user-dir VIDEOS 2>/dev/null || echo "$HOME/Videos")"
+PROJECT_DIR="$VIDEOS_DIR/video-factory/$(date +%Y%m%d_%H%M%S)_$(echo "TOPIC" | tr ' ' '_' | head -c 30)"
+mkdir -p "$PROJECT_DIR" || { echo "Не смог создать $PROJECT_DIR — назови это вслух и останови конвейер"; exit 1; }
 cd "$PROJECT_DIR"
+echo "PROJECT_DIR=$PROJECT_DIR"   # обязательно: путь должен попасть в отчёт, а не остаться догадкой
 ```
+
+Report that absolute path in the final answer. "Готово, ролик собран" without the path is
+the failure mode: the file exists, the person cannot find it.
 
 Directory structure after completion:
 ```
-~/Videos/video-factory/20260328_143000_ai_replaces_devs/
+<Videos>/video-factory/20260328_143000_ai_replaces_devs/
   trend_brief.json          # Phase 1 output
   script.json               # Phase 2 output
   reference_01.png          # Phase 3 reference images

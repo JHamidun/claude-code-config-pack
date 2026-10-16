@@ -44,6 +44,19 @@ allowed-tools: Bash, Read, Write, Edit, Glob
 Имя папки Claude Code кодирует из пути проекта, у каждого своё — определи его один раз:
 `ls -dt ~/.claude/projects/*/memory | head -1`. Дальше по тексту `<memory>` = этот путь.
 
+**Первый запуск (памяти ещё нет).** На чистой установке команда выше вернёт пустоту:
+каталога `memory/` в проекте не существует, пока в него не записали первую заметку.
+Тогда `<memory>` собирается вручную — Claude Code кодирует путь проекта, заменяя
+`\` и `/` на `-`, а `:` выбрасывая (`C:\Users\ann\work` → `C--Users-ann-work`):
+
+```bash
+PROJ=$(pwd | sed 's#:##; s#[\\/]#-#g')          # git bash / wsl
+mkdir -p ~/.claude/projects/"$PROJ"/memory
+touch  ~/.claude/projects/"$PROJ"/memory/MEMORY.md
+```
+
+`MEMORY.md` в первый раз пустой — это нормально, Уровень 2 создаст в нём секцию сам.
+
 ```markdown
 ---
 name: <slug>
@@ -104,10 +117,12 @@ See [<slug>.md](<slug>.md). <Полный путь HTML/PDF>. Ключевые �
 ### Уровень 4 — vector_memory.py learn (семантический поиск)
 
 ```bash
+pip install qdrant-client          # один раз: скрипт держит базу на Qdrant в local-режиме
 python ~/.claude/tools/vector_memory.py learn "<длинное описание 500-1500 слов с ключевыми фактами, цифрами, именами, триггерами>" reference
 ```
 
 Для случаев когда триггер не дословный («как почистить прибор» → найдёт нужный раздел мануала).
+База создаётся при первом `learn` в `~/.claude/vector-memory/` — предварительно ничего готовить не надо.
 
 ## Алгоритм работы скилла
 
@@ -184,7 +199,7 @@ python ~/.claude/tools/vector_memory.py learn "<длинное описание 
         └── <slug>.md           ← Уровень 1 (детали топика)
 
 ~/.claude/tools/
-└── vector_memory.py            ← Уровень 4 (семантический FAISS поиск, есть в паке)
+└── vector_memory.py            ← Уровень 4 (семантический поиск на Qdrant local, есть в паке)
 ```
 
 ## Связано

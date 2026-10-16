@@ -7,9 +7,9 @@ description: "Параллельный разбор стратегическог
 
 Launch parallel sub-agents as isolated C-level experts. Each analyzes the same project data from their perspective. No coordination between experts — isolation produces genuine diversity of opinion. Then synthesize consensus and disagreements.
 
-## Critical: How to Launch Experts
+## How to Launch Experts
 
-**MUST use the Task tool** with `subagent_type: "general-purpose"` and `model: "opus"`.
+Launch each expert with the Task tool, `subagent_type: "general-purpose"`, `model: "opus"`.
 
 ```
 Task(
@@ -158,7 +158,7 @@ Save to a logical location:
 | Mistake | Fix |
 |---------|-----|
 | Picking roles without asking user | ALWAYS use AskUserQuestion first |
-| Using bash to launch experts | ONLY use Task tool with subagent_type: "general-purpose" |
+| Using bash to launch experts | Launch through the Task tool with subagent_type: "general-purpose" |
 | Giving experts different data | Prepare ONE data block, paste into all prompts |
 | Gathering vanity metrics | Focus on project docs, strategy, actual metrics |
 | Too many experts (6+) | 3-4 is optimal for signal-to-noise |

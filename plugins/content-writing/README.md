@@ -8,10 +8,10 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `author-voice` | Voice DNA автора — reference-пакет: анти-ИИ-чеклист и ремесло нон-фикшн. |
+| `author-voice` | Voice DNA автора — reference-пакет (anti-ai-tells.md, writing-craft.md, writing-craft-v2.md). |
 | `brand-voice` | Tone of voice бренда: описание, проверка контента на соответствие, стайлгайд. |
 | `content-creation` | Generic маркетинг-копирайт: блог, соцсети, рассылки, лендинги, кейсы, SEO copy. |
-| `content-engine` | Platform-native контент из одного исходника под X, LinkedIn, TikTok, YouTube: контент-план, посты. |
+| `content-engine` | Platform-native контент из одного исходника под X, LinkedIn, Threads, Bluesky, TikTok, YouTube, рассылку. |
 | `content-research` | Research под контент-артефакт: источники, CRAAP, цитаты с пруфами. |
 | `de-ai-ify` | КАНОН чистки русских текстов от ИИ-клише и жаргона. |
 | `doc-coauthoring` | Совместное написание дока: контекст → структура → тест свежим читателем. |

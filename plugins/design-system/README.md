@@ -9,17 +9,17 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | Skill | What it does |
 |-------|--------------|
 | `brand-extractor` | Вытащить цвета, шрифты, копирайт из сайта по URL (headless Playwright). |
-| `brand-guidelines` | Официальные цвета и шрифты бренда Anthropic для артефактов. |
+| `brand-guidelines` | Официальные цвета и шрифты бренда Anthropic (палитра + Poppins/Lora) для артефактов и .pptx. |
 | `color-system-builder` | Из одного акцента — полная палитра: light+dark, 9-step scale, semantic, WCAG-контраст. |
 | `dark-mode-add` | Добавить dark mode к light-дизайну: продуманные dark-токены, не инверт. |
 | `deck-themes` | Готовые CSS-темы для slides без бренда: минимал, editorial, dark, data, brutalist. |
-| `design-md-brands` | A bank of ready-made DESIGN.md design systems for 73+ known brands (Stripe, Linear, Vercel, Notion, Apple) — pulled on demand. |
+| `design-md-brands` | Банк DESIGN.md: 73 бренда (Stripe, Linear, Notion) + 287 сайтов инди-эстетики. |
 | `design-system-create` | Собрать дизайн-систему с нуля: токены, типографика, компоненты, гайдлайны. |
 | `design-tokens-w3c` | Экспорт дизайн-токенов в W3C DTCG tokens.json: Style Dictionary, Token Studio. |
 | `fonts-bundle` | Готовые блоки <link> для пар шрифтов Google Fonts (веса, subset) + system-стек. |
 | `moodboard` | HTML-мудборд из 5-15 референсов с палитрой из картинок — согласовать визуальный язык на старте. |
-| `theme-factory` | Стилизация артефакта темой: 10 пресетов цвета/шрифтов или новая тема на лету. |
-| `type-scale` | Modular type scale из base + ratio, плюс 30 проверенных font-пар. |
+| `theme-factory` | Стилизация артефакта темой: 10 пресетов цвета/шрифтов или новая тема на лету, дек в том числе. |
+| `type-scale` | Modular type scale из base + ratio, плюс 28 проверенных font-пар. |
 
 ## Install
 

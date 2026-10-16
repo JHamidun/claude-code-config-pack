@@ -18,14 +18,17 @@ description: "Кликабельный React-прототип в одном HTML
 
 ## Технический каркас
 
-Используй точно эти версии React + Babel — другие могут отвалиться:
+Используй точно эти версии React + Babel — другие могут отвалиться. Хост важен не меньше
+версии: в опубликованном артефакте CSP пускает скрипты только с `cdnjs.cloudflare.com`,
+`cdn.jsdelivr.net/npm/`, `cdn.tailwindcss.com` и `code.jquery.com`. **unpkg и esm.sh
+заблокированы, причём молча** — локально страница откроется, а артефактом отдаст пустую.
 
 ```html
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.js"
         crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.js"
         crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+<script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.29.0/babel.min.js"
         crossorigin="anonymous"></script>
 ```
 
@@ -81,12 +84,14 @@ useEffect(() => {
 
 ```html
 <script type="module">
-  import Anthropic from "https://esm.sh/@anthropic-ai/sdk";
+  // esm.sh заблокирован CSP артефакта — тянуть SDK с cdn.jsdelivr.net/npm/
+  import Anthropic from "https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk/+esm";
   const client = new Anthropic({
     apiKey: localStorage.getItem('anthropic_key'),
     dangerouslyAllowBrowser: true,
   });
-  // ... client.messages.create({...})
+  // Модель указывать явно, канон ID → config/models.md (по памяти не подставлять):
+  // await client.messages.create({ model: "claude-opus-5", max_tokens: 1024, messages: [...] })
 </script>
 ```
 

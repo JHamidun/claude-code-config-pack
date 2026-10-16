@@ -1135,11 +1135,11 @@
               "options": [
                 {
                   "name": "Angel",
-                  "value": "angel@n8n.io"
+                  "value": "REPLACE_ME@example.com"
                 },
                 {
                   "name": "John Smith",
-                  "value": "john@n8n.io"
+                  "value": "REPLACE_ME@example.com"
                 }
               ],
               "removed": true,
@@ -1450,11 +1450,11 @@
               "options": [
                 {
                   "name": "Angel",
-                  "value": "angel@n8n.io"
+                  "value": "REPLACE_ME@example.com"
                 },
                 {
                   "name": "John Smith",
-                  "value": "john@n8n.io"
+                  "value": "REPLACE_ME@example.com"
                 }
               ],
               "removed": true,
@@ -2239,11 +2239,11 @@
               "options": [
                 {
                   "name": "Angel",
-                  "value": "angel@n8n.io"
+                  "value": "REPLACE_ME@example.com"
                 },
                 {
                   "name": "John Smith",
-                  "value": "john@n8n.io"
+                  "value": "REPLACE_ME@example.com"
                 }
               ],
               "removed": true,
@@ -2554,11 +2554,11 @@
               "options": [
                 {
                   "name": "Angel",
-                  "value": "angel@n8n.io"
+                  "value": "REPLACE_ME@example.com"
                 },
                 {
                   "name": "John Smith",
-                  "value": "john@n8n.io"
+                  "value": "REPLACE_ME@example.com"
                 }
               ],
               "removed": true,
@@ -2869,11 +2869,11 @@
               "options": [
                 {
                   "name": "Angel",
-                  "value": "angel@n8n.io"
+                  "value": "REPLACE_ME@example.com"
                 },
                 {
                   "name": "John Smith",
-                  "value": "john@n8n.io"
+                  "value": "REPLACE_ME@example.com"
                 }
               ],
               "removed": true,
@@ -3645,11 +3645,11 @@
               "options": [
                 {
                   "name": "Angel",
-                  "value": "angel@n8n.io"
+                  "value": "REPLACE_ME@example.com"
                 },
                 {
                   "name": "John Smith",
-                  "value": "john@n8n.io"
+                  "value": "REPLACE_ME@example.com"
                 }
               ],
               "removed": false,
@@ -3938,11 +3938,11 @@
               "options": [
                 {
                   "name": "Angel",
-                  "value": "angel@n8n.io"
+                  "value": "REPLACE_ME@example.com"
                 },
                 {
                   "name": "John Smith",
-                  "value": "john@n8n.io"
+                  "value": "REPLACE_ME@example.com"
                 }
               ],
               "removed": false,

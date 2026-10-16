@@ -78,7 +78,18 @@ cat draft.txt | python3 scripts/test_detectors.py --stdin
 Most detectors gate their API behind paid plans. The script supports two modes:
 
 1. **API mode** — set keys in `.env` (`GPTZERO_API_KEY`, `ORIGINALITY_API_KEY`, `ZEROGPT_API_KEY`, `SAPLING_API_KEY`, `COPYLEAKS_API_KEY`, `COPYLEAKS_EMAIL`). Detectors with valid keys run automatically.
-2. **Manual paste mode** — `--manual` flag opens each detector's web UI, prompts the user to paste the score back. Slower but free, and captures detectors with no API.
+2. **Manual paste mode** — `--manual` prints each detector's URL and waits for the score on stdin. Slower but free, and captures detectors with no API.
+
+> **Состояние на 22.08.2026 — ни один режим здесь цифр не даёт, проверено запуском.**
+> Ни одного из пяти ключей в `~/.claude/.credentials.master.env` нет, поэтому API-режим
+> печатает `-- (no API key)` по всем детекторам и `Not enough detectors returned a score`
+> (при этом exit-код 0 — молчаливый пустой результат, не ошибка).
+> `--manual` в агентной сессии падает `EOFError: EOF when reading a line`
+> (`scripts/test_detectors.py:186` зовёт `input()`, а stdin у агента пустой) — он
+> рассчитан на живой терминал человека.
+> Значит: **не обещай отсюда «скриншот с цифрами»**. Либо владелец добавляет ключ хотя бы
+> одного детектора, либо `--manual` гоняет он сам в своём терминале. Без этого опирайся
+> на `linkedin-post-audit` — он ловит AI-tells без детекторов.
 
 ## Files
 

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tweaks panel — рабочий пример</title>
+
+<!--
+  Открывается двойным кликом, сборка не нужна. Три CDN-скрипта (React, ReactDOM,
+  Babel) — единственная внешняя зависимость; без сети страница откроется, но
+  останется пустой, это ожидаемо.
+
+  Что показывает: цвет, размер шрифта и тёмная тема крутятся в панели справа внизу,
+  значения переживают refresh (localStorage под ключом tweaks.<путь страницы>).
+-->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, system-ui, sans-serif; }
+  .page { min-height: 100vh; padding: 64px 24px; transition: background .2s, color .2s; }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  h1 { margin: 0 0 12px; font-size: 2em; line-height: 1.15; }
+  p  { margin: 0 0 16px; line-height: 1.6; opacity: .85; }
+  .cta { display: inline-block; padding: 10px 20px; border: 0; border-radius: 8px;
+         color: #fff; cursor: pointer; font-size: .95em; }
+  .card { margin-top: 24px; padding: 16px; border-radius: 12px; border: 1px solid; }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<!-- Компоненты панели. Порядок важен: сперва панель, потом приложение. -->
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+
+<script type="text/babel">
+function App() {
+  // Ключи объекта = то, что крутится. 4-8 штук — потолок, дальше панель
+  // превращается в экран настроек и перестаёт помогать.
+  const [tweaks, setTweak, reset] = useTweaks({
+    primary: '#D97757',
+    fontSize: 16,
+    dark: false,
+    layout: 'A',
+    heading: 'Заголовок, который можно переписать прямо тут',
+  });
+
+  const bg = tweaks.dark ? '#111' : '#fff';
+  const fg = tweaks.dark ? '#f5f5f5' : '#111';
+
+  return (
+    <div className="page" style={{ background: bg, color: fg, fontSize: tweaks.fontSize }}>
+      <div className="wrap" style={{ textAlign: tweaks.layout === 'B' ? 'center' : 'left' }}>
+        <h1 style={{ color: tweaks.primary }}>{tweaks.heading}</h1>
+        <p>
+          Крути панель справа внизу и смотри, как меняется макет. Обнови страницу —
+          значения останутся: они лежат в localStorage под ключом
+          <code> tweaks.{location.pathname}</code>.
+        </p>
+        <button className="cta" style={{ background: tweaks.primary }}>Действие</button>
+
+        {tweaks.layout === 'C' && (
+          <div className="card" style={{ borderColor: tweaks.primary }}>
+            Раскладка C добавляет блок — так проверяют варианты структуры,
+            а не только цвета.
+          </div>
+        )}
+      </div>
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection title="Цвет">
+          <TweakColor label="Primary" value={tweaks.primary}
+                      onChange={v => setTweak('primary', v)} />
+        </TweakSection>
+
+        <TweakSection title="Текст">
+          <TweakSlider label="Размер" min={12} max={24} step={1}
+                       value={tweaks.fontSize} onChange={v => setTweak('fontSize', v)} />
+          <TweakText label="H1" value={tweaks.heading}
+                     onChange={v => setTweak('heading', v)} />
+        </TweakSection>
+
+        <TweakSection title="Тема">
+          <TweakToggle label="Тёмная" value={tweaks.dark}
+                       onChange={v => setTweak('dark', v)} />
+        </TweakSection>
+
+        <TweakSection title="Layout">
+          <TweakRadio value={tweaks.layout} options={['A', 'B', 'C']}
+                      onChange={v => setTweak('layout', v)} />
+        </TweakSection>
+
+        <TweakSection>
+          <button onClick={reset} style={{
+            width: '100%', padding: '6px 0', marginTop: 4, fontSize: 12,
+            background: 'none', border: '1px solid #ddd', borderRadius: 6, cursor: 'pointer',
+          }}>Reset</button>
+        </TweakSection>
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

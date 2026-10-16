@@ -24,7 +24,7 @@
         "color": 4,
         "width": 1280,
         "height": 480,
-        "content": "=======================================\n            WORKFLOW ASSISTANCE\n=======================================\nScrape Indeed Job Listings for Hiring Signals Using Bright Data and LLMs\n\nFor any questions or support, please contact:\n    Yaron@nofluff.online\n\nExplore more tips and tutorials here:\n   - YouTube: {{ $env.WEBHOOK_URL }}\n   - LinkedIn: {{ $env.WEBHOOK_URL }}\n=======================================\nBright Data Docs: {{ $env.WEBHOOK_URL }}\n\n*Important*\nMake Sure To Add Your API Keys to the HTTTP REQUESTS NODES (BRIGHT DATA API), GOOGLE RELATED NODES AND LLM NODE"
+        "content": "=======================================\n            WORKFLOW ASSISTANCE\n=======================================\nScrape Indeed Job Listings for Hiring Signals Using Bright Data and LLMs\n\nFor any questions or support, please contact:\n    REPLACE_ME@example.com\n\nExplore more tips and tutorials here:\n   - YouTube: {{ $env.WEBHOOK_URL }}\n   - LinkedIn: {{ $env.WEBHOOK_URL }}\n=======================================\nBright Data Docs: {{ $env.WEBHOOK_URL }}\n\n*Important*\nMake Sure To Add Your API Keys to the HTTTP REQUESTS NODES (BRIGHT DATA API), GOOGLE RELATED NODES AND LLM NODE"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."

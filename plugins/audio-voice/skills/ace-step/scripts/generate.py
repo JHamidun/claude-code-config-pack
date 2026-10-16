@@ -8,6 +8,17 @@ Usage:
     python generate.py "chill lofi hip-hop" --duration 60 --instrumental
     python generate.py "pop song about summer" --lyrics "..." --duration 180
 """
+# UTF-8 на выход. Консоль Windows по умолчанию cp1251/cp866/cp1252, и первый же
+# не-ASCII символ (кириллица, →, ✓) валит процесс UnicodeEncodeError — обычно на
+# --help, то есть ДО любой полезной работы. errors="replace" оставляет вывод
+# читаемым, если терминал всё же не UTF-8.
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 import argparse
 import json
@@ -18,15 +29,66 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-try:
-    from gradio_client import Client
-except ImportError:
-    print("Installing gradio_client...")
-    import subprocess
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "gradio_client", "-q"])
-    from gradio_client import Client
+def _client(url):
+    """gradio_client по требованию.
 
-OUTPUT_DIR = Path(os.path.expanduser("~/Music/ace-step"))
+    Раньше `import gradio_client` стоял на верхнем уровне модуля, а в except —
+    `pip install` подпроцессом: простой импорт этого файла (линтер, автодополнение)
+    молча ставил пакет в чужой Python. Теперь установка происходит только при
+    реальном запуске, вслух, и её провал — понятный отказ, а не CalledProcessError.
+    """
+    try:
+        from gradio_client import Client
+    except ImportError:
+        print("gradio_client не установлен, ставлю: pip install gradio_client", flush=True)
+        import subprocess
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "gradio_client"])
+        except subprocess.CalledProcessError as e:
+            raise SystemExit(
+                f"ОТКАЗ: не удалось поставить gradio_client (pip вернул {e.returncode}).\n"
+                f"  Поставь вручную: {sys.executable} -m pip install gradio_client\n"
+                "  На системах с PEP 668 (Homebrew, Debian 12+, Ubuntu 23.04+) — в venv\n"
+                "  или добавь --break-system-packages."
+            )
+        from gradio_client import Client
+    return Client(url)
+
+def user_media_dir(xdg_name: str, english_name: str) -> tuple[Path, str]:
+    """Настоящий пользовательский каталог («Музыка», «Видео»…), а не его английское имя.
+
+    На локализованном Linux `~/Music` не существует: каталог называется «Музыка» или
+    «Музика». `mkdir -p ~/Music` ошибки не даст — он молча создаст ВТОРОЙ каталог рядом,
+    и файлы окажутся не там, где человек их ищет. Порядок разрешения:
+    переменная окружения → `xdg-user-dir` → существующий английский каталог → домашний.
+    Возвращает (каталог, как он был выбран) — второе печатается, чтобы путь не был тайной.
+    """
+    override = os.getenv("ACE_STEP_OUTPUT_DIR")
+    if override:
+        return Path(os.path.expanduser(override)), "переменная ACE_STEP_OUTPUT_DIR"
+
+    if sys.platform.startswith("linux") and shutil.which("xdg-user-dir"):
+        import subprocess
+        try:
+            out = subprocess.run(["xdg-user-dir", xdg_name], capture_output=True,
+                                 text=True, timeout=10).stdout.strip()
+            if out and Path(out).is_dir() and Path(out) != Path.home():
+                return Path(out), f"xdg-user-dir {xdg_name}"
+        except Exception:  # noqa: BLE001 — отсутствие xdg не повод падать
+            pass
+
+    english = Path.home() / english_name
+    if english.is_dir():
+        return english, f"~/{english_name}"
+
+    return Path.home(), (
+        f"домашний каталог: ~/{english_name} не существует, а localized-имя "
+        f"определить нечем (поставь xdg-user-dirs или задай ACE_STEP_OUTPUT_DIR)"
+    )
+
+
+_MUSIC_DIR, _MUSIC_DIR_SOURCE = user_media_dir("MUSIC", "Music")
+OUTPUT_DIR = _MUSIC_DIR / "ace-step"
 GRADIO_URL = "http://127.0.0.1:7860/"
 
 
@@ -45,7 +107,7 @@ def generate(
 ) -> dict:
     """Generate music via Gradio API."""
 
-    client = Client(GRADIO_URL)
+    client = _client(GRADIO_URL)
 
     start = time.time()
 
@@ -131,8 +193,10 @@ def generate(
                     elif isinstance(sub, dict) and "path" in sub:
                         audio_files.append(sub["path"])
 
-    # Copy to output dir
+    # Copy to output dir. Путь печатается всегда: «файлы сохранены» без указания куда —
+    # ровно тот случай, когда человек ищет их в «Музыке», а лежат они в ~/Music.
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    print(f"Каталог вывода: {OUTPUT_DIR}  (выбран: {_MUSIC_DIR_SOURCE})", flush=True)
     saved_files = []
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     for i, f in enumerate(audio_files):

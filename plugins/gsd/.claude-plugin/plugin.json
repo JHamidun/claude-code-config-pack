@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "gsd",
   "displayName": "Get Shit Done (GSD)",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Phase-based dev framework: roadmaps, plans, execution, verification, debugging.",
   "author": {
     "name": "Zhemal Khamidun",

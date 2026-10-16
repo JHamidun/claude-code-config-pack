@@ -38,7 +38,7 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "lrnr6ha3nt9cv8i0fimup684e4@group.calendar.google.com",
+          "value": "REPLACE_ME@group.calendar.google.com",
           "cachedResultName": "Meeting Room"
         },
         "operation": "getAll"

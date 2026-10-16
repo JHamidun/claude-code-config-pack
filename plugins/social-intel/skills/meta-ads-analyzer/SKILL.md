@@ -24,7 +24,7 @@ Expert framework for Meta Ads campaign analysis with focus on the Breakdown Effe
 
 **The Breakdown Effect:** When breaking down campaign data by dimension (placement, age, gender, device), the sum of segment CPAs weighted by their spend does NOT equal the campaign-level CPA due to Meta's marginal cost optimization.
 
-**Critical rule:** NEVER recommend pausing segments based solely on higher average CPA. Higher average cost does NOT mean poor performance — it often reflects the system capturing low marginal cost opportunities earlier.
+**Key rule:** do not recommend pausing segments based solely on higher average CPA. Higher average cost does not mean poor performance — it often reflects the system capturing low marginal cost opportunities earlier.
 
 ## Analysis Workflow
 
@@ -72,14 +72,15 @@ Winners are determined by Total Value, not just bid amount.
 
 Meta distributes budget evenly across the day using pacing algorithms. Early underspend or overspend are normal system behavior.
 
-## Mandatory Report Rules
+## Report Rules
 
-1. **NEVER** recommend pausing segments based solely on higher average CPA
-2. **ALWAYS** justify recommendations with data evidence + system mechanics
-3. **USE** qualified language: "Estimated Reach of ~1,000" not "You reached 1,000"
-4. **DISAMBIGUATE** clicks: "Clicks (all)" vs "Link Clicks" — always specify
-5. **CHECK** `get_recommendations` API first if Meta API access available
-6. Every insight must include data evidence and explanation
+(правило про паузу по среднему CPA — в Core Principle выше, здесь не дублируется)
+
+1. Justify recommendations with data evidence + system mechanics
+2. Use qualified language: "Estimated Reach of ~1,000", not "You reached 1,000"
+3. Disambiguate clicks: specify "Clicks (all)" vs "Link Clicks"
+4. Check the `get_recommendations` API first when Meta API access is available
+5. Every insight includes data evidence and explanation
 
 ## Data Import
 
@@ -107,7 +108,7 @@ df = pd.read_csv("meta_ads_export.csv")
 
 ## When to Use
 
-**Trigger words:** "meta ads", "facebook ads", "instagram ads", "рекламный кабинет", "CPA analysis", "breakdown effect", "ad performance", "campaign optimization", "ROAS", "cost per result", "диагностика Meta кампании", "почему дорого в Meta", "воронка обучения Meta", "не выходит из обучения", "Meta vs Google различие", "когда не Meta", "проблема не Meta-специфична"
+**Trigger words:** "meta ads", "facebook ads", "instagram ads", "рекламный кабинет", "CPA analysis", "breakdown effect", "ad performance", "campaign optimization", "ROAS", "cost per result", "диагностика Meta кампании", "почему дорого в Meta", "воронка обучения Meta", "не выходит из обучения", "Meta vs Google различие", "когда не Meta", "проблема не Meta-специфична", "кампания не идёт", "открутка есть, результата нет", "что делать с зависшей кампанией"
 
 **НЕ для:** запуска/настройки/масштабирования (→ `meta-ads-launch-ru`), анализа конкурентов (→ `ad-spy`), норм по каналам (→ `ad-benchmarks-ru`).
 
@@ -115,8 +116,8 @@ df = pd.read_csv("meta_ads_export.csv")
 
 For deep analysis, read these bundled references:
 - `references/breakdown_effect.md` — The Breakdown Effect with examples
-- `references/core_concepts.md` — Ad Auction, Pacing, Learning Phase
-- `references/analysis_checklist.md` — Step-by-step analysis template
+- `references/core_concepts.md` — Ad Auction, Pacing, Learning Phase + формула аукциона в свёрнутом виде и сравнение с VCG (Директ) / GCC (РСЯ) / Google, **точка баланса** (после неё каждый следующий результат дороже — вопрос «как снизить CPA» перестаёт иметь ответ в кабинете)
+- `references/analysis_checklist.md` — Step-by-step analysis template + быстрый триаж «кампания не идёт» (9 ходов с ценой и риском каждого: re-setup, намеренный сброс в обучение, расширение гео, Cost Cap, менеджер площадки, «забить — дорогие аукционы лучше конвертят»)
 - `references/meta-vs-google-diagnostic.md` — Meta vs Google различие при диагностике: разная длительность Learning Phase (Google 5-7 дней vs Meta <24ч), привязка событий, как отличить Meta-специфику от универсальной проблемы аукциона
 - `references/learning-funnel-diagnostic.md` — воронка обучения Meta (общая → CPC-кластер → ядро) + 7 факторов сброса + 4 безопасных действия как диагностический чеклист «почему не выходит из обучения»
 

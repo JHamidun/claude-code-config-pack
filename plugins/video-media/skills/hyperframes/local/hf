@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# hf - launcher for the vendored HyperFrames bundle (heygen-com/hyperframes, CLI 0.8.98).
+# Pack wrapper (not upstream code). What it adds on top of upstream plugin-cli.mjs:
+#   - telemetry, update checks and skill auto-install are switched off (CLI and media-use);
+#   - refuses commands that upload, deploy or sign in (publish, cloud, lambda, cloudrun, auth,
+#     feedback, skills, telemetry enable) unless HF_ALLOW_OUTWARD=1 is set after the user said yes;
+#   - optional: uses a pinned local CLI runtime when HF_RUNTIME points at one (saves the npx
+#     download on every call):  npm install --prefix "$HF_RUNTIME/hyperframes-cli" --ignore-scripts hyperframes@0.8.98
+# Usage:  hf <hyperframes command> [args...]      e.g. hf init my-video --non-interactive
+#         hf --script <path to bundled .mjs> [args...]   (bundled helper scripts)
+# Needs: Node.js 22+, FFmpeg, Chrome (hf browser ensure fetches the pinned one).
+set -euo pipefail
+HF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HF_RUNTIME="${HF_RUNTIME:-$HOME/.cache/hyperframes-runtime}"
+HF_VERSION="0.8.98"
+export HYPERFRAMES_NO_TELEMETRY=1
+export DO_NOT_TRACK=1
+export HYPERFRAMES_SKIP_SKILLS=1
+export HYPERFRAMES_NO_UPDATE_CHECK=1
+export HYPERFRAMES_PLUGIN_VERSION="$HF_VERSION"
+export HYPERFRAMES_SKILL_PKG_VERSION="$HF_VERSION"
+
+cmd="${1:-}"
+case "$cmd" in
+  skills)
+    echo "hf: refused - bundled skills are pinned (heygen-com/hyperframes@76c634d); a new version comes with a pack update, see SKILL.md" >&2; exit 2 ;;
+  publish|cloud|lambda|cloudrun|auth|feedback)
+    if [ "${HF_ALLOW_OUTWARD:-}" != "1" ]; then
+      echo "hf: refused '$cmd' - it uploads/deploys/signs in to HeyGen/AWS/GCP. Needs the user's explicit OK, then HF_ALLOW_OUTWARD=1 hf $cmd ..." >&2; exit 2
+    fi ;;
+  telemetry)
+    if [ "${2:-}" = "enable" ]; then echo "hf: refused - telemetry stays off in this pack" >&2; exit 2; fi ;;
+  --script)
+    shift; [ -n "${1:-}" ] || { echo "hf: --script needs a script path" >&2; exit 2; }
+    exec node "$@" ;;
+esac
+
+CLI="$HF_RUNTIME/hyperframes-cli/node_modules/hyperframes/bin/hyperframes.mjs"
+if [ -f "$CLI" ]; then
+  exec node "$CLI" "$@"
+fi
+# Default: upstream launcher (npx hyperframes@<pinned version>).
+exec node "$HF_ROOT/skills/hyperframes/scripts/plugin-cli.mjs" "$@"

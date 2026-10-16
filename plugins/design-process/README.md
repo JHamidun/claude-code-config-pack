@@ -8,17 +8,17 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `comparison-mode` | Diff two HTML files — DOM diff, visual diff, side-by-side — for review. |
-| `content-rules` | Anti-slop rules — what NOT to add so a design doesn't look AI-generated. |
-| `cookbook` | Ready-made recipes from request to result — common design tasks with a step-by-step flow and the skills to use. |
-| `critique-mode` | Critique a finished design instead of making one — concrete, checklist-driven, no 'looks good'. |
-| `design-guide` | A guide to good-design principles — hierarchy, rhythm, density, copy, restraint. A taste memo, not a process. |
-| `design-orchestrator` | The entry skill — activates on any 'make a design / prototype / slides / landing' task and routes to the right design skills. |
-| `design-taste` | Quantitative taste control for landings and redesigns — three 1-10 scales (variance, motion, density) plus an AI-tells scanner. |
-| `frontend-design` | Five ready aesthetic presets for projects with no design system — a fast starting style. |
-| `license-check` | Check licenses of fonts, images, icons, and npm packages in an artifact (avoid GPL fonts or Getty images). |
-| `questions-protocol` | When and how to ask clarifying questions before a design task, so you don't have to rebuild it. |
-| `states-checklist` | Per-screen state checklist — empty, loading, error, success, disabled, partial-data, no-permission, offline. |
+| `comparison-mode` | Diff двух HTML-версий: side-by-side, DOM-, pixel- и style-разница. |
+| `content-rules` | Анти-слоп правила дизайна — что НЕ добавлять, чтобы не выглядело ИИ-выхлопом; проверка перед сдачей артефакта. |
+| `cookbook` | Готовые сценарии из скиллов под типовые задачи: питч-дек, прототип, дизайн-система, лендинг. |
+| `critique-mode` | Критика готового дизайна по чеклисту, конкретно, без «выглядит хорошо». |
+| `design-guide` | Памятка о дизайн-вкусе: иерархия, ритм, плотность, копирайт — перечитать перед сдачей. |
+| `design-orchestrator` | Главный дизайн-скилл: «сделай дизайн/прототип/слайды/лендинг/макет» — любой HTML-артефакт с дизайном; ведёт процесс, подключает design-скиллы. |
+| `design-taste` | Калибровка дизайн-вкуса лендингов: 3 шкалы 1-10 + сканер AI-tells. |
+| `frontend-design` | 5 эстетических пресетов, когда у проекта нет дизайн-системы: типографика, цвет, ритм. |
+| `license-check` | Проверка лицензий ассетов перед публикацией: шрифты не-OFL, неподписанный stock, img без alt. |
+| `questions-protocol` | Уточняющие вопросы в начале задачи с коротким или неоднозначным брифом; не для мелких правок. |
+| `states-checklist` | Чек-лист состояний экрана перед сдачей прототипа: empty, loading, error, partial, success. |
 
 ### Agents
 

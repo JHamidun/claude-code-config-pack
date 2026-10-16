@@ -27,7 +27,7 @@ import deepl
 import os
 from dotenv import load_dotenv
 
-load_dotenv('${HOME}/.claude/.credentials.master.env')
+load_dotenv(os.path.expanduser('~/.claude/.credentials.master.env'))
 translator = deepl.Translator(os.getenv('DEEPL_API_KEY'))
 
 # Text translation

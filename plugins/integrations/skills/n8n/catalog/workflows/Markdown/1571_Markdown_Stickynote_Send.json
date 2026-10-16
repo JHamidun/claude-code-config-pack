@@ -46,7 +46,7 @@
       "credentials": {
         "imap": {
           "id": "k31W9oGddl9pMDy4",
-          "name": "IMAP info@n3witalia.com"
+          "name": "IMAP REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2,
@@ -86,7 +86,7 @@
       "credentials": {
         "smtp": {
           "id": "hRjP3XbDiIQqvi7x",
-          "name": "SMTP info@n3witalia.com"
+          "name": "SMTP REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2.1,
@@ -235,14 +235,14 @@
         "message": "=<h3>MESSAGE</h3>\n{{ $('Email Trigger (IMAP)').item.json.textHtml }}\n\n<h3>AI RESPONSE</h3>\n{{ $json.email }}",
         "options": {},
         "subject": "=[Approval Required]  {{ $('Email Trigger (IMAP)').item.json.subject }}",
-        "toEmail": "info@n3witalia.com",
-        "fromEmail": "info@n3witalia.com",
+        "toEmail": "REPLACE_ME@example.com",
+        "fromEmail": "REPLACE_ME@example.com",
         "operation": "sendAndWait"
       },
       "credentials": {
         "smtp": {
           "id": "hRjP3XbDiIQqvi7x",
-          "name": "SMTP info@n3witalia.com"
+          "name": "SMTP REPLACE_ME@example.com"
         }
       },
       "typeVersion": 2.1,

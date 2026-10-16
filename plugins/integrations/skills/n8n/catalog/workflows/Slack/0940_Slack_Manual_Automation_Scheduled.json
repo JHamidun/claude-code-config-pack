@@ -128,7 +128,7 @@
         "operation": "getAll",
         "returnAll": true,
         "additionalFields": {
-          "q": "from:(orlenpay@orlen.pl) has:attachment is:unread",
+          "q": "from:(REPLACE_ME@example.com) has:attachment is:unread",
           "format": "resolved"
         }
       },

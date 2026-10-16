@@ -201,7 +201,7 @@
         "additionalParameters": {
           "author": {
             "name": "n8n",
-            "email": "noreply-n8n@mipih.fr"
+            "email": "REPLACE_ME@example.com"
           }
         }
       },

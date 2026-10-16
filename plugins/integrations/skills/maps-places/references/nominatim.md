@@ -13,17 +13,19 @@
 
 ## Авторизация
 
-Ключа нет. **Обязателен** заголовок `User-Agent` с описанием приложения и контактом, иначе блокировка. Polite policy: **max 1 req/sec**.
+Ключа нет. **Обязателен** заголовок `User-Agent` с описанием приложения и **своим рабочим контактом** (email или URL), иначе блокировка. Polite policy: **max 1 req/sec**.
+
+`places_search.py` берёт контакт из `NOMINATIM_CONTACT` в `~/.claude/.credentials.master.env`; без него он работает, но пишет предупреждение в stderr. Подставлять чужой или общий адрес нельзя: Nominatim банит по User-Agent целиком, и у всех, кто оставил дефолт, поиск отвалится разом.
 
 ## Примеры
 
 ```bash
 # Forward
-curl -A "maps-places-skill/1.0 (your-email@gmail.com)" \
+curl -A "maps-places-skill/1.0 ($NOMINATIM_CONTACT)" \
   "https://nominatim.openstreetmap.org/search?q=Sample+District,+Sample+City&format=json&limit=5&addressdetails=1&accept-language=pt-BR,en"
 
 # Reverse
-curl -A "maps-places-skill/1.0 (your-email@gmail.com)" \
+curl -A "maps-places-skill/1.0 ($NOMINATIM_CONTACT)" \
   "https://nominatim.openstreetmap.org/reverse?lat=-22.971&lon=-43.182&format=json&accept-language=pt-BR"
 ```
 

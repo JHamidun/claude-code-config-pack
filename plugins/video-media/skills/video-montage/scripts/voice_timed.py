@@ -16,10 +16,22 @@
     python voice_timed.py script.json -o voice_timed.mp3 --voice <id>
 """
 from __future__ import annotations
+# UTF-8 на выход. Консоль Windows по умолчанию cp1251/cp866/cp1252, и первый же
+# не-ASCII символ (кириллица, →, ✓) валит процесс UnicodeEncodeError — обычно на
+# --help, то есть ДО любой полезной работы. errors="replace" оставляет вывод
+# читаемым, если терминал всё же не UTF-8.
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 import argparse
 import base64
 import json
+import os
 import pathlib
 import subprocess
 import sys
@@ -30,11 +42,21 @@ ENV = pathlib.Path.home() / ".claude" / ".credentials.master.env"
 
 
 def creds() -> dict:
+    """Ключи из файла, если он есть, плюс окружение поверх него.
+
+    Файла может не быть вовсе — тогда работают обычные переменные окружения;
+    без этой проверки скрипт падал трейсбеком FileNotFoundError вместо
+    внятного «нет ключа».
+    """
     out = {}
-    for line in ENV.read_text(encoding="utf-8", errors="replace").splitlines():
-        if "=" in line and not line.lstrip().startswith("#"):
-            k, v = line.split("=", 1)
-            out[k.strip()] = v.strip().strip('"').strip("'")
+    if ENV.exists():
+        for line in ENV.read_text(encoding="utf-8", errors="replace").splitlines():
+            if "=" in line and not line.lstrip().startswith("#"):
+                k, v = line.split("=", 1)
+                out[k.strip()] = v.strip().strip('"').strip("'")
+    for k in ("ELEVENLABS_API_KEY", "ELEVENLABS_VOICE_ID_RU"):
+        if os.environ.get(k):
+            out[k] = os.environ[k]
     return out
 
 

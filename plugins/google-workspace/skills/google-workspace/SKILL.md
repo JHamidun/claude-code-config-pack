@@ -1,6 +1,6 @@
 ---
 name: google-workspace
-description: "Хаб Google Workspace: Docs, Sheets, Gmail (много ящиков), Drive, локальный Outlook; карта скриптов и токенов. Триггеры: «гугл таблица», «гугл диск»."
+description: "Хаб Google Workspace: Docs, Sheets, Gmail, Drive, локальный Outlook; карта скриптов и токенов. Триггеры: «гугл таблица», «гугл диск». НЕ: Яндекс→yandex; IMAP→email-imap."
 ---
 
 # Google Workspace + рабочая почта
@@ -191,7 +191,7 @@ python ~/.claude/skills/google-workspace/scripts/outlook_local.py send --to ко
 
 | Задача | Куда |
 | --- | --- |
-| Яндекс.Диск, Яндекс.Почта, Метрика, Директ | отдельный навык под Яндекс (в пак не входит) |
+| Яндекс.Диск, Яндекс.Почта, Метрика, Директ | skill `yandex` |
 | публичная папка Яндекс.Диска по ссылке | `~/.claude/tools/yadisk_public.py` |
 | произвольный IMAP/SMTP-ящик | skill `email-imap` |
 | Календарь, Контакты, Задачи, Meet, Chat | команды `/gcalendar` `/gcontacts` `/gtasks` `/gmeet` `/gchat` |

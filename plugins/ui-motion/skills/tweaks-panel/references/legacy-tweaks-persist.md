@@ -1,6 +1,10 @@
-<!-- LEGACY: полное тело скилла 'tweaks-persist' из старого дерева ~/.claude/tools/claude-code-skills (@2026-04-30).
-     Сохранено при консолидации деревьев design-пака 2026-07-18 (lossless-merge, канон deep-read-before-merge).
-     Актуальный канон — ../SKILL.md; здесь — расширенный материал прежней версии (таблицы, рецепты, антипаттерны). -->
+<!-- Прежняя, более длинная версия навыка 'tweaks-persist' (запись значений панели обратно
+     в исходник). Актуальный канон — ../SKILL.md и references/tweaks-persist-file-writeback.md;
+     здесь то, что в них не поместилось: таблицы, рецепты, антипаттерны.
+     ⚠ Файла `scripts/save-tokens-server.js` в навыке нет и не было: ниже это подпись к коду,
+     приведённому тут же, и сервер на :8082 поднимается вручную по этому коду. Готовый файл на
+     диске — `../templates/tweaks-server.mjs` (другой сервер: WebSocket :5175, режим из
+     tweaks-persist-file-writeback.md). -->
 
 ---
 name: tweaks-persist

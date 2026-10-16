@@ -16,14 +16,17 @@ Use gcalendar skill to fetch today's events
 
 ### 2. Current Tasks
 Ask user or check:
-- Linear issues assigned to me
-- Todoist tasks for today
+- Beads: `bd ready` / `bd list --status open` (задачи репозитория)
+- Todoist tasks for today (команда `/gtd`)
 - Any explicit priorities mentioned
 
 ### 3. Recent Context
 ```bash
-python ~/.claude/tools/vector_memory.py recall-recent 1
+python ~/.claude/tools/search_chats.py titles      # recent sessions by name
 ```
+
+> Was `vector_memory.py recall-recent` — that tool is dead (its `qdrant_client` import
+> never returns, so the call hangs). Recent context now comes from the chat index.
 
 ## Energy-Based Scheduling
 

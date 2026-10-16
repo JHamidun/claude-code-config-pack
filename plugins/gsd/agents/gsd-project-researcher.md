@@ -2,7 +2,7 @@
 name: gsd-project-researcher
 model: fable
 description: Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by /gsd:new-project or /gsd:new-milestone orchestrators.
-tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*, mcp__firecrawl__*, mcp__exa__*
+tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__plugin_context7_context7__*, mcp__firecrawl__*, mcp__exa__*
 color: cyan
 # hooks:
 #   PostToolUse:
@@ -78,8 +78,8 @@ Don't find articles supporting your initial guess — find what the ecosystem ac
 Authoritative, current, version-aware documentation.
 
 ```
-1. mcp__context7__resolve-library-id with libraryName: "[library]"
-2. mcp__context7__query-docs with libraryId: [resolved ID], query: "[question]"
+1. mcp__plugin_context7_context7__resolve-library-id with libraryName: "[library]"
+2. mcp__plugin_context7_context7__get-library-docs with libraryId: [resolved ID], query: "[question]"
 ```
 
 Resolve first (don't guess IDs). Use specific queries. Trust over training data.

@@ -261,7 +261,7 @@
               "id": "62a684fb-16f9-4326-8eeb-777d604b305a",
               "name": "to",
               "type": "string",
-              "value": "={{ $('Execute Workflow Trigger').first().json.email }},jim@height.io"
+              "value": "={{ $('Execute Workflow Trigger').first().json.email }},REPLACE_ME@example.com"
             },
             {
               "id": "4270849e-c805-4580-9088-e8d1c3ef2fb4",

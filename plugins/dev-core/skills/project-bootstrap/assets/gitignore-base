@@ -1,0 +1,45 @@
+# --- секреты: строками ВЫШЕ всего остального, чтобы не перекрыть исключением ---
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+credentials*.json
+.credentials*
+*secret*
+*token*
+*.session
+
+# --- окружения и сборка ---
+node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# --- инструменты и IDE ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# --- рабочий мусор: черновики, пробы, выгрузки ---
+scratchpad/
+tmp/
+*.log
+*.bak
+*.orig
+*_старый*
+*_финал*
+
+# --- Claude Code: личное не в репозиторий, командное — в репозиторий ---
+.claude/settings.local.json
+.claude/projects/
+.claude/todos/
+.claude/shell-snapshots/
+# .claude/settings.json и CLAUDE.md КОММИТИМ: это командные договорённости

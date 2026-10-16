@@ -10,11 +10,11 @@ Part of the **[hamidun marketplace](../../README.md)**.
 |-------|--------------|
 | `algorithmic-art` | Генеративное искусство на p5.js: seeded randomness, flow fields, частицы. |
 | `edit-banana` | Диаграмма PNG/JPG → редактируемый DrawIO XML (локально ~/Edit-Banana). |
-| `image-enhancer` | Улучшение картинок: апскейл, denoise, оптимизация (Pillow/OpenCV). |
-| `image-generation` | Промпт-инжиниринг генерации картинок (DALL-E, Midjourney, SD, Gemini) + авторский сюрреализм-пресет. |
-| `nano-banana-pro` | Prompt engineering Nano Banana Pro (Gemini Image): реставрация фото, VK-креативы без VPN. |
+| `image-enhancer` | Улучшение картинок: апскейл, denoise, оптимизация (Pillow/OpenCV/Real-ESRGAN). |
+| `image-generation` | Промпт-инжиниринг генерации картинок (Nano Banana, gpt-image-2.5, Midjourney, SD) + сюрреализм-пресет «эксперт/Магритт-Дали». |
+| `nano-banana-pro` | Prompt engineering Nano Banana Pro (Gemini Image): перерендер и реставрация фото, VK-креативы без VPN. |
 | `ocr-restore` | Восстановление битого OCR по ступеням с оценкой качества: склейки, мусорные символы. |
-| `openai-dalle` | OpenAI media API (OPENAI_API_KEY): gpt-image-2 face-swap/edit, Sora 2 video, Whisper STT, TTS, embeddings. |
+| `openai-dalle` | OpenAI API (OPENAI_API_KEY): gpt-image-2.5 генерация/edit до 16 референсов, прозрачный фон, TTS, транскрипция, embeddings. |
 | `replicate` | Replicate: запуск 1000+ AI-моделей по API (FLUX, SDXL, Whisper), если модели нет нативно. |
 | `slack-gif-creator` | Анимированные GIF под лимиты Slack (emoji 64KB): валидаторы и анимационные примитивы. |
 | `sticker-pack-generator` | Стикерпаки Telegram: static WEBP, WebM VP9-alpha, кастом-эмодзи; Telethon upload через @Stickers. |

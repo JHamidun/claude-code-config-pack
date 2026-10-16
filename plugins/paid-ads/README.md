@@ -8,13 +8,13 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `ad-benchmarks-ru` | Diagnose ad metrics against benchmarks — feed in your CPM/CTR/CPL/CPA and get the bottleneck and the likely fix. |
-| `ai-creative-factory-ru` | Performance creative methodology for video and static ads — concept angles, hooks, iteration cadence and testing. |
-| `google-ads-pro-ru` | Google Ads playbook — eight campaign types (Search, Display, Shopping, PMax and more), structure, bidding, and scaling. |
-| `meta-ads-launch-ru` | Launch and run your own Meta Ads — Business Manager → campaign → ad set → ads, structure, budgets, and account hygiene. |
-| `telegram-ads-pro-ru` | Telegram Ads — CPM auction, channel targeting, creative limits, budget management and measurement. |
-| `vk-ads-pro-ru` | VK Ads playbook — hands-on account work instead of trusting the algorithm: launch, audiences, creatives, optimization. |
-| `yandex-direct-pro-ru` | Yandex Direct playbook — contextual advertising strategy (not an API wrapper): campaign structure, bidding, negative keywords. |
+| `ad-benchmarks-ru` | Сверка CPM/CTR/CPL/CPA с бенчмарками РФ + детектор ботовода. |
+| `ai-creative-factory-ru` | Performance-креативы Meta/VK/Директ: хук, 5-блочный канон, Creative System. |
+| `google-ads-pro-ru` | Google Ads playbook (СНГ/мир): Search, PMax, YouTube, семантика, ставки, аудитории. |
+| `meta-ads-launch-ru` | Запуск своей Meta Ads (не РФ): Pixel + CAPI, аудитории, Lookalike. |
+| `telegram-ads-pro-ru` | Платная реклама Telegram Ads: еврокабинет/тонкабинет, подбор каналов. |
+| `vk-ads-pro-ru` | VK Ads playbook: ручной запуск, парсинг аудиторий Target Hunter, Метод А. |
+| `yandex-direct-pro-ru` | Яндекс.Директ playbook: ЕПК, семантика Wordstat, автостратегии, ЦДРР. |
 
 ## Install
 

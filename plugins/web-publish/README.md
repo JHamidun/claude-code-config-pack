@@ -8,18 +8,20 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `canonical-html` | Write HTML canonically — closed tags, double quotes, no implied closes — so tools can edit markup safely. |
-| `cards-creator` | Editorial card carousels for social channels — HTML/CSS template rendered through Playwright into a 1080×1350 PNG series. |
+| `anatomy` | Идея как изометрическая «машина»: SVG с живыми показаниями. |
+| `canonical-html` | Канонический HTML: закрытые теги, double-quotes, без implied-close — для предсказуемых правок инструментами. |
+| `cards-creator` | Карточки-карусели для Telegram-канала: HTML+CSS → Playwright → PNG 1080×1350. |
+| `cert-badge-factory` | Именные сертификаты (PDF/PNG) и цифровые бейджи выпускникам курса, выдача в Accredible. |
 | `d3-visualization` | Интерактивные графики и визуализации данных на D3.js. |
-| `excalidraw-flowchart` | Generate Excalidraw JSON for architecture diagrams, flowcharts, and sequence diagrams. |
+| `excalidraw-flowchart` | Excalidraw JSON: флоучарты, архитектурные и sequence-диаграммы, ER, mind map. |
 | `generate-report-header` | Единая шапка отчётов агентов: тип, версия, статус, время, фаза. |
-| `html-email` | Table-based HTML email for Outlook / Gmail / Apple Mail / mobile — old-school tables and inline styles, not modern CSS. |
-| `print-styles` | CSS @media print styles so an artifact prints / exports to PDF cleanly — hides nav, sets page breaks. |
-| `pwa-shell` | PWA wrapper for a prototype — manifest.json, offline service worker, install prompt, app icon. |
-| `slides` | HTML presentation — 1920×1080 canvas, arrow-key nav, ?slide=N in the URL; each slide a fixed-size section. |
-| `standalone-html` | Self-contained single-file HTML — all scripts, styles, and images inline — email it or open without a server. |
+| `html-email` | HTML-письма: табличная разметка, inline CSS, Outlook-safe, dark-mode. |
+| `print-styles` | Print stylesheet, чтобы Cmd+P давал приличный результат. |
+| `pwa-shell` | HTML-артефакт → устанавливаемое PWA: manifest, service worker, иконки. |
+| `slides` | HTML-презентации: навигация, скейлинг под экран, спикер-ноты, печать в PDF. |
+| `standalone-html` | Свернуть HTML со всеми ассетами в один офлайн-файл (inline base64). |
 | `web-assets-generator` | Фавиконы, PWA-иконки, og-images и брендовые баннеры: HTML-шаблон → скриншот. |
-| `website-creation` | Build modern landing pages and sites — from vanilla HTML to React + Tailwind (Lovable-style). |
+| `website-creation` | Создание современных лендингов и сайтов — от vanilla HTML до React+Tailwind (Lovable-style). |
 
 ### Agents
 

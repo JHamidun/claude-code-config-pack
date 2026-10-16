@@ -6,12 +6,31 @@
 
 set -e
 
-EDIT_BANANA_DIR="$HOME/Edit-Banana"
-VENV_PYTHON="$EDIT_BANANA_DIR/.venv/Scripts/python.exe"
+EDIT_BANANA_DIR="${EDIT_BANANA_DIR:-$HOME/Edit-Banana}"
 
-if [ ! -f "$VENV_PYTHON" ]; then
-    echo "ERROR: Edit Banana venv not found at $VENV_PYTHON"
-    echo "See ~/.claude/skills/edit-banana/SKILL.md for installation"
+# venv раскладывается по-разному: Windows кладёт интерпретатор в .venv/Scripts/python.exe,
+# macOS и Linux — в .venv/bin/python. Скрипт с shebang `#!/usr/bin/env bash` писался как
+# раз для *nix, а внутри стоял ТОЛЬКО Windows-путь: на маке и линуксе он честно печатал
+# «venv not found» при полностью собранном venv и отправлял переустанавливать то, что уже
+# стоит. Проверяем обе раскладки.
+# Без переносов строки обратным слэшем: в рабочей копии .sh иногда лежат с CRLF,
+# и тогда за `\` идёт возврат каретки — продолжение строки ломается, bash падает
+# с syntax error. Одна строка на кандидата надёжнее.
+VENV_PYTHON=""
+for _cand in "$EDIT_BANANA_DIR/.venv/bin/python" "$EDIT_BANANA_DIR/.venv/bin/python3" "$EDIT_BANANA_DIR/.venv/Scripts/python.exe"; do
+    if [ -x "$_cand" ] || [ -f "$_cand" ]; then
+        VENV_PYTHON="$_cand"
+        break
+    fi
+done
+
+if [ -z "$VENV_PYTHON" ]; then
+    echo "ERROR: не найден интерпретатор venv Edit Banana."
+    echo "  Искал:"
+    echo "    $EDIT_BANANA_DIR/.venv/bin/python        (macOS, Linux)"
+    echo "    $EDIT_BANANA_DIR/.venv/Scripts/python.exe (Windows)"
+    echo "  Если Edit-Banana лежит в другом месте — задай EDIT_BANANA_DIR."
+    echo "  Установка: ~/.claude/skills/edit-banana/SKILL.md"
     exit 1
 fi
 

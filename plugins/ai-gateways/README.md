@@ -10,9 +10,9 @@ Part of the **[hamidun marketplace](../../README.md)**.
 |-------|--------------|
 | `deepseek` | DeepSeek API (deepseek-chat): кодогенерация, reasoning, 128K контекст. |
 | `gemini-3-pro` | Google AI API (GOOGLE_API_KEY): Gemini text 2M контекст, embeddings, TTS, grounding. |
-| `jev` | Jev (TypeSafe) — модель решений вместо LLM: да/нет, выбор из N, оценка по шкале за 0,3 с и копейки. |
-| `kimi` | Kimi K2 (Moonshot AI, KIMI_API_KEY, kimi-k2-thinking): глубокий reasoning, код-анализ, алгоритмы. |
-| `multi-model-gateway` | Прогон задачи через Claude, GPT и Gemini разом (AI Gateway) + GPT-6 Astra через Codex CLI. |
+| `jev` | Jev (TypeSafe): решения вместо LLM — да/нет, выбор из N, шкала за 0,3 с. |
+| `kimi` | Kimi у Moonshot (KIMI_API_KEY, модель kimi-k3): глубокий reasoning, код-анализ, алгоритмы. |
+| `multi-model-gateway` | Прогон через Claude, GPT и Gemini разом (AI Gateway) + GPT-6 Astra через Codex CLI. |
 | `perplexity` | Perplexity веб-поиск и research с источниками: дефолт pplx-max.py по подписке Max. |
 
 ### Agents

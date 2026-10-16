@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "web-publish",
   "displayName": "Web Publishing",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Websites, HTML email, standalone/canonical HTML, PWA shell, web assets, slides, dataviz, diagrams.",
   "author": {
     "name": "Zhemal Khamidun",

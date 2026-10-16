@@ -8,19 +8,19 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `animations` | Timeline animations with a player, scrubber, and easing — for motion design and video-style output. |
-| `comment-injector` | Inject an overlay into HTML — click an element to copy its CSS selector + outerHTML to clipboard for chat. |
-| `device-frames` | iOS, Android, macOS window, and browser frames that wrap a mockup in a realistic container. |
-| `emil-design-eng` | Design-engineering guidance on UI polish, component design, and the invisible details that make software feel great. |
-| `forms-a11y` | Accessible forms — labels, error messages, autocomplete, fieldset grouping, focus rings, validate-on-blur. |
-| `live-preview` | Local dev server with auto-reload on file changes — a Vite-style dev experience inside Claude Code. |
-| `microinteractions` | Skeleton loaders, hover effects, scroll-reveal, button feedback — small animations that make a prototype feel alive. |
-| `mobile-overlays` | Mobile UI layers — keyboard (iOS/Android), bottom sheet, action sheet, toasts, notifications over a prototype. |
-| `review-animations` | Review animation and motion code against a high craft bar — defaults to flagging; approval has to be earned. |
-| `screen-labels` | Set data-screen-label on each screen/slide — eases 'slide 5 / Settings screen' dialogue and edits. |
-| `text-to-lottie` | Author a Lottie (Bodymovin) JSON animation that renders in a local skia player — create, edit, or fix motion assets. |
-| `tweaks-panel` | Sidebar with live controls (sliders/toggles/color pickers) to tune a prototype — primary color, font size, etc. |
-| `visual-edit` | Drag/resize handles in the browser that patch back to the source file — move an element, the skill writes the change. |
+| `animations` | Таймлайн-анимации в HTML (React): плеер, скраббер, ease. |
+| `comment-injector` | Overlay в HTML: Alt+Click кладёт в clipboard селектор и outerHTML, Shift+Alt+Click — пачку пометок. |
+| `device-frames` | CSS-рамки iOS, Android, окно macOS и браузера вокруг макета. |
+| `emil-design-eng` | Философия UI-полиша Emil Kowalski: анимации, микродетали. |
+| `forms-a11y` | Как размечать доступную форму: label, ошибки, focus-management, fieldset. |
+| `live-preview` | Локальный сервер с auto-reload для итеративной работы над HTML/CSS — браузер обновляется при сохранении. |
+| `microinteractions` | Готовые snippets анимированных микро-фич: skeleton, success-tick, stagger reveal, parallax. |
+| `mobile-overlays` | Мобильные оверлеи поверх device-frames: iOS-клавиатура, bottom sheet, тосты. |
+| `review-animations` | Ревью анимаций и motion-кода по планке Emil Kowalski: по умолчанию флагует. |
+| `screen-labels` | Атрибут data-screen-label на каждом экране/слайде артефакта — правки адресуются «слайд 5». |
+| `text-to-lottie` | Собирает Lottie (Bodymovin) JSON и разворачивает npm-проект skia-плеера (degit+vite) для превью. |
+| `tweaks-panel` | Панель крутилок в прототипе: цвета, шрифты, варианты; localStorage + запись в исходник. |
+| `visual-edit` | Overlay: двигать и resize элементы мышкой, правки патчатся в CSS через локальный сервер. |
 
 ## Install
 

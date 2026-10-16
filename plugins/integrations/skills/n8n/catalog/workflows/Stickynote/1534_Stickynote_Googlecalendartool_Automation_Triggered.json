@@ -121,8 +121,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "hello@1node.ai",
-          "cachedResultName": "hello@1node.ai"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "additionalFields": {}
       },
@@ -148,8 +148,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "hello@1node.ai",
-          "cachedResultName": "hello@1node.ai"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "operation": "update",
         "updateFields": {}
@@ -456,8 +456,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "hello@1node.ai",
-          "cachedResultName": "hello@1node.ai"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "operation": "get"
       },
@@ -484,8 +484,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "hello@1node.ai",
-          "cachedResultName": "hello@1node.ai"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "operation": "getAll"
       },

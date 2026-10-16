@@ -75,7 +75,7 @@
       ],
       "webhookId": "e969a9f5-631b-4719-a4f6-87e6063cef6a",
       "parameters": {
-        "sendTo": "sarfaraz@mediusaware.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "=Hello HR,\n\nA new CV has been successfully received in our system. Please review the candidate's details at your earliest convenience.\n\nCandidate Name: {{ $('Application Form').item.json['Full Name'] }}\nCandidate E-mail: {{ $('Application Form').item.json['E-mail'] }}\nCandidate Linkedin: {{ $('Application Form').item.json.Linkedin }}\nCandidate Expectation: {{ $('Application Form').item.json.Expectation }}\nCandidate AI Rating: {{ $('Using AI Analysis & Rating').item.json.text }}\n\nThank you for your attention.\n\nBest regards,\nAutomated CV Screening",
         "options": {},
         "subject": "New Candidate CV Awaiting Review"

@@ -8,10 +8,10 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `ai-seo-agent-pipeline` | Programmatic AI-SEO factory — mass-generate hundreds of SEO pages from templates and data, with quality gates. |
-| `geo-aeo-ru` | GEO / AEO / LLM SEO — brand visibility inside ChatGPT, Claude, Perplexity, Gemini and AI Overviews; citation share measurement. |
-| `schema-markup-ru` | Schema.org / JSON-LD markup — Organization, Course, FAQPage, Article and Product templates with validation. |
-| `seo-machine-ru` | Russian-market SEO/GEO/AEO pipeline — semantic core, article clusters, and optimization for Yandex and AI answers. |
+| `ai-seo-agent-pipeline` | Программатическая SEO-фабрика: сотни страниц под длинный хвост через n8n+Perplexity. |
+| `geo-aeo-ru` | GEO/AEO/LLM SEO — видимость бренда в ответах ChatGPT, Perplexity, YandexGPT; Citation Share, llms.txt. |
+| `schema-markup-ru` | Schema.org / JSON-LD разметка: Organization, Course, FAQPage; Яндекс читает JSON-LD. |
+| `seo-machine-ru` | SEO под Яндекс и Google: лонгриды, семантика (Wordstat, Tilda), техбаза, мета-теги, SEO на Запад. |
 
 ### Commands
 

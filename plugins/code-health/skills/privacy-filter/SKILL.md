@@ -5,7 +5,11 @@ metadata:
   version: 1.0.0
   updated: 2026-05-31
   model: openai/privacy-filter
-  license: Apache-2.0
+  # Apache-2.0 — у МОДЕЛИ и репозитория openai/privacy-filter, который ставится
+  # отдельно (`git clone` в разделе Setup). Код самого навыка — обёртка,
+  # написанная для этого пака, и на неё распространяется MIT из корневого
+  # LICENSE. Файла лицензии здесь намеренно нет: чужой код тут не лежит.
+  license: MIT (обёртка); внешняя модель openai/privacy-filter — Apache-2.0
 ---
 
 # Privacy Filter (OpenAI `opf`)

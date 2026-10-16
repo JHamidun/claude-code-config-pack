@@ -1,11 +1,11 @@
 ---
-description: "Глубокий reasoning через Kimi K2 (k2-thinking): алгоритмы, трудные баги, архитектура, математика. Триггеры: «спроси kimi». Агент-обёртка → kimi-algorithm-specialist."
+description: "Глубокий reasoning через Kimi (модель kimi-k3): алгоритмы, трудные баги, архитектура, математика. Триггеры: «спроси kimi». Агент-обёртка → kimi-algorithm-specialist."
 argument-hint: "<problem>"
 ---
 
-# /kimi-reasoning - Глубокий анализ с Kimi K2
+# /kimi-reasoning - Глубокий анализ с Kimi K3
 
-**Назначение:** Используй Kimi K2 (k2-thinking модель) для глубокого reasoning и анализа сложных проблем.
+**Назначение:** Используй Kimi (модель `kimi-k3`) для глубокого reasoning и анализа сложных проблем.
 
 **Когда использовать:**
 - Сложные алгоритмические задачи
@@ -28,18 +28,20 @@ argument-hint: "<problem>"
 
 ## Задача для агента
 
-Ты используешь **Kimi K2** (k2-thinking модель) - специализированную модель для reasoning с **1 trillion параметров** (MoE архитектура, 32B активных).
+Ты используешь **Kimi** (модель `kimi-k3` у Moonshot AI) — специализированную модель для reasoning.
 
-**Преимущества Kimi K2:**
-- 🎯 Top results на coding benchmarks (SWE-bench: 65.8%, LiveCodeBench: 53.7%)
-- 🧠 128K контекстное окно
+**Преимущества Kimi K3:**
+- 🎯 Сильна на coding benchmarks. ⚠️ Цифры SWE-bench 65.8% / LiveCodeBench 53.7% —
+  замеры **K2**; K3 ими не мерилась, владельцу их как «результаты K3» НЕ приводить
+- 🧠 Очень длинный контекст (`kimi-k3` принял 678K prompt-токенов, замер 22.08.2026)
 - 💡 Отлично для: coding, debugging, test generation, math reasoning
-- 💰 ~10x дешевле чем GPT-4 для coding tasks
+- 💰 Заметно дешевле флагманов OpenAI на coding-задачах (кратность не сверялась —
+  сравнение с GPT-4 устарело, модели в прайсе нет)
 
 **Шаги:**
 
 1. **Получи problem** из аргументов команды
-2. **Сформируй запрос** к Kimi K2 API (OpenAI-compatible):
+2. **Сформируй запрос** к Kimi K3 API (OpenAI-compatible):
    ```python
    import os
    from openai import OpenAI
@@ -50,7 +52,7 @@ argument-hint: "<problem>"
    )
 
    response = client.chat.completions.create(
-       model='kimi-k2-thinking',  # Включает chain-of-thought reasoning
+       model='kimi-k3',  # reasoning-модель; kimi-k2-thinking снята — на неё API отдаёт 404
        messages=[
            {
                'role': 'system',
@@ -70,7 +72,7 @@ argument-hint: "<problem>"
 
 3. **Верни детальный анализ** в формате:
    ```markdown
-   ## 🧠 Kimi K2 Reasoning: {problem title}
+   ## 🧠 Kimi K3 Reasoning: {problem title}
 
    ### Анализ проблемы:
    {step-by-step breakdown}

@@ -121,7 +121,7 @@
       "parameters": {
         "subject": "book from telegram bot",
         "bodyContent": "=This is a book named  {{ $json.message.document.file_name }} from telegram bot.",
-        "toRecipients": "hulb.kindle11@kindle.com",
+        "toRecipients": "REPLACE_ME@example.com",
         "additionalFields": {
           "attachments": {
             "attachments": [

@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "linkedin-suite",
   "displayName": "LinkedIn Suite",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Write, humanize, audit, plan LinkedIn posts; profile optimization; comment & reply drafting.",
   "author": {
     "name": "Zhemal Khamidun",

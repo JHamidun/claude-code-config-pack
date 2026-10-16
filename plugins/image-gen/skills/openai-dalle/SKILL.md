@@ -1,6 +1,6 @@
 ---
 name: openai-dalle
-description: "OpenAI media API (OPENAI_API_KEY): gpt-image-2.5 генерация и edit до 16 референсов, прозрачный фон, транскрипция, TTS, embeddings. Дефолт картинок NB2→image-generation; видео у OpenAI больше нет→video-generation."
+description: "OpenAI API (OPENAI_API_KEY): gpt-image-2.5 генерация/edit до 16 референсов, прозрачный фон, TTS, транскрипция, embeddings. Дефолт картинок→image-generation; видео→video-generation."
 ---
 
 > ⚠️ **NO-KEY GUARD (обязательно):** этот функционал требует ОПЦИОНАЛЬНОГО стороннего API-ключа. Перед вызовом проверь ключ в `.credentials.master.env`. Если ключ отсутствует, пустой или placeholder (`your_*_api_key`) — **НЕ проси пользователя оплатить счёт, включить биллинг или купить API**. Скажи одной строкой: «Эта функция опциональна и требует свой API-ключ (например, бесплатный ключ на aistudio.google.com); из коробки всё остальное работает по подписке Claude» — и предложи альтернативу или продолжай без неё.
@@ -19,8 +19,13 @@ description: "OpenAI media API (OPENAI_API_KEY): gpt-image-2.5 генераци�
 >
 > Формулировка «OpenAI-образы для случаев, когда нужен именно OpenAI» снята: 2.5
 > не альтернатива сбоку, а верхняя ступень. Плюс то, чего у Gemini нет вовсе:
-> `input_fidelity` (одна личность на всей пачке), до 16 референсов, прозрачный
-> фон, многоходовая правка одной картинки через Responses API.
+> до 16 референсов, прозрачный фон, многоходовая правка одной картинки через
+> Responses API.
+>
+> ⚠️ **`input_fidelity` у 2.5 НЕТ.** `images.edit` с ним отвечает 400 «The model
+> 'gpt-image-2.5-sunburst' does not support the 'input_fidelity' parameter»
+> (проверено 29.09.2026, 12 вызовов из 12). Близость к референсу держится самим
+> референсом и точным промптом («keep … exactly as in the reference»).
 
 **See Also:**
 
@@ -75,16 +80,16 @@ def generate_image(prompt: str, out_path: str, size: str = "1024x1024",
 
 ```python
 def edit_image(prompt: str, input_paths: list[str], out_path: str,
-               fidelity: str = "high"):
+               size: str = "1024x1024", quality: str = "high"):
     """До 16 input-картинок (было 2 у gpt-image-2): сцена + лица + предметы + палитра.
-    input_fidelity='high' держит лица и логотипы близко к оригиналу; 'low' даёт
-    модели свободу перерисовать. Канон мемов прежний: качать ОРИГИНАЛ и править
-    его, а не генерить сцену заново."""
+    Канон мемов прежний: качать ОРИГИНАЛ и править его, а не генерить сцену заново.
+    input_fidelity НЕ передавать: у 2.5 его нет, вызов падает с 400."""
     r = client.images.edit(
         model="gpt-image-2.5-sunburst",
         image=[open(p, "rb") for p in input_paths],   # ≤16
         prompt=prompt,
-        input_fidelity=fidelity,
+        size=size,
+        quality=quality,
     )
     with open(out_path, "wb") as f:
         f.write(base64.b64decode(r.data[0].b64_json))

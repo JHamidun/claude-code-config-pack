@@ -2,6 +2,14 @@
 > original frontmatter: version 2.0.0). Body preserved verbatim; only the
 > worker-prompts link path updated to the new references layout.
 
+> **2026-08-22:** the ten standalone worker agents were retired into
+> `_trash-2026-08-22/agents/health/workers/` — the agent registry holds only 66
+> slots. Every worker is now spawned as `subagent_type: "general-purpose"`,
+> `model: "fable"`, with the full role brief pasted from
+> `references/worker-prompts/deps.md`. The short prompts below are the
+> orchestration outline; the brief is what the worker actually needs.
+
+
 # Dependency Health Check (Inline Orchestration)
 
 You ARE the orchestrator. Execute this workflow directly without spawning a separate orchestrator agent.
@@ -45,10 +53,10 @@ Audit → Validate → Update by Priority → Verify → Repeat if needed
 
 ## Phase 2: Detection
 
-**Invoke dependency-auditor** via Task tool:
+**Invoke the audit worker** via Task tool:
 
 ```
-subagent_type: "dependency-auditor"
+subagent_type: "general-purpose"   # brief: worker-prompts/deps.md § Dependency Auditor — Detection
 description: "Audit all dependencies"
 prompt: |
   Audit the entire codebase for dependency issues:
@@ -64,7 +72,7 @@ prompt: |
   Return summary with issue counts per priority.
 ```
 
-**After dependency-auditor returns**:
+**After the audit worker returns**:
 1. Read `dependency-scan-report.md`
 2. Parse issue counts by priority
 3. If zero issues → skip to Final Summary
@@ -72,17 +80,24 @@ prompt: |
 
 ---
 
-## Phase 3: Quality Gate (Detection)
+## Phase 3: Baseline (non-blocking — NEVER exits)
 
-Run inline validation:
+Run inline validation to **record the starting state**, not to gate:
 
 ```bash
 pnpm type-check
 pnpm build
 ```
 
-- If both pass → proceed to updates
-- If fail → report to user, exit
+- Both pass → baseline = GREEN, proceed to updates
+- Either fails → baseline = RED: record the exact error list, hand it to
+  the update worker as context, **proceed to updates anyway**
+
+A red build is the usual reason this workflow was invoked, so exiting here would
+mean exiting on exactly the input the workflow exists to repair. The gate that
+can stop the run lives in Phase 4, after an update, and compares against this
+baseline (the per-dependency validate-and-rollback inside the updater uses the
+same baseline comparison).
 
 ---
 
@@ -95,9 +110,9 @@ pnpm build
 
 2. **Update TodoWrite**: mark current priority in_progress
 
-3. **Invoke dependency-updater** via Task tool:
+3. **Invoke the update worker** via Task tool:
    ```
-   subagent_type: "dependency-updater"
+   subagent_type: "general-purpose"   # brief: worker-prompts/deps.md § Dependency Updater — By Priority
    description: "Update {priority} dependencies"
    prompt: |
      Read dependency-scan-report.md and fix all {priority} priority issues.
@@ -114,14 +129,17 @@ pnpm build
      Return: count of updated deps, count of failed updates.
    ```
 
-4. **Quality Gate** (inline):
+4. **Quality Gate** (inline, vs Phase 3 baseline) — this is the gate that can
+   stop the run:
    ```bash
    pnpm type-check
    pnpm build
    ```
 
-   - If FAIL → report error, suggest rollback, exit
-   - If PASS → continue
+   - Any error NOT present in the baseline → the updates made things worse:
+     report error, suggest rollback, exit
+   - Same errors as baseline, or fewer → continue to the next priority
+   - Green baseline stays strict: any failure at all is "worse than baseline"
 
 5. **Update TodoWrite**: mark priority complete
 
@@ -135,9 +153,9 @@ After all priorities updated:
 
 1. **Update TodoWrite**: mark verification in_progress
 
-2. **Invoke dependency-auditor** (verification mode):
+2. **Invoke the audit worker** (verification mode):
    ```
-   subagent_type: "dependency-auditor"
+   subagent_type: "general-purpose"   # brief: worker-prompts/deps.md § Dependency Auditor — Verification
    description: "Verification audit"
    prompt: |
      Re-audit dependencies after updates.

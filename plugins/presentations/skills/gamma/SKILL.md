@@ -1,6 +1,6 @@
 ---
 name: gamma
-description: "Генерация презентаций, доков и страниц через Gamma Generate API + экспорт в PDF/PPTX/PNG. Триггеры: «презентация в Gamma», «gamma api»."
+description: "Генерация презентаций и доков через Gamma Generate API + экспорт PDF/PPTX/PNG; ключ GAMMA_API_KEY мёртв — сперва перевыпустить. Триггеры: «презентация в Gamma», «gamma api»."
 ---
 
 # Gamma Generate API

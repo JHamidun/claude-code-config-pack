@@ -126,7 +126,7 @@ curl -X POST "https://demandapi.booking.com/3.1/hotels/details" \
 
 ```bash
 # В нашем skill apify-scraping
-curl -X POST "https://api.apify.com/v2/acts/voyager~booking-scraper/runs?token=$APIFY_API_KEY" \
+curl -X POST "https://api.apify.com/v2/acts/voyager~booking-scraper/runs?token=$APIFY_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "search": "Sample Beach, Brazil",

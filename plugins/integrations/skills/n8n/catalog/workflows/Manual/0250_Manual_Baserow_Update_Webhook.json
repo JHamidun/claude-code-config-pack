@@ -210,9 +210,9 @@
       ],
       "parameters": {
         "subject": "Investment report",
-        "toEmail": "mutedjam@n8n.io",
+        "toEmail": "REPLACE_ME@example.com",
         "resource": "mail",
-        "fromEmail": "mutedjam@n8n.io",
+        "fromEmail": "REPLACE_ME@example.com",
         "contentType": "text/html",
         "contentValue": "={{ $json[\"html\"] }}",
         "additionalFields": {}

@@ -22,18 +22,25 @@ GitHub Trees API (`git/trees/main?recursive=1`) и локальный `git ls-tr
 Ориентируйся на 2061, иначе будешь искать несуществующее.
 
 ```text
-~/.claude/skills/n8n/catalog/    # git clone --depth 1, ~55 MB
+~/.claude/skills/n8n/catalog/    # едет вместе с паком, ~48 MB
 ├── workflows/                   # 2061 JSON в 188 папках по интеграции (Telegram/, Openai/, Rssfeedread/, Slack/…)
 ├── context/                     # def_categories.json, search_categories.json, unique_categories.json — маппинг node-type → 15 бизнес-категорий
 ├── database/workflows.db        # SQLite FTS5, уже проиндексирована (2061 запись)
-├── .venv_search/                # venv с FastAPI/uvicorn (см. гочу Python 3.13)
 ├── run.py                       # launcher локального поиск-сервера
 └── api_server.py                # FastAPI-приложение
+     .venv_search/               # ← НЕ в паке: venv непереносим, создаёшь сам, см. «Гоча (Python 3.13)» ниже
 ```
 
 Каждый файл — самостоятельный JSON в формате n8n-импорта
 (`{id, meta, name, tags, nodes, active, pinData, settings, versionId, connections}`).
 Имя кодирует интеграции и тип триггера: `1941_Telegram_Stickynote_Automate_Triggered.json`.
+
+> **`REPLACE_ME@example.com` в воркфлоу — так и задумано.** В 260 файлах из 2060
+> стояли живые адреса их авторов: импортируешь шаблон, жмёшь «выполнить» — и
+> письмо уходит постороннему человеку. Все такие адреса, а также идентификаторы
+> чужих Google-календарей и одна пара логин/пароль открытым текстом заменены на
+> плейсхолдеры. Перед запуском чужого воркфлоу ищи `REPLACE_ME` и подставляй
+> своё. Подробности и цифры — `catalog/NOTICE.md`.
 
 Метрики каталога (`/api/stats`): 311 уникальных интеграций, 30 774 ноды, триггеры
 Webhook 588 / Manual 582 / Scheduled 244 / мультитриггер 647, сложность low 467 /
@@ -47,12 +54,15 @@ Uncategorized.
 
 ### Поиск 1 — локальный FastAPI + FTS5 (полнотекст, фильтры, <100 мс)
 
-БД уже собрана, индексировать заново не нужно:
+БД уже собрана и едет с паком — индексировать заново не нужно. А вот venv нужно
+создать один раз (его в паке нет, см. «Гоча (Python 3.13)» ниже — там точная
+команда и почему нельзя ставить по `requirements.txt` дословно):
 
 ```bash
 cd ~/.claude/skills/n8n/catalog
 ./.venv_search/Scripts/python.exe run.py --port 8123 --skip-index
 # --reindex вместо --skip-index — только если папка workflows/ изменилась
+# на macOS/Linux путь к интерпретатору — ./.venv_search/bin/python
 ```
 
 Веб-UI `http://127.0.0.1:8123/`, Swagger `/docs`. Эндпоинты:
@@ -71,9 +81,18 @@ cd ~/.claude/skills/n8n/catalog
 менять не нужно — API не завязан на конкретный минорный pydantic:
 
 ```bash
+cd ~/.claude/skills/n8n/catalog
 python -m venv .venv_search
+
+# Windows:
 ./.venv_search/Scripts/python.exe -m pip install fastapi uvicorn pydantic PyJWT passlib httpx requests psutil email-validator python-multipart
+# macOS / Linux — интерпретатор лежит в bin/, а не в Scripts/:
+./.venv_search/bin/python       -m pip install fastapi uvicorn pydantic PyJWT passlib httpx requests psutil email-validator python-multipart
 ```
+
+Этот блок выполняется **раньше** блока запуска выше по файлу: venv надо сперва создать.
+Оговорка про раскладку продублирована здесь намеренно — читать её после того, как
+команда уже не сработала, поздно.
 
 ### Поиск 2 — grep по папке (без сервера, мгновенно)
 
@@ -102,7 +121,7 @@ Downloads» отдаёт JSON без клонирования репо. Годи
    вызовут конфликт.
 3. **Credentials-гоча:** шаблоны каталога хранят только *тип* credential (например
    `telegramApi`), без секретов. Сразу после импорта ноды падают с «credential not
-   found», пока вручную не перевесишь их на наши реальные credentials.
+   found», пока вручную не перевесишь их на свои реальные credentials.
 4. Проверь `typeVersion` нод: старые шаблоны тянут устаревшие версии, n8n предложит
    апгрейд при открытии.
 
@@ -119,7 +138,9 @@ Downloads» отдаёт JSON без клонирования репо. Годи
 
 ## Доступы
 
-Ключи — в `~/.claude/.credentials.master.env`, в коде только `os.getenv`:
+Ключи — в переменных окружения либо в `~/.claude/.credentials.master.env` (шаблон:
+`~/.claude/templates/.credentials.master.env.example`, скопируй и заполни). В коде
+только `os.getenv`:
 
 ```python
 N8N_SERVER_URL      # http://<ip>:5678/api/v1   — self-hosted
@@ -130,8 +151,11 @@ N8N_MCP_SERVER_URL  # https://<имя>.app.n8n.cloud/mcp-server/http
 N8N_MCP_ACCESS_TOKEN
 ```
 
-Оба инстанса живые, выбор по задаче: self-hosted — свои ноды и никаких лимитов,
-cloud — обновления и аптайм не на нас.
+API-ключ в n8n: Settings → API → Create an API key (и в облаке, и в self-hosted).
+Инстанса может быть один или оба — заполняй только те переменные, что у тебя есть;
+код должен проверять `os.getenv` на пустоту, а не считать оба доступными.
+Выбор по задаче: self-hosted — свои ноды и никаких лимитов, cloud — обновления
+и аптайм не на тебе.
 
 ## MCP
 

@@ -1,6 +1,6 @@
 ---
 name: tiktok-intel
-description: "Аналитика TikTok и Instagram через Scraping API: тренды, инфлюенсеры, демография, TikTok Shop, Reels. Триггеры: «тикток тренды», «популярные рилсы»."
+description: "Аналитика TikTok и Instagram через ScraperVendor: тренды, инфлюенсеры, демография, TikTok Shop, Reels. Триггеры: «тикток тренды», «популярные рилсы»."
 allowed-tools: Bash, Read, Write, WebSearch
 ---
 

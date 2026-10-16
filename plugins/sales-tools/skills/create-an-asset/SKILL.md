@@ -1,6 +1,6 @@
 ---
 name: create-an-asset
-description: "Продажные материалы под сделку: лендинг, дек. Триггеры: «sales deck», «материал для клиента»."
+description: "Продажные материалы под сделку: лендинг, дек. Триггеры: «sales deck», «материал для клиента». НЕ: инвесторам→investor-materials; RU B2B→sales-enablement-ru."
 ---
 
 # Create an Asset
@@ -26,12 +26,22 @@ prospect that someone did the homework.
 - Primary concerns: ROI · technical depth · strategic alignment · risk & security · implementation timeline.
 - Goals: intro · discovery follow-up · technical deep-dive · exec alignment · POC proposal · close.
 
+Which format fits which job:
+
+| Format | Best for |
+|---|---|
+| Interactive landing page (tabs, demos, calculators) | exec alignment, intros, value prop |
+| Deck-style (linear slides) | formal meetings, large audiences |
+| One-pager (single scroll) | leave-behinds, quick summaries |
+| Workflow / architecture demo (animated diagram) | technical deep-dive, POC, integrations |
+
 **Seller context** — what the *user* sells. Derive it from their email domain
 (`"[domain]" company products services site:linkedin.com OR site:crunchbase.com`), then
 confirm. If the domain belongs to a multi-product company, a consultancy, or a generic
 mailbox, ask which product this asset is for — guessing here poisons every section that
-follows. Persist company, product, value props, differentiators, pricing model; on later
-invocations confirm instead of re-asking: "Still selling [Product] at [Company]?"
+follows. Persist company, product, value props, differentiators, pricing model (to memory,
+or to `~/.claude/business-context.md`); on later invocations confirm instead of
+re-asking: "Still selling [Product] at [Company]?"
 
 **Workflow demo only** — also establish the components involved, the step-by-step flow,
 where a human touches it, and one concrete example scenario. Parse these from the user's
@@ -98,6 +108,10 @@ assumption gets discovered in the meeting and takes the whole model down with it
 
 The **CTA** names a specific next step with a date, not "let's chat", plus contact
 details and what happens after they act.
+
+Ready-made section content templates (hero / intro, their priorities, solution mapping,
+use cases, why us, next steps) and the deck and one-pager skeletons →
+`references/build-details.md`.
 
 ## Phase 4 — Visual design
 

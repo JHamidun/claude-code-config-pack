@@ -6,7 +6,7 @@
 
 | Западный инструмент | RU-эквивалент | Исполняющий скилл |
 |---|---|---|
-| Apollo / ZoomInfo / Clearbit (фирмографика) | **Контур.Фокус, Rusprofile, СПАРК, ЕГРЮЛ** | ручной research / web; CRM-запись — `crm` |
+| Apollo / ZoomInfo / Clearbit (фирмографика) | **Контур.Фокус, Rusprofile, СПАРК, ЕГРЮЛ** | ручной research / web; CRM-запись — через API твоей CRM |
 | Crunchbase (раунды/инвесторы) | **РБ.ру (Rusbase), Венчурная база, СПАРК** | web research |
 | LinkedIn Sales Nav (ЛПР) | **LinkedIn** (через ScraperVendor) + **HeadHunter** + Telegram | `linkedin`, `headhunter`, `social-intel` |
 | Hunter / Snov (поиск email) | Контур.Фокус контакты, сайт компании, Rusprofile | web research |

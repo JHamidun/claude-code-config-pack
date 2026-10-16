@@ -9,7 +9,8 @@ Inline-вшивает в один HTML все локальные ресурсы:
 
 ## Скрипт
 
-`templates/inline.mjs`:
+Готового файла в навыке НЕТ (каталога `templates/` тоже) — код ниже сохрани сам
+рядом с обрабатываемым HTML как `inline.mjs`, оттуда и запускай.
 
 ```js
 import fs from 'node:fs/promises';
@@ -26,7 +27,9 @@ let html = await fs.readFile(input, 'utf8');
 html = await replaceAsync(html, /<link\s+[^>]*rel=["']stylesheet["'][^>]*>/gi, async (tag) => {
   const m = tag.match(/href=["']([^"']+)["']/);
   if (!m || /^https?:|\/\//.test(m[1])) return tag;
-  const css = await fs.readFile(path.join(dir, m[1]), 'utf8');
+  // url(...) внутри CSS отсчитывается от САМОГО CSS, а не от HTML — базу берём по файлу стиля
+  const cssPath = path.join(dir, m[1]);
+  const css = await inlineUrls(await fs.readFile(cssPath, 'utf8'), path.dirname(cssPath), false);
   return `<style>\n${css}\n</style>`;
 });
 
@@ -51,20 +54,29 @@ html = await replaceAsync(html, /<img\s+[^>]*src=["']([^"']+)["'][^>]*>/gi, asyn
   } catch { return tag; }
 });
 
-// url(...) внутри инлайн-CSS — тоже data URL
-html = await replaceAsync(html, /url\(["']?([^"')]+)["']?\)/g, async (m, src) => {
-  if (/^https?:|\/\/|data:/.test(src)) return m;
-  try {
-    const buf = await fs.readFile(path.join(dir, src));
-    const ext = path.extname(src).slice(1).toLowerCase();
-    const mime = ({ woff2: 'font/woff2', woff: 'font/woff', ttf: 'font/ttf',
-      svg: 'image/svg+xml', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg' })[ext] || 'application/octet-stream';
-    return `url("data:${mime};base64,${buf.toString('base64')}")`;
-  } catch { return m; }
-});
+// url(...), написанные прямо в <style> самого HTML — база тут и правда каталог HTML
+html = await inlineUrls(html, dir);
 
 await fs.writeFile(out, html);
 console.log('✓', out);
+
+// warn=false на первом (CSS-относительном) проходе: непойманное добьёт финальный проход от HTML
+async function inlineUrls(css, baseDir, warn = true) {
+  return replaceAsync(css, /url\(["']?([^"')]+)["']?\)/g, async (m, src) => {
+    if (/^https?:|\/\/|data:|^#/.test(src)) return m;
+    try {
+      const buf = await fs.readFile(path.resolve(baseDir, src));
+      const ext = path.extname(src).slice(1).toLowerCase();
+      const mime = ({ woff2: 'font/woff2', woff: 'font/woff', ttf: 'font/ttf',
+        svg: 'image/svg+xml', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg' })[ext] || 'application/octet-stream';
+      return `url("data:${mime};base64,${buf.toString('base64')}")`;
+    } catch {
+      // молча оставлять ссылку нельзя: файл уедет получателю без фона/шрифта
+      if (warn) console.warn('! не вшит ассет:', src, '(искал от', baseDir + ')');
+      return m;
+    }
+  });
+}
 
 async function replaceAsync(str, re, fn) {
   const promises = [];

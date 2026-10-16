@@ -63,7 +63,7 @@
         510
       ],
       "parameters": {
-        "functionCode": "item.ip = \"YOUR_PUBLIC_IP\";\nitem.email = \"miquel@uproc.io\";\n\nreturn item;"
+        "functionCode": "item.ip = \"YOUR_PUBLIC_IP\";\nitem.email = \"REPLACE_ME@example.com\";\n\nreturn item;"
       },
       "typeVersion": 1,
       "id": "fd136836-2c01-487b-ac4c-dc10cdf6180c",
@@ -79,7 +79,7 @@
       "parameters": {
         "body": "Hi,\n\nThank you for your signup!",
         "subject": "Welcome aboard",
-        "fromEmail": "sample@uproc.io",
+        "fromEmail": "REPLACE_ME@example.com",
         "toAddresses": [
           "={{$node[\"Create IP and Email Item\"].json[\"email\"]}}"
         ],
@@ -102,7 +102,7 @@
       "parameters": {
         "body": "Hola,\n\n¡Gracias por registrarte!",
         "subject": "Bienvenido a bordo",
-        "fromEmail": "sample@uproc.io",
+        "fromEmail": "REPLACE_ME@example.com",
         "toAddresses": [
           "={{$node[\"Create IP and Email Item\"].json[\"email\"]}}"
         ],

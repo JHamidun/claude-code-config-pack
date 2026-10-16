@@ -122,7 +122,7 @@ def download_zip(project_id: str, dest_path: str | Path) -> Path:
     return dest
 
 
-def chat_send(project_id: str, message: str, *, model: str = "claude-opus-4-7") -> Dict[str, Any]:
+def chat_send(project_id: str, message: str, *, model: str = "claude-opus-5") -> Dict[str, Any]:
     """PLACEHOLDER for the streaming Chat call.
 
     Chat uses application/connect+proto with envelope framing — needs separate

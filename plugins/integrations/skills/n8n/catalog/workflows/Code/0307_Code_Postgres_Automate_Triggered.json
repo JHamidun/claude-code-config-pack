@@ -144,7 +144,7 @@
         680
       ],
       "parameters": {
-        "jsCode": "return [\n  {\n    \"id\": 1,\n    \"username\": \"max_mustermann\",\n    \"email\": \"max_mustermann@acme.com\",\n    \"company_size\": \"500-999\",\n    \"role\": \"Sales\",\n    \"users\": 50\n  }\n]"
+        "jsCode": "return [\n  {\n    \"id\": 1,\n    \"username\": \"max_mustermann\",\n    \"email\": \"REPLACE_ME@example.com\",\n    \"company_size\": \"500-999\",\n    \"role\": \"Sales\",\n    \"users\": 50\n  }\n]"
       },
       "notesInFlow": true,
       "typeVersion": 1

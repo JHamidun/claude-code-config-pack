@@ -219,7 +219,7 @@
       ],
       "webhookId": "cd6b6b20-e619-4526-aa69-64754e3d9035",
       "parameters": {
-        "sendTo": "phanineeraj@quantana.com",
+        "sendTo": "REPLACE_ME@example.com",
         "message": "=SSL Expiry - {{ $json.result.days_left }} Days Left - {{ $json.result.host }}",
         "options": {
           "appendAttribution": false

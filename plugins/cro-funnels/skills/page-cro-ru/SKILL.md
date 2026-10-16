@@ -5,7 +5,7 @@ metadata:
   version: 1.2.0
   updated: 2026-06-23
   ported_from: coreyhaines31/marketingskills (cro)
-  reuses: web-analytics, ab-testing-ru, funnel-design-ru, marketing-psychology-ru
+  reuses: ab-testing-ru, funnel-design-ru, marketing-psychology-ru
 ---
 
 # CRO маркетинговых страниц (RU)
@@ -106,7 +106,7 @@ metadata:
 
 ## Данные и публикация (НЕ дублировать — звать существующее)
 
-- **Трафик, bounce, конверсии целей, сегменты B2B/B2C, воронки** → `web-analytics` (Метрика/GA API).
+- **Трафик, bounce, конверсии целей, сегменты B2B/B2C, воронки** → твоя веб-аналитика (Метрика/GA API); какой счётчик стоит — раздел «Учёт и аналитика» в `~/.claude/business-context.md`.
 - **Внесение правок на страницу/лендинг и публикация** → ваш конструктор сайтов/CMS.
 - **Заявки/лиды с форм** → ваша CRM + продуктовая БД.
 - **Конкуренты (RU)** → `competitive-analysis` / `similarweb-analytics`.
@@ -118,7 +118,7 @@ metadata:
 |------|-------|
 | Чек-лист лендинга (8 пунктов), дерево метрик, выбор ТИПА воронки | `funnel-design-ru` |
 | Психология: Система 2, FOMO/дефицит, якорение, соцпруф | `marketing-psychology-ru` |
-| Данные воронки/конверсий | `web-analytics` |
+| Данные воронки/конверсий | твоя веб-аналитика (Метрика/GA) |
 | Метрика/Вебмастер/Wordstat | `yandex` |
 | Правки и публикация страницы | конструктор сайтов/CMS |
 | Лиды с форм в CRM | ваша CRM |

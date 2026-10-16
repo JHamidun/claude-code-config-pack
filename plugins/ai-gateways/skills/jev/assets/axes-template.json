@@ -1,0 +1,27 @@
+{
+  "_comment": "Axes for the readable vector (references/pattern-readable-vector.md). One question = one coordinate. Write the questions for YOUR corpus: this template triages incoming messages. type is noul (yes/no), choice (one of N, give a description per option) or score (ordered levels, lowest first). weight defaults to 1 and is not part of the axes hash, so re-weighting never forces re-profiling. Keep questions literal and in English: Jev reads literally and is trained mostly on English; the texts may be Russian.",
+  "axes": [
+    {"name": "needs_reply", "type": "noul", "weight": 2,
+     "instructions": "Does the message ask the recipient for an answer or an action?"},
+    {"name": "time_sensitive", "type": "noul", "weight": 2,
+     "instructions": "Does the message state or imply a deadline within the next few days?"},
+    {"name": "money", "type": "noul",
+     "instructions": "Is the message about a payment, an invoice, a price or a refund?"},
+    {"name": "complaint", "type": "noul",
+     "instructions": "Is the sender unhappy about something that already happened?"},
+    {"name": "kind", "type": "choice",
+     "instructions": "What kind of message is this?",
+     "options": {
+       "request": "asks for something to be done",
+       "question": "asks for information",
+       "status": "reports progress or a result",
+       "notice": "announces something with no reply expected",
+       "chat": "social conversation"}},
+    {"name": "tone", "type": "score",
+     "instructions": "How formal is the tone?",
+     "levels": ["casual", "neutral", "formal"]},
+    {"name": "urgency", "type": "score", "weight": 2,
+     "instructions": "How urgent is the message for the recipient?",
+     "levels": ["can wait weeks", "this week", "today", "right now"]}
+  ]
+}

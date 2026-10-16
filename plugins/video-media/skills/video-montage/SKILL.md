@@ -7,18 +7,32 @@ description: "Конвейер ролика ролями: бриф→сцена�
 
 Вертикальные ролики (9:16, 1080×1920, 30fps) от исходников до готового файла.
 
-> **Windows-адаптация (стек пользователя):** `python` вместо `python3`; headless
+> **Windows-адаптация:** `python` вместо `python3`; headless
 > Chrome = `"C:/Program Files/Google/Chrome/Application/chrome.exe"` (те же флаги);
-> временные файлы → scratchpad, не `/tmp`; ElevenLabs-ключ `ELEVENLABS_API_KEY`
-> из `~/.claude/.credentials.master.env`, свой голос — см. навык `elevenlabs`;
-> правило кодека то же: только `libx264 + yuv420p`. WhisperX уже стоит (см.
-> `video-editor` karaoke_captions). Смежное: монтаж готового футажа →
+> временные файлы → scratchpad, не `/tmp`; правило кодека то же: только
+> `libx264 + yuv420p`. Смежное: монтаж готового футажа →
 > `video-editor`; AI-генерация сцен → `video-generation`; музыка → `ace-step`/`elevenlabs`;
 > публикация в Telegram-канал → `tg-bot-publish`, в остальные соцсети — своим
 > публикатором (например, Postiz self-hosted), готовой обёртки в паке нет.
 
 **Требуется:** ffmpeg (с libass и drawtext) · whisper (`pip install openai-whisper`) ·
 Python с Pillow · yt-dlp · ключ ElevenLabs для озвучки.
+Пословный караоке-тайминг требует WhisperX отдельно (`pip install whisperx`) — он в
+пак не входит; без него работают обычные субтитры, см. `video-editor`.
+
+### Ключи и голос — свои
+
+Скрипты берут ключи из переменных окружения, а если их нет — из
+`~/.claude/.credentials.master.env` (шаблон: `~/.claude/templates/.credentials.master.env.example`,
+скопируй и заполни). Нужны `ELEVENLABS_API_KEY` для озвучки и `GOOGLE_API_KEY` для
+контроля дорожки на слух (`scripts/review_cut.py`) и поиска рта у персонажа
+(`scripts/mouth_map.py`).
+
+`$VOICE_ID` / `ELEVENLABS_VOICE_ID_RU` — **идентификатор твоего голоса**, дефолта у
+него нет намеренно: чужой голос в твоём ролике — это не «удобная настройка».
+Где взять: кабинет ElevenLabs → Voices → нужный голос → ID; подробнее — навык
+`elevenlabs`. Не задал — `voice_timed.py` остановится с явным сообщением, а не
+озвучит чужим тембром.
 
 ---
 
@@ -33,9 +47,16 @@ Workflow({
   scriptPath: '~/.claude/skills/video-montage/workflows/video-factory.js',
   args: { brief: 'как за день собрали лендинг вайбкодингом',
           seconds: 35, platform: 'reels', goal: 'watch',
-          workdir: '~/Videos/video-factory/lending-35s' }
+          workdir: '~/video-factory/lending-35s' }
 })
 ```
+
+`workdir` по умолчанию — `~/video-factory/run`. В нём намеренно нет `~/Videos`: на
+локализованном Linux системная папка называется «Видео», а `mkdir -p ~/Videos` не
+падает — он молча создаёт второй каталог, и готовый ролик оказывается не там, где его
+ищут. Класть в системную «Видео» — передавай уже развёрнутый путь:
+`workdir: "$(xdg-user-dir VIDEOS 2>/dev/null || echo $HOME/Videos)/video-factory/lending-35s"`.
+Итоговый абсолютный путь называй в отчёте: «готово» без пути — это ненайденный файл.
 
 Обрыв не страшен: `Workflow({scriptPath, resumeFromRunId})` продолжит с места, а готовые
 кадры помечены в конверте и второй раз не оплачиваются.

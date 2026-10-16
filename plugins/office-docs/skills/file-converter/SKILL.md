@@ -1,6 +1,6 @@
 ---
 name: file-converter
-description: "Конвертация файлов локально: Word↔PDF, Excel→CSV, что угодно→Markdown (markitdown). Триггеры: «word в pdf», «вытащи текст из pdf». НЕ сканы→ocr-restore."
+description: "Локальная конвертация форматов: Word↔PDF, Excel→CSV, что угодно→Markdown (markitdown). Триггеры: «конвертируй файл», «word в pdf». НЕ извлечь текст из pdf→pdf; сканы→ocr-restore."
 ---
 
 # File Converter MCP Server Skill

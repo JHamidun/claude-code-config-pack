@@ -16,7 +16,7 @@ description: "Claude по подписке как OpenAI API (/v1/chat/completio
 |---|---|---|
 | Свой прокси-гейтвей к внешним провайдерам | НАРУЖУ | проксирует OpenAI/Perplexity/Runway; в пак не входит — если нужен, поднимается отдельно (например, LiteLLM) |
 | **`agent-api-server`** (127.0.0.1:**8199**) | ВНУТРЬ | отдаёт Claude-по-подписке как OpenAI-совместимый эндпоинт |
-| `claude-cli-runner` / `claude_cli.py` | — | разовый вызов из Python-кода, без HTTP |
+| `claude-api` / `claude_cli.py` | — | разовый вызов из Python-кода, без HTTP |
 
 ## Когда использовать
 
@@ -151,7 +151,7 @@ for chunk in c.chat.completions.create(model="haiku", stream=True,
    некому подтвердить. `--allow-tools` включает их — это значит, что HTTP-клиент получает право
    выполнять Bash на машине владельца. Включать только с `AGENT_API_TOKEN`.
 10. **Сессии живут в CLI, не в сервере.** `X-Session-Id` → UUIDv5 → `--session-id` (1-й ход) /
-    `--resume` (далее); реестр `~/.claude/agent_api_sessions.json`. Если удалить реестр — следующий
+    `--resume` (далее); реестр `agent_api_sessions.json` в корне `~/.claude` (создаётся сервером при первом stateful-запросе). Если удалить реестр — следующий
     ход снова пойдёт как первый и потеряет историю (сама сессия CLI при этом останется на диске).
 11. **В stateful-режиме на бэкенд уходит только последнее user-сообщение** — историю держит CLI.
     В stateless-режиме весь `messages[]` схлопывается в один промпт с префиксом «Conversation so far».

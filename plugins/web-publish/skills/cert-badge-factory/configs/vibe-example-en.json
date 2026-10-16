@@ -1,0 +1,29 @@
+{
+  "_comment": "English example for the vibe theme; all data is fictional. For English sheets set 'did' (the verb does not depend on gender) and the 'labels'. TEMPLATE mode for Accredible (a sheet with no name and no number; Accredible overlays the recipient name as an attribute): set people to [\" \"], cert_no to \"\" and samples to [[1, \" \", \"long\"]].",
+  "program": "AI Agents Intensive",
+  "program_sub": "Building teams of AI agents and professional work with neural networks",
+  "did": "completed the programme",
+  "hours": "over 16 hours of live practice",
+  "subline": "8 live sessions · September 2026",
+  "brand": {"name": "Your", "tag": "School", "by": "by Your Name"},
+  "modules": [
+    ["Session 01", "How models work and how an agent differs from an assistant", ""],
+    ["Session 02", "Your own autonomous agent on a server", ""],
+    ["Session 03", "Websites and visuals: take apart someone else's site and build your own", ""],
+    ["Session 04", "A fleet of agents: roles, links between them, working as a team", ""]
+  ],
+  "people": [
+    "Elena Ivanova",
+    "Daniil Petrov",
+    "O. Kovalenko"
+  ],
+  "cert_no": "CERT-2026-{i:03d}",
+  "labels": {"title": "Certificate", "lead_in": "— confirms that", "vol": "in the amount of", "issuer_l1": "Issued by"},
+  "issuer": {"l1": "Issued by", "l2": "Your School"},
+  "signer": {"name": "Your Name", "role": "Founder", "image": "signature.png"},
+  "samples": [
+    [1, "Elena Ivanova", "long"],
+    [2, "Daniil Petrov", "mid"],
+    [3, "O. Kovalenko", "short"]
+  ]
+}

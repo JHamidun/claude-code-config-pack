@@ -1,5 +1,13 @@
 # Spec-kit to Beads Bridge
 
+> ⚠️ **В этой системе Spec-kit не установлен.** Команд `/speckit.specify`, `/speckit.clarify`,
+> `/speckit.plan`, `/speckit.tasks`, `/speckit.tobeads` нет (проверено обходом `commands/` и
+> `plugins/` 22.08.2026 — ноль файлов). Автоматического импорта `tasks.md` в Beads тоже нет.
+> Читай этот файл как описание апстримного моста и как **формат разбивки задач**: фазы,
+> маркеры `[P]`/`[USn]`, правило «после переноса план заморожен». Сам перенос делается вручную
+> через `bd create … --deps`. Чем заменить шаги планирования — в SKILL.md, раздел
+> «Планирование перед Beads».
+
 ## Overview
 
 Spec-kit handles **planning** (spec → plan → tasks), Beads handles **execution** (tracking, dependencies, multi-session).

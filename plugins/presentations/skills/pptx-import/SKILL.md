@@ -30,7 +30,8 @@ deck.pptx (zip)
 pip install python-pptx
 ```
 
-`templates/import.py`:
+Готового файла в навыке НЕТ (каталога `templates/` тоже) — сохрани код ниже как `import.py`
+в рабочем каталоге и запускай оттуда:
 
 ```python
 #!/usr/bin/env python3
@@ -103,7 +104,7 @@ python import.py deck.pptx
 
 ### Конвертер JSON → HTML
 
-`templates/json-to-html.mjs`:
+Тоже сохрани сам — как `json-to-html.mjs` рядом с `import.py`:
 
 ```js
 import fs from 'node:fs/promises';
@@ -124,12 +125,15 @@ for (const sl of data.slides) {
     if (it.kind === 'text') {
       const txt = (it.paragraphs || []).map(p =>
         p.runs.map(r => {
-          let t = `<span`;
-          if (r.size) t += ` style="font-size:${r.size}px;`;
-          if (r.bold) t += `font-weight:bold;`;
-          if (r.color) t += `color:#${r.color};`;
-          t += `"`;
-          return t + `>${r.text}</span>`;
+          // размер из PPTX приходит в ПУНКТАХ → px = pt * 4/3, иначе весь дек мельче в 1,33 раза
+          let css = '';
+          if (r.size) css += `font-size:${Math.round(r.size * 4 / 3)}px;`;
+          if (r.bold) css += `font-weight:bold;`;
+          if (r.italic) css += `font-style:italic;`;
+          if (r.color) css += `color:#${r.color};`;
+          // кавычка атрибута собирается ЦЕЛИКОМ здесь: если её открывать внутри if (r.size),
+          // то ран без размера даёт тег с именем `spanfont-weight:bold;`
+          return `<span${css ? ` style="${css}"` : ''}>${r.text}</span>`;
         }).join('')
       ).join('<br>');
       html += `\n<div class="slide-content" style="${style}">${txt}</div>`;
@@ -149,10 +153,13 @@ console.log('✓', file.replace('.json', '.html'));
 
 ## Round-trip workflow
 
+0. Скопируй `~/.claude/skills/slides/templates/deck-stage.js` в тот же каталог — генерируемый
+   HTML тянет его тегом `<script src="deck-stage.js">` и оборачивает секции в `<deck-stage>`.
+   Без файла кастомный элемент не зарегистрируется и все секции лягут в столбик.
 1. `python import.py original.pptx` → `original.json`
 2. `node json-to-html.mjs original.json` → `original.html`
 3. Правишь в HTML.
-4. `pptx-editable-extractor` → новый PPTX.
+4. `export-pptx` в режиме editable → новый PPTX.
 
 ## Ограничения
 
@@ -169,6 +176,6 @@ console.log('✓', file.replace('.json', '.html'));
 
 ## Связь с другими скиллами
 
-- `pptx-editable-extractor` — обратная задача (HTML → PPTX).
+- `export-pptx` — обратная задача (HTML → PPTX), режим editable.
 - `slides` — каркас для нового HTML, куда переносить контент.
 - `document-import` — общий импорт docx/pdf/pptx.

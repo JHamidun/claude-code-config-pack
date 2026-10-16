@@ -8,23 +8,23 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `a11y-audit` | Run axe-core headless; report WCAG violations with links to the offending elements. |
-| `claude-design` | Work with Claude Design (claude.ai/design) — mockup-to-production workflow, reading prototypes and porting them pixel-perfect. |
-| `design-guardrails` | Final verification of a design artifact — design read, quality gate, visual diff against the reference, drift rejection. |
-| `dev-handoff` | Build a developer handoff package — extract tokens from finished HTML, generate a component/spec README with sizes and states. |
-| `document-import` | PDF / DOCX / PPTX / sketch → structured content for slides or landing pages (headings, text, quotes, images). |
-| `export-pdf` | HTML → PDF via Playwright Chromium, keeping vector text — for slides and landers you send as one file. |
-| `export-png` | HTML → PNG (single or series) — social covers (Twitter/Instagram/LinkedIn), previews, individual slides. |
-| `export-pptx` | HTML slides → PPTX where each slide is a screenshot image (no text editability). |
-| `github-import` | GitHub repo → design system, components, and CSS tokens as context so a new prototype matches the codebase. |
-| `i18n-stress-test` | Stress-test UI for i18n — long words (German), RTL (Arabic/Hebrew), CJK, and emoji in text. |
+| `a11y-audit` | Прогон axe-core в headless: отчёт по WCAG-нарушениям готовой страницы. |
+| `claude-design` | Claude Design (claude.ai/design): от AI-мокапа до production-кода, handoff-bundle. |
+| `design-guardrails` | QA-гейт дизайн-артефакта: Visual Diff PASS/FAIL против референса, редизайн без поломки логики. |
+| `dev-handoff` | Handoff-пакет разработчику из готового HTML: токены, компоненты, README. |
+| `document-import` | Извлечь текст и картинки из PDF/DOCX/PPTX/скетча для прототипа или дека. |
+| `export-pdf` | Печать HTML-макета или дека в PDF через headless Chrome (Playwright), слайд = страница. |
+| `export-png` | PNG-скриншоты слайдов/экранов через Playwright: кадр на слайд или по селектору. |
+| `export-pptx` | HTML-дек в PPTX: режим картинок (надёжный) или редактируемый (нативный текст, pptxgenjs). |
+| `github-import` | Импорт файлов GitHub-репо как контекст: токены, компоненты, стили. |
+| `i18n-stress-test` | Стресс-тест локализации перед сдачей макета: немецкий, арабский RTL, японский, emoji-переполнение. |
 | `miro` | Доски Miro: MCP (чтение/саммари, layout-DSL, диаграммы, комменты) + REST v2 (коннекторы, теги — чего MCP не умеет). |
-| `onboarding-ux` | First-run patterns — welcome screens, permission requests, teaching empty states, progressive disclosure, time-to-value. |
-| `perf-audit` | Lighthouse performance audit — measures LCP / CLS / TBT / FCP / TTI on an artifact with actionable advice. |
-| `proto-smoketest` | E2E click-through smoke test via Playwright over the critical user paths of an interactive prototype. |
-| `screenshot-test` | Pixel-diff between the current and a baseline screenshot; fails if the artifact visually broke. |
-| `verifier` | Headless HTML check — open in Chromium, read console errors/warnings, screenshot for review. |
-| `version-snapshots` | Lightweight version history for an artifact — snapshot on each save, roll back, compare two moments. |
+| `onboarding-ux` | Паттерны первого запуска: welcome, tour, empty-states. |
+| `perf-audit` | Lighthouse в headless перед публикацией страницы: LCP, CLS, TBT, размер бандла, конкретные советы. |
+| `proto-smoketest` | Smoke-тесты прототипа: 5-10 критичных путей не отвалились, не unit. |
+| `screenshot-test` | Pixel-diff скриншота с эталоном в репо — падает при визуальной поломке; CI/pre-commit. |
+| `verifier` | Готовый файл в headless перед сдачей: console-ошибки, скриншот, матрица проверок. |
+| `version-snapshots` | Копии одного файла в .snapshots/ + MANIFEST.md — откат правки без git. |
 
 ### Agents
 

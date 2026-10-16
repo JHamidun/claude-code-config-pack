@@ -179,7 +179,7 @@
         -40
       ],
       "parameters": {
-        "jsonSchemaExample": "{\"contact_info\": \n{\n\"first name\": \n\"Thomas\",\n\"last name\": \"Vie\",\n\"position\": \n\"CTO\",\n\"company\": \n\"Pollup Data Services\",\n\"email\": \n\"Thomas@pollup.net\",\n\"phone\": \n\"+34 673626552\",\n\"website\": \n\"{{ $env.WEBHOOK_URL }}\",\n\"address\": \n{\n\"street\": \n\"Oppelner Str. 32\",\n\"postal_code\": \n\"10997\",\n\"city\": \n\"Berlin\",\n\"country\": \n\"Germany\"\n}}}"
+        "jsonSchemaExample": "{\"contact_info\": \n{\n\"first name\": \n\"Thomas\",\n\"last name\": \"Vie\",\n\"position\": \n\"CTO\",\n\"company\": \n\"Pollup Data Services\",\n\"email\": \n\"REPLACE_ME@example.com\",\n\"phone\": \n\"+34 673626552\",\n\"website\": \n\"{{ $env.WEBHOOK_URL }}\",\n\"address\": \n{\n\"street\": \n\"Oppelner Str. 32\",\n\"postal_code\": \n\"10997\",\n\"city\": \n\"Berlin\",\n\"country\": \n\"Germany\"\n}}}"
       },
       "typeVersion": 1.2,
       "notes": "This outputParserStructured node performs automated tasks as part of the workflow."
@@ -321,7 +321,7 @@
       "parameters": {
         "width": 460,
         "height": 200,
-        "content": "## Contact me\n- If you need any modification to this workflow\n- if you need some help with this workflow\n- Or if you need any workflow in n8n, Make, or Langchain / Langgraph\n\nWrite to me: [thomas@pollup.net](mailto:thomas@pollup.net)"
+        "content": "## Contact me\n- If you need any modification to this workflow\n- if you need some help with this workflow\n- Or if you need any workflow in n8n, Make, or Langchain / Langgraph\n\nWrite to me: [REPLACE_ME@example.com](mailto:REPLACE_ME@example.com)"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."

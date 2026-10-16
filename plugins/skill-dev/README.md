@@ -8,16 +8,17 @@ Part of the **[hamidun marketplace](../../README.md)**.
 
 | Skill | What it does |
 |-------|--------------|
-| `claude-api` | Anthropic Claude API (ANTHROPIC_API_KEY) из Python: text, vision, tool use, streaming. |
+| `claude-api` | Claude API из Python по ключу ANTHROPIC_API_KEY: vision, tool use, batch. |
 | `claude-cli-runner` | Запуск Claude из Python БЕЗ API-ключа — claude CLI по подписке; модуль claude_cli.py. |
-| `content-policy` | What NOT to reproduce — protected UI of big companies, unverified brands. The legal and ethical boundary. |
+| `content-policy` | Что НЕ воспроизводить: защищённые UI крупных продуктов, бренды, шрифты, brand-цвета. |
 | `context-engineering` | Оптимизация контекста LLM: progressive disclosure, компрессия, structured references. |
-| `llm-evals` | Evaluate LLMs and agents — golden sets, two-tier grading (programmatic metrics + LLM judge), model sweeps, keep/rollback verdicts. |
+| `llm-evals` | Эвалы LLM/агентов: golden-set, LLM-судья + метрики, вердикт keep/rollback, свип моделей и effort. |
 | `mcp-builder` | Разработка MCP-серверов (Python FastMCP / TS SDK) и дизайн инструментов агента. |
 | `prompt-engineering` | Промпт-инжиниринг: системные промпты, few-shot, structured outputs. |
 | `sharing-skills` | Отправка своего навыка в upstream-репозиторий через PR: ветка, коммит, пуш. |
 | `skill-creator` | Создание, правка и эвалы навыков, оптимизация description. |
-| `tool-search-protocol` | Don't refuse an MCP/connector capability outright — search via tool_search first; the tool may exist but be hidden. |
+| `tool-search-protocol` | До отказа «нет интеграции» с Slack/Drive/Linear — сначала поиск инструмента через ToolSearch и claude mcp list. |
+| `web-to-cli` | CLI для сервиса без API и MCP по трафику своей сессии: карта API, клиент с doctor и dry-run. |
 
 ### Agents
 

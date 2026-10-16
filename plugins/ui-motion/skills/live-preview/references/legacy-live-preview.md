@@ -1,6 +1,8 @@
 <!-- LEGACY: полное тело скилла 'live-preview' из старого дерева ~/.claude/tools/claude-code-skills (@2026-04-30).
      Сохранено при консолидации деревьев design-пака 2026-07-18 (lossless-merge, канон deep-read-before-merge).
-     Актуальный канон — ../SKILL.md; здесь — расширенный материал прежней версии (таблицы, рецепты, антипаттерны). -->
+     Актуальный канон — ../SKILL.md; здесь — расширенный материал прежней версии (таблицы, рецепты, антипаттерны).
+     ⚠ Файла `scripts/dev-server.js` в скилле НЕТ и не было: ниже это подпись к коду, который приведён
+     тут же целиком. Рабочий скрипт сегодня — `../templates/live.mjs` (проверено 22.08.2026). -->
 
 ---
 name: live-preview
@@ -155,7 +157,10 @@ cloudflared tunnel --url http://localhost:8080
 ## Когда НЕ использовать
 
 - Прототип finalize'нут, экспорт в standalone-html → больше не нужен dev server
-- Артефакт не имеет live итераций (single static cover) → просто `open file`
+- Артефакт не имеет live итераций (single static cover) → просто открыть файл в браузере:
+  `open file` (macOS) · `xdg-open file` (Linux) · `start file` (Windows) ·
+  `cmd //c start file` (Git Bash). Кросс-платформенно:
+  `python -c "import webbrowser,sys; webbrowser.open(sys.argv[1])" file`
 - В CI / headless env → используй verifier, не live-preview
 
 ## Stack

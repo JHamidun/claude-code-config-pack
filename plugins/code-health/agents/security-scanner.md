@@ -146,8 +146,8 @@ When invoked, you must follow these steps systematically:
 ### Phase 5: RLS Policy Validation (Supabase)
 12. **CRITICAL**: Check Supabase RLS policies:
    ```bash
-   # Supabase MCP (configured in .mcp.json)
-   # Use MCP tools for RLS policy checks
+   # No Supabase MCP ships with the pack: read RLS policies from the repo's
+   # SQL migrations, or run checks via psql / the project's own client
    ```
 
 13. Verify all tables have RLS enabled:

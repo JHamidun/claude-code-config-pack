@@ -12,6 +12,13 @@ description: "Диаграмма PNG/JPG → редактируемый DrawIO X
 > **Локальная установка:** `~/Edit-Banana/`
 > **venv:** `~/Edit-Banana/.venv/` (Python 3.11, uv)
 
+> ⚠️ **Пути в примерах ниже записаны в Windows-раскладке venv.** Интерпретатор внутри
+> venv лежит по-разному: Windows — `.venv/Scripts/python.exe`, macOS и Linux —
+> `.venv/bin/python`. Везде дальше по файлу читай `Scripts/python.exe` как
+> `bin/python`, если ты не на Windows; иначе получишь `No such file or directory` при
+> полностью собранном venv и пойдёшь переустанавливать то, что уже стоит.
+> Обёртка `scripts/edit-banana.sh` обе раскладки проверяет сама.
+
 ## Что делает
 
 Превращает статичные изображения диаграмм/таблиц/формул в редактируемые
@@ -38,7 +45,8 @@ DrawIO XML-файлы с сохранением:
 ```bash
 cd ~/Edit-Banana
 .venv/Scripts/python.exe main.py -i input/diagram.png
-# → output/diagram.xml (открыть в app.diagrams.net)
+# → output/diagram/diagram_merged.drawio.xml (открыть в app.diagrams.net)
+# ⚠️ Результат — ПАПКА output/<basename>/, а не файл output/<basename>.xml. Раскладка ниже.
 ```
 
 ### Batch processing
@@ -47,7 +55,7 @@ cd ~/Edit-Banana
 cd ~/Edit-Banana
 cp ~/Downloads/*.png input/
 .venv/Scripts/python.exe main.py
-# → output/*.xml для всех картинок из input/
+# → output/<basename>/<basename>_merged.drawio.xml для каждой картинки из input/
 ```
 
 ### Web API (FastAPI)
@@ -140,15 +148,16 @@ cp config/config.example.yaml config/config.yaml   # вписать GOOGLE_API_K
 Отдельно докачать:
 
 - [ ] **BPE vocab** → `models/bpe_simple_vocab_16e6.txt.gz`
-- [ ] **SAM3 веса** (`models/sam3_ms/sam3.pt`, ~4 GB) — с ModelScope, см. ниже
+- [ ] **SAM3 веса** (`models/sam3_ms/sam3.pt`, ~3,2 GiB) — с ModelScope, см. ниже
 - [ ] Tesseract — опционально, по умолчанию работает PaddleOCR
 
 ### Если SAM3 веса не докачались
 
 ```bash
 ~/Edit-Banana/.venv/Scripts/python.exe -c "
+import os
 from modelscope import snapshot_download
-snapshot_download('facebook/sam3', cache_dir='${HOME}/Edit-Banana/models_ms_cache', allow_patterns=['sam3.pt'])
+snapshot_download('facebook/sam3', cache_dir=os.path.expanduser('~/Edit-Banana/models_ms_cache'), allow_patterns=['sam3.pt'])
 "
 # → переместить файл в models/sam3_ms/sam3.pt
 mv ~/Edit-Banana/models_ms_cache/facebook/sam3/sam3.pt ~/Edit-Banana/models/sam3_ms/
@@ -198,8 +207,15 @@ cd ~/Edit-Banana && .venv/Scripts/python.exe scripts/setup_rmbg.py
 
 ```bash
 bash ~/.claude/skills/edit-banana/scripts/edit-banana.sh path/to/diagram.png
-# → результат в ~/Edit-Banana/output/
+# → результат в ~/Edit-Banana/output/<basename>/<basename>_merged.drawio.xml
 ```
+
+⚠️ **Второй аргумент `[output_dir]` у обёртки не работает** (проверено 22.08.2026).
+Блок «Move output if different dir» в скрипте копирует `output/<basename>.xml` — файла с таким
+именем pipeline не создаёт (он кладёт папку `output/<basename>/`), ошибка глушится через `|| true`,
+и финальный `echo` печатает «✅ Done. Output: …» на несуществующий путь. Пока это
+не починено в самом `edit-banana.sh`, вызывай обёртку **с одним аргументом** и бери
+результат из `~/Edit-Banana/output/<basename>/`.
 
 ## Триггеры (routing)
 

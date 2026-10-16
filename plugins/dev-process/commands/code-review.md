@@ -1,9 +1,17 @@
 ---
-description: Комплексный code review с проверкой всех аспектов
-argument-hint: [file path или PR number]
+description: Комплексное ревью кода ИЛИ документа (PRD, спека) — чеклист + профильные агенты
+argument-hint: [file path / PR number / document path]
 ---
 
 # Code Review: $ARGUMENTS
+
+## 0. Определи тип объекта ревью
+
+**Документ (PRD, спека, roadmap, design doc)** → раздел «Ревью документов» в конце — код-чеклист ниже не нужен.
+**Код (файл, PR, ветка)** → продолжай по разделам 1-6; при необходимости подключай агентов:
+- @code-reviewer: Code quality, standards, best practices
+- @security-engineer: Security vulnerabilities
+- @software-architect: Architecture compliance
 
 ## 1. Структурный анализ
 
@@ -144,3 +152,36 @@ node --prof $ARGUMENTS
 **Final Score:** [Оцени от 1 до 10]
 
 **Summary:** [Краткий вердикт и ключевые моменты]
+
+---
+
+## Ревью документов (PRD, спеки, roadmap)
+
+Подключи профильных агентов:
+- @business-analyst: Requirements clarity and completeness
+- @software-architect: Technical feasibility (режим ANALYSIS)
+- @product-designer: UX considerations
+
+### Структура фидбека (для кода и документов)
+
+**Strengths**
+- What's done well
+- Good practices observed
+
+**Issues Found**
+- CRITICAL: Must fix before proceeding
+- HIGH: Should fix soon
+- MEDIUM: Nice to fix
+- LOW: Minor improvements
+
+**Suggestions**
+- How to improve
+- Alternative approaches
+- Best practices to follow
+
+**Action Items**
+- Specific next steps
+- Priority order
+- Assigned to whom
+
+Provide structured, actionable feedback.

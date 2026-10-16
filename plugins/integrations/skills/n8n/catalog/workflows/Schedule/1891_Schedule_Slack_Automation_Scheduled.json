@@ -120,8 +120,8 @@
         "calendar": {
           "__rl": true,
           "mode": "list",
-          "value": "john@iKemo.io",
-          "cachedResultName": "john@iKemo.io"
+          "value": "REPLACE_ME@example.com",
+          "cachedResultName": "REPLACE_ME@example.com"
         },
         "operation": "getAll",
         "descriptionType": "manual",

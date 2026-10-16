@@ -1,5 +1,10 @@
 # check-skill-solo
 
+> **README.md и install.sh — раздаточный пакет для ЧУЖОЙ машины, а не часть рабочего навыка.**
+> Здесь навык уже установлен, и машина — Windows, а `install.sh` заявлен «macOS and Linux».
+> Запуск его на месте бесполезен: `SRC_DIR` совпадёт с `DEST`, и `cp SKILL.md` на самого себя
+> упадёт под `set -e`. Рабочий вход — сам `SKILL.md`; инструкции ниже адресованы получателю пакета.
+
 A Claude Code skill that fact-checks claims, numbers, citations, and AI output against
 **independent model families** (Claude + Gemini + GPT) and verifies every source URL
 mechanically (alive + exact quote present). Built to catch hallucinations — including the

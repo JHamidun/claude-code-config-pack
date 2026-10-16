@@ -5,9 +5,42 @@ description: "Perplexity веб-поиск и research с источниками
 
 # Perplexity AI API Skill
 
+<!-- no-key-block -->
+## Ни подписки, ни ключа — что тогда
+
+У этого навыка **нет бесплатного пути**. Оба способа ниже требуют денег:
+первый — активную подписку Perplexity Max (и её cookies, которые с паком не едут),
+второй — платный `PERPLEXITY_API_KEY`. Если нет ни того ни другого, навык не заработает,
+и лучше узнать это здесь, чем на 200-й строке.
+
+Чем заменить веб-research без Perplexity:
+
+| Нужно | Чем | Ключ |
+|-------|-----|------|
+| поиск с источниками | встроенный веб-поиск Claude Code | не нужен |
+| выкачать и разобрать страницы | плагин `firecrawl` (`firecrawl-search`, `firecrawl-scrape`) | свой, есть free tier |
+| живая выдача поисковика | `openserp` в Docker — навык `serpapi`, раздел «Локальная бесплатная альтернатива» | не нужен |
+| что обсуждают в соцсетях | навыки `last30days`, `reddit-hn` | не нужен |
+| фактчек утверждений | навык `check-skill-solo` (кросс-модельная проверка) | по моделям, которые уже настроены |
+
+**Ловушка про `PERPLEXITY_API_KEY`.** Фолбэк внизу файла создаёт клиент как
+`OpenAI(api_key=os.getenv('PERPLEXITY_API_KEY'), base_url="https://api.perplexity.ai")`.
+Если переменная не задана, а `OPENAI_API_KEY` в окружении есть — SDK **молча возьмёт
+его** и отправит чужой ключ на `api.perplexity.ai`. Ответ: голый `401`, без слова
+«perplexity» и без слова «ключ». Проверяй значение до создания клиента:
+
+```python
+key = (os.getenv('PERPLEXITY_API_KEY') or '').strip()
+if not key:
+    raise RuntimeError('PERPLEXITY_API_KEY не задан. Ключ — на perplexity.ai/settings/api; '
+                       'бесплатной альтернативы у этого навыка нет, см. таблицу выше.')
+```
+
 ## ⭐ ПРЕДПОЧТИТЕЛЬНЫЙ СПОСОБ: pplx-max.py через подписку Max
 
 **Используй pplx-max.py wrapper по умолчанию** — это даёт доступ к Claude Opus 4.7 Thinking + reasoning mode через подписку Perplexity Max (без API quota, без лимитов биллинга).
+
+> **Нет подписки Max — этот раздел не про тебя.** Wrapper работает на cookies залогиненного Max-аккаунта, без них он честно падает с кодом 1. Иди сразу в «Фолбэк: API-ключ» в конце файла: там платный, но обычный API. Всё остальное в навыке (batch-паттерн, фактчек, верификация цитат) применимо к обоим путям.
 
 ### Quick start
 
@@ -41,10 +74,14 @@ Output: answer text + numbered sources with URLs.
 - `gemini-3.1-pro`
 - `sonar-2`
 
-### Конфигурация (уже настроена)
+### Установка и конфигурация
 
 ```bash
-# В ~/.claude/.credentials.master.env
+pip install perplexity python-dotenv      # пакет helallao/perplexity-ai, класс Client
+```
+
+```bash
+# В ~/.claude/.credentials.master.env — свои cookies, с паком они не едут
 PERPLEXITY_COOKIES='{"__Secure-next-auth.session-token":"...","__cf_bm":"..."}'
 ```
 
@@ -69,6 +106,11 @@ nohup python ~/.claude/skills/perplexity/pplx-max.py "query 2" > /tmp/q2.log 2>&
 nohup python ~/.claude/skills/perplexity/pplx-max.py "query 3" > /tmp/q3.log 2>&1 &
 wait
 ```
+
+> Блок POSIX-ный целиком: `nohup`, фоновый `&`, `/tmp`, `2>&1`. На Windows он выполнится
+> в **Git Bash** (там есть и `nohup`, и `/tmp`) — но не в `cmd.exe` и не в PowerShell.
+> Нет Git Bash — ставится вместе с Git for Windows: `winget install Git.Git`.
+> Если `python` не находится, зови `python3` (и наоборот — см. врезку в `PREREQUISITES.md`).
 
 ---
 
@@ -154,8 +196,9 @@ python ~/.claude/skills/perplexity/scripts/sync_results.py /path/to/work_dir
 
 ### Гочеты
 
-- **UTF-8 на Windows**: pplx-max.py содержит `sys.stdout.reconfigure(encoding='utf-8')` — без этого падает на cp1251 при кириллице.
-- **Ответ — это generator/dict**: используется `stream=False` для возврата dict с ключом `answer`. Если `stream=True` — генератор chunks (последний chunk содержит финальный ответ).
+- **UTF-8 на Windows**: pplx-max.py оборачивает stdout/stderr в `io.TextIOWrapper(..., encoding='utf-8')` — без этого падает на cp1251 при кириллице.
+- **🚨 Текст ответа лежит НЕ в одном месте.** `stream=False` возвращает dict, но форма менялась: раньше текст был в `result['answer']`, теперь — в `result['blocks'][i]['markdown_block']['answer']` (иногда разбитый на `chunks`, иногда `answer` приходит JSON-строкой). Наивное `result.get('answer','')` на новой форме отдаёт пустую строку — и скрипт печатает пустоту с кодом 0, то есть **поломка неотличима от успешного пустого ответа**. `extract_answer()` в pplx-max.py перебирает все известные формы, а если не нашёл ни одной — печатает в stderr ключи верхнего уровня и выходит с кодом 3. Пустой stdout при exit 0 из этого скрипта означать не может ничего.
+- **exit-коды**: 1 — нет `PERPLEXITY_COOKIES` (или не стоит `python-dotenv`), 2 — ответ не dict, 3 — текст не извлёкся (чаще всего протухли cookies). В пайплайнах проверяй код, а не длину вывода.
 - **Pip пакет**: `perplexity` (helallao/perplexity-ai). Класс `Client` (не `Perplexity`!).
 - **Cookies формат**: JSON-объект. **Обязателен только `__Secure-next-auth.session-token`** — `__cf_bm` опционален и быстро устаревает.
 - **Производительность**: reasoning mode ~30-90s, pro mode ~10-30s, deep research ~60-180s.

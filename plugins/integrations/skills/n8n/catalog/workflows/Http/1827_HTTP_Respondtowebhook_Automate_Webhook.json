@@ -12,7 +12,7 @@
     "priority": "high",
     "environment": "production"
   },
-  "name": "Your CRM Chatbot Application Workflow example with Webhook Integration",
+  "name": "Bitrix24 Chatbot Application Workflow example with Webhook Integration",
   "tags": [
     "automation",
     "n8n",
@@ -23,7 +23,7 @@
   "nodes": [
     {
       "id": "ddd802bb-0da0-474d-b1e9-74f247e603e0",
-      "name": "Your CRM Handler",
+      "name": "Bitrix24 Handler",
       "type": "n8n-nodes-base.webhook",
       "position": [
         0,
@@ -461,7 +461,7 @@
   ],
   "active": true,
   "pinData": {
-    "Your CRM Handler": [
+    "Bitrix24 Handler": [
       {
         "json": {
           "body": {
@@ -542,7 +542,7 @@
           "headers": {
             "host": "orpheus-dev.h-gap.hu",
             "x-real-ip": "YOUR_PUBLIC_IP",
-            "user-agent": "Your CRM Webhook Engine",
+            "user-agent": "Bitrix24 Webhook Engine",
             "content-type": "application/x-www-form-urlencoded",
             "content-length": "3711",
             "accept-encoding": "gzip",
@@ -973,6 +973,6 @@
       ]
     }
   },
-  "description": "Automated workflow: Your CRM Chatbot Application Workflow example with Webhook Integration. This workflow processes data and performs automated tasks.",
-  "notes": "Excellent quality workflow: Your CRM Chatbot Application Workflow example with Webhook Integration. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
+  "description": "Automated workflow: Bitrix24 Chatbot Application Workflow example with Webhook Integration. This workflow processes data and performs automated tasks.",
+  "notes": "Excellent quality workflow: Bitrix24 Chatbot Application Workflow example with Webhook Integration. This workflow has been optimized for production use with comprehensive error handling, security, and documentation."
 }

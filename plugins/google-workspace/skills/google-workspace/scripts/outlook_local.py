@@ -123,7 +123,10 @@ def cmd_search(a) -> int:
     flt = f"@SQL=(\"{DASL[a.field]}\" like '%{q}%')"
     if a.days:
         import datetime as dt
-        since = (dt.datetime.now() - dt.timedelta(days=a.days)).strftime("%m/%d/%Y")
+        # ISO, а НЕ «мм/дд/гггг»: при русской локали Outlook читает «10/02/2026» как
+        # 10 февраля, и при дне месяца ≤ 12 --days молча отдавал почти весь ящик
+        # вместо последних дней. ISO читается одинаково при любой локали.
+        since = (dt.datetime.now() - dt.timedelta(days=a.days)).strftime("%Y-%m-%d")
         flt += f" AND (\"urn:schemas:httpmail:datereceived\" >= '{since}')"
     items = sorted_items(f).Restrict(flt)
     print(f"  поиск {a.field} ~ «{a.query}» в {f.Name}\n")

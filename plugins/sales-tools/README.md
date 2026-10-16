@@ -15,10 +15,10 @@ Part of the **[hamidun marketplace](../../README.md)**.
 | `daily-briefing` | Утренний sales-брифинг: встречи, сделки, приоритеты дня. |
 | `draft-outreach` | B2B-аутрич с рисёрчем проспекта: email + LinkedIn + Telegram, цепочки касаний под корп-ЛПР. |
 | `lead-research` | Свежий B2B-список лидов по ICP (РФ): discovery → ЛПР → скоринг Hot/Warm/Cold. |
-| `revops-ru` | RevOps across two motions — B2C self-serve (free→trial→paid) and B2B sales-led: data model, handoffs, pipeline hygiene. |
-| `sales-enablement-ru` | Sales collateral for B2B — decks, one-pagers, objection handling and proof material for workshops and consulting. |
-| `sales-team-ru` | Build and run a sales team — hiring, scripts, quotas, control, plus AI-driven call review for B2C and B2B. |
-| `tender-search-ru` | Find Russian procurement tenders (goszakupki) and shortlist contracts matching a product or company profile. |
+| `revops-ru` | RevOps: воронки B2C self-serve и B2B sales-led, скоринг, MQL/SQL-хэндофф, SLA; учёт в B2B-CRM. |
+| `sales-enablement-ru` | Sales-материалы B2B: питч-деки, one-pager, возражения, battle-cards, демо-скрипты. |
+| `sales-team-ru` | Отдел продаж: найм, мотивация, нормативы, скрипты, AI-разбор звонков. |
+| `tender-search-ru` | Russian procurement tender search via Playwright: geo-block workaround (zakupki -> rostender), OKPD2 filtering. |
 
 ### Commands
 

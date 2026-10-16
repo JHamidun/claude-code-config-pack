@@ -496,7 +496,7 @@
       "parameters": {
         "width": 720,
         "height": 100,
-        "content": "## Contact me\n### If you need some help with this workflow: Write to me: [thomas@pollup.net](mailto:thomas@pollup.net)\n"
+        "content": "## Contact me\n### If you need some help with this workflow: Write to me: [REPLACE_ME@example.com](mailto:REPLACE_ME@example.com)\n"
       },
       "typeVersion": 1,
       "notes": "This stickyNote node performs automated tasks as part of the workflow."
