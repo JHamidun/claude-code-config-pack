@@ -14,6 +14,7 @@
 | Реставрация фото | "реставрируй фото", "улучши старую фотку", "восстанови фото", "photo restoration", "шакальная фотка", "улучши качество фото" | Skill `nano-banana-pro` (раздел Photo Restoration) |
 | Видео аватар | "видео с аватаром", "аватар" | Skill `heygen` |
 | Видеомонтаж | "склей видео", "монтаж", "concat videos", "склейка", "видеоредактор", "наложи музыку на видео" | Skill `video-editor`, CLI: `python ~/.claude/skills/video-editor/video_editor.py` |
+| Интерактивные схемы-«машины» (anatomy) | "анатомия идеи", "схема как машина", "интерактивная изометрия", "изометрическая схема", "интерактивная инфографика", "объясни схемой как это работает", "запусти самолёты и монетки в автомат", "anatomy" | Skill `anatomy` (`/anatomy <идея>`; wheresryan22/anatomy@689dcf9, MIT): Figure 30–90 мин сразу, Hero 2–4 ч и Epic по слову пользователя; фигуры строить в `~/anatomy/<slug>/`, не в папке навыка; съёмка `node ~/.claude/skills/anatomy/scripts/capture.mjs <page.html> --out …`; происхождение: `skills/anatomy/UPSTREAM.md`. НЕ блок-схемы → `excalidraw-flowchart`; графики данных → `d3-visualization`; рисованное видео → `sketch-course-video` / `code-cartoon`; обновлять только через `skill-manager`, не `npx skills add` |
 | Мультик кодом (code-cartoon) | "мультик кодом", "мультики кодом", "рисованный мультик", "объясняющий мультик", "мультик про курс", "мультик про продукт", "3D-мультик", "цветной карандаш", "карандашная анимация", "анимация на двойках", "кипящие линии", "глянцевое 3D", "рисованный герой-стикер", "мел на доске", "стекло и хром", "ретро-растр", "коллаж из вырезок", "техно-частицы", "инфографика мультиком", "красная нить", "тушь", "акварельный мультик", "по методичке «Мультики кодом»" | Skill `code-cartoon` → `scripts/new_project.py <slug>` (проект `~/VideoJobs/<ГГГГ-ММ-ДД>-<slug>/`: engine/, pencil/, gloss/, timing/, render/, sound/, voice/); стиль по умолчанию — цветной карандаш; голос → `voice/voice.py` (ElevenLabs, свой голос — `ELEVENLABS_VOICE_ID`); превью → `render/send_preview.py`, только владельцу. НЕ sketch-course-video (там запись спикера), НЕ video-shotcraft (промо UI), НЕ video-generation (кадры рисует модель) |
 | Pro монтаж (toolkit) | "профессиональный монтаж", "смонтируй ролик", "докрути монтаж", "как у блогеров", "крутой монтаж" | Skill `video-editor` → `skills/video-editor/references/montage-toolkit.md` (индекс скриптов + правила ремесла) |
 | Вырезать паузы/тишину | "вырежи паузы", "убери тишину", "jump cut", "auto-editor", "убери эээ", "плотный монтаж" | `python ~/.claude/skills/video-editor/scripts/silence_cut.py in.mp4 out.mp4` |
@@ -25,6 +26,7 @@
 | Speed ramps | "слоумо", "ускорь видео", "slow motion", "speed ramp", "замедли момент", "ускорь скучное" | `python ~/.claude/skills/video-editor/scripts/speed_ramp.py in.mp4 out.mp4 --ramp "0:3:0.25,3:12:1.0"` |
 | Sound design | "звуковые эффекты", "whoosh", "sfx", "freesound", "подложи звук под переход", "приглуши музыку под голос" | `python ~/.claude/skills/video-editor/scripts/sfx.py search whoosh` / `place` / `duck` |
 | Соц-UI оверлеи | "соц-UI оверлей", "instagram оверлей на видео", "telegram баблы", "фейк лента", "как в том рилсе", "kinetic UI", "motion graphics на видео" | Skill `video-generation` → `skills/video-generation/references/remotion-overlays.md` + `skills/video-generation/scripts/motion_graphics.py` |
+| HTML→видео (HyperFrames) | "hyperframes", "видео из html", "gsap в mp4", "html-композиция в mp4", "порт remotion в html", "моушн на gsap" | Skill `hyperframes` (вендорский бандл HeyGen 0.8.98, 21 навык внутри, вход — его SKILL.md), CLI: `bash ~/.claude/skills/hyperframes/local/hf <cmd>`; НЕ проекты на Remotion → `video-shotcraft` / `sketch-course-video` |
 | VOID (удаление объектов) | "удали объект из видео", "remove object from video", "VOID", "video inpainting", "убери из видео", "video object removal" | Skill `void-video`, CLI: `python ~/.claude/skills/void-video/void_remove.py` |
 | Видео фабрика | "полный ролик", "video factory", "ролик под ключ", "сделай видео и выложи", "запиши и выложи" | Agent `video-factory` |
 | Озвучка | "озвучь", "голос", "TTS" | Skill `elevenlabs` |
@@ -32,10 +34,12 @@
 | Транскрипция | "транскрибируй", "распознай речь" | Command `transcribe` (обёртка), Skill `deepgram` (reference) |
 | База знаний | "найди в встречах", "kb", "knowledge base", "в истории" | Command `kb` |
 | Перевод | "переведи", "translate" | Command `translate` (обёртка), Skill `deepl-pro` (reference) |
-| Figma design | "сверстай из фигмы", "implement design" | Plugin `figma:implement-design` |
-| Figma connect | "code connect", "компоненты фигмы" | Plugin `figma:code-connect-components` |
+| Figma design | "сверстай из фигмы", "implement design" | Plugin `figma:figma-design-to-code` (плагина `figma` в паке нет — поставь из official marketplace и включи через `/plugin`) |
+| Figma connect | "code connect", "компоненты фигмы" | Plugin `figma:figma-code-connect` (плагин не входит в пак — сначала поставь и включи через `/plugin`) |
 | Баги | "найди баги", "ошибки" | Agent `bug-hunter` → `bug-fixer` |
 | Безопасность | "security", "уязвимости" | Agent `security-scanner` |
+| Codebase health (детект → фикс → верификация) | "прогони health по проекту", "почисти мёртвый код воркерами", "проверь и обнови зависимости", "найди дубли кода и сведи", "security-прогон с фиксами" | Command `/health bugs\|cleanup\|deps\|reuse\|security` → Skill `health-inline`; точечно — агенты из строк «Баги» … «Дубли фикс» ниже. Только отчёт без фиксов → skill `security-audit`; одна красная сборка → skill `build-fix` |
+| Ozon (покупки, только чтение) | "найди на озоне", "сравни на ozon", "стоит ли брать", "цена на озоне", "отзывы накручены", "накрутка отзывов", "за что ругают товар", "ozon.ru/product" | Skill `ozon-shopping` + MCP `ozon-shopping` (`ozon_search`/`ozon_product`/`ozon_reviews`/`ozon_compare`/`ozon_status`), то же из командной строки: `node ~/.claude/skills/ozon-shopping/scripts/ozon-audit.mjs {search|product|reviews|compare|health|setup}`. Сессию Ozon создаёт пользователь (`setup`, окно Chrome); покупок и кабинета продавца нет; НЕ `npx ozon-shopping-mcp` (в deny). Аудит, установка, откат — `skills/ozon-shopping/references/audit-and-install.md` |
 | Тесты | "напиши тесты" | Agent `test-writer` |
 | Деплой | "задеплой", "deploy" | Command `deploy` |
 | Last 30 Days | "last30", "за последние 30 дней", "что обсуждают", "тренды соцсетей", "social media research", "what's trending" | Skill `last30days` |
@@ -93,7 +97,7 @@
 | БД | "миграция", "schema", "SQL" | Command `setup-db` |
 | CI/CD | "pipeline", "docker" | Agent `devops-engineer` |
 | Презентация | "слайды", "презентация", "pitch deck", "whiteboard", "маркерная доска" | Agent `slide-designer`, Skill `manus-slides`, Command `slides` |
-| Manus Slides | "manus slides", "html slides", "html презентация" | Skill `manus-slides`, Command `slides` |
+| Manus Slides | "manus slides", "стили Manus", "тема Manus" | Skill `manus-slides` (⚠️ «html слайды/html slides» — НЕ сюда, это `slides`, строка ниже) |
 | Marp слайды | "marp", "slides from markdown", "слайды из markdown" | Skill `marp-presentations` |
 | Рефакторинг | "рефакторинг", "legacy" | Agent `legacy-modernizer` |
 | Performance | "оптимизируй", "медленно" | Agent `performance-optimizer` |
@@ -116,7 +120,7 @@
 | Презентация мастер | "мастер презентаций", "presentation master", "training program" | Agent `presentation-master` |
 | Product дизайн | "UX", "UI дизайн", "wireframe", "user flow", "accessibility" | Agent `product-designer` |
 | Промпт инженер | "промпт агент", "optimize prompt agent" | Agent `prompt-engineer` |
-| Корректура | "проверь текст", "корректура" | Agent `proofreader-ortho` → `proofreader-punctuation` → `proofreader-typography`, Command `proofread` |
+| Корректура | "проверь текст", "корректура" | Agent `proofreader` (3 прохода: орфография → пунктуация → типографика), Command `proofread` |
 | QA | "QA", "test strategy", "test automation" | Agent `qa-specialist` |
 | Security инженер | "security engineer", "secure coding", "compliance" | Agent `security-engineer` |
 | Senior dev | "напиши код", "implement feature", "production code" | Agent `senior-developer` |
@@ -140,6 +144,14 @@
 | GitHub доки | "документация репо", "deepwiki" | Skill `deepwiki` |
 | План дня | "спланируй день", "plan my day" | Command `plan-my-day` |
 | Диаграммы | "диаграмма", "flowchart", "excalidraw" | Skill `excalidraw-flowchart` |
+| 3D / CAD через MCP | "3д", "cad", "blender", "cadquery", "step", "stl", "рендер модели" | Claude в папке-воркспейсе с `.mcp.json` (шаблон — `templates/3d-workspace/`): MCP `cadquery` (мм; render/inspect/get_parameters/export) + `blender` (`*_for_cli`); STL в Blender со scale 0.001; сборка runtime — `templates/3d-workspace/SETUP.md` |
+| Семантический веб-поиск (Exa) | "найди людей/компании/статьи", "exa", "семантический поиск" | Плагин `exa@claude-plugins-official` (MCP web_search_exa, web_fetch_exa — **нужен OAuth**: `/mcp` → plugin:exa:exa → Authenticate, адрес плагина `?client=claude-code-plugin` без входа отвечает 401; навыки search, exa-agent). НЕ вместо perplexity/firecrawl — для людей, компаний, статей |
+| Схема Excalidraw в чате | "excalidraw схема", "нарисуй схему в excalidraw" | Сначала Skill `excalidraw-flowchart` (локально); MCP `excalidraw` (read_me/create_view/checkpoints). ⚠️ `export_to_excalidraw` публикует по публичной ссылке — стоит ask |
+| Miro для кода | "код-ревью PR на доске", "объясни кодбазу диаграммами в miro", "выгрузи спеки с доски" | Skill `miro` → `references/code-review|code-explain|code-spec` (нужен MCP `miro` после OAuth) |
+| Higgsfield-рецепты | "пресет higgsfield", "faceless-канал", "UGC-ролик", "обложка через higgsfield", "сайт на higgsfield" | `skills/video-generation/engines/higgsfield/references/mcp-app-skills/README.md` (17 рецептов, нужен MCP `higgsfield` после OAuth; без него работает CLI `hf` из того же движка). Тратит кредиты |
+| Рендер Office в картинки | "отрендери docx/pptx/xlsx", "как выглядит документ/дек", "визуальная проверка без LibreOffice", "пересчитай формулы и покажи" | `python ~/.claude/tools/office_render.py <file> --out <dir>` (Word/PowerPoint/Excel COM → PDF → PNG, JSON {pdf, pngs}); нужен установленный Microsoft Office (Windows), LibreOffice не нужен |
+| Отели (trivago) | "найди отель", "отели в", "где остановиться" | MCP `trivago` (без ключа, 3 инструмента поиска жилья) |
+| Видеомонтаж Descript / сайты Lovable (облако) | "descript", "underlord", "lovable" | MCP `descript` (api.descript.com/v2/mcp) и `lovable` (mcp.lovable.dev/mcp) — оба ждут OAuth: `/mcp` → Authenticate |
 | Мониторинг | "мониторинг", "uptime", "статус-страница" | Навыка-обёртки над Uptime Kuma в паке нет (был написан под конкретный сервер). Поднять свой: Uptime Kuma в docker, дальше Skill `webhook-receiver` для алёртов и Skill `n8n` для сценариев |
 | DNS/Домены | "DNS", "домен", "cloudflare" | Command `domain-dns-ops` |
 | Reddit/HN | "reddit", "hacker news", "мнения" | Skill `reddit-hn` |
@@ -179,7 +191,7 @@
 | Wireframe | "вайрфрейм", "wireframe", "грубый каркас", "структура без стиля", "lo-fi" | Skill `wireframe` |
 | Старт дизайн-проекта | "инициализация дизайн-проекта", "scaffold дизайн", "wizard старта" | Skill `design-orchestrator` (ведёт процесс с нуля) + Skill `questions-protocol` (вопросы до дизайна). Отдельный wizard `project-init` в пак НЕ входит: 7 из 7 функций scaffold были пустыми заглушками |
 | Moodboard | "moodboard", "мудборд", "извлеки палитру из картинок", "vibe-tags" | Skill `moodboard` |
-| Slides skill | "html слайды", "1920x1080 дек", "slides канва" | Skill `slides` |
+| Slides skill | "html слайды", "html slides", "html презентация", "1920x1080 дек", "slides канва" | Skill `slides` |
 | Interactive prototype | "кликабельный прототип", "react babel прототип", "interactive prototype" | Skill `interactive-prototype` |
 | Mobile overlays | "iOS клавиатура", "bottom sheet", "action sheet", "toast", "mobile UI overlay" | Skill `mobile-overlays` |
 | Tweaks panel | "крутилки в прототипе", "tweaks panel", "live tweaks", "слайдер для primary color" | Skill `tweaks-panel` |
@@ -209,16 +221,19 @@
 | Tweaks persist | "сохрани tweaks", "запиши обратно в tokens.css", "tweaks в localStorage" | Skill `tweaks-panel` (persist поглощён 2026-07-18, тело в references) |
 | Sketch to HTML | "из скетча в html", "whiteboard photo в каркас", "excalidraw в html" | Skill `sketch-to-html` |
 | HTML email | "newsletter html", "email html outlook gmail", "MJML", "transactional email" | Skill `html-email` |
+| Сертификаты и цифровые бейджи | "сертификаты группе", "именные сертификаты", "цифровой бейдж", "Open Badges", "Accredible" | Skill `cert-badge-factory` (PDF/PNG, три чекера вёрстки; выдача через API Accredible — опционально, под NO-KEY GUARD). НЕ слайды → `slides` |
+| Office-документы через CLI | "собери docx без Word", "найди проблемы в pptx", "график в xlsx", "сводная таблица" | Skill `officecli` (чужой навык iOfficeAI/OfficeCLI, Apache-2.0). Чтение и правка файла с формулами → `xlsx`; PDF → `pdf` |
 | PWA shell | "PWA обёртка", "install prompt", "manifest.json", "service worker offline" | Skill `pwa-shell` |
 | Outlook | "outlook", "exchange", "рабочая почта" | Command `outlook` |
+| Outlook на этом ПК (ветка, отложка, «Исходящие», календарь) | "аутлук", "ответь в ветке", "отложи отправку на утро", "что в исходящих", "слоты в календаре" | Skill `outlook-desktop` (Windows + классический Outlook, COM; всё исходящее только с `--yes`). НЕ: Gmail → `gmail`; чужой ящик → `email-imap` |
 | Multi-model | "спроси GPT", "ask GPT", "ask Gemini", "compare models", "cross-model", "consensus", "мульти-модель", "gateway models" | Skill `multi-model-gateway`, Agents: `gpt-agent`, `gemini-agent` |
 | AI модели | "replicate", "FLUX", "stable diffusion" | Skill `replicate` |
 | Аватар видео | "D-ID", "talking head" | Skill `did` |
 | Сервер | "сервер", "server health", "docker ps", "почему упало на сервере" | Навыки эксплуатации флота (`server-health`, `runbook`) в пак НЕ входят — они были написаны под конкретный хост, его контейнеры и порты. Поставляется: Skill `claude-server-auth` (Claude CLI на своём VPS). Свой чек-лист заводи навыком под хост из `~/.ssh/config` — как, см. Skill `skill-creator` |
 | Презентация AI | "gamma", "AI презентация" | Skill `gamma` |
 | Slack | "slack", "напиши в slack" | Плагина `slack` в паке НЕТ — поставь из official marketplace |
-| Linear | "linear", "задачи linear", "issues" | Plugin `linear` (official MCP), также: Command `sprint-planning` |
-| AI ревью PR | "greptile", "AI review PR" | Plugin `greptile` |
+| Linear | "linear", "задачи linear", "issues" | Plugin `linear` (official MCP; в паке выключен), также: Command `sprint-planning`. Без плагина: `python ~/.claude/tools/linear_client.py {teams|issues|search|issue|create|states}` — нужен свой `LINEAR_API_KEY` (опционально), коннектор не нужен |
+| AI ревью PR | "greptile", "AI review PR" | Plugin `greptile` — ⚠️ MCP отдаёт 403, пока в окружении процесса нет `GREPTILE_API_KEY` (опционально, нужен свой аккаунт). Ревью PR без него: Agent `code-reviewer` / `/code-review` |
 | Tapestry (документы) | "tapestry", "weave", "свяжи документы", "interlink docs" | Skill `tapestry` (интерлинкинг внешних документов, YouTube, PDF) |
 | EPUB | "epub", "ebook", "электронная книга", "kindle" | Skill `epub-tools` |
 | Claude CLI | "claude CLI", "без API ключа", "without API key", "claude binary" | Skill `claude-cli-runner`, модуль `~/.claude/tools/claude_cli.py` |
@@ -270,6 +285,7 @@
 | Лиды | "lead research", "поиск лидов", "qualify leads" | Skill `lead-research` |
 | Manus | "manus agent", "autonomous agent", "manus task" | Skill `manus` |
 | MCP builder | "создай MCP", "build MCP server", "MCP сервер" | Skill `mcp-builder` |
+| Клиент для веб-сервиса без API | "сделай клиент для сервиса", "нет API, есть сайт", "CLI из веб-приложения", "клиент по трафику сайта" | Skill `web-to-cli` (карта API по трафику своей сессии → argparse-клиент с doctor и dry-run → таблица команд из кода; скрипты `scripts/{harvest,client_skeleton,gen_commands}.py`, справочники `references/{api-map-template,auth-map,troubleshooting}.md`; только своя учётка). НЕ MCP-сервер→mcp-builder; официальный API→agent `integration-dev` |
 | MCP usage | "как использовать MCP", "MCP tools", "какой MCP сервер" | Read `config/mcp-servers.md` — секция «Советы по выбору» (отдельного навыка нет, всё там) |
 | Анализ встреч | "анализ встречи", "meeting analysis", "action items" | Skill `meeting-analyzer` |
 | OCR восстановление | "OCR", "распознай скан", "garbled text" | Skill `ocr-restore` |
@@ -313,12 +329,12 @@
 | Context7 cloud | "context7 cloud", "docs library" | Cloud MCP `claude_ai_Context7` (resolve-library-id, query-docs) |
 | Sentry | "sentry", "ошибки production", "error monitoring" | Плагина `sentry` в паке НЕТ — поставь из official marketplace |
 | Semgrep | "semgrep", "static analysis", "SAST" | Плагина `semgrep` в паке НЕТ — поставь из marketplace; из коробки — skill `security-audit` |
-| Sourcegraph | "sourcegraph", "поиск по репо", "code search" | Plugin `sourcegraph` (sg-search, sg-file) |
+| Sourcegraph | "sourcegraph", "поиск по репо", "code search" | Plugin `sourcegraph` (sg-search, sg-file) — ⚠️ MCP падает при старте без `SOURCEGRAPH_ENDPOINT` (адрес своего инстанса). Поиск по своим репозиториям — Skill `codegraph` либо инструмент Grep |
 | Firecrawl | "firecrawl", "scrape URL", "crawl site", "extract web" | Plugin `firecrawl` (firecrawl-cli, skill-gen) |
 | CodeRabbit | "coderabbit", "AI review PR" | Plugin `coderabbit` (code-review) |
 | Adspirer Ads | "google ads agent", "meta ads agent", "keyword research" | Плагина `adspirer-ads-agent` в паке НЕТ — поставь из marketplace; из коробки — skills `google-ads-pro-ru`, `meta-ads-launch-ru` |
 | HuggingFace | "huggingface", "train model", "dataset HF", "gradio" | Плагина `huggingface-skills` в паке НЕТ — поставь из official marketplace |
-| Notion | "notion", "notion page", "notion database", "notion task" | Plugin `notion` (search, create-page, database-query, tasks) |
+| Notion | "notion", "notion page", "notion database", "notion task" | Plugin `notion` (search, create-page, database-query, tasks; в паке выключен). Без плагина: `python ~/.claude/tools/notion_client.py {search|page|db|create}` — нужен свой `NOTION_API_KEY` (опционально); страница должна быть открыта интеграции (в Notion «…» → Connections), иначе 404 |
 | Slack расширенный | "slack digest", "slack announcement", "slack standup" | Плагина `slack` в паке НЕТ — поставь из official marketplace |
 | Beads issues | "beads", "issue tracking", "баг-трекер" | Skill `beads`, Command `beads-init` |
 | Context Engineering | "context engineering", "контекст инжиниринг" | Skill `context-engineering` |
@@ -329,16 +345,16 @@
 | Defense in Depth | "validation layers", "defense in depth" | Плагин `superpowers:systematic-debugging` (defense-in-depth = его reference) |
 | Privacy Filter / Обезличивание | "обезличь текст", "деперсонализация", "убери персональные данные", "privacy filter", "opf", "redact PII", "найди ПД", "обезличить перед отправкой в GPT", "де-идентификация", "вырежи имена/телефоны/адреса" | Skill `privacy-filter` (локальная on-device модель openai/privacy-filter, обратимое обезличивание + fine-tune RU) |
 | GTD | "GTD", "todoist", "getting things done" | Command `gtd` |
-| Figma library | "figma library", "design system figma", "figma tokens" | Plugin `figma:figma-generate-library` |
-| Figma write | "write to figma", "push to figma", "create in figma" | Plugin `figma:figma-generate-design` + `figma:figma-use` |
+| Figma library | "figma library", "design system figma", "figma tokens" | Plugin `figma:figma-generate-library` (плагин не входит в пак — сначала поставь и включи через `/plugin`) |
+| Figma write | "write to figma", "push to figma", "create in figma" | Plugin `figma:figma-generate-design` + `figma:figma-use` (плагин не входит в пак — сначала поставь и включи через `/plugin`) |
 | Voice mode | "голосовой режим", "voice", "диктовка", "push to talk" | `/voice` (CLI + VSCode, push-to-talk пробелом) |
 | Remote Control | "удалённый доступ", "remote", "с телефона", "веб сессия", "QR код" | `/remote` → URL claude.ai/code или QR-код (CLI + VSCode) |
-| Channels | "channels", "telegram channel", "discord channel", "управление через тг" | `claude --channels plugin:telegram@claude-plugins-official` |
+| Channels | "channels", "telegram channel", "discord channel", "управление через тг" | `claude --channels plugin:telegram@claude-plugins-official` — ⚠️ плагин `telegram` выключен, сперва включить через `/plugin` |
 | Loop | "повторяй", "loop", "каждые N минут", "мониторь", "следи" | `/loop 5m <prompt>`, дефолт 10 мин |
 | Schedule | "schedule", "cron", "запланируй агента", "по расписанию" | `/schedule` — cron-задачи для remote agents |
 | Цвет сессии | "цвет сессии", "color" | `/color` |
 | Переименовать сессию | "переименуй сессию", "rename session" | `/rename` |
-| Effort | "effort", "глубина ответа", "ultrathink", "думай глубже" | `/effort low\|medium\|high\|max\|auto`, `/model ultrathink` |
+| Effort | "effort", "глубина ответа", "ultrathink", "думай глубже" | `/effort low\|medium\|high\|xhigh\|max\|auto` (в `settings.json` стоит `xhigh`), `/model ultrathink` |
 | Fork/Branch | "форк", "ветка разговора", "branch", "эксперимент" | `/fork` или `/branch` — ответвление диалога |
 | Rewind | "откати", "rewind", "верни назад", "отмени изменения" | `/rewind` — откат кода и диалога к checkpoint |
 | Resume | "продолжи сессию", "resume", "восстанови" | `/resume` — восстановить предыдущую сессию |
@@ -362,8 +378,72 @@
 | Reload plugins | "обнови плагины", "reload plugins" | `/reload-plugins` — применить изменения плагинов без рестарта |
 | Keybindings | "горячие клавиши", "keybindings", "шорткаты" | `/keybindings` — настройка клавиатурных сокращений |
 | Memory | "память claude", "memory", "что запомнил" | `/memory` — управление auto-memory |
-| Model | "смени модель", "model", "переключи на opus" | `/model opus\|sonnet\|haiku`, `/model ultrathink` |
+| Model | "смени модель", "model", "переключи на opus" | `/model opus\|fable\|sonnet\|haiku`, `/model ultrathink` |
 | Plan | "план", "plan mode", "спланируй" | `/plan` — режим планирования |
 | Compact | "сожми контекст", "compact" | `/compact` — сжатие истории диалога |
 | Clear | "очисти", "clear", "начни заново" | `/clear` — полный сброс сессии |
 | Help | "помощь", "help", "команды" | `/help` — список всех команд |
+
+## Навыки без строки в роутинге
+
+Эти навыки существуют, но ни в `routing.md`, ни выше по этому файлу не
+упомянуты — то есть по описанию задачи их не найти. Список построен сверкой
+папки `skills/` с текстом обоих файлов маршрутизации; держать его в основном
+роутере нельзя — тот и так занимает почти половину бюджета правил.
+
+| Навык | О чём |
+|---|---|
+| `ad-benchmarks-ru` | Диагностика рекламных метрик по эталонам РФ: введи свои CPM/CTR/CPL/CPA → сверка с бенчмарками 6 каналов (Директ, Google, Telegram, VK, Meta, посевы)  |
+| `agent-swarm` | Рой из нескольких моделей на одну задачу, когда выводу надо ВЕРИТЬ: калибровка каждой линзы (пустой результат говорит о проверке, а не о предмете), опровержение вместо подтверждения, CRASH-SAFE-PROTOCOL дословно в промпт воркера. Механику `Workflow` не дублирует. Триггеры: «запусти рой», «несколькими моделями», «аудит роями» |
+| `ai-marketing-stack-ru` | AI-инструментарий МАРКЕТОЛОГА (не разработчика) — Cursor/Claude Code как сотрудник, vibe-coding вместо подрядчиков: разворачивает Marketing-OS (9 папо |
+| `ai-seo-agent-pipeline` | Программатическая AI-SEO фабрика: массовая генерация сотен SEO-страниц под длинный хвост через n8n+Perplexity+OpenAI; «1 запрос = 1 статья = 1 страниц |
+| `apple-developer` | Подпись (Developer ID) и нотаризация macOS-приложений/dmg БЕЗ Mac — весь цикл на Windows + браузере + CI. Использовать когда: «подпиши dmg», «нотаризу |
+| `autocad-com` | AutoCAD/GstarCAD/ZWCAD/BricsCAD/nanoCAD из Python через COM: чертежи, размеры, 3D-тела, листы. ⚠️ Только Windows; симптомы «RPC недоступен» и размер без текста разобраны в самом навыке |
+| `b2b-marketing-ru` | B2B-маркетинг playbook: (1) воронка TOFU/MOFU/BOFU вместо AIDA (ICP, intent); (2) Cold Outreach (5-блочное письмо, цепочка 4-7 касаний, email+LinkedIn |
+| `brand-extractor` | Вытащить цвета, шрифты, базовый копирайт из лендинга по URL. Через headless Playwright. |
+| `building-an-exo` | Консалтинговый reference ExO 3.0 / The Organizational Singularity (OpenExO) для AI-перестройки компании: Intelligence Stack, REWRITE-плейбук, Edge Twi |
+| `canonical-html` | Писать HTML канонически — закрытые теги, double-quotes, никаких implied-close. Чтобы инструменты могли править разметку без сюрпризов. |
+| `capi-no-code-setup` | Серверная передача событий (Conversions API / server-side) БЕЗ кода — Zapier/n8n/Albato + CRM (your CRM/Битрикс24): Meta CAPI (Event ID дедупликация), s |
+| `citp-research-ru` | CITP — карта «5 слоёв данных × 6 этапов воронки»: что собирать на этапе, откуда и чем. НЕ дизайн самой воронки → `funnel-design-ru` |
+| `claude-api` | Anthropic Claude API (ANTHROPIC_API_KEY) из Python: text generation, vision, tool use, streaming. Триггеры: «claude api», «вызови клода из кода», «ant |
+| `claude-design` | Работа с Claude Design (claude.ai/design) — AI-инструмент Anthropic для дизайн-мокапов. Skill покрывает workflow от мокапа до production code, структу |
+| `comparison-mode` | Diff между двумя HTML-файлами — DOM-разница, визуальная разница, side-by-side. Полезно для ревью. |
+| `config-health` | Здоровье СВОЕЙ конфигурации Claude Code: счётчики, битые ссылки, вес системного промпта, лимит памяти, живость MCP. Обёртка над шестью проверялками в `scripts/`, у которых до 05.09 не было ни одного вызывающего. НЕ чужой навык перед установкой → `skill-manager`; НЕ код проекта → `/health` |
+| `construction-agents` | Агенты-расчётчики для стройки: чертежи, раскладки, проверка по СП, сметы. Симптомы, которые он ловит: площадь и цена «на глаз», здание молча ужимается под запрос |
+| `content-policy` | Что НЕ воспроизводить — защищённые UI крупных компаний, бренды без подтверждения. Юридическая и этическая граница. |
+| `deepseek` | DeepSeek API (DEEPSEEK_API_KEY, deepseek-chat, OpenAI-совместимый эндпоинт) — кодогенерация, рефакторинг, reasoning, 128K контекст. Триггеры: deepseek |
+| `design-tokens-w3c` | Экспорт дизайн-токенов в формат W3C Design Tokens (DTCG). Совместимо со Style Dictionary, Token Studio, всеми современными tools. |
+| `developer-growth` | Оценка и развитие навыков разработчика — self-assessment матрица, анализ git-вклада, персональный план развития (PDP), карьерная лестница IC. Триггеры |
+| `doc-coauthoring` | Guide users through a structured workflow for co-authoring documentation. Use when the user wants to write documentation, proposals, technical specs,  |
+| `emil-design-eng` | This skill encodes Emil Kowalski's philosophy on UI polish, component design, animation decisions, and the invisible details that make software feel g |
+| `fonts-bundle` | Готовые блоки <link> для типовых пар шрифтов — Google Fonts с правильными весами и subset, плюс system-стек. |
+| `full-funnel-analytics-ru` | Сквозная (full-funnel) когортная маркетинг-аналитика на масштабе — решения по когортной выручке, а не CPL: когортная воронка, Predict LTV, дашборд. Тр |
+| `funnel-design-ru` | Проектирование маркетинговых воронок: дерево метрик CPM→CTR→CPL→CPA→LTV→CAC, 8 типов воронок (лид-магнит/tripwire/вебинар/бот/freemium), лиды A/B/C/D, |
+| `generate-report-header` | Create standardized report headers with metadata for all agent-generated reports. Use when generating bug reports, security audits, dependency reports |
+| `jtbd` | Advanced Jobs To Be Done (AJTBD): Job = задача, ради которой клиент нанимает продукт; сегментация по работам, не по демографии. Триггеры: «AJTBD», «JT |
+| `manychat-funnel-ru` | Автоворонки ManyChat «комментарий → автосообщение в директ» для Instagram/Facebook/Telegram: ключевое слово под Reels/постом → цепочка в директ → прог |
+| `market-selection-ru` | Выбор рынка перед запуском: цепочка «бизнес-модель → страна → TAM → конкуренты → CustDev», 20 вопросов фаундерам, расчёт TAM, «венчур vs lifestyle», к |
+| `marketing-decisions-ru` | Контур маркетинговых решений, когда непонятно ГДЕ проблема: гипотеза → тест, ABCDX, сегмент А. Триггеры «почему не растём», «маркетинг не работает» |
+| `marketing-masterminds-ru` | Разбор маркетингового кейса по методу мастермайнда: подбор прецедента из библиотеки 7 живых кейсов с цифрами (FMCG, HR-тех, недвижимость, TG-бот, гран |
+| `marketing-team-builder-ru` | Найм маркетинговой команды и карьера маркетолога (RU-рынок): карта 35 ролей + AI-роли (GTM engineer, vibe coders), активный сорсинг, тестовое, план 30 |
+| `media-planning-ru` | Стратегическое медиапланирование — «в какой канал вообще идти» ДО ad-playbook. (ROMI/ROAS/CPL/CPA), аукц. vs неаукц. каналы, матрица ниша×бюджет→канал |
+| `parse-git-status` | Parse git status output into structured data showing staged, modified, and untracked files. Use for pre-flight validation, checking clean working dire |
+| `pptx-import` | Распаковать PPTX как zip, прочитать XML слайдов, извлечь текст/картинки/координаты. Чтобы редактировать чужой дек как HTML. |
+| `project-bootstrap` | Заведение БОЛЬШОГО проекта по инженерной дисциплине: гейт размера → интервью → спека → git и GitHub → каркас docs → бэклог bd → CI → проверка онбординга на чистой копии. НЕ дизайн-скаффолд → `project-init`; разовую правку сюда не носить |
+| `react-pinning` | Закреплённые версии React/ReactDOM/Babel с integrity-хешами. Готовый блок script-тегов для interactive-prototype. |
+| `review-animations` | Reviews animation and motion code against a high craft bar derived from Emil Kowalski's design engineering philosophy. Default to flagging; approval i |
+| `rollback-changes` | Automatically rollback changes from failed workflow phases using changes log files. Use when workflows fail and need to restore previous state, includ |
+| `ru-text` | Качество русского текста: типографика, инфостиль, чистка канцелярита. НЕ орфография → `/proofread`; «звучит как ИИ» → `de-ai-ify` |
+| `run-quality-gate` | Execute quality gate validation with configurable blocking behavior. Use when running type-check, build, tests, lint, or custom validation commands in |
+| `sales-team-ru` | Построение и контроль отдела продаж B2C/B2B + AI-разбор звонков. Найм, контроль (РОПы, мотивация, нормативы, SLA, перелидоз), скрипты + критерии звонк |
+| `scaling-stage` | Letterbox-обёртка для контента фиксированного размера (видео, постеры, фиксированные мокапы). Аналог deck-stage для не-слайдов. |
+| `screen-labels` | Стейтить data-screen-label на каждом экране/слайде. Облегчает диалог "слайд 5 / экран Settings" и упрощает правки. |
+| `screenshot-test` | Pixel-diff между текущим и эталонным скриншотом. Падает, если артефакт визуально сломался. |
+| `sharing-skills` | Use when you've developed a broadly useful skill and want to contribute it upstream via pull request |
+| `sticker-pack-generator` | End-to-end Telegram sticker pack pipeline — static WEBP, animated VP9-alpha video, custom emoji packs. PNG-секвенции или AI-кадры, маски SAM2+rembg, V |
+| `storybook-bridge` | Экспорт component-playground в формат Storybook 7+ (CSF3). Чтобы команда с существующим Storybook смогла подхватить. |
+| `telegram-ads-pro-ru` | Платная реклама Telegram Ads (еврокабинет/тонкабинет): CPM-аукцион, Target Channels vs Target Users, топики, подбор каналов, RPP, воронки, омниканальн |
+| `tool-search-protocol` | Не отказывайся от MCP/connector-возможности сходу. Сначала ищи через `tool_search` — может, инструмент есть, но не виден. |
+| `validate-plan-file` | Validate that orchestrator plan files conform to expected JSON schema. Use before workers read plan files or after orchestrators create them to ensure |
+| `vk-ads-pro-ru` | VK Ads playbook — ручная работа в кабинете без надежды на алгоритм: запуск, оптимизация, масштабирование, парсинг аудиторий через Target Hunter, нотац |
+| `watch-video` | Агент «смотрит» видео — кадры с таймкодами + транскрипт, отвечает по тому, что ВИДНО на экране (слайды, UI, демо). Триггеры: «посмотри видео», «что по |

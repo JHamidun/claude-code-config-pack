@@ -29,6 +29,7 @@ GRAPH_DIR = HOME / ".claude" / "memory-graph"
 DB = GRAPH_DIR / "graph.db"
 
 LINK_RE = re.compile(r"\[\[([^\]|]+)")           # [[name]] или [[name|alias]]
+MDLINK_RE = re.compile(r"\]\(<?([^)\s>]+?\.md)>?(?:#[^)]*)?\)")  # [текст](файл.md)
 FM_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
 
 
@@ -36,7 +37,7 @@ def parse_note(path):
     """Вернуть (name, type, title, status, supersedes[list], links[list])."""
     txt = path.read_text(encoding="utf-8", errors="replace")
     name = path.stem
-    ntype, title, status, supersedes = "memory", "", "active", []
+    ntype, title, status, supersedes, superseded_by = "memory", "", "active", [], []
     m = FM_RE.match(txt)
     body = txt
     if m:
@@ -54,19 +55,35 @@ def parse_note(path):
         dm = re.search(r"^description:\s*(.+)$", fm, re.M)
         if dm:
             title = dm.group(1).strip().strip('"\'>')[:200]
-        # supersedes может быть [[id]] или список
-        for sup in re.findall(r"supersede[sd_by]*:\s*\[?\[?([^\]\n]+)", fm):
-            for tok in re.split(r"[,\s]+", sup):
-                tok = tok.strip().strip('[]"\'')
-                if tok and tok not in ("null", "none", "[]"):
-                    supersedes.append(tok)
+        # supersedes: [[id]] / id / YAML-список; ниже строки бывает пояснение прозой
+        # («[[x]] — только таблица …»), его слова — не id. superseded_by — ОБРАТНОЕ
+        # направление: раньше оба поля шли одним регэкспом, и `superseded_by: B` в
+        # старой заметке превращался в «старая заместила новую B».
+        for field, val in re.findall(r"^\s*(supersedes|superseded_by):[ \t]*(.*)$", fm, re.M):
+            vals = [val]
+            if not val.strip():  # YAML-список на следующих строках
+                tail = fm.split(f"{field}:", 1)[1].split("\n")[1:]
+                for line in tail:
+                    lm = re.match(r"^\s*-\s*(?:-\s*)?(.+)$", line)
+                    if not lm:
+                        break
+                    vals.append(lm.group(1))
+            for v in vals:
+                ids = re.findall(r"\[\[([^\]|]+)", v) or re.findall(r"(?<![\w-])([A-Za-z0-9][\w.-]*-[\w.-]+)", v)[:1]
+                for tok in ids:
+                    tok = tok.strip().strip('[]"\'')
+                    if tok and tok.lower() not in ("null", "none"):
+                        (supersedes if field == "supersedes" else superseded_by).append(tok)
     # заголовок из первого H1 если нет description
     if not title:
         h = re.search(r"^#\s+(.+)$", body, re.M)
         if h:
             title = h.group(1).strip()[:200]
     links = [l.strip() for l in LINK_RE.findall(body)]
-    return name, ntype, title, status, supersedes, links
+    # MEMORY.md и архивы индекса ссылаются обычными markdown-ссылками [текст](файл.md),
+    # а не [[wikilinks]]; без этого всё, на что указывает индекс, считалось сиротой.
+    links += [Path(t).stem for t in MDLINK_RE.findall(body) if "://" not in t]
+    return name, ntype, title, status, supersedes, superseded_by, links
 
 
 def build():
@@ -91,17 +108,21 @@ def build():
         if p.name in ("MEMORY.md",) or p.name.startswith("_"):
             # индекс и служебные (_ORPHANS_INDEX, _ops-archive) не как узлы, но их ссылки учтём отдельно
             pass
-        name, ntype, title, status, sup, links = parse_note(p)
-        parsed.append((p, name, ntype, title, status, sup, links))
+        name, ntype, title, status, sup, sby, links = parse_note(p)
+        parsed.append((p, name, ntype, title, status, sup, sby, links))
         notes[name] = (ntype, title, status, str(p), p.stat().st_mtime)
         alias.setdefault(p.stem, name)  # слаг -> канон-имя узла
         alias.setdefault(name, name)    # имя -> само
     # второй проход: рёбра с резолвом цели по alias (слаг ИЛИ frontmatter name -> канон-имя узла)
-    for p, name, ntype, title, status, sup, links in parsed:
+    seen_sup = set()
+    for p, name, ntype, title, status, sup, sby, links in parsed:
         for l in links:
             edges.append((name, alias.get(l, l), "link"))
-        for s in sup:
-            edges.append((name, alias.get(s, s), "supersedes"))
+        # одно ребро на пару: оба поля описывают один и тот же факт с двух сторон
+        for new, old in [(name, alias.get(s, s)) for s in sup] + [(alias.get(b, b), name) for b in sby]:
+            if (new, old) not in seen_sup:
+                seen_sup.add((new, old))
+                edges.append((new, old, "supersedes"))
     for name, (ntype, title, status, file, mt) in notes.items():
         con.execute("INSERT OR REPLACE INTO nodes VALUES(?,?,?,?,?,?)", (name, ntype, title, status, file, mt))
     con.executemany("INSERT INTO edges VALUES(?,?,?)", edges)
@@ -267,16 +288,58 @@ def _ingest_casebook(con):
     return nodes, edges
 
 
-def cases(sub):
-    """Список кейсов (сессий) по проекту/подстроке."""
-    con = _con()
-    rows = con.execute("""
+# Проекты записаны латиницей, а спрашивают по-русски: русское написание давало
+# 0 кейсов при десятках существующих под proj:<Name>. Подстановка включается ТОЛЬКО
+# когда прямой поиск ничего не нашёл — точный запрос она не портит.
+# Заполни своими проектами: русское написание (строчными) -> имя проекта в графе.
+RU_PROJECT_ALIASES = {
+    # "академия": "Academy",
+    # "новости": "News",
+}
+
+
+def _alias_terms(sub: str) -> list:
+    low = sub.lower()
+    out = []
+    for ru, lat in RU_PROJECT_ALIASES.items():
+        if ru in low and lat not in out:
+            out.append(lat)
+    return out
+
+
+def _cases_rows(con, sub):
+    return con.execute("""
         SELECT n.name, n.title FROM nodes n
         WHERE n.type='case' AND (n.title LIKE ? OR n.name IN (
             SELECT src FROM edges WHERE dst LIKE ? ))
         ORDER BY n.title DESC LIMIT 60""", (f"%{sub}%", f"proj:%{sub}%")).fetchall()
+
+
+def cases(sub):
+    """Список кейсов (сессий) по проекту/подстроке."""
+    con = _con()
+    rows = _cases_rows(con, sub)
+    used = sub
+    if not rows:
+        for term in _alias_terms(sub):
+            rows = _cases_rows(con, term)
+            if rows:
+                used = term
+                break
     for name, title in rows:
         print(f"  {title[:100]}  [{name}]")
+    if rows and used != sub:
+        print(f"  -- {len(rows)} кейсов (по «{used}» — «{sub}» латиницей не пишется)")
+        return
+    if not rows:
+        near = con.execute(
+            "SELECT DISTINCT dst FROM edges WHERE dst LIKE 'proj:%' ORDER BY dst LIMIT 200"
+        ).fetchall()
+        print("  -- 0 кейсов. Проекты в графе (имя пишется как здесь):")
+        for (d,) in near[:12]:
+            print(f"     {d[5:]}")
+        print("     … полный список: memory_graph.py hubs 40")
+        return
     print(f"  -- {len(rows)} кейсов")
 
 

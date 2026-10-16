@@ -1,5 +1,5 @@
 ---
-description: "Профилирование КОДА: cProfile, memory_profiler, node --prof, SQL/N+1. Триггеры: «медленный код»."
+description: "Профилирование КОДА: cProfile, memory_profiler, node --prof, SQL/N+1. Триггеры: «медленный код». НЕ маркетинг → /performance-report."
 argument-hint: "[путь к файлу/модулю | cpu|memory|io|all]"
 ---
 

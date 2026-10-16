@@ -5,6 +5,17 @@ argument-hint: [sprint name/number]
 
 # Sprint Planning: $ARGUMENTS
 
+> ⚠️ **Плагин `linear` выключен** в `settings.json` → `enabledPlugins`, значит
+> инструментов `mcp__linear__*` в сессии НЕТ. Не выдумывай их вывод и не
+> пересказывай «данные из Linear» по памяти — это тот самый PHANTOM CITATION из
+> `rules/quality-gates.md`.
+>
+> Два честных пути: **включить** плагин (`/plugin` → `linear@claude-plugins-official`)
+> либо взять локальный трекер **beads** — `bd list`, `bd ready`, `bd stats`
+> (если `bd` установлен, см. навык `beads`). Ниже читай «Linear» как «источник задач»,
+> каким бы он ни оказался; если источника нет вовсе — скажи об этом и спроси
+> данные, а не сочиняй velocity.
+
 ## 1. Подготовка (Pre-Planning)
 
 ### Собери данные из Linear

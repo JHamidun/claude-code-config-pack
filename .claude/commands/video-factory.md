@@ -1,5 +1,5 @@
 ---
-description: Full video production pipeline — from trends to YouTube in one command
+description: "Слэш-обёртка: запускает АГЕНТ video-factory (полный видеоконвейер тренды→YouTube). Сама ничего не производит — весь пайплайн у агента."
 argument-hint: "topic or 'auto' for trend-based selection"
 ---
 
@@ -24,3 +24,9 @@ Launch the Video Factory agent to produce a complete video.
 Topic: $ARGUMENTS
 
 Read the Agent `video-factory` definition and execute the full pipeline for the specified topic.
+
+Stage prompts live in Skill `video-factory-pipeline`: the six phases above are
+`references/youtube-pipeline.md`, and the eight-stage reel conveyor (brief →
+screenwriter → sound → storyboard → prompter → operator → editor → qc) is
+`references/stage-*.md`. In this pack the same roles are also available as short agents
+`vf-brief` … `vf-qc`; the stage file is the full working text of each role.

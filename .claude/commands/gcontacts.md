@@ -5,6 +5,13 @@ argument-hint: "[list <N> | search <запрос> | get <resourceName> | create 
 
 # Google Contacts Operations
 
+> ⚠️ Токена с правами People API на машине нет. Общий `google_oauth_token.json`
+> несёт ТОЛЬКО скоуп `drive` — People API с ним отдаёт 403 на первом же вызове.
+> Сначала завести отдельный `google_oauth_token_contacts.json` со скоупами
+> контактов (OAuth-прогон с `google_oauth_client.json`, тем же путём, каким
+> подняли `google_oauth_token_calendar.json`), и только потом идти по шагам ниже.
+> Пока токена нет — сказать владельцу об этом, а не пробовать общий.
+
 /gcontacts - Работа с Google Контактами
 
 ## Описание
@@ -27,7 +34,7 @@ import json
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-with open(os.path.expanduser('~/.claude/google_oauth_token.json'), 'r') as f:
+with open(os.path.expanduser('~/.claude/google_oauth_token_contacts.json'), 'r') as f:
     token_data = json.load(f)
 creds = Credentials.from_authorized_user_info(token_data)
 people = build('people', 'v1', credentials=creds)

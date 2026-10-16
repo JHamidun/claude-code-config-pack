@@ -6,6 +6,12 @@
 > 33 записи: 29 включены (`true`), 4 выключены (`false`: linear, notion,
 > pdf-viewer, telegram). Каталог ниже сгенерирован из этого списка; при
 > расхождении верь settings.json, не документу.
+>
+> Актуальное состояние — одной строкой:
+>
+> ```bash
+> python -c "import json,os;e=json.load(open(os.path.expanduser('~/.claude/settings.json')))['enabledPlugins'];print('\n'.join(('ON  ' if v else 'off ')+k for k,v in sorted(e.items())))"
+> ```
 
 ---
 
@@ -95,6 +101,19 @@
 `mintlify`, `zapier`, `adspirer-ads-agent`, `laravel-boost`, `legalzoom` — в
 старых версиях этого каталога значились как установленные; в паке их НЕТ.
 Нужен такой — `/plugin` → marketplace, а потом впиши строку в `enabledPlugins`.
+
+## Forks — when which one
+
+Таблицы выше говорят, что плагин делает; здесь — чем он отличается от соседних инструментов пака.
+
+| Плагин | Что даёт | Развилка |
+|--------|----------|----------|
+| `code-review` | Мультиагентное ревью PR со скорингом уверенности | Локальные правки до коммита → Agent `code-reviewer`; баги с фиксом → `/health-bugs` |
+| `pr-review-toolkit` | Пять узких агентов: комментарии, тесты, обработка ошибок, дизайн типов, упрощение | Берётся ПОД PR; агент `silent-failure-hunter` — единственный, кто ищет проглоченные ошибки |
+| `claude-security` | Глубокий скан уязвимостей роем + патч-файлы, которые применяешь сам | Отчёт без фиксов → skill `security-audit`; фикс на месте → `/health-security` |
+| `playwright` | Полная автоматизация браузера, E2E, скриншоты | Лёгкий заход с куками → skill `dev-browser`; быстрый headless-прогон для QA → skill `gstack` |
+| `frontend-design` | Продакшн-качество UI | Вкус до генерации → skill `design-taste`; финальный QA → `design-guardrails` |
+| `context7` | Свежие доки любой библиотеки | Скрипт `tools/context7_docs.py` делает то же без MCP — см. `rules/context7.md` |
 
 ## Summary by Source
 

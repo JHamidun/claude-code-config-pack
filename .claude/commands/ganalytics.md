@@ -1,9 +1,16 @@
 ---
-description: "Google Analytics 4: аккаунты, properties, отчёты по трафику (GA4 Data+Admin API). Триггеры: «GA4», «аналитика google», «трафик в GA»."
+description: "Google Analytics 4: аккаунты, properties, отчёты по трафику (GA4 Data+Admin API). Триггеры: «GA4», «аналитика google», «трафик в GA». НЕ Яндекс Метрика → yandex."
 argument-hint: "[accounts | properties | report <property_id>]"
 ---
 
 # Google Analytics (GA4) Operations
+
+> ⚠️ Токена с правами Analytics по умолчанию нет. Общий `google_oauth_token.json`
+> несёт ТОЛЬКО скоуп `drive` — GA4 Data и Admin API с ним отдают 403 на первом
+> же вызове. Сначала завести отдельный `google_oauth_token_analytics.json` со
+> скоупами Analytics (OAuth-прогон с `google_oauth_client.json`, тем же путём,
+> каким поднимается `google_oauth_token_calendar.json`), и только потом идти по
+> шагам ниже. Пока токена нет — сказать пользователю об этом, а не пробовать общий.
 
 /ganalytics - Работа с Google Analytics 4
 
@@ -26,7 +33,7 @@ import json
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-with open(os.path.expanduser('~/.claude/google_oauth_token.json'), 'r') as f:
+with open(os.path.expanduser('~/.claude/google_oauth_token_analytics.json'), 'r') as f:
     token_data = json.load(f)
 creds = Credentials.from_authorized_user_info(token_data)
 

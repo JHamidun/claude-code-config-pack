@@ -21,12 +21,12 @@ ROUTES = [
 
     # Code quality
     (r"проверь код|ревью|review", "Agent `code-reviewer`"),
-    (r"найди баг|ошибк|bug", "Agent `bug-hunter` → `bug-fixer`"),
-    (r"security|уязвимост|безопасност", "Agent `security-scanner`"),
+    (r"найди баг|ошибк|bug", "Command `/health bugs` (Skill `health-inline`)"),
+    (r"security|уязвимост|безопасност", "Command `/health security` (Skill `health-inline`)"),
     (r"напиши тест|write test", "Agent `test-writer`"),
-    (r"dead code|unused|мёртвый код", "Agent `dead-code-hunter`"),
-    (r"дублирован|duplicate", "Agent `reuse-hunter`"),
-    (r"dependenc|outdated|зависимост", "Agent `dependency-auditor`"),
+    (r"dead code|unused|мёртвый код", "Command `/health cleanup` (Skill `health-inline`)"),
+    (r"дублирован|duplicate", "Command `/health reuse` (Skill `health-inline`)"),
+    (r"dependenc|outdated|зависимост", "Command `/health deps` (Skill `health-inline`)"),
 
     # Dev
     (r"задеплой|deploy", "Command `deploy`"),
@@ -43,8 +43,8 @@ ROUTES = [
     (r"pipeline|docker|ci.?cd", "Agent `devops-engineer`"),
     (r"слайд|презентаци", "Agent `slide-designer`"),
     (r"проверь текст|корректур|proofread", "Command `proofread`"),
-    (r"рефакторинг|legacy", "Agent `legacy-modernizer`"),
-    (r"оптимизируй|медленно|performance", "Agent `performance-optimizer`"),
+    (r"рефакторинг|legacy", "Agent `senior-developer` (режим MODERNIZE)"),
+    (r"оптимизируй|медленно|performance", "Agent `web-quality` (режим PERF)"),
 
     # New skills (v8.0)
     (r"убери ии стиль|де-аифай|humanize text|ai.?жаргон", "Skill `de-ai-ify`"),

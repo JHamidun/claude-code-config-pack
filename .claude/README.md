@@ -8,10 +8,10 @@
 | Каталог / файл | Что это |
 |---|---|
 | `settings.json` | Живой конфиг Claude Code: env, permissions, hooks, enabledPlugins, mcpServers |
-| `rules/` | 18 правил поведения — авто-загружаются каждую сессию (+ `README.md` с их каталогом) |
-| `skills/` | 314 навыков (каталог: `skills/CATALOG.md`) |
-| `agents/` | 74 агента: 57 в корне + 17 воркеров в `health/`, `meta/`, `testing/` |
-| `commands/` | 155 slash-команд: 98 в корне + 57 в `gsd/` |
+| `rules/` | 20 правил поведения — авто-загружаются каждую сессию (+ `README.md` с их каталогом) |
+| `skills/` | 330 навыков (каталог: `skills/CATALOG.md`) |
+| `agents/` | 77 агентов: 59 в корне + 18 воркеров в `health/`, `meta/`, `testing/` |
+| `commands/` | 156 slash-команд: 99 в корне + 57 в `gsd/` |
 | `hooks/` | 8 hook-скриптов (+3 теста): подключён ОДИН — `guard.js`; рядом лежат два файла, из которых он собран, 4 GSD и звуковой сигнал Stop |
 | `tools/` | 28 универсальных Python-инструментов (почта, Figma, Miro, OSINT…) |
 | `scripts/` | Служебные скрипты: `config_lint.py`, `sanitize_config_secrets.py`, `setup_runtime.py`… |

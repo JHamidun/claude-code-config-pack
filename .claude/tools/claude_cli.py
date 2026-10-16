@@ -9,14 +9,14 @@ Usage:
     # Simple call
     result = claude("Translate to English: Привет мир")
 
-    # With model selection
-    result = claude("Fix this code", model="claude-sonnet-4-5")
+    # With model selection (alias always points at the latest snapshot)
+    result = claude("Fix this code", model="opus")
 
     # With system prompt
     result = claude(
         "Review this function",
         system="You are a senior Python developer",
-        model="claude-opus-4-6",
+        model="claude-opus-5",
     )
 
     # Streaming (yields chunks)
@@ -55,6 +55,11 @@ _CLI_SEARCH_PATHS = [
     str(Path.home() / ".npm-global" / "bin" / "claude"),
     str(Path.home() / "n" / "bin" / "claude"),
 ]
+
+# Single source of truth for the default model. An alias, not a pinned id: the CLI
+# resolves 'opus' / 'fable' / 'sonnet' to the current snapshot, so the string does
+# not go stale. Need a pinned one? Pass e.g. model="claude-opus-5".
+DEFAULT_MODEL = "sonnet"  # same class as the old pinned default, but never stale
 
 CLAUDE_CLI_PATH: Optional[str] = None
 for p in _CLI_SEARCH_PATHS:
@@ -139,7 +144,7 @@ def claude(
     prompt: str,
     *,
     system: str = "",
-    model: str = "claude-sonnet-4-5",
+    model: str = DEFAULT_MODEL,
     timeout: float = 300.0,
     max_tokens: int = 0,
     temperature: float = 0,
@@ -151,7 +156,7 @@ def claude(
     Args:
         prompt: User prompt (passed via stdin to avoid OS arg limits)
         system: System prompt (optional)
-        model: Model name (default: claude-sonnet-4-5)
+        model: Model name or alias (default: DEFAULT_MODEL)
         timeout: Timeout in seconds (default: 300)
         max_tokens: accepted for signature compatibility and IGNORED — the CLI has
             no output-token flag (see note below). Cap length in the prompt instead.
@@ -204,7 +209,7 @@ def claude_stream(
     prompt: str,
     *,
     system: str = "",
-    model: str = "claude-sonnet-4-5",
+    model: str = DEFAULT_MODEL,
     timeout: float = 300.0,
     allow_nested: bool = False,
 ) -> Iterator[str]:
@@ -286,7 +291,7 @@ async def claude_async(
     prompt: str,
     *,
     system: str = "",
-    model: str = "claude-sonnet-4-5",
+    model: str = DEFAULT_MODEL,
     timeout: float = 300.0,
     max_tokens: int = 0,
     output_format: str = "text",
@@ -315,7 +320,7 @@ def claude_json(
     prompt: str,
     *,
     system: str = "",
-    model: str = "claude-sonnet-4-5",
+    model: str = DEFAULT_MODEL,
     timeout: float = 300.0,
     allow_nested: bool = False,
 ) -> dict:
@@ -393,7 +398,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     prompt_text = sys.argv[1]
-    model_name = "claude-sonnet-4-5"
+    model_name = DEFAULT_MODEL
 
     if "--model" in sys.argv:
         idx = sys.argv.index("--model")

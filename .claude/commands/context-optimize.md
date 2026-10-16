@@ -16,11 +16,10 @@ argument-hint: "[тип задачи] \"<описание>\""
 
 2. **Собирает релевантный контекст** из multiple sources:
    - CLAUDE.md (project instructions)
-   - Memory MCP (previous context)
-   - Linear MCP (tasks)
-   - GitHub MCP (code history)
-   - Sentry MCP (errors)
-   - Filesystem MCP (codebase)
+   - Память: `/search-chats <вопрос>` (прошлый контекст)
+   - Задачи: `bd list` / `bd show <id>` (Beads — трекер репозитория)
+   - История кода: `git log`, `git blame`, `gh pr list` / `gh issue list`
+   - Кодовая база: Read / Grep / Glob
 
 3. **Оптимизирует token usage**:
    - Prioritizes by relevance

@@ -120,8 +120,12 @@ Criteria:
 ### Step 4: Save to Memory
 ```bash
 # Для каждого validated learning:
-python ~/.claude/tools/vector_memory.py learn "$LEARNING" "$CATEGORY"
+python ~/.claude/tools/search_chats.py learn "$LEARNING" "$CATEGORY"
 ```
+
+> Был `vector_memory.py learn` — он мёртв: тянет `qdrant_client`, чей импорт не
+> завершается, поэтому вызов не падает, а висит. Долгоживущее знание лучше класть
+> заметкой в `memory/` и переиндексировать `python ~/.claude/tools/search_chats.py index`.
 
 ### Step 5: Update Workflows (if applicable)
 ```
@@ -192,8 +196,8 @@ learning = {
     "session_id": "xxx"
 }
 
-# Save via vector_memory.py
-python ~/.claude/tools/vector_memory.py learn "{learning['content']}" "{learning['category']}"
+# Save via search_chats.py (vector_memory.py is dead — its qdrant import hangs)
+python ~/.claude/tools/search_chats.py learn "{learning['content']}" "{learning['category']}"
 ```
 
 ### Retrieval перед ответами

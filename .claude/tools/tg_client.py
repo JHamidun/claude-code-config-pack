@@ -24,6 +24,10 @@ import json
 import os
 import sys
 import io
+import fnmatch
+import re
+import errno
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -76,6 +80,48 @@ from telethon.tl.functions.account import UpdateProfileRequest
 from telethon.tl.functions.stories import GetPeerStoriesRequest
 from telethon.tl.types import ChatBannedRights
 
+# ========== TELETHON 1.45+ COMPATIBILITY (DialogCommunity) ==========
+# Telethon 1.45 (layer 228+) may receive a `dialogCommunity` entry in the dialog list. Its class has
+# none of the fields iter_dialogs() reads (peer, top_message, folder_id, unread_*, draft, pts), so
+# iter_dialogs() / get_dialogs() die with AttributeError as soon as the account belongs to a
+# community: `dialogs`, `unread` and every script that lists chats. guard_community_dialogs() gives
+# the class the missing fields (a community is addressed like a channel). It only adds what is
+# missing, so it is harmless on Telethon 1.44 (no such class) and after a Telethon release that
+# copes by itself.
+
+def guard_community_dialogs(types_module=None):
+    """Make DialogCommunity usable by iter_dialogs(); True when this call added anything to the class.
+
+    Idempotent. Never raises: a failure here must not stop the client from starting."""
+    try:
+        if types_module is None:
+            from telethon.tl import types as types_module
+        community = getattr(types_module, "DialogCommunity", None)
+        if community is None or getattr(community, "_tg_community_guard", False):
+            return False
+
+        class _CommunityPeer:       # no __set__: an instance attribute called "peer" would still win
+            def __get__(self, obj, owner=None):
+                return self if obj is None else types_module.PeerChannel(obj.community_id)
+
+        defaults = {
+            "peer": _CommunityPeer(), "top_message": 0, "folder_id": None, "unread_count": 0,
+            "unread_mentions_count": 0, "unread_reactions_count": 0, "unread_poll_votes_count": 0,
+            "draft": None, "pts": None,
+        }
+        changed = False
+        for name, value in defaults.items():
+            if not hasattr(community, name):
+                setattr(community, name, value)
+                changed = True
+        community._tg_community_guard = True
+        return changed
+    except Exception:
+        return False
+
+
+guard_community_dialogs()
+
 SESSION_PATH = str(Path.home() / ".claude" / "telegram_session")
 DOWNLOAD_DIR = str(Path.home() / ".claude" / "downloads")
 
@@ -101,6 +147,89 @@ def get_api_credentials():
     return api_id, api_hash
 
 
+def _env_says_off(name, environ=None):
+    """True when the variable is 0 / false / no / off (any case); unset, empty and anything else mean on."""
+    env = os.environ if environ is None else environ
+    return (env.get(name) or "").strip().lower() in ("0", "false", "no", "off")
+
+
+# ========== INCOMING TEXT CLEANING (TG_SANITIZE) ==========
+# Everything this tool prints from a chat was written by someone else, and an agent reads it as
+# context. Some Unicode characters are invisible or change how text is shown, so a person sees
+# "hello" while the model reads a hidden instruction: Unicode tag characters (U+E0000-E007F) spell
+# ASCII invisibly, bidi overrides and isolates (U+202A-202E, U+2066-2069) reorder what is displayed,
+# zero-width characters (U+200B, U+2060, U+FEFF) and control codes hide or split words.
+# clean_incoming_text() removes exactly those and turns U+2028 / U+2029 into a line feed. It keeps
+# what carries meaning: ZWJ U+200D and the variation selectors (emoji sequences), ZWNJ U+200C
+# (Persian), LRM / RLM / ALM U+200E U+200F U+061C (right-to-left text), tab, CR and LF, and the
+# flags of England, Scotland and Wales (an emoji written with tag characters). Text without any of
+# the removed characters comes back unchanged (same string, byte for byte).
+# Wired into message_text() (so into every command that reads messages, and export-chat),
+# fmt_user() (names), fmt_media() (file names, poll and link titles) and the dialog names printed by
+# `dialogs` and `unread`. NOT covered: chat titles and bios printed by other commands, the URLs of
+# `links`. When something was removed, main() prints one line to stderr at the end of the run.
+# TG_SANITIZE=0 (or false / no / off) turns the cleaning off; any other value leaves it on.
+
+SANITIZE_ENV = "TG_SANITIZE"
+_HIDDEN_CLASS = (
+    r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f"     # C0 controls except tab, LF, CR; DEL; C1 controls
+    r"\u200b\u2060\ufeff"                       # zero-width space, word joiner, BOM / zero-width no-break space
+    r"\u202a-\u202e\u2066-\u2069"               # bidi embeddings, overrides and isolates
+    r"\U000e0000-\U000e007f]"                   # Unicode tag characters
+)
+_TAG_FLAGS = (                                  # the only tag sequences that are real text: three emoji flags
+    "\U0001F3F4\U000E0067\U000E0062\U000E0065\U000E006E\U000E0067\U000E007F",   # England  (gbeng)
+    "\U0001F3F4\U000E0067\U000E0062\U000E0073\U000E0063\U000E0074\U000E007F",   # Scotland (gbsct)
+    "\U0001F3F4\U000E0067\U000E0062\U000E0077\U000E006C\U000E0073\U000E007F",   # Wales    (gbwls)
+)
+_HIDDEN_RE = re.compile("(" + "|".join(re.escape(flag) for flag in _TAG_FLAGS) + ")|" + _HIDDEN_CLASS)
+_LINE_SEPARATORS = {0x2028: "\n", 0x2029: "\n"}
+_SANITIZE_REMOVED = 0       # characters removed so far in this run
+_SANITIZE_REPORTED = False  # the stderr notice is printed once
+
+
+def clean_incoming_text(text):
+    """`text` without hidden or look-alike characters (see the section comment above).
+
+    Anything that is not a string, and the empty string, come back as they are."""
+    global _SANITIZE_REMOVED
+    if not isinstance(text, str) or not text or _env_says_off(SANITIZE_ENV):
+        return text
+    removed = 0
+
+    def drop(match):
+        nonlocal removed
+        if match.group(1) is not None:
+            return match.group(1)               # a tag-letter flag: keep it whole
+        removed += len(match.group(0))
+        return ""
+
+    cleaned = _HIDDEN_RE.sub(drop, text)
+    if not removed:
+        cleaned = text                          # nothing (or only whole flags) matched: hand back the same string
+    if "\u2028" in cleaned or "\u2029" in cleaned:
+        cleaned = cleaned.translate(_LINE_SEPARATORS)
+    _SANITIZE_REMOVED += removed
+    return cleaned
+
+
+def sanitize_notice():
+    """The stderr line for what clean_incoming_text() removed in this run, or None when nothing was."""
+    if _SANITIZE_REMOVED <= 0:
+        return None
+    return (f"removed {_SANITIZE_REMOVED} invisible/control characters from incoming text "
+            "(possible hidden instruction)")
+
+
+def report_sanitized():
+    """Print sanitize_notice() to stderr, once per run: later calls print nothing."""
+    global _SANITIZE_REPORTED
+    notice = sanitize_notice()
+    if notice and not _SANITIZE_REPORTED:
+        _SANITIZE_REPORTED = True
+        print(notice, file=sys.stderr)
+
+
 def fmt_date(dt):
     if dt is None:
         return ""
@@ -111,18 +240,23 @@ def fmt_user(user):
     if user is None:
         return "Unknown"
     parts = []
-    if user.first_name:
-        parts.append(user.first_name)
-    if user.last_name:
-        parts.append(user.last_name)
+    for part in (user.first_name, user.last_name):
+        part = clean_incoming_text(part) if part else part
+        if part:
+            parts.append(part)
     name = " ".join(parts) or "NoName"
     if user.username:
-        name += f" (@{user.username})"
+        name += f" (@{clean_incoming_text(user.username)})"
     return name
 
 
 def fmt_media(msg):
-    """Describe media type in a message."""
+    """Describe media type in a message (file names and titles in it are cleaned like any incoming text)."""
+    return clean_incoming_text(_describe_media(msg))
+
+
+def _describe_media(msg):
+    """Describe media type in a message, as the sender wrote it."""
     if not msg.media:
         return ""
     if isinstance(msg.media, MessageMediaPhoto):
@@ -158,6 +292,369 @@ def fmt_media(msg):
     return f"[MEDIA: {type(msg.media).__name__}]"
 
 
+# ========== RICH MESSAGES (read side) ==========
+# A "rich" post has no plain `message` text: its body is a tree of Instant-View style blocks in
+# `Message.rich_message` (Telethon >= 1.44, layer 227). `msg.text` is therefore empty and every
+# command that printed it showed such posts (long posts included) as a blank.
+# message_text() is the one place that turns them into text. It dispatches on class NAMES, not
+# isinstance, and falls back to a generic walk over the known text-bearing fields, so a Telethon
+# upgrade that adds a block type degrades to "less text", never to an exception.
+
+RICH_TEXT_MAX_CHARS = 20000   # cap on the text returned for one rich message
+RICH_MAX_DEPTH = 40           # blocks nested inside blocks
+RICH_MAX_NODES = 20000        # work budget per message (a corrupt or hostile tree must not spin)
+
+_RICH_MEDIA_MARKERS = {
+    "PageBlockPhoto": "[photo]",
+    "PageBlockVideo": "[video]",
+    "PageBlockAudio": "[audio]",
+    "PageBlockMap": "[map]",
+    "InputPageBlockMap": "[map]",
+    "PageBlockEmbed": "[embed]",
+}
+# Fields that hold text (RichText, PageCaption or a plain str) and fields that hold child nodes.
+_RICH_TEXT_FIELDS = ("title", "subtitle", "author", "text", "caption", "credit")
+_RICH_CHILD_FIELDS = ("blocks", "items", "rows", "cells", "articles")
+
+
+class _RichBudget:
+    """Counts visited nodes so that one message cannot make a read command run away."""
+
+    def __init__(self, nodes=RICH_MAX_NODES):
+        self.left = nodes
+
+    def spend(self):
+        self.left -= 1
+        return self.left >= 0
+
+
+def _rich_inline(node, budget, depth=0):
+    """Plain text of one RichText node (TextPlain, TextBold, TextConcat, ...); '' when unknown."""
+    if node is None or depth > RICH_MAX_DEPTH or not budget.spend():
+        return ""
+    if isinstance(node, str):
+        return node
+    name = type(node).__name__
+    try:
+        if name == "TextConcat":
+            return "".join(_rich_inline(t, budget, depth + 1) for t in (getattr(node, "texts", None) or ()))
+        if name == "TextCustomEmoji":
+            return getattr(node, "alt", "") or ""
+        if name == "TextMath":
+            return getattr(node, "source", "") or ""
+        inner = _rich_inline(getattr(node, "text", None), budget, depth + 1)
+        if name == "TextUrl":
+            url = getattr(node, "url", "") or ""
+            if url and url != inner:
+                return f"{inner} ({url})" if inner else url
+        return inner
+    except Exception:
+        return ""
+
+
+def _rich_caption(cap, budget, depth=0):
+    """PageCaption(text, credit) as 'caption - credit'; a bare RichText is accepted as well."""
+    if cap is None:
+        return ""
+    if type(cap).__name__ == "PageCaption":
+        parts = (_rich_inline(getattr(cap, "text", None), budget, depth + 1),
+                 _rich_inline(getattr(cap, "credit", None), budget, depth + 1))
+        return " - ".join(p for p in parts if p)
+    return _rich_inline(cap, budget, depth + 1)
+
+
+def _rich_generic(node, budget, depth):
+    """Text of a block we have no special rule for: its text fields, then its child nodes."""
+    parts = []
+    for field in _RICH_TEXT_FIELDS:
+        value = getattr(node, field, None)
+        if value is None:
+            continue
+        if type(value).__name__ == "PageCaption":
+            text = _rich_caption(value, budget, depth)
+        else:
+            text = _rich_inline(value, budget, depth + 1)
+        if text:
+            parts.append(text)
+    for field in _RICH_CHILD_FIELDS:
+        value = getattr(node, field, None)
+        if isinstance(value, (list, tuple)):
+            text = _rich_blocks(value, budget, depth + 1, sep="\n")
+            if text:
+                parts.append(text)
+    return "\n".join(parts)
+
+
+def _rich_list(block, budget, depth, ordered):
+    """Bulleted or numbered list: one line per item, continuation lines indented."""
+    items = getattr(block, "items", None) or ()
+    start = getattr(block, "start", None) if ordered else None
+    descending = bool(getattr(block, "reversed", False)) if ordered else False
+    lines = []
+    for index, item in enumerate(items):
+        if type(item).__name__.endswith("Text"):   # PageListItemText / PageListOrderedItemText
+            body = _rich_inline(getattr(item, "text", None), budget, depth + 1)
+        else:                                      # ...Blocks: the item holds nested blocks
+            body = _rich_blocks(getattr(item, "blocks", None), budget, depth + 1, sep="\n")
+        if not body:
+            continue
+        if ordered:
+            label = getattr(item, "num", None) or getattr(item, "value", None)
+            if label in (None, ""):
+                first = start if isinstance(start, int) else (len(items) if descending else 1)
+                label = first - index if descending else first + index
+            label = str(label)
+            marker = (label if label.endswith((".", ")")) else label + ".") + " "
+        else:
+            marker = "- "
+        if getattr(item, "checkbox", False):
+            marker += "[x] " if getattr(item, "checked", False) else "[ ] "
+        lines.append(marker + body.replace("\n", "\n" + " " * len(marker)))
+    return "\n".join(lines)
+
+
+def _rich_blocks(blocks, budget, depth=0, sep="\n\n"):
+    parts = []
+    for block in (blocks or ()):
+        text = _rich_block(block, budget, depth + 1)
+        if text:
+            parts.append(text)
+    return sep.join(parts)
+
+
+def _rich_block(block, budget, depth=0):
+    """Plain text of one PageBlock (it may span several lines); '' for blocks without text."""
+    if block is None or depth > RICH_MAX_DEPTH or not budget.spend():
+        return ""
+    name = type(block).__name__
+    try:
+        marker = _RICH_MEDIA_MARKERS.get(name)
+        if marker:
+            parts = [marker]
+            if name == "PageBlockEmbed" and getattr(block, "url", None):
+                parts.append(block.url)
+            cap = _rich_caption(getattr(block, "caption", None), budget, depth)
+            if cap:
+                parts.append(cap)
+            return " ".join(parts)
+        if name == "PageBlockDivider":
+            return "---"
+        if name in ("PageBlockAnchor", "PageBlockUnsupported"):
+            return ""
+        if name == "PageBlockMath":
+            return getattr(block, "source", "") or ""
+        if name == "PageBlockList":
+            return _rich_list(block, budget, depth, ordered=False)
+        if name == "PageBlockOrderedList":
+            return _rich_list(block, budget, depth, ordered=True)
+        if name == "PageBlockTable":
+            lines = []
+            title = _rich_inline(getattr(block, "title", None), budget, depth + 1)
+            if title:
+                lines.append(title)
+            for row in (getattr(block, "rows", None) or ()):
+                cells = [_rich_inline(getattr(cell, "text", None), budget, depth + 1)
+                         for cell in (getattr(row, "cells", None) or ())]
+                if any(cells):
+                    lines.append(" | ".join(cells))
+            return "\n".join(lines)
+        if name == "PageBlockDetails":
+            title = _rich_inline(getattr(block, "title", None), budget, depth + 1)
+            body = _rich_blocks(getattr(block, "blocks", None), budget, depth + 1, sep="\n")
+            return "\n".join(p for p in (title, body) if p)
+        if name in ("PageBlockBlockquote", "PageBlockPullquote", "PageBlockBlockquoteBlocks"):
+            if name == "PageBlockBlockquoteBlocks":
+                body = _rich_blocks(getattr(block, "blocks", None), budget, depth + 1, sep="\n")
+            else:
+                body = _rich_inline(getattr(block, "text", None), budget, depth + 1)
+            cap = _rich_inline(getattr(block, "caption", None), budget, depth + 1)
+            return "\n".join(p for p in (body, f"- {cap}" if cap else "") if p)
+        if name == "PageBlockChannel":
+            return getattr(getattr(block, "channel", None), "title", "") or ""
+        if name == "PageBlockCover":
+            return _rich_block(getattr(block, "cover", None), budget, depth + 1)
+        return _rich_generic(block, budget, depth)
+    except Exception:
+        return ""
+
+
+def rich_message_text(rich):
+    """Plain text of a RichMessage; '' when there is none or nothing in it is readable."""
+    if rich is None:
+        return ""
+    try:
+        text = _rich_blocks(getattr(rich, "blocks", None), _RichBudget(), 0).strip()
+    except Exception:
+        return ""
+    if len(text) > RICH_TEXT_MAX_CHARS:
+        text = text[:RICH_TEXT_MAX_CHARS].rstrip() + "...[truncated]"
+    return text
+
+
+def message_text(msg):
+    """The text of a message: msg.text, or the plain text of its rich_message when that is empty.
+
+    Hidden and look-alike characters are removed (clean_incoming_text; TG_SANITIZE=0 turns that off)."""
+    if msg is None:
+        return ""
+    text = getattr(msg, "text", None)
+    if text:
+        return clean_incoming_text(text)
+    return clean_incoming_text(rich_message_text(getattr(msg, "rich_message", None)))
+
+
+# ========== OUTGOING FILE GUARD (TG_SEND_FILE_ROOTS) ==========
+# Off unless TG_SEND_FILE_ROOTS is set to a list of folders (separated by os.pathsep). When it is
+# set, every command that sends a local file given on the command line (send-file, send-album,
+# send-paid-media, post-story, set-photo, contact-photo, edit-chat --photo, set-chat-photo,
+# create-sticker-set, add-sticker, set-sticker-thumb) or reads a local list whose contents go to
+# Telegram (import-contacts <file>, broadcast --file) calls guard_upload_path() first: the path is
+# resolved (".." and symlinks/junctions are followed), anything that ends up outside the roots is
+# refused, and well-known secret names are refused even inside a root. *.key and *.pem are judged
+# by what the file holds, because a Keynote presentation is a *.key too: a "-----BEGIN" block or a
+# PuTTY key header in the first 8 KB means refusal, a ZIP container passes, anything else keeps
+# the refusal by name (see _content_secret_reason). The threat is prompt injection: text read
+# from a chat must not be able to make an agent upload ~/.ssh/id_rsa or an .env file, or push a
+# local file through contacts / usernames. Not covered: a file swapped between the check and the
+# upload, hard links, and http(s):// URLs (Telegram fetches those itself, no local file is read).
+
+SEND_FILE_ROOTS_ENV = "TG_SEND_FILE_ROOTS"
+SECRET_FILE_PATTERNS = (
+    ".env", ".env.*", "*.env", ".netrc", "_netrc",
+    "credentials*", ".credentials*",
+    "*.session", "*.session-journal",
+    "id_rsa*", "id_dsa*", "id_ecdsa*", "id_ed25519*",
+    "*.p12", "*.pfx", "*.ppk",
+)
+KEY_CONTENT_PATTERNS = ("*.pem", "*.key")    # secret or not depends on what the file holds
+SECRET_CONTENT_MARKERS = (b"-----BEGIN", b"PuTTY-User-Key-File")
+ZIP_HEADERS = (b"PK\x03\x04", b"PK\x05\x06", b"PK\x07\x08")
+SECRET_DIR_NAMES = (".ssh", ".gnupg")
+
+
+class UploadPathRefused(Exception):
+    """A local path was refused by the TG_SEND_FILE_ROOTS guard; the message says why."""
+
+
+def upload_roots(environ=None):
+    """The configured upload roots (a list, possibly empty), or None when the guard is off."""
+    raw = (os.environ if environ is None else environ).get(SEND_FILE_ROOTS_ENV)
+    if raw is None or not raw.strip():
+        return None
+    parts = (part.strip().strip('"') for part in raw.split(os.pathsep))
+    return [part for part in parts if part]
+
+
+def _strip_extended_prefix(path):
+    """Drop the extended-length prefix Windows may add (backslash-backslash-question-backslash)."""
+    if path.startswith("\\\\?\\UNC\\"):
+        return "\\\\" + path[8:]
+    if path.startswith("\\\\?\\"):
+        return path[4:]
+    return path
+
+
+def _comparable(path):
+    """Absolute, normalised form of a path, lower-cased on Windows; used only for comparing."""
+    return os.path.normcase(os.path.abspath(_strip_extended_prefix(path)))
+
+
+def _is_unc(path):
+    """True for a Windows network path (UNC) or a device path; always False elsewhere."""
+    if os.name != "nt":
+        return False
+    return os.path.splitdrive(_strip_extended_prefix(path))[0][:2] in ("\\\\", "//")
+
+
+def _secret_reason(path):
+    """Why `path` looks like a secret (file name or .ssh/.gnupg folder), or None. Case-insensitive."""
+    parts = [p.rstrip(". ").lower() for p in re.split(r"[\\/]+", path)]
+    parts = [p for p in parts if p]     # Windows ignores trailing dots and spaces in a name
+    for part in parts:
+        if part in SECRET_DIR_NAMES:
+            return f"it lies inside a {part} folder"
+    if parts:
+        for pattern in SECRET_FILE_PATTERNS:
+            if fnmatch.fnmatchcase(parts[-1], pattern):
+                return f"the file name {parts[-1]!r} looks like a secret ({pattern})"
+    return None
+
+
+def _content_secret_reason(path, real):
+    """Why a *.key / *.pem file looks like a secret judging by what it holds, or None when it may go.
+
+    Reads the first 8 KB of the file that `real` points to. A PEM / PGP block ("-----BEGIN") or a
+    PuTTY key header: secret. A ZIP container (a Keynote presentation is a *.key ZIP): fine.
+    Anything else, a file that cannot be read and a path that is not a file: refused, as every
+    *.key / *.pem was before this check existed. Other names are not looked at (None)."""
+    names = []
+    for candidate in (path, real):
+        parts = [p.rstrip(". ").lower() for p in re.split(r"[\\/]+", candidate)]
+        parts = [p for p in parts if p]
+        if parts:
+            names.append(parts[-1])
+    pattern = next((p for name in names for p in KEY_CONTENT_PATTERNS if fnmatch.fnmatchcase(name, p)), None)
+    if pattern is None:
+        return None
+    by_name = f"the file name {names[-1]!r} looks like a secret ({pattern})"
+    try:
+        if not os.path.isfile(real):
+            return by_name + " and it is not a regular file that can be inspected"
+        with open(real, "rb") as handle:
+            head = handle.read(8192)
+    except OSError:
+        return by_name + " and it cannot be read to check what it holds"
+    for marker in SECRET_CONTENT_MARKERS:
+        if marker in head:
+            return f"{names[-1]!r} looks like a secret: it holds a key or certificate block ({marker.decode('ascii')})"
+    if head.startswith(ZIP_HEADERS):
+        return None
+    return by_name + " and its content does not show it is something else (a ZIP-based file, such as a Keynote presentation, passes)"
+
+
+def guard_upload_path(path, environ=None):
+    """Return `path` unchanged when it may be uploaded; raise UploadPathRefused otherwise.
+
+    A no-op while TG_SEND_FILE_ROOTS is unset, so today's commands behave exactly as before."""
+    roots = upload_roots(environ)
+    if roots is None:
+        return path
+    text = os.fspath(path)
+    if re.match("https?://", text):
+        return path
+    if not text.strip() or "\x00" in text:
+        raise UploadPathRefused("refusing to upload an empty or malformed path")
+    if not roots:
+        raise UploadPathRefused(
+            f"refusing to upload {text!r}: {SEND_FILE_ROOTS_ENV} is set but lists no folder")
+    if os.name == "nt" and ":" in os.path.splitdrive(text)[1]:
+        raise UploadPathRefused(
+            f"refusing to upload {text!r}: a colon after the drive (NTFS stream syntax) is not allowed")
+    if _is_unc(text) and not any(_is_unc(root) for root in roots):
+        # decided without resolving it: realpath() on a UNC path would go out on the network
+        raise UploadPathRefused(
+            f"refusing to upload {text!r}: a network (UNC) path, outside {SEND_FILE_ROOTS_ENV}")
+    real = _strip_extended_prefix(os.path.realpath(text))
+    reason = _secret_reason(text) or _secret_reason(real)
+    if reason:
+        raise UploadPathRefused(f"refusing to upload {text!r}: {reason}")
+    target = _comparable(real)
+    for root in roots:
+        root_real = _comparable(os.path.realpath(root))
+        try:
+            if os.path.commonpath([root_real, target]) == root_real:
+                break
+        except ValueError:      # different drive or share: certainly outside this root
+            continue
+    else:
+        raise UploadPathRefused(
+            f"refusing to upload {text!r}: it resolves to {real!r}, which is outside {SEND_FILE_ROOTS_ENV}")
+    reason = _content_secret_reason(text, real)
+    if reason:
+        raise UploadPathRefused(f"refusing to upload {text!r}: {reason}")
+    return path
+
+
 # ========== COMMANDS ==========
 
 async def cmd_dialogs(client, args):
@@ -171,10 +668,10 @@ async def cmd_dialogs(client, args):
         username = ""
         if hasattr(entity, "username") and entity.username:
             username = f" @{entity.username}"
-        print(f"  [{dtype}] {dialog.name}{username}{unread}")
+        print(f"  [{dtype}] {clean_incoming_text(dialog.name)}{username}{unread}")
         if dialog.message:
             media = fmt_media(dialog.message)
-            text = dialog.message.text or ""
+            text = message_text(dialog.message)
             print(f"    Last: {fmt_date(dialog.message.date)} — {media}{text[:80]}")
         print()
 
@@ -195,7 +692,7 @@ async def cmd_read_chat(client, args):
         if msg.sender and not msg.out:
             sender = fmt_user(msg.sender) if isinstance(msg.sender, User) else str(msg.sender_id)
         media = fmt_media(msg)
-        text = msg.text or ""
+        text = message_text(msg)
         fwd = ""
         if msg.forward:
             fwd_name = ""
@@ -227,7 +724,7 @@ async def cmd_read_channel(client, args):
 
     for msg in reversed(messages):
         media = fmt_media(msg)
-        text = msg.text or ""
+        text = message_text(msg)
         views = f" | {msg.views} views" if msg.views else ""
         replies = f" | {msg.replies.replies} replies" if msg.replies else ""
         reactions_str = ""
@@ -263,7 +760,7 @@ async def cmd_search(client, args):
         if msg.sender and not msg.out:
             sender = fmt_user(msg.sender) if isinstance(msg.sender, User) else str(msg.sender_id)
         media = fmt_media(msg)
-        text = msg.text or ""
+        text = message_text(msg)
         print(f"[{fmt_date(msg.date)}]{chat_name} {sender}: {media}{text[:300]}")
         print()
 
@@ -285,7 +782,7 @@ async def cmd_mentions(client, args):
                 if msg.out:
                     continue
                 sender = fmt_user(msg.sender) if isinstance(msg.sender, User) else str(msg.sender_id)
-                print(f"[{fmt_date(msg.date)}] [{dialog.name}] {sender}: {(msg.text or '(media)')[:300]}")
+                print(f"[{fmt_date(msg.date)}] [{dialog.name}] {sender}: {(message_text(msg) or '(media)')[:300]}")
                 print()
                 count += 1
         except Exception:
@@ -310,11 +807,11 @@ async def cmd_parse_comments(client, args):
         if isinstance(sender, User):
             name = fmt_user(sender)
             premium = " [Premium]" if sender.premium else ""
-            print(f"[{fmt_date(msg.date)}] {name}{premium}: {(msg.text or fmt_media(msg))[:500]}")
+            print(f"[{fmt_date(msg.date)}] {name}{premium}: {(message_text(msg) or fmt_media(msg))[:500]}")
         elif isinstance(sender, Channel):
-            print(f"[{fmt_date(msg.date)}] {sender.title} (channel): {(msg.text or fmt_media(msg))[:500]}")
+            print(f"[{fmt_date(msg.date)}] {sender.title} (channel): {(message_text(msg) or fmt_media(msg))[:500]}")
         else:
-            print(f"[{fmt_date(msg.date)}] ID:{msg.sender_id}: {(msg.text or fmt_media(msg))[:500]}")
+            print(f"[{fmt_date(msg.date)}] ID:{msg.sender_id}: {(message_text(msg) or fmt_media(msg))[:500]}")
 
     print(f"\n--- {len(comments)} comments ---")
 
@@ -341,7 +838,7 @@ async def cmd_parse_commenters(client, args):
                     "premium": bool(sender.premium),
                     "bot": bool(sender.bot),
                     "verified": bool(sender.verified),
-                    "comment": (msg.text or "")[:200],
+                    "comment": message_text(msg)[:200],
                     "date": fmt_date(msg.date),
                     "bio": "",
                     "personal_channel_id": None,
@@ -577,13 +1074,14 @@ async def cmd_pinned(client, args):
     print(f"=== Pinned messages in {name} ===\n")
 
     count = 0
-    async for msg in client.iter_messages(entity, filter=None, limit=500):
+    from telethon.tl.types import InputMessagesFilterPinned
+    async for msg in client.iter_messages(entity, filter=InputMessagesFilterPinned(), limit=args.limit or 20):
         if msg.pinned:
             sender = "You" if msg.out else ""
             if msg.sender and not msg.out:
                 sender = fmt_user(msg.sender) if isinstance(msg.sender, User) else str(msg.sender_id)
             media = fmt_media(msg)
-            print(f"[{fmt_date(msg.date)}] #{msg.id} {sender}: {media}{(msg.text or '')[:300]}")
+            print(f"[{fmt_date(msg.date)}] #{msg.id} {sender}: {media}{message_text(msg)[:300]}")
             print()
             count += 1
             if count >= (args.limit or 20):
@@ -654,7 +1152,7 @@ async def cmd_export_chat(client, args):
             "sender_id": msg.sender_id,
             "sender_name": sender_name,
             "out": msg.out,
-            "text": msg.text or "",
+            "text": message_text(msg),
             "media": fmt_media(msg) if msg.media else None,
             "reply_to": msg.reply_to.reply_to_msg_id if msg.reply_to else None,
             "forward": bool(msg.forward),
@@ -685,7 +1183,7 @@ async def cmd_user_messages(client, args):
 
     for msg in reversed(messages):
         media = fmt_media(msg)
-        print(f"[{fmt_date(msg.date)}] #{msg.id}: {media}{(msg.text or '')[:300]}")
+        print(f"[{fmt_date(msg.date)}] #{msg.id}: {media}{message_text(msg)[:300]}")
         print()
 
     print(f"--- {len(messages)} messages ---")
@@ -712,7 +1210,7 @@ async def cmd_channel_stats(client, args):
         print(f"\n  Recent posts engagement:")
         count = 0
         async for msg in client.iter_messages(entity, limit=20):
-            if msg.text or msg.media:
+            if message_text(msg) or msg.media:
                 views = msg.views or 0
                 replies = msg.replies.replies if msg.replies else 0
                 reactions_count = sum(r.count for r in msg.reactions.results) if msg.reactions else 0
@@ -728,7 +1226,12 @@ async def cmd_channel_stats(client, args):
 
 async def cmd_send(client, args):
     """Send a text message to a user/group/channel."""
-    entity = await client.get_entity(args.target)
+    ref = args.target
+    if isinstance(ref, str) and ref.lstrip('-').isdigit():
+        # "-100123..." arrives as a string and get_entity cannot resolve it
+        from telethon import types
+        ref = types.PeerChannel(int(ref[4:])) if ref.startswith('-100') else int(ref)
+    entity = await client.get_entity(ref)
     name = getattr(entity, "title", None) or fmt_user(entity)
 
     kwargs = {}
@@ -745,6 +1248,7 @@ async def cmd_send(client, args):
 
 async def cmd_send_file(client, args):
     """Send a file/photo/video to a user/group/channel."""
+    guard_upload_path(args.file)
     entity = await client.get_entity(args.target)
     name = getattr(entity, "title", None) or fmt_user(entity)
 
@@ -817,13 +1321,14 @@ async def cmd_schedule(client, args):
 
 async def cmd_create_poll(client, args):
     """Create a poll in a chat."""
-    from telethon.tl.types import InputMediaPoll, Poll, PollAnswer
+    from telethon.tl.types import InputMediaPoll, Poll, PollAnswer, TextWithEntities
     entity = await client.get_entity(args.target)
-    answers = [PollAnswer(text=opt.strip(), option=bytes([i])) for i, opt in enumerate(args.options.split("|"))]
+    answers = [PollAnswer(text=TextWithEntities(text=opt.strip(), entities=[]), option=bytes([i])) for i, opt in enumerate(args.options.split("|"))]
     poll = InputMediaPoll(poll=Poll(
         id=0,
-        question=args.question,
+        question=TextWithEntities(text=args.question, entities=[]),
         answers=answers,
+        hash=0,
         quiz=args.quiz if hasattr(args, "quiz") else False,
     ))
     msg = await client.send_message(entity, file=poll)
@@ -897,18 +1402,25 @@ async def cmd_unban(client, args):
 async def cmd_create_group(client, args):
     """Create a new group."""
     users = [await client.get_entity(u.strip()) for u in args.users.split(",")]
-    result = await client.create_group(args.name, users)
+    from telethon import functions
+    result = await client(functions.channels.CreateChannelRequest(title=args.name, about="", megagroup=True))
+    channel = result.chats[0]
+    if users:
+        await client(functions.channels.InviteToChannelRequest(channel=channel, users=users))
     print(f"Created group: {args.name}")
 
 
 async def cmd_create_channel(client, args):
     """Create a new channel."""
-    result = await client.create_channel(args.name, about=args.about or "")
+    from telethon import functions
+    result = await client(functions.channels.CreateChannelRequest(title=args.name, about=args.about or "", broadcast=True))
     print(f"Created channel: {args.name}")
 
 
 async def cmd_edit_chat(client, args):
     """Edit group/channel title, description, or photo."""
+    if args.photo:
+        guard_upload_path(args.photo)
     entity = await client.get_entity(args.target)
     if args.title:
         from telethon.tl.functions.channels import EditTitleRequest
@@ -1040,6 +1552,7 @@ async def cmd_set_name(client, args):
 
 async def cmd_set_photo(client, args):
     """Set own profile photo."""
+    guard_upload_path(args.file)
     from telethon.tl.functions.photos import UploadProfilePhotoRequest
     photo = await client.upload_file(args.file)
     await client(UploadProfilePhotoRequest(file=photo))
@@ -1072,7 +1585,7 @@ async def cmd_search_media(client, args):
     count = 0
     async for msg in client.iter_messages(entity, limit=limit, filter=media_filter):
         sender_name = fmt_user(msg.sender) if isinstance(msg.sender, User) else "Channel"
-        text = (msg.text or "")[:100]
+        text = message_text(msg)[:100]
         print(f"[{fmt_date(msg.date)}] #{msg.id} {sender_name}: {fmt_media(msg)}{text}")
         count += 1
     print(f"\n--- {count} results ---")
@@ -1098,7 +1611,7 @@ async def cmd_search_date(client, args):
 
     for msg in reversed(messages):
         sender_name = fmt_user(msg.sender) if isinstance(msg.sender, User) else "Channel"
-        print(f"[{fmt_date(msg.date)}] #{msg.id} {sender_name}: {(msg.text or fmt_media(msg))[:200]}")
+        print(f"[{fmt_date(msg.date)}] #{msg.id} {sender_name}: {(message_text(msg) or fmt_media(msg))[:200]}")
 
     print(f"\n--- {len(messages)} messages ---")
 
@@ -1145,7 +1658,7 @@ async def cmd_hashtags(client, args):
     count = 0
     async for msg in client.iter_messages(entity, limit=limit, search=tag):
         sender_name = fmt_user(msg.sender) if isinstance(msg.sender, User) else "Channel"
-        print(f"[{fmt_date(msg.date)}] #{msg.id} {sender_name}: {(msg.text or '')[:200]}")
+        print(f"[{fmt_date(msg.date)}] #{msg.id} {sender_name}: {message_text(msg)[:200]}")
         count += 1
     print(f"\n--- {count} messages ---")
 
@@ -1207,7 +1720,7 @@ async def cmd_saved(client, args):
 
     async for msg in client.iter_messages("me", limit=limit):
         media = fmt_media(msg) if msg.media else ""
-        text = (msg.text or "")[:300]
+        text = message_text(msg)[:300]
         fwd = ""
         if msg.forward:
             fwd_name = ""
@@ -1241,7 +1754,7 @@ async def cmd_unread(client, args):
     async for dialog in client.iter_dialogs(limit=200):
         if dialog.unread_count > 0:
             dtype = "channel" if dialog.is_channel else "group" if dialog.is_group else "user"
-            print(f"  [{dtype}] {dialog.name}: {dialog.unread_count} unread")
+            print(f"  [{dtype}] {clean_incoming_text(dialog.name)}: {dialog.unread_count} unread")
             count += 1
             if count >= limit:
                 break
@@ -1275,6 +1788,7 @@ async def cmd_poll_results(client, args):
 async def cmd_broadcast(client, args):
     """Send a message to multiple users (from comma-separated list or file)."""
     if args.file:
+        guard_upload_path(args.file)
         targets = Path(args.file).read_text(encoding="utf-8").strip().splitlines()
     else:
         targets = [t.strip() for t in args.targets.split(",")]
@@ -1324,13 +1838,14 @@ async def cmd_star_gifts(client, args):
 async def cmd_send_star_gift(client, args):
     """Send a star gift to a user."""
     from telethon import functions, types
-    target = await client.get_entity(args.target)
-    result = await client(functions.payments.SendStarGiftRequest(
-        peer=target,
-        gift_id=args.gift_id,
-        message=types.TextWithEntities(text=args.message or '', entities=[]) if args.message else None,
+    target = await client.get_input_entity(args.target)
+    invoice = types.InputInvoiceStarGift(
+        peer=target, gift_id=args.gift_id,
         hide_name=args.anonymous or False,
-    ))
+        message=types.TextWithEntities(text=args.message, entities=[]) if args.message else None,
+    )
+    form = await client(functions.payments.GetPaymentFormRequest(invoice=invoice))
+    result = await client(functions.payments.SendStarsFormRequest(form_id=form.form_id, invoice=invoice))
     print(f"Star gift sent to {args.target}")
 
 
@@ -1338,6 +1853,7 @@ async def cmd_send_star_gift(client, args):
 
 async def cmd_post_story(client, args):
     """Post a story (photo/video)."""
+    guard_upload_path(args.file)
     from telethon import functions, types
     import os
 
@@ -1554,9 +2070,7 @@ async def cmd_gift_premium(client, args):
     """Gift Telegram Premium to a user."""
     from telethon import functions, types
     target = await client.get_entity(args.target)
-    options = await client(functions.payments.GetPremiumGiftCodeOptionsRequest(
-        peer=target, boost_peer=None
-    ))
+    options = await client(functions.payments.GetPremiumGiftCodeOptionsRequest(boost_peer=None))
     print("Premium gift options:")
     for o in options:
         months = getattr(o, 'months', '?')
@@ -1603,15 +2117,10 @@ async def cmd_set_business_location(client, args):
     """Set business location."""
     from telethon import functions, types
     if args.clear:
-        await client(functions.account.UpdateBusinessLocationRequest(business_location=None))
+        await client(functions.account.UpdateBusinessLocationRequest())
         print("Business location cleared")
     else:
-        await client(functions.account.UpdateBusinessLocationRequest(
-            business_location=types.BusinessLocation(
-                address=args.address,
-                geo_point=None,
-            )
-        ))
+        await client(functions.account.UpdateBusinessLocationRequest(address=args.address))
         print(f"Business location set: {args.address}")
 
 
@@ -1753,7 +2262,7 @@ async def cmd_toggle_forum(client, args):
     """Toggle forum mode for a group/channel."""
     from telethon import functions
     peer = await client.get_entity(args.channel)
-    await client(functions.channels.ToggleForumRequest(channel=peer, enabled=not args.disable))
+    await client(functions.channels.ToggleForumRequest(channel=peer, enabled=not args.disable, tabs=False))
     print(f"Forum mode {'disabled' if args.disable else 'enabled'} for {args.channel}")
 
 
@@ -1807,16 +2316,44 @@ async def cmd_translate_msg(client, args):
         print(f"Translation ({args.lang or 'en'}): {getattr(t, 'text', t)}")
 
 
-async def cmd_transcribe_voice(client, args):
-    """Transcribe a voice message."""
+TRANSCRIBE_TRIES = 10       # Telegram answers pending=True while a longer record is still processed
+TRANSCRIBE_INTERVAL = 2.0   # seconds between two asks
+_TRANSCRIBE_SLEEP = asyncio.sleep   # tests swap this (or pass sleep=) so they do not really wait
+
+
+async def transcribe_with_polling(client, peer, msg_id, tries=TRANSCRIBE_TRIES,
+                                  interval=TRANSCRIBE_INTERVAL, sleep=None):
+    """Ask for the transcription until Telegram stops saying pending, at most `tries` times.
+
+    Returns (result, asks): `result` is the last TranscribedAudio, and result.pending is still
+    true when Telegram never finished."""
     from telethon import functions
+    sleep = sleep or _TRANSCRIBE_SLEEP
+    result = None
+    asks = 0
+    for attempt in range(max(1, int(tries))):
+        if attempt:
+            await sleep(interval)
+        result = await client(functions.messages.TranscribeAudioRequest(peer=peer, msg_id=msg_id))
+        asks += 1
+        if not getattr(result, 'pending', False):
+            break
+    return result, asks
+
+
+async def cmd_transcribe_voice(client, args):
+    """Transcribe a voice message; waits while Telegram answers pending."""
     peer = await client.get_entity(args.chat)
-    result = await client(functions.messages.TranscribeAudioRequest(
-        peer=peer, msg_id=args.msg_id
-    ))
-    text = getattr(result, 'text', '')
-    pending = getattr(result, 'pending', False)
-    print(f"Transcription{'(pending)' if pending else ''}: {text}")
+    result, asks = await transcribe_with_polling(client, peer, args.msg_id)
+    text = getattr(result, 'text', '') or ''
+    if getattr(result, 'pending', False):
+        waited = (asks - 1) * TRANSCRIBE_INTERVAL
+        print(f"Transcription still pending after {asks} asks ({waited:.0f} s): "
+              "Telegram has not finished it yet, run the command again in a minute")
+        if text:
+            print(f"Partial text so far: {text}")
+    else:
+        print(f"Transcription: {text}")
 
 
 # --- AI commands ---
@@ -1830,7 +2367,7 @@ async def cmd_ai_compose(client, args):
         proofread=args.proofread or False,
         emojify=args.emojify or False,
         translate_to_lang=args.translate or None,
-        change_tone=args.tone or None,
+        tone=types.InputAiComposeToneDefault(tone=args.tone) if args.tone else None,
     ))
     composed = getattr(result, 'text', result)
     if hasattr(composed, 'text'):
@@ -1877,7 +2414,7 @@ async def cmd_ai_change_tone(client, args):
     from telethon import functions, types
     text_obj = types.TextWithEntities(text=args.text, entities=[])
     result = await client(functions.messages.ComposeMessageWithAIRequest(
-        text=text_obj, change_tone=args.tone
+        text=text_obj, tone=types.InputAiComposeToneDefault(tone=args.tone)
     ))
     composed = getattr(result, 'text', result)
     print(f"Tone ({args.tone}): {composed.text if hasattr(composed, 'text') else composed}")
@@ -1903,8 +2440,8 @@ async def cmd_create_topic(client, args):
     """Create a forum topic."""
     from telethon import functions
     peer = await client.get_entity(args.channel)
-    result = await client(functions.channels.CreateForumTopicRequest(
-        channel=peer, title=args.title,
+    result = await client(functions.messages.CreateForumTopicRequest(
+        peer=peer, title=args.title,
         icon_color=args.color or None,
     ))
     print(f"Topic '{args.title}' created")
@@ -1947,11 +2484,10 @@ async def cmd_set_personal_channel(client, args):
 
 async def cmd_set_color(client, args):
     """Set profile/reply color."""
-    from telethon import functions
+    from telethon import functions, types
     await client(functions.account.UpdateColorRequest(
         for_profile=args.profile or False,
-        color=args.color_id,
-        background_emoji_id=int(args.emoji_id) if args.emoji_id else None,
+        color=types.PeerColor(color=args.color_id, background_emoji_id=int(args.emoji_id) if args.emoji_id else None),
     ))
     target = "profile" if args.profile else "replies"
     print(f"{target.title()} color set to {args.color_id}")
@@ -2267,6 +2803,7 @@ async def cmd_content_settings(client, args):
 
 async def cmd_contact_photo(client, args):
     """Set/suggest profile photo for a contact."""
+    guard_upload_path(args.file)
     from telethon import functions
     target = await client.get_entity(args.target)
     file = await client.upload_file(args.file)
@@ -2320,10 +2857,10 @@ async def cmd_auto_save(client, args):
 
 async def cmd_live_story(client, args):
     """Start a live story stream."""
-    from telethon import functions
+    from telethon import functions, types
     peer = await client.get_entity(args.channel) if args.channel else await client.get_me()
     try:
-        result = await client(functions.stories.StartLiveRequest(peer=peer))
+        result = await client(functions.stories.StartLiveRequest(peer=peer, privacy_rules=[types.InputPrivacyValueAllowAll()]))
         print(f"Live story started!")
     except Exception as e:
         print(f"Live story error: {e}")
@@ -2588,6 +3125,7 @@ async def cmd_import_contact_token(client, args):
 
 async def cmd_create_sticker_set(client, args):
     """Create a new sticker set via API (not @Stickers bot)."""
+    guard_upload_path(args.file)
     from telethon import functions, types
     user = await client.get_me()
     file = await client.upload_file(args.file)
@@ -2732,6 +3270,7 @@ async def cmd_toggle_slow_mode(client, args):
 
 async def cmd_set_chat_photo(client, args):
     """Set group/channel photo."""
+    guard_upload_path(args.file)
     from telethon import functions, types
     peer = await client.get_entity(args.chat)
     file = await client.upload_file(args.file)
@@ -2840,8 +3379,16 @@ async def cmd_edit_admin(client, args):
     from telethon import functions, types
     channel = await client.get_entity(args.channel)
     user = await client.get_entity(args.user)
+    RIGHTS = ("change_info", "post_messages", "edit_messages", "delete_messages", "ban_users", "invite_users",
+              "pin_messages", "add_admins", "anonymous", "manage_call", "other", "manage_topics")
     if args.remove:
         rights = types.ChatAdminRights()
+    elif args.rights:
+        chosen = [x.strip() for x in args.rights.split(",") if x.strip()]
+        bad = [x for x in chosen if x not in RIGHTS]
+        if bad:
+            raise SystemExit("unknown right(s): " + ", ".join(bad) + "; allowed: " + ", ".join(RIGHTS))
+        rights = types.ChatAdminRights(**{x: True for x in chosen})
     else:
         rights = types.ChatAdminRights(
             change_info=True, post_messages=args.can_post or False,
@@ -2887,6 +3434,7 @@ async def cmd_get_sticker_set(client, args):
 
 async def cmd_add_sticker(client, args):
     """Add a sticker to an existing set."""
+    guard_upload_path(args.file)
     from telethon import functions, types
     file = await client.upload_file(args.file)
     uploaded = await client(functions.messages.UploadMediaRequest(
@@ -2974,6 +3522,7 @@ async def cmd_kill_web_session(client, args):
 
 async def cmd_import_contacts(client, args):
     """Import contacts from a CSV file (phone,first_name,last_name)."""
+    guard_upload_path(args.file)
     from telethon import functions, types
     import csv
     contacts = []
@@ -3077,12 +3626,15 @@ async def cmd_leave_folder(client, args):
 
 async def cmd_get_forum_topics(client, args):
     """List forum topics in a group."""
-    from telethon import functions
-    peer = await client.get_entity(args.channel)
-    result = await client(functions.channels.GetForumTopicsRequest(
-        channel=peer, offset_date=None, offset_id=0, offset_topic=0,
-        limit=args.limit or 50, q=args.query or ''
-    ))
+    from telethon import functions, types
+    ref = args.channel
+    if isinstance(ref, str) and ref.lstrip('-').isdigit():
+        # "-100123..." arrives as a string and get_entity cannot resolve it
+        ref = types.PeerChannel(int(ref[4:])) if ref.startswith('-100') else int(ref)
+    peer = await client.get_entity(ref)
+    common = dict(offset_date=None, offset_id=0, offset_topic=0,
+                  limit=args.limit or 50, q=args.query or '')
+    result = await client(functions.messages.GetForumTopicsRequest(peer=peer, **common))
     topics = getattr(result, 'topics', [])
     print(f"Forum topics: {len(topics)}")
     for t in topics:
@@ -3097,8 +3649,8 @@ async def cmd_edit_forum_topic(client, args):
     """Edit a forum topic title/icon."""
     from telethon import functions
     peer = await client.get_entity(args.channel)
-    await client(functions.channels.EditForumTopicRequest(
-        channel=peer, topic_id=args.topic_id,
+    await client(functions.messages.EditForumTopicRequest(
+        peer=peer, topic_id=args.topic_id,
         title=args.title or None,
         icon_emoji_id=int(args.icon) if args.icon else None,
     ))
@@ -3109,8 +3661,8 @@ async def cmd_close_forum_topic(client, args):
     """Close/reopen a forum topic."""
     from telethon import functions
     peer = await client.get_entity(args.channel)
-    await client(functions.channels.EditForumTopicRequest(
-        channel=peer, topic_id=args.topic_id, closed=not args.reopen
+    await client(functions.messages.EditForumTopicRequest(
+        peer=peer, topic_id=args.topic_id, closed=not args.reopen
     ))
     print(f"Topic #{args.topic_id} {'reopened' if args.reopen else 'closed'}")
 
@@ -3119,8 +3671,8 @@ async def cmd_delete_topic(client, args):
     """Delete a forum topic and all its messages."""
     from telethon import functions
     peer = await client.get_entity(args.channel)
-    await client(functions.channels.DeleteTopicHistoryRequest(
-        channel=peer, top_msg_id=args.topic_id
+    await client(functions.messages.DeleteTopicHistoryRequest(
+        peer=peer, top_msg_id=args.topic_id
     ))
     print(f"Topic #{args.topic_id} deleted")
 
@@ -3131,8 +3683,8 @@ async def cmd_send_album(client, args):
     """Send multiple photos/videos as an album."""
     from telethon.tl.types import InputMediaUploadedPhoto, InputMediaUploadedDocument, DocumentAttributeVideo
     import os
+    files = [guard_upload_path(f) for f in args.files]
     peer = await client.get_entity(args.chat)
-    files = args.files
     media_list = []
     for f in files:
         uploaded = await client.upload_file(f)
@@ -3265,6 +3817,7 @@ async def cmd_move_sticker(client, args):
 
 async def cmd_set_sticker_thumb(client, args):
     """Set sticker set thumbnail."""
+    guard_upload_path(args.file)
     from telethon import functions, types
     file = await client.upload_file(args.file)
     uploaded = await client(functions.messages.UploadMediaRequest(
@@ -3306,14 +3859,15 @@ async def cmd_upgrade_gift(client, args):
 
 async def cmd_set_chat_theme(client, args):
     """Set theme for a specific chat."""
-    from telethon import functions
+    from telethon import functions, types
     peer = await client.get_entity(args.chat)
     emoticon = args.theme if args.theme else ''
-    await client(functions.messages.SetChatThemeRequest(peer=peer, emoticon=emoticon))
+    await client(functions.messages.SetChatThemeRequest(peer=peer, theme=types.InputChatTheme(emoticon=emoticon) if emoticon else types.InputChatThemeEmpty()))
     print(f"Chat theme {'cleared' if not emoticon else 'set to ' + emoticon} for {args.chat}")
 
 async def cmd_send_paid_media(client, args):
     """Send paid media (stars required to view)."""
+    guard_upload_path(args.file)
     from telethon import functions, types
     peer = await client.get_entity(args.chat)
     file = await client.upload_file(args.file)
@@ -3343,9 +3897,11 @@ async def cmd_report_message(client, args):
         'other': types.InputReportReasonOther(),
     }
     reason = reasons.get(args.reason, types.InputReportReasonOther())
-    await client(functions.messages.ReportRequest(
-        peer=peer, id=ids, reason=reason, message=args.message or ''
+    result = await client(functions.messages.ReportRequest(
+        peer=peer, id=ids, option=b'', message=args.message or ''
     ))
+    # result is one of: types.ReportResultChooseOption (choose an entry of result.options, repeat the call with option=<its bytes>),
+    # types.ReportResultAddComment (repeat with option=result.option and message=<comment text>), types.ReportResultReported (done).
     print(f"Reported {len(ids)} messages in {args.chat}")
 
 async def cmd_rename_sticker_set(client, args):
@@ -3464,9 +4020,18 @@ async def cmd_get_web_page_preview(client, args):
     """Preview a URL — extract title, description, embed info."""
     from telethon.tl.functions.messages import GetWebPagePreviewRequest
     result = await client(GetWebPagePreviewRequest(message=args.url))
-    wp = getattr(result, 'webpage', None) if hasattr(result, 'webpage') else result
-    if not wp or getattr(wp, 'CONSTRUCTOR_ID', 0) == 0xeb1477e8:
-        print("No preview available for this URL.")
+    # В новых слоях ответ — обёртка messages.WebPagePreview, превью лежит в
+    # result.media.webpage. Раньше код брал сам result и печатал «?» во всех
+    # полях для ЛЮБОЙ ссылки (11.09.2026: «пусто» даже у t.me и your-domain.com).
+    media = getattr(result, 'media', None)
+    wp = (getattr(media, 'webpage', None) if media is not None
+          else getattr(result, 'webpage', None))
+    kind = type(wp).__name__ if wp is not None else 'None'
+    if wp is None or kind in ('WebPageEmpty', 'MessageMediaEmpty'):
+        print(f"No preview available for this URL ({kind}).")
+        return
+    if kind == 'WebPagePending':
+        print("Preview is still being built by Telegram (WebPagePending) — retry in a few seconds.")
         return
     print(f"URL: {getattr(wp, 'url', '?')}")
     print(f"Display URL: {getattr(wp, 'display_url', '?')}")
@@ -3520,10 +4085,16 @@ async def cmd_save_auto_download_settings(client, args):
     """Update auto-download settings for a tier (low/high)."""
     from telethon.tl.functions.account import SaveAutoDownloadSettingsRequest
     from telethon.tl.types import AutoDownloadSettings
+    from telethon.tl.functions.account import GetAutoDownloadSettingsRequest
+    cur = await client(GetAutoDownloadSettingsRequest())
+    base = cur.low if args.tier == "low" else cur.high
     settings = AutoDownloadSettings(
         photo_size_max=int(args.photo_max) if args.photo_max else 1048576,
         video_size_max=int(args.video_max) if args.video_max else 15728640,
         file_size_max=int(args.file_max) if args.file_max else 3145728,
+        video_upload_maxbitrate=base.video_upload_maxbitrate,
+        small_queue_active_operations_max=base.small_queue_active_operations_max,
+        large_queue_active_operations_max=base.large_queue_active_operations_max,
         disabled=args.disabled,
     )
     await client(SaveAutoDownloadSettingsRequest(
@@ -3604,10 +4175,312 @@ async def cmd_gift_withdrawal_url(client, args):
     print(f"Withdrawal URL: {getattr(result, 'url', result)}")
 
 
+async def cmd_set_default_rights(client, args):
+    """Set default member permissions of a group/supergroup (listed flags become BANNED)."""
+    from telethon import functions, types
+    peer = await client.get_entity(args.chat)
+    banned = {f.strip(): True for f in (args.ban or "").split(",") if f.strip()}
+    rights = types.ChatBannedRights(until_date=None, **banned)
+    await client(functions.messages.EditChatDefaultBannedRightsRequest(peer=peer, banned_rights=rights))
+    print(f"Default rights of {args.chat}: banned = {sorted(banned) or 'nothing'}")
+
+
+# ========== SAFETY SWITCHES AND ERROR WORDING (used by main) ==========
+# The switches are OFF or invisible by default: with no TG_* variable set and no --readonly flag,
+# main() behaves as it did before these helpers existed, except for three things that are ON
+# unless switched off: the wording of FloodWait / TypeNotFoundError failures, the session lock
+# (TG_SESSION_LOCK=0 turns it off) and the cleaning of hidden characters in incoming text
+# (TG_SANITIZE=0 turns it off).
+
+EXIT_REFUSED = 2        # a local safety switch refused the request; nothing reached Telegram
+EXIT_FLOOD_WAIT = 75    # EX_TEMPFAIL: Telegram asked us to wait
+EXIT_SCHEMA_DRIFT = 76  # EX_PROTOCOL: Telegram sent a type this Telethon does not know
+EXIT_SESSION_BUSY = 69  # EX_UNAVAILABLE: another tg_client.py holds the session; nothing reached Telegram
+
+# --- TG_READONLY=1 (or the global flag --readonly, written before the command) ---------------
+# Only the commands below may run. Every name was added after reading the command's body: it
+# cannot send, edit, delete, join or leave, mark anything read (mark-read, read-history,
+# read-mentions, read-reactions and mark-unread all write), set or create anything, upload, or
+# spend (gifts, Stars, payments, 2FA, drafts, folder edits, typing indicators). export-chat,
+# download, download-photo and the --output option of participants / parse-commenters write a
+# local file and nothing else. Commands that only sound read-only are left out on purpose:
+# transcribe-voice, translate-msg and ai-* use server-side processing and quota, get-invite-link
+# creates a link, global-privacy / account-ttl / content-settings can also set, get-web-page-
+# preview makes Telegram fetch a URL, and the whole gift / Stars family sits next to spending.
+# To allow one more command: read its body first, then add its name here. The test suite
+# re-checks that every name is a real command and which calls these handlers make.
+READONLY_COMMANDS = frozenset({
+    # messages and dialogs
+    "dialogs", "unread", "read-chat", "read-channel", "saved", "pinned",
+    "search", "search-global", "search-media", "search-date", "links", "hashtags",
+    "user-messages", "mentions", "unread-mentions", "unread-reactions",
+    "get-replies", "scheduled-messages", "poll-results",
+    "parse-comments", "parse-commenters",
+    # write a local file only
+    "export-chat", "download", "download-photo",
+    # people, channels, folders, drafts
+    "user-info", "participants", "channel-stats", "admin-log",
+    "common-groups", "similar-channels", "contacts", "top-peers", "contact-birthdays",
+    "user-photos", "online-count", "msg-readers", "msg-views",
+    "get-forum-topics", "get-send-as",
+    "folders", "folder-chats", "shared-folders", "drafts",
+    # stories (read)
+    "stories", "story-views", "story-reactions", "story-archive", "pinned-stories", "story-albums",
+    # account (read)
+    "sessions", "web-sessions", "blocked-list", "notify-settings", "get-privacy",
+    "connected-bots", "get-left-channels",
+})
+
+
+def readonly_mode_requested(args=None, environ=None):
+    """True when TG_READONLY is 1/true/yes/on or the --readonly flag was given."""
+    env = os.environ if environ is None else environ
+    raw = (env.get("TG_READONLY") or "").strip().lower()
+    return raw in ("1", "true", "yes", "on") or bool(getattr(args, "readonly", False))
+
+
+def readonly_refusal(command):
+    """None when `command` may run in read-only mode, otherwise the line to print."""
+    if command in READONLY_COMMANDS:
+        return None
+    return (f"command {command} is not in the read-only allowlist (it may write or spend); "
+            "add it to READONLY_COMMANDS after reading its body")
+
+
+# --- TG_FLOOD_SLEEP_THRESHOLD, TG_DEVICE_MODEL, ...: passed to TelegramClient only when set --
+def telegram_client_kwargs(environ=None):
+    """Extra TelegramClient(...) keyword arguments taken from the environment (none by default).
+
+    TG_FLOOD_SLEEP_THRESHOLD is a whole number of seconds: waits up to that long are slept
+    through by Telethon itself, longer ones raise FloodWaitError (0 means always raise). Unset
+    or empty keeps Telethon's own default (60 s).
+
+    TG_DEVICE_MODEL, TG_APP_VERSION and TG_SYSTEM_VERSION are free text, passed as device_model,
+    app_version and system_version only when set and not blank: they are what Telegram shows
+    under Settings > Devices, so a session used by an agent can be told apart from a phone.
+    Unset or blank keeps Telethon's own values and adds no argument at all."""
+    env = os.environ if environ is None else environ
+    kwargs = {}
+    raw = (env.get("TG_FLOOD_SLEEP_THRESHOLD") or "").strip()
+    if raw:
+        try:
+            seconds = int(raw)
+        except ValueError:
+            seconds = -1
+        if seconds < 0:
+            raise ValueError(
+                f"TG_FLOOD_SLEEP_THRESHOLD must be a whole number of seconds (0 or more), got {raw!r}")
+        kwargs["flood_sleep_threshold"] = seconds
+    for variable, parameter in (("TG_DEVICE_MODEL", "device_model"), ("TG_APP_VERSION", "app_version"),
+                                ("TG_SYSTEM_VERSION", "system_version")):
+        value = (env.get(variable) or "").strip()
+        if value:
+            kwargs[parameter] = value
+    return kwargs
+
+
+# --- TG_SESSION_LOCK / TG_SESSION_LOCK_WAIT: one tg_client.py per Telegram session at a time ----
+# Two processes that connect with the same session file share one auth key, and Telegram may revoke
+# a key that is used from two places at once: the session is then lost and needs a new login. So
+# main() takes an exclusive lock on SESSION_PATH + ".lock" before it creates the client and gives
+# it back after client.disconnect(). A second tg_client.py started meanwhile waits
+# TG_SESSION_LOCK_WAIT seconds (whole number, default 20, 0 = do not wait) and then stops with exit
+# code 69 and one line on stderr that names the holder; nothing reaches Telegram. The operating
+# system drops the lock when its holder dies, so a killed process never leaves the session stuck.
+# TG_SESSION_LOCK=0 (or false / no / off) turns the lock off.
+# Not covered: processes that open the same session without going through tg_client.py (carousel
+# scripts, listeners, one-off scripts) neither ask for the lock nor see it.
+# File layout: byte 0 is the byte that gets locked (on Windows nobody else can read a locked byte
+# range); the holder writes pid / started / command after it, for the "who holds it" message.
+
+SESSION_LOCK_ENV = "TG_SESSION_LOCK"
+SESSION_LOCK_WAIT_ENV = "TG_SESSION_LOCK_WAIT"
+SESSION_LOCK_DEFAULT_WAIT = 20      # seconds
+SESSION_LOCK_POLL = 0.25            # seconds between two attempts while waiting
+_LOCK_BACKEND = "nt" if os.name == "nt" else "posix"
+_LOCK_BUSY_ERRNOS = {getattr(errno, name) for name in ("EACCES", "EAGAIN", "EWOULDBLOCK", "EDEADLK", "EDEADLOCK")
+                     if hasattr(errno, name)}
+
+
+class SessionLockBusy(Exception):
+    """Another process holds the session lock and did not let go in time; the message says who and what to do."""
+
+
+def session_lock_wait(environ=None):
+    """Seconds to wait for the session lock: TG_SESSION_LOCK_WAIT (whole number, 0 = do not wait), default 20."""
+    env = os.environ if environ is None else environ
+    raw = (env.get(SESSION_LOCK_WAIT_ENV) or "").strip()
+    if not raw:
+        return SESSION_LOCK_DEFAULT_WAIT
+    try:
+        seconds = int(raw)
+    except ValueError:
+        seconds = -1
+    if seconds < 0:
+        raise ValueError(f"{SESSION_LOCK_WAIT_ENV} must be a whole number of seconds (0 or more), got {raw!r}")
+    return seconds
+
+
+def _try_lock_byte(fd):
+    """Try to lock the first byte of the file without waiting: True when it is ours, False when another process holds it."""
+    try:
+        if _LOCK_BACKEND == "nt":
+            import msvcrt
+            os.lseek(fd, 0, os.SEEK_SET)
+            msvcrt.locking(fd, msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return True
+    except OSError as exc:
+        if exc.errno in _LOCK_BUSY_ERRNOS:
+            return False
+        raise
+
+
+def _unlock_byte(fd):
+    try:
+        if _LOCK_BACKEND == "nt":
+            import msvcrt
+            os.lseek(fd, 0, os.SEEK_SET)
+            msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(fd, fcntl.LOCK_UN)
+    except OSError:
+        pass            # closing the descriptor releases the lock anyway
+
+
+class SessionLock:
+    """The exclusive lock on one Telegram session. release() is safe to call twice; the OS frees it if the process dies."""
+
+    def __init__(self, path, fd):
+        self.path = path
+        self._fd = fd           # None: an inert lock (switched off, or the lock file could not be used)
+
+    def release(self):
+        fd, self._fd = self._fd, None
+        if fd is None:
+            return
+        _unlock_byte(fd)
+        try:
+            os.close(fd)
+        except OSError:
+            pass
+
+
+def _lock_holder(path):
+    """(pid, started, command) that the holder wrote into the lock file; '?' for whatever cannot be read."""
+    note = {}
+    try:
+        with open(path, "rb") as handle:
+            handle.seek(1)
+            for line in handle.read(4096).decode("utf-8", "replace").splitlines():
+                key, separator, value = line.partition("=")
+                if separator:
+                    note[key.strip()] = re.sub(r"[^0-9A-Za-z_.:+@/ -]", "?", value.strip())[:60]
+    except OSError:
+        pass
+    return note.get("pid") or "?", note.get("started") or "?", note.get("command") or "?"
+
+
+def _busy_message(path, wait):
+    pid, started, command = _lock_holder(path)
+    waited = f"waited {wait} s" if wait else f"not waiting ({SESSION_LOCK_WAIT_ENV}=0)"
+    return (f"session busy: tg_client.py PID {pid} (command {command}, since {started}) holds the Telegram "
+            f"session; {waited}. Two connections on one session can make Telegram revoke its key, so this "
+            f"run did not start and nothing reached Telegram. Wait for it to finish, or set "
+            f"{SESSION_LOCK_ENV}=0 to skip this check.")
+
+
+def acquire_session_lock(path, command, wait=SESSION_LOCK_DEFAULT_WAIT, environ=None):
+    """Take the exclusive lock on `path`, waiting up to `wait` seconds; returns a SessionLock.
+
+    Raises SessionLockBusy when another process keeps it. Switched off by TG_SESSION_LOCK=0: an inert
+    lock comes back and no file is touched. If the lock file itself cannot be used (read-only folder,
+    a file system without locks) one warning goes to stderr and the run carries on unlocked: the lock
+    is a safety net, not a reason to refuse every command."""
+    if _env_says_off(SESSION_LOCK_ENV, environ):
+        return SessionLock(None, None)
+
+    def carry_on(exc):
+        print(f"warning: could not use the session lock file {path} ({exc}); continuing without the lock "
+              f"(set {SESSION_LOCK_ENV}=0 to silence this)", file=sys.stderr)
+        return SessionLock(None, None)
+
+    try:
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+        fd = os.open(path, os.O_RDWR | os.O_CREAT | getattr(os, "O_BINARY", 0), 0o600)
+    except OSError as exc:
+        return carry_on(exc)
+    deadline = time.monotonic() + wait
+    try:
+        while not _try_lock_byte(fd):
+            left = deadline - time.monotonic()
+            if left <= 0:
+                raise SessionLockBusy(_busy_message(path, wait))
+            time.sleep(min(SESSION_LOCK_POLL, left))
+    except BaseException as exc:
+        os.close(fd)
+        if isinstance(exc, OSError):
+            return carry_on(exc)
+        raise
+    started = datetime.now().astimezone().isoformat(timespec="seconds")
+    note = f"pid={os.getpid()}\nstarted={started}\ncommand={command}\n".encode("utf-8", "replace")
+    try:
+        os.lseek(fd, 1, os.SEEK_SET)
+        os.write(fd, note)
+        os.ftruncate(fd, 1 + len(note))
+    except OSError:
+        pass            # only for the message of whoever finds the lock taken; the lock itself is held
+    return SessionLock(path, fd)
+
+
+# --- wording of the failures that deserve more than a traceback ------------------------------
+def explain_error(exc):
+    """(one-line message, exit code) for errors with their own wording, otherwise None."""
+    from telethon import errors as tl_errors
+    if isinstance(exc, tl_errors.FloodWaitError):
+        seconds = getattr(exc, "seconds", None)
+        wait = f"{seconds} seconds" if seconds is not None else "an unknown time"
+        return (f"Telegram asks to wait {wait} (FloodWait): do not retry immediately", EXIT_FLOOD_WAIT)
+    if isinstance(exc, tl_errors.TypeNotFoundError):
+        constructor = getattr(exc, "invalid_constructor_id", None)
+        known = f" (constructor {constructor:08x})" if isinstance(constructor, int) else ""
+        return ("Telegram sent a TL type this Telethon does not know" + known + ": the schema of this "
+                "Telethon is older than the server's, or another process with a different Telethon "
+                "version shares the same auth key; do not retry in a loop (upgrade Telethon or stop "
+                "the other process)", EXIT_SCHEMA_DRIFT)
+    if isinstance(exc, UploadPathRefused):
+        return (str(exc), EXIT_REFUSED)
+    if isinstance(exc, SessionLockBusy):
+        return (str(exc), EXIT_SESSION_BUSY)
+    return None
+
+
+def report_fatal_error(exc):
+    """Print a failed command the way main() reports it and return the process exit code.
+
+    Errors with their own wording get one line on stderr; everything else is reported exactly
+    as before: 'ERROR: ...' on stdout, the traceback on stderr, exit code 1."""
+    known = explain_error(exc)
+    if known is not None:
+        message, code = known
+        print(message, file=sys.stderr)
+        return code
+    print(f"ERROR: {exc}")
+    import traceback
+    traceback.print_exception(type(exc), exc, exc.__traceback__)
+    return 1
+
+
 # ========== ARGPARSE ==========
 
 async def main():
     parser = argparse.ArgumentParser(description="Telegram CLI for Claude Code")
+    parser.add_argument("--readonly", action="store_true",
+                        help="Refuse every command outside READONLY_COMMANDS (same as TG_READONLY=1); "
+                             "write it before the command name")
     sub = parser.add_subparsers(dest="command", help="Command")
 
     # --- Read ---
@@ -4317,6 +5190,7 @@ async def main():
     sp.add_argument("--rank", default="", help="Admin title")
     sp.add_argument("--can-post", action="store_true")
     sp.add_argument("--can-edit", action="store_true")
+    sp.add_argument("--rights", help="comma-separated ChatAdminRights flags")
 
     sp = sub.add_parser("edit-channel-title", help="Change channel title")
     sp.add_argument("channel")
@@ -4550,19 +5424,46 @@ async def main():
     sp.add_argument("msg_id", help="Message ID of the gift")
     sp.add_argument("password", help="2FA password")
 
+    sp = sub.add_parser("set-default-rights", help="Default member rights of a group (listed flags = banned)")
+    sp.add_argument("chat")
+    sp.add_argument("--ban", default="", help="comma-separated ChatBannedRights flags, e.g. send_polls,pin_messages")
+
     args = parser.parse_args()
     if not args.command:
         parser.print_help()
         return
 
-    api_id, api_hash = get_api_credentials()
-    client = TelegramClient(SESSION_PATH, api_id, api_hash)
-    await client.connect()
+    if readonly_mode_requested(args):
+        refusal = readonly_refusal(args.command)
+        if refusal:
+            print(refusal, file=sys.stderr)
+            sys.exit(EXIT_REFUSED)
 
-    if not await client.is_user_authorized():
-        print("ERROR: Session not authorized. Run telegram_auth.py first.")
-        await client.disconnect()
-        sys.exit(1)
+    api_id, api_hash = get_api_credentials()
+
+    try:
+        client_kwargs = telegram_client_kwargs()
+        lock_wait = session_lock_wait()
+    except ValueError as e:
+        print(e, file=sys.stderr)
+        sys.exit(EXIT_REFUSED)
+
+    try:
+        session_lock = acquire_session_lock(SESSION_PATH + ".lock", args.command, lock_wait)
+    except SessionLockBusy as e:
+        sys.exit(report_fatal_error(e))
+
+    try:
+        client = TelegramClient(SESSION_PATH, api_id, api_hash, **client_kwargs)
+        await client.connect()
+
+        if not await client.is_user_authorized():
+            print("ERROR: Session not authorized. Run telegram_auth.py first.")
+            await client.disconnect()
+            sys.exit(1)
+    except BaseException:
+        session_lock.release()      # the process may live on (tests); a dead one is released by the OS
+        raise
 
     commands = {
         # Read
@@ -4833,17 +5734,17 @@ async def main():
         "get-unique-star-gift": cmd_get_unique_star_gift,
         "get-saved-star-gifts": cmd_get_saved_star_gifts,
         "gift-withdrawal-url": cmd_gift_withdrawal_url,
+        "set-default-rights": cmd_set_default_rights,
     }
 
     try:
         await commands[args.command](client, args)
     except Exception as e:
-        print(f"ERROR: {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
+        sys.exit(report_fatal_error(e))
     finally:
         await client.disconnect()
+        session_lock.release()
+        report_sanitized()
 
 
 if __name__ == "__main__":

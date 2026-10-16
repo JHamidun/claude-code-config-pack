@@ -112,14 +112,11 @@ Priority: [P0-P3]
 
 ### 5. Quality Assurance
 ```
-Checklist:
-- [ ] Tests pass
-- [ ] Linter clean
-- [ ] No console errors
-- [ ] Edge cases handled
-- [ ] Error handling proper
-- [ ] Performance acceptable
-- [ ] Security reviewed (if applicable)
+Прогнать внешние гейты и прочитать их вывод:
+- tests
+- linter
+- production build
+- console браузера, если менялся фронт
 ```
 
 ### 6. PR & Commit
@@ -145,14 +142,6 @@ Tool: Todoist + Linear (if work task)
 - Link PR
 - Update any dependent tasks
 ```
-
-## Quality Checks
-- [ ] Task понят полностью (не половина)
-- [ ] Tests написаны/обновлены
-- [ ] Code reviewed (self или peer)
-- [ ] Linting passed
-- [ ] Documentation updated
-- [ ] No obvious regressions
 
 ## Completion Criteria
 - Code merged или PR создан

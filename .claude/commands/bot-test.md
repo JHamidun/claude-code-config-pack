@@ -330,6 +330,13 @@ pytest tests/unit tests/integration --junitxml=test-results.xml
 - [ ] Rate limiting works
 - [ ] Authentication required where needed
 
+#### Gotchas
+- **Check state, not just the reply.** In unit tests assert what changed in `user_data` too: a handler that answers but does not advance the state breaks the dialog silently.
+- **E2E only from your own test accounts**, never from accounts of real people. One StringSession = one process: two simultaneous connections on the same string revoke the key for good and the session has to be issued again.
+- **Load tests measure Telegram's limit too.** A bot is capped at about 30 messages per second; a test that runs into 429 is measuring that limit, not your bot.
+- **Negative scenarios are mandatory.** A suite of happy paths only stays green even with error handling switched off.
+- Do not report "tests passed" without having seen the runner output in this session.
+
 ### 8. Automated Test Report
 
 **Generate test report:**

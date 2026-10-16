@@ -2,7 +2,8 @@
 
 > Принципы, НЕ снимок конфигурации. Текущее состояние — только из источника:
 > режим и списки → `settings.json` → `permissions` (defaultMode, allow/deny/ask) + `/context`;
-> хуки → `settings.json` → `hooks` + `/doctor`; MCP → `settings.json` → `mcpServers` + `/mcp`.
+> хуки → `settings.json` → `hooks` + `/doctor`; MCP → **`~/.claude.json`** → `mcpServers` + `/mcp`
+> (в `settings.json` секция `mcpServers` НЕ читается — молча).
 > Не описывай режим по памяти — прочитай settings.json.
 > Креды и injection-вектора → `rules/security.md`. Стоимость и дизайн хуков → `config/rules-ref/hooks.md`.
 

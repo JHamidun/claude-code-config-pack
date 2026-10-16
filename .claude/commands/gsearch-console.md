@@ -5,6 +5,11 @@ argument-hint: "[sites | analytics <site_url> | sitemaps <site_url>]"
 
 # Google Search Console Operations
 
+> Права ТОЛЬКО в `google_oauth_token_gsc.json` (скоуп `webmasters.readonly`).
+> В общем `google_oauth_token.json` их нет — там один `drive`, и Search Console
+> с ним отдаёт 403 на первом же вызове. Токен только на чтение: список сайтов,
+> запросы и карты сайта читаются, отправка sitemap — нет.
+
 /gsearch-console - Работа с Google Search Console
 
 ## Описание
@@ -26,7 +31,7 @@ import json
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-with open(os.path.expanduser('~/.claude/google_oauth_token.json'), 'r') as f:
+with open(os.path.expanduser('~/.claude/google_oauth_token_gsc.json'), 'r') as f:
     token_data = json.load(f)
 creds = Credentials.from_authorized_user_info(token_data)
 sc = build('searchconsole', 'v1', credentials=creds)

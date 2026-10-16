@@ -5,6 +5,13 @@ argument-hint: "[create <название> | list | get <space_name>]"
 
 # Google Meet Operations
 
+> ⚠️ Токена с правами Meet на машине нет. Общий `google_oauth_token.json` несёт
+> ТОЛЬКО скоуп `drive` — Meet REST API с ним отдаёт 403 на первом же вызове.
+> Сначала завести отдельный `google_oauth_token_meet.json` со скоупами Meet
+> (OAuth-прогон с `google_oauth_client.json`, тем же путём, каким подняли
+> `google_oauth_token_calendar.json`), и только потом идти по шагам ниже.
+> Пока токена нет — сказать владельцу об этом, а не пробовать общий.
+
 /gmeet - Работа с Google Meet
 
 ## Описание
@@ -26,7 +33,7 @@ import json
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-with open(os.path.expanduser('~/.claude/google_oauth_token.json'), 'r') as f:
+with open(os.path.expanduser('~/.claude/google_oauth_token_meet.json'), 'r') as f:
     token_data = json.load(f)
 creds = Credentials.from_authorized_user_info(token_data)
 meet = build('meet', 'v2', credentials=creds)

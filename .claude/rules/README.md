@@ -12,6 +12,8 @@
 | `context7` | Свежие доки библиотек: скрипт `tools/context7_docs.py` (без ключа и плагина) или плагин Context7 — зови тот, что есть в `tools` агента |
 | `delegation` | Task complexity levels and agent routing |
 | `dont-do` | Forbidden actions and common mistakes |
+| `just-do-it` | Reversible and checkable by me: do it and report; ask only when the decision is yours |
+| `keep-working-while-swarm-runs` | Background work needs an alarm: stay in the foreground or schedule a wake-up |
 | `model-selection` | Which model for which task (decision tree) |
 | `models` | Указатель: актуальные алиасы Max → канон config/models.md |
 | `permissions` | Security boundaries; актуальный режим — только из settings.json / `/context` |

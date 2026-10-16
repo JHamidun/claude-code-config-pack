@@ -1,9 +1,21 @@
 ---
-description: "Google Ads по API (GAQL): аккаунты, кампании, отчёты по расходам. Триггеры: «гугл реклама», «отчёт google ads»."
+description: "НЕ РАБОТАЕТ без настройки: нужны developer token и OAuth-скоуп AdWords. Google Ads по API (GAQL): аккаунты, кампании, отчёты по расходам. Триггеры: «гугл реклама», «отчёт google ads». НЕ Директ → yandex; VK Ads → vk-ads-pro-ru."
 argument-hint: "[accounts | campaigns <customer_id> | report <customer_id>]"
 ---
 
 # Google Ads Operations
+
+> ⛔ **Команда НЕ РАБОТАЕТ из коробки.** Два независимых стопора:
+> 1) developer token не выпущен — в конфиге ниже стоит плейсхолдер
+>    `YOUR_DEVELOPER_TOKEN`, без реального токена Google Ads API отвечает
+>    `DEVELOPER_TOKEN_NOT_APPROVED`;
+> 2) OAuth-токена с правами Google Ads нет — общий `google_oauth_token.json`
+>    несёт ТОЛЬКО скоуп `drive` и даёт 403.
+>
+> Не запускай шаги ниже «на пробу» — скажи пользователю, что нужно сперва выпустить
+> developer token в MCC и завести `google_oauth_token_ads.json` со скоупом
+> AdWords. Код ниже — заготовка на этот момент, а не рабочий маршрут.
+> Стратегия и настройка кампаний без API — навык `google-ads-pro-ru`.
 
 /gads - Работа с Google Ads
 
@@ -32,7 +44,7 @@ import os
 import json
 from google.ads.googleads.client import GoogleAdsClient
 
-with open(os.path.expanduser('~/.claude/google_oauth_token.json'), 'r') as f:
+with open(os.path.expanduser('~/.claude/google_oauth_token_ads.json'), 'r') as f:  # токена ещё нет — см. блок выше
     token_data = json.load(f)
 
 # Google Ads требует developer token + login customer ID

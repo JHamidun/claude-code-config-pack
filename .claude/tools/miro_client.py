@@ -677,6 +677,46 @@ def cmd_groups(args):
     out(args, data, lines)
 
 
+def cmd_comments(args):
+    """GET /v2-experimental/boards/{id}/comments — board comment threads (read-only).
+
+    Not in the stable v2 reference (the MCP `comment_*` tools were thought to be the only way);
+    verified 13.10.2026 with the same OAuth token (boards:read): the endpoint answers
+    {offset, limit, size, total, data[]}. Thread: id, createdAt, createdBy{id,name},
+    messages[{content, createdAt, createdBy, reactions}], position{type: attached, itemId, x, y},
+    resolved. Text may carry HTML entities (&#34; for a double quote).
+    """
+    board = urllib.parse.quote(args.board_id, safe="")
+    threads, offset = [], 0
+    while True:
+        data = api_request("GET", f"/v2-experimental/boards/{board}/comments",
+                           params={"limit": 50, "offset": offset}, verbose=args.verbose)
+        chunk = data.get("data") or []
+        threads += chunk
+        if not chunk or len(threads) >= data.get("total", len(threads)):
+            break
+        offset += len(chunk)
+    if args.since:
+        threads = [t for t in threads if (t.get("createdAt") or "") >= args.since]
+    if args.author:
+        needle = args.author.lower()
+        threads = [t for t in threads if needle in ((t.get("createdBy") or {}).get("name") or "").lower()]
+    if args.unresolved:
+        threads = [t for t in threads if not t.get("resolved")]
+    threads.sort(key=lambda t: t.get("createdAt") or "")
+    lines = [f"{len(threads)} comment thread(s)"]
+    for t in threads:
+        who = (t.get("createdBy") or {}).get("name") or (t.get("createdBy") or {}).get("id")
+        pos = t.get("position") or {}
+        where = pos.get("itemId") or f"({pos.get('x')},{pos.get('y')})"
+        lines.append(f"\n[{t.get('createdAt')}] {who} -> item {where}" + ("  [resolved]" if t.get("resolved") else ""))
+        for m in t.get("messages") or []:
+            mw = (m.get("createdBy") or {}).get("name") or ""
+            body = (m.get("content") or "").strip().replace("&#34;", '"')
+            lines.append(f"  - {mw}: {body}")
+    out(args, {"total": len(threads), "data": threads}, lines)
+
+
 def cmd_group(args):
     """POST /v2/boards/{id}/groups (Level 2) — group existing items."""
     ids = [i.strip() for i in args.items.split(",") if i.strip()]
@@ -1006,6 +1046,13 @@ def main():
     p.add_argument("board_id")
     p.add_argument("--limit", type=int, default=50)
     p.set_defaults(func=cmd_groups)
+
+    p = common(sub.add_parser("comments", help="list board comment threads (GET /v2-experimental/.../comments, read-only, undocumented endpoint)"))
+    p.add_argument("board_id")
+    p.add_argument("--since", help="lower bound for createdAt, ISO, e.g. 2026-10-13")
+    p.add_argument("--author", help="substring of the author's name")
+    p.add_argument("--unresolved", action="store_true", help="only open threads")
+    p.set_defaults(func=cmd_comments)
 
     p = common(sub.add_parser("group", help="group existing items (POST .../groups, L2)"))
     p.add_argument("board_id")

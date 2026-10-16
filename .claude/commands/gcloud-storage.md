@@ -5,6 +5,13 @@ argument-hint: "[buckets | list <bucket> | upload <bucket> <file> | download <bu
 
 # Google Cloud Storage Operations
 
+> ⚠️ Токена с правами GCS по умолчанию нет. Общий `google_oauth_token.json` несёт
+> ТОЛЬКО скоуп `drive` — Storage API с ним отдаёт 403 на первом же вызове.
+> Сначала завести отдельный `google_oauth_token_gcs.json` со скоупами Storage
+> (OAuth-прогон с `google_oauth_client.json`, тем же путём, каким поднимается
+> `google_oauth_token_calendar.json`), и только потом идти по шагам ниже.
+> Пока токена нет — сказать пользователю об этом, а не пробовать общий.
+
 /gcloud-storage - Работа с Google Cloud Storage
 
 ## Описание
@@ -31,7 +38,7 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 import io
 
-with open(os.path.expanduser('~/.claude/google_oauth_token.json'), 'r') as f:
+with open(os.path.expanduser('~/.claude/google_oauth_token_gcs.json'), 'r') as f:
     token_data = json.load(f)
 creds = Credentials.from_authorized_user_info(token_data)
 storage = build('storage', 'v1', credentials=creds)
@@ -39,7 +46,8 @@ storage = build('storage', 'v1', credentials=creds)
 
 2. **Список бакетов:**
 ```python
-buckets = storage.buckets().list(project='your-gcp-project-id').execute()
+import os  # значение в ~/.claude/.credentials.master.env
+buckets = storage.buckets().list(project=os.getenv('GOOGLE_CLOUD_PROJECT_ID')).execute()
 for b in buckets.get('items', []):
     print(f"{b['name']} | {b['location']} | created: {b['timeCreated']}")
 ```
@@ -95,7 +103,7 @@ pip install google-cloud-storage
 import os
 from google.cloud import storage as gcs
 
-client = gcs.Client(project='your-gcp-project-id', credentials=creds)
+client = gcs.Client(project=os.getenv('GOOGLE_CLOUD_PROJECT_ID'), credentials=creds)
 
 # Список бакетов
 for bucket in client.list_buckets():

@@ -10,7 +10,7 @@ argument-hint: [Q1 2025 / 2025 / next 6 months]
 ## Process:
 
 ### 1. Gather Context
-- Fetch Linear/Jira issues
+- Задачи из Beads: `bd list` / `bd ready` (трекер репозитория)
 - Analyze backlog
 - Review PRD and specs
 
@@ -29,7 +29,5 @@ Impact vs Effort Matrix с Priority Score
 - Feature Highlights
 
 ### 5. Distribution
-- Notion page
-- Google Drive share
-- Slack notification
+- Google Drive: `python ~/.claude/tools/gdrive_client.py` (команда `/gdrive`)
 

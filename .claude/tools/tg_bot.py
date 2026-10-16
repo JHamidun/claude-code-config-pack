@@ -41,6 +41,13 @@ tg_bot.py — полный инструмент Telegram Bot API: ВСЁ, что
 Глобальный флаг --dry-run печатает метод+payload и НИЧЕГО не отправляет (для проверки).
 
 Примеры — внизу файла (EXAMPLES) и в TG_BOT_API_REFERENCE.md.
+
+Покрытие Bot API (сверка 03.10.2026 с core.telegram.org/bots/api, версия 10.3): 173 из 185 методов.
+НЕТ: editEphemeralMessageText/Media/Caption/ReplyMarkup и deleteEphemeralMessage (10.2),
+getUserPersonalChatMessages (10.0), getManagedBotToken и replaceManagedBotToken (9.6),
+repostStory (9.3), setUserEmojiStatus (8.0), unpinAllGeneralForumTopicMessages (6.8),
+setPassportDataErrors. Не поддержаны параметры 10.2-10.3: ephemeral_message_parameters,
+can_stop/keep_on_stop (drafts).
 """
 import argparse
 import json
@@ -137,6 +144,11 @@ def api(token: str, method: str, payload: dict, files=None, dry=False) -> Any:
         if data.get("error_code") == 429:
             retry = data.get("parameters", {}).get("retry_after", 3)
             time.sleep(retry + 1)
+            for _f in (files or {}).values():   # дескрипторы после первой попытки стоят в конце файла
+                try:
+                    _f.seek(0)
+                except Exception:
+                    pass
             return api(token, method, payload, files=files, dry=dry)
         raise TelegramError(method, data.get("error_code"), data.get("description"))
     return data["result"]
@@ -416,7 +428,7 @@ def cmd_poll(token, args):
         p["allows_multiple_answers"] = True
     if args.quiz:
         p["type"] = "quiz"
-        p["correct_option_id"] = args.correct
+        p["correct_option_ids"] = [args.correct]   # Bot API 9.6 (03.04.2026): correct_option_id заменён на массив correct_option_ids
         if args.explanation:
             p["explanation"] = args.explanation
             p["explanation_parse_mode"] = "HTML"
@@ -926,7 +938,9 @@ def cmd_promote(token, args):
     for flag in ("can_post_messages", "can_edit_messages", "can_delete_messages",
                  "can_pin_messages", "can_manage_chat", "can_invite_users",
                  "can_restrict_members", "can_promote_members", "can_manage_video_chats",
-                 "can_manage_direct_messages"):
+                 "can_manage_direct_messages", "is_anonymous", "can_change_info", "can_post_stories",
+                 "can_edit_stories", "can_delete_stories", "can_manage_topics", "can_manage_tags",
+                 "can_send_welcome_messages"):
         if getattr(args, flag, False):
             p[flag] = True
     api(token, "promoteChatMember", p, dry=args.dry_run)
@@ -1310,6 +1324,9 @@ def _report_sent(result, args):
     if args.dry_run:
         return
     mid = result.get("message_id")
+    if mid == 0:   # сервер сам отложил видео в большой чат/канал (changelog 17.11.2024): сообщения ещё нет
+        print("⚠️ Telegram отложил отправку (message_id=0) — ищи сообщение в отложенных, ссылки пока нет")
+        return
     chat = result.get("chat", {})
     uname = chat.get("username")
     where = f"https://t.me/{uname}/{mid}" if uname else f"chat {chat.get('id')} • #{mid}"
@@ -1368,11 +1385,11 @@ def build_parser():
     s = sub.add_parser("poll", help="Опрос / викторина (quiz)")
     s.add_argument("--to", required=True)
     s.add_argument("--question", required=True)
-    s.add_argument("--option", action="append", required=True, help="Вариант (повторяемый, ≥2)")
+    s.add_argument("--option", action="append", required=True, help="Вариант (повторяемый, от 1 до 12: минимум снижен с 2 до 1 в 10.0, максимум поднят до 12 в 9.1)")
     s.add_argument("--public", action="store_true", help="Не анонимный")
     s.add_argument("--multiple", action="store_true", help="Несколько ответов")
     s.add_argument("--quiz", action="store_true", help="Режим викторины")
-    s.add_argument("--correct", type=int, default=0, help="Индекс правильного (quiz)")
+    s.add_argument("--correct", type=int, default=0, help="Индекс правильного ответа (quiz); уходит как correct_option_ids=[N]")
     s.add_argument("--explanation", help="Пояснение (quiz)")
     s.add_argument("--silent", action="store_true")
     s.add_argument("--protect", action="store_true")
@@ -1431,7 +1448,8 @@ def build_parser():
     s = sub.add_parser("react", help="Реакция-эмодзи")
     s.add_argument("--to", required=True)
     s.add_argument("--msg-id", type=int, required=True)
-    s.add_argument("--emoji", nargs="+", default=["👍"])
+    s.add_argument("--emoji", nargs="+", default=["👍"],
+                   help="Эмодзи. Бот без Premium может поставить только ОДНУ реакцию на сообщение; платные реакции ботам недоступны")
     s.add_argument("--big", action="store_true")
 
     s = sub.add_parser("copy", help="Скопировать сообщение (без «переслано от»)")
@@ -1581,6 +1599,14 @@ def build_parser():
     s.add_argument("--can-promote", dest="can_promote_members", action="store_true")
     s.add_argument("--can-manage-video", dest="can_manage_video_chats", action="store_true")
     s.add_argument("--can-manage-dm", dest="can_manage_direct_messages", action="store_true")
+    s.add_argument("--anonymous", dest="is_anonymous", action="store_true")
+    s.add_argument("--can-change-info", dest="can_change_info", action="store_true")
+    s.add_argument("--can-post-stories", dest="can_post_stories", action="store_true")
+    s.add_argument("--can-edit-stories", dest="can_edit_stories", action="store_true")
+    s.add_argument("--can-delete-stories", dest="can_delete_stories", action="store_true")
+    s.add_argument("--can-manage-topics", dest="can_manage_topics", action="store_true")
+    s.add_argument("--can-manage-tags", dest="can_manage_tags", action="store_true")
+    s.add_argument("--can-send-welcome", dest="can_send_welcome_messages", action="store_true")
 
     s = sub.add_parser("perms", help="Дефолтные права чата (setChatPermissions)")
     s.add_argument("--to", required=True); s.add_argument("--perms", required=True, help="JSON: ChatPermissions")

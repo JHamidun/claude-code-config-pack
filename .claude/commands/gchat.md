@@ -5,6 +5,13 @@ argument-hint: "[spaces | messages <space_id> | send <space_id> <текст>]"
 
 # Google Chat Operations
 
+> ⚠️ Токена с правами Chat API по умолчанию нет. Общий `google_oauth_token.json`
+> несёт ТОЛЬКО скоуп `drive` — Chat API с ним отдаёт 403 на первом же вызове.
+> Сначала завести отдельный `google_oauth_token_chat.json` со скоупами Chat
+> (OAuth-прогон с `google_oauth_client.json`, тем же путём, каким поднимается
+> `google_oauth_token_calendar.json`), и только потом идти по шагам ниже.
+> Пока токена нет — сказать пользователю об этом, а не пробовать общий.
+
 /gchat - Работа с Google Chat
 
 ## Описание
@@ -26,7 +33,7 @@ import json
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-with open(os.path.expanduser('~/.claude/google_oauth_token.json'), 'r') as f:
+with open(os.path.expanduser('~/.claude/google_oauth_token_chat.json'), 'r') as f:
     token_data = json.load(f)
 creds = Credentials.from_authorized_user_info(token_data)
 chat = build('chat', 'v1', credentials=creds)

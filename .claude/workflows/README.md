@@ -82,10 +82,6 @@
 ### 2. Another Step
 ...
 
-## Quality Checks
-- [ ] Check 1
-- [ ] Check 2
-
 ## Completion Criteria
 Когда считать задачу выполненной
 

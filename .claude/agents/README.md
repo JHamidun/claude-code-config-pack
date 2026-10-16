@@ -52,6 +52,7 @@
 | `accessibility-tester` | WCAG 2.1 AA/AAA compliance |
 | `mobile-responsiveness-tester` | Multi-viewport mobile testing |
 | `mobile-fixes-implementer` | Mobile CSS/JS fix automation |
+| `web-quality` | Web page quality in modes: A11Y (WCAG 2.1 AA/AAA), RESPONSIVE (multi-viewport), PERF (Core Web Vitals), FIX (applies the checklist) |
 
 ## Security
 
@@ -78,12 +79,17 @@
 | `proofreader-ortho` | Stage 1: Russian spelling |
 | `proofreader-punctuation` | Stage 2: Russian punctuation |
 | `proofreader-typography` | Stage 3: Typographic corrections |
+| `proofreader` | The same three passes in one agent: spelling (+`<err>` tags) → punctuation → typography. Rules: `agents/references/proofreader-rules.md` |
 
-## Long-form Content (1 agent)
+## Long-form Content (2 agents)
 
 | Agent | Description |
 |-------|-------------|
+| `article-pipeline` | Гонит статью по 8 стадиям: research → draft → fact-check → voice → proof → edit → cover → .docx |
 | `book-fact-checker` | Book chapters fact-check («a non-fiction book», UNKNOWN vs VERIFIED) |
+
+Карта конвейера `article-pipeline` — `skills/article-pipeline/SKILL.md`, полные промпты стадий —
+`skills/article-pipeline/references/stage-*.md`. Агент читает навык и спавнит `general-purpose` с промптом стадии.
 
 ## External Models
 

@@ -420,6 +420,15 @@ docker exec bot-database mongodump --out=/backup/dump_$DATE
 find /backup -name "dump_*" -mtime +7 -delete  # Keep 7 days
 ```
 
+A backup that was never restored is not a backup: restore it into staging at least once.
+
+### 10. Gotchas
+
+- **Production is irreversible for live users.** Before `production`, make sure the owner really asked for prod and that staging has already been checked.
+- **Polling and webhook are mutually exclusive.** While a webhook is set, polling silently receives no updates (the bot looks alive but is deaf). When switching to polling, call `deleteWebhook` first.
+- **A running container does not prove delivery.** `getWebhookInfo` is the only check that Telegram really pushes updates: read `last_error_message` and `pending_update_count`.
+- **Verify with your own eyes, not by "container is up":** the bot answers `/start`, the database reads and writes, `docker-compose logs --tail=100 bot | grep ERROR` is empty, `/health` returns 200, and user data survives a restart.
+
 ## Output:
 
 ### Deployment Summary
