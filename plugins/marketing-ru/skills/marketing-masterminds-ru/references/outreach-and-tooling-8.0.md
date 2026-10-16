@@ -160,5 +160,5 @@ Instagram) · плюс камера, свет, петличка. «Не буду
 - Работа с блогерами вне Telegram, маркировка рекламы, проверка на накрутку —
   `influencer-buying-ru`.
 - Трендвотчинг под контент и креативы — `trend-engine`, `ai-creative-factory-ru`.
-- Агент-аутрич на Hermes/OpenClaw — agent-builder tooling, `tg-carousel-outreach`.
+- Агент-аутрич на Hermes/OpenClaw — `autonomous-agent-creator`, `tg-carousel-outreach`.
 - B2B-цепочки касаний и ICP — `b2b-marketing-ru`, `lead-research`.

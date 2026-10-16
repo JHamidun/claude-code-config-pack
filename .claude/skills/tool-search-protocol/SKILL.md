@@ -19,7 +19,7 @@ Claude Code (и Claude в целом) видит **частичный** спис
    значит отсутствие пути: у Slack/Drive/Linear/почты в этом конфиге чаще есть свой
    скрипт или CLI. Дальше по `rules/auto-learning.md` идут четыре источника —
    конфиг (`rules/routing.md` → `config/routing-ext.md` → списком `skills/`, `commands/`,
-   `tools/`, `scripts/`), память (`memory_find.py` + `memory_vec.py`), история чатов
+   `tools/`, `scripts/`), память (`memory_find.py` + `memory_vec.py`; если их нет в `scripts/` — `search_chats.py`), история чатов
    (`search_chats.py`), сама система (`.credentials.master.env`, `~/.ssh/config`,
    `pip list`). Отказ — только после всех четырёх и с парой «инструмент → результат»
    (`rules/try-before-refusing.md`).

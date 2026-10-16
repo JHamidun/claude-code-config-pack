@@ -272,7 +272,7 @@ IP пользоваться можно, но клиента Claude там не �
 
 Практический вывод для сборки агента 24/7: если движок живёт на сервере (Hermes, OpenClaw),
 дефолт — **API-ключ**, а подписка на сервере — это либо Codex, либо осознанный риск по
-Claude. Механика самого агента — agent-builder tooling →
+Claude. Механика самого агента — `autonomous-agent-creator` →
 `references/second-brain-tg-assistant.md`.
 
 **Смежное:**
@@ -480,5 +480,5 @@ Claude Code и рой агентов.
   после малвари — дороже.
 - [`harness-goal-workflow.md`](harness-goal-workflow.md) — почему лимиты кончаются: рой
   агентов Dynamic Workflow жжёт подписку часами (§7.1 здесь — сколько это в деньгах).
-- agent-builder tooling → `references/second-brain-tg-assistant.md` — контур, где
+- `autonomous-agent-creator` → `references/second-brain-tg-assistant.md` — контур, где
   подписка не нужна вовсе: агент на сервере с дешёвым API-ключом (§4, §7.1).

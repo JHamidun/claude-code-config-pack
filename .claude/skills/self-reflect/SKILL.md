@@ -19,6 +19,9 @@ Analyze past sessions and errors to generate actionable improvements.
 > списком — свежими на вид записями февраля, которые легко принять за текущие
 > (проверено запуском 06.09.2026).
 
+> Если `memory_find.py` / `memory_vec.py` нет в твоём `~/.claude/scripts/` (в паке их нет), ищи через
+> `python ~/.claude/tools/search_chats.py search "<запрос>"` и по заметкам в папке `memory/` проекта.
+
 1. **Recent errors from memory**:
 ```bash
 python ~/.claude/scripts/memory_find.py "ошибка баг что чинили"

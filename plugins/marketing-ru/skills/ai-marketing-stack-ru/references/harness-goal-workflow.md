@@ -159,7 +159,7 @@ loop**. Скилл — это осознанное ограничение мод
 > предварительная критика по схеме pre-mortem, за которой идёт контр-аргументация.
 
 Пара «критик → оптимист» — тот же приём, что оформлен у нас в
-agent-builder tooling → `references/adversarial-agent-pairs-pattern.md`
+`autonomous-agent-creator` → `references/adversarial-agent-pairs-pattern.md`
 (Ideator ↔ Critic + гейт SHARP). Здесь она встроена не в двух агентов, а в один harness.
 
 **Контрольная точка внутри workflow:** запуская режим, можно прямо велеть — «на этапе
@@ -192,7 +192,7 @@ Harness внутри Claude Code упирается в то, что машина
 а на сервере автоматизация отработала, и в Telegram она меня уже ждёт».
 
 Отсюда переход к агенту 24/7 на VPS (Hermes / OpenClaw) — механика в
-agent-builder tooling → `references/second-brain-tg-assistant.md`.
+`autonomous-agent-creator` → `references/second-brain-tg-assistant.md`.
 
 ## Cross-links
 
@@ -201,9 +201,9 @@ agent-builder tooling → `references/second-brain-tg-assistant.md`.
 - [`cursor-os.md`](cursor-os.md) — слои контекста и rules.md, на которые опирается harness.
 - [`access-and-accounts.md`](access-and-accounts.md) — лимиты подписок: workflow сжигает
   окно за часы, порог «$100, а лучше $200» оттуда.
-- agent-builder tooling → `references/second-brain-tg-assistant.md` — тот же harness,
+- `autonomous-agent-creator` → `references/second-brain-tg-assistant.md` — тот же harness,
   но живущий на сервере и доступный голосом из Telegram.
-- agent-builder tooling → `references/adversarial-agent-pairs-pattern.md` — критик и
+- `autonomous-agent-creator` → `references/adversarial-agent-pairs-pattern.md` — критик и
   оппонент как отдельные агенты с квантованным гейтом.
 - `llm-evals` — если надо доказать, что workflow дал результат лучше, чем одиночный прогон,
   а не просто дороже.
