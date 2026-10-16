@@ -2,6 +2,14 @@
 > original frontmatter: version 2.0.0). Body preserved verbatim; only the
 > worker-prompts link path updated to the new references layout.
 
+> **2026-08-22:** the ten standalone worker agents were retired into
+> `_trash-2026-08-22/agents/health/workers/` — the agent registry holds only 66
+> slots. Every worker is now spawned as `subagent_type: "general-purpose"`,
+> `model: "fable"`, with the full role brief pasted from
+> `references/worker-prompts/cleanup.md`. The short prompts below are the
+> orchestration outline; the brief is what the worker actually needs.
+
+
 # Cleanup Health Check (Inline Orchestration)
 
 You ARE the orchestrator. Execute this workflow directly without spawning a separate orchestrator agent.
@@ -44,10 +52,10 @@ Detection → Validate → Remove by Priority → Verify → Repeat if needed
 
 ## Phase 2: Detection
 
-**Invoke dead-code-hunter** via Task tool:
+**Invoke the detection worker** via Task tool:
 
 ```
-subagent_type: "dead-code-hunter"
+subagent_type: "general-purpose"   # brief: worker-prompts/cleanup.md § Dead Code Hunter — Detection
 description: "Detect all dead code"
 prompt: |
   Scan the entire codebase for dead code:
@@ -64,7 +72,7 @@ prompt: |
   Return summary with dead code counts per priority.
 ```
 
-**After dead-code-hunter returns**:
+**After the detection worker returns**:
 1. Read `dead-code-report.md`
 2. Parse dead code counts by priority
 3. If zero dead code → skip to Final Summary
@@ -72,17 +80,23 @@ prompt: |
 
 ---
 
-## Phase 3: Quality Gate (Detection)
+## Phase 3: Baseline (non-blocking — NEVER exits)
 
-Run inline validation:
+Run inline validation to **record the starting state**, not to gate:
 
 ```bash
 pnpm type-check
 pnpm build
 ```
 
-- If both pass → proceed to removal
-- If fail → report to user, exit
+- Both pass → baseline = GREEN, proceed to removal
+- Either fails → baseline = RED: record the exact error list, hand it to
+  the removal worker as context, **proceed to removal anyway**
+
+A red build is the usual reason this workflow was invoked, so exiting here would
+mean exiting on exactly the input the workflow exists to repair. The gate that
+can stop the run lives in Phase 4, after a removal, and compares against this
+baseline.
 
 ---
 
@@ -95,9 +109,9 @@ pnpm build
 
 2. **Update TodoWrite**: mark current priority in_progress
 
-3. **Invoke dead-code-remover** via Task tool:
+3. **Invoke the removal worker** via Task tool:
    ```
-   subagent_type: "dead-code-remover"
+   subagent_type: "general-purpose"   # brief: worker-prompts/cleanup.md § Dead Code Remover — By Priority
    description: "Remove {priority} dead code"
    prompt: |
      Read dead-code-report.md and remove all {priority} priority dead code.
@@ -112,14 +126,17 @@ pnpm build
      Return: count of removed items, count of failed removals.
    ```
 
-4. **Quality Gate** (inline):
+4. **Quality Gate** (inline, vs Phase 3 baseline) — this is the gate that can
+   stop the run:
    ```bash
    pnpm type-check
    pnpm build
    ```
 
-   - If FAIL → report error, suggest rollback, exit
-   - If PASS → continue
+   - Any error NOT present in the baseline → the removals made things worse:
+     report error, suggest rollback, exit
+   - Same errors as baseline, or fewer → continue to the next priority
+   - Green baseline stays strict: any failure at all is "worse than baseline"
 
 5. **Update TodoWrite**: mark priority complete
 
@@ -133,9 +150,9 @@ After all priorities cleaned:
 
 1. **Update TodoWrite**: mark verification in_progress
 
-2. **Invoke dead-code-hunter** (verification mode):
+2. **Invoke the detection worker** (verification mode):
    ```
-   subagent_type: "dead-code-hunter"
+   subagent_type: "general-purpose"   # brief: worker-prompts/cleanup.md § Dead Code Hunter — Verification
    description: "Verification scan"
    prompt: |
      Re-scan codebase after cleanup.

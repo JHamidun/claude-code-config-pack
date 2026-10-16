@@ -2,6 +2,14 @@
 > original frontmatter: version 2.0.0). Body preserved verbatim; only the
 > worker-prompts link path updated to the new references layout.
 
+> **2026-08-22:** the ten standalone worker agents were retired into
+> `_trash-2026-08-22/agents/health/workers/` — the agent registry holds only 66
+> slots. Every worker is now spawned as `subagent_type: "general-purpose"`,
+> `model: "fable"`, with the full role brief pasted from
+> `references/worker-prompts/reuse.md`. The short prompts below are the
+> orchestration outline; the brief is what the worker actually needs.
+
+
 # Code Reuse Health Check (Inline Orchestration)
 
 You ARE the orchestrator. Execute this workflow directly without spawning a separate orchestrator agent.
@@ -43,10 +51,10 @@ Detection → Validate → Consolidate by Priority → Verify → Repeat if need
 
 ## Phase 2: Detection
 
-**Invoke reuse-hunter** via Task tool:
+**Invoke the detection worker** via Task tool:
 
 ```
-subagent_type: "reuse-hunter"
+subagent_type: "general-purpose"   # brief: worker-prompts/reuse.md § Reuse Hunter — Detection
 description: "Detect all code duplications"
 prompt: |
   Scan the entire codebase for code duplications:
@@ -62,7 +70,7 @@ prompt: |
   Return summary with duplication counts per priority.
 ```
 
-**After reuse-hunter returns**:
+**After the detection worker returns**:
 1. Read `reuse-hunting-report.md`
 2. Parse duplication counts by priority
 3. If zero duplications → skip to Final Summary
@@ -70,17 +78,23 @@ prompt: |
 
 ---
 
-## Phase 3: Quality Gate (Detection)
+## Phase 3: Baseline (non-blocking — NEVER exits)
 
-Run inline validation:
+Run inline validation to **record the starting state**, not to gate:
 
 ```bash
 pnpm type-check
 pnpm build
 ```
 
-- If both pass → proceed to consolidation
-- If fail → report to user, exit
+- Both pass → baseline = GREEN, proceed to consolidation
+- Either fails → baseline = RED: record the exact error list, hand it to
+  the consolidation worker as context, **proceed to consolidation anyway**
+
+A red build is the usual reason this workflow was invoked, so exiting here would
+mean exiting on exactly the input the workflow exists to repair. The gate that
+can stop the run lives in Phase 4, after a consolidation, and compares against
+this baseline.
 
 ---
 
@@ -93,9 +107,9 @@ pnpm build
 
 2. **Update TodoWrite**: mark current priority in_progress
 
-3. **Invoke reuse-fixer** via Task tool:
+3. **Invoke the consolidation worker** via Task tool:
    ```
-   subagent_type: "reuse-fixer"
+   subagent_type: "general-purpose"   # brief: worker-prompts/reuse.md § Reuse Fixer — By Priority
    description: "Consolidate {priority} duplications"
    prompt: |
      Read reuse-hunting-report.md and consolidate all {priority} priority duplications.
@@ -112,14 +126,17 @@ pnpm build
      Return: count of consolidated items, count of failed consolidations.
    ```
 
-4. **Quality Gate** (inline):
+4. **Quality Gate** (inline, vs Phase 3 baseline) — this is the gate that can
+   stop the run:
    ```bash
    pnpm type-check
    pnpm build
    ```
 
-   - If FAIL → report error, suggest rollback, exit
-   - If PASS → continue
+   - Any error NOT present in the baseline → the consolidation made things
+     worse: report error, suggest rollback, exit
+   - Same errors as baseline, or fewer → continue to the next priority
+   - Green baseline stays strict: any failure at all is "worse than baseline"
 
 5. **Update TodoWrite**: mark priority complete
 
@@ -133,9 +150,9 @@ After all priorities consolidated:
 
 1. **Update TodoWrite**: mark verification in_progress
 
-2. **Invoke reuse-hunter** (verification mode):
+2. **Invoke the detection worker** (verification mode):
    ```
-   subagent_type: "reuse-hunter"
+   subagent_type: "general-purpose"   # brief: worker-prompts/reuse.md § Reuse Hunter — Verification
    description: "Verification scan"
    prompt: |
      Re-scan codebase after consolidation.

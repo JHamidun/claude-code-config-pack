@@ -28,13 +28,27 @@ recs = ticker.recommendations  # Analyst recommendations
 
 ## Available Data via yfinance
 
-| Manus API | yfinance Equivalent | Usage |
-|-----------|-------------------|-------|
-| `get_stock_profile` | `yf.Ticker(sym).info` | Company profile, sector, employees |
-| `get_stock_insights` | `yf.Ticker(sym).recommendations` | Analyst ratings, target prices |
-| `get_stock_chart` | `yf.Ticker(sym).history()` | OHLCV price data |
-| `get_stock_holders` | `yf.Ticker(sym).insider_transactions` | Insider trading activity |
-| `get_stock_sec_filing` | `yf.Ticker(sym).sec_filings` | SEC filing history |
+| Что нужно | yfinance | CLI-подкоманда |
+|-----------|----------|----------------|
+| Профиль компании, сектор, сотрудники | `yf.Ticker(sym).info` | `profile` |
+| Рейтинги аналитиков, таргеты | `yf.Ticker(sym).recommendations` | `recommendations` |
+| OHLCV-история цен | `yf.Ticker(sym).history()` | `chart` |
+| Сделки инсайдеров | `yf.Ticker(sym).insider_transactions` | `insiders` |
+| История подач в SEC | `yf.Ticker(sym).sec_filings` | **нет — только из Python, см. ниже** |
+
+> Раньше в левой колонке стояли имена инструментов Manus (`get_stock_profile` и т.д.) — след
+> портирования. В этой среде их нет; искать «готовый тул» по этим именам бессмысленно.
+
+**SEC — единственный пункт описания, до которого CLI не доводит.** `scripts/stock_analysis.py`
+принимает только `profile, chart, recommendations, insiders, full, compare`; подкоманды `sec`
+нет, и `full` её не включает. Берётся напрямую (проверено на yfinance 1.6.0 — AAPL отдал
+79 записей):
+
+```python
+import yfinance as yf
+for f in yf.Ticker("AAPL").sec_filings[:10]:
+    print(f["date"], f["type"], f["title"], f["edgarUrl"])
+```
 
 ## Script
 

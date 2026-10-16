@@ -24,6 +24,11 @@ A skill missing from one source is not missing: check all of them before saying
 
 With `CLAUDE_CONFIG_DIR` set, read the same paths under that directory.
 
+Optional ranking of many local descriptions: the `jev` skill (`rank`) chooses among
+candidates by description; treat it as a shortlist signal, then read the entrypoint.
+It needs its own optional API key: without one, skip this step (the walk above is
+enough) and do not ask the user to pay for API access.
+
 ## Public catalogs
 
 - skills.sh: browse https://skills.sh or use domain-restricted web search, then open

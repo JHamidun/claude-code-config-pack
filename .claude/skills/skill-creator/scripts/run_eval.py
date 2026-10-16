@@ -65,6 +65,13 @@ def _pump(stream, sink: "queue.Queue") -> None:
         sink.put(None)  # EOF sentinel
 
 
+# Файлы, чтение которых — НЕ провал, а нормальный шаг поиска. Маршрут
+# «запрос → карта роутинга → фасад → навык» легален: именно так устроена
+# навигация в этой конфигурации. Тест, считающий такой маршрут провалом,
+# оптимизирует описания против собственной архитектуры — см. --max-steps ниже.
+ROUTING_FILES = ("routing.md", "routing-ext.md", "CLAUDE.md", "SKILL.md", "MEMORY.md")
+
+
 def run_single_query(
     query: str,
     skill_name: str,
@@ -72,6 +79,7 @@ def run_single_query(
     timeout: int,
     project_root: str,
     model: str | None = None,
+    max_steps: int = 1,
 ) -> bool:
     """Run a single query and return whether the skill was triggered.
 
@@ -143,6 +151,7 @@ def run_single_query(
         # Track state for stream event detection
         pending_tool_name = None
         accumulated_json = ""
+        steps = 0  # сколько подготовительных чтений уже засчитано (см. max_steps)
 
         # Pump both pipes from background threads. select.select() cannot be
         # used here: on Windows it accepts sockets only (WinError 10038/10093),
@@ -215,7 +224,21 @@ def run_single_query(
 
                     elif se_type in ("content_block_stop", "message_stop"):
                         if pending_tool_name:
-                            return clean_name in accumulated_json
+                            if clean_name in accumulated_json:
+                                return True
+                            # Навык не назван. При max_steps=1 это провал (старое
+                            # поведение). Но если агент читает карту роутинга или
+                            # чужой SKILL.md — он ИЩЕТ, и обрывать его здесь значит
+                            # засчитывать провал за правильно устроенную навигацию.
+                            looked_up = pending_tool_name == "Read" and any(
+                                f in accumulated_json for f in ROUTING_FILES
+                            )
+                            if looked_up and steps + 1 < max_steps:
+                                steps += 1
+                                pending_tool_name = None
+                                accumulated_json = ""
+                                continue
+                            return False
                         if se_type == "message_stop":
                             return False
 
@@ -272,6 +295,7 @@ def run_eval(
     runs_per_query: int = 1,
     trigger_threshold: float = 0.5,
     model: str | None = None,
+    max_steps: int = 1,
 ) -> dict:
     """Run the full eval set and return results.
 
@@ -299,6 +323,7 @@ def run_eval(
                     timeout,
                     str(project_root),
                     model,
+                    max_steps,
                 )
                 future_to_info[future] = (item, run_idx)
 
@@ -395,6 +420,15 @@ def main():
     parser.add_argument("--trigger-threshold", type=float, default=0.5, help="Trigger rate threshold")
     parser.add_argument("--model", default=None, help="Model to use for claude -p (default: user's configured model)")
     parser.add_argument("--verbose", action="store_true", help="Print progress to stderr")
+    parser.add_argument(
+        "--max-steps",
+        type=int,
+        default=1,
+        help="Сколько подготовительных чтений (карта роутинга, чужой SKILL.md) засчитывать "
+             "как ПОИСК, а не провал. 1 = только прямой вызов первым действием (прежнее "
+             "поведение). Для проверки МАРШРУТИЗАЦИИ ставь 3-4: путь «запрос → карта → "
+             "фасад → навык» легален, и тест не должен считать его промахом.",
+    )
     args = parser.parse_args()
 
     eval_set = json.loads(Path(args.eval_set).read_text())
@@ -417,6 +451,7 @@ def main():
             skill_name=name,
             description=description,
             num_workers=args.num_workers,
+            max_steps=args.max_steps,
             timeout=args.timeout,
             project_root=project_root,
             runs_per_query=args.runs_per_query,

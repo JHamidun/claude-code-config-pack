@@ -1,6 +1,6 @@
 ---
 name: xlsx
-description: "Excel .xlsx на openpyxl: создать книгу, править существующую без потери формул, форматирование, ширины, заморозка, автофильтр, диаграммы, чтение посчитанных значений. Триггеры: «эксель», «xlsx», «таблица Excel», «запиши в таблицу», «формулы в экселе». НЕ анализ данных и графики → csv-analysis; НЕ Google Sheets → google-workspace."
+description: "Excel .xlsx на openpyxl: создать, править без потери формул, диаграммы. Триггеры: «эксель», «xlsx», «csv в эксель». НЕ анализ→csv-analysis; НЕ Google Sheets→google-workspace."
 metadata:
   version: 1.0.0
   updated: 2026-08-23

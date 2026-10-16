@@ -61,12 +61,16 @@ Proactively ask questions about edge cases, input/output formats, example files,
 
 Check available MCPs - if useful for research (searching docs, finding similar skills, looking up best practices), research in parallel via subagents if available, otherwise inline. Come prepared with context to reduce burden on the user.
 
+**Extend before you add.** Search the existing skills first (`skill-manager` covers local skills, skills.sh and SkillsMP). If one already owns the domain, extend it with a `references/` file instead of creating a sibling: two skills with overlapping descriptions compete for the same request, and the wrong one wins about half the time. Example: the public `prompt-master` skill went into `prompt-engineering` as three reference files, not as a second prompt skill.
+
+**Building from someone else's skill or repo.** Read the actual `LICENSE` file first (the GitHub API field can be wrong): MIT or Apache is fine; no license, or a non-commercial one, means don't vendor it. Run the `skill-manager` audit on the staged copy (both scanners plus reading the flagged lines yourself) before copying anything. Keep a `LICENSE-<source>` file next to the borrowed text and record the origin (`metadata.origin: owner/repo@commit`). Expect borrowed advice to be stale: check model names, prices and "best practice" rules against current docs before carrying them over.
+
 ### Write the SKILL.md
 
 Based on the user interview, fill in these components:
 
 - **name**: Skill identifier
-- **description**: When to trigger, what it does. This is the primary triggering mechanism - include both what the skill does AND specific contexts for when to use it. All "when to use" info goes here, not in the body. Note: currently Claude has a tendency to "undertrigger" skills -- to not use them when they'd be useful. To combat this, please make the skill descriptions a little bit "pushy". So for instance, instead of "How to build a simple fast dashboard to display internal Anthropic data.", you might write "How to build a simple fast dashboard to display internal Anthropic data. Make sure to use this skill whenever the user mentions dashboards, data visualization, internal metrics, or wants to display any kind of company data, even if they don't explicitly ask for a 'dashboard.'"
+- **description**: When to trigger, what it does. This is the primary triggering mechanism - include both what the skill does AND specific contexts for when to use it. All "when to use" info goes here, not in the body. State when the skill is appropriate without intensifiers — name the concrete contexts and the words a user would actually use, including cases where they don't name the domain. So for instance, instead of "How to build a simple fast dashboard to display internal Anthropic data.", you might write "How to build a simple fast dashboard to display internal Anthropic data. Use when the user asks about dashboards, data visualization, internal metrics, or displaying company data."
 - **compatibility**: Required tools, dependencies (optional, rarely needed)
 - **the rest of the skill :)**
 
@@ -121,7 +125,7 @@ Prefer using the imperative form in instructions.
 **Defining output formats** - You can do it like this:
 ```markdown
 ## Report structure
-ALWAYS use this exact template:
+Use this exact template:
 # [Title]
 ## Executive summary
 ## Key findings
@@ -138,7 +142,14 @@ Output: feat(auth): implement JWT-based authentication
 
 ### Writing Style
 
-Try to explain to the model why things are important in lieu of heavy-handed musty MUSTs. Use theory of mind and try to make the skill general and not super-narrow to specific examples. Start by writing a draft and then look at it with fresh eyes and improve it.
+Try to explain to the model why things are important in lieu of heavy-handed musty MUSTs. Use theory of mind and try to make the skill general and not super-narrow to specific examples.
+
+**What rots in a skill, and what to write instead:**
+
+- **Model IDs, prices, counts, dates in the body.** They go stale silently, and a stale ID often keeps working through an alias, so nothing fails. Point to the canonical file (`~/.claude/config/models.md` for models) instead of copying values. A public skill checked a month after its release still named two retired models.
+- **Instructions written for older models.** "Double-check your work", "think step by step", "don't narrate", "keep progress terse", CAPS and "CRITICAL: you MUST". Current Claude verifies itself, takes depth from the `effort` setting rather than from prose, and overtriggers on pressure words. Delete these lines rather than rewording them. External checks stay: tests, builds, scanners, the server's answer.
+- **A prohibition with no origin.** "Never do X" without the reason gets applied too broadly or ignored at the edges. Name the incident or the mechanism in one clause, and state the rule as the action to take.
+- **Borrowed rules that contradict the owner's.** A caps-lock rule or a "max 3 clarifying questions" limit from a public skill can quietly override a standing preference. When you vendor text, resolve such conflicts in the owner's favour and write down what you dropped and why.
 
 ### Test Cases
 
@@ -305,7 +316,7 @@ This is the heart of the loop. You've run the test cases, the user has reviewed 
 
 4. **Look for repeated work across test cases.** Read the transcripts from the test runs and notice if the subagents all independently wrote similar helper scripts or took the same multi-step approach to something. If all 3 test cases resulted in the subagent writing a `create_docx.py` or a `build_chart.py`, that's a strong signal the skill should bundle that script. Write it once, put it in `scripts/`, and tell the skill to use it. This saves every future invocation from reinventing the wheel.
 
-This task is pretty important (we are trying to create billions a year in economic value here!) and your thinking time is not the blocker; take your time and really mull things over. I'd suggest writing a draft revision and then looking at it anew and making improvements. Really do your best to get into the head of the user and understand what they want and need.
+This task is pretty important (we are trying to create billions a year in economic value here!). Really do your best to get into the head of the user and understand what they want and need.
 
 ### The iteration loop
 

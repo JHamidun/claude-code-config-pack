@@ -2,6 +2,14 @@
 > original frontmatter: version 2.0.0). Body preserved verbatim; only the
 > worker-prompts link path updated to the new references layout.
 
+> **2026-08-22:** the ten standalone worker agents were retired into
+> `_trash-2026-08-22/agents/health/workers/` — the agent registry holds only 66
+> slots. Every worker is now spawned as `subagent_type: "general-purpose"`,
+> `model: "fable"`, with the full role brief pasted from
+> `references/worker-prompts/bug.md`. The short prompts below are the
+> orchestration outline; the brief is what the worker actually needs.
+
+
 # Bug Health Check (Inline Orchestration)
 
 You ARE the orchestrator. Execute this workflow directly without spawning a separate orchestrator agent.
@@ -44,10 +52,10 @@ Detection → Validate → Fix by Priority → Verify → Repeat if needed
 
 ## Phase 2: Detection
 
-**Invoke bug-hunter** via Task tool:
+**Invoke the detection worker** via Task tool:
 
 ```
-subagent_type: "bug-hunter"
+subagent_type: "general-purpose"   # brief: worker-prompts/bug.md § Bug Hunter — Detection
 description: "Detect all bugs"
 prompt: |
   Scan the entire codebase for bugs:
@@ -61,7 +69,7 @@ prompt: |
   Return summary with bug counts per priority.
 ```
 
-**After bug-hunter returns**:
+**After the detection worker returns**:
 1. Read `bug-hunting-report.md`
 2. Parse bug counts by priority
 3. If zero bugs → skip to Final Summary
@@ -69,17 +77,23 @@ prompt: |
 
 ---
 
-## Phase 3: Quality Gate (Detection)
+## Phase 3: Baseline (non-blocking — NEVER exits)
 
-Run inline validation:
+Run inline validation to **record the starting state**, not to gate:
 
 ```bash
 pnpm type-check
 pnpm build
 ```
 
-- If both pass → proceed to fixing
-- If fail → report to user, exit
+- Both pass → baseline = GREEN, proceed to fixing
+- Either fails → baseline = RED: record the exact error list, hand it to
+  the fix worker as context, **proceed to fixing anyway**
+
+A red build is the usual reason this workflow was invoked, so exiting here would
+mean exiting on exactly the input the workflow exists to repair. The gate that
+can stop the run lives in Phase 4, after a fix, and compares against this
+baseline.
 
 ---
 
@@ -92,9 +106,9 @@ pnpm build
 
 2. **Update TodoWrite**: mark current priority in_progress
 
-3. **Invoke bug-fixer** via Task tool:
+3. **Invoke the fix worker** via Task tool:
    ```
-   subagent_type: "bug-fixer"
+   subagent_type: "general-purpose"   # brief: worker-prompts/bug.md § Bug Fixer — By Priority
    description: "Fix {priority} bugs"
    prompt: |
      Read bug-hunting-report.md and fix all {priority} priority bugs.
@@ -109,14 +123,17 @@ pnpm build
      Return: count of fixed bugs, count of failed fixes.
    ```
 
-4. **Quality Gate** (inline):
+4. **Quality Gate** (inline, vs Phase 3 baseline) — this is the gate that can
+   stop the run:
    ```bash
    pnpm type-check
    pnpm build
    ```
 
-   - If FAIL → report error, suggest rollback, exit
-   - If PASS → continue
+   - Any error NOT present in the baseline → the fixes made things worse:
+     report error, suggest rollback, exit
+   - Same errors as baseline, or fewer → continue to the next priority
+   - Green baseline stays strict: any failure at all is "worse than baseline"
 
 5. **Update TodoWrite**: mark priority complete
 
@@ -130,9 +147,9 @@ After all priorities fixed:
 
 1. **Update TodoWrite**: mark verification in_progress
 
-2. **Invoke bug-hunter** (verification mode):
+2. **Invoke the detection worker** (verification mode):
    ```
-   subagent_type: "bug-hunter"
+   subagent_type: "general-purpose"   # brief: worker-prompts/bug.md § Bug Hunter — Verification
    description: "Verification scan"
    prompt: |
      Re-scan codebase after fixes.

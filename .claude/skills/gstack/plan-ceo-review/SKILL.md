@@ -299,7 +299,7 @@ For each finding: threat, likelihood (High/Med/Low), impact (High/Med/Low), and 
 **STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
 
 ### Section 4: Data Flow & Interaction Edge Cases
-This section traces data through the system and interactions through the UI with adversarial thoroughness.
+This section traces data through the system and interactions through the UI adversarially — hunting the paths that break, not confirming the ones that work.
 
 **Data Flow Tracing:** For every new data flow, produce an ASCII diagram showing:
 ```

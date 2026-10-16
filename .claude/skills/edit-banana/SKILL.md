@@ -45,7 +45,8 @@ DrawIO XML-файлы с сохранением:
 ```bash
 cd ~/Edit-Banana
 .venv/Scripts/python.exe main.py -i input/diagram.png
-# → output/diagram.xml (открыть в app.diagrams.net)
+# → output/diagram/diagram_merged.drawio.xml (открыть в app.diagrams.net)
+# ⚠️ Результат — ПАПКА output/<basename>/, а не файл output/<basename>.xml. Раскладка ниже.
 ```
 
 ### Batch processing
@@ -54,7 +55,7 @@ cd ~/Edit-Banana
 cd ~/Edit-Banana
 cp ~/Downloads/*.png input/
 .venv/Scripts/python.exe main.py
-# → output/*.xml для всех картинок из input/
+# → output/<basename>/<basename>_merged.drawio.xml для каждой картинки из input/
 ```
 
 ### Web API (FastAPI)
@@ -147,7 +148,7 @@ cp config/config.example.yaml config/config.yaml   # вписать GOOGLE_API_K
 Отдельно докачать:
 
 - [ ] **BPE vocab** → `models/bpe_simple_vocab_16e6.txt.gz`
-- [ ] **SAM3 веса** (`models/sam3_ms/sam3.pt`, ~4 GB) — с ModelScope, см. ниже
+- [ ] **SAM3 веса** (`models/sam3_ms/sam3.pt`, ~3,2 GiB) — с ModelScope, см. ниже
 - [ ] Tesseract — опционально, по умолчанию работает PaddleOCR
 
 ### Если SAM3 веса не докачались
@@ -206,8 +207,15 @@ cd ~/Edit-Banana && .venv/Scripts/python.exe scripts/setup_rmbg.py
 
 ```bash
 bash ~/.claude/skills/edit-banana/scripts/edit-banana.sh path/to/diagram.png
-# → результат в ~/Edit-Banana/output/
+# → результат в ~/Edit-Banana/output/<basename>/<basename>_merged.drawio.xml
 ```
+
+⚠️ **Второй аргумент `[output_dir]` у обёртки не работает** (проверено 22.08.2026).
+Блок «Move output if different dir» в скрипте копирует `output/<basename>.xml` — файла с таким
+именем pipeline не создаёт (он кладёт папку `output/<basename>/`), ошибка глушится через `|| true`,
+и финальный `echo` печатает «✅ Done. Output: …» на несуществующий путь. Пока это
+не починено в самом `edit-banana.sh`, вызывай обёртку **с одним аргументом** и бери
+результат из `~/Edit-Banana/output/<basename>/`.
 
 ## Триггеры (routing)
 

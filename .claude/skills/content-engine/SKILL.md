@@ -1,64 +1,52 @@
 ---
 name: content-engine
-description: "Platform-native контент из одного исходника под X, LinkedIn, TikTok, YouTube: контент-план, посты. Триггеры: «контент для соцсетей»."
+description: "Platform-native контент из одного исходника под X, LinkedIn, Threads, Bluesky, TikTok, YouTube, рассылку. Триггеры: «контент для соцсетей», «кросспост». Публикация → postiz."
 origin: ECC
 ---
 
 # Content Engine
 
-Build platform-native content without flattening the author's real voice into platform slop.
+One source, many surfaces — platform-native content that does not flatten the author's voice into
+platform slop, and does not ship the same fake post in four costumes.
 
 ## When to Activate
 
-- writing X posts or threads
-- drafting LinkedIn posts or launch updates
-- scripting short-form video or YouTube explainers
+- X posts or threads, LinkedIn posts, launch updates, newsletter issues
+- scripts for short-form video or YouTube explainers
 - repurposing articles, podcasts, demos, docs, or internal notes into public content
-- building a launch sequence or ongoing content system around a product, insight, or narrative
+- a launch sequence or content system around a product, insight, or narrative
+- the user says "crosspost", "post this everywhere", or "adapt this for X and LinkedIn"
 
 ## Non-Negotiables
 
 1. Start from source material, not generic post formulas.
-2. Adapt the format for the platform, not the persona.
-3. One post should carry one actual claim.
-4. Specificity beats adjectives.
-5. No engagement bait unless the user explicitly asks for it.
-
-## Source-First Workflow
-
-Before drafting, identify the source set:
-- published articles
-- notes or internal memos
-- product demos
-- docs or changelogs
-- transcripts
-- screenshots
-- prior posts from the same author
-
-If the user wants a specific voice, build a voice profile from real examples before writing.
-Use `brand-voice` as the canonical workflow when voice consistency matters across more than one output.
+2. Adapt for the platform's constraints, not its stereotypes — format changes, persona does not.
+3. One post carries one actual claim.
+4. Never ship identical copy on two platforms.
+5. Specificity beats adjectives.
+6. No engagement bait, CTA, question, or moral unless the source earned it or the user asks.
 
 ## Voice Handling
 
-`brand-voice` is the canonical voice layer.
+`brand-voice` is the canonical voice layer. Run it first when there are multiple downstream
+outputs, when the user explicitly cares about style, or when the content is launch, outreach, or
+reputation-sensitive — including for your brand voice.
 
-Run it first when:
-
-- there are multiple downstream outputs
-- the user explicitly cares about writing style
-- the content is launch, outreach, or reputation-sensitive
-
-Reuse the resulting `VOICE PROFILE` here instead of rebuilding a second voice model.
-If the user wants your brand voice specifically, still treat `brand-voice` as the source of truth and feed it the best live or source-derived material available.
+Reuse the resulting `VOICE PROFILE` instead of building a second voice model or a per-platform ad
+hoc checklist. Two voice models drift apart, and the drift shows up as the author sounding like a
+different person on each platform. Override only if the user asks for a fresh one this campaign.
 
 ## Hard Bans
 
 Delete and rewrite any of these:
 - "In today's rapidly evolving landscape"
 - "game-changer", "revolutionary", "cutting-edge"
+- "Excited to share"
 - "here's why this matters" unless it is followed immediately by something concrete
-- ending with a LinkedIn-style question just to farm replies
+- generic "professional takeaway" or "here's what I learned" paragraphs absent from the source
+- a reply-farming closing question ("What do you think?") added because the platform expects one
 - forced casualness on LinkedIn
+- "link in bio" unless that is literally true
 - fake engagement padding that was not present in the source material
 
 ## Platform Adaptation Rules
@@ -67,15 +55,25 @@ Delete and rewrite any of these:
 
 - open with the strongest claim, artifact, or tension
 - keep the compression if the source voice is compressed
-- if writing a thread, each post must advance the argument
-- do not pad with context the audience does not need
+- use a thread only when one post would collapse the argument; then each post must advance it
+- no hashtags, no padding with context the audience does not need
 
 ### LinkedIn
 
 - expand only enough for people outside the immediate niche to follow
-- do not turn it into a fake lesson post unless the source material actually is reflective
-- no corporate inspiration cadence
-- no praise-stacking, no "journey" filler
+- no fake lesson or founder-reflection framing unless the source really is reflective; no corporate
+  inspiration cadence, no praise-stacking, no "journey" filler
+- do not sand the author into a polished "professional tone" if they are naturally sharper
+
+### Threads
+
+- keep it readable and direct
+- no fake hyper-casual creator copy; do not paste the LinkedIn version and shorten it
+
+### Bluesky
+
+- keep it concise, preserve the author's cadence
+- no hashtags, no feed-gaming language
 
 ### Short Video
 
@@ -91,41 +89,43 @@ Delete and rewrite any of these:
 
 ### Newsletter
 
-- open with the point, conflict, or artifact
-- do not spend the first paragraph warming up
+- open with the point, conflict, or artifact; do not warm up for a paragraph
 - every section needs to add something new
 
 ## Repurposing Flow
 
-1. Pick the anchor asset.
+1. Pick the anchor: the strongest item in the source set — articles and essays, the original X post
+   or thread, launch notes, changelogs, docs, internal memos, demos, transcripts, screenshots,
+   prior posts from the same author.
 2. Extract 3 to 7 atomic claims or scenes.
 3. Rank them by sharpness, novelty, and proof.
 4. Assign one strong idea per output.
-5. Adapt structure for each platform.
-6. Strip platform-shaped filler.
-7. Run the quality gate.
+5. Adapt structure for each platform, strip platform-shaped filler.
+6. Run the quality gate.
 
-## Deliverables
+## Deliverables and Posting Order
 
-When asked for a campaign, return:
-- a short voice profile if voice matching matters
-- the core angle
-- platform-native drafts
-- posting order only if it helps execution
-- gaps that must be filled before publishing
+Return: a short voice profile if voice matching matters; the core angle; platform-native drafts,
+strongest native version first, then the secondary platforms; a note on what changed per platform
+and why; posting order and staggered timing only if the user wants sequencing help; gaps and
+publishing constraints to resolve before publishing.
+
+Do not add cross-platform references unless useful. Most of the time a post should stand on its own.
 
 ## Quality Gate
 
 Before delivering:
-- every draft sounds like the intended author, not the platform stereotype
+- every draft sounds like the intended author, not the platform stereotype, and every version reads
+  like the same author under different constraints
 - every draft contains a real claim, proof point, or concrete observation
-- no generic hype language remains
-- no fake engagement bait remains
-- no duplicated copy across platforms unless requested
+- nothing from Hard Bans survived; no version feels padded or sanitized
+- no copy is duplicated verbatim across platforms unless requested
+- extra context added for LinkedIn or the newsletter is actually necessary
 - any CTA is earned and user-approved
 
 ## Related Skills
 
-- `brand-voice` for source-derived voice profiles
-- `social-intel` for sourcing recent posts
-- дистрибуция и публикация одобренных постов — своим публикатором (например, Postiz self-hosted; для Telegram — свой бот через `tg-bot-publish`); навыка-автомата кросс-постинга в паке нет
+- `brand-voice` — voice profiles; `social-intel` — сбор свежих постов автора
+- `postiz` — ДЕФОЛТНАЯ публикация (14 платформ), одобренные версии отдавай туда; `publora-post` —
+  только эксклюзивы Publora: LinkedIn-аналитика/реакции/комменты, Telegram; свой Telegram-бот — `tg-bot-publish`
+- `tg-post` / `linkedin-post-author` — когда текст должен быть именно голосом пользователя (RU)

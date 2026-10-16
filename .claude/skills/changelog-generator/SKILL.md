@@ -16,6 +16,14 @@ description: "Changelog из git-коммитов: semver, Keep a Changelog, PR/
 - Документирование изменений
 - CI/CD pipeline для changelog
 
+## Full Release Flow (5 шагов)
+
+1. **Git Analysis** — коммиты с последнего тега, группировка по типам (Conventional Commits) — см. «Generation Algorithm» ниже.
+2. **GitHub Integration** — обогати детали через `gh`: `gh pr list --state merged --search "merged:>YYYY-MM-DD"`, `gh issue list --state closed` — заголовки PR и закрытые issues часто описательнее коммитов.
+3. **Format CHANGELOG.md** — по Keep a Changelog (шаблон ниже).
+4. **Generate Release Notes** — `gh release create vX.Y.Z --notes-file release_notes.md` (или через CI, см. GitHub Actions ниже).
+5. **Distribution** — закоммить CHANGELOG.md, создай git tag, уведоми команду.
+
 ## Changelog Format
 
 ### Keep a Changelog Standard
@@ -80,10 +88,10 @@ PATCH - Bug fixes (fix:)
 
 ## Generation Algorithm
 
-> **Готового скрипта навык НЕ содержит** — в папке `changelog-generator/` только этот SKILL.md.
-> Код ниже — исходник, который надо сохранить в СВОЁМ репозитории (обычно `scripts/changelog.py`)
-> и добавить к нему разбор аргументов `--version` / `--since` / `--dry-run`. Все команды в разделах
-> «CLI Usage» и «Integration with CI/CD» подразумевают уже сохранённый файл, а не поставку навыка.
+> **Готовый скрипт поставляется с навыком:** `~/.claude/skills/changelog-generator/scripts/changelog.py`
+> (разбор `--version` / `--since` / `--repo` / `--hashes` / `--dry-run` уже встроен; работает и в репо без тегов).
+> Код ниже — ядро алгоритма для понимания/адаптации; для запуска используй файл из scripts/.
+> Для CI скопируй его в свой репозиторий (обычно как `scripts/changelog.py`).
 
 ```python
 import subprocess
@@ -188,18 +196,25 @@ def generate_changelog(version: str, categories: dict) -> str:
 
 ## CLI Usage
 
+Скрипт лежит в навыке: `~/.claude/skills/changelog-generator/scripts/changelog.py`.
+
 ```bash
-# Generate changelog for next version
-python changelog.py --version 1.2.0
+CL=~/.claude/skills/changelog-generator/scripts/changelog.py
+
+# Generate changelog for next version (since last tag; no tags -> entire history)
+python $CL --version 1.2.0
 
 # Generate since specific tag
-python changelog.py --since v1.1.0 --version 1.2.0
+python $CL --since v1.1.0 --version 1.2.0
+
+# Another repo + short hashes in entries
+python $CL --version 1.2.0 --repo path/to/repo --hashes
 
 # Output to file
-python changelog.py --version 1.2.0 >> CHANGELOG.md
+python $CL --version 1.2.0 >> CHANGELOG.md
 
-# Preview only
-python changelog.py --version 1.2.0 --dry-run
+# Preview only (changelog -> stdout, stats -> stderr)
+python $CL --version 1.2.0 --dry-run
 ```
 
 ## Git Commands
@@ -239,6 +254,8 @@ jobs:
         with:
           fetch-depth: 0
 
+      # scripts/changelog.py — копия из навыка (~/.claude/skills/changelog-generator/scripts/changelog.py),
+      # закоммиченная в ТВОЙ репозиторий; без неё шаг упадёт с «No such file».
       - name: Generate Changelog
         id: changelog
         run: |

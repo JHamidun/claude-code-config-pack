@@ -1,6 +1,6 @@
 ---
 name: linkedin-comment-drafter
-description: "Комменты и ответы в тредах LinkedIn: черновики + постинг через Publora, follow-up. Триггеры: «коммент на linkedin», «автор ответил»."
+description: "Комменты и ответы в тредах LinkedIn: черновики + постинг через SocialPublisher, follow-up. Триггеры: «коммент на linkedin», «автор ответил». НЕ голос пользователя→comment-replies."
 ---
 
 # LinkedIn Comment Drafter

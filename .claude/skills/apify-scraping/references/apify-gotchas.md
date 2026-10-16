@@ -61,6 +61,9 @@ Common causes:
 - Platform blocking without proxy (enable Apify Proxy)
 - Actor requires cookies/login but none provided
 - Wrong input field name (always verify with `--input --json`)
+- **Hashtag passed with or without the leading `#`** - Actors disagree; some strip it, some search for the literal string `#tag` and return nothing. Try both spellings before concluding the tag is dead.
+- **Field name is `hashtags` in one Actor and `hashtagList` in another** - same data, different key. This is the single most common cause of a silent empty dataset on hashtag scrapes.
+- **Profile passed as a full URL where the Actor expects a bare username** (or the reverse). `apify/instagram-reel-scraper` accepts both in `username[]`, most others do not.
 
 **maxResults vs maxCrawledPages**
 Different Actors use different limit field names. Common variants:
@@ -82,6 +85,55 @@ Always compare pricing before selecting a LinkedIn Actor.
 
 **SEO tool pricing**
 `radeance/` SEO scrapers (SimilarWeb, Ahrefs, SEMrush, Moz) have the highest per-result costs ($0.005-0.0275/result). For large-scale SEO analysis, estimate costs carefully and suggest batching.
+
+## Social trendwatching: cost defaults and how trends are actually mined
+
+Recurring job: "find what is going viral in niche X on Instagram / TikTok / YouTube".
+Two things make or break it - the defaults you run with, and the fact that the feature
+people expect does not exist.
+
+**There is no "give me platform X trends" Actor.** No Apify Actor exposes a global
+trending feed for a niche. Trends are mined in three ways, and you pick per task:
+
+1. **Hashtag scrape** with top/recent sorting - fastest entry point for a topic.
+2. **Profile scrape of niche opinion leaders** - the highest-signal source: you learn
+   what works for *this* audience, not what is globally popular.
+3. **Keyword search inside the niche** - fills gaps the first two miss.
+
+This is a feature, not a limitation. A global trending feed is dominated by mass-market
+content that a niche account cannot reproduce or convert. Filtering by hashtag and by a
+curated profile list gives trends that are already validated on the target audience.
+
+**Cost defaults for trendwatching runs.** [сервис]ing means running the same Actors
+weekly over a growing account list, so defaults matter more than one-off savings:
+
+| Setting | Default | Why |
+|---------|---------|-----|
+| results per Actor run | **20-30** | enough to compute a median and take the top 20%; more items rarely change which videos win |
+| `downloadVideos` / `includeDownloadedVideo` | **false** | video bytes are the most expensive part of the run and are useless for shortlisting - watch the 5-10 winners by URL instead |
+| `downloadCovers` | **false** unless the run feeds a visual board | cover images are cheap but add up across weekly runs on hundreds of accounts |
+| `includeTranscript` | **false** | transcribe only the shortlisted videos, and cheaper elsewhere (e.g. Gemini) |
+| `skipPinnedPosts` | **true** | pinned posts accumulate views for months and distort the median, making real outliers invisible |
+| >100 results in one run | **confirm with the user first** | this is where a $2 job silently becomes a $30 one |
+
+**Preferred Actors for this job** (IDs from `curated-actors.md`, verify before calling):
+
+| Platform | Actor | Note |
+|----------|-------|------|
+| Instagram | `apify/instagram-reel-scraper` | reels with engagement fields; accepts both bare usernames and profile URLs in `username[]` |
+| Instagram | `apify/instagram-hashtag-scraper` | hashtag route |
+| Instagram | `apify/instagram-scraper` | general fallback |
+| TikTok | `clockworks/free-tiktok-scraper` | free tier, limited volume - fine for weekly shortlists |
+| TikTok | `clockworks/tiktok-scraper` | paid, more stable, covers trending feeds |
+| YouTube | `streamers/youtube-scraper` | videos + metrics |
+
+**Trending sounds** are not a separate Actor either. Scrape videos, then group by
+`musicInfo` / `musicMeta` and take the 5 most repeated tracks. A track that shows up in
+5 of 30 outlier videos is a live trend; anything appearing once is noise.
+
+**Signal fields worth keeping** in the output for later analysis: `caption`, hashtags,
+`musicInfo`, video duration, video URL, play/like/comment/share counts, and top comments
+(comments often state outright what hooked people - the cheapest source of "why viral").
 
 ## Error recovery
 

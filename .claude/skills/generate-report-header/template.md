@@ -52,7 +52,7 @@ Common additional fields:
 **Generated**: 2025-10-17 14:30:00 UTC
 **Status**: ✅ success
 **Version**: 2025-10-17
-**Agent**: bug-hunter
+**Agent**: health-inline/bug-detect
 **Duration**: 3m 45s
 **Files Scanned**: 147
 **Bugs Found**: 23

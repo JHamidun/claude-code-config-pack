@@ -1,6 +1,6 @@
 ---
 name: webhook-receiver
-description: "Приём вебхуков (GitHub, Stripe, формы) локальным сервером webhook_server.py: HMAC-подписи. Триггеры: «поймай вебхук», «лови POST от формы»."
+description: "Приём вебхуков (GitHub, Stripe, формы) локальным сервером webhook_server.py: HMAC-подписи. Триггеры: «поймай вебхук», «лови POST от формы». НЕ боты→autonomous-agent-creator."
 ---
 
 # Webhook Receiver
@@ -21,8 +21,8 @@ description: "Приём вебхуков (GitHub, Stripe, формы) лока�
 Зависимости: только stdlib (aiohttp НЕ нужен). Файлы:
 
 - Инструмент: `~/.claude/tools/webhook_server.py`
-- Конфиг маршрутов: `~/.claude/data/webhooks/routes.json` (создать: `routes --init`)
-- Лог событий: `~/.claude/data/webhooks/YYYY-MM-DD.jsonl`
+- Конфиг маршрутов: `routes.json` в `~/.claude/data/webhooks/` (файла нет, пока не выполнен `routes --init`)
+- Лог событий: `<дата>.jsonl` (формат YYYY-MM-DD) там же, в `~/.claude/data/webhooks/`
 
 Секреты — ТОЛЬКО из окружения (переменная либо `~/.claude/.credentials.master.env`; шаблон файла — `~/.claude/templates/.credentials.master.env.example`, скопируй и заполни). В routes.json хранится **имя** переменной (`secret_env`), а не значение. Значения берёшь у себя в настройках вебхука на стороне провайдера:
 

@@ -1,13 +1,15 @@
 ---
 name: kimi
-description: "Kimi K2 (Moonshot AI, KIMI_API_KEY, kimi-k2-thinking): глубокий reasoning, код-анализ, алгоритмы. Триггеры: «спроси кими», «Kimi K2»."
+description: "Kimi у Moonshot (KIMI_API_KEY, модель kimi-k3): глубокий reasoning, код-анализ, алгоритмы. Триггеры: «спроси кими», «Kimi K2», «Kimi K3»."
 ---
 
-# Kimi K2 API Skill
+> ⚠️ **NO-KEY GUARD (обязательно):** этот функционал требует ОПЦИОНАЛЬНОГО стороннего API-ключа. Перед вызовом проверь ключ в `.credentials.master.env`. Если ключ отсутствует, пустой или placeholder (`your_*_api_key`) — **НЕ проси пользователя оплатить счёт, включить биллинг или купить API**. Скажи одной строкой: «Эта функция опциональна и требует свой API-ключ (например, бесплатный ключ на aistudio.google.com); из коробки всё остальное работает по подписке Claude» — и предложи альтернативу или продолжай без неё.
+
+# Kimi K3 API Skill
 
 ## Overview
 
-Expert skill for Kimi K2 (Moonshot AI) - specialized in deep reasoning and code analysis.
+Expert skill for Kimi (Moonshot AI, дефолт `kimi-k3`) - specialized in deep reasoning and code analysis.
 
 ## API Key
 
@@ -16,26 +18,35 @@ Expert skill for Kimi K2 (Moonshot AI) - specialized in deep reasoning and code 
 # Переменная: KIMI_API_KEY
 export KIMI_API_KEY="$(grep -m1 '^KIMI_API_KEY=' ~/.claude/.credentials.master.env | cut -d= -f2-)"
 export KIMI_BASE_URL=https://api.moonshot.ai/v1
-export KIMI_MODEL=kimi-k2-thinking
+export KIMI_MODEL=kimi-k3
 ```
 
-## When to Use Kimi K2
+Живые модели на этом ключе (сверено `GET /v1/models` 22.08.2026): `kimi-k3` (дефолт),
+`kimi-k2.6`, `kimi-k2.5`, `kimi-k2.7-code`, `kimi-k2.7-code-highspeed`, плюс старые
+`moonshot-v1-8k/32k/128k(+vision)` и `moonshot-v1-auto`.
+**Модели `kimi-k2-thinking` больше нет** — запрос с ней возвращает
+`404 Not found the model kimi-k2-thinking or Permission denied`. Если видишь это имя
+в чужом коде — меняй на `kimi-k3`.
+
+## When to Use Kimi
 
 **Best for:**
-- Deep code review (kimi-code-reviewer agent)
-- Complex debugging (kimi-debugging-specialist agent)
-- Performance optimization (kimi-performance-optimizer agent)
-- Algorithm design (kimi-algorithm-specialist agent)
-- Code refactoring (kimi-refactoring-specialist agent)
-- Testing strategy (kimi-testing-strategist agent)
-- Senior coding tasks (kimi-senior-coder agent)
+- Deep code review
+- Complex debugging
+- Performance optimization
+- Algorithm design (есть готовый агент `kimi-algorithm-specialist`)
+- Code refactoring
+- Testing strategy
+- Senior coding tasks
 
 **Advantages:**
 - Excellent reasoning capabilities
 - Strong code analysis
-- Thinking process visible
+- Reasoning-токены возвращаются в `usage.completion_tokens_details.reasoning_tokens`
 - Good for multi-step problems
-- 128K context window
+- Очень длинный контекст: `kimi-k3` принял запрос на **678 175 prompt-токенов**
+  (замер 22.08.2026). Цифра «128K» относилась к снятой `moonshot-v1-128k` — по ней
+  задачу дробить не надо.
 
 ## Dependencies
 
@@ -56,7 +67,7 @@ client = OpenAI(
     base_url=os.getenv('KIMI_BASE_URL', 'https://api.moonshot.ai/v1')
 )
 
-MODEL = os.getenv('KIMI_MODEL', 'kimi-k2-thinking')
+MODEL = os.getenv('KIMI_MODEL', 'kimi-k3')
 ```
 
 ### Deep Reasoning
@@ -64,7 +75,7 @@ MODEL = os.getenv('KIMI_MODEL', 'kimi-k2-thinking')
 ```python
 def kimi_reason(problem: str, show_thinking: bool = True):
     """
-    Use Kimi K2 for complex reasoning tasks.
+    Use Kimi for complex reasoning tasks.
 
     Args:
         problem: The problem to analyze
@@ -95,7 +106,7 @@ result = kimi_reason("Design an algorithm to find the shortest path in a weighte
 ```python
 def kimi_code_review(code: str, language: str = "python"):
     """
-    Comprehensive code review with Kimi K2.
+    Comprehensive code review with Kimi.
 
     Returns:
         - Bugs and issues
@@ -141,7 +152,7 @@ def process_user(user_id):
 ```python
 def kimi_debug(error: str, code: str, context: str = ""):
     """
-    Analyze and fix bugs with Kimi K2.
+    Analyze and fix bugs with Kimi.
 
     Args:
         error: Error message or description
@@ -352,9 +363,10 @@ reasoning). Остальные роли (ревью, дебаг, рефакто�
 
 ## Tips
 
-1. **Thinking model** - kimi-k2-thinking shows reasoning process
+1. **Reasoning** - `kimi-k3` думает перед ответом; расход виден в
+   `usage.completion_tokens_details.reasoning_tokens`
 2. **Low temperature** - Use 0.2-0.3 for code tasks
-3. **128K context** - Can analyze large codebases
+3. **Длинный контекст** - большие кодбазы влезают целиком (см. замер выше)
 4. **Structured prompts** - Use clear sections for best results
 5. **Chain of thought** - Encourage step-by-step reasoning
 6. **Specific questions** - Ask for line numbers and concrete fixes

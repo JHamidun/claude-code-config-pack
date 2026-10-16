@@ -1,6 +1,6 @@
 ---
 name: text-to-lottie
-description: "Lottie (Bodymovin) JSON-анимация с рендером в skia-плеере. Триггеры: «лотти», «анимированная иконка», «лоадер», «after effects в json»."
+description: "Собирает Lottie (Bodymovin) JSON и разворачивает npm-проект skia-плеера (degit+vite) для превью. Триггеры: «лотти», «анимированная иконка», «лоадер», «after effects в json»."
 ---
 
 # Authoring Renderable Lottie Files
@@ -70,9 +70,9 @@ Rules the scanner enforces:
   If you're creating a brand-new animation and no target scene is specified,
   create a project folder (e.g. `public/projects/my-animation/scene-1/`) and
   write `lottie.json` there, then open `/my-animation/scene-1`.
-- The app routes on **`/:project/:scene`** ([`src/router.tsx`](../../../src/router.tsx));
-  `/` redirects to the first project's first scene. The canvas provider
-  ([`src/context/canvas.tsx`](../../../src/context/canvas.tsx)) fetches that
+- The app routes on **`/:project/:scene`** (`src/router.tsx` **внутри склонированного
+  проекта плеера**, не внутри этого навыка); `/` redirects to the first project's
+  first scene. The canvas provider (`src/context/canvas.tsx`, там же) fetches that
   scene's `lottie.json` (plus its images) and renders it.
 - With the dev server running, the scenes plugin **watches the folder tree**.
   Adding, removing, or renaming a project/scene folder live-updates the sidebar
@@ -95,7 +95,8 @@ Rules the scanner enforces:
   "slots": {
     "ballColor": { "p": { "a": 0, "k": [0.231, 0.6, 1, 1] } },
     "ballOpacity": { "p": { "a": 0, "k": 100 } },
-    "ballSize": { "p": { "a": 0, "k": [120, 120] } }
+    "ballSize": { "p": { "a": 0, "k": [120, 120] } },
+    "bgColor": { "p": { "a": 0, "k": [0.5, 0.5, 0.5, 1] } }
   },
   "layers": [
     {
@@ -149,7 +150,7 @@ Rules the scanner enforces:
           "nm": "background-group",
           "it": [
             { "ty": "rc", "p": { "a": 0, "k": [0, 0] }, "s": { "a": 0, "k": [512, 512] }, "r": { "a": 0, "k": 0 } },
-            { "ty": "fl", "c": { "a": 0, "k": [0.5, 0.5, 0.5, 1] }, "o": { "a": 0, "k": 100 } },
+            { "ty": "fl", "c": { "sid": "bgColor" }, "o": { "a": 0, "k": 100 } },
             { "ty": "tr", "p": { "a": 0, "k": [0, 0] }, "a": { "a": 0, "k": [0, 0] }, "s": { "a": 0, "k": [100, 100] }, "r": { "a": 0, "k": 0 }, "o": { "a": 0, "k": 100 } }
           ]
         }
@@ -164,7 +165,8 @@ Rules the scanner enforces:
   "controls": [
     { "sid": "ballColor", "label": "Ball color" },
     { "sid": "ballOpacity", "label": "Ball opacity", "min": 0, "max": 100, "step": 1 },
-    { "sid": "ballSize", "label": "Ball size", "min": 20, "max": 400, "step": 1 }
+    { "sid": "ballSize", "label": "Ball size", "min": 20, "max": 400, "step": 1 },
+    { "sid": "bgColor", "label": "Background color" }
   ]
 }
 ```

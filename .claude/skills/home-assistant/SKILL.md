@@ -1,6 +1,6 @@
 ---
 name: home-assistant
-description: "Умный дом Home Assistant через ha_client.py: состояния, сервисы, история, события. Триггеры: «включи свет через HA», «hass»."
+description: "Умный дом Home Assistant через ha_client.py: состояния, сервисы, история, события. Триггеры: «включи свет через HA», «hass». НЕ Яндекс/Алиса → yandex."
 ---
 
 # Home Assistant CLI

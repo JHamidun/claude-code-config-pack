@@ -36,8 +36,10 @@ _PROVIDER_ENDPOINTS = {
     "openai": "https://api.openai.com/v1/audio/transcriptions",
 }
 _PROVIDER_MODELS = {
+    # Groq хостит Whisper сам — его версия к снятиям OpenAI отношения не имеет.
     "groq": "whisper-large-v3",
-    "openai": "whisper-1",
+    # Было "whisper-1"; OpenAI снимает его и gpt-4o-transcribe 26.02.2027.
+    "openai": "gpt-transcribe",
 }
 
 

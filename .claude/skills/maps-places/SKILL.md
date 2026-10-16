@@ -1,11 +1,11 @@
 ---
 name: maps-places
-description: "Поиск мест, адресов и геокодинг: 11 провайдеров — Google Places, Yandex Geosearch, 2GIS, OSM, Airbnb. Триггеры: «найди ресторан», «координаты адреса»."
+description: "Поиск мест, адресов и геокодинг: 12 провайдеров — Google Places, Yandex Geosearch, 2GIS, OSM, Airbnb. Триггеры: «найди ресторан», «координаты адреса»."
 ---
 
 # Maps & Places
 
-Универсальный скилл для поиска организаций, мест, адресов через 11 провайдеров. Выбирает оптимальный по гео/задаче или мёрджит несколько.
+Универсальный скилл для поиска организаций, мест, адресов через 12 провайдеров. Выбирает оптимальный по гео/задаче или мёрджит несколько.
 
 ## Когда использовать
 
@@ -32,7 +32,7 @@ description: "Поиск мест, адресов и геокодинг: 11 пр
 | **OpenStreetMap Overpass** | Bulk «все кафе в bbox», raw OSM queries | без ключа |
 | **Open Charge Map** | EV-зарядки, community-managed | 100% free, no quota |
 | **SerpAPI** | Fallback когда Places недоступен | 250/мес |
-| **Apify Airbnb** | Airbnb-листинги с датами+гостями | pay-per-result ~$5/1K |
+| **Apify Airbnb** | Airbnb-листинги с датами+гостями | pay-per-result ~$5/1K · нужен свой `APIFY_API_TOKEN`, см. грабли №14 |
 
 ## Decision tree
 
@@ -72,7 +72,9 @@ python ~/.claude/tools/places_search.py serpapi "pizza" --lat 40.71 --lon -74.00
 # Airbnb
 python ~/.claude/tools/places_search.py airbnb "Sample District, Brazil" --check-in 2026-07-01 --check-out 2026-07-08 --guests 2
 
-# Гибридные merge-режимы
+# Гибридные merge-режимы (провайдеры опрашиваются ПО ОЧЕРЕДИ, не параллельно:
+# в скрипте нет ни threading, ни asyncio — время ответа = сумма таймаутов,
+# и недоступный провайдер удлиняет весь прогон на свой таймаут)
 python ~/.claude/tools/places_search.py both "ресторан" --lat 55.7558 --lon 37.6173   # Yandex + Google
 python ~/.claude/tools/places_search.py all  "кафе"     --lat 55.7558 --lon 37.6173   # +2GIS
 python ~/.claude/tools/places_search.py all+ "ресторан" --lat 55.7558 --lon 37.6173   # +HERE + Foursquare + Mapbox (6 источников)
@@ -80,10 +82,10 @@ python ~/.claude/tools/places_search.py all+ "ресторан" --lat 55.7558 --
 # JSON-выгрузка
 python ~/.claude/tools/places_search.py all+ "пиццерия" --lat 55.75 --lon 37.62 --json > out.json
 
-# Геокодинг (forward — все 6 провайдеров параллельно)
+# Геокодинг (forward — 7 провайдеров ПОСЛЕДОВАТЕЛЬНО, один за другим)
 python ~/.claude/tools/places_search.py geocode "Мясницкая 13, Москва"
 
-# Reverse геокодинг (все 6 параллельно)
+# Reverse геокодинг (те же 7, тоже последовательно)
 python ~/.claude/tools/places_search.py reverse_geocode --lat 55.7558 --lon 37.6173
 ```
 
@@ -100,11 +102,18 @@ python ~/.claude/tools/places_search.py reverse_geocode --lat 55.7558 --lon 37.6
 - `references/overpass.md` — Overpass QL, amenity tags, bulk выборки
 - `references/open-charge-map.md` — EV connection types, power tiers
 - `references/serpapi-maps.md` — fallback scraping
-- `references/yelp-fusion.md` — США/Canada/EU (требует business approval, ключа нет)
-- `references/tripadvisor.md` — tourism (partner application only)
-- `references/booking-affiliate.md` — hotels (partner only, альтернатива Apify)
-- `references/china-maps.md` — Amap/Baidu (skip без кит. телефона)
 - `references/geocoding.md` — forward/reverse normalization
+
+### Недоступные API — НЕ читать без нужды
+
+Доступа к этим четырём нет и не предвидится, в CLI и decision tree они не участвуют.
+Файлы (≈27 КБ суммарно) оставлены на случай, если доступ когда-нибудь оформят; открывать
+их имеет смысл только тогда, а не при обычном поиске мест.
+
+- `references/yelp-fusion.md` — США/Canada/EU, требует business approval, ключа нет
+- `references/tripadvisor.md` — tourism, partner application only
+- `references/booking-affiliate.md` — hotels, partner only (альтернатива Apify)
+- `references/china-maps.md` — Amap/Baidu, нужен китайский телефон
 
 ## Грабли
 
@@ -121,11 +130,18 @@ python ~/.claude/tools/places_search.py reverse_geocode --lat 55.7558 --lon 37.6
 11. **Merge tolerance 0.0005° (~50м)** — Google и Yandex могут давать одно место с >50м разницы
 12. **Yandex Геокодер 403** — `YANDEX_GEOSEARCH_API_KEY` подключён только к Geosearch, для Geocoder API нужно «Привязать к API» в кабинете
 13. **OpenCage оптимален для bulk address normalization** без POI-поиска
+14. **Airbnb и имя ключа Apify.** В кабинете Apify ключ зовётся то «API token», то «API key»; скрипт
+    принимает оба имени (`APIFY_API_TOKEN` или `APIFY_API_KEY`), но **переменная окружения не спасёт**:
+    `_require_key` читает ТОЛЬКО распарсенный файл кредов (`~/.claude/.credentials.master.env`), не `os.environ`.
+    Нет строки в файле — `airbnb error: APIFY_API_TOKEN not in ~/.claude/.credentials.master.env`. Ключ платный
+    и необязательный: без него все остальные провайдеры работают, недоступен только Airbnb — не проси
+    пользователя оплачивать Apify, скажи, что функция опциональна. Тот же актор умеет skill `apify-scraping`
+    (токен нужен и ему).
 
 ## Связано
 
 - `~/.claude/templates/.credentials.master.env.example` — какие ключи включают каких провайдеров (раздел «Карты и геоданные»); Airbnb — `APIFY_API_TOKEN`
 - `~/.claude/tools/places_search.py` — основной CLI (shim к скиллу)
-- отдельный навык под Яндекс (в пак не входит) — Метрика/Директ/Диск (не карты)
+- Skill `yandex` — Метрика/Директ/Диск (не карты)
 - Skill `apify-scraping` — для Airbnb actor
 - Skill `serpapi` — SERP scraping (включая google_maps)

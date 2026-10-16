@@ -1,6 +1,6 @@
 ---
 name: theme-factory
-description: "Стилизация артефакта темой: 10 пресетов цвета/шрифтов или новая тема на лету. Триггеры: «смени тему артефакта», «стилизация». НЕ слайды → deck-themes."
+description: "Стилизация артефакта темой: 10 пресетов цвета/шрифтов или новая тема на лету, дек в том числе. Триггеры: «смени тему», «стилизация». НЕ CSS для deck-stage → deck-themes."
 license: Complete terms in LICENSE.txt
 ---
 
@@ -54,6 +54,25 @@ After a preferred theme is selected:
 2. Apply the specified colors and fonts consistently throughout the deck
 3. Ensure proper contrast and readability
 4. Maintain the theme's visual identity across all slides
+
+## Fonts: the presets name Linux families — substitute before applying (local note, not upstream)
+
+All 10 themes in `themes/` name only **DejaVu Sans / DejaVu Serif / FreeSans / FreeSerif**.
+These are GNU/Linux system families: they are **not installed on this machine** (checked against
+`C:/Windows/Fonts`), and in a claude.ai artifact the CSP admits web fonts only from Google Fonts.
+Applied literally, a theme therefore delivers its palette and silently loses its typography —
+everything falls back to the default sans, which looks like "the theme did not apply".
+
+So when applying a theme:
+
+1. Take the **palette** from the theme file as written — it is the part that works everywhere.
+2. Replace the **font pair** with something that will actually load in the target medium
+   (Google Fonts for artifacts and web pages; installed Windows families for local HTML/PDF).
+   Keep the character of the original: DejaVu Sans / FreeSans → a neutral grotesque,
+   DejaVu Serif / FreeSerif → a book serif.
+3. Russian text: verify the substitute carries Cyrillic before shipping — see `fonts-bundle`.
+4. Note that in 7 of 10 presets both roles name one family in two weights, so there is no real
+   pairing to preserve — pick a header/body pair yourself.
 
 ## Create your Own Theme
 To handle cases where none of the existing themes work for an artifact, create a custom theme. Based on provided inputs, generate a new theme similar to the ones above. Give the theme a similar name describing what the font/color combinations represent. Use any basic description provided to choose appropriate colors/fonts. After generating the theme, show it for review and verification. Following that, apply the theme as described above.

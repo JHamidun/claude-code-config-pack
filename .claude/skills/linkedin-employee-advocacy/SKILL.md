@@ -112,11 +112,28 @@ Stand up a marketing-team LinkedIn advocacy program that scales without killing 
 - **Measuring only vanity metrics** — program gets cut without pipeline attribution
 - **All-same pillars across team** — redundancy kills team reach (EnterpriseTool penalizes clustering)
 
+## Cadence by role
+
+Cadence is calibrated per person, never mandated flat — a uniform quota is what
+kills these programs by week six.
+
+| Role | Posts / week | Comments / week |
+|------|--------------|-----------------|
+| Founder, C-level | 2-3 | 5-10 |
+| Sales, BD | 1-2 | 10-15 |
+| Engineering, product | 1 every 2 weeks | 3-5 |
+| Marketing | 2-3 | 10+ |
+
+## Governance
+
+Review **claims** — customer names, numbers, unreleased roadmap, legal and
+compliance. Do NOT review voice, structure, opinion or word choice: that is the
+ghostwriting failure mode above. Review SLA is 24 hours; past that the writer
+publishes as-is, because an approval loop that feels like work stops being used.
+
 ## Resources
 
 - `references/advocacy-principles.md` — the 4 operating principles with examples
-- `references/team-cadence-matrix.md` (file not created yet) — realistic cadence by role + seniority
-- `references/governance-playbook.md` (file not created yet) — what to review, what not to, SLA
 
 ## Related skills
 

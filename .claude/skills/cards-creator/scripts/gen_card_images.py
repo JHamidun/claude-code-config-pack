@@ -29,6 +29,14 @@ import requests
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
+# --- early --help guard (added 2026-08-19): must work with no keys/network ---
+if __name__ == '__main__' and ('-h' in sys.argv[1:] or '--help' in sys.argv[1:]):
+    print(__doc__ or '')
+    print('Usage:')
+    print('python gen_card_images.py [out_dir]   # словарь IMAGES правится внутри файла')
+    raise SystemExit(0)
+# --- end guard ---
+
 # Ключ — лениво и с громким отказом. Раньше здесь на верхнем уровне модуля стояло
 # open(...).read().split("OPENAI_API_KEY=")[1]: у того, кто не завёл ключ, простой
 # импорт файла падал с `IndexError: list index out of range` — по такому тексту

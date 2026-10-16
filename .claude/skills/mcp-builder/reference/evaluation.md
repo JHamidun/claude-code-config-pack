@@ -190,10 +190,8 @@ List the tools available in the MCP server:
 
 ### Step 3: Developing Understanding
 
-Repeat steps 1 & 2 until you have a good understanding:
-- Iterate multiple times
-- Think about the kinds of tasks you want to create
-- Refine your understanding
+One pass over steps 1 & 2 is normally enough; go back only if a specific gap blocks task writing:
+- Note the kinds of tasks you want to create
 - At NO stage should you READ the code of the MCP server implementation itself
 - Use your intuition and understanding to create reasonable, realistic, but VERY challenging tasks
 
@@ -365,7 +363,7 @@ Remember to parallelize solving tasks to avoid running out of context, then accu
 
 ## Tips for Creating Quality Evaluations
 
-1. **Think Hard and Plan Ahead** before generating tasks
+1. **Choose an approach to the task set and commit to it** — revisit the plan only if new information directly contradicts it
 2. **Parallelize Where Opportunity Arises** to speed up the process and manage context
 3. **Focus on Realistic Use Cases** that humans would actually want to accomplish
 4. **Create Challenging Questions** that test the limits of the MCP server's capabilities
@@ -596,7 +594,7 @@ If many evaluations fail:
 ### Timeout Issues
 
 If tasks are timing out:
-- Use a more capable model (e.g., `claude-sonnet-5`)
+- Use a more capable model (e.g., `claude-opus-5`)
 - Check if tools are returning too much data
 - Verify pagination is working correctly
 - Consider simplifying complex questions

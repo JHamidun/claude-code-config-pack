@@ -54,6 +54,9 @@ Verdicts:
 - 21-50: borderline
 - 51-100: AI-likely
 
+Шкала насыщается быстро: трёх высокочастотных эмодзи (🚀 ✨ 💡) уже хватает на cap.
+Число — флаг, а не градиент; сравнивать два поста «у кого 100 выше» бессмысленно.
+
 ### Mode 3 — SUGGEST
 
 Returns a rewritten emoji set. Keeps the post's emoji count roughly the same but swaps AI-pattern emojis for less-correlated alternatives, or recommends removal where no clean substitute exists.
@@ -63,6 +66,10 @@ Returns a rewritten emoji set. Keeps the post's emoji count roughly the same but
 ### `--strict`
 
 Flag any AI-pattern emoji at all. One lightbulb = AI-likely verdict. Use when content goes out under a personal brand that has never used emoji-heavy AI patterns.
+
+(Пороги дефолтного режима — в `references/emoji-patterns.md`, раздел «Cluster rules»:
+там один эмодзи в изоляции считается нормой. `--strict` этот порог сознательно сдвигает
+до единицы; противоречия между файлами нет — это разные режимы.)
 
 ### `--lenient`
 
@@ -84,7 +91,11 @@ Default mode is between the two: flag if score >20.
 > "Excited to share our new feature 🚀 Game-changing AI ✨ Unlock your potential 💡 Let's go 🔥"
 >
 > **Output (default mode):**
-> Score: 78 / 100 — AI-likely
+> Score: 100 / 100 (cap) — AI-likely
+> Арифметика по формуле выше: 3.28·1·10 + 3.11·1·10 + 2.57·1·10 + 1.31·1·10 = 32.8 + 31.1 +
+> 25.7 + 13.1 = **102.7 → cap 100**; cluster-бонус +20 уже ничего не меняет.
+> (Раньше здесь стояло «78» — число из более ранней редакции формулы, по текущей оно не
+> воспроизводится. Считай по формуле, а не по примеру.)
 >
 > Flagged:
 > - 🚀 rocket (3.28% AI freq, 1 use) → consider 📦 or remove

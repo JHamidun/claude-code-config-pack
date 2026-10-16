@@ -272,7 +272,7 @@ paragraph rhythm, emoji density, and CTA style from the statistics above.
 """
 ```
 
-LLM соблюдает метрики **точнее**, чем когда даёшь только сэмплы — эмпирика с малых моделей (замер был на gpt-4o-mini/gemini-2.0-flash-эре; актуальные малые модели — haiku-4-5 через claude-cli-runner или `gemini-3.1-flash-lite`, канон `config/models.md`).
+LLM соблюдает метрики **точнее**, чем когда даёшь только сэмплы — эмпирика с малых моделей (замер был на gpt-4o-mini/gemini-2.0-flash-эре; актуальные малые модели — haiku-4-5 через claude-api (путь «CLI по подписке») или `gemini-3.1-flash-lite`, канон `config/models.md`).
 
 ### Когда обновлять профиль
 

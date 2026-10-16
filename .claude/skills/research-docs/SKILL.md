@@ -1,8 +1,7 @@
 ---
 name: research-docs
-description: "Document Q&A с визуальными цитатами: парсит папку PDF/DOCX/PPTX/XLSX/картинок через LiteParse, отвечает на вопрос, отдаёт HTML-отчёт со скриншотами страниц и подсветкой цитат. Триггеры: «Q&A по PDF», «отчёт по документам с цитатами», «Q&A по документам», «отчёт по PDF с цитатами», «проанализируй папку документов», «research docs»."
+description: "Q&A по папке документов (PDF/DOCX/PPTX/XLSX) со скриншотами страниц и подсветкой цитат, LiteParse. Триггеры: «Q&A по PDF», «отчёт по документам с цитатами»."
 argument-hint: "[data_directory] [question]"
-disable-model-invocation: true
 allowed-tools: Bash(python *)
 compatibility: Python 3.9+ with `liteparse` (see Setup below); Node 18+ with `@llamaindex/liteparse` optional
 ---

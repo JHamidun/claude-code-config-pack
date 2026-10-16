@@ -1,6 +1,6 @@
 ---
 name: screenshot-test
-description: "Pixel-diff текущего скриншота с эталоном — падает при визуальной поломке; CI/pre-commit. Триггеры: «pixel diff», «визуальный регресс»."
+description: "Pixel-diff скриншота с эталоном в репо — падает при визуальной поломке; CI/pre-commit. Триггеры: «pixel diff», «визуальный регресс». НЕ разовая проверка→verifier."
 ---
 
 # Screenshot test
@@ -45,7 +45,13 @@ test-screenshots.config.json
 
 ## Скрипт
 
-`templates/test.mjs`:
+Готового файла у навыка нет — `templates/` тут не лежит. Сохрани блок ниже как `test.mjs` в корне проекта
+(рядом с `test-screenshots.config.json`), дальше команды `node test.mjs` из раздела «Использование» работают.
+
+**Как есть этот код флакает**: в нём нет ни одного приёма из раздела «Стабилизация скриншотов» ниже —
+только `newContext` → `goto` → `document.fonts.ready` → `screenshot`. Анимации, каретка и `Date.now`
+не заглушены, то есть навык отдаёт код ровно с тем дефектом, который сам же перечисляет в антипаттернах
+(«❌ Тестировать SPA с anim splash без отключения анимаций»). Перед `page.screenshot` вставь пункты 1, 3 и 5.
 
 ```js
 import { chromium } from 'playwright';
@@ -156,9 +162,9 @@ node test.mjs || (echo "Screenshot test failed. Review diff/, run --update if in
 - run: npx playwright install --with-deps chromium
 - run: node test.mjs
 - if: failure()
-  uses: actions/upload-artifact@v3
+  uses: actions/upload-artifact@v4   # v3 отключён GitHub'ом — шаг упадёт на deprecated version
   with:
-    name: screenshot-diffs
+    name: screenshot-diffs           # в v4 имя должно быть уникальным на прогон (матрица → ${{ matrix.os }})
     path: screenshots/diff/
 ```
 
@@ -181,7 +187,14 @@ Pixel-diff чувствителен к шуму. Чтобы тесты не фл
    await page.addStyleTag({ content: `* { caret-color: transparent !important; }` });
    ```
 
-4. **Фиксированная dpr**: viewport: { ..., deviceScaleFactor: 2 }.
+4. **Фиксированная dpr** — опция КОНТЕКСТА, а не поле viewport. Внутри `viewport` Playwright её молча
+   игнорирует (`ViewportSize` в типах — только `width` и `height`), и «стабилизация» не делает ничего:
+   ```js
+   // ❌ browser.newContext({ viewport: { width: 1280, height: 800, deviceScaleFactor: 2 } })  → devicePixelRatio 1
+   // ✅
+   await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 2 }); // → devicePixelRatio 2
+   ```
+   (проверено запуском: внутри viewport — `window.devicePixelRatio === 1`, рядом — `2`.)
 
 5. **Stub time** для динамических виджетов (часы, "X minutes ago"):
    ```js
@@ -203,6 +216,21 @@ Pixel-diff чувствителен к шуму. Чтобы тесты не фл
 
 ## Связь со скиллами
 
-- `verifier` запускает раз, screenshot-test — регулярно.
 - `comparison-mode` — для ручного diff'а перед обновлением baseline.
 - `a11y-audit` — комплементарно: визуал + структура.
+
+### Место в предсдаточном прогоне
+
+Какие ещё проверки звать под твой тип артефакта и в каком порядке — матрица в
+`verifier` («Матрица: тип артефакта → набор проверок»). Там же зафиксировано, что
+этот скилл **вне разового прогона**: ему нужен baseline, и на первом запуске он
+ничего не проверяет, а создаёт эталон. Окупается со второго раза — место ему в CI
+и pre-commit, а не в чек-листе «перед тем как написать готово».
+
+Соседи по набору отличаются входом, а не инструментом (Playwright у всех): у
+`verifier` на входе один готовый файл, у `webapp-testing` — поднятый dev-сервер,
+у `proto-smoketest` — список сценариев. Здесь на входе **эталонная картинка**, и
+вопрос ровно один: «картинка не поехала?». Отсюда же граница с `proto-smoketest`:
+он отвечает «путь работает?», и держать вторую реализацию pixel-diff у него незачем —
+два набора эталонов разъезжаются, и падение читается как «сломался тест», а не
+«сломался UI».

@@ -304,6 +304,34 @@ If you're {winning behavior}, you already won.
 - **Specific number in the first sentence** raises expand-rate by ~35%. $873.47 beats $900. 40,000 beats "a lot of".
 - **Real failure in the first 3 lines** outperforms polished framing by **8.5x**. Lead with what broke.
 
+## B2B post frameworks (Kozhemyakin, методология)
+
+The F1-F10 formulas above are built for reach on a personal-brand account. These three are
+the quieter B2B counterpart — used when the reader is a prospect, not an audience, and the
+goal is trust rather than a spike. Lower ceiling, but they survive being read by a buying
+committee.
+
+**Three content types they map onto:** *professional* (your company — cases, news, culture,
+team, events) · *expert* (your domain **outside** your company, e.g. commenting on industry
+pieces) · *personal* (hobbies, family, travel).
+
+| Framework | Structure |
+|---|---|
+| **Professional post** | clickbait headline → describe the problem → **one thought per paragraph** → invite readers to share their view → personal photo |
+| **Personal post** | **main point in the first sentence** → what influenced you → **reference people, ideally via @** → question and CTA → photo proof |
+| **Re-introduction post** | `Let me re-introduce myself!` → personal bullets → CTA → personal photo |
+
+Every one of them ends on a photo and a question — in B2B that pairing does the work the
+hook formulas do through pattern interrupt.
+
+The stated test before publishing anything, verbatim from the class:
+
+> **ASK YOURSELF — WOULD I WANT TO READ THIS MYSELF?**
+
+Supporting rules: put the main idea in the first sentence · rotate formats (text+image,
+video, poll, PDF carousel, short posts) · **never copy-paste from ChatGPT** · structure
+the post visually.
+
 ## Never do
 
 - Blend two hooks in one post (dilutes both)

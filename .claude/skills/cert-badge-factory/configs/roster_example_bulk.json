@@ -1,0 +1,28 @@
+{
+  "credentials": [
+    {
+      "recipient": {
+        "name": "Иванова Мария Сергеевна",
+        "email": "m.ivanova@example.com"
+      },
+      "group_id": 123456,
+      "issued_on": "2026-09-12"
+    },
+    {
+      "recipient": {
+        "name": "Петров Алексей Игоревич",
+        "email": "a.petrov@example.com"
+      },
+      "group_id": 123456,
+      "issued_on": "2026-09-12"
+    },
+    {
+      "recipient": {
+        "name": "Сидорова Ольга",
+        "email": "o.sidorova@example.com"
+      },
+      "group_id": 123456,
+      "issued_on": "2026-09-12"
+    }
+  ]
+}

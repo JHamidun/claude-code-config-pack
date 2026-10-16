@@ -23,7 +23,7 @@ Tapestry weaves learning content into actionable knowledge:
 ```bash
 # YouTube transcripts (existing skill: youtube-transcript.md)
 # Articles (WebFetch tool)
-# PDFs (existing skill: document-skills/pdf/)
+# PDFs (existing skill: pdf)
 # Code documentation (Glob + Read tools)
 ```
 
@@ -125,5 +125,5 @@ Knowledge graphs are saved as Markdown files in the project directory:
 
 - Based on [tapestry-skills-for-claude-code](https://github.com/michalparkola/tapestry-skills-for-claude-code)
 - Works best with 3-10 sources on a related topic
-- Can be combined with vector_memory for persistent knowledge storage
+- For persistent knowledge storage use `/memory-learn` (skill `memory-agent`)
 - For visual graphs, use Mermaid diagrams or excalidraw-flowchart skill

@@ -1,6 +1,6 @@
 ---
 name: linkedin
-description: "LinkedIn-разведка (Scraping API): профили, компании, посты. Триггеры: «пробей профиль linkedin», «найди контакты в linkedin». НЕ реклама→ad-spy; свой пост→linkedin-post-writer."
+description: "LinkedIn-разведка (ScraperVendor): профили, компании, посты. Триггеры: «пробей профиль linkedin», «найди контакты в linkedin». НЕ реклама→ad-spy; свой пост→linkedin-post-writer."
 allowed-tools: Bash, Read, Write, WebSearch
 ---
 
@@ -33,8 +33,9 @@ HEADER: x-api-key: $SCRAPER_API_KEY
 Получить полные данные о человеке по LinkedIn URL или username.
 
 ```bash
-# Load API key
-source ~/.claude/.credentials.master.env
+# Load API key. ТОЛЬКО так: голый `source` оставляет ключ переменной оболочки,
+# и дочерний python/скрипт получит None (проверено). `set -a` экспортирует.
+set -a && source ~/.claude/.credentials.master.env && set +a
 
 # By LinkedIn URL
 curl -s "https://api.your-scraper.example/v1/linkedin/profile?url=https://www.linkedin.com/in/username/" \
@@ -108,7 +109,9 @@ curl -s "https://api.your-scraper.example/v1/linkedin/ad?id=AD_ID" \
 
 ## Batch Processing
 
-Для массового обогащения используй Python-скрипт:
+Для массового обогащения используй Python-скрипт. Ключ должен быть ЭКСПОРТИРОВАН
+(`set -a && source ~/.claude/.credentials.master.env && set +a`), иначе `os.getenv`
+вернёт `None` и все запросы уйдут с `x-api-key: None`.
 
 ```bash
 python3 -c "
@@ -125,7 +128,10 @@ for url in urls:
     )
     resp = urllib.request.urlopen(req)
     data = json.loads(resp.read())
-    print(json.dumps({'name': data.get('name'), 'headline': data.get('headline'), 'company': data.get('company')}, ensure_ascii=False))
+    # 'company' в документированном выходе профиля (см. раздел 1) НЕТ — компания лежит
+    # внутри experience[]; берём последнее место работы, а плоское поле только как фолбэк
+    exp = (data.get('experience') or [{}])[0]
+    print(json.dumps({'name': data.get('name'), 'headline': data.get('headline'), 'company': exp.get('company') or data.get('company')}, ensure_ascii=False))
     time.sleep(1)  # rate limit courtesy
 "
 ```

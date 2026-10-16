@@ -1,6 +1,6 @@
 ---
 name: ru-text
-description: "Качество русского текста: типографика, инфостиль, чистка канцелярита. Триггеры: «поправь стиль», «убери канцелярит». НЕ орфография→/proofread."
+description: "Качество русского текста: типографика, инфостиль, чистка канцелярита. Триггеры: «поправь стиль», «убери канцелярит». НЕ: орфография→/proofread; «звучит как ИИ»→de-ai-ify."
 metadata:
   your-gateway-project:
     always: true
@@ -20,9 +20,26 @@ Credits and recommended reading: `references/sources.md`
 
 **Reviewing vs. rewriting**: when *checking* or proofreading existing text or a file, return the corrected version plus a list of changes — do not silently overwrite the source file. Rewrite a file in place only when the user explicitly asks.
 
+## Place in the family (does not duplicate)
+
+What splits these three is not the topic but what the author is complaining about:
+
+| Complaint in the request | Skill |
+|---|---|
+| the Russian NORM: «поправь стиль», «убери канцелярит», «кавычки и тире», «неразрывные пробелы», «оцени текст» | **`ru-text`** (this one) |
+| the AUTHOR, text in Russian: «звучит как ИИ», «перепиши по-человечески» | `de-ai-ify` |
+| the AUTHOR, text in English and/or a LinkedIn post: "AI tells", "humanize", "run it past a detector" | `linkedin-humanizer` |
+
+`de-ai-ify` and this skill get confused because the tables literally overlap: «является», «данный», «осуществлять», «на сегодняшний день» are struck out by both. The reason differs. Here they are канцелярит — a defect of the Russian norm — and they sit next to 97 more stop-words plus typography (guillemets, NBSP, en dash vs hyphen, ₽), UX writing and business correspondence, all of it just as applicable to text a human wrote. There the same words are a generation marker, sitting next to negative parallelism, rule-of-three triplets, signposting and flat sentence rhythm — patterns this skill does not look for at all.
+
+Order for a Russian AI draft: `de-ai-ify` first, then this skill. The reverse wastes the pass — typography gets polished on paragraphs that are about to be rewritten anyway.
+
+`linkedin-humanizer` is English-only; nothing here applies to English text, and its regexes and detector runs do not transfer to Russian.
+
 ## Always-On: Typography
 
-Apply these rules to ALL Russian text output without exception.
+These are the typography defaults for Russian text output. The style priority above
+still holds: an explicit request from the user wins where it conflicts.
 
 | Rule | Wrong | Correct |
 |---|---|---|

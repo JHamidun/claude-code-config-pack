@@ -453,3 +453,36 @@ Check: `GET /v1/users/credits` → remaining balance.
 11. **Secrets for LLM keys** — in FULL mode, store your OpenAI/Gemini key via `POST /v1/secrets`, reference in LLM config. Never sent in plain text after creation.
 12. **Push-to-talk** — only in CONVERSATIONAL vs PUSH_TO_TALK interactivity modes. PTT sends command on LiveKit, waits for server ACK.
 13. **ElevenLabsAgentSession** — specialized subclass for EL Agent integration. Adds `sendUserMessage`, `sendContextualUpdate`, `sendClientToolResult`. Disables `message()`/`repeat()`/`repeatAudio()`.
+
+---
+
+## Выжимка из SKILL.md (перенесена 2026-08-19)
+
+## LiveAvatar — Realtime Video Avatar (separate service)
+
+**Full reference: `references/liveavatar.md`** (SDK source, OpenAPI spec, WebSocket protocol, Telegram integration architecture).
+
+**Base URL:** `https://api.liveavatar.com` (NOT `api.heygen.com`)
+**Auth:** `X-API-KEY` header, key in `.credentials.master.env` → `HEYGEN_LIVE_AVATAR_API_KEY`
+**SDK:** `@heygen/liveavatar-web-sdk` (npm), built on **LiveKit** (WebRTC rooms)
+**OpenAPI:** `https://docs.liveavatar.com/openapi.json` (24 endpoints)
+**SDK source:** `github.com/heygen-com/liveavatar-web-sdk` → `packages/js-sdk/src/`
+
+| Mode | Cost | HeyGen does | You provide |
+|------|------|-------------|-------------|
+| **FULL** | 2 credits/min | STT + LLM + TTS + avatar | Configure via API |
+| **LITE** | 1 credit/min | Avatar render only | STT + LLM + TTS pipeline |
+
+**LITE mode** is key for custom integrations (Telegram calls, custom voice agents):
+- You get a LiveKit room with avatar video+audio tracks
+- You get a WebSocket for sending PCM 24kHz audio → avatar lip-syncs
+- Commands: `agent.speak` (chunked base64 PCM), `agent.interrupt`, `agent.start/stop_listening`
+
+**Quick check credits:**
+```python
+import os, requests
+r = requests.get('https://api.liveavatar.com/v1/users/credits',
+                 headers={'X-API-KEY': os.environ['HEYGEN_LIVE_AVATAR_API_KEY']})
+print(r.json())
+```
+

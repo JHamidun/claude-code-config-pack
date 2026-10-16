@@ -48,4 +48,4 @@ This skill is the map + the non-obvious lessons; готового репозит
 - **`.gitattributes`: `*.sh text eol=lf`** (CRLF breaks the shebang on Mac).
 - A `.dmg` can be built **only on macOS** → use the GitHub Actions mac runner (`ci-and-platforms.md`).
 
-After creating or changing the skill, register it (routing.md row + CLAUDE.md count). The reference project is the source of truth for code — prefer reading/adapting it over writing from scratch.
+After creating or changing the skill, register it with a `rules/routing.md` row (или строкой в `config/routing-ext.md`). Счётчиков навыков в CLAUDE.md нет намеренно — их не восстанавливать; актуальные цифры даёт `python ~/.claude/scripts/config_health.py`. The reference project is the source of truth for code — prefer reading/adapting it over writing from scratch.

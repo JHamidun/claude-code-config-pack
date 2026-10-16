@@ -19,7 +19,10 @@ REPLICATE_API_KEY = os.getenv('REPLICATE_API_KEY')
 
 ## MCP Server
 
-Already configured in `~/.claude/mcp.json` as `replicate`. Can use MCP tools directly.
+MCP-сервера `replicate` в этом конфиге нет: `~/.claude/mcp.json` движок не читает,
+реестр серверов живёт в `~/.claude.json` → `mcpServers`. Инструментов
+`mcp__replicate__*` в сессии не будет — работай через Python SDK (ниже) или REST
+`https://api.replicate.com/v1` с ключом `REPLICATE_API_KEY`.
 
 ## Dependencies
 

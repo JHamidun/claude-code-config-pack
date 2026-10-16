@@ -1,6 +1,6 @@
 # Skills Catalog
 
-> 314 skills total (срез 2026-08-23). Точное число — `ls ~/.claude/skills/`: этот файл — выборка по
+> 330 skills total (срез 2026-10-16). Точное число — `ls ~/.claude/skills/`: этот файл — выборка по
 > категориям и отстаёт от дерева.
 > This catalog lists a categorized subset — per-section counts refer to entries
 > below, not the whole pack. Full list: `ls ~/.claude/skills/`.
@@ -265,6 +265,21 @@
 |-------|------|-------------|
 
 ---
+
+## Added in the 2026-10 update (11 skills)
+| Skill | Type | Description |
+|-------|------|-------------|
+| agent-swarm | P | Рой из разных моделей на одну задачу: линзы, опровержение находок, Codex воркером |
+| anatomy | **A** | Идея как изометрическая «машина»: SVG с живыми показаниями |
+| cert-badge-factory | **A** | Именные сертификаты (PDF/PNG) и цифровые бейджи выпускникам курса, выдача в Accredible |
+| config-health | **A** | Здоровье конфига Claude Code: битые ссылки, вес промпта, лимит памяти, живость MCP |
+| construction-agents | **A** | Агенты-расчётчики для стройки: чертёж, раскладка, проверка по СП, смета-вилка |
+| hyperframes | **A** | Видео из HTML/GSAP (HyperFrames): титры, моушн, слайды, порт из Remotion |
+| officecli | P | Создание и правка .docx/.xlsx/.pptx без Office через CLI officecli: графики, сводные, проверка оформления |
+| outlook-desktop | **A** | Локальный Outlook для Windows (COM): письма, ответ в ветке, отложенная отправка, «Исходящие», календарь |
+| ozon-shopping | **A** | Ozon глазами покупателя, только чтение: поиск, цены, отзывы с отсевом накрутки |
+| project-bootstrap | P | Заводит большой проект: интервью, спека, git и GitHub, каркас docs, бэклог bd, CI |
+| web-to-cli | **A** | CLI для сервиса без API и MCP по трафику своей сессии: карта API, клиент с doctor и dry-run |
 
 ## Summary by Category
 

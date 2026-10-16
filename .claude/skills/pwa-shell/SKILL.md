@@ -59,11 +59,15 @@ project/
 
 ```js
 const CACHE = 'app-v1';
+// В списке — ТОЛЬКО реально существующие пути. Cache.addAll() атомарен: один 404
+// отклоняет весь промис, install падает, SW не активируется, кэш остаётся пустым.
+// Снаружи это выглядит как «PWA поставилось, но офлайн не работает», и молча —
+// ошибку видно только в DevTools → Application → Service Workers.
+// Ниже — минимум из дерева выше; свои style.css/app.js добавляй, когда они есть.
 const ASSETS = [
   '/',
   '/index.html',
-  '/style.css',
-  '/app.js',
+  '/manifest.webmanifest',
   '/icons/icon-192.png',
 ];
 
@@ -130,24 +134,34 @@ iOS Safari install — **только** через "Поделиться → Н�
 
 ## Update flow
 
-Когда пользователь открывает старую версию, новый SW активируется в фоне. Чтобы он применился сразу:
+Когда пользователь открывает старую версию, новый SW активируется в фоне. Чтобы он
+применился сразу, нужны `skipWaiting()` + `clients.claim()` — **они уже стоят в `sw.js`
+выше** (строки `install` и `activate`), второй раз добавлять нечего.
+
+Остаётся перезагрузка страницы в основном коде. Голый
+`addEventListener('controllerchange', () => location.reload())` даёт лишнюю
+перезагрузку сразу после ПЕРВОЙ установки: `clients.claim()` тоже меняет контроллер,
+а при неудачной активации это уходит в цикл. Поэтому перезагружаем, только если
+контроллер уже был:
 
 ```js
-self.addEventListener('install', e => self.skipWaiting());
-self.addEventListener('activate', e => self.clients.claim());
-```
-
-И в основном коде:
-
-```js
-navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+const hadController = !!navigator.serviceWorker.controller;
+navigator.serviceWorker.addEventListener('controllerchange', () => {
+  if (!hadController) return;   // первая установка — это claim(), а не обновление
+  location.reload();
+});
 ```
 
 ## Тестирование
 
-- Chrome DevTools → Application → Manifest и Service Workers.
-- Lighthouse → PWA score (стремиться к ≥90).
+- Chrome DevTools → Application → Manifest и Service Workers (там же видно упавший install).
+- Офлайн: DevTools → Network → Offline, перезагрузить страницу.
 - Самое надёжное — установить на реальный телефон.
+
+> **PWA-score в Lighthouse больше не существует** — категорию PWA убрали в Lighthouse 12
+> (2024). Доступный здесь аудит (`lighthouse_audit`, chrome-devtools) считает только
+> accessibility, SEO, best practices и agentic browsing. Ставить «PWA ≥90» приёмочным
+> критерием нельзя: его нечем измерить.
 
 ## Что НЕ нужно
 
@@ -162,7 +176,8 @@ navigator.serviceWorker.addEventListener('controllerchange', () => location.relo
 - ✅ SW зарегистрирован и работает.
 - ✅ Иконки 192 и 512 есть.
 - ✅ Maskable иконка есть (для Android adaptive icons).
-- ✅ Lighthouse PWA-checks зелёные.
+- ✅ Каждый путь из `ASSETS` реально существует (иначе install падает целиком).
+- ✅ Офлайн проверен вживую: DevTools → Network → Offline → reload.
 
 ## Legacy reference
 

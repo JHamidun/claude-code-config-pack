@@ -17,6 +17,20 @@ The previous version applied every rule equally. We learned that some rules catc
 
 See `references/linkedin-rules-explainer/` for per-rule justification, defenses, and citations.
 
+## Place in the family (does not duplicate)
+
+What splits these three is not the topic but what the author is complaining about:
+
+| Complaint in the request | Skill |
+|---|---|
+| the AUTHOR, text in English and/or a LinkedIn post: "AI tells", "humanize", "run it past a detector" | **`linkedin-humanizer`** (this one) |
+| the AUTHOR, text in Russian: «звучит как ИИ», «перепиши по-человечески» | `de-ai-ify` |
+| the Russian NORM: «поправь стиль», «убери канцелярит», «кавычки и тире», «неразрывные пробелы» | `ru-text` |
+
+Language and surface decide the first split. Everything in the SCRUB pass here is English lexis and English regex ("leverage", "delve", curly quotes, "What do you think?" closers) plus LinkedIn-specific patterns — none of it fires on a Russian draft, where the equivalent tells are «данный», «является» and «в рамках». Route Russian humanizing to `de-ai-ify`; the language-agnostic techniques (forensic leakage markers, the negative-parallelism ban, burstiness, human fingerprints) are already cross-referenced in its body, so no round trip is needed.
+
+`ru-text` is a different job entirely, not a Russian version of this skill: it enforces Russian typography and infostyle on any text, including text a human wrote, and asks nothing about who produced it. Do not send an English post there.
+
 ## When to use
 
 - Before publishing any AI-drafted post or comment
@@ -37,23 +51,18 @@ Any text (post, comment, reply, DM). Optional: target voice samples (past human 
 
 ## Modes
 
-```bash
-# Default: forensic + strict (recommended for LinkedIn)
-linkedin-humanizer <text>
+**Автоматизации нет: CLI `linkedin-humanizer` не существует** (проверено — ни на PATH,
+ни в `scripts/` этого навыка, ни командой в `~/.claude/commands/`). Режим — это набор
+tiers, который ты выбираешь и применяешь сам, проходя три прохода ниже. В отчёте
+указывай выбранный режим в поле "Tier applied".
 
-# Forensic only — minimum-touch, just kill the leakage
-linkedin-humanizer --mode forensic <text>
-
-# Strict — forensic + corporate-speak (the LinkedIn-default config)
-linkedin-humanizer --mode strict <text>
-
-# Aesthetic — strict + style rules (em dashes, rule of three, "robust")
-# Use when target audience is Wikipedia editors / academic readers / AI-tell hunters
-linkedin-humanizer --mode aesthetic <text>
-
-# All — every rule. Maximum scrub. Will flatten literary writing.
-linkedin-humanizer --mode all <text>
-```
+| Режим | Какие tiers включены | Когда |
+|---|---|---|
+| **default** | forensic + strict | по умолчанию для LinkedIn |
+| forensic | только forensic | минимальное касание — убрать реальную утечку модели |
+| strict | forensic + strict | тот же default, названный явно |
+| aesthetic | forensic + strict + aesthetic (em dashes, rule of three, "robust") | аудитория ловит AI-tells: редакторы Wikipedia, академические читатели |
+| all | все правила, максимальный scrub | сплющит художественный текст — только если это приемлемо |
 
 ## The three passes
 
@@ -201,14 +210,14 @@ For emoji-pattern detection (lightbulb, rocket, sparkles signature), see `refere
 
 - `SKILL.md` — this file
 - `references/scrub-rules.md` — full regex patterns by tier
-- `references/voice-fingerprint.md` (file not created yet) — how to preserve user voice while scrubbing
 - `references/tier-rationale.md` — long-form per-rule justification
 
 ## Related skills
 
-- `de-ai-ify` — КАНОН для русских текстов (все площадки): RU-таблицы клише («данный→этот», «является→тире», «в рамках→в»). This skill is EN/LinkedIn-specific; route Russian-language humanizing there. Language-agnostic techniques here (forensic leakage markers, negative parallelism ban, burstiness, human fingerprints) are cross-referenced in its body.
+- `de-ai-ify` — КАНОН for Russian text (all surfaces): RU cliché tables («данный→этот», «является→тире», «в рамках→в»). This skill is EN/LinkedIn-specific; route Russian-language humanizing there. Language-agnostic techniques here (forensic leakage markers, negative parallelism ban, burstiness, human fingerprints) are cross-referenced in its body.
+- `ru-text` — Russian typography and infostyle (guillemets, NBSP, ₽, канцелярит). Norm-of-the-language work, not AI-detection work, and Russian-only. See "Place in the family" above.
 - `references/linkedin-rules-explainer/` — per-rule deep dive with citations and defenses
-- `references/linkedin-detector-tester/` — run text through 5 AI detectors in parallel, show divergence
+- `references/linkedin-detector-tester/` — run text through 5 AI detectors in parallel, show divergence. Живых цифр сейчас не даёт: ключей детекторов в creds нет, а `--manual` требует человека у терминала — см. оговорку в его SKILL.md
 - `references/linkedin-emoji-detector/` — flag AI-pattern emoji usage (lightbulb / rocket / sparkles)
 - `references/linkedin-post-audit/` — detection-only pass (no rewrite)
 - `linkedin-post-writer` — generates drafts that already pass the humanizer

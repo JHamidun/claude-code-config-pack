@@ -165,6 +165,11 @@ High-throughput inference system:
 
 ## Common Commands
 
+Generic shape of a production LLM service — an illustration, **not this skill's own
+scripts**. `scripts/train.py`, `scripts/evaluate.py` and `scripts/health_check.py` do not
+exist here and never did (checked 2026-08-22); neither does the `k8s/` or `charts/` this
+block deploys. What this skill actually ships in `scripts/` is listed under Resources below.
+
 ```bash
 # Development
 python -m pytest tests/ -v --cov
@@ -190,7 +195,7 @@ python scripts/health_check.py
 - Advanced Patterns: `references/prompt_engineering_patterns.md`
 - Implementation Guide: `references/llm_evaluation_frameworks.md`
 - Technical Reference: `references/agentic_system_design.md`
-- Automation Scripts: `scripts/` directory
+- Automation Scripts: `scripts/` — `agent_orchestrator.py`, `prompt_optimizer.py`, `rag_evaluator.py`
 
 ## Senior-Level Responsibilities
 

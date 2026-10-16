@@ -18,7 +18,7 @@ description: "Скрапинг через Apify Actors: соцсети, e-commer
 ## Справочники (references/)
 
 - **[references/curated-actors.md](references/curated-actors.md)** — curated индекс 130+ Actor'ов с точными ID по платформам (Instagram, Facebook, TikTok, YouTube, X, LinkedIn, Maps, отзывы, недвижимость, SEO, RAG-краулинг, Telegram/Reddit/Snapchat, обогащение контактов). **Всегда сверяй ID отсюда перед вызовом.**
-- **[references/apify-gotchas.md](references/apify-gotchas.md)** — модели оплаты (FREE/PPE/FLAT), протокол оценки стоимости, частые грабли (cookies, rate limits, пустые результаты, deprecated Actors), восстановление после ошибок, лимиты по платформам.
+- **[references/apify-gotchas.md](references/apify-gotchas.md)** — модели оплаты (FREE/PPE/FLAT), протокол оценки стоимости, частые грабли (cookies, rate limits, пустые результаты, deprecated Actors), восстановление после ошибок, лимиты по платформам, **дефолты под трендвотчинг соцсетей** (20-30 результатов, `downloadVideos: false`, откуда на самом деле берутся тренды).
 
 > ⚠️ **Namespace важнее всего.** Таблицы ниже — упрощённые; часть ID неполные. Реальные namespace'ы: TikTok = `clockworks/`, YouTube = `streamers/`, Google Maps = `compass/`, X/Twitter = `apidojo/`, LinkedIn = `harvestapi/` + `apimaestro/`. С неверным namespace (`apify/tiktok-scraper` и т.п.) вызов не найдёт Actor — бери точные ID из `curated-actors.md`.
 >
@@ -36,6 +36,8 @@ description: "Скрапинг через Apify Actors: соцсети, e-commer
 | `apify/youtube-scraper` | YouTube видео, каналы, комментарии | "Спарси видео канала" |
 | `apify/twitter-scraper` | X/Twitter посты, профили | "Собери твиты по запросу" |
 | `apify/linkedin-profile-scraper` | LinkedIn профили | "Получи данные профиля" |
+
+> **Трендвотчинг**: универсального актора «дай тренды платформы X» в Apify нет — тренды добываются скрейпом по хэштегу, скрейпом профилей лидеров мнений или поиском по ключевым словам ниши. Дефолты запусков и разбор в `references/apify-gotchas.md` → «Social trendwatching»; методология отбора и что делать с результатом — скилл `content-machine-instructor2-ru`.
 
 > **VK-аудитории для рекламы**: Apify VK-actors НЕ покрывают полный workflow парсинга аудиторий для VK Ads (нотация PS/CS/А/ТУ/НВ, метод А, вечные аудитории). Production-grade парсер для VK Ads — **Target Hunter** (не Apify). См. скилл `vk-ads-pro-ru` для VK-аудиторий.
 

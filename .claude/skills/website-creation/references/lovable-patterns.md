@@ -211,6 +211,15 @@ className="bg-primary/10" // акцентная секция
 Плёночное зерно — слой `absolute inset-0` с `opacity-[0.03]` и повторяющимся
 SVG-шумом в `background-image` (data-URI), поверх всей секции, `pointer-events-none`.
 
+## Адаптивные сетки
+
+```tsx
+grid sm:grid-cols-2 lg:grid-cols-4 gap-5   // карточки в 4 колонки
+grid md:grid-cols-3 gap-6                  // 3 колонки — преимущества
+grid md:grid-cols-2 gap-6                  // 2 колонки — блог
+flex flex-col sm:flex-row gap-3            // форма в строку (на мобильном — стопкой)
+```
+
 ## Каркас Mode A (vanilla, один файл)
 
 ```html

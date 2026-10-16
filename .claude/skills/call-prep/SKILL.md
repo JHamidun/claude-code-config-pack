@@ -197,7 +197,8 @@ Run **call-follow-up** to:
 
 ### Step 2: Research Supplement
 
-**Always run (web search):**
+**Fill the gaps the user's context left open (web search).** Skip any line the pasted
+notes, CRM record or briefing already answers:
 ```
 1. "[Company] news" — last 30 days
 2. "[Company] funding" — recent announcements

@@ -91,11 +91,20 @@ Good user stories are:
 
 ## Requirements Categorization
 
-### MoSCoW Framework
-- **Must have**: Without these, the feature is not viable. Non-negotiable.
-- **Should have**: Important but not critical for launch. High-priority fast follows.
-- **Could have**: Desirable if time permits. Will not delay delivery if cut.
-- **Won't have (this time)**: Explicitly out of scope. May revisit in future versions.
+### One scale in the document: P0 / P1 / P2
+
+The spec template (section 5 above) writes requirements as **P0 / P1 / P2**. Use that notation
+in the document itself — do not mix the two vocabularies in one spec, or "Should have" and "P1"
+end up side by side meaning different things to different readers.
+
+MoSCoW is here only as a translation layer for teams that speak it out loud:
+
+| MoSCoW | This spec | Meaning |
+|---|---|---|
+| Must have | **P0** | Without these the feature is not viable. Non-negotiable. |
+| Should have | **P1** | Important but not critical for launch. High-priority fast follows. |
+| Could have | **P1, bottom of the list** | Desirable if time permits. Will not delay delivery if cut. |
+| Won't have (this time) | **P2** | Explicitly out of scope for v1; design so it stays possible later. |
 
 ### Tips for Categorization
 - Be ruthless about P0s. The tighter the must-have list, the faster you ship and learn.

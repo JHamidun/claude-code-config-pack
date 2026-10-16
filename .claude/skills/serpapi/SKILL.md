@@ -12,8 +12,8 @@ YouTube, Scholar, Jobs, Trends. Один эндпоинт, движок выби
 ## Ключ
 
 `SERPAPI_API_KEY` из `~/.claude/.credentials.master.env`, читать через
-`os.getenv`. Каждый вызов списывает единицу квоты плана — при отладке не гоняй
-цикл по страницам вслепую. Тарифы и лимиты → `references/pricing-and-limits.md`.
+`os.getenv`. Каждый некэшированный вызов списывает единицу квоты плана — при
+отладке не гоняй цикл по страницам вслепую. Тарифы и лимиты → `references/pricing-and-limits.md`.
 
 <!-- no-key-block -->
 ### Ключа нет — что тогда
@@ -70,12 +70,14 @@ SerpAPI не отдаёт вообще) из коробки капчатся/р�
 | `google_maps` | `q` | `local_results` |
 | `google_shopping` | `q` | `shopping_results` |
 | `google_news` | `q` | `news_results` |
-| `google_images` | `q` | `images_results` (не `image_`) |
+| `google_images` | `q` | `images_results` (не `image_`); `original` — полноразмер |
 | `youtube` | **`search_query`** (не `q`) | `video_results` |
 | `google_scholar` | `q` | `organic_results` |
 | `google_jobs` | `q` | `jobs_results` |
 | `google_trends` | `q` | `interest_over_time`, `related_queries`, `related_topics` |
-| `google_videos`, `google_local`, `google_patents` | `q` | распечатай `results.keys()` — здесь не зафиксировано |
+| `google_local` | `q` | `local_results` |
+| `google_patents` | `q` | `organic_results` |
+| `google_videos` | `q` | распечатай `results.keys()` — здесь не зафиксировано |
 
 ## Параметры, которые не угадываются
 
@@ -83,6 +85,7 @@ SerpAPI не отдаёт вообще) из коробки капчатся/р�
 |---|---|
 | Язык / страна выдачи | `hl=en`, `gl=us` |
 | Вторая страница | `start=10` (третья — 20) |
+| Размер страницы | `num` (до 100) |
 | Свежесть: день/неделя/месяц/год | `tbs=qdr:d` / `qdr:w` / `qdr:m` / `qdr:y` |
 | Вилка цен в Shopping | `tbs=mr:1,price:1,ppr_min:50` (и/или `ppr_max:200`) |
 | Размер картинки | `tbs=isz:l` (`m` средние, `i` иконки) |
@@ -109,6 +112,7 @@ SerpAPI не отдаёт вообще) из коробки капчатся/р�
 ## Гочи
 
 - Результаты кэшируются ~30 секунд: повтор идентичного запроса вернёт тот же
-  снимок. Если нужна свежесть после правки — меняй параметры, а не жми повтор.
+  снимок мгновенно и квоту не спишет. Если нужна свежесть после правки — меняй
+  параметры, а не жми повтор.
 - Локаль решает состав выдачи: `gl`/`hl` меняют не только язык подписей, но и
   набор блоков (`answer_box`, «People also ask» появляются не везде).

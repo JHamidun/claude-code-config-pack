@@ -1,6 +1,6 @@
 ---
 name: linkedin-post-writer
-description: "Viral LinkedIn посты на hook-формулах: хук+пост, Publora-schedule. Триггеры: «hook formula», «разбери viral пост»."
+description: "Viral LinkedIn посты на hook-формулах: хук+пост, SocialPublisher-schedule. Триггеры: «hook formula», «разбери viral пост»."
 ---
 
 # LinkedIn Post Writer

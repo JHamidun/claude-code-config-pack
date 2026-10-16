@@ -112,9 +112,16 @@ git branch -m old-name new-name
 
 ### Commits
 
+> ⚠️ **Интерактивные формы (`-i`, `-p`) агенту недоступны.** Инструменты Bash и PowerShell в этой
+> среде не дают stdin, и `git add -p` / `git add -i` / `git rebase -i` не падают с ошибкой, а **молча
+> ничего не делают**: проверено на временном репозитории — `git add -p` напечатал
+> `(1/1) Stage this hunk [y,n,q,a,d,e,p,?]?`, вышел с кодом 0, `git diff --cached --stat` пуст,
+> файл остался `M`. То есть агент решит, что застейджил. Ниже — неинтерактивные замены.
+
 ```bash
-# Staged changes
-git add -p  # интерактивно
+# Staged changes — по путям (постранично hunk'ами агент не может; выбирай файлами)
+git add path/to/file.ts
+git add -A                # всё
 
 # Commit
 git commit -m "feat: add feature"
@@ -122,8 +129,8 @@ git commit -m "feat: add feature"
 # Amend последний коммит
 git commit --amend -m "new message"
 
-# Squash коммиты
-git rebase -i HEAD~3
+# Squash последних 3 коммитов БЕЗ интерактива
+git reset --soft HEAD~3 && git commit -m "feat: squashed message"
 ```
 
 ### Merge & Rebase
@@ -135,8 +142,9 @@ git merge --no-ff feature/branch
 # Rebase (линейная история)
 git rebase main
 
-# Интерактивный rebase
-git rebase -i HEAD~5
+# Интерактивный rebase — агенту НЕДОСТУПЕН (см. предупреждение выше: молча ничего не делает).
+# Переписать последние N коммитов одним: git reset --soft HEAD~5 && git commit -m "..."
+# Нужен именно интерактивный разбор по коммитам — это к человеку в терминал.
 ```
 
 ### Stash
@@ -223,6 +231,21 @@ git bisect reset
 ```
 
 ## Pull Request Best Practices
+
+### Как PR СОЗДАТЬ (триггер «оформи PR»)
+
+GitHub-операции в этой среде идут через `gh` CLI (`gh version 2.72.0` установлен, `/c/Program Files/GitHub CLI/gh`):
+
+```bash
+git push -u origin feature/my-branch
+gh pr create --title "feat: короткий заголовок" --body-file pr-body.md   # тело по шаблону ниже
+gh pr view --web        # открыть в браузере
+gh pr status            # что с моими PR
+```
+
+Тело PR длиннее одной строки передавай файлом (`--body-file`) или heredoc — многострочный `--body`
+в кавычках ломается на разных шеллах. Пуш и создание PR — только когда владелец об этом попросил;
+на дефолтной ветке сначала завести свою.
 
 ### Checklist
 

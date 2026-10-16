@@ -1,6 +1,6 @@
 ---
 name: social-intel
-description: "Досье на человека/компанию по соцсетям (Scraping API). Триггеры: «досье на», «кто этот человек». НЕ домены → osint-recon; компания по открытым источникам → account-research."
+description: "Досье на человека/компанию по соцсетям (ScraperVendor). Триггеры: «досье на», «кто этот человек»."
 allowed-tools: Bash, Read, Write, WebSearch
 ---
 

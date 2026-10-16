@@ -1,0 +1,719 @@
+{
+ "schema": 1,
+ "unit": "reply",
+ "model_requested": "jev-1.13.0",
+ "model_reported": [
+  "jev-1.13.0"
+ ],
+ "date": "2026-10-04",
+ "show_at": {
+  "v01": 0.5,
+  "v02": 0.5,
+  "v03": 0.5
+ },
+ "budget_usd": 0.3,
+ "spent_usd": 0.00380134,
+ "requests": 70,
+ "items": {
+  "live-ex03": {
+   "sha1": "6c489c259d43",
+   "kind": "live",
+   "answers": {
+    "v01": 0.03,
+    "v02": 0.26,
+    "v03": 0.04
+   },
+   "cost": 4.582e-05
+  },
+  "live-ex04": {
+   "sha1": "8ad7456a424d",
+   "kind": "live",
+   "answers": {
+    "v01": 0.07,
+    "v02": 0.27,
+    "v03": 0.04
+   },
+   "cost": 5.183e-05
+  },
+  "live-ex02": {
+   "sha1": "989d87211996",
+   "kind": "live",
+   "answers": {
+    "v01": 0.71,
+    "v02": 0.06,
+    "v03": 0.04
+   },
+   "cost": 5.578e-05
+  },
+  "live-ex01": {
+   "sha1": "efeec9bade6f",
+   "kind": "live",
+   "answers": {
+    "v01": 0.05,
+    "v02": 0.46,
+    "v03": 0.03
+   },
+   "cost": 4.565e-05
+  },
+  "live-ex05": {
+   "sha1": "93594252a25b",
+   "kind": "live",
+   "answers": {
+    "v01": 0.06,
+    "v02": 0.13,
+    "v03": 0.08
+   },
+   "cost": 5.2e-05
+  },
+  "live-ex08": {
+   "sha1": "39b0dfde1493",
+   "kind": "live",
+   "answers": {
+    "v01": 0.77,
+    "v02": 0.06,
+    "v03": 0.06
+   },
+   "cost": 5.733e-05
+  },
+  "live-ex07": {
+   "sha1": "36988cfcb2bc",
+   "kind": "live",
+   "answers": {
+    "v01": 0.05,
+    "v02": 0.52,
+    "v03": 0.04
+   },
+   "cost": 4.523e-05
+  },
+  "live-ex06": {
+   "sha1": "b3c86764517e",
+   "kind": "live",
+   "answers": {
+    "v01": 0.13,
+    "v02": 0.88,
+    "v03": 0.03
+   },
+   "cost": 5.414e-05
+  },
+  "live-ex09": {
+   "sha1": "5709509cc6a5",
+   "kind": "live",
+   "answers": {
+    "v01": 0.04,
+    "v02": 0.07,
+    "v03": 0.95
+   },
+   "cost": 6.187e-05
+  },
+  "live-ex11": {
+   "sha1": "8256db4f68ca",
+   "kind": "live",
+   "answers": {
+    "v01": 0.03,
+    "v02": 0.07,
+    "v03": 0.04
+   },
+   "cost": 5.72e-05
+  },
+  "live-ex12": {
+   "sha1": "470d078661ff",
+   "kind": "live",
+   "answers": {
+    "v01": 0.07,
+    "v02": 0.09,
+    "v03": 0.07
+   },
+   "cost": 6.115e-05
+  },
+  "live-ex10": {
+   "sha1": "622e496d8332",
+   "kind": "live",
+   "answers": {
+    "v01": 0.03,
+    "v02": 0.04,
+    "v03": 0.83
+   },
+   "cost": 5.149e-05
+  },
+  "live-ex13": {
+   "sha1": "a75a026af713",
+   "kind": "live",
+   "answers": {
+    "v01": 0.07,
+    "v02": 0.07,
+    "v03": 0.38
+   },
+   "cost": 5.04e-05
+  },
+  "live-ex14": {
+   "sha1": "bbf102bfe4be",
+   "kind": "live",
+   "answers": {
+    "v01": 0.09,
+    "v02": 0.13,
+    "v03": 0.94
+   },
+   "cost": 5.716e-05
+  },
+  "live-ex15": {
+   "sha1": "9e4d95c69f97",
+   "kind": "live",
+   "answers": {
+    "v01": 0.17,
+    "v02": 0.06,
+    "v03": 0.1
+   },
+   "cost": 6.329e-05
+  },
+  "live-ex16": {
+   "sha1": "67db9e365528",
+   "kind": "live",
+   "answers": {
+    "v01": 0.06,
+    "v02": 0.07,
+    "v03": 0.03
+   },
+   "cost": 4.956e-05
+  },
+  "live-ex17": {
+   "sha1": "497c09df2152",
+   "kind": "live",
+   "answers": {
+    "v01": 0.07,
+    "v02": 0.09,
+    "v03": 0.07
+   },
+   "cost": 6.103e-05
+  },
+  "live-ex19": {
+   "sha1": "c17346e1072b",
+   "kind": "live",
+   "answers": {
+    "v01": 0.08,
+    "v02": 0.69,
+    "v03": 0.03
+   },
+   "cost": 5.775e-05
+  },
+  "live-ex18": {
+   "sha1": "3f27a3957a50",
+   "kind": "live",
+   "answers": {
+    "v01": 0.04,
+    "v02": 0.36,
+    "v03": 0.03
+   },
+   "cost": 5.59e-05
+  },
+  "live-ex20": {
+   "sha1": "9857058e5645",
+   "kind": "live",
+   "answers": {
+    "v01": 0.9,
+    "v02": 0.16,
+    "v03": 0.04
+   },
+   "cost": 5.956e-05
+  },
+  "live-ex21": {
+   "sha1": "e39c3e4917e1",
+   "kind": "live",
+   "answers": {
+    "v01": 0.78,
+    "v02": 0.21,
+    "v03": 0.04
+   },
+   "cost": 6.09e-05
+  },
+  "live-ex23": {
+   "sha1": "539ca91ddb31",
+   "kind": "live",
+   "answers": {
+    "v01": 0.2,
+    "v02": 0.29,
+    "v03": 0.03
+   },
+   "cost": 5.88e-05
+  },
+  "live-ex22": {
+   "sha1": "e23add4dbc66",
+   "kind": "live",
+   "answers": {
+    "v01": 0.04,
+    "v02": 0.14,
+    "v03": 0.32
+   },
+   "cost": 6.892e-05
+  },
+  "live-ex24": {
+   "sha1": "f5fa909b2cae",
+   "kind": "live",
+   "answers": {
+    "v01": 0.06,
+    "v02": 0.83,
+    "v03": 0.03
+   },
+   "cost": 4.796e-05
+  },
+  "live-ex25": {
+   "sha1": "23581fc9d6e2",
+   "kind": "live",
+   "answers": {
+    "v01": 0.84,
+    "v02": 0.07,
+    "v03": 0.13
+   },
+   "cost": 7.472e-05
+  },
+  "live-a01": {
+   "sha1": "215a86f0cab8",
+   "kind": "live",
+   "answers": {
+    "v01": 0.05,
+    "v02": 0.7,
+    "v03": 0.04
+   },
+   "cost": 5.006e-05
+  },
+  "live-a02": {
+   "sha1": "edc2f02cb848",
+   "kind": "live",
+   "answers": {
+    "v01": 0.06,
+    "v02": 0.71,
+    "v03": 0.03
+   },
+   "cost": 4.822e-05
+  },
+  "live-a03": {
+   "sha1": "adf00459ea3d",
+   "kind": "live",
+   "answers": {
+    "v01": 0.03,
+    "v02": 0.12,
+    "v03": 0.03
+   },
+   "cost": 4.599e-05
+  },
+  "live-a05": {
+   "sha1": "9e2bbf37574b",
+   "kind": "live",
+   "answers": {
+    "v01": 0.04,
+    "v02": 0.17,
+    "v03": 0.04
+   },
+   "cost": 4.99e-05
+  },
+  "live-a04": {
+   "sha1": "59958aa889ca",
+   "kind": "live",
+   "answers": {
+    "v01": 0.04,
+    "v02": 0.04,
+    "v03": 0.03
+   },
+   "cost": 4.393e-05
+  },
+  "live-a06": {
+   "sha1": "767a22718f32",
+   "kind": "live",
+   "answers": {
+    "v01": 0.04,
+    "v02": 0.69,
+    "v03": 0.03
+   },
+   "cost": 5.149e-05
+  },
+  "live-a07": {
+   "sha1": "84f73bf9ba24",
+   "kind": "live",
+   "answers": {
+    "v01": 0.05,
+    "v02": 0.3,
+    "v03": 0.04
+   },
+   "cost": 4.973e-05
+  },
+  "machine-m01": {
+   "sha1": "cefd13836044",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.77,
+    "v02": 0.11,
+    "v03": 0.96
+   },
+   "cost": 5.485e-05
+  },
+  "machine-m02": {
+   "sha1": "ceb61a6b621c",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.88,
+    "v02": 0.1,
+    "v03": 0.93
+   },
+   "cost": 5.741e-05
+  },
+  "machine-m03": {
+   "sha1": "ccc1a7006636",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.42,
+    "v02": 0.08,
+    "v03": 0.86
+   },
+   "cost": 5.523e-05
+  },
+  "machine-m04": {
+   "sha1": "a82b9e7b33a2",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.8,
+    "v02": 0.58,
+    "v03": 0.9
+   },
+   "cost": 6.124e-05
+  },
+  "machine-m05": {
+   "sha1": "640db1d714e1",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.13,
+    "v02": 0.69,
+    "v03": 0.03
+   },
+   "cost": 5.187e-05
+  },
+  "machine-m06": {
+   "sha1": "5a1405da4443",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.51,
+    "v02": 0.08,
+    "v03": 0.92
+   },
+   "cost": 5.813e-05
+  },
+  "machine-m07": {
+   "sha1": "2e2eba567eb1",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.59,
+    "v02": 0.08,
+    "v03": 0.93
+   },
+   "cost": 5.334e-05
+  },
+  "machine-m08": {
+   "sha1": "26d65c881858",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.35,
+    "v02": 0.05,
+    "v03": 0.94
+   },
+   "cost": 5.33e-05
+  },
+  "machine-m10": {
+   "sha1": "756990760188",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.45,
+    "v02": 0.07,
+    "v03": 0.83
+   },
+   "cost": 5.876e-05
+  },
+  "machine-m11": {
+   "sha1": "ed673b77aa3d",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.47,
+    "v02": 0.06,
+    "v03": 0.91
+   },
+   "cost": 5.788e-05
+  },
+  "machine-m09": {
+   "sha1": "a0358892ef3e",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.79,
+    "v02": 0.09,
+    "v03": 0.92
+   },
+   "cost": 5.8e-05
+  },
+  "machine-m12": {
+   "sha1": "c6aa5444694d",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.9,
+    "v02": 0.1,
+    "v03": 0.91
+   },
+   "cost": 5.708e-05
+  },
+  "machine-m14": {
+   "sha1": "f378ff0b7927",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.95,
+    "v02": 0.12,
+    "v03": 0.94
+   },
+   "cost": 5.632e-05
+  },
+  "machine-m15": {
+   "sha1": "1f12184a0238",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.1,
+    "v02": 0.09,
+    "v03": 0.94
+   },
+   "cost": 5.775e-05
+  },
+  "machine-m13": {
+   "sha1": "99e1dad18a9d",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.94,
+    "v02": 0.05,
+    "v03": 0.92
+   },
+   "cost": 5.909e-05
+  },
+  "machine-m16": {
+   "sha1": "24654f3dedf5",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.86,
+    "v02": 0.38,
+    "v03": 0.88
+   },
+   "cost": 5.594e-05
+  },
+  "machine-m17": {
+   "sha1": "705b4fe4b5df",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.8,
+    "v02": 0.42,
+    "v03": 0.93
+   },
+   "cost": 5.981e-05
+  },
+  "machine-m18": {
+   "sha1": "bbf39b6fe0a7",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.49,
+    "v02": 0.09,
+    "v03": 0.03
+   },
+   "cost": 5.473e-05
+  },
+  "machine-m19": {
+   "sha1": "490b9c33bc6b",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.05,
+    "v02": 0.06,
+    "v03": 0.85
+   },
+   "cost": 5.351e-05
+  },
+  "machine-m20": {
+   "sha1": "b0a5836fdbfc",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.87,
+    "v02": 0.18,
+    "v03": 0.03
+   },
+   "cost": 5.506e-05
+  },
+  "machine-m21": {
+   "sha1": "faaae9b37039",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.81,
+    "v02": 0.18,
+    "v03": 0.81
+   },
+   "cost": 5.62e-05
+  },
+  "machine-m22": {
+   "sha1": "e4855fdb2b07",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.55,
+    "v02": 0.19,
+    "v03": 0.94
+   },
+   "cost": 5.615e-05
+  },
+  "machine-m23": {
+   "sha1": "8e02d2d54e83",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.96,
+    "v02": 0.09,
+    "v03": 0.89
+   },
+   "cost": 5.775e-05
+  },
+  "machine-m24": {
+   "sha1": "c238a9bf76fb",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.88,
+    "v02": 0.11,
+    "v03": 0.92
+   },
+   "cost": 5.699e-05
+  },
+  "machine-m26": {
+   "sha1": "1a50b007a148",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.39,
+    "v02": 0.08,
+    "v03": 0.93
+   },
+   "cost": 5.418e-05
+  },
+  "machine-m27": {
+   "sha1": "0eeb03a31fff",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.85,
+    "v02": 0.8,
+    "v03": 0.04
+   },
+   "cost": 5.515e-05
+  },
+  "machine-m28": {
+   "sha1": "631f184665c4",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.12,
+    "v02": 0.86,
+    "v03": 0.03
+   },
+   "cost": 5.389e-05
+  },
+  "machine-m25": {
+   "sha1": "a87b3ad6d5fb",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.11,
+    "v02": 0.06,
+    "v03": 0.03
+   },
+   "cost": 5.405e-05
+  },
+  "machine-m30": {
+   "sha1": "083771957618",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.61,
+    "v02": 0.33,
+    "v03": 0.03
+   },
+   "cost": 5.431e-05
+  },
+  "machine-m33": {
+   "sha1": "47d1577572a6",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.06,
+    "v02": 0.88,
+    "v03": 0.03
+   },
+   "cost": 4.847e-05
+  },
+  "machine-m34": {
+   "sha1": "33201dc45f5b",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.04,
+    "v02": 0.91,
+    "v03": 0.03
+   },
+   "cost": 4.998e-05
+  },
+  "machine-m35": {
+   "sha1": "11a3a336287d",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.15,
+    "v02": 0.9,
+    "v03": 0.03
+   },
+   "cost": 4.612e-05
+  },
+  "machine-m36": {
+   "sha1": "ac32c387be68",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.06,
+    "v02": 0.86,
+    "v03": 0.03
+   },
+   "cost": 4.603e-05
+  },
+  "machine-m29": {
+   "sha1": "635d7d650059",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.82,
+    "v02": 0.14,
+    "v03": 0.04
+   },
+   "cost": 5.107e-05
+  },
+  "machine-m37": {
+   "sha1": "2b59f11fdce2",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.03,
+    "v02": 0.81,
+    "v03": 0.03
+   },
+   "cost": 4.775e-05
+  },
+  "machine-m38": {
+   "sha1": "95d6bd849b3c",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.07,
+    "v02": 0.81,
+    "v03": 0.03
+   },
+   "cost": 4.595e-05
+  },
+  "machine-m31": {
+   "sha1": "4e961945e541",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.2,
+    "v02": 0.82,
+    "v03": 0.03
+   },
+   "cost": 4.771e-05
+  },
+  "machine-m32": {
+   "sha1": "2973f1cf9c91",
+   "kind": "machine",
+   "answers": {
+    "v01": 0.38,
+    "v02": 0.37,
+    "v03": 0.04
+   },
+   "cost": 4.553e-05
+  }
+ }
+}

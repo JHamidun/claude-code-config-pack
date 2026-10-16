@@ -29,15 +29,26 @@ Contribute skills from your local branch back to upstream repositories.
 
 - `gh` CLI installed and authenticated
 - Skill has been tested
+- Локальный клон upstream-репозитория (в `~/.claude` его нет — см. ниже)
+
+> ⚠️ **`~/.claude` — локальный git без remote.** `git remote -v` там пустой, поэтому
+> `git pull origin main` / `git push -u origin` оттуда не работают. Навык **копируется**
+> из `~/.claude/skills/<name>/` в клон upstream-репо, и вся работа с ветками идёт там.
+>
+> ⚠️ **Навык — это папка, а не файл.** На диске `skills/<name>/SKILL.md` (+ `scripts/`,
+> `references/`, `templates/`), а не `skills/<name>.md`.
 
 ## Sharing Workflow
 
-### 1. Ensure You're on Main and Synced
+### 1. Get the upstream clone and sync it
 
 ```bash
-cd ~/.claude/skills/
+# один раз: форк + клон upstream-репозитория навыков
+gh repo fork <owner>/<repo> --clone --remote
+cd ~/src/<repo>          # клон, НЕ ~/.claude
+
 git checkout main
-git pull origin main
+git pull upstream main   # upstream добавлен gh repo fork --remote
 ```
 
 ### 2. Create Feature Branch
@@ -47,17 +58,20 @@ skill_name="your-skill-name"
 git checkout -b "add-${skill_name}-skill"
 ```
 
-### 3. Create or Edit Skill
+### 3. Copy the Skill Folder In
 
 ```bash
-# Create skill file
-# skills/your-skill-name.md
+# навык = папка с SKILL.md внутри
+cp -r ~/.claude/skills/${skill_name} skills/${skill_name}
+
+# перед копированием прогнать leak-scan: наружу не должно уехать личное
+python ~/.claude/skills/leak-scan/scripts/leak_scan.py skills/${skill_name}
 ```
 
 ### 4. Commit Changes
 
 ```bash
-git add skills/your-skill-name.md
+git add "skills/${skill_name}"
 git commit -m "Add ${skill_name} skill
 
 Brief description of what this skill does and why it's useful.
@@ -92,9 +106,10 @@ EOF
 ## After PR is Merged
 
 ```bash
-# Sync your local main
+# Sync your fork's main (в клоне upstream-репо, не в ~/.claude)
 git checkout main
-git pull origin main
+git pull upstream main
+git push origin main
 
 # Delete feature branch
 git branch -d "add-${skill_name}-skill"
@@ -119,4 +134,5 @@ Each skill should:
 | "gh: command not found" | Install GitHub CLI: https://cli.github.com/ |
 | "Permission denied" | Check SSH keys: `gh auth status` |
 | "Skill already exists" | Consider different name or coordinate |
-| PR merge conflicts | Rebase: `git fetch origin && git rebase origin/main` |
+| PR merge conflicts | Rebase: `git fetch upstream && git rebase upstream/main` |
+| "fatal: 'origin' does not appear to be a git repository" | Ты в `~/.claude` — у него нет remote; перейди в клон upstream-репо |

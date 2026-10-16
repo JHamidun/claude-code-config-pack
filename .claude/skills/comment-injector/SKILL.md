@@ -1,10 +1,32 @@
 ---
 name: comment-injector
 version: 1.0.0
-description: "Overlay в HTML: Alt+Click по элементу кладёт в clipboard CSS-селектор и outerHTML — правки без скриншотов. Триггеры: «ревью прототипа в браузере». НЕ правка мышкой→visual-edit."
+description: "Overlay в HTML: Alt+Click кладёт в clipboard селектор и outerHTML, Shift+Alt+Click — пачку пометок. Триггеры: «ревью прототипа в браузере», «убери всё отмеченное»."
 ---
 
 # Comment injector
+
+## Место в семье (три overlay-скилла, не дублируют)
+
+Все три вешают overlay на прототип в браузере, и по просьбе «дай поправить прототип
+прямо на странице» подходят одинаково. Различает их **кто вносит правку и что именно
+меняется**:
+
+| Скилл | Кто правит | Что меняется | Куда уходит результат |
+|---|---|---|---|
+| `comment-injector` (этот) | Claude — человек только показывает пальцем | что угодно, дальше словами в чате | никуда сам: в clipboard селектор + `outerHTML` |
+| `visual-edit` | человек мышкой | геометрия ОДНОГО элемента (позиция, размер) | CSS-правило под маркером `/* visual-edit */` |
+| `tweaks-panel` | человек крутилками | сквозной параметр: цвет, кегль, тема, вариант | localStorage, на диск — только через writeback |
+
+Признак берётся из формулировки: «вот этот блок надо поправить», «покажу, что менять» —
+сюда; «дай я сам подвину/растяну» — `visual-edit`; «дай повертеть цвет и шрифт» —
+`tweaks-panel`.
+
+Этот скилл — единственный из трёх, который **ничего не меняет**. Он решает не задачу
+правки, а задачу адресации: без него человек присылает скриншот и фразу «вот эта
+плашка справа», и половина итераций уходит на выяснение, какой это элемент. Отсюда и
+его область — ревью, где правит всё равно Claude, и правки могут быть любыми (текст,
+логика, разметка), а не только те, что выражаются в CSS.
 
 Добавь `<script src="comment-injector.js"></script>` в страницу или дёрни `?cc=1` через query-параметр (snippet ниже).
 
@@ -17,45 +39,35 @@ OUTER_HTML: <h3 class="title">Apex Pro</h3>
 
 Пользователь вставляет это в чат → ты сразу знаешь, что править.
 
+## Пачка пометок — Shift+Alt+Click
+
+Когда править надо не один элемент, а сразу много («убери весь этот мусор», «почини
+наезды здесь, здесь и здесь»), поштучные вставки растягиваются на десяток сообщений.
+**Shift+Alt+Click** добавляет элемент в пачку: он получает красную пунктирную обводку, а в
+clipboard ложится весь пронумерованный список. Повторный Shift+Alt+Click по элементу
+убирает его из пачки. **Escape** очищает всё.
+
+```
+MARKED: 2
+1. SELECTOR: html > body > div.card > span.chip.live:nth-of-type(1)
+   OUTER_HTML: <span class="chip live">Live</span>
+2. SELECTOR: html > body > div.card > span.chip.ai:nth-of-type(2)
+   OUTER_HTML: <span class="chip ai">AI-powered</span>
+```
+
+Пользователь вставляет список одной репликой и пишет одну команду: «удали все отмеченные»
+или «в отмеченных местах текст наезжает — почини». Это аналог режима Annotate в Google AI
+Studio (гайд от 16.09.2026): обвести лишнее → «Remove all circled elements». Что считать
+лишним — `content-rules` («Проход „что убрать“»).
+
+`OUTER_HTML` снимается **до** того, как элемент обведён, — в список не попадают наши
+собственные стили обводки, и они не выглядят частью вёрстки. Проверено в браузере
+17.09.2026: добавление, снятие, повторное добавление, очистка Escape.
+
 ## Snippet
 
-`templates/comment-injector.js`:
-
-```js
-(function () {
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') document.body.removeAttribute('data-cc-on');
-  });
-  document.addEventListener('click', (e) => {
-    if (!e.altKey) return;
-    e.preventDefault(); e.stopPropagation();
-    const el = e.target;
-    const sel = cssPath(el);
-    const text = `SELECTOR: ${sel}\nOUTER_HTML: ${el.outerHTML.slice(0, 400)}`;
-    navigator.clipboard.writeText(text);
-    flash(el);
-  }, true);
-
-  function cssPath(el) {
-    const parts = [];
-    while (el && el.nodeType === 1 && parts.length < 6) {
-      let part = el.tagName.toLowerCase();
-      if (el.id) { part += '#' + el.id; parts.unshift(part); break; }
-      if (el.className) part += '.' + [...el.classList].slice(0, 2).join('.');
-      const sib = [...el.parentNode.children].filter(c => c.tagName === el.tagName);
-      if (sib.length > 1) part += `:nth-of-type(${sib.indexOf(el) + 1})`;
-      parts.unshift(part);
-      el = el.parentElement;
-    }
-    return parts.join(' > ');
-  }
-  function flash(el) {
-    const o = el.style.outline;
-    el.style.outline = '2px solid #ff3b30';
-    setTimeout(() => { el.style.outline = o; }, 600);
-  }
-})();
-```
+Код — `templates/comment-injector.js`, он и есть источник: копируй файл в проект, а не
+переписывай его по памяти из этого описания.
 
 ## Auto-inject через live-preview
 

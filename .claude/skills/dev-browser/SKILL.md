@@ -1,6 +1,6 @@
 ---
 name: dev-browser
-description: "Браузер с сохранением состояния страницы: формы, скриншоты, логин. Триггеры: «зайди на сайт», «залогинься». НЕ e2e-тесты→playwright-automation; тест своего фронта→webapp-testing."
+description: "Браузер с состоянием между скриптами; режим расширения — реальный Chrome с логинами. Триггеры: «зайди под моим логином». НЕ: быстрый QA→gstack; антибот→playwright-automation."
 type: actionable
 ---
 

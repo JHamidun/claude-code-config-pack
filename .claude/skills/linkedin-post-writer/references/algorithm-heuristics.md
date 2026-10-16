@@ -30,6 +30,26 @@ Avoid: Mon before 9 AM, Fri after 2 PM, Sat/Sun (30-50% reach cut for B2B).
 - Long-form (1,500-1,900) works only with line breaks every 1-2 sentences and narrative payoff
 - Avoid <400 chars unless you're an established voice with punchy observations
 
+### Length by format (методология / Kozhemyakin, B2B practice)
+
+The 900-1,300 sweet spot above is a blended figure. Split by format it looks different,
+and the split matters when you know which format you're writing:
+
+| Format | Target length | Notes |
+|---|---|---|
+| **Text + image** | **700-900 chars** | Shorter than text-only — the image carries part of the load. **Does not lose reach under frequent posting**, unlike text-only |
+| **Text-only** | **1,000+ chars, or 300-400 words** | **Under 200 words gets suppressed.** 20+ sentences is fine if each reads easily |
+
+Two rules that only apply to text-only:
+
+- **Never post text after text.** Image-less posts perform **~20% worse when they run
+  back-to-back** — alternate with a visual format.
+- Open with a positive, negative, or personal beat in the **first 2 lines** — that is the
+  whole hook budget before the fold.
+
+Format-agnostic: **always close on a simple question.** A CTA plus an easy question
+produces more comments than a CTA alone, and comments are what buys the second wave.
+
 ## Hashtags
 
 - **0 hashtags** performs equal to or better than 5+ in 2026 (EnterpriseTool uses semantic embeddings, not tag matching)
@@ -51,6 +71,28 @@ Avoid: Mon before 9 AM, Fri after 2 PM, Sat/Sun (30-50% reach cut for B2B).
 - Dwell time sweet spot: **31-60 seconds**
 - "See More" expand + fast abandon (<3s) = clickbait penalty
 - First 1-2 sentences scored for topic relevance before user scrolls
+
+## Distribution in four stages
+
+The stage view explains *why* the timing rules below work:
+
+```
+1. Initial screen  — post is judged on QUALITY and FORMAT
+2. First cohort    — shown to 10-15% of your followers;
+                     WHICH followers is decided by the post's KEYWORDS
+3. Engagement read — comments · reactions · saves ·
+                     PROFILE VISITS · TIME SPENT READING
+4. Next cohort     — wider distribution; the post keeps getting re-evaluated
+                     for relevance over time
+```
+
+Two consequences: **higher engagement → wider reach**, and **more reactions → the post
+keeps resurfacing for longer**.
+
+The practical, non-obvious part is stage 2. Reach is not a single dial — the first
+cohort is *selected by keywords*, so a post about pricing that never says "pricing"
+lands in front of the wrong 10-15% and dies with good writing intact. Say the topic
+plainly in the first lines, in the words your audience uses.
 
 ## First 60 minutes
 

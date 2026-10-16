@@ -20,7 +20,7 @@ description: "Транскрипты роликов YouTube, саммари и �
 ## Installation
 
 ```bash
-pip install youtube-transcript-api pytube
+pip install youtube-transcript-api yt-dlp
 ```
 
 ## Core Functions
@@ -28,7 +28,7 @@ pip install youtube-transcript-api pytube
 ### Get Transcript
 
 ```python
-from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound
 from urllib.parse import urlparse, parse_qs
 
 def extract_video_id(url: str) -> str:
@@ -51,18 +51,17 @@ def get_transcript(video_url: str, language: str = 'en') -> list:
     """Get transcript for a YouTube video"""
     video_id = extract_video_id(video_url)
 
+    api = YouTubeTranscriptApi()          # v1.x: fetch()/list() — методы экземпляра
+
     try:
         # Try requested language first
-        transcript = YouTubeTranscriptApi.get_transcript(
-            video_id,
-            languages=[language]
-        )
-    except:
-        # Fall back to auto-generated or any available
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-        transcript = transcript_list.find_transcript(['en', 'ru']).fetch()
+        fetched = api.fetch(video_id, languages=[language])
+    except NoTranscriptFound:
+        # Requested language missing — fall back to any available
+        fetched = api.list(video_id).find_transcript(['en', 'ru']).fetch()
 
-    return transcript
+    # to_raw_data() -> [{'text': ..., 'start': ..., 'duration': ...}, ...]
+    return fetched.to_raw_data()
 
 # Usage
 transcript = get_transcript("https://youtube.com/watch?v=dQw4w9WgXcQ")
@@ -98,20 +97,21 @@ plain = format_transcript(transcript)
 ### Get Video Metadata
 
 ```python
-from pytube import YouTube
+from yt_dlp import YoutubeDL   # pytube заброшен и здесь не установлен
 
 def get_video_info(url: str) -> dict:
     """Get video metadata"""
-    yt = YouTube(url)
+    with YoutubeDL({'quiet': True, 'skip_download': True}) as ydl:
+        info = ydl.extract_info(url, download=False)
     return {
-        'title': yt.title,
-        'author': yt.author,
-        'length': yt.length,  # seconds
-        'views': yt.views,
-        'publish_date': yt.publish_date,
-        'description': yt.description,
-        'thumbnail_url': yt.thumbnail_url,
-        'keywords': yt.keywords
+        'title': info.get('title'),
+        'author': info.get('uploader'),
+        'length': info.get('duration'),  # seconds
+        'views': info.get('view_count'),
+        'publish_date': info.get('upload_date'),  # 'YYYYMMDD'
+        'description': info.get('description'),
+        'thumbnail_url': info.get('thumbnail'),
+        'keywords': info.get('tags') or []
     }
 
 info = get_video_info("https://youtube.com/watch?v=...")
@@ -127,7 +127,7 @@ print(f"Duration: {info['length'] // 60} minutes")
 def get_available_languages(video_url: str) -> list:
     """List available transcript languages"""
     video_id = extract_video_id(video_url)
-    transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+    transcript_list = YouTubeTranscriptApi().list(video_id)
 
     languages = []
     for transcript in transcript_list:
@@ -142,12 +142,12 @@ def get_available_languages(video_url: str) -> list:
 def get_translated_transcript(video_url: str, target_lang: str) -> list:
     """Get transcript translated to target language"""
     video_id = extract_video_id(video_url)
-    transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+    transcript_list = YouTubeTranscriptApi().list(video_id)
 
     # Find any translatable transcript
     for transcript in transcript_list:
         if transcript.is_translatable:
-            return transcript.translate(target_lang).fetch()
+            return transcript.translate(target_lang).fetch().to_raw_data()
 
     raise Exception("No translatable transcript found")
 ```

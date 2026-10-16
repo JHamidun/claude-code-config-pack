@@ -1,6 +1,6 @@
 ---
 name: security-audit
-description: "Security-аудит: секреты в коде, pip/npm audit, OWASP Top 10. Триггеры: «аудит безопасности», «проверь на уязвимости»."
+description: "Security-аудит: секреты в коде, pip/npm audit, OWASP Top 10. Триггеры: «аудит безопасности», «проверь на уязвимости». НЕ активный пентест→агент security-engineer (режим PENTEST)."
 ---
 
 # Security Audit Skill
@@ -188,6 +188,14 @@ full_path = os.path.realpath(os.path.join(base_path, filename))
 if not full_path.startswith(base_path):
     raise ValueError("Invalid path")
 ```
+
+## Configuration Checklist (быстрая проверка прод-конфига)
+
+- DEBUG режим выключен?
+- HTTPS enforced (redirect + HSTS)?
+- CORS настроен не на `*` для авторизованных запросов?
+- Rate limiting есть на auth/API эндпоинтах?
+- `.gitignore` покрывает `.env`, secrets, credentials, keys?
 
 ## Security Headers
 

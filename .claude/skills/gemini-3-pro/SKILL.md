@@ -55,17 +55,18 @@ client = genai.Client(api_key=os.getenv('GOOGLE_API_KEY'))
 
 ⛔ Старый SDK `google.generativeai` (`import google.generativeai as genai`, `genai.configure(...)`, `GenerativeModel`) **ЗАПРЕЩЁН** (`rules/dont-do.md` п.9). Только `from google import genai`.
 
-## Актуальные модели (сверка июль 2026)
+## Актуальные модели (канон — config/models.md, сверка август 2026)
 
 | Модель | Контекст | Роль |
 |--------|----------|------|
-| `gemini-3.1-pro-preview` | ~2M | Лучший reasoning / длинные документы |
-| `gemini-3.5-flash` | ~1M | **Рекомендованный primary для ботов** (быстрый, дешёвый) |
-| `gemini-3.1-flash-lite` | ~1M | Самый дешёвый, простые Q&A/классификация |
-| `gemini-3-flash-preview` | ~1M | Beta, местами ограничен |
+| `gemini-3.1-pro-preview` | ~2M | Лучший reasoning / длинные документы (всё ещё старший Pro) |
+| `gemini-3-flash-preview` | ~1M | **Рекомендованный primary для ботов** (быстрый, дешёвый) |
+| `gemini-2.5-flash-lite` | ~1M | Самый дешёвый, простые Q&A/классификация |
 | `gemini-2.5-pro` / `gemini-2.5-flash` | 1M | Стабильные fallback |
 | `gemini-embedding-001` | — | Embeddings |
-| `gemini-3.1-flash-tts-preview` | — | TTS |
+| `gemini-3.1-flash-tts-preview` | — | TTS (дрейфует — сверяй через discovery) |
+
+> `gemini-3.7-flash` (вышел 13.08.2026) и `gemini-3.8-flash` — оба ID есть в `models.list` на 17.09.2026. Google называет их лучшими для воссоздания UI по скриншоту. Там же уже `gemini-3.5-flash` и `gemini-3.6-flash`, которых нет в таблице выше: таблицу перед выбором primary для бота сверить заново (config/models.md).
 
 Каталог дрейфует между ключами и релизами — **перед хардкодом модели в конфиг прогони discovery**:
 
@@ -79,7 +80,7 @@ curl -s "https://generativelanguage.googleapis.com/v1beta/models?key=${GOOGLE_AP
 
 ```python
 def gemini_chat(prompt: str, system: str | None = None,
-                model: str = "gemini-3.5-flash") -> str:
+                model: str = "gemini-3-flash-preview") -> str:
     response = client.models.generate_content(
         model=model,
         contents=prompt,
@@ -103,7 +104,7 @@ from PIL import Image
 def analyze_image(image_path: str, prompt: str) -> str:
     img = Image.open(image_path)
     response = client.models.generate_content(
-        model="gemini-3.5-flash",
+        model="gemini-3-flash-preview",
         contents=[prompt, img],           # можно несколько картинок списком
     )
     return response.text
@@ -134,7 +135,7 @@ def transcribe_audio(audio_path: str) -> str:
 ```python
 def analyze_youtube(url: str, prompt: str) -> str:
     response = client.models.generate_content(
-        model="gemini-3.5-flash",
+        model="gemini-3-flash-preview",
         contents=types.Content(parts=[
             types.Part(file_data=types.FileData(file_uri=url)),
             types.Part(text=prompt),
@@ -150,7 +151,7 @@ import json
 
 def structured_output(prompt: str, schema: dict) -> dict:
     response = client.models.generate_content(
-        model="gemini-3.5-flash",
+        model="gemini-3-flash-preview",
         contents=prompt,
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
@@ -165,12 +166,12 @@ def structured_output(prompt: str, schema: dict) -> dict:
 ```python
 # Streaming
 for chunk in client.models.generate_content_stream(
-        model="gemini-3.5-flash", contents=prompt):
+        model="gemini-3-flash-preview", contents=prompt):
     print(chunk.text, end="")
 
 # Multi-turn chat
 chat = client.chats.create(
-    model="gemini-3.5-flash",
+    model="gemini-3-flash-preview",
     config=types.GenerateContentConfig(system_instruction="You are a coding assistant."),
 )
 r1 = chat.send_message("Write a Python function to sort a list")
@@ -184,7 +185,7 @@ r2 = chat.send_message("Now add type hints")
 ```python
 def grounded(query: str):
     response = client.models.generate_content(
-        model="gemini-3.5-flash",
+        model="gemini-3-flash-preview",
         contents=query,
         config=types.GenerateContentConfig(
             tools=[types.Tool(google_search=types.GoogleSearch())],
@@ -201,7 +202,7 @@ def grounded(query: str):
 ```python
 def execute_code(prompt: str) -> str:
     response = client.models.generate_content(
-        model="gemini-3.5-flash",
+        model="gemini-3-flash-preview",
         contents=prompt,
         config=types.GenerateContentConfig(
             tools=[types.Tool(code_execution=types.ToolCodeExecution())],
@@ -219,7 +220,7 @@ def execute_code(prompt: str) -> str:
 
 ```python
 response = client.models.generate_content(
-    model="gemini-3.5-flash",
+    model="gemini-3-flash-preview",
     contents=f"Summarize: https://example.com/article",
     config=types.GenerateContentConfig(
         tools=[types.Tool(url_context=types.UrlContext())],
@@ -235,7 +236,7 @@ def get_weather(city: str) -> str:
     ...
 
 response = client.models.generate_content(
-    model="gemini-3.5-flash",
+    model="gemini-3-flash-preview",
     contents="Погода в город?",
     config=types.GenerateContentConfig(tools=[get_weather]),  # SDK сам строит схему из сигнатуры
 )
@@ -302,7 +303,7 @@ Hermes/боты ходят в Gemini через OpenAI-совместимый э
 
 ```
 base_url: https://generativelanguage.googleapis.com/v1beta/openai
-model:    gemini-3.5-flash        # bare name, без "models/"
+model:    gemini-3-flash-preview        # bare name, без "models/"
 ```
 
 404 → неправильный base_url или модели нет на ключе (прогони discovery). Детали, rate limits (free tier ~1500 req/day), пустой `message {}` при выжранном reasoning-бюджете — в `autonomous-agent-creator/references/gemini-api-models.md`.
@@ -324,8 +325,8 @@ model:    gemini-3.5-flash        # bare name, без "models/"
 
 | Модель | Input | Output |
 |--------|-------|--------|
-| gemini-3.5-flash | ~$0.10 | ~$0.40 |
-| gemini-3.1-flash-lite | ~$0.04 | ~$0.20 |
+| gemini-3-flash-preview | ~$0.10 | ~$0.40 |
+| gemini-2.5-flash-lite | ~$0.04 | ~$0.20 |
 | gemini-3.1-pro-preview | ~$1.25 | ~$10 |
 
 Gemini Flash ~30× дешевле Sonnet на бот-нагрузках. Актуализация — в reference-файле.
@@ -348,7 +349,7 @@ Gemini Flash ~30× дешевле Sonnet на бот-нагрузках. Акт�
 
 1. **Discovery перед хардкодом** — модели дрейфуют, `gemini-3-flash` уже один раз молча умер в 404.
 2. **2M контекст** (`gemini-3.1-pro-preview`) — целые кодбазы/книги одним запросом.
-3. **Для ботов** — `gemini-3.5-flash` primary, `gemini-2.5-flash` known-good fallback.
+3. **Для ботов** — `gemini-3-flash-preview` primary, `gemini-2.5-flash` known-good fallback.
 4. **В Claude Code** — Gemini только для того, что Opus не может: multimodal-анализ, 2M, grounding, embeddings.
 5. **Старый SDK запрещён** — только `from google import genai`.
 6. **Image/video — НЕ здесь** — skill `image-generation` / `video-generation`, канон `config/models.md`.

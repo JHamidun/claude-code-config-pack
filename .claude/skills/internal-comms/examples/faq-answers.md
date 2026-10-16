@@ -20,7 +20,7 @@ The formatting should be pretty basic:
 - *Answer*: [insert answer - 1-2 sentence]
 
 ## Guidance
-Make sure you're being holistic in your questions. Don't focus too much on just the user in question or the team they are a part of, but try to capture the entire company. Try to be as holistic as you can in reading all the tools available, producing responses that are relevant to all at the company.
+Keep the questions company-wide: don't narrow them to the requesting user or their team. Read the sources that plausibly carry company-wide news (announcements, all-hands notes, recent leadership posts) rather than sweeping every connected tool — answers should be relevant to everyone at the company.
 
 ## Answer Guidelines
 - Base answers on official company communications when possible

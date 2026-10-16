@@ -1,6 +1,6 @@
 ---
 name: rollback-changes
-description: "Откат упавшей фазы воркфлоу по changes-log: восстановление файлов, чистка артефактов, отмена команд. Триггеры: «откати изменения», «верни как было»."
+description: "Откат упавшей фазы воркфлоу по changes-log: файлы из бэкапа, revert коммитов, чистка артефактов. Триггеры: «откати фазу», «верни как было». НЕ копия файла→version-snapshots."
 allowed-tools: Bash, Read, Write
 ---
 
@@ -13,6 +13,25 @@ Rollback failed workflow phases by reading changes log and reversing tracked mod
 - Workflow phase fails and needs state restoration
 - Error recovery in worker agents
 - Quality gate failures requiring revert
+
+## Boundary with `version-snapshots`: check what is on disk first
+
+"Roll it back" / "put it back the way it was" fits this skill and `version-snapshots`
+equally well, so the phrasing decides nothing. What decides is which artifact exists:
+
+- `.bug-changes.json` (or another `.{domain}-changes.json`) plus `.rollback/` backups →
+  this skill;
+- a `.snapshots/` directory holding timestamped copies of one file → `version-snapshots`,
+  where rollback is a single `cp` over the original;
+- neither → nothing to reverse here; fall back to `git`.
+
+The deeper difference is who wrote the safety net and what it holds. A snapshot is taken
+**deliberately and in advance**, before editing one artifact, and stores that file's whole
+state. A changes log is written **by a worker as the phase runs**; it stores no project
+state at all — only the list of what the phase did, plus the inverse action for each entry.
+So a snapshot restores a file to the exact look you saw, while this skill restores the
+project to "the phase never ran" — including deleting files the phase created and
+reverting its commits. Those are different outcomes; picking the wrong one loses work.
 
 ## Input
 

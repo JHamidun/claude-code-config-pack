@@ -1,6 +1,6 @@
 ---
 name: brand-guidelines
-description: "Официальные цвета и шрифты бренда Anthropic для артефактов. Триггеры: «стиль Anthropic». НЕ свой бренд или бренд клиента→design-md-brands."
+description: "Официальные цвета и шрифты бренда Anthropic (палитра + Poppins/Lora) для артефактов и .pptx. Триггеры: «стиль Anthropic». НЕ бренд пользователя/клиента→design-md-brands."
 license: Complete terms in LICENSE.txt
 ---
 

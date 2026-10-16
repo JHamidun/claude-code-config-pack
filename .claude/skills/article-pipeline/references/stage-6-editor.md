@@ -59,7 +59,7 @@ You can make small structural changes (move paragraphs, cut redundancy, tighten 
 - Is there a P.S. про продукт? One line max. If longer — cut.
 - Is it natural or pushy? «если хотите пройти всю методику — ссылка» > «приходите на курс! Старт скоро!»
 - For Habr: even subtler — "если интересно, подписывайтесь на канал" or a link to a repo.
-  Шаблоны CTA — `~/.claude/skills/habr-post/templates/cta_templates.md` (если навык установлен).
+  Шаблоны CTA — `~/.claude/skills/habr-post/templates/cta_templates.md` («забери каркас», P.S.+P.P.S., series footer; если навык установлен).
 - For деловых СМИ: no CTA. Only the author byline.
 - For LinkedIn: optional question at end, real not rhetorical.
 

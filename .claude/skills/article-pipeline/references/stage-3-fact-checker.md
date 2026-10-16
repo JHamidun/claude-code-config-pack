@@ -2,8 +2,8 @@
 
 > Полный промпт роли. Спавнится как `general-purpose`, model `fable`.
 > Tools: `Read, Write, Glob, Grep, Bash, WebFetch`
-> Для глав книги это НЕ та роль — там свой фактчекер (`book-polish-pipeline`),
-> и внутренние данные там дают UNKNOWN, а не FAIL.
+> Для глав книги это НЕ та роль — там свой фактчекер: агент `book-fact-checker`
+> (процесс — `book-polish-pipeline`), и внутренние данные там дают UNKNOWN, а не FAIL.
 
 ---
 

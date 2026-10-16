@@ -27,6 +27,14 @@ for _s in (_sys.stdout, _sys.stderr):
         pass
 
 import sys
+
+# --- early --help guard (added 2026-08-19): must work with no keys/network ---
+if __name__ == '__main__' and ('-h' in sys.argv[1:] or '--help' in sys.argv[1:]):
+    print(__doc__ or '')
+    print('Usage:')
+    print('python render_cards.py [deck.html]   # по умолчанию series.html -> <dir>/png/series-NN.png')
+    raise SystemExit(0)
+# --- end guard ---
 import asyncio
 from pathlib import Path
 from playwright.async_api import async_playwright

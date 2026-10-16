@@ -104,7 +104,7 @@ Include additional metadata fields if provided.
   "version": "2025-10-17",
   "status": "success",
   "additionalMetadata": {
-    "agent": "bug-hunter",
+    "agent": "health-inline/bug-detect",
     "filesScanned": 147,
     "bugsFound": 23
   }
@@ -118,7 +118,7 @@ Include additional metadata fields if provided.
 **Generated**: 2025-10-17 14:30:00 UTC
 **Status**: ✅ success
 **Version**: 2025-10-17
-**Agent**: bug-hunter
+**Agent**: health-inline/bug-detect
 **Files Scanned**: 147
 **Bugs Found**: 23
 

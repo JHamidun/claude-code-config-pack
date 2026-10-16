@@ -104,7 +104,7 @@ With the philosophy AND conceptual framework established, express it through cod
 
 ### ⚠️ STEP 0: READ THE TEMPLATE FIRST ⚠️
 
-**CRITICAL: BEFORE writing any HTML:**
+**Before writing any HTML:**
 
 1. **Read** `templates/viewer.html` using the Read tool
 2. **Study** the exact structure, styling, and Anthropic branding
@@ -220,7 +220,7 @@ The HTML artifact contains everything: p5.js (from CDN), the algorithm, paramete
 
 ## INTERACTIVE ARTIFACT CREATION
 
-**REMINDER: `templates/viewer.html` should have already been read (see STEP 0). Use that file as the starting point.**
+Use `templates/viewer.html` (read at STEP 0) as the starting point.
 
 To allow exploration of the generative art, create a single, self-contained HTML artifact. Ensure this artifact works immediately in claude.ai or any browser - no setup required. Embed everything inline.
 

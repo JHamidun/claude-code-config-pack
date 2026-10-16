@@ -80,6 +80,17 @@ BG, CS, DA, DE, EL, EN, ES, ET, FI, FR, HU, ID, IT, JA, KO, LT, LV, NB, NL, PL, 
 **Target:**
 BG, CS, DA, DE, EL, EN-GB, EN-US, ES, ET, FI, FR, HU, ID, IT, JA, KO, LT, LV, NB, NL, PL, PT-BR, PT-PT, RO, RU, SK, SL, SV, TR, UK, ZH-HANS, ZH-HANT
 
+**Актуальный список и детект языка через API** (заменяет бывший /gtranslate; проверено 2026-08-17, 110 target-языков):
+
+```python
+result = translator.translate_text("Bonjour le monde", target_lang="RU")
+print(result.detected_source_lang)   # "FR" — детект бесплатно при переводе
+
+for lang in translator.get_target_languages():
+    print(lang.code, lang.name)
+translator.get_source_languages()
+```
+
 ## Basic Usage
 
 ### Setup Client

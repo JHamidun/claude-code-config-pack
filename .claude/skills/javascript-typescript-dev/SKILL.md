@@ -9,7 +9,7 @@ Modern JS/TS development including React, Next.js, Node.js, and testing.
 
 ## When to Use
 - React applications (hooks, state management)
-- Next.js 14 (App Router, Server Components)
+- Next.js, App Router + Server Components (мажор не фиксируем — сверять с package.json проекта)
 - Node.js backends (Express, Nest.js)
 - TypeScript patterns
 - Testing (Jest, Vitest, Playwright)
@@ -38,14 +38,17 @@ function useAsync<T>(asyncFunction: () => Promise<T>) {
 }
 \`\`\`
 
-## Next.js 14 Patterns
+## Next.js Patterns (App Router)
 
 **Server Components:**
 \`\`\`typescript
 // app/posts/page.tsx
 async function getPosts() {
   const res = await fetch('https://api.example.com/posts', {
-    cache: 'no-store' // or 'force-cache'
+    // 'no-store' — всегда свежие данные, рендер динамический;
+    // 'force-cache' — кэшировать. Это НЕ взаимозаменяемые варианты, и семантика
+    // дефолта менялась между мажорами Next — сверять с доками своей версии.
+    cache: 'no-store'
   });
   return res.json();
 }

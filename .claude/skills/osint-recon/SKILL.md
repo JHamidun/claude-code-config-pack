@@ -121,6 +121,6 @@ python ~/.claude/tools/osint_client.py recon example.com --json
 | Обогащение лидов, цифровой след компании, квалификация заявок | `account-research` + `social-intel` (готового навыка обогащения в паке нет) |
 | Досье по соцсетям, профили людей, KYC по цифровому следу | `social-intel` |
 | Проверка контрагентов РФ (ФНС, реквизиты, арбитраж) | свой источник по ИНН/ОГРН (DaData/Checko/kad.arbitr.ru — готового клиента в паке нет) |
-| Аудит СВОЕГО кода и инфраструктуры, OWASP, уязвимости в репо | `security-audit`, `threat-hunting` |
+| Аудит СВОЕГО кода и инфраструктуры, OWASP, уязвимости в репо | `security-audit`, `threat-hunting`, `health-inline` (`/health security`) |
 | Обезличивание перед публикацией, поиск PII в своих файлах | `privacy-filter` |
 | Реклама конкурентов, их креативы | `ad-spy` |

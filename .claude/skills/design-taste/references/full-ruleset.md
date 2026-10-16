@@ -275,7 +275,7 @@ LLMs default to "static successful state only." Always implement full cycles:
 Landing pages and portfolios are **visual products**. Text-only pages with fake-screenshot divs are slop.
 
 **Priority order for visual assets:**
-1. **Image-generation tool first.** If ANY image-gen tool is available in the environment (`generate_image`, MCP image tool, IDE-integrated gen, OpenAI image tools, etc.) you MUST use it to create section-specific assets: hero photography, product shots, texture backgrounds, mood images. Generate at the right aspect ratio for the section. Do not skip this step because hand-rolled CSS feels faster.
+1. **Image-generation tool first.** When an image-gen tool is available in the environment (`generate_image`, MCP image tool, IDE-integrated gen, OpenAI image tools, etc.), use it for the section-specific assets the brief actually calls for: hero photography, product shots, texture backgrounds, mood images. Generate at the right aspect ratio for the section. Generation is billed per image, so generate the assets the page needs — not one per section by reflex.
 2. **Real web images second.** When no gen tool is available, use real photography sources. Acceptable defaults:
    * `https://picsum.photos/seed/{descriptive-seed}/{w}/{h}` for placeholder photography (seed should describe the section, e.g. `marrow-cookware-kitchen`)
    * Actual stock or brand URLs when the brief provides them
@@ -921,8 +921,6 @@ If the brief is one of the above, **say so explicitly**, point to the right tool
 ## 14. FINAL PRE-FLIGHT CHECK
 
 Run this matrix before outputting code. This is the last filter.
-
-**THIS IS NOT OPTIONAL. Run every box. If any box fails, the output is not done.**
 
 - [ ] **Brief inference** declared (Section 0.B one-liner)?
 - [ ] **Dial values** explicit and reasoned from the brief, not silently using baseline?

@@ -80,9 +80,20 @@ http.createServer((req, res) => {
 
 Прототип бьёт `localhost:3002/api/...` — реально дёргает `internal.company.com/api/...`.
 
-## Скрипт-мост
+## Мост CSV/JSON → HTTP (готового файла НЕТ, код вставляется руками)
 
-`templates/data-bridge.mjs` — один файл, который покрывает все варианты:
+⚠️ Файла `templates/data-bridge.mjs` в навыке нет, и на диске его нет нигде — код ниже надо
+сохранить самому (например в `data-bridge.mjs` рядом с прототипом) и только потом запускать.
+Соседи по паку (`live-preview`, `verifier`, `version-snapshots`, `tweaks-panel`, `slides`) свои
+`templates/*` реально держат на диске, поэтому путь здесь читается как существующий — он таким
+не был.
+
+Перед запуском:
+- `npm i papaparse` (пакет НЕ установлен; либо возьми ESM-сборку как в §2:
+  `import Papa from 'https://esm.sh/papaparse'`);
+- дописать разбор аргументов — в коде ниже он был заглушкой `function parse(argv) {}`,
+  которая возвращает `undefined`, и скрипт падал на шестой строке:
+  `TypeError: Cannot read properties of undefined (reading 'port')` (воспроизведено в node).
 
 ```bash
 node data-bridge.mjs --csv users.csv --port 3001
@@ -119,7 +130,15 @@ http.createServer((req, res) => {
 console.log(`data-bridge :${port} →`, Object.keys(data));
 
 function path(p) { return p.split('/').pop().split('.')[0]; }
-function parse(argv) { /* как в других скриптах */ }
+function parse(argv) {                       // было заглушкой → TypeError на args.port
+  const o = {};
+  for (let i = 0; i < argv.length; i++) {
+    if (!argv[i].startsWith('--')) continue;
+    const k = argv[i].slice(2);
+    o[k] = (argv[i + 1] && !argv[i + 1].startsWith('--')) ? argv[++i] : true;
+  }
+  return o;
+}
 ```
 
 ## Когда что использовать

@@ -1,6 +1,11 @@
 <!-- LEGACY: полное тело скилла 'version-snapshots' из старого дерева ~/.claude/tools/claude-code-skills (@2026-04-30).
      Сохранено при консолидации деревьев design-пака 2026-07-18 (lossless-merge, канон deep-read-before-merge).
-     Актуальный канон — ../SKILL.md; здесь — расширенный материал прежней версии (таблицы, рецепты, антипаттерны). -->
+     Актуальный канон — ../SKILL.md; здесь — расширенный материал прежней версии (таблицы, рецепты, антипаттерны).
+     ⚠ Каталога `scripts/` в скилле НЕТ. Из четырёх скриптов ниже сегодня существует один:
+     снимок делает `../templates/snapshot.mjs` (бывший `scripts/snapshot.js`).
+     `list-snapshots.js` / `restore.js` / `diff.js` не переносили — их работу делают обычные команды:
+     список — чтение `.snapshots/MANIFEST.md`, откат — `cp .snapshots/<file>.<ts>.html <file>`,
+     сравнение — `diff` / `git diff --no-index`. Код ниже оставлен как справка (проверено 22.08.2026). -->
 
 ---
 name: version-snapshots

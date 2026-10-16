@@ -45,6 +45,10 @@ def read_epub(filepath):
     chapters = []
     removed_total = 0
     for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
+        # ITEM_DOCUMENT включает служебную nav.xhtml (EpubNav) — без этого фильтра
+        # оглавление попадает в главы, и номера в get_chapter(n) едут на единицу.
+        if isinstance(item, epub.EpubNav) or not item.is_chapter():
+            continue
         soup = BeautifulSoup(item.get_content(), 'html.parser')
         text = soup.get_text(separator='\n', strip=True)
 
@@ -70,12 +74,18 @@ def read_epub(filepath):
     return metadata, chapters
 
 
+def _meta1(metadata, key, default='Unknown'):
+    """ebooklib отдаёт метаданные списком кортежей: [('Probe', {})]. Берём строку."""
+    values = metadata.get(key) or []
+    return values[0][0] if values else default
+
+
 def epub_summary(filepath):
     """Print EPUB structure and stats."""
     metadata, chapters = read_epub(filepath)
 
-    print(f"Title: {metadata.get('title', 'Unknown')}")
-    print(f"Author: {metadata.get('author', 'Unknown')}")
+    print(f"Title: {_meta1(metadata, 'title')}")
+    print(f"Author: {_meta1(metadata, 'author')}")
     print(f"Chapters: {len(chapters)}")
     total_words = sum(ch['word_count'] for ch in chapters)
     print(f"Total words: {total_words:,}")
@@ -260,5 +270,5 @@ markdown_to_epub(
 - Based on [ebooklib](https://github.com/aerkalov/ebooklib) (EPUB2/EPUB3 support)
 - Kindle: convert EPUB → MOBI via `calibre` or send EPUB to Kindle email
 - For large books, read chapter-by-chapter to manage context
-- Complements existing PDF skills in `document-skills/pdf/`
+- Complements the PDF skill in `~/.claude/skills/pdf/`
 - Проверить готовый дамп на невидимку без правки кода: `python ~/.claude/scripts/text_sanitize.py book.txt --scan`

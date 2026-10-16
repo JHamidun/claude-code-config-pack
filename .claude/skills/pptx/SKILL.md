@@ -1,9 +1,9 @@
 ---
 name: pptx
-description: "PowerPoint .pptx на python-pptx: собрать колоду, править чужую, разобрать по слайдам, заметки докладчика, таблицы, картинки, замена текста с сохранением оформления. Триггеры: «pptx», «PowerPoint», «поправь слайд», «заметки докладчика», «собери колоду». НЕ HTML-дек → export-pptx; НЕ дизайн слайдов → manus-slides."
+description: "Создание, правка и разбор .pptx на python-pptx: заметки, таблицы, замена текста. Триггеры: «поправь слайд», «собери колоду». НЕ: HTML-дек→export-pptx; дизайн→manus-slides."
 metadata:
-  version: 1.0.0
-  updated: 2026-08-23
+  version: 1.1.0
+  updated: 2026-10-15
   license: MIT (этот навык написан для пака; сторонний код не вендорится)
 ---
 
@@ -208,6 +208,13 @@ soffice --headless --convert-to pdf --outdir out/ deck.pptx
 `/Applications/LibreOffice.app/Contents/MacOS/soffice`, Windows
 `C:\Program Files\LibreOffice\program\soffice.exe`.
 
+Нет LibreOffice — ставится одной командой: Windows
+`winget install TheDocumentFoundation.LibreOffice`, macOS
+`brew install --cask libreoffice`, Linux — пакет `libreoffice`. Чтобы потом
+нарезать PDF на картинки слайдов, нужен Poppler (`pdftoppm`): Windows
+`winget install oschwartz10612.Poppler`, macOS `brew install poppler`, Linux —
+пакет `poppler-utils`.
+
 Без LibreOffice, на Windows с установленным PowerPoint — `~/.claude/tools/office_render.py`:
 PowerPoint сохраняет PDF, pdftoppm режет его на слайды (`<имя>-pptx-N.png`),
 скрипт отдаёт JSON `{"pdf": ..., "pngs": [...]}`.
@@ -216,10 +223,18 @@ PowerPoint сохраняет PDF, pdftoppm режет его на слайды 
 python ~/.claude/tools/office_render.py deck.pptx --out out/
 ```
 
+Холодный старт PowerPoint — около минуты, это нормально. PNG слайдов смотреть
+по одному: на общей сетке-миниатюре обрезанный текст не заметен.
+
 PowerPoint однооконный. Если он уже открыт или его откроют во время рендера,
 скрипт закрывает только свою презентацию: чужие окна не закрывает, процесс не
 убивает, изменённые настройки (макросы, предупреждения) возвращает. Нужны `pywin32`,
 `psutil` и Poppler (`pdftoppm` в `PATH` или путь в переменной `PDFTOPPM`).
+
+Нет ни LibreOffice, ни PowerPoint — картинок слайдов не будет. Тогда колоду
+проверяют текстовой инвентаризацией (`pip install "markitdown[pptx]"`, затем
+`python -m markitdown deck.pptx`) и **прямо пишут в отчёте, что вид слайдов не
+проверялся**: колода, которую не открыли глазами, не считается проверенной.
 
 ---
 

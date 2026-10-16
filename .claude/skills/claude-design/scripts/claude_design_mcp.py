@@ -119,7 +119,7 @@ def claude_design_get_handoff_token(project_id: str) -> dict:
 
 
 @mcp.tool()
-def claude_design_chat(project_id: str, message: str, model: str = "claude-opus-4-7") -> dict:
+def claude_design_chat(project_id: str, message: str, model: str = "claude-opus-5") -> dict:
     """[NOT YET IMPLEMENTED — Phase 2]
 
     Send a message to Claude Design and run the agent in the project.

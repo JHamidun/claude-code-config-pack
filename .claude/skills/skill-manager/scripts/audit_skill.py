@@ -171,6 +171,8 @@ def main(argv=None):
         raise ValueError("--nvidia-timeout must be a positive number of seconds")
     target = preflight(args.target)
     output = args.output.absolute()
+    if output.is_dir():
+        raise ValueError("--output is a report file path (e.g. <dir>/report.json), not a directory")
     if output.resolve().is_relative_to(target if target.is_dir() else target.parent):
         raise ValueError("Report must be outside the scanned target directory")
     if any(output.resolve().is_relative_to(root.resolve()) for root in PROTECTED_ROOTS):

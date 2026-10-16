@@ -21,7 +21,7 @@ description: "Готовые сценарии из скиллов под тип�
 5. `placeholders` для логотипов и скринов продукта.
 6. `content-rules` — пройти весь дек, выкинуть слова-паразиты.
 7. `verifier` — открыть, поймать ошибки, скриншоты.
-8. `export-pdf` или `export-pptx` (editable, через `pptx-editable-extractor`).
+8. `export-pdf` или `export-pptx` в режиме editable.
 
 **Антипаттерны:** не плодить filler-слайды, не делать «Why us» из 4 общих слов.
 
@@ -75,7 +75,7 @@ description: "Готовые сценарии из скиллов под тип�
 **Шаги:**
 1. `questions-protocol` — аудитория, главное обещание, есть ли бренд, формат демо.
 2. `wireframe` — 4-6 структур, согласовать.
-3. `figma-import` — если есть бренд в Figma.
+3. `figma-api` → `references/figma-import/` — если есть бренд в Figma (ex-скилл `figma-import` влит туда 18.07.2026).
 4. `frontend-design` — направление.
 5. `design-canvas` — 2-3 варианта первого экрана бок-о-бок.
 6. После выбора: основной HTML.

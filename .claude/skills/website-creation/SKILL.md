@@ -132,7 +132,7 @@ Meta:        text-[10px] tracking-widest uppercase
 ### Готовые куски вёрстки
 
 Hero, шапка-на-скролле, карточка с hover, три варианта scroll-reveal, счётчик
-цифр, таймлайн, зерно/скроллбар, каркас Mode A → **`references/lovable-patterns.md`**.
+цифр, таймлайн, зерно/скроллбар, адаптивные сетки, каркас Mode A → **`references/lovable-patterns.md`**.
 Открывай, когда собираешь конкретный блок: там числа (длительности, threshold,
 задержки каскада) уже подобраны.
 
@@ -140,14 +140,16 @@ Hero, шапка-на-скролле, карточка с hover, три вари
 
 ## Mode A — Vanilla HTML
 
-Готовой библиотеки эффектов в паке нет. Снипеты частых мелочей (stagger reveal,
-parallax, counter, skeleton) — в скилле `microinteractions`; вкус, шрифты и
-палитру держат `design-taste`/`frontend-design`. Остальное из чеклиста
-(preloader, grain overlay, hover, animated gradient) пишется руками — это по
-10-30 строк CSS/JS каждое.
+Библиотека эффектов — скилл `landing-page-effects` (50+ эффектов, 15 шрифтов,
+палитра, анимации для Tilda): открывай её, когда нужен эффект, шрифт или палитра,
+а не изобретай своё. Снипеты частых мелочей (stagger reveal, parallax, counter,
+skeleton) — в скилле `microinteractions`; вкус, шрифты и палитру держат
+`design-taste`/`frontend-design`. Остальное из чеклиста (preloader, grain overlay,
+hover, animated gradient) пишется руками — это по 10-30 строк CSS/JS каждое.
 
 Эталон лендинга в паке не поставляется: держи собственный (лучший из своих
-прошлых) и переиспользуй его структуру.
+прошлых) и переиспользуй его структуру. Шаблон, куда его записать, —
+`landing-page-effects/references/reference-page.md`.
 
 Чеклист перед сдачей:
 

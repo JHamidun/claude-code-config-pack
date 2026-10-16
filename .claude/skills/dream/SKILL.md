@@ -1,6 +1,6 @@
 ---
 name: dream
-description: "Консолидация памяти + Second Brain sleeptime: supersede, decay, prune, promote, TOP-INSTINCTS. Триггеры: «консолидируй память», «сон мозга»."
+description: "Уборка всей памяти + Second Brain sleeptime: supersede, decay, prune, promote, TOP-INSTINCTS. Триггеры: «консолидируй память», «сон мозга». НЕ записать новое→memory-agent."
 triggers:
   - "dream"
   - "консолидируй память"
@@ -25,6 +25,15 @@ Memory directory: `~/.claude/projects/C--Users-<твой-логин>/memory/`
 > **Нет — пропускай Фазы 0, 6, 7 целиком:** файловая консолидация (Фазы 1–5)
 > самодостаточна и это законный полный прогон dream. В отчёте так и напиши:
 > «Second Brain не установлен, фазы 0/6/7 пропущены».
+
+> **Boundary with `memory-agent`, `save-knowledge-base`, `graph-memory` — all four work the same
+> store.** What sets dream apart is that it needs **no new input from the user**: it only reworks
+> what is already written — supersede, decay, prune, promote, TOP-INSTINCTS, brain sleeptime — and
+> it rebuilds the graph (`memory_graph.py build`) that `graph-memory` then queries. Writing needs a
+> different skill: a ready document plus named trigger words → `save-knowledge-base`; an
+> observation with no obvious home → `memory-agent` picks the layer. Asking about connections or
+> chronology → `graph-memory` (read-only). Rule of thumb: **nothing to add, just tidy up → dream;
+> anything that adds new content → one of the other three.**
 
 **Full v2 regulation** (frontmatter schema, supersede protocol, decay/prune/promote formulas, TOP-INSTINCTS block format): `references/memory-v2.md`. Read it before Phases 2–5.
 

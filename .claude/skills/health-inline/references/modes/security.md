@@ -2,6 +2,14 @@
 > original frontmatter: version 2.0.0). Body preserved verbatim; only the
 > worker-prompts link path updated to the new references layout.
 
+> **2026-08-22:** the ten standalone worker agents were retired into
+> `_trash-2026-08-22/agents/health/workers/` — the agent registry holds only 66
+> slots. Every worker is now spawned as `subagent_type: "general-purpose"`,
+> `model: "fable"`, with the full role brief pasted from
+> `references/worker-prompts/security.md`. The short prompts below are the
+> orchestration outline; the brief is what the worker actually needs.
+
+
 # Security Health Check (Inline Orchestration)
 
 You ARE the orchestrator. Execute this workflow directly without spawning a separate orchestrator agent.
@@ -44,10 +52,10 @@ Detection → Validate → Fix by Priority → Verify → Repeat if needed
 
 ## Phase 2: Detection
 
-**Invoke security-scanner** via Task tool:
+**Invoke the scan worker** via Task tool:
 
 ```
-subagent_type: "security-scanner"
+subagent_type: "general-purpose"   # brief: worker-prompts/security.md § Security Scanner — Detection
 description: "Detect all vulnerabilities"
 prompt: |
   Scan the entire codebase for security vulnerabilities:
@@ -64,7 +72,7 @@ prompt: |
   Return summary with vulnerability counts per priority.
 ```
 
-**After security-scanner returns**:
+**After the scan worker returns**:
 1. Read `security-scan-report.md`
 2. Parse vulnerability counts by priority
 3. If zero vulnerabilities → skip to Final Summary
@@ -72,17 +80,23 @@ prompt: |
 
 ---
 
-## Phase 3: Quality Gate (Detection)
+## Phase 3: Baseline (non-blocking — NEVER exits)
 
-Run inline validation:
+Run inline validation to **record the starting state**, not to gate:
 
 ```bash
 pnpm type-check
 pnpm build
 ```
 
-- If both pass → proceed to fixing
-- If fail → report to user, exit
+- Both pass → baseline = GREEN, proceed to fixing
+- Either fails → baseline = RED: record the exact error list, hand it to
+  the fix worker as context, **proceed to fixing anyway**
+
+Blocking here is worst in this mode specifically: an unrelated broken build would
+stop a live vulnerability from being patched. Build health and exploitability are
+independent — never let the first veto the second. The gate that can stop the run
+lives in Phase 4, after a fix, and compares against this baseline.
 
 ---
 
@@ -95,9 +109,9 @@ pnpm build
 
 2. **Update TodoWrite**: mark current priority in_progress
 
-3. **Invoke vulnerability-fixer** via Task tool:
+3. **Invoke the fix worker** via Task tool:
    ```
-   subagent_type: "vulnerability-fixer"
+   subagent_type: "general-purpose"   # brief: worker-prompts/security.md § Vulnerability Fixer — By Priority
    description: "Fix {priority} vulnerabilities"
    prompt: |
      Read security-scan-report.md and fix all {priority} priority vulnerabilities.
@@ -112,14 +126,17 @@ pnpm build
      Return: count of fixed vulnerabilities, count of failed fixes.
    ```
 
-4. **Quality Gate** (inline):
+4. **Quality Gate** (inline, vs Phase 3 baseline) — this is the gate that can
+   stop the run:
    ```bash
    pnpm type-check
    pnpm build
    ```
 
-   - If FAIL → report error, suggest rollback, exit
-   - If PASS → continue
+   - Any error NOT present in the baseline → the fixes made things worse:
+     report error, suggest rollback, exit
+   - Same errors as baseline, or fewer → continue to the next priority
+   - Green baseline stays strict: any failure at all is "worse than baseline"
 
 5. **Update TodoWrite**: mark priority complete
 
@@ -133,9 +150,9 @@ After all priorities fixed:
 
 1. **Update TodoWrite**: mark verification in_progress
 
-2. **Invoke security-scanner** (verification mode):
+2. **Invoke the scan worker** (verification mode):
    ```
-   subagent_type: "security-scanner"
+   subagent_type: "general-purpose"   # brief: worker-prompts/security.md § Security Scanner — Verification
    description: "Verification scan"
    prompt: |
      Re-scan codebase after fixes.

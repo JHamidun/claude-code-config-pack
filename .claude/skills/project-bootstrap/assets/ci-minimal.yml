@@ -1,0 +1,77 @@
+# Минимальный CI. Три работы, и третья — та, ради которой всё затевалось.
+# Положить в .github/workflows/ci.yml
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # --- 1. Типы и линтер: подставь свой стек -------------------------------
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # <установка зависимостей под твой стек>
+      # - run: npm ci && npm run type-check && npm run lint
+      # - run: pip install -r requirements.txt && ruff check . && mypy .
+      - run: echo "ЗАМЕНИ на реальные проверки, иначе гейт зелёный всегда"
+
+  # --- 2. Тесты ------------------------------------------------------------
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # - run: npm test
+      # - run: pytest -q
+      - run: echo "ЗАМЕНИ на реальный прогон тестов"
+
+  # --- 3. Связность документации ------------------------------------------
+  # Врущая карта хуже отсутствующей: без неё идут смотреть факты, а с ней
+  # строят выводы на неверном и потом их защищают. Эта работа не даёт
+  # неверному доехать до main.
+  docs-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: пути из CLAUDE.md существуют
+        run: |
+          python - <<'PY'
+          import re, pathlib, sys
+
+          md = pathlib.Path("CLAUDE.md")
+          if not md.exists():
+              sys.exit("CLAUDE.md нет — карта проекта обязательна")
+          text = md.read_text(encoding="utf-8")
+
+          def check(source: str) -> tuple[list[str], int]:
+              """(пути в обратных кавычках, которых нет на диске; сколько путей проверено)."""
+              bad, checked = [], 0
+              for raw in set(re.findall(r'`([^`\n]+?/[^`\n]*?)`', source)):
+                  p = raw.strip().rstrip("/")
+                  if p.startswith(("http", "<", "$", "-")) or " " in p:
+                      continue      # ссылки, плейсхолдеры, флаги — не пути
+                  if "*" in p or "<" in p:
+                      continue      # шаблоны вроде docs/specs/<фича>.md
+                  checked += 1
+                  if not pathlib.Path(p).exists():
+                      bad.append(p)
+              return bad, checked
+
+          # Канарейка: прогоняем ТУ ЖЕ логику по заведомо битой ссылке.
+          # Не поймала — значит проверка сломана, и её "0 ошибок" ничего не
+          # значит. Без этого зелёный CI неотличим от молчащей проверки.
+          canary_bad, _ = check("`docs/__canary_does_not_exist__/x.md`")
+          if not canary_bad:
+              sys.exit("КАНАРЕЙКА НЕ ПОЙМАНА: проверка ссылок неисправна, "
+                       "её результату верить нельзя")
+
+          missing, checked = check(text)
+          if missing:
+              print("CLAUDE.md ссылается на несуществующее:")
+              for m in sorted(missing):
+                  print("  ", m)
+              sys.exit(1)
+          print(f"проверено путей: {checked}, битых нет")
+          PY

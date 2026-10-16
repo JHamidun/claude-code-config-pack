@@ -1,7 +1,7 @@
 ---
 name: gstack
 version: 1.1.0
-description: "Быстрый headless-браузер (~100 мс) для QA: переходы, действия, дифф, скриншоты. Триггеры: «быстрый браузер», «gstack browse», «проверь деплой»."
+description: "Быстрый headless-браузер (~100 мс) для QA: дифф снапшотов, скриншоты. Триггеры: «проверь деплой», «gstack browse». НЕ: мой Chrome→dev-browser; антибот→playwright-automation."
 allowed-tools:
   - Bash
   - Read
@@ -113,7 +113,6 @@ If `NEEDS_SETUP`:
 ## IMPORTANT
 
 - Use the compiled binary via Bash: `$B <command>`
-- NEVER use `mcp__claude-in-chrome__*` tools. They are slow and unreliable.
 - Browser persists between calls — cookies, login sessions, and tabs carry over.
 - Dialogs (alert/confirm/prompt) are auto-accepted by default — no browser lockup.
 

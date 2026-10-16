@@ -4,6 +4,14 @@ so Telegram shows the full card width with nothing cut off. Safe-zone aware (Tel
 ~top header + bottom reply area land on the empty bands, never on content)."""
 import sys, io, os
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
+# --- early --help guard (added 2026-08-19): must work with no keys/network ---
+if __name__ == '__main__' and ('-h' in sys.argv[1:] or '--help' in sys.argv[1:]):
+    print(__doc__ or '')
+    print('Usage:')
+    print('python build_story_frames.py [src_png_dir] [out_dir]   # по умолчанию ./png -> ./story_png')
+    raise SystemExit(0)
+# --- end guard ---
 from PIL import Image, ImageFilter
 import numpy as np
 LANCZOS = getattr(Image, 'Resampling', Image).LANCZOS
