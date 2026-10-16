@@ -333,10 +333,10 @@ drifting again):
 CLAUDE_CONFIG_DIR="$PWD/.claude" python .claude/scripts/config_lint.py | head -20
 ```
 
-- 315 skills (`~/.claude/skills/`) — 86 ship executable code, 229 are prompt-only
-- 74 agents (`~/.claude/agents/`) — 57 top-level + 17 workers in `health/`, `meta/`, `testing/`
-- 155 slash commands (`~/.claude/commands/`) — 98 top-level + 57 in `gsd/`
-- 18 auto-loaded rules (`~/.claude/rules/`) + a `README.md` cataloguing them
+- 330 skills (`~/.claude/skills/`) — 102 ship executable code, 228 are prompt-only
+- 77 agents (`~/.claude/agents/`) — 59 top-level + 18 workers in `health/`, `meta/`, `testing/`
+- 156 slash commands (`~/.claude/commands/`) — 99 top-level + 57 in `gsd/`
+- 20 auto-loaded rules (`~/.claude/rules/`) + a `README.md` cataloguing them
 - 33 plugins of this pack (`.claude-plugin/marketplace.json`; a 34th entry,
   `video-media-subdir`, is a reference example of the `git-subdir` source format, not a
   separate plugin). Separately, `enabledPlugins` in `settings.json` lists 33 **third-party**

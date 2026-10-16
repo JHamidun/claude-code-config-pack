@@ -8,11 +8,11 @@
 
 | | |
 |---|---:|
-| Навыков | 318 |
-| Команд (`/имя`) | 99 |
-| Агентов | 78 |
-| Правил (грузятся каждую сессию) | 19 |
-| Скриптов и инструментов | 47 |
+| Навыков | 329 |
+| Команд (`/имя`) | 100 |
+| Агентов | 81 |
+| Правил (грузятся каждую сессию) | 21 |
+| Скриптов и инструментов | 50 |
 | Хуков | 11 |
 
 **Навык** — инструкция, которую модель подхватывает сама, когда задача подходит под её описание. **Команда** вызывается вручную через `/имя`. **Агент** — отдельный исполнитель со своим контекстом, ему поручают кусок работы целиком. **Правило** читается в начале каждой сессии и задаёт поведение. **Хук** срабатывает на событие, например перед выполнением команды в оболочке.
@@ -25,23 +25,23 @@
 
 ### Работа с кодом
 
-**`dev-core`** — Dev Core. 15 навыков, 15 команд, 10 агентов.
+**`dev-core`** — Dev Core. 17 навыков, 16 команд, 10 агентов.
   Python/JS/TS dev, database design, API docs, build fix, git workflow, architecture agents.
-  Внутри: `api-documentation`, `apple-developer`, `autocad-com`, `beads`, `build-fix`, `changelog-generator` и ещё 9
+  Внутри: `api-documentation`, `apple-developer`, `autocad-com`, `beads`, `build-fix`, `changelog-generator` и ещё 11
 
-**`skill-dev`** — Skill & Agent Dev. 10 навыков, 5 агентов.
+**`skill-dev`** — Skill & Agent Dev. 11 навыков, 5 агентов.
   Author skills/agents/plugins/MCP, prompt engineering, Claude API & CLI.
-  Внутри: `claude-api`, `claude-cli-runner`, `content-policy`, `context-engineering`, `llm-evals`, `mcp-builder` и ещё 4
+  Внутри: `claude-api`, `claude-cli-runner`, `content-policy`, `context-engineering`, `llm-evals`, `mcp-builder` и ещё 5
 
-**`code-health`** — Code Health. 8 навыков, 6 команд, 12 агентов.
+**`code-health`** — Code Health. 9 навыков, 6 команд, 12 агентов.
   Bug/cleanup/deps/reuse/security health audits, security audit, threat hunting, finding and vetting third-party skills before install.
-  Внутри: `health-inline`, `leak-scan`, `osint-recon`, `privacy-filter`, `security-audit`, `skill-audit` и ещё 2
+  Внутри: `config-health`, `health-inline`, `leak-scan`, `osint-recon`, `privacy-filter`, `security-audit` и ещё 3
 
-**`dev-process`** — Dev Process. 5 навыков, 8 команд, 1 агент.
+**`dev-process`** — Dev Process. 6 навыков, 8 команд, 1 агент.
   TDD, systematic debugging, planning, code review, worktrees, parallel agents.
-  Внутри: `parse-git-status`, `rollback-changes`, `run-quality-gate`, `scaling-stage`, `validate-plan-file`
+  Внутри: `agent-swarm`, `parse-git-status`, `rollback-changes`, `run-quality-gate`, `scaling-stage`, `validate-plan-file`
 
-**`browser-testing`** — Browser & Testing. 4 навыка, 2 команды, 4 агента. 1.3 МБ.
+**`browser-testing`** — Browser & Testing. 4 навыка, 2 команды, 5 агентов. 1.7 МБ.
   Browser automation (dev-browser, gstack, Playwright), webapp testing, test/perf agents.
   Внутри: `dev-browser`, `gstack`, `playwright-automation`, `webapp-testing`
 
@@ -67,9 +67,9 @@
   Wireframes, interactive prototypes, component playground, sketch/Claude-design to HTML.
   Внутри: `canvas-design`, `claude-in-html`, `component-playground`, `design-canvas`, `interactive-prototype`, `placeholders` и ещё 6
 
-**`web-publish`** — Web Publishing. 12 навыков, 1 агент.
+**`web-publish`** — Web Publishing. 14 навыков, 1 агент. 12.2 МБ.
   Websites, HTML email, standalone/canonical HTML, PWA shell, web assets, slides, dataviz, diagrams.
-  Внутри: `canonical-html`, `cards-creator`, `d3-visualization`, `excalidraw-flowchart`, `generate-report-header`, `html-email` и ещё 6
+  Внутри: `anatomy`, `canonical-html`, `cards-creator`, `cert-badge-factory`, `d3-visualization`, `excalidraw-flowchart` и ещё 8
 
 **`design-process`** — Design Process. 11 навыков, 1 агент.
   Design taste, orchestration, critique, comparison, frontend presets, cookbook.
@@ -78,13 +78,13 @@
 
 ### Тексты и публикации
 
-**`content-writing`** — Content Writing. 9 навыков, 1 команда, 4 агента.
+**`content-writing`** — Content Writing. 9 навыков, 1 команда, 6 агентов.
   Content engine, de-AI text, document interlinking, Telegram posts, RU proofreading.
   Внутри: `author-voice`, `brand-voice`, `content-creation`, `content-engine`, `content-research`, `de-ai-ify` и ещё 3
 
-**`office-docs`** — Office Documents. 8 навыков.
+**`office-docs`** — Office Documents. 9 навыков.
   DOCX, XLSX, PDF, EPUB, CSV analysis, file conversion & organization.
-  Внутри: `csv-analysis`, `docx`, `epub-tools`, `file-converter`, `file-organizer`, `invoice-organizer` и ещё 2
+  Внутри: `csv-analysis`, `docx`, `epub-tools`, `file-converter`, `file-organizer`, `invoice-organizer` и ещё 3
 
 **`linkedin-suite`** — LinkedIn Suite. 6 навыков.
   Write, humanize, audit, plan LinkedIn posts; profile optimization; comment & reply drafting.
@@ -101,7 +101,7 @@
 
 ### Маркетинг и продажи
 
-**`marketing-ru`** — Marketing Strategy. 18 навыков. 1.2 МБ.
+**`marketing-ru`** — Marketing Strategy. 18 навыков. 1.7 МБ.
   Offers, pricing, positioning, launches, retention, referrals, growth loops, JTBD, PR outreach, marketing team building.
   Внутри: `ai-marketing-stack-ru`, `b2b-marketing-ru`, `churn-prevention-ru`, `content-machine-ru`, `free-tools-lead-magnets-ru`, `jtbd` и ещё 12
 
@@ -132,9 +132,9 @@
 
 ### Медиа
 
-**`video-media`** — Video Production. 14 навыков, 3 команды, 9 агентов. 15.3 МБ.
+**`video-media`** — Video Production. 15 навыков, 3 команды, 9 агентов. 31.1 МБ.
   8-role production pipeline (brief to QC), generation (Runway), avatars (HeyGen/D-ID), edit, download, export, subtitles, transcripts.
-  Внутри: `code-cartoon`, `did`, `heygen`, `sketch-course-video`, `submagic`, `video-downloader` и ещё 8
+  Внутри: `code-cartoon`, `did`, `heygen`, `hyperframes`, `sketch-course-video`, `submagic` и ещё 9
 
 **`image-gen`** — AI Image Generation. 10 навыков, 1 агент.
   Nano Banana, DALL-E, Replicate, enhancement, OCR, stickers, generative art.
@@ -151,14 +151,14 @@
   Document Q&A, stock analysis, CEO council, thinking frameworks, meeting analysis.
   Внутри: `building-an-exo`, `ceo-council`, `check-skill-solo`, `developer-growth`, `domain-brainstormer`, `internal-comms` и ещё 5
 
-**`social-intel`** — Social Intelligence. 10 навыков. 12.0 МБ.
+**`social-intel`** — Social Intelligence. 11 навыков. 12.2 МБ.
   Trends, ad spy, TikTok intel, SimilarWeb, Reddit/HN, scraping, GitHub gem hunting.
-  Внутри: `ad-spy`, `apify-scraping`, `github-gem-seeker`, `last30days`, `meta-ads-analyzer`, `reddit-hn` и ещё 4
+  Внутри: `ad-spy`, `apify-scraping`, `github-gem-seeker`, `last30days`, `meta-ads-analyzer`, `ozon-shopping` и ещё 5
 
 
 ### Инфраструктура
 
-**`integrations`** — Integrations & DevOps. 11 навыков, 6 команд, 2 агента. 42.8 МБ.
+**`integrations`** — Integrations & DevOps. 11 навыков, 6 команд, 2 агента. 43.7 МБ.
   n8n, AWS, Telegram bots, Zoom, Pinecone, DeepL, Home Assistant, webhooks.
   Внутри: `agent-api-server`, `aws-skills`, `claude-server-auth`, `deepl-pro`, `home-assistant`, `maps-places` и ещё 5
 
@@ -170,9 +170,9 @@
   Route to GPT, Gemini, Kimi, DeepSeek, Perplexity for cross-model work; Jev decision model for yes/no, choice and scoring.
   Внутри: `deepseek`, `gemini-3-pro`, `jev`, `kimi`, `multi-model-gateway`, `perplexity`
 
-**`google-workspace`** — Google Workspace. 1 навык, 14 команд.
+**`google-workspace`** — Google Workspace. 2 навыка, 14 команд.
   Gmail, Docs, Sheets, Drive, Calendar, Contacts, Tasks, Meet, Chat, Ads, Analytics.
-  Внутри: `google-workspace`
+  Внутри: `google-workspace`, `outlook-desktop`
 
 
 ---

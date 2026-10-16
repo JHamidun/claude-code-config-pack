@@ -64,7 +64,7 @@ deepgram-sdk                  # skills/deepgram, /transcribe (DEEPGRAM_API_KEY)
 
 # Доукомплектовано 2026-08-17: импорты были в коде, а в списке зависимостей нет —
 # на чистой машине это трейсбек при первом запуске, а не понятная просьба доставить.
-pywin32 ; sys_platform == "win32"   # outlook_local.py: import win32com.client
+pywin32 ; sys_platform == "win32"   # outlook_local.py, outlook_desktop.py: import win32com.client
 scikit-learn   # isolate_speaker.py: кластеризация дикторов
 soundfile      # isolate_speaker.py: чтение и запись wav
 
