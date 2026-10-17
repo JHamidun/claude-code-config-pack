@@ -77,7 +77,7 @@ def transcribe_media(
             health.MISSING,
         )
 
-    workdir = tempfile.mkdtemp(prefix="d-transcribe-")
+    workdir = tempfile.mkdtemp(prefix="l30d-transcribe-")
     try:
         audio_path = _acquire_audio(source, workdir, timeout=timeout)
         if not audio_path:
@@ -193,7 +193,7 @@ def _post_audio(provider: str, path: str, api_key: str, timeout: float) -> Optio
 
     endpoint = _PROVIDER_ENDPOINTS[provider]
     model = _PROVIDER_MODELS[provider]
-    boundary = "----dTranscribeBoundary"
+    boundary = "----l30dTranscribeBoundary"
     with open(path, "rb") as fh:
         audio = fh.read()
 

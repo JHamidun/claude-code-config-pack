@@ -44,7 +44,7 @@ class TextTraces(unittest.TestCase):
                 "Цифра [cite: 8] из отчёта.",
                 "[cite_start]Начало цитаты.",
                 "Конец фразы [span_2].",
-                "https://your-serveraisearch.cloud.google.com/grounding-api-redirect/AbC",
+                "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AbC",
             ],
             "internal-footnote": [
                 "Как сказано 【4†source】 выше.",

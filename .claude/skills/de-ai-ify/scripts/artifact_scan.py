@@ -31,7 +31,7 @@ TEXT_KINDS = [
     ("grok-card", "разметка карточки Grok",
      re.compile(r"grok_card://|grok_render_citation_card_json|<grok-card\b")),
     ("gemini-cite", "разметка цитаты Gemini",
-     re.compile(r"your-serveraisearch\S*grounding-api-redirect|\[cite_start\]|\[cite:\s*\d+|\[span_\d+\]")),
+     re.compile(r"vertexaisearch\S*grounding-api-redirect|\[cite_start\]|\[cite:\s*\d+|\[span_\d+\]")),
     ("internal-footnote", "внутренняя сноска чат-бота",
      re.compile(r"【\d+†[^】\n]*】|\]\(sandbox:/mnt/data/")),
     ("think-tag", "остаток рассуждений модели",

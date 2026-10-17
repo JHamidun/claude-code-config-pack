@@ -428,7 +428,7 @@ class DxfCanvas:
         body = (f"0\nPOLYLINE\n8\n{layer}\n{self._col(color)}6\n{'DASHED' if dash else 'CONTINUOUS'}\n66\n1\n"
                 f"70\n{1 if closed else 0}\n10\n0.000\n20\n0.000\n30\n0.000\n40\n{width:.3f}\n41\n{width:.3f}\n")
         for x, y in pts:
-            body += f"0\nYOUR_SERVER\n8\n{layer}\n10\n{x:.3f}\n20\n{self._y(y):.3f}\n30\n0.000\n"
+            body += f"0\nVERTEX\n8\n{layer}\n10\n{x:.3f}\n20\n{self._y(y):.3f}\n30\n0.000\n"
         body += f"0\nSEQEND\n8\n{layer}\n"
         self.ents.append(body)
 
