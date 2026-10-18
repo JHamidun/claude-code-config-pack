@@ -98,6 +98,11 @@ ENV_DEFAULTS = {
     "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
 }
 
+# --- B09: top-level student defaults -----------------------------------------
+TOP_DEFAULTS = {
+    "disableAutoMode": "disable",
+}
+
 # --- B17: status line --------------------------------------------------------
 # Exact-string surgery, same shape as the installer fixes in guard_free_by_default.py.
 # The colour logic stays as it was (red, blinking at >= 80% of usable context);
@@ -202,6 +207,9 @@ def settings_problems(data):
     for key, want in ENV_DEFAULTS.items():
         if env.get(key) != want:
             problems.append('env: %s must be "%s" (B08), found %r' % (key, want, env.get(key)))
+    for key, want in TOP_DEFAULTS.items():
+        if data.get(key) != want:
+            problems.append('top-level: %s must be "%s" (B09), found %r' % (key, want, data.get(key)))
     return problems
 
 
@@ -268,6 +276,11 @@ def apply(dry=False):
             if env.get(key) != want:
                 env[key] = want
                 changes.append(("env", SETTINGS, "%s=%s" % (key, want)))
+
+        for key, want in TOP_DEFAULTS.items():
+            if data.get(key) != want:
+                data[key] = want
+                changes.append(("top-level", SETTINGS, "%s=%s" % (key, want)))
 
         new_raw = dump_settings(data, raw)
         if new_raw != raw and not dry:

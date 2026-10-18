@@ -305,5 +305,6 @@
   "inputNeededNotifEnabled": true,
   "skipWorkflowUsageWarning": true,
   "dialogExpiry": "10m",
-  "crossSessionInbound": "accept"
+  "crossSessionInbound": "accept",
+  "disableAutoMode": "disable"
 }
